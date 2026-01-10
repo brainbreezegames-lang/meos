@@ -28,6 +28,8 @@ export function EditableDesktopItem({
 
   const [isDragging, setIsDragging] = useState(false);
   const [visualPos, setVisualPos] = useState({ x: item.positionX, y: item.positionY });
+  // Track if we're currently in a drag interaction (set true on mousedown in edit mode, cleared on mouseup)
+  const isInDragInteraction = useRef(false);
   const dragDataRef = useRef({
     startMouseX: 0,
     startMouseY: 0,
@@ -59,10 +61,11 @@ export function EditableDesktopItem({
     }
   }, [item.positionX, item.positionY, isDragging]);
 
-  // Reset hasDragged when edit mode changes (so clicks work after exiting edit mode)
+  // Reset drag state when edit mode changes (so clicks work after exiting edit mode)
   useEffect(() => {
     if (!isOwner) {
       dragDataRef.current.hasDragged = false;
+      isInDragInteraction.current = false;
     }
   }, [isOwner]);
 
@@ -76,6 +79,9 @@ export function EditableDesktopItem({
 
     const parent = containerRef.current?.parentElement;
     if (!parent) return;
+
+    // Mark that we started a drag interaction in edit mode
+    isInDragInteraction.current = true;
 
     dragDataRef.current = {
       startMouseX: e.clientX,
@@ -128,6 +134,13 @@ export function EditableDesktopItem({
         context.updateItemPosition(item.id, data.currentX, data.currentY);
       }
 
+      // Clear the drag interaction flag AFTER the click event would fire
+      // The click event fires after mouseup, so we use setTimeout to ensure
+      // the click handler can check this flag before we clear it
+      setTimeout(() => {
+        isInDragInteraction.current = false;
+      }, 0);
+
       // Small delay to let the context update propagate before we stop dragging
       // This prevents the useEffect from resetting to old values
       requestAnimationFrame(() => {
@@ -147,19 +160,30 @@ export function EditableDesktopItem({
   const handleClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
 
+    // If we're not in edit mode, always allow clicks
+    if (!isOwner) {
+      onClick(e);
+      return;
+    }
+
+    // In edit mode: only block if we actually dragged during THIS interaction
+    // isInDragInteraction tells us if this click came from a mousedown in edit mode
+    // hasDragged tells us if significant movement happened
+    const shouldBlock = isInDragInteraction.current && dragDataRef.current.hasDragged;
+
     console.log('EditableDesktopItem click:', {
       itemId: item.id,
       isOwner,
+      isInDragInteraction: isInDragInteraction.current,
       hasDragged: dragDataRef.current.hasDragged,
-      willTriggerOnClick: !isOwner || !dragDataRef.current.hasDragged
+      shouldBlock,
     });
 
-    // Only block the click if we JUST dragged (during this mouse interaction)
-    // If not in edit mode, always allow clicks
-    if (!isOwner || !dragDataRef.current.hasDragged) {
+    if (!shouldBlock) {
       onClick(e);
     }
-    // Reset hasDragged after click so future clicks work
+
+    // Reset for next interaction
     dragDataRef.current.hasDragged = false;
   }, [onClick, isOwner, item.id]);
 
