@@ -35,8 +35,8 @@ export default function SocialBlockRenderer({ data }: SocialBlockRendererProps) 
   if (!profiles.length) return null;
 
   return (
-    <div className="px-5 py-3">
-      <div className="flex flex-wrap gap-2">
+    <div style={{ padding: 'var(--spacing-window-padding)' }}>
+      <div className="flex flex-wrap" style={{ gap: 'var(--spacing-social-gap)' }}>
         {profiles.map((profile, index) => {
           const social = socialIcons[profile.platform] || socialIcons.website;
           const href = profile.platform === 'email'
@@ -49,10 +49,16 @@ export default function SocialBlockRenderer({ data }: SocialBlockRendererProps) 
               href={href}
               target={profile.platform !== 'email' ? '_blank' : undefined}
               rel={profile.platform !== 'email' ? 'noopener noreferrer' : undefined}
-              className="w-10 h-10 flex items-center justify-center rounded-full text-[14px] font-bold transition-all hover:scale-110"
+              className="flex items-center justify-center font-bold transition-all hover:scale-110"
               style={{
+                width: 'var(--social-button-size)',
+                height: 'var(--social-button-size)',
+                borderRadius: 'var(--radius-social)',
+                fontSize: 'var(--font-size-social-icon)',
+                fontFamily: 'var(--font-body)',
                 background: `${social.color}15`,
                 color: social.color,
+                border: 'var(--border-social)',
               }}
               title={social.label}
             >

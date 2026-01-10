@@ -18,23 +18,40 @@ export default function QuoteBlockRenderer({ data }: QuoteBlockRendererProps) {
 
   if (style === 'large') {
     return (
-      <div className="px-5 py-4">
+      <div style={{ padding: 'var(--spacing-window-padding)' }}>
         <blockquote className="relative">
           <span
-            className="absolute -left-1 -top-2 text-[48px] leading-none opacity-20"
-            style={{ color: 'var(--accent-primary)' }}
+            className="absolute -left-1 -top-2 leading-none opacity-20"
+            style={{
+              color: 'var(--accent-primary)',
+              fontFamily: 'var(--font-display)',
+              fontSize: '48px',
+            }}
           >
             &ldquo;
           </span>
           <p
-            className="text-[17px] font-medium leading-relaxed pl-4"
-            style={{ color: 'var(--text-primary)' }}
+            className="pl-4 leading-relaxed"
+            style={{
+              color: 'var(--text-primary)',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--font-size-quote-large)',
+              fontWeight: 'var(--font-weight-medium)',
+              lineHeight: 'var(--line-height-body)',
+            }}
           >
             {text}
           </p>
           {(attribution || source) && (
-            <footer className="mt-3 pl-4 text-[12px]" style={{ color: 'var(--text-secondary)' }}>
-              {attribution && <span className="font-medium">{attribution}</span>}
+            <footer
+              className="mt-3 pl-4"
+              style={{
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-label)',
+              }}
+            >
+              {attribution && <span style={{ fontWeight: 'var(--font-weight-medium)' }}>{attribution}</span>}
               {source && <span className="opacity-70"> — {source}</span>}
             </footer>
           )}
@@ -44,19 +61,33 @@ export default function QuoteBlockRenderer({ data }: QuoteBlockRendererProps) {
   }
 
   return (
-    <div className="px-5 py-3">
+    <div style={{ padding: 'var(--spacing-window-padding)' }}>
       <blockquote
-        className="border-l-2 pl-4"
-        style={{ borderColor: 'var(--accent-primary)' }}
+        className="pl-4"
+        style={{
+          borderLeft: `var(--quote-border-width) solid var(--accent-primary)`,
+        }}
       >
         <p
-          className="text-[13px] leading-relaxed italic"
-          style={{ color: 'var(--text-primary)' }}
+          className="leading-relaxed italic"
+          style={{
+            color: 'var(--text-primary)',
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--font-size-quote)',
+            lineHeight: 'var(--line-height-body)',
+          }}
         >
           &ldquo;{text}&rdquo;
         </p>
         {(attribution || source) && (
-          <footer className="mt-2 text-[12px]" style={{ color: 'var(--text-secondary)' }}>
+          <footer
+            className="mt-2"
+            style={{
+              color: 'var(--text-secondary)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--font-size-label)',
+            }}
+          >
             {attribution && <span>{attribution}</span>}
             {source && <span className="opacity-70">, {source}</span>}
           </footer>

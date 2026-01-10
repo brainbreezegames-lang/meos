@@ -14,12 +14,15 @@ export default function TextBlockRenderer({ data }: TextBlockRendererProps) {
   if (!content) return null;
 
   return (
-    <div className="px-5 py-3">
+    <div style={{ padding: 'var(--spacing-window-padding)' }}>
       <p
-        className="text-[13px] leading-relaxed"
         style={{
           color: 'var(--text-primary)',
-          whiteSpace: 'pre-wrap'
+          whiteSpace: 'pre-wrap',
+          fontFamily: 'var(--font-body)',
+          fontSize: 'var(--font-size-body)',
+          lineHeight: 'var(--line-height-body)',
+          letterSpacing: 'var(--letter-spacing-normal)',
         }}
       >
         {content}

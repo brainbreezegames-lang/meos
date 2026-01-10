@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem as DesktopItemType } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
+import { useWindowContextSafe } from '@/contexts/WindowContext';
 import { ContextMenu, useContextMenu } from '@/components/editing/ContextMenu';
 
 interface EditableDesktopItemProps {
@@ -21,7 +22,9 @@ export function EditableDesktopItem({
   onBringToFront,
 }: EditableDesktopItemProps) {
   const context = useEditContextSafe();
+  const windowContext = useWindowContextSafe();
   const isOwner = context?.isOwner ?? false;
+  const isWindowOpen = windowContext?.isItemOpen(item.id) ?? false;
 
   const [isDragging, setIsDragging] = useState(false);
   const [visualPos, setVisualPos] = useState({ x: item.positionX, y: item.positionY });
@@ -249,6 +252,27 @@ export function EditableDesktopItem({
         >
           {item.label}
         </span>
+
+        {/* Open window indicator */}
+        <AnimatePresence>
+          {isWindowOpen && (
+            <motion.div
+              className="absolute -bottom-3 left-1/2 -translate-x-1/2"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            >
+              <div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{
+                  background: 'var(--accent-primary)',
+                  boxShadow: '0 0 6px var(--accent-primary), 0 0 12px var(--accent-primary)',
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Owner indicator */}
         {isOwner && !isDragging && (

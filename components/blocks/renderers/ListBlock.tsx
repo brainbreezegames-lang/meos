@@ -29,10 +29,15 @@ export default function ListBlockRenderer({ data }: ListBlockRendererProps) {
       case 'numbered':
         return (
           <span
-            className="text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+            className="font-bold flex items-center justify-center flex-shrink-0"
             style={{
+              width: '20px',
+              height: '20px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: 'var(--font-size-stat-label)',
+              fontFamily: 'var(--font-body)',
               background: 'linear-gradient(135deg, rgba(0, 122, 255, 0.15) 0%, rgba(0, 122, 255, 0.08) 100%)',
-              color: 'var(--accent-primary)'
+              color: 'var(--accent-primary)',
             }}
           >
             {index + 1}
@@ -41,13 +46,16 @@ export default function ListBlockRenderer({ data }: ListBlockRendererProps) {
       case 'check':
         return (
           <span
-            className="w-[18px] h-[18px] rounded-md flex items-center justify-center flex-shrink-0 transition-all"
+            className="flex items-center justify-center flex-shrink-0 transition-all"
             style={{
+              width: '18px',
+              height: '18px',
+              borderRadius: 'var(--radius-sm)',
               background: item.checked !== false
-                ? 'linear-gradient(135deg, #34C759 0%, #30B350 100%)'
+                ? 'linear-gradient(135deg, var(--accent-success) 0%, var(--accent-success) 100%)'
                 : 'var(--bg-glass)',
               border: item.checked !== false ? 'none' : '1.5px solid var(--border-light)',
-              boxShadow: item.checked !== false ? '0 1px 2px rgba(52, 199, 89, 0.25)' : 'none'
+              boxShadow: item.checked !== false ? 'var(--shadow-sm)' : 'none',
             }}
           >
             {item.checked !== false && (
@@ -66,10 +74,13 @@ export default function ListBlockRenderer({ data }: ListBlockRendererProps) {
       default:
         return (
           <span
-            className="w-[6px] h-[6px] rounded-full flex-shrink-0 mt-[6px]"
+            className="flex-shrink-0 mt-[6px]"
             style={{
+              width: 'var(--detail-dot-size)',
+              height: 'var(--detail-dot-size)',
+              borderRadius: 'var(--radius-detail-dot)',
               background: 'var(--accent-primary)',
-              opacity: 0.7
+              opacity: 0.7,
             }}
           />
         );
@@ -77,17 +88,20 @@ export default function ListBlockRenderer({ data }: ListBlockRendererProps) {
   };
 
   return (
-    <div className="px-5 py-3">
-      <ul className="flex flex-col gap-2">
+    <div style={{ padding: 'var(--spacing-window-padding)' }}>
+      <ul className="flex flex-col" style={{ gap: 'var(--spacing-block-gap)' }}>
         {normalizedItems.map((item, index) => (
-          <li key={index} className="flex items-start gap-2.5">
+          <li key={index} className="flex items-start" style={{ gap: 'var(--spacing-inline-gap)' }}>
             {getBullet(index, item)}
             <span
-              className="text-[13px] leading-relaxed"
+              className="leading-relaxed"
               style={{
                 color: 'var(--text-primary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-body)',
+                lineHeight: 'var(--line-height-body)',
                 textDecoration: style === 'check' && item.checked === false ? 'line-through' : 'none',
-                opacity: style === 'check' && item.checked === false ? 0.5 : 1
+                opacity: style === 'check' && item.checked === false ? 0.5 : 1,
               }}
             >
               {item.text}

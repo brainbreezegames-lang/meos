@@ -41,8 +41,53 @@
   --font-weight-bold: 700;
   --letter-spacing-tight: -0.01em;
   --letter-spacing-normal: 0;
+  --letter-spacing-label: 0;
+  --letter-spacing-button: 0;
   --line-height-tight: 1.2;
   --line-height-normal: 1.5;
+  --line-height-body: 1.6;
+  --text-transform-label: none;
+  --text-transform-button: none;
+
+  /* Block Typography */
+  --font-size-body: 13px;
+  --font-size-label: 12px;
+  --font-size-heading-1: 18px;
+  --font-size-heading-2: 15px;
+  --font-size-heading-3: 13px;
+  --font-size-stat-value: 24px;
+  --font-size-stat-label: 11px;
+  --font-size-quote: 13px;
+  --font-size-quote-large: 17px;
+  --font-size-button: 13px;
+  --font-size-button-icon: 16px;
+  --font-size-social-icon: 14px;
+  --font-size-timeline-date: 11px;
+  --font-size-timeline-title: 14px;
+  --font-size-timeline-subtitle: 12px;
+
+  /* Block Spacing */
+  --spacing-block-gap: 8px;
+  --spacing-inline-gap: 10px;
+  --spacing-button-gap: 10px;
+  --spacing-social-gap: 8px;
+  --spacing-button-padding: 8px 16px;
+
+  /* Block Element Sizes */
+  --detail-dot-size: 6px;
+  --social-button-size: 40px;
+  --timeline-dot-size: 11px;
+  --quote-border-width: 2px;
+
+  /* Block Radii */
+  --radius-detail-dot: 9999px;
+  --radius-social: 9999px;
+  --radius-stat: 8px;
+  --radius-quote: 0;
+
+  /* Block Borders */
+  --border-social: none;
+  --border-button-secondary: 1px solid rgba(0, 122, 255, 0.2);
 
   /* === COLORS === */
   --bg-solid: #F5F5F7;
@@ -159,6 +204,51 @@
   --font-weight-bold: 700;
   --letter-spacing-tight: -0.02em;
   --letter-spacing-normal: -0.01em;
+  --letter-spacing-label: 0.03em;
+  --letter-spacing-button: 0.02em;
+  --line-height-body: 1.55;
+  --text-transform-label: uppercase;
+  --text-transform-button: none;
+
+  /* Block Typography - tech/sharp */
+  --font-size-body: 13px;
+  --font-size-label: 11px;
+  --font-size-heading-1: 20px;
+  --font-size-heading-2: 16px;
+  --font-size-heading-3: 12px;
+  --font-size-stat-value: 28px;
+  --font-size-stat-label: 10px;
+  --font-size-quote: 13px;
+  --font-size-quote-large: 18px;
+  --font-size-button: 12px;
+  --font-size-button-icon: 14px;
+  --font-size-social-icon: 13px;
+  --font-size-timeline-date: 10px;
+  --font-size-timeline-title: 13px;
+  --font-size-timeline-subtitle: 11px;
+
+  /* Block Spacing - tighter */
+  --spacing-block-gap: 6px;
+  --spacing-inline-gap: 8px;
+  --spacing-button-gap: 8px;
+  --spacing-social-gap: 6px;
+  --spacing-button-padding: 6px 14px;
+
+  /* Block Element Sizes - compact */
+  --detail-dot-size: 5px;
+  --social-button-size: 36px;
+  --timeline-dot-size: 9px;
+  --quote-border-width: 3px;
+
+  /* Block Radii - sharper */
+  --radius-detail-dot: 2px;
+  --radius-social: 8px;
+  --radius-stat: 6px;
+  --radius-quote: 0;
+
+  /* Block Borders */
+  --border-social: 1px solid rgba(91, 160, 255, 0.2);
+  --border-button-secondary: 1px solid rgba(91, 160, 255, 0.25);
 
   /* === COLORS === */
   --bg-solid: #0A0A0C;
@@ -262,8 +352,53 @@
   --font-weight-bold: 600;
   --letter-spacing-tight: 0;
   --letter-spacing-normal: 0.01em;
+  --letter-spacing-label: 0.02em;
+  --letter-spacing-button: 0;
   --line-height-tight: 1.25;
   --line-height-normal: 1.6;
+  --line-height-body: 1.7;
+  --text-transform-label: none;
+  --text-transform-button: none;
+
+  /* Block Typography - clean, minimal */
+  --font-size-body: 14px;
+  --font-size-label: 12px;
+  --font-size-heading-1: 17px;
+  --font-size-heading-2: 14px;
+  --font-size-heading-3: 12px;
+  --font-size-stat-value: 22px;
+  --font-size-stat-label: 10px;
+  --font-size-quote: 14px;
+  --font-size-quote-large: 16px;
+  --font-size-button: 13px;
+  --font-size-button-icon: 15px;
+  --font-size-social-icon: 13px;
+  --font-size-timeline-date: 10px;
+  --font-size-timeline-title: 14px;
+  --font-size-timeline-subtitle: 12px;
+
+  /* Block Spacing - very airy */
+  --spacing-block-gap: 10px;
+  --spacing-inline-gap: 12px;
+  --spacing-button-gap: 12px;
+  --spacing-social-gap: 10px;
+  --spacing-button-padding: 10px 20px;
+
+  /* Block Element Sizes - refined */
+  --detail-dot-size: 4px;
+  --social-button-size: 38px;
+  --timeline-dot-size: 8px;
+  --quote-border-width: 1px;
+
+  /* Block Radii - geometric, small */
+  --radius-detail-dot: 9999px;
+  --radius-social: 6px;
+  --radius-stat: 4px;
+  --radius-quote: 0;
+
+  /* Block Borders */
+  --border-social: 0.5px solid rgba(0, 0, 0, 0.06);
+  --border-button-secondary: 0.5px solid rgba(0, 113, 227, 0.15);
 
   /* === COLORS - Pure, minimal === */
   --bg-solid: #ffffff;
@@ -369,8 +504,53 @@
   --font-weight-bold: 600;
   --letter-spacing-tight: -0.03em;
   --letter-spacing-normal: 0;
+  --letter-spacing-label: 0.12em;
+  --letter-spacing-button: 0.1em;
   --line-height-tight: 1.1;
   --line-height-normal: 1.65;
+  --line-height-body: 1.75;
+  --text-transform-label: uppercase;
+  --text-transform-button: uppercase;
+
+  /* Block Typography - editorial, serif-influenced */
+  --font-size-body: 14px;
+  --font-size-label: 10px;
+  --font-size-heading-1: 22px;
+  --font-size-heading-2: 17px;
+  --font-size-heading-3: 11px;
+  --font-size-stat-value: 32px;
+  --font-size-stat-label: 9px;
+  --font-size-quote: 15px;
+  --font-size-quote-large: 20px;
+  --font-size-button: 11px;
+  --font-size-button-icon: 13px;
+  --font-size-social-icon: 12px;
+  --font-size-timeline-date: 9px;
+  --font-size-timeline-title: 15px;
+  --font-size-timeline-subtitle: 12px;
+
+  /* Block Spacing - generous, editorial */
+  --spacing-block-gap: 12px;
+  --spacing-inline-gap: 16px;
+  --spacing-button-gap: 14px;
+  --spacing-social-gap: 12px;
+  --spacing-button-padding: 12px 24px;
+
+  /* Block Element Sizes - elegant proportions */
+  --detail-dot-size: 3px;
+  --social-button-size: 42px;
+  --timeline-dot-size: 7px;
+  --quote-border-width: 1px;
+
+  /* Block Radii - nearly square, refined */
+  --radius-detail-dot: 1px;
+  --radius-social: 2px;
+  --radius-stat: 2px;
+  --radius-quote: 0;
+
+  /* Block Borders */
+  --border-social: 1px solid rgba(202, 232, 189, 0.2);
+  --border-button-secondary: 1px solid rgba(202, 232, 189, 0.25);
 
   /* === COLORS - Warm dark, sage accents === */
   --bg-solid: #0d0d0d;

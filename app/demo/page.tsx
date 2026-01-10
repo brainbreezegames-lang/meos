@@ -4,9 +4,11 @@ import { useState, useRef, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
-import { EditableInfoWindow } from '@/components/desktop/EditableInfoWindow';
+import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
+import { WindowManager } from '@/components/desktop/MultiWindow';
 import { EditableDesktopItem } from '@/components/desktop/EditableDesktopItem';
 import { BackgroundPanel } from '@/components/desktop/BackgroundPanel';
+import { WelcomeNotification } from '@/components/desktop/WelcomeNotification';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import type { DesktopItem, Desktop } from '@/types';
@@ -98,6 +100,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     windowSubtitle: 'Selected Work',
     windowHeaderImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=400&fit=crop',
     windowDescription: '',
+    windowType: 'browser',
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
@@ -164,6 +167,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     windowSubtitle: "Let's Connect",
     windowHeaderImage: 'https://images.unsplash.com/photo-1596524430615-b46475ddff6e?w=400&h=400&fit=crop',
     windowDescription: '',
+    windowType: 'mail',
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
@@ -738,16 +742,12 @@ function RotatingBackground() {
 // Theme-aware Desktop Content
 function DesktopContent() {
   const context = useEditContextSafe();
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const windowContext = useWindowContext();
   const [itemOrder, setItemOrder] = useState<string[]>(() =>
     context?.desktop?.items.map(i => i.id) || []
   );
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [newItemPosition, setNewItemPosition] = useState({ x: 50, y: 50 });
-
-  const selectedItem = selectedItemId
-    ? context?.desktop?.items.find(i => i.id === selectedItemId) || null
-    : null;
 
   useEffect(() => {
     if (context?.desktop?.items) {
@@ -805,7 +805,7 @@ function DesktopContent() {
     });
 
     setShowNewItemModal(false);
-    setSelectedItemId(newItem.id);
+    windowContext.openWindow(newItem.id);
     context.showToast('Item created', 'success');
   };
 
@@ -822,7 +822,7 @@ function DesktopContent() {
           <EditableDesktopItem
             key={item.id}
             item={item}
-            onClick={() => setSelectedItemId(item.id)}
+            onClick={() => windowContext.openWindow(item.id)}
             zIndex={itemOrder.indexOf(item.id) + 1}
             onBringToFront={() => bringToFront(item.id)}
           />
@@ -844,11 +844,8 @@ function DesktopContent() {
         )}
       </div>
 
-      {/* Info Window */}
-      <EditableInfoWindow
-        item={selectedItem}
-        onClose={() => setSelectedItemId(null)}
-      />
+      {/* Multi-Window Manager */}
+      <WindowManager items={items} />
 
       {/* New Item Modal - Uses CSS variables for all styling */}
       <AnimatePresence>
@@ -984,6 +981,16 @@ function DemoPageInner() {
         currentBackground={bgContext.customBackground}
         onBackgroundChange={bgContext.setCustomBackground}
       />
+
+      {/* Welcome Notification */}
+      <WelcomeNotification
+        title="Welcome to MeOS"
+        subtitle="Your personal web desktop"
+        body="Click any item to open its window. Use the traffic lights to minimize/maximize. Try the theme switcher!"
+        icon="🖥️"
+        delay={1500}
+        duration={10000}
+      />
     </main>
   );
 }
@@ -1002,7 +1009,9 @@ export default function DemoPage() {
         setShowBackgroundPanel,
       }}>
         <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
-          <DemoPageInner />
+          <WindowProvider>
+            <DemoPageInner />
+          </WindowProvider>
         </EditProvider>
       </BackgroundContext.Provider>
     </ThemeProvider>

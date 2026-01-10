@@ -20,23 +20,38 @@ export default function DetailsBlockRenderer({ data }: DetailsBlockRendererProps
   if (!items.length) return null;
 
   return (
-    <div className="px-5 py-3">
-      <div className="flex flex-col gap-2">
+    <div style={{ padding: 'var(--spacing-window-padding)' }}>
+      <div className="flex flex-col" style={{ gap: 'var(--spacing-block-gap)' }}>
         {items.map((item, index) => (
-          <div key={index} className="flex items-center gap-2.5">
+          <div key={index} className="flex items-center" style={{ gap: 'var(--spacing-inline-gap)' }}>
             <span
-              className="w-[6px] h-[6px] rounded-full flex-shrink-0"
-              style={{ backgroundColor: item.color || 'var(--accent-success)' }}
+              className="flex-shrink-0"
+              style={{
+                width: 'var(--detail-dot-size)',
+                height: 'var(--detail-dot-size)',
+                borderRadius: 'var(--radius-detail-dot)',
+                backgroundColor: item.color || 'var(--accent-success)',
+              }}
             />
             <span
-              className="text-[12px] font-medium flex-shrink-0"
-              style={{ color: 'var(--text-secondary)' }}
+              className="flex-shrink-0"
+              style={{
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-label)',
+                fontWeight: 'var(--font-weight-medium)',
+                letterSpacing: 'var(--letter-spacing-label)',
+                textTransform: 'var(--text-transform-label)' as React.CSSProperties['textTransform'],
+              }}
             >
               {item.label}
             </span>
             <span
-              className="text-[12px]"
-              style={{ color: 'var(--text-primary)' }}
+              style={{
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-label)',
+              }}
             >
               {item.value}
             </span>

@@ -17,19 +17,46 @@ export default function DividerBlockRenderer({ data }: DividerBlockRendererProps
 
   if (style === 'dots') {
     return (
-      <div className="px-5 py-3 flex justify-center gap-1.5">
-        <span className="w-1 h-1 rounded-full bg-[var(--text-tertiary)]" />
-        <span className="w-1 h-1 rounded-full bg-[var(--text-tertiary)]" />
-        <span className="w-1 h-1 rounded-full bg-[var(--text-tertiary)]" />
+      <div
+        className="flex justify-center"
+        style={{ padding: 'var(--spacing-window-padding)', gap: 'var(--spacing-block-gap)' }}
+      >
+        <span
+          style={{
+            width: 'var(--detail-dot-size)',
+            height: 'var(--detail-dot-size)',
+            borderRadius: 'var(--radius-detail-dot)',
+            backgroundColor: 'var(--text-tertiary)',
+          }}
+        />
+        <span
+          style={{
+            width: 'var(--detail-dot-size)',
+            height: 'var(--detail-dot-size)',
+            borderRadius: 'var(--radius-detail-dot)',
+            backgroundColor: 'var(--text-tertiary)',
+          }}
+        />
+        <span
+          style={{
+            width: 'var(--detail-dot-size)',
+            height: 'var(--detail-dot-size)',
+            borderRadius: 'var(--radius-detail-dot)',
+            backgroundColor: 'var(--text-tertiary)',
+          }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="px-5 py-2">
+    <div style={{ padding: 'var(--spacing-window-padding)', paddingTop: '8px', paddingBottom: '8px' }}>
       <div
-        className="h-px w-full"
-        style={{ background: 'var(--border-light)' }}
+        className="w-full"
+        style={{
+          height: 'var(--border-width)',
+          background: 'var(--border-light)',
+        }}
       />
     </div>
   );

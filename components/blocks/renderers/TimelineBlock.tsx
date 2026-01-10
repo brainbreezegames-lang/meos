@@ -21,53 +21,88 @@ export default function TimelineBlockRenderer({ data }: TimelineBlockRendererPro
   if (!items.length) return null;
 
   return (
-    <div className="px-5 py-3">
+    <div style={{ padding: 'var(--spacing-window-padding)' }}>
       <div className="relative">
         {items.map((item, index) => (
-          <div key={index} className="relative flex gap-4 pb-4 last:pb-0">
+          <div
+            key={index}
+            className="relative flex last:pb-0"
+            style={{ gap: 'var(--spacing-inline-gap)', paddingBottom: 'var(--spacing-block-gap)' }}
+          >
             {/* Timeline line */}
             {index < items.length - 1 && (
               <div
-                className="absolute left-[5px] top-[12px] w-px h-[calc(100%-4px)]"
-                style={{ background: 'var(--border-light)' }}
+                className="absolute w-px"
+                style={{
+                  left: `calc(var(--timeline-dot-size) / 2)`,
+                  top: 'calc(var(--timeline-dot-size) + 4px)',
+                  height: 'calc(100% - var(--timeline-dot-size))',
+                  background: 'var(--border-light)',
+                }}
               />
             )}
 
             {/* Timeline dot */}
             <div
-              className="w-[11px] h-[11px] rounded-full flex-shrink-0 mt-[2px] border-2"
+              className="flex-shrink-0 mt-[2px]"
               style={{
+                width: 'var(--timeline-dot-size)',
+                height: 'var(--timeline-dot-size)',
+                borderRadius: 'var(--radius-detail-dot)',
+                borderWidth: '2px',
+                borderStyle: 'solid',
                 borderColor: 'var(--accent-primary)',
-                background: index === 0 ? 'var(--accent-primary)' : 'var(--bg-elevated)'
+                background: index === 0 ? 'var(--accent-primary)' : 'var(--bg-elevated)',
               }}
             />
 
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div
-                className="text-[11px] font-medium uppercase tracking-wide mb-0.5"
-                style={{ color: 'var(--text-tertiary)' }}
+                className="mb-0.5"
+                style={{
+                  color: 'var(--text-tertiary)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--font-size-timeline-date)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  textTransform: 'var(--text-transform-label)' as React.CSSProperties['textTransform'],
+                  letterSpacing: 'var(--letter-spacing-label)',
+                }}
               >
                 {item.date}
               </div>
               <div
-                className="text-[14px] font-medium leading-tight"
-                style={{ color: 'var(--text-primary)' }}
+                className="leading-tight"
+                style={{
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'var(--font-size-timeline-title)',
+                  fontWeight: 'var(--font-weight-medium)',
+                }}
               >
                 {item.title}
               </div>
               {item.subtitle && (
                 <div
-                  className="text-[12px] mt-0.5"
-                  style={{ color: 'var(--text-secondary)' }}
+                  className="mt-0.5"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-timeline-subtitle)',
+                  }}
                 >
                   {item.subtitle}
                 </div>
               )}
               {item.description && (
                 <p
-                  className="text-[12px] mt-1.5 leading-relaxed"
-                  style={{ color: 'var(--text-secondary)' }}
+                  className="mt-1.5 leading-relaxed"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--font-size-timeline-subtitle)',
+                    lineHeight: 'var(--line-height-body)',
+                  }}
                 >
                   {item.description}
                 </p>

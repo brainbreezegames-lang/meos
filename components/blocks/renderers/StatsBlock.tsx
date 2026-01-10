@@ -21,26 +21,39 @@ export default function StatsBlockRenderer({ data }: StatsBlockRendererProps) {
   if (!items.length) return null;
 
   return (
-    <div className="px-5 py-4">
+    <div style={{ padding: 'var(--spacing-window-padding)' }}>
       <div
-        className="grid gap-4"
+        className="grid"
         style={{
-          gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)`
+          gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)`,
+          gap: 'var(--spacing-block-gap)',
         }}
       >
         {items.map((item, index) => (
           <div key={index} className="text-center">
             <div
-              className="text-[24px] font-bold leading-none"
-              style={{ color: 'var(--text-primary)' }}
+              className="font-bold leading-none"
+              style={{
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--font-size-stat-value)',
+                letterSpacing: 'var(--letter-spacing-tight)',
+              }}
             >
               {item.prefix}
               {item.value}
               {item.suffix}
             </div>
             <div
-              className="text-[11px] mt-1 uppercase tracking-wide font-medium"
-              style={{ color: 'var(--text-tertiary)' }}
+              className="mt-1"
+              style={{
+                color: 'var(--text-tertiary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--font-size-stat-label)',
+                fontWeight: 'var(--font-weight-medium)',
+                textTransform: 'var(--text-transform-label)' as React.CSSProperties['textTransform'],
+                letterSpacing: 'var(--letter-spacing-label)',
+              }}
             >
               {item.label}
             </div>

@@ -29,18 +29,20 @@ export default function ImageBlockRenderer({ data }: ImageBlockRendererProps) {
 
   return (
     <>
-      <div className="px-5 py-3">
+      <div style={{ padding: 'var(--spacing-window-padding)' }}>
         <div
-          className={`relative overflow-hidden rounded-lg cursor-pointer ${aspectRatioClass}`}
+          className={`relative overflow-hidden cursor-pointer ${aspectRatioClass}`}
+          style={{ borderRadius: 'var(--radius-lg)' }}
           onClick={() => setIsExpanded(true)}
         >
           {aspectRatio === 'auto' ? (
             <img
               src={url}
               alt={alt || 'Image'}
-              className="w-full h-auto rounded-lg"
+              className="w-full h-auto"
               style={{
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+                borderRadius: 'var(--radius-lg)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             />
           ) : (
@@ -50,15 +52,19 @@ export default function ImageBlockRenderer({ data }: ImageBlockRendererProps) {
               fill
               className="object-cover"
               style={{
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+                boxShadow: 'var(--shadow-sm)',
               }}
             />
           )}
         </div>
         {caption && (
           <p
-            className="text-[11px] mt-2 text-center"
-            style={{ color: 'var(--text-tertiary)' }}
+            className="mt-2 text-center"
+            style={{
+              color: 'var(--text-tertiary)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--font-size-stat-label)',
+            }}
           >
             {caption}
           </p>

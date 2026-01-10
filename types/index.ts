@@ -23,6 +23,8 @@ export interface Desktop {
   dockItems: DockItem[];
 }
 
+export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document';
+
 export interface DesktopItem {
   id: string;
   desktopId: string;
@@ -34,6 +36,8 @@ export interface DesktopItem {
   windowSubtitle: string | null;
   windowHeaderImage: string | null;
   windowDescription: string;
+  // Window type for specialized window styles
+  windowType?: WindowType;
   // Legacy fields (for backwards compatibility)
   windowDetails: DetailItem[] | null;
   windowGallery: GalleryItem[] | null;
