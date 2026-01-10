@@ -77,46 +77,58 @@
 }
 
 [data-theme="dark"] {
-  /* Backgrounds */
-  --bg-solid: #1C1C1E;
-  --bg-elevated: #2C2C2E;
-  --bg-glass: rgba(50, 50, 52, 0.82);
-  --bg-glass-elevated: rgba(60, 60, 62, 0.90);
-  --bg-dock: rgba(60, 60, 62, 0.50);
-  --bg-menubar: rgba(40, 40, 42, 0.72);
-  --bg-tooltip: rgba(90, 90, 92, 0.95);
-  --bg-overlay: rgba(0, 0, 0, 0.6);
+  /* Backgrounds - Rich, deep blacks with subtle warmth */
+  --bg-solid: #0A0A0C;
+  --bg-elevated: #161618;
+  --bg-glass: rgba(22, 22, 26, 0.82);
+  --bg-glass-elevated: rgba(32, 32, 38, 0.90);
+  --bg-dock: rgba(18, 18, 22, 0.72);
+  --bg-menubar: rgba(12, 12, 16, 0.85);
+  --bg-tooltip: rgba(40, 40, 48, 0.96);
+  --bg-overlay: rgba(0, 0, 0, 0.75);
 
-  /* Text */
-  --text-primary: #F5F5F7;
-  --text-secondary: #A1A1A6;
-  --text-tertiary: #636366;
-  --text-on-glass: rgba(255, 255, 255, 0.9);
+  /* Text - Warm whites for better readability */
+  --text-primary: #F8F8FA;
+  --text-secondary: #94949C;
+  --text-tertiary: #56565C;
+  --text-on-glass: rgba(255, 255, 255, 0.94);
   --text-on-dark: #FFFFFF;
   --text-on-image: #FFFFFF;
 
-  /* Borders */
-  --border-light: rgba(255, 255, 255, 0.06);
-  --border-medium: rgba(255, 255, 255, 0.1);
-  --border-glass-outer: rgba(255, 255, 255, 0.08);
-  --border-glass-inner: rgba(255, 255, 255, 0.15);
+  /* Borders - Subtle luminous edges */
+  --border-light: rgba(255, 255, 255, 0.045);
+  --border-medium: rgba(255, 255, 255, 0.08);
+  --border-glass-outer: rgba(255, 255, 255, 0.05);
+  --border-glass-inner: rgba(255, 255, 255, 0.1);
 
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+  /* Shadows - Deeper, more dramatic with subtle glow */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.7);
   --shadow-window:
-    0 25px 60px -12px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-  --shadow-dock: 0 10px 40px rgba(0, 0, 0, 0.4);
-  --shadow-item: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-item-hover: 0 12px 32px rgba(0, 0, 0, 0.5);
+    0 35px 80px -20px rgba(0, 0, 0, 0.8),
+    0 0 0 0.5px rgba(255, 255, 255, 0.08),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.12);
+  --shadow-dock:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 0.5px rgba(255, 255, 255, 0.06),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
+  --shadow-item: 0 6px 20px rgba(0, 0, 0, 0.5);
+  --shadow-item-hover: 0 18px 45px rgba(0, 0, 0, 0.65);
 
-  /* Accent */
-  --accent-primary: #0A84FF;
-  --accent-success: #30D158;
-  --accent-warning: #FF9F0A;
-  --accent-danger: #FF453A;
+  /* Accent - Vibrant colors that pop on dark */
+  --accent-primary: #5BA0FF;
+  --accent-success: #3DD860;
+  --accent-warning: #FFBA4A;
+  --accent-danger: #FF6259;
+
+  /* Traffic lights - brighter in dark mode */
+  --traffic-red: #FF6961;
+  --traffic-red-hover: #FF4D44;
+  --traffic-yellow: #FFC94A;
+  --traffic-yellow-hover: #FFB800;
+  --traffic-green: #35D958;
+  --traffic-green-hover: #28C946;
 }
 
 * {
@@ -313,4 +325,80 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   Dark Theme Premium Enhancements
+   ============================================ */
+
+/* Enhanced glass effects for dark mode */
+[data-theme="dark"] .glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(50px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.1);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 0.5px rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .glass-elevated {
+  background: var(--bg-glass-elevated);
+  backdrop-filter: blur(60px) saturate(220%) brightness(1.15);
+  -webkit-backdrop-filter: blur(60px) saturate(220%) brightness(1.15);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.06),
+    0 0 0 0.5px rgba(255, 255, 255, 0.04);
+}
+
+/* Subtle ambient glow on interactive elements */
+[data-theme="dark"] button:hover,
+[data-theme="dark"] a:hover {
+  text-shadow: 0 0 20px rgba(91, 160, 255, 0.3);
+}
+
+/* Dark mode selection */
+[data-theme="dark"] ::selection {
+  background: rgba(91, 160, 255, 0.35);
+}
+
+/* Theme transition */
+html {
+  transition: background-color 0.3s ease;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Theme toggle animation */
+@keyframes sunRise {
+  0% { transform: rotate(-90deg) scale(0.8); opacity: 0; }
+  100% { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes moonRise {
+  0% { transform: rotate(90deg) scale(0.8); opacity: 0; }
+  100% { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+.theme-toggle-icon {
+  animation: sunRise 0.3s ease-out forwards;
+}
+
+[data-theme="dark"] .theme-toggle-icon {
+  animation: moonRise 0.3s ease-out forwards;
+}
+
+/* Glow effect for dark mode buttons */
+[data-theme="dark"] .btn-primary {
+  box-shadow:
+    0 0 0 1px rgba(91, 160, 255, 0.2),
+    0 4px 16px rgba(91, 160, 255, 0.25);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  box-shadow:
+    0 0 0 1px rgba(91, 160, 255, 0.3),
+    0 8px 24px rgba(91, 160, 255, 0.35);
 }
