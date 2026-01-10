@@ -55,14 +55,10 @@ export function AppIcon({
   };
 
   const handleClick = () => {
-    console.log('ICON CLICKED:', label);
-
-    // Don't trigger if long press was activated or in editing mode
     if (longPressTriggeredRef.current || isEditing) {
       longPressTriggeredRef.current = false;
       return;
     }
-
     if ('vibrate' in navigator) navigator.vibrate(3);
     onTap();
   };

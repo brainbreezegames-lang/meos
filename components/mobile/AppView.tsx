@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { AppHeader } from './AppHeader';
-import { AppContent } from './AppContent';
+import React, { useRef } from 'react';
+import { motion, useMotionValue, useTransform, AnimatePresence, PanInfo } from 'framer-motion';
 import { useMobileNav } from '@/contexts/MobileNavigationContext';
 import { DesktopItem, BlockData } from '@/types';
+import { AppHeader } from './AppHeader';
+import { AppContent } from './AppContent';
 
 interface AppViewProps {
   item: DesktopItem;
@@ -14,135 +14,110 @@ interface AppViewProps {
 }
 
 export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
-  const { closeApp, goHome } = useMobileNav();
+  const { closeApp } = useMobileNav();
   const containerRef = useRef<HTMLDivElement>(null);
+  const dragX = useMotionValue(0);
 
-  // Handle edge swipe back
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+  // iOS-style parallax transforms for back gesture
+  const backgroundX = useTransform(dragX, [0, 300], [0, 80]);
+  const backgroundScale = useTransform(dragX, [0, 300], [0.94, 1]);
+  const shadowOpacity = useTransform(dragX, [0, 300], [0.5, 0]);
+  const edgeGlowOpacity = useTransform(dragX, [0, 50], [0, 1]);
 
-    let startX = 0;
-    let startY = 0;
-    let isEdgeSwipe = false;
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const threshold = 80;
+    const velocity = info.velocity.x;
 
-    const handleTouchStart = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      startX = touch.clientX;
-      startY = touch.clientY;
-      isEdgeSwipe = startX <= 30;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (!isEdgeSwipe) return;
-
-      const touch = e.changedTouches[0];
-      const deltaX = touch.clientX - startX;
-      const deltaY = Math.abs(touch.clientY - startY);
-
-      if (deltaX > 80 && deltaX > deltaY) {
-        if ('vibrate' in navigator) navigator.vibrate(5);
-        closeApp();
-      }
-      isEdgeSwipe = false;
-    };
-
-    container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-    return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [closeApp]);
-
-  // Handle bottom swipe for home
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let startY = 0;
-    let isBottomSwipe = false;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      startY = touch.clientY;
-      isBottomSwipe = touch.clientY >= window.innerHeight - 50;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (!isBottomSwipe) return;
-
-      const touch = e.changedTouches[0];
-      const deltaY = startY - touch.clientY;
-
-      if (deltaY > 50) {
-        if ('vibrate' in navigator) navigator.vibrate(5);
-        goHome();
-      }
-      isBottomSwipe = false;
-    };
-
-    container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-    return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [goHome]);
+    if (info.offset.x > threshold || velocity > 400) {
+      if ('vibrate' in navigator) navigator.vibrate(5);
+      closeApp();
+    }
+  };
 
   return (
-    <motion.div
-      ref={containerRef}
-      className="fixed inset-0 z-[100] flex flex-col overflow-hidden"
-      style={{ backgroundColor: '#121218' }}
-      initial={{ x: '100%', opacity: 1 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '100%', opacity: 1 }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 30,
-      }}
-    >
-      {/* Debug - remove later */}
-      <div style={{
-        position: 'absolute',
-        top: 100,
-        left: 20,
-        right: 20,
-        padding: 20,
-        background: 'red',
-        color: 'white',
-        zIndex: 9999,
-        borderRadius: 8
-      }}>
-        DEBUG: AppView rendered for {item.label}
-      </div>
-
-      {/* Header */}
-      <AppHeader
-        title={item.windowTitle || item.label}
-        subtitle={item.windowSubtitle || undefined}
-        onBack={closeApp}
-        rightAction={rightAction}
+    <>
+      {/* Shadow layer - iOS depth effect */}
+      <motion.div
+        className="fixed inset-0 z-[99] pointer-events-none"
+        style={{
+          opacity: shadowOpacity,
+          background: 'linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 30%)',
+        }}
       />
 
-      {/* Content */}
-      <AppContent item={item} renderBlock={renderBlock} />
-
-      {/* Home indicator */}
-      <div className="flex-shrink-0 flex justify-center pb-2 pt-1">
-        <div
-          className="w-32 h-1 rounded-full"
-          style={{ background: 'rgba(255, 255, 255, 0.3)' }}
+      {/* Main app view - draggable */}
+      <motion.div
+        ref={containerRef}
+        className="fixed inset-0 z-[100] flex flex-col overflow-hidden"
+        style={{
+          x: dragX,
+          background: 'linear-gradient(180deg, #1c1c1e 0%, #000000 100%)',
+          boxShadow: '-10px 0 40px rgba(0,0,0,0.5)',
+        }}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={{ left: 0.15, right: 0 }}
+        dragMomentum={false}
+        onDragEnd={handleDragEnd}
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{
+          x: '100%',
+          transition: {
+            type: 'spring',
+            stiffness: 400,
+            damping: 40,
+          }
+        }}
+        transition={{
+          type: 'spring',
+          stiffness: 400,
+          damping: 40,
+          mass: 0.8,
+        }}
+      >
+        {/* Edge glow indicator for swipe */}
+        <motion.div
+          className="absolute left-0 top-0 bottom-0 w-1 pointer-events-none"
+          style={{
+            opacity: edgeGlowOpacity,
+            background: 'linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%)',
+          }}
         />
-      </div>
 
-      {/* Safe area bottom */}
-      <div style={{ height: 'env(safe-area-inset-bottom, 8px)' }} />
-    </motion.div>
+        {/* Header */}
+        <AppHeader
+          item={item}
+          onBack={closeApp}
+          rightAction={rightAction}
+        />
+
+        {/* Scrollable content */}
+        <AppContent
+          item={item}
+          renderBlock={renderBlock}
+        />
+
+        {/* iOS Home Indicator */}
+        <div
+          className="flex-shrink-0 flex justify-center"
+          style={{
+            paddingTop: 8,
+            paddingBottom: 'max(env(safe-area-inset-bottom, 8px), 8px)',
+          }}
+        >
+          <motion.div
+            className="rounded-full"
+            style={{
+              width: 134,
+              height: 5,
+              background: 'rgba(255, 255, 255, 0.25)',
+            }}
+            whileHover={{ background: 'rgba(255, 255, 255, 0.4)' }}
+          />
+        </div>
+      </motion.div>
+    </>
   );
 }
 

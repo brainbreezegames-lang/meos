@@ -2,161 +2,235 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { DesktopItem } from '@/types';
 
 interface AppHeaderProps {
-  title: string;
-  subtitle?: string;
+  item: DesktopItem;
   onBack: () => void;
   rightAction?: React.ReactNode;
-  transparent?: boolean;
-  large?: boolean;
 }
 
 export function AppHeader({
-  title,
-  subtitle,
+  item,
   onBack,
   rightAction,
-  transparent = false,
-  large = false,
 }: AppHeaderProps) {
+  const title = item.windowTitle || item.label;
+  const subtitle = item.windowSubtitle;
+  const heroImage = item.windowHeaderImage || item.thumbnailUrl;
+
   return (
     <motion.header
-      className="sticky top-0 z-50 flex-shrink-0"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+      className="flex-shrink-0 relative"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
     >
-      {/* Safe area top with glass */}
-      <div
-        style={{
-          height: 'env(safe-area-inset-top, 44px)',
-          background: transparent
-            ? 'transparent'
-            : 'linear-gradient(180deg, rgba(24, 24, 32, 0.95) 0%, rgba(24, 24, 32, 0.85) 100%)',
-          backdropFilter: transparent ? 'none' : 'blur(24px) saturate(180%)',
-          WebkitBackdropFilter: transparent ? 'none' : 'blur(24px) saturate(180%)',
-        }}
-      />
-
-      {/* Header content */}
-      <div
-        className="relative flex items-center justify-between px-4 h-11"
-        style={{
-          background: transparent
-            ? 'transparent'
-            : 'linear-gradient(180deg, rgba(24, 24, 32, 0.85) 0%, rgba(24, 24, 32, 0.75) 100%)',
-          backdropFilter: transparent ? 'none' : 'blur(24px) saturate(180%)',
-          WebkitBackdropFilter: transparent ? 'none' : 'blur(24px) saturate(180%)',
-        }}
-      >
-        {/* Bottom border with gradient */}
-        {!transparent && (
-          <div
-            className="absolute bottom-0 left-0 right-0 h-px"
-            style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.08) 80%, transparent 100%)',
-            }}
-          />
-        )}
-
-        {/* Back button with press effect */}
-        <motion.button
-          onClick={onBack}
-          className="flex items-center gap-1 -ml-2 px-2 py-1.5 rounded-xl"
-          whileTap={{ scale: 0.92, opacity: 0.7 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-        >
-          <motion.svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-[#0A84FF]"
+      {/* Hero image section */}
+      {heroImage && (
+        <div className="relative h-56 overflow-hidden">
+          {/* Background image with parallax-ready container */}
+          <motion.div
+            className="absolute inset-0"
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
           >
-            <polyline points="15 18 9 12 15 6" />
-          </motion.svg>
-          <span
-            className="font-normal"
-            style={{
-              fontSize: 17,
-              color: '#0A84FF',
-              fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            Back
-          </span>
-        </motion.button>
-
-        {/* Title (small mode) - centered */}
-        {!large && (
-          <div className="absolute left-1/2 transform -translate-x-1/2 text-center pointer-events-none">
-            <h1
-              className="font-semibold truncate max-w-[180px]"
+            <img
+              src={heroImage}
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+            {/* Gradient overlay */}
+            <div
+              className="absolute inset-0"
               style={{
-                fontSize: 17,
+                background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.7) 100%)',
+              }}
+            />
+          </motion.div>
+
+          {/* Floating navigation bar */}
+          <div
+            className="absolute top-0 left-0 right-0 flex items-center justify-between px-3"
+            style={{
+              paddingTop: 'calc(env(safe-area-inset-top, 44px) + 4px)',
+            }}
+          >
+            {/* Back button */}
+            <motion.button
+              onClick={onBack}
+              className="flex items-center justify-center rounded-full"
+              style={{
+                width: 36,
+                height: 36,
+                background: 'rgba(255, 255, 255, 0.15)',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+              }}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ background: 'rgba(255, 255, 255, 0.25)' }}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </motion.button>
+
+            {/* Right action */}
+            <div className="flex items-center gap-2">
+              {rightAction || (
+                <motion.button
+                  className="flex items-center justify-center rounded-full"
+                  style={{
+                    width: 36,
+                    height: 36,
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    backdropFilter: 'blur(20px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                  }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="1" fill="white" />
+                    <circle cx="19" cy="12" r="1" fill="white" />
+                    <circle cx="5" cy="12" r="1" fill="white" />
+                  </svg>
+                </motion.button>
+              )}
+            </div>
+          </div>
+
+          {/* Title overlay at bottom of hero */}
+          <motion.div
+            className="absolute bottom-0 left-0 right-0 px-4 pb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.4 }}
+          >
+            <h1
+              style={{
+                fontSize: 28,
+                fontWeight: 700,
                 color: 'white',
-                fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-                letterSpacing: '-0.01em',
-                textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                fontFamily: '"SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                letterSpacing: '-0.5px',
+                textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+                lineHeight: 1.1,
               }}
             >
               {title}
             </h1>
-          </div>
-        )}
-
-        {/* Right action */}
-        <div className="flex items-center">
-          {rightAction}
+            {subtitle && (
+              <p
+                style={{
+                  marginTop: 4,
+                  fontSize: 15,
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+                }}
+              >
+                {subtitle}
+              </p>
+            )}
+          </motion.div>
         </div>
-      </div>
+      )}
 
-      {/* Large title (iOS style) */}
-      {large && (
-        <motion.div
-          className="px-4 pt-1 pb-3"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
-          style={{
-            background: transparent
-              ? 'transparent'
-              : 'linear-gradient(180deg, rgba(24, 24, 32, 0.75) 0%, transparent 100%)',
-            backdropFilter: transparent ? 'none' : 'blur(20px) saturate(180%)',
-            WebkitBackdropFilter: transparent ? 'none' : 'blur(20px) saturate(180%)',
-          }}
-        >
-          <h1
-            className="font-bold"
+      {/* Compact header when no hero image */}
+      {!heroImage && (
+        <>
+          {/* Safe area spacer */}
+          <div
             style={{
-              fontSize: 34,
-              color: 'white',
-              letterSpacing: '-0.5px',
-              fontFamily: '"SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-              textShadow: '0 2px 4px rgba(0,0,0,0.15)',
+              height: 'env(safe-area-inset-top, 44px)',
+              background: 'rgba(28, 28, 30, 0.9)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+            }}
+          />
+
+          {/* Header bar */}
+          <div
+            className="flex items-center justify-between px-3 h-12"
+            style={{
+              background: 'rgba(28, 28, 30, 0.9)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
             }}
           >
-            {title}
-          </h1>
-          {subtitle && (
-            <p
-              className="mt-0.5"
-              style={{
-                fontSize: 15,
-                color: 'rgba(255, 255, 255, 0.55)',
-                fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-              }}
+            {/* Back button */}
+            <motion.button
+              onClick={onBack}
+              className="flex items-center gap-1 py-1 -ml-1"
+              whileTap={{ opacity: 0.5 }}
             >
-              {subtitle}
-            </p>
-          )}
-        </motion.div>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#0A84FF"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+              <span
+                style={{
+                  fontSize: 17,
+                  color: '#0A84FF',
+                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                }}
+              >
+                Back
+              </span>
+            </motion.button>
+
+            {/* Centered title */}
+            <div
+              className="absolute left-0 right-0 flex justify-center pointer-events-none"
+              style={{ paddingLeft: 80, paddingRight: 80 }}
+            >
+              <h1
+                className="truncate"
+                style={{
+                  fontSize: 17,
+                  fontWeight: 600,
+                  color: 'white',
+                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                }}
+              >
+                {title}
+              </h1>
+            </div>
+
+            {/* Right action */}
+            <div>{rightAction}</div>
+          </div>
+        </>
       )}
     </motion.header>
   );

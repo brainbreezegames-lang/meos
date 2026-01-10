@@ -80,7 +80,6 @@ export function AppGrid({
       {/* Grid container */}
       <div
         className="flex-1 overflow-hidden relative"
-        onClick={() => console.log('GRID CLICKED')}
       >
         <motion.div
           className="flex h-full"
