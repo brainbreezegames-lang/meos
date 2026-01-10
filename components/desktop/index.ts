@@ -5,3 +5,5 @@ export { InfoWindow } from './InfoWindow';
 export { Dock } from './Dock';
 export { DockItem } from './DockItem';
 export { MadeWithBadge } from './MadeWithBadge';
+export { PublicDesktop } from './PublicDesktop';
+export { SettingsWindow } from './SettingsWindow';

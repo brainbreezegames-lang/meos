@@ -42,25 +42,14 @@ export function Dock({ items }: DockProps) {
     >
       <motion.div
         ref={dockRef}
-        className="flex items-end gap-1 px-3 pb-2.5 pt-2"
+        className="dock flex items-end gap-1 px-3 pb-2.5 pt-2"
         style={{
           borderRadius: '22px',
-          background: `
-            linear-gradient(
-              180deg,
-              rgba(255, 255, 255, 0.45) 0%,
-              rgba(255, 255, 255, 0.25) 100%
-            )
-          `,
+          background: 'var(--bg-dock)',
           backdropFilter: 'blur(40px) saturate(200%)',
           WebkitBackdropFilter: 'blur(40px) saturate(200%)',
-          boxShadow: `
-            0 20px 60px -15px rgba(0, 0, 0, 0.35),
-            0 10px 30px -10px rgba(0, 0, 0, 0.2),
-            0 0 0 0.5px rgba(255, 255, 255, 0.4),
-            inset 0 0 0 0.5px rgba(255, 255, 255, 0.5),
-            inset 0 1px 0 rgba(255, 255, 255, 0.6)
-          `,
+          boxShadow: 'var(--shadow-dock)',
+          border: '1px solid var(--border-glass-outer)',
         }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -80,10 +69,11 @@ export function Dock({ items }: DockProps) {
 
       {/* Reflection/glow underneath */}
       <div
-        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[80%] h-[20px] pointer-events-none"
+        className="dock-reflection absolute -bottom-1 left-1/2 -translate-x-1/2 w-[80%] h-[20px] pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, var(--border-glass-inner) 0%, transparent 70%)',
           filter: 'blur(10px)',
+          opacity: 0.5,
         }}
       />
     </motion.div>

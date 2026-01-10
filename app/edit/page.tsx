@@ -7,6 +7,8 @@ import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { EditorSidebar } from '@/components/editor/EditorSidebar';
 import { EditableDesktopCanvas } from '@/components/editor/EditableDesktopCanvas';
 import { DesktopCanvas, MenuBar, Dock, MadeWithBadge } from '@/components/desktop';
+import { SettingsWindow } from '@/components/desktop/SettingsWindow';
+import { ThemeProvider, type ThemeId } from '@/contexts/ThemeContext';
 import type { Desktop, DesktopItem, DockItem } from '@/types';
 
 export default function EditPage() {
@@ -18,6 +20,7 @@ export default function EditPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -316,50 +319,68 @@ export default function EditPage() {
     return null;
   }
 
-  return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-solid)' }}>
-      <EditorToolbar
-        username={session.user.username}
-        isSaving={isSaving}
-        lastSaved={lastSaved}
-        isPreview={isPreview}
-        onTogglePreview={() => setIsPreview(!isPreview)}
-      />
+  // Get initial theme from desktop
+  const validThemes: ThemeId[] = ['monterey', 'dark', 'bluren', 'refined'];
+  const initialTheme = validThemes.includes(desktop.theme as ThemeId)
+    ? (desktop.theme as ThemeId)
+    : 'monterey';
 
-      {isPreview ? (
-        <>
-          <MenuBar title={desktop.title || session.user.name || session.user.username} />
-          <DesktopCanvas desktop={desktop} />
-          <Dock items={desktop.dockItems} />
-          <MadeWithBadge />
-        </>
-      ) : (
-        <>
-          <EditableDesktopCanvas
-            desktop={desktop}
-            selectedItemId={selectedItem?.id || null}
-            onSelectItem={setSelectedItem}
-            onMoveItem={handleMoveItem}
-          />
-          <EditorSidebar
-            desktop={desktop}
-            selectedItem={selectedItem}
-            selectedDockItem={selectedDockItem}
-            onDeselectItem={() => setSelectedItem(null)}
-            onDeselectDockItem={() => setSelectedDockItem(null)}
-            onUpdateDesktop={handleUpdateDesktop}
-            onCreateItem={handleCreateItem}
-            onUpdateItem={handleUpdateItem}
-            onDeleteItem={handleDeleteItem}
-            onCreateDockItem={handleCreateDockItem}
-            onUpdateDockItem={handleUpdateDockItem}
-            onDeleteDockItem={handleDeleteDockItem}
-            onMoveDockItem={handleMoveDockItem}
-            onUpload={handleUpload}
-          />
-          <Dock items={desktop.dockItems} />
-        </>
-      )}
-    </div>
+  return (
+    <ThemeProvider initialTheme={initialTheme} desktopId={desktop.id} isOwner={true}>
+      <div className="min-h-screen" style={{ background: 'var(--bg-solid)' }}>
+        <EditorToolbar
+          username={session.user.username}
+          isSaving={isSaving}
+          lastSaved={lastSaved}
+          isPreview={isPreview}
+          onTogglePreview={() => setIsPreview(!isPreview)}
+          onSettingsClick={() => setShowSettings(true)}
+        />
+
+        {isPreview ? (
+          <>
+            <MenuBar
+              title={desktop.title || session.user.name || session.user.username}
+              onSettingsClick={() => setShowSettings(true)}
+            />
+            <DesktopCanvas desktop={desktop} />
+            <Dock items={desktop.dockItems} />
+            <MadeWithBadge />
+          </>
+        ) : (
+          <>
+            <EditableDesktopCanvas
+              desktop={desktop}
+              selectedItemId={selectedItem?.id || null}
+              onSelectItem={setSelectedItem}
+              onMoveItem={handleMoveItem}
+            />
+            <EditorSidebar
+              desktop={desktop}
+              selectedItem={selectedItem}
+              selectedDockItem={selectedDockItem}
+              onDeselectItem={() => setSelectedItem(null)}
+              onDeselectDockItem={() => setSelectedDockItem(null)}
+              onUpdateDesktop={handleUpdateDesktop}
+              onCreateItem={handleCreateItem}
+              onUpdateItem={handleUpdateItem}
+              onDeleteItem={handleDeleteItem}
+              onCreateDockItem={handleCreateDockItem}
+              onUpdateDockItem={handleUpdateDockItem}
+              onDeleteDockItem={handleDeleteDockItem}
+              onMoveDockItem={handleMoveDockItem}
+              onUpload={handleUpload}
+            />
+            <Dock items={desktop.dockItems} />
+          </>
+        )}
+
+        {/* Settings Window */}
+        <SettingsWindow
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      </div>
+    </ThemeProvider>
   );
 }

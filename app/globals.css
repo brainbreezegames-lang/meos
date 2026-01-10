@@ -131,6 +131,207 @@
   --traffic-green-hover: #28C946;
 }
 
+/* ============================================
+   BLUREN THEME - Clean Light Apple-inspired
+   ============================================ */
+[data-theme="bluren"] {
+  /* Backgrounds - Pure white, minimal */
+  --bg-solid: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-elevated: rgba(255, 255, 255, 0.92);
+  --bg-dock: rgba(255, 255, 255, 0.75);
+  --bg-menubar: rgba(255, 255, 255, 0.8);
+  --bg-tooltip: rgba(30, 30, 30, 0.92);
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+
+  /* Text - Pure black with transparency levels */
+  --text-primary: #000000;
+  --text-secondary: rgba(0, 0, 0, 0.5);
+  --text-tertiary: rgba(0, 0, 0, 0.35);
+  --text-on-glass: rgba(0, 0, 0, 0.85);
+  --text-on-dark: #FFFFFF;
+  --text-on-image: #FFFFFF;
+
+  /* Borders - Very subtle */
+  --border-light: rgba(0, 0, 0, 0.07);
+  --border-medium: rgba(0, 0, 0, 0.1);
+  --border-glass-outer: rgba(0, 0, 0, 0.05);
+  --border-glass-inner: rgba(255, 255, 255, 0.5);
+
+  /* Shadows - Soft, minimal */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+  --shadow-window:
+    0 20px 50px -12px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  --shadow-dock:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  --shadow-item: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-item-hover: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  /* Accent - Apple Blue */
+  --accent-primary: rgb(30, 110, 244);
+  --accent-success: rgb(53, 199, 89);
+  --accent-warning: #FF9500;
+  --accent-danger: #FF3B30;
+
+  /* Traffic lights - standard */
+  --traffic-red: #FF5F57;
+  --traffic-red-hover: #FF3B30;
+  --traffic-yellow: #FFBD2E;
+  --traffic-yellow-hover: #FFAA00;
+  --traffic-green: #28CA41;
+  --traffic-green-hover: #1AAD2E;
+
+  /* Detail dots */
+  --dot-color: rgb(30, 110, 244);
+
+  /* Font - Clean system fonts */
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+
+/* Bluren-specific glass enhancements */
+[data-theme="bluren"] .glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+}
+
+[data-theme="bluren"] .glass-elevated {
+  background: var(--bg-glass-elevated);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+}
+
+/* ============================================
+   REFINED THEME - Elegant Dark Editorial
+   ============================================ */
+[data-theme="refined"] {
+  /* Backgrounds - Deep blacks, editorial feel */
+  --bg-solid: #0d0d0d;
+  --bg-elevated: #171717;
+  --bg-glass: rgba(23, 23, 23, 0.92);
+  --bg-glass-elevated: rgba(40, 40, 40, 0.85);
+  --bg-dock: rgba(255, 255, 255, 0.06);
+  --bg-menubar: rgba(13, 13, 13, 0.85);
+  --bg-tooltip: rgba(40, 40, 48, 0.96);
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Text - White with transparency levels */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --text-tertiary: rgba(255, 255, 255, 0.35);
+  --text-on-glass: rgba(255, 255, 255, 0.94);
+  --text-on-dark: #FFFFFF;
+  --text-on-image: #FFFFFF;
+
+  /* Borders - Subtle luminous edges */
+  --border-light: rgba(255, 255, 255, 0.06);
+  --border-medium: rgba(255, 255, 255, 0.1);
+  --border-glass-outer: rgba(255, 255, 255, 0.05);
+  --border-glass-inner: rgba(255, 255, 255, 0.08);
+
+  /* Shadows - Dramatic */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.6);
+  --shadow-window:
+    0 30px 70px -15px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-dock:
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-item: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-item-hover: 0 12px 32px rgba(0, 0, 0, 0.5);
+
+  /* Accent - Muted sage green */
+  --accent-primary: #cae8bd;
+  --accent-success: #cae8bd;
+  --accent-warning: #FFBA4A;
+  --accent-danger: #FF6259;
+
+  /* Traffic lights - standard */
+  --traffic-red: #FF5F57;
+  --traffic-red-hover: #FF3B30;
+  --traffic-yellow: #FFBD2E;
+  --traffic-yellow-hover: #FFAA00;
+  --traffic-green: #28CA41;
+  --traffic-green-hover: #1AAD2E;
+
+  /* Detail dots - sage green */
+  --dot-color: #cae8bd;
+
+  /* Font - Halant serif for display, Inter for body */
+  --font-display: "Halant", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Refined-specific glass enhancements */
+[data-theme="refined"] .glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(60px) saturate(150%);
+  -webkit-backdrop-filter: blur(60px) saturate(150%);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 0.5px rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="refined"] .glass-elevated {
+  background: var(--bg-glass-elevated);
+  backdrop-filter: blur(60px) saturate(150%);
+  -webkit-backdrop-filter: blur(60px) saturate(150%);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+}
+
+/* Refined theme color scheme */
+[data-theme="refined"] {
+  color-scheme: dark;
+}
+
+/* Refined typography overrides */
+[data-theme="refined"] .window-header-title,
+[data-theme="refined"] .info-window-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1em;
+}
+
+/* Refined selection */
+[data-theme="refined"] ::selection {
+  background: rgba(202, 232, 189, 0.35);
+}
+
+/* Refined scrollbar */
+[data-theme="refined"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="refined"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Bluren selection */
+[data-theme="bluren"] ::selection {
+  background: rgba(30, 110, 244, 0.25);
+}
+
+/* Bluren scrollbar */
+[data-theme="bluren"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="bluren"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

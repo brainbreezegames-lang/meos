@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
-import { DesktopCanvas, MenuBar, Dock, MadeWithBadge } from '@/components/desktop';
+import { PublicDesktop } from '@/components/desktop/PublicDesktop';
+import type { ThemeId } from '@/contexts/ThemeContext';
 import type { DesktopItem, DockItem, Tab, Block } from '@prisma/client';
 
 interface PageProps {
@@ -146,12 +147,17 @@ export default async function UserDesktopPage({ params }: PageProps) {
     })),
   };
 
+  // Validate theme value from database
+  const validThemes: ThemeId[] = ['monterey', 'dark', 'bluren', 'refined'];
+  const theme = validThemes.includes(user.desktop.theme as ThemeId)
+    ? (user.desktop.theme as ThemeId)
+    : 'monterey';
+
   return (
-    <main className="min-h-screen overflow-hidden">
-      <MenuBar title={desktop.title || user.name || user.username} />
-      <DesktopCanvas desktop={desktop} />
-      <Dock items={desktop.dockItems} />
-      <MadeWithBadge />
-    </main>
+    <PublicDesktop
+      desktop={desktop}
+      title={desktop.title || user.name || user.username}
+      theme={theme}
+    />
   );
 }

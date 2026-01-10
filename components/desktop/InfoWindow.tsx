@@ -151,7 +151,7 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
             {/* Window */}
             <motion.div
               ref={windowRef}
-              className="max-w-[92vw] overflow-hidden flex flex-col pointer-events-auto"
+              className="info-window max-w-[92vw] overflow-hidden flex flex-col pointer-events-auto"
               drag
               dragControls={dragControls}
               dragListener={false}
@@ -162,22 +162,11 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
                 width: item.windowWidth || 440,
                 maxHeight: 'calc(100vh - 120px)',
                 borderRadius: '14px',
-                background: `
-                  linear-gradient(
-                    180deg,
-                    rgba(255, 255, 255, 0.92) 0%,
-                    rgba(255, 255, 255, 0.85) 100%
-                  )
-                `,
+                background: 'var(--bg-glass-elevated)',
                 backdropFilter: 'blur(60px) saturate(200%)',
                 WebkitBackdropFilter: 'blur(60px) saturate(200%)',
-                boxShadow: `
-                  0 40px 80px -20px rgba(0, 0, 0, 0.4),
-                  0 20px 40px -10px rgba(0, 0, 0, 0.25),
-                  0 0 0 0.5px rgba(255, 255, 255, 0.4),
-                  inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.8)
-                `,
+                boxShadow: 'var(--shadow-window)',
+                border: '1px solid var(--border-glass-outer)',
               }}
               initial={{ opacity: 0, scale: 0.88, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -191,10 +180,10 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
             >
             {/* Title Bar - Drag Handle */}
             <div
-              className="flex items-center h-[52px] px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
+              className="window-title-bar flex items-center h-[52px] px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
               style={{
-                borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 100%)',
+                borderBottom: '1px solid var(--border-light)',
+                background: 'transparent',
               }}
               onPointerDown={startDrag}
             >
@@ -281,8 +270,8 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
 
               {/* Centered Title */}
               <span
-                className="absolute left-1/2 -translate-x-1/2 text-[13px] font-medium truncate max-w-[55%] select-none"
-                style={{ color: 'rgba(0, 0, 0, 0.75)' }}
+                className="window-title absolute left-1/2 -translate-x-1/2 text-[13px] font-medium truncate max-w-[55%] select-none"
+                style={{ color: 'var(--text-secondary)' }}
               >
                 {item.windowTitle}
               </span>
@@ -315,15 +304,15 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
                 {/* Title + Subtitle */}
                 <div className="flex flex-col min-w-0 pt-1.5">
                   <h2
-                    className="text-[17px] font-semibold tracking-tight truncate leading-tight"
-                    style={{ color: '#1D1D1F' }}
+                    className="info-window-title text-[17px] font-semibold tracking-tight truncate leading-tight"
+                    style={{ color: 'var(--text-primary)' }}
                   >
                     {item.windowTitle}
                   </h2>
                   {item.windowSubtitle && (
                     <p
                       className="text-[13px] mt-0.5 truncate"
-                      style={{ color: '#6E6E73' }}
+                      style={{ color: 'var(--text-secondary)' }}
                     >
                       {item.windowSubtitle}
                     </p>
@@ -335,7 +324,7 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
               {item.useTabs && sortedTabs.length > 0 && (
                 <div
                   className="flex gap-1 px-6 pb-3"
-                  style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }}
+                  style={{ borderBottom: '1px solid var(--border-light)' }}
                 >
                   {sortedTabs.map((tab) => (
                     <button
@@ -372,7 +361,7 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
                       <div
                         key={block.id}
                         style={{
-                          borderTop: index > 0 ? '1px solid rgba(0, 0, 0, 0.06)' : undefined,
+                          borderTop: index > 0 ? '1px solid var(--border-light)' : undefined,
                         }}
                       >
                         <BlockRenderer block={block} />

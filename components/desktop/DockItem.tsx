@@ -111,16 +111,16 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
       <AnimatePresence>
         {showTooltip && isHovered && (
           <motion.div
-            className="absolute bottom-full mb-3 px-3.5 py-2 rounded-lg text-[11px] font-semibold whitespace-nowrap pointer-events-none z-50"
+            className="dock-tooltip absolute bottom-full mb-3 px-3.5 py-2 rounded-lg text-[11px] font-semibold whitespace-nowrap pointer-events-none z-50"
             style={{
-              background: 'rgba(30, 30, 32, 0.95)',
+              background: 'var(--bg-tooltip)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
-              color: '#FFFFFF',
+              color: 'var(--text-on-dark)',
               boxShadow: `
                 0 8px 32px -4px rgba(0, 0, 0, 0.4),
-                0 0 0 0.5px rgba(255, 255, 255, 0.1),
-                inset 0 0 0 0.5px rgba(255, 255, 255, 0.05)
+                0 0 0 0.5px var(--border-glass-inner),
+                inset 0 0 0 0.5px var(--border-glass-outer)
               `,
               letterSpacing: '0.01em',
             }}
@@ -142,7 +142,7 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
                 height: 0,
                 borderLeft: '6px solid transparent',
                 borderRight: '6px solid transparent',
-                borderTop: '6px solid rgba(30, 30, 32, 0.95)',
+                borderTop: '6px solid var(--bg-tooltip)',
               }}
             />
           </motion.div>
@@ -151,22 +151,15 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
 
       {/* Icon Container */}
       <div
-        className="w-full h-full rounded-[13px] flex items-center justify-center overflow-hidden relative"
+        className="dock-icon w-full h-full rounded-[13px] flex items-center justify-center overflow-hidden relative"
         style={{
           background: isEmoji
-            ? 'linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 250, 0.95) 100%)'
+            ? 'var(--bg-elevated)'
             : 'transparent',
           boxShadow: isEmoji
-            ? `
-                0 6px 20px -4px rgba(0, 0, 0, 0.2),
-                0 2px 6px rgba(0, 0, 0, 0.08),
-                0 0 0 0.5px rgba(0, 0, 0, 0.04),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9)
-              `
-            : `
-                0 4px 16px -3px rgba(0, 0, 0, 0.15),
-                0 0 0 0.5px rgba(255, 255, 255, 0.15)
-              `,
+            ? 'var(--shadow-item)'
+            : `0 4px 16px -3px rgba(0, 0, 0, 0.15), 0 0 0 0.5px var(--border-glass-inner)`,
+          border: isEmoji ? '1px solid var(--border-light)' : undefined,
         }}
       >
         {isEmoji ? (
@@ -201,10 +194,10 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
 
       {/* Active indicator dot */}
       <motion.div
-        className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+        className="dock-icon-indicator absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
         style={{
-          background: 'rgba(255, 255, 255, 0.9)',
-          boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)',
+          background: 'var(--text-secondary)',
+          boxShadow: '0 0 4px var(--border-glass-inner)',
         }}
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
