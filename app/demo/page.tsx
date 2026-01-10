@@ -381,7 +381,7 @@ const DEMO_DESKTOP: Desktop = {
   ],
 };
 
-// Theme-aware Dock Icon Component
+// Theme-aware Dock Icon Component - Uses CSS variables for theming
 interface DockIconProps {
   item: typeof DEMO_DESKTOP.dockItems[0];
   mouseX: ReturnType<typeof useMotionValue<number>>;
@@ -390,13 +390,25 @@ interface DockIconProps {
 function DockIcon({ item, mouseX }: DockIconProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const { themeInfo } = useTheme();
-  const isDark = themeInfo.isDark;
+  const [sizes, setSizes] = useState({ base: 48, max: 72 });
 
-  const baseSize = 48;
-  const maxSize = 72;
+  // Read CSS variable sizes on mount and theme change
+  useEffect(() => {
+    const updateSizes = () => {
+      const style = getComputedStyle(document.documentElement);
+      const base = parseInt(style.getPropertyValue('--dock-icon-size')) || 48;
+      const max = parseInt(style.getPropertyValue('--dock-icon-size-hover')) || 72;
+      setSizes({ base, max });
+    };
+    updateSizes();
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateSizes);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+
   const distance = 140;
-
   const springConfig = { mass: 0.1, stiffness: 150, damping: 12 };
 
   const distanceFromMouse = useTransform(mouseX, (val) => {
@@ -407,14 +419,14 @@ function DockIcon({ item, mouseX }: DockIconProps) {
   const widthSync = useTransform(
     distanceFromMouse,
     [-distance, 0, distance],
-    [baseSize, maxSize, baseSize]
+    [sizes.base, sizes.max, sizes.base]
   );
   const width = useSpring(widthSync, springConfig);
 
   const iconSizeSync = useTransform(
     distanceFromMouse,
     [-distance, 0, distance],
-    [24, 36, 24]
+    [sizes.base * 0.5, sizes.max * 0.5, sizes.base * 0.5]
   );
   const iconSize = useSpring(iconSizeSync, springConfig);
 
@@ -438,7 +450,7 @@ function DockIcon({ item, mouseX }: DockIconProps) {
       onMouseLeave={() => setIsHovered(false)}
       className="relative flex items-center justify-center cursor-pointer"
     >
-      {/* Tooltip - Theme aware */}
+      {/* Tooltip */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
@@ -450,16 +462,21 @@ function DockIcon({ item, mouseX }: DockIconProps) {
             transition={{ duration: 0.15 }}
           >
             <div
-              className="px-2.5 py-1 rounded-md whitespace-nowrap"
+              className="px-2.5 py-1 whitespace-nowrap"
               style={{
                 background: 'var(--bg-tooltip)',
                 backdropFilter: 'blur(12px)',
                 boxShadow: 'var(--shadow-md)',
+                borderRadius: 'var(--radius-sm)',
               }}
             >
               <span
-                className="text-[11px] font-medium"
-                style={{ color: 'var(--text-on-dark)' }}
+                className="font-medium"
+                style={{
+                  color: 'var(--text-on-dark)',
+                  fontSize: '11px',
+                  fontFamily: 'var(--font-body)',
+                }}
               >
                 {item.label}
               </span>
@@ -468,17 +485,14 @@ function DockIcon({ item, mouseX }: DockIconProps) {
         )}
       </AnimatePresence>
 
-      {/* Icon button - Theme aware */}
+      {/* Icon button - Uses CSS variable for background and shadow */}
       <motion.button
         onClick={handleClick}
-        className="w-full h-full rounded-xl flex items-center justify-center"
+        className="w-full h-full flex items-center justify-center"
         style={{
-          background: isDark
-            ? 'linear-gradient(145deg, rgba(60, 60, 70, 0.9) 0%, rgba(40, 40, 50, 0.85) 100%)'
-            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 240, 245, 0.88) 100%)',
-          boxShadow: isDark
-            ? `0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)`
-            : `0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9)`,
+          borderRadius: 'var(--radius-dock-icon)',
+          background: 'var(--bg-dock-icon)',
+          boxShadow: 'var(--shadow-dock-icon)',
         }}
         whileTap={{ scale: 0.9 }}
         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
@@ -494,7 +508,7 @@ function DockIcon({ item, mouseX }: DockIconProps) {
   );
 }
 
-// Theme-aware Dock Component
+// Theme-aware Dock Component - Uses CSS variables for all styling
 function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
   const mouseX = useMotionValue(Infinity);
 
@@ -507,14 +521,16 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
       transition={{ type: 'spring', stiffness: 300, damping: 30, delay: 0.3 }}
     >
       <motion.div
-        className="flex items-end gap-1 px-2 pb-2 pt-2"
+        className="flex items-end"
         style={{
-          borderRadius: '18px',
+          gap: 'var(--spacing-dock-gap)',
+          padding: 'var(--spacing-dock-padding)',
+          borderRadius: 'var(--radius-dock)',
           background: 'var(--bg-dock)',
-          backdropFilter: 'blur(30px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(30px) saturate(180%)',
+          backdropFilter: 'var(--blur-dock)',
+          WebkitBackdropFilter: 'var(--blur-dock)',
           boxShadow: 'var(--shadow-dock)',
-          border: '1px solid var(--border-glass-outer)',
+          border: 'var(--border-width) solid var(--border-glass-outer)',
         }}
         onMouseMove={(e) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
@@ -527,11 +543,10 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
   );
 }
 
-// Theme-aware Menu Bar Component
+// Theme-aware Menu Bar Component - Uses CSS variables for all styling
 function MenuBar() {
   const context = useEditContextSafe();
   const bgContext = useBackgroundContext();
-  const { themeInfo } = useTheme();
   const [time, setTime] = useState<string>('');
 
   useEffect(() => {
@@ -552,37 +567,43 @@ function MenuBar() {
 
   return (
     <motion.header
-      className="fixed top-0 left-0 right-0 z-[150] h-[28px] flex items-center justify-between px-4"
+      className="fixed top-0 left-0 right-0 z-[150] flex items-center justify-between px-4"
       style={{
+        height: 'var(--menubar-height)',
         background: 'var(--bg-menubar)',
-        backdropFilter: 'blur(50px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(50px) saturate(180%)',
+        backdropFilter: 'var(--blur-glass)',
+        WebkitBackdropFilter: 'var(--blur-glass)',
         boxShadow: '0 0.5px 0 var(--border-light), inset 0 -0.5px 0 var(--border-glass-inner)',
+        fontFamily: 'var(--font-body)',
       }}
-      initial={{ y: -28 }}
+      initial={{ y: -32 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
       <div className="flex items-center gap-4">
         <span
-          className="text-[13px] font-semibold"
+          className="font-semibold"
           style={{
+            fontSize: '13px',
             color: 'var(--text-primary)',
-            fontFamily: themeInfo.id === 'refined' ? 'var(--font-display)' : undefined,
+            fontFamily: 'var(--font-display)',
+            letterSpacing: 'var(--letter-spacing-tight)',
           }}
         >
           MeOS
         </span>
-        <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>Demo Desktop</span>
+        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Demo Desktop</span>
       </div>
       <div className="flex items-center gap-3">
         {/* Background settings button */}
         <button
           onClick={() => bgContext.setShowBackgroundPanel(true)}
-          className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all"
+          className="flex items-center gap-1.5 px-2.5 py-0.5 font-medium transition-all"
           style={{
+            fontSize: '11px',
             color: 'var(--text-secondary)',
             background: 'transparent',
+            borderRadius: 'var(--radius-full)',
           }}
           onMouseEnter={(e) => e.currentTarget.style.background = 'var(--border-light)'}
           onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
@@ -599,8 +620,10 @@ function MenuBar() {
         {/* Edit mode toggle */}
         <button
           onClick={toggleEditMode}
-          className="px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all"
+          className="px-2.5 py-0.5 font-medium transition-all"
           style={{
+            fontSize: '11px',
+            borderRadius: 'var(--radius-full)',
             background: context?.isOwner
               ? 'color-mix(in srgb, var(--accent-primary) 15%, transparent)'
               : 'var(--border-light)',
@@ -624,7 +647,7 @@ function MenuBar() {
             <rect x="2" y="2" width="17" height="8" rx="1" fill="currentColor"/>
             <path d="M23 4v4a2 2 0 001-1.73v-.54A2 2 0 0023 4z" fill="currentColor"/>
           </svg>
-          <span className="text-[13px] font-medium tabular-nums ml-1" style={{ color: 'var(--text-primary)' }}>{time}</span>
+          <span className="font-medium tabular-nums ml-1" style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{time}</span>
         </div>
       </div>
     </motion.header>
@@ -715,7 +738,6 @@ function RotatingBackground() {
 // Theme-aware Desktop Content
 function DesktopContent() {
   const context = useEditContextSafe();
-  const { themeInfo } = useTheme();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [itemOrder, setItemOrder] = useState<string[]>(() =>
     context?.desktop?.items.map(i => i.id) || []
@@ -828,7 +850,7 @@ function DesktopContent() {
         onClose={() => setSelectedItemId(null)}
       />
 
-      {/* New Item Modal - Theme aware */}
+      {/* New Item Modal - Uses CSS variables for all styling */}
       <AnimatePresence>
         {showNewItemModal && (
           <>
@@ -841,52 +863,67 @@ function DesktopContent() {
               onClick={() => setShowNewItemModal(false)}
             />
             <motion.div
-              className="fixed z-[301] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 rounded-2xl"
+              className="fixed z-[301] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               style={{
+                padding: 'var(--spacing-window-padding)',
+                borderRadius: 'var(--radius-window)',
                 background: 'var(--bg-glass-elevated)',
-                backdropFilter: 'blur(40px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+                backdropFilter: 'var(--blur-glass)',
+                WebkitBackdropFilter: 'var(--blur-glass)',
                 boxShadow: 'var(--shadow-window)',
-                border: '1px solid var(--border-light)',
+                border: 'var(--border-width) solid var(--border-light)',
               }}
             >
               <h3
-                className="text-lg font-semibold mb-4"
+                className="font-semibold mb-4"
                 style={{
+                  fontSize: '18px',
                   color: 'var(--text-primary)',
-                  fontFamily: themeInfo.id === 'refined' ? 'var(--font-display)' : undefined,
+                  fontFamily: 'var(--font-display)',
+                  letterSpacing: 'var(--letter-spacing-tight)',
                 }}
               >
                 Create New Item
               </h3>
               <p
-                className="text-sm mb-6"
-                style={{ color: 'var(--text-secondary)' }}
+                className="mb-6"
+                style={{
+                  fontSize: '14px',
+                  color: 'var(--text-secondary)',
+                  fontFamily: 'var(--font-body)',
+                  lineHeight: 'var(--line-height-normal)',
+                }}
               >
                 A new item will be created at the clicked position.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowNewItemModal(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="px-4 py-2 font-medium transition-colors"
                   style={{
+                    fontSize: '14px',
+                    borderRadius: 'var(--radius-button)',
                     color: 'var(--text-secondary)',
-                    background: 'var(--border-light)',
+                    background: 'var(--bg-button)',
+                    border: 'var(--border-width) solid var(--border-light)',
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--border-medium)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'var(--border-light)'}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-button-hover)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-button)'}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateItem}
-                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="px-4 py-2 font-medium transition-colors"
                   style={{
+                    fontSize: '14px',
+                    borderRadius: 'var(--radius-button)',
                     background: 'var(--accent-primary)',
-                    color: themeInfo.id === 'refined' ? '#0d0d0d' : '#fff',
+                    color: 'var(--text-on-accent)',
+                    boxShadow: 'var(--shadow-button)',
                   }}
                 >
                   Create Item
@@ -904,16 +941,20 @@ function DesktopContent() {
       <SaveIndicator />
       <Toast />
 
-      {/* Made with badge - Theme aware */}
+      {/* Made with badge - Uses CSS variables */}
       <motion.a
         href="/"
-        className="fixed bottom-3 right-4 z-[50] px-3 py-1.5 rounded-full text-[10px] font-medium"
+        className="fixed bottom-3 right-4 z-[50] px-3 py-1.5 font-medium"
         style={{
+          fontSize: '10px',
+          borderRadius: 'var(--radius-full)',
           background: 'var(--bg-dock)',
-          backdropFilter: 'blur(20px)',
+          backdropFilter: 'var(--blur-dock)',
+          WebkitBackdropFilter: 'var(--blur-dock)',
           color: 'var(--text-on-image)',
           boxShadow: 'var(--shadow-sm)',
-          border: '1px solid var(--border-glass-outer)',
+          border: 'var(--border-width) solid var(--border-glass-outer)',
+          fontFamily: 'var(--font-body)',
         }}
         whileHover={{ scale: 1.05 }}
         initial={{ opacity: 0 }}

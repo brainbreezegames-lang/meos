@@ -201,13 +201,14 @@ export function EditableDesktopItem({
         onClick={handleClick}
         onContextMenu={handleContextMenu}
       >
-        {/* Icon Thumbnail */}
+        {/* Icon Thumbnail - Uses CSS variables for border-radius and shadows */}
         <motion.div
-          className="relative w-[76px] h-[76px] rounded-[18px] overflow-hidden"
+          className="relative w-[76px] h-[76px] overflow-hidden"
           style={{
+            borderRadius: 'var(--radius-lg)',
             boxShadow: isDragging
-              ? '0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2)'
-              : '0 8px 32px -8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+              ? 'var(--shadow-item-hover)'
+              : 'var(--shadow-item)',
           }}
           animate={{
             y: isDragging ? -8 : 0,
@@ -236,8 +237,11 @@ export function EditableDesktopItem({
 
         {/* Label */}
         <span
-          className="px-2 py-0.5 text-[11px] font-medium text-white text-center leading-tight max-w-[90px] truncate rounded pointer-events-none"
+          className="px-2 py-0.5 font-medium text-white text-center leading-tight max-w-[90px] truncate pointer-events-none"
           style={{
+            fontSize: '11px',
+            fontFamily: 'var(--font-body)',
+            borderRadius: 'var(--radius-sm)',
             textShadow: '0 1px 3px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.6)',
             background: 'rgba(0, 0, 0, 0.35)',
             backdropFilter: 'blur(8px)',
@@ -251,8 +255,8 @@ export function EditableDesktopItem({
           <div
             className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
             style={{
-              background: 'rgba(0, 122, 255, 0.9)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+              background: 'var(--accent-primary)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             <svg className="w-2 h-2 text-white" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5">

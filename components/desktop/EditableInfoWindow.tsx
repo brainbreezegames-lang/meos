@@ -196,7 +196,7 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
             className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none"
             style={{ padding: '40px' }}
           >
-            {/* Window */}
+            {/* Window - Uses CSS variables for theming */}
             <motion.div
               ref={windowRef}
               className="max-w-[92vw] overflow-hidden flex flex-col glass-elevated pointer-events-auto"
@@ -209,11 +209,12 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
               style={{
                 width: item.windowWidth || 440,
                 maxHeight: 'calc(100vh - 120px)',
-                borderRadius: '14px',
+                borderRadius: 'var(--radius-window)',
                 background: 'var(--bg-glass-elevated)',
-                backdropFilter: 'blur(60px) saturate(200%)',
-                WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                backdropFilter: 'var(--blur-glass)',
+                WebkitBackdropFilter: 'var(--blur-glass)',
                 boxShadow: 'var(--shadow-window)',
+                border: 'var(--border-width) solid var(--border-glass-outer)',
               }}
               initial={{ opacity: 0, scale: 0.88, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -225,22 +226,25 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 mass: 0.8
               }}
             >
-            {/* Title Bar */}
+            {/* Title Bar - Uses CSS variable for height */}
             <div
-              className="flex items-center h-[52px] px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
+              className="flex items-center px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
               style={{
-                borderBottom: '1px solid var(--border-light)',
+                height: 'var(--window-header-height)',
+                borderBottom: 'var(--border-width) solid var(--border-light)',
                 background: 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
               }}
               onPointerDown={startDrag}
             >
-              {/* Traffic Lights */}
-              <div className="flex items-center gap-2 group/traffic" onPointerDown={(e) => e.stopPropagation()}>
+              {/* Traffic Lights - Uses CSS variables for size and gap */}
+              <div className="flex items-center group/traffic" style={{ gap: 'var(--traffic-gap)' }} onPointerDown={(e) => e.stopPropagation()}>
                 <button
                   onClick={onClose}
-                  className="w-[13px] h-[13px] rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"
+                  className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"
                   style={{
-                    background: 'linear-gradient(180deg, #FF6058 0%, #FF4D44 100%)',
+                    width: 'var(--traffic-size)',
+                    height: 'var(--traffic-size)',
+                    background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
                     boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   }}
                 >
@@ -249,9 +253,11 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                   </svg>
                 </button>
                 <div
-                  className="w-[13px] h-[13px] rounded-full flex items-center justify-center"
+                  className="rounded-full flex items-center justify-center"
                   style={{
-                    background: 'linear-gradient(180deg, #FFBE2E 0%, #FFB014 100%)',
+                    width: 'var(--traffic-size)',
+                    height: 'var(--traffic-size)',
+                    background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
                     boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   }}
                 >
@@ -260,9 +266,11 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                   </svg>
                 </div>
                 <div
-                  className="w-[13px] h-[13px] rounded-full flex items-center justify-center"
+                  className="rounded-full flex items-center justify-center"
                   style={{
-                    background: 'linear-gradient(180deg, #2ACB42 0%, #1DB934 100%)',
+                    width: 'var(--traffic-size)',
+                    height: 'var(--traffic-size)',
+                    background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
                     boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   }}
                 >
@@ -274,8 +282,14 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
 
               {/* Title */}
               <span
-                className="absolute left-1/2 -translate-x-1/2 text-[13px] font-medium truncate max-w-[55%] select-none"
-                style={{ color: 'var(--text-primary)', opacity: 0.85 }}
+                className="absolute left-1/2 -translate-x-1/2 font-medium truncate max-w-[55%] select-none"
+                style={{
+                  fontSize: '13px',
+                  color: 'var(--text-primary)',
+                  opacity: 0.85,
+                  fontFamily: 'var(--font-display)',
+                  letterSpacing: 'var(--letter-spacing-tight)',
+                }}
               >
                 {item.windowTitle}
               </span>
@@ -289,8 +303,11 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 overscrollBehavior: 'contain',
               }}
             >
-              {/* Header Section */}
-              <div className="flex items-start gap-4 px-6 pt-5 pb-4">
+              {/* Header Section - Uses CSS variables for padding and radii */}
+              <div
+                className="flex items-start gap-4"
+                style={{ padding: `calc(var(--spacing-window-padding) * 0.75) var(--spacing-window-padding)` }}
+              >
                 {/* Header Image */}
                 {isOwner ? (
                   <EditableImage
@@ -299,9 +316,10 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                     onChange={handleHeaderImageChange}
                   >
                     <div
-                      className="relative w-16 h-16 rounded-[12px] overflow-hidden shrink-0"
+                      className="relative w-16 h-16 overflow-hidden shrink-0"
                       style={{
-                        boxShadow: '0 4px 16px -2px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.05), inset 0 0 0 0.5px rgba(255, 255, 255, 0.2)',
+                        borderRadius: 'var(--radius-md)',
+                        boxShadow: 'var(--shadow-sm)',
                       }}
                     >
                       <Image
@@ -315,9 +333,10 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                   </EditableImage>
                 ) : (
                   <div
-                    className="relative w-16 h-16 rounded-[12px] overflow-hidden shrink-0"
+                    className="relative w-16 h-16 overflow-hidden shrink-0"
                     style={{
-                      boxShadow: '0 4px 16px -2px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.05), inset 0 0 0 0.5px rgba(255, 255, 255, 0.2)',
+                      borderRadius: 'var(--radius-md)',
+                      boxShadow: 'var(--shadow-sm)',
                     }}
                   >
                     <Image
@@ -341,8 +360,13 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                         placeholder="Window title..."
                       >
                         <h2
-                          className="text-[17px] font-semibold tracking-tight truncate leading-tight"
-                          style={{ color: 'var(--text-primary)' }}
+                          className="font-semibold truncate leading-tight info-window-title"
+                          style={{
+                            fontSize: '17px',
+                            color: 'var(--text-primary)',
+                            fontFamily: 'var(--font-display)',
+                            letterSpacing: 'var(--letter-spacing-tight)',
+                          }}
                         >
                           {item.windowTitle}
                         </h2>
@@ -354,8 +378,12 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                         placeholder="Add subtitle..."
                       >
                         <p
-                          className="text-[13px] mt-0.5 truncate"
-                          style={{ color: 'var(--text-secondary)' }}
+                          className="mt-0.5 truncate"
+                          style={{
+                            fontSize: '13px',
+                            color: 'var(--text-secondary)',
+                            fontFamily: 'var(--font-body)',
+                          }}
                         >
                           {item.windowSubtitle || (isOwner && <span className="opacity-40">Add subtitle...</span>)}
                         </p>
@@ -364,15 +392,24 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                   ) : (
                     <>
                       <h2
-                        className="text-[17px] font-semibold tracking-tight truncate leading-tight"
-                        style={{ color: 'var(--text-primary)' }}
+                        className="font-semibold truncate leading-tight info-window-title"
+                        style={{
+                          fontSize: '17px',
+                          color: 'var(--text-primary)',
+                          fontFamily: 'var(--font-display)',
+                          letterSpacing: 'var(--letter-spacing-tight)',
+                        }}
                       >
                         {item.windowTitle}
                       </h2>
                       {item.windowSubtitle && (
                         <p
-                          className="text-[13px] mt-0.5 truncate"
-                          style={{ color: 'var(--text-secondary)' }}
+                          className="mt-0.5 truncate"
+                          style={{
+                            fontSize: '13px',
+                            color: 'var(--text-secondary)',
+                            fontFamily: 'var(--font-body)',
+                          }}
                         >
                           {item.windowSubtitle}
                         </p>
@@ -382,20 +419,26 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 </div>
               </div>
 
-              {/* Tabs */}
+              {/* Tabs - Uses CSS variables for styling */}
               {item.useTabs && sortedTabs.length > 0 && (
                 <div
-                  className="flex gap-1 px-6 pb-3"
-                  style={{ borderBottom: '1px solid var(--border-light)' }}
+                  className="flex gap-1"
+                  style={{
+                    padding: `0 var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)`,
+                    borderBottom: 'var(--border-width) solid var(--border-light)',
+                  }}
                 >
                   {sortedTabs.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTabId(tab.id)}
-                      className="px-3 py-1.5 rounded-md text-[12px] font-medium transition-all"
+                      className="px-3 py-1.5 font-medium transition-all"
                       style={{
-                        background: activeTabId === tab.id ? 'rgba(0, 122, 255, 0.1)' : 'transparent',
+                        fontSize: '12px',
+                        borderRadius: 'var(--radius-sm)',
+                        background: activeTabId === tab.id ? 'color-mix(in srgb, var(--accent-primary) 10%, transparent)' : 'transparent',
                         color: activeTabId === tab.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                        fontFamily: 'var(--font-body)',
                       }}
                     >
                       {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
@@ -437,15 +480,16 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
 
                     {/* Add block button (owner only) */}
                     {isOwner && (
-                      <div className="px-6 pt-4 pb-2">
+                      <div style={{ padding: `var(--spacing-window-padding) var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)` }}>
                         {showBlockPicker ? (
                           <motion.div
-                            className="rounded-xl overflow-hidden"
+                            className="overflow-hidden"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             style={{
+                              borderRadius: 'var(--radius-lg)',
                               background: 'var(--bg-elevated)',
-                              border: '1px solid var(--border-medium)',
+                              border: 'var(--border-width) solid var(--border-medium)',
                               boxShadow: 'var(--shadow-md)',
                             }}
                           >
@@ -532,11 +576,14 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                         ) : (
                           <button
                             onClick={() => setShowBlockPicker(true)}
-                            className="w-full py-2.5 rounded-lg border border-dashed flex items-center justify-center gap-2 text-[13px] font-medium transition-all"
+                            className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
                             style={{
+                              fontSize: '13px',
+                              borderRadius: 'var(--radius-button)',
                               borderColor: 'var(--border-medium)',
                               color: 'var(--text-tertiary)',
                               background: 'transparent',
+                              fontFamily: 'var(--font-body)',
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.background = 'var(--border-light)';
