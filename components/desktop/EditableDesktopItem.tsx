@@ -59,6 +59,13 @@ export function EditableDesktopItem({
     }
   }, [item.positionX, item.positionY, isDragging]);
 
+  // Reset hasDragged when edit mode changes (so clicks work after exiting edit mode)
+  useEffect(() => {
+    if (!isOwner) {
+      dragDataRef.current.hasDragged = false;
+    }
+  }, [isOwner]);
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (!isOwner) return;
     if (e.button !== 0) return;
@@ -140,10 +147,14 @@ export function EditableDesktopItem({
   const handleClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!dragDataRef.current.hasDragged) {
+    // Only block the click if we JUST dragged (during this mouse interaction)
+    // If not in edit mode, always allow clicks
+    if (!isOwner || !dragDataRef.current.hasDragged) {
       onClick(e);
     }
-  }, [onClick]);
+    // Reset hasDragged after click so future clicks work
+    dragDataRef.current.hasDragged = false;
+  }, [onClick, isOwner]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     if (isOwner) {
