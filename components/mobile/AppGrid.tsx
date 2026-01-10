@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 import { AppIcon } from './AppIcon';
 import { PageIndicator } from './PageIndicator';
 import { DesktopItem } from '@/types';
@@ -78,21 +78,18 @@ export function AppGrid({
   return (
     <div className="flex-1 flex flex-col" ref={containerRef}>
       {/* Grid container */}
-      <div className="flex-1 overflow-hidden relative">
+      <div
+        className="flex-1 overflow-hidden relative"
+        onClick={() => console.log('GRID CLICKED')}
+      >
         <motion.div
           className="flex h-full"
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.1}
-          onDragStart={() => setIsDragging(true)}
-          onDragEnd={handleDragEnd}
           animate={{ x: -currentPage * containerWidth }}
           transition={{
             type: 'spring',
             stiffness: 300,
             damping: 30,
           }}
-          style={{ x: isDragging ? x : 0 }}
         >
           {Array.from({ length: totalPages }).map((_, pageIndex) => (
             <div
@@ -119,12 +116,13 @@ export function AppGrid({
                       stiffness: 400,
                       damping: 25,
                     }}
+                    onPointerDownCapture={(e) => e.stopPropagation()}
                   >
                     <AppIcon
                       id={item.id}
                       icon={item.thumbnailUrl || '📁'}
                       label={item.label}
-                      onTap={() => !isDragging && onAppTap(item)}
+                      onTap={() => onAppTap(item)}
                       onLongPress={() => onAppLongPress?.(item)}
                       isEditing={isEditing}
                       size={iconSize}

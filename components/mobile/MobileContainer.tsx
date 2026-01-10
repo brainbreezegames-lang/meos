@@ -206,8 +206,13 @@ function MobileContainerInner({
         )}
       </AnimatePresence>
 
+      {/* DEBUG */}
+      <div style={{ position: 'fixed', top: 10, left: 10, background: 'red', color: 'white', padding: 10, zIndex: 9999 }}>
+        Screen: {state.screen} | Unlocked: {String(state.isUnlocked)}
+      </div>
+
       {/* Home Screen */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {state.screen === 'home' && (
           <HomeScreen
             items={items}
@@ -218,7 +223,7 @@ function MobileContainerInner({
         )}
       </AnimatePresence>
 
-      {/* App View */}
+      {/* App View - above home when active */}
       <AppViewContainer renderBlock={renderBlock} />
 
       {/* Recruiter Mode */}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AppHeader } from './AppHeader';
 import { AppContent } from './AppContent';
 import { useMobileNav } from '@/contexts/MobileNavigationContext';
@@ -14,13 +14,8 @@ interface AppViewProps {
 }
 
 export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
-  const { closeApp, goHome, state } = useMobileNav();
+  const { closeApp, goHome } = useMobileNav();
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Edge swipe for back gesture
-  const x = useMotionValue(0);
-  const opacity = useTransform(x, [0, 100], [1, 0.5]);
-  const scale = useTransform(x, [0, 100], [1, 0.95]);
 
   // Handle edge swipe back
   useEffect(() => {
@@ -35,20 +30,7 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
       const touch = e.touches[0];
       startX = touch.clientX;
       startY = touch.clientY;
-      isEdgeSwipe = startX <= 20;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isEdgeSwipe) return;
-
-      const touch = e.touches[0];
-      const deltaX = touch.clientX - startX;
-      const deltaY = Math.abs(touch.clientY - startY);
-
-      // Only track horizontal swipes
-      if (deltaX > 0 && deltaX > deltaY) {
-        x.set(deltaX);
-      }
+      isEdgeSwipe = startX <= 30;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -56,25 +38,23 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
 
       const touch = e.changedTouches[0];
       const deltaX = touch.clientX - startX;
+      const deltaY = Math.abs(touch.clientY - startY);
 
-      if (deltaX > 100) {
+      if (deltaX > 80 && deltaX > deltaY) {
+        if ('vibrate' in navigator) navigator.vibrate(5);
         closeApp();
       }
-
-      x.set(0);
       isEdgeSwipe = false;
     };
 
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchmove', handleTouchMove, { passive: true });
     container.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [closeApp, x]);
+  }, [closeApp]);
 
   // Handle bottom swipe for home
   useEffect(() => {
@@ -87,8 +67,7 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
     const handleTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
       startY = touch.clientY;
-      // Check if touch is near bottom of screen (home indicator area)
-      isBottomSwipe = touch.clientY >= window.innerHeight - 34;
+      isBottomSwipe = touch.clientY >= window.innerHeight - 50;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -98,9 +77,9 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
       const deltaY = startY - touch.clientY;
 
       if (deltaY > 50) {
+        if ('vibrate' in navigator) navigator.vibrate(5);
         goHome();
       }
-
       isBottomSwipe = false;
     };
 
@@ -116,23 +95,32 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
   return (
     <motion.div
       ref={containerRef}
-      className="fixed inset-0 flex flex-col"
-      style={{
-        background: 'linear-gradient(180deg, rgba(20, 20, 25, 1) 0%, rgba(30, 30, 35, 1) 100%)',
-        x,
-        opacity,
-        scale,
-      }}
-      initial={{ x: '100%', opacity: 0 }}
+      className="fixed inset-0 z-[100] flex flex-col overflow-hidden"
+      style={{ backgroundColor: '#121218' }}
+      initial={{ x: '100%', opacity: 1 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '100%', opacity: 0 }}
+      exit={{ x: '100%', opacity: 1 }}
       transition={{
         type: 'spring',
-        stiffness: 400,
-        damping: 40,
-        mass: 0.8,
+        stiffness: 300,
+        damping: 30,
       }}
     >
+      {/* Debug - remove later */}
+      <div style={{
+        position: 'absolute',
+        top: 100,
+        left: 20,
+        right: 20,
+        padding: 20,
+        background: 'red',
+        color: 'white',
+        zIndex: 9999,
+        borderRadius: 8
+      }}>
+        DEBUG: AppView rendered for {item.label}
+      </div>
+
       {/* Header */}
       <AppHeader
         title={item.windowTitle || item.label}
@@ -146,10 +134,9 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
 
       {/* Home indicator */}
       <div className="flex-shrink-0 flex justify-center pb-2 pt-1">
-        <motion.div
+        <div
           className="w-32 h-1 rounded-full"
           style={{ background: 'rgba(255, 255, 255, 0.3)' }}
-          whileHover={{ background: 'rgba(255, 255, 255, 0.5)' }}
         />
       </div>
 

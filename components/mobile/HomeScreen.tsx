@@ -75,7 +75,7 @@ export function HomeScreen({
 
   return (
     <motion.div
-      className="fixed inset-0 flex flex-col select-none"
+      className="fixed inset-0 z-10 flex flex-col select-none"
       style={{
         background: backgroundUrl
           ? `url(${backgroundUrl}) center/cover no-repeat`
@@ -83,6 +83,7 @@ export function HomeScreen({
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
       {/* Status bar area */}

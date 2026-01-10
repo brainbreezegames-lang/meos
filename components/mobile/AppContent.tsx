@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { DesktopItem, BlockData, TabData } from '@/types';
+import { DesktopItem, BlockData } from '@/types';
 
 interface AppContentProps {
   item: DesktopItem;
@@ -10,58 +10,45 @@ interface AppContentProps {
 }
 
 export function AppContent({ item, renderBlock }: AppContentProps) {
-  const [activeTab, setActiveTab] = React.useState(0);
+  const [activeTab, setActiveTab] = useState(0);
 
   // Determine which blocks to show
-  const blocksToRender = item.useTabs && item.tabs.length > 0
+  const blocksToRender = item.useTabs && item.tabs && item.tabs.length > 0
     ? item.tabs[activeTab]?.blocks || []
-    : item.blocks;
+    : item.blocks || [];
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header image */}
       {item.windowHeaderImage && (
-        <motion.div
-          className="flex-shrink-0 w-full h-48 overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
+        <div className="flex-shrink-0 w-full h-48 overflow-hidden">
           <img
             src={item.windowHeaderImage}
-            alt={item.windowTitle}
+            alt={item.windowTitle || ''}
             className="w-full h-full object-cover"
           />
-        </motion.div>
+        </div>
       )}
 
-      {/* Tabs (if using tabs) */}
-      {item.useTabs && item.tabs.length > 0 && (
+      {/* Tabs */}
+      {item.useTabs && item.tabs && item.tabs.length > 0 && (
         <div
-          className="flex-shrink-0 flex gap-2 px-4 py-3 overflow-x-auto"
-          style={{
-            background: 'rgba(30, 30, 30, 0.6)',
-            backdropFilter: 'blur(10px)',
-          }}
+          className="flex-shrink-0 flex gap-2 px-4 py-3 overflow-x-auto border-b border-white/10"
+          style={{ background: 'rgba(0, 0, 0, 0.2)' }}
         >
           {item.tabs.map((tab, index) => (
-            <motion.button
+            <button
               key={tab.id}
               onClick={() => setActiveTab(index)}
-              className="flex-shrink-0 px-4 py-2 rounded-full flex items-center gap-2"
+              className="flex-shrink-0 px-4 py-2 rounded-full text-sm"
               style={{
                 background: activeTab === index ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                border: activeTab === index ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid transparent',
+                color: activeTab === index ? 'white' : 'rgba(255, 255, 255, 0.6)',
               }}
-              whileTap={{ scale: 0.95 }}
             >
-              {tab.icon && <span>{tab.icon}</span>}
-              <span
-                className={`text-sm ${activeTab === index ? 'text-white' : 'text-white/60'}`}
-                style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
-              >
-                {tab.label}
-              </span>
-            </motion.button>
+              {tab.icon && <span className="mr-1">{tab.icon}</span>}
+              {tab.label}
+            </button>
           ))}
         </div>
       )}
@@ -69,33 +56,19 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="px-4 py-4 space-y-4">
-          {/* Title section */}
-          <div className="space-y-1">
-            <h2
-              className="text-xl font-semibold text-white"
-              style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif' }}
-            >
-              {item.windowTitle}
+          {/* Title */}
+          <div>
+            <h2 className="text-xl font-semibold text-white">
+              {item.windowTitle || item.label}
             </h2>
             {item.windowSubtitle && (
-              <p
-                className="text-sm text-white/60"
-                style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
-              >
-                {item.windowSubtitle}
-              </p>
+              <p className="text-sm text-white/60 mt-1">{item.windowSubtitle}</p>
             )}
           </div>
 
           {/* Description */}
           {item.windowDescription && (
-            <p
-              className="text-white/80 leading-relaxed"
-              style={{
-                fontSize: 15,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
-              }}
-            >
+            <p className="text-white/80 text-[15px] leading-relaxed">
               {item.windowDescription}
             </p>
           )}
@@ -108,47 +81,30 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              {renderBlock ? (
-                renderBlock(block)
-              ) : (
-                <MobileBlockFallback block={block} />
-              )}
+              {renderBlock ? renderBlock(block) : <BlockFallback block={block} />}
             </motion.div>
           ))}
 
-          {/* Legacy: Gallery items */}
+          {/* Legacy gallery */}
           {item.windowGallery && item.windowGallery.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider">Gallery</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {item.windowGallery.map((media, index) => (
-                  <motion.div
-                    key={index}
-                    className="aspect-square rounded-xl overflow-hidden"
-                    style={{ background: 'rgba(255, 255, 255, 0.05)' }}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    {media.type === 'image' ? (
-                      <img src={media.url} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <video src={media.url} className="w-full h-full object-cover" />
-                    )}
-                  </motion.div>
-                ))}
-              </div>
+            <div className="grid grid-cols-2 gap-2">
+              {item.windowGallery.map((media, i) => (
+                <div key={i} className="aspect-square rounded-xl overflow-hidden bg-white/5">
+                  {media.type === 'image' ? (
+                    <img src={media.url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <video src={media.url} className="w-full h-full object-cover" />
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Legacy: Details */}
+          {/* Legacy details */}
           {item.windowDetails && item.windowDetails.length > 0 && (
             <div className="space-y-2">
-              {item.windowDetails.map((detail, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between py-3 border-b border-white/10 last:border-0"
-                >
+              {item.windowDetails.map((detail, i) => (
+                <div key={i} className="flex justify-between py-2 border-b border-white/10">
                   <span className="text-white/50 text-sm">{detail.label}</span>
                   <span className="text-white text-sm">{detail.value}</span>
                 </div>
@@ -156,112 +112,70 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
             </div>
           )}
 
-          {/* Legacy: Links */}
+          {/* Legacy links */}
           {item.windowLinks && item.windowLinks.length > 0 && (
             <div className="space-y-2">
-              {item.windowLinks.map((link, index) => (
-                <motion.a
-                  key={index}
+              {item.windowLinks.map((link, i) => (
+                <a
+                  key={i}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl"
-                  style={{ background: 'rgba(255, 255, 255, 0.05)' }}
-                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center justify-between p-4 rounded-xl bg-white/5 text-white text-sm"
                 >
-                  <span className="text-white text-sm">{link.label}</span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="text-white/40"
-                  >
-                    <path d="M7 17L17 7M17 7H7M17 7V17" />
-                  </svg>
-                </motion.a>
+                  {link.label}
+                  <span className="text-white/40">→</span>
+                </a>
               ))}
             </div>
           )}
         </div>
 
-        {/* Bottom safe area */}
+        {/* Bottom padding */}
         <div style={{ height: 'env(safe-area-inset-bottom, 20px)' }} />
       </div>
     </div>
   );
 }
 
-// Fallback block renderer for mobile
-function MobileBlockFallback({ block }: { block: BlockData }) {
+// Simple fallback block renderer
+function BlockFallback({ block }: { block: BlockData }) {
   const data = block.data as Record<string, unknown>;
 
   switch (block.type) {
     case 'text':
-      return (
-        <p
-          className="text-white/80 leading-relaxed"
-          style={{ fontSize: 15, fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
-        >
-          {String(data.content || data.text || '')}
-        </p>
-      );
+      return <p className="text-white/80 text-[15px] leading-relaxed">{String(data.content || data.text || '')}</p>;
 
     case 'heading':
-      return (
-        <h3
-          className="text-lg font-semibold text-white"
-          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif' }}
-        >
-          {String(data.content || data.text || '')}
-        </h3>
-      );
+      return <h3 className="text-lg font-semibold text-white">{String(data.content || data.text || '')}</h3>;
 
     case 'image':
-      const caption = data.caption ? String(data.caption) : null;
       return (
-        <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
-          <img
-            src={String(data.url || data.src || '')}
-            alt={String(data.alt || '')}
-            className="w-full h-auto"
-          />
-          {caption && (
-            <p className="text-xs text-white/50 p-3">{caption}</p>
-          )}
+        <div className="rounded-xl overflow-hidden bg-white/5">
+          <img src={String(data.url || data.src || '')} alt={String(data.alt || '')} className="w-full" />
+          {data.caption ? <p className="text-xs text-white/50 p-3">{String(data.caption)}</p> : null}
         </div>
       );
 
     case 'video':
       return (
-        <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
-          <video
-            src={String(data.url || data.src || '')}
-            controls
-            className="w-full"
-            playsInline
-          />
+        <div className="rounded-xl overflow-hidden bg-white/5">
+          <video src={String(data.url || data.src || '')} controls className="w-full" playsInline />
         </div>
       );
 
     case 'link':
     case 'button':
       return (
-        <motion.a
+        <a
           href={String(data.url || data.href || '#')}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between p-4 rounded-xl"
-          style={{ background: 'rgba(255, 255, 255, 0.05)' }}
-          whileTap={{ scale: 0.98 }}
+          className="flex items-center justify-between p-4 rounded-xl bg-white/5 text-white text-sm"
         >
-          <span className="text-white text-sm">{String(data.label || data.text || 'Link')}</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white/40">
-            <path d="M7 17L17 7M17 7H7M17 7V17" />
-          </svg>
-        </motion.a>
+          {String(data.label || data.text || 'Link')}
+          <span className="text-white/40">→</span>
+        </a>
       );
 
     case 'divider':
@@ -269,10 +183,7 @@ function MobileBlockFallback({ block }: { block: BlockData }) {
 
     case 'quote':
       return (
-        <blockquote
-          className="border-l-2 border-white/30 pl-4 italic text-white/70"
-          style={{ fontSize: 15, fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
-        >
+        <blockquote className="border-l-2 border-white/30 pl-4 italic text-white/70 text-[15px]">
           {String(data.content || data.text || '')}
         </blockquote>
       );

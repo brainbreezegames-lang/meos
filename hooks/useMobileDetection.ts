@@ -30,8 +30,8 @@ export function useMobileDetection(): MobileDetectionResult {
     const isSmallScreen = window.innerWidth <= 768;
     const isMediumScreen = window.innerWidth <= 1024 && window.innerWidth > 768;
 
-    // Mobile = small screen + touch OR mobile user agent
-    const isMobile = (isSmallScreen && hasTouchScreen) || isIOS || (isAndroid && isSmallScreen);
+    // Mobile = small screen (touch not required for dev testing) OR mobile user agent
+    const isMobile = isSmallScreen || isIOS || isAndroid;
     const isTablet = isMediumScreen && hasTouchScreen;
 
     setResult({
@@ -50,7 +50,7 @@ export function useMobileDetection(): MobileDetectionResult {
 
       setResult(prev => ({
         ...prev,
-        isMobile: (smallScreen && prev.hasTouchScreen) || prev.isIOS || (prev.isAndroid && smallScreen),
+        isMobile: smallScreen || prev.isIOS || prev.isAndroid,
         isTablet: mediumScreen && prev.hasTouchScreen,
       }));
     };
