@@ -31,6 +31,15 @@ export async function GET() {
       include: {
         items: {
           orderBy: { order: 'asc' },
+          include: {
+            blocks: { orderBy: { order: 'asc' } },
+            tabs: {
+              orderBy: { order: 'asc' },
+              include: {
+                blocks: { orderBy: { order: 'asc' } },
+              },
+            },
+          },
         },
         dockItems: {
           orderBy: { order: 'asc' },
@@ -43,7 +52,12 @@ export async function GET() {
       const newDesktop = await prisma.desktop.create({
         data: { userId: session.user.id },
         include: {
-          items: true,
+          items: {
+            include: {
+              blocks: true,
+              tabs: { include: { blocks: true } },
+            },
+          },
           dockItems: true,
         },
       });
@@ -80,6 +94,15 @@ export async function PUT(request: NextRequest) {
       include: {
         items: {
           orderBy: { order: 'asc' },
+          include: {
+            blocks: { orderBy: { order: 'asc' } },
+            tabs: {
+              orderBy: { order: 'asc' },
+              include: {
+                blocks: { orderBy: { order: 'asc' } },
+              },
+            },
+          },
         },
         dockItems: {
           orderBy: { order: 'asc' },

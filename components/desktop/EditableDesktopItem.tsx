@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef, memo } from 'react';
-import { motion, useMotionValue } from 'framer-motion';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem as DesktopItemType } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
@@ -14,7 +14,7 @@ interface EditableDesktopItemProps {
   onBringToFront: () => void;
 }
 
-function EditableDesktopItemComponent({
+export function EditableDesktopItem({
   item,
   onClick,
   zIndex,
@@ -24,75 +24,131 @@ function EditableDesktopItemComponent({
   const isOwner = context?.isOwner ?? false;
 
   const [isDragging, setIsDragging] = useState(false);
-  const [hasDragged, setHasDragged] = useState(false);
-  const dragStartPos = useRef({ x: 0, y: 0 });
+  const [visualPos, setVisualPos] = useState({ x: item.positionX, y: item.positionY });
+  const dragDataRef = useRef({
+    startMouseX: 0,
+    startMouseY: 0,
+    startItemX: 0,
+    startItemY: 0,
+    currentX: item.positionX,
+    currentY: item.positionY,
+    hasDragged: false
+  });
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
 
   const { position: contextMenuPos, showContextMenu, hideContextMenu } = useContextMenu();
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    dragStartPos.current = { x: e.clientX, y: e.clientY };
-    setHasDragged(false);
+  // Sync visual position with props when not dragging
+  useEffect(() => {
+    if (!isDragging) {
+      // Only update if the props are actually different from our current tracked position
+      // This prevents snapping back to old values during the brief moment after drag ends
+      const data = dragDataRef.current;
+      const propsMatch = Math.abs(item.positionX - data.currentX) < 0.1 &&
+                         Math.abs(item.positionY - data.currentY) < 0.1;
+
+      if (!propsMatch) {
+        // Props changed from external source, sync to them
+        setVisualPos({ x: item.positionX, y: item.positionY });
+        data.currentX = item.positionX;
+        data.currentY = item.positionY;
+      }
+    }
+  }, [item.positionX, item.positionY, isDragging]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!isOwner) return;
+    if (e.button !== 0) return;
+
+    e.preventDefault();
+    e.stopPropagation();
     onBringToFront();
-  };
 
-  const handleDragStart = () => {
-    if (!isOwner) return;
+    const parent = containerRef.current?.parentElement;
+    if (!parent) return;
+
+    dragDataRef.current = {
+      startMouseX: e.clientX,
+      startMouseY: e.clientY,
+      startItemX: item.positionX,
+      startItemY: item.positionY,
+      currentX: item.positionX,
+      currentY: item.positionY,
+      hasDragged: false,
+    };
+
     setIsDragging(true);
-  };
+  }, [isOwner, item.positionX, item.positionY, onBringToFront]);
 
-  const handleDrag = () => {
-    if (!isOwner) return;
-    setHasDragged(true);
-  };
+  useEffect(() => {
+    if (!isDragging) return;
 
-  const handleDragEnd = () => {
-    if (!isOwner) return;
-    setIsDragging(false);
-
-    // Calculate new position as percentage
-    if (hasDragged && containerRef.current) {
-      const parent = containerRef.current.parentElement;
+    const handleMouseMove = (e: MouseEvent) => {
+      const parent = containerRef.current?.parentElement;
       if (!parent) return;
 
-      const rect = containerRef.current.getBoundingClientRect();
       const parentRect = parent.getBoundingClientRect();
+      const data = dragDataRef.current;
 
-      // Get the current center of the item
-      const centerX = rect.left + rect.width / 2 - parentRect.left;
-      const centerY = rect.top + rect.height / 2 - parentRect.top;
+      const deltaXPx = e.clientX - data.startMouseX;
+      const deltaYPx = e.clientY - data.startMouseY;
 
-      // Convert to percentage
-      const newX = Math.max(5, Math.min(95, (centerX / parentRect.width) * 100));
-      const newY = Math.max(5, Math.min(95, (centerY / parentRect.height) * 100));
+      if (Math.abs(deltaXPx) > 3 || Math.abs(deltaYPx) > 3) {
+        data.hasDragged = true;
+      }
 
-      // Update position
-      context?.updateItemPosition(item.id, newX, newY);
+      const deltaXPercent = (deltaXPx / parentRect.width) * 100;
+      const deltaYPercent = (deltaYPx / parentRect.height) * 100;
 
-      // Reset motion values
-      x.set(0);
-      y.set(0);
-    }
-  };
+      const newX = Math.max(2, Math.min(98, data.startItemX + deltaXPercent));
+      const newY = Math.max(2, Math.min(98, data.startItemY + deltaYPercent));
 
-  const handleClick = (e: React.MouseEvent) => {
-    // Only open window if we didn't drag
-    if (!hasDragged) {
+      data.currentX = newX;
+      data.currentY = newY;
+
+      setVisualPos({ x: newX, y: newY });
+    };
+
+    const handleMouseUp = () => {
+      const data = dragDataRef.current;
+
+      if (data.hasDragged && context) {
+        // Update context first, then set isDragging false
+        // This ensures the new position is committed before we allow syncing
+        context.updateItemPosition(item.id, data.currentX, data.currentY);
+      }
+
+      // Small delay to let the context update propagate before we stop dragging
+      // This prevents the useEffect from resetting to old values
+      requestAnimationFrame(() => {
+        setIsDragging(false);
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, context, item.id]);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!dragDataRef.current.hasDragged) {
       onClick(e);
     }
-    e.stopPropagation();
-  };
+  }, [onClick]);
 
-  const handleContextMenu = (e: React.MouseEvent) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
     if (isOwner) {
+      e.preventDefault();
       showContextMenu(e);
     }
-  };
+  }, [isOwner, showContextMenu]);
 
-  // Context menu items
   const contextMenuItems = [
     {
       label: 'Open',
@@ -131,35 +187,19 @@ function EditableDesktopItemComponent({
 
   return (
     <>
-      <motion.div
+      <div
         ref={containerRef}
-        drag={isOwner}
-        dragMomentum={false}
-        dragElastic={0}
-        onPointerDown={handlePointerDown}
-        onDragStart={handleDragStart}
-        onDrag={handleDrag}
-        onDragEnd={handleDragEnd}
-        onClick={handleClick}
-        onContextMenu={handleContextMenu}
-        className="absolute flex flex-col items-center gap-2 select-none group touch-none"
+        className="absolute flex flex-col items-center gap-2 select-none"
         style={{
-          left: `${item.positionX}%`,
-          top: `${item.positionY}%`,
+          left: `${visualPos.x}%`,
+          top: `${visualPos.y}%`,
           transform: 'translate(-50%, -50%)',
-          zIndex: isDragging ? 1000 : zIndex,
-          x,
-          y,
+          zIndex: isDragging ? 9999 : zIndex,
           cursor: isDragging ? 'grabbing' : isOwner ? 'grab' : 'pointer',
         }}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ scale: isDragging ? 1 : 1.05 }}
-        transition={{
-          type: 'spring',
-          stiffness: 400,
-          damping: 25,
-        }}
+        onMouseDown={handleMouseDown}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
       >
         {/* Icon Thumbnail */}
         <motion.div
@@ -169,7 +209,11 @@ function EditableDesktopItemComponent({
               ? '0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2)'
               : '0 8px 32px -8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)',
           }}
-          animate={{ y: isDragging ? -10 : 0, scale: isDragging ? 1.1 : 1 }}
+          animate={{
+            y: isDragging ? -8 : 0,
+            scale: isDragging ? 1.08 : 1,
+          }}
+          whileHover={{ scale: isDragging ? 1.08 : 1.05 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         >
           <Image
@@ -181,20 +225,9 @@ function EditableDesktopItemComponent({
             draggable={false}
           />
 
-          {/* Owner glow on hover */}
-          {isOwner && (
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0, 122, 255, 0.15) 0%, transparent 50%)',
-                boxShadow: 'inset 0 0 0 2px rgba(0, 122, 255, 0.3)',
-              }}
-            />
-          )}
-
-          {/* Regular hover highlight */}
+          {/* Hover highlight */}
           <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+            className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-200 pointer-events-none"
             style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
             }}
@@ -206,17 +239,17 @@ function EditableDesktopItemComponent({
           className="px-2 py-0.5 text-[11px] font-medium text-white text-center leading-tight max-w-[90px] truncate rounded pointer-events-none"
           style={{
             textShadow: '0 1px 3px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.6)',
-            background: 'rgba(0, 0, 0, 0.3)',
+            background: 'rgba(0, 0, 0, 0.35)',
             backdropFilter: 'blur(8px)',
           }}
         >
           {item.label}
         </span>
 
-        {/* Owner indicator (subtle edit icon) */}
+        {/* Owner indicator */}
         {isOwner && !isDragging && (
-          <motion.div
-            className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          <div
+            className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
             style={{
               background: 'rgba(0, 122, 255, 0.9)',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
@@ -225,9 +258,9 @@ function EditableDesktopItemComponent({
             <svg className="w-2 h-2 text-white" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M6 1l1 1M1 7l.5-2L5.5 1l1 1-4 4-2 .5z" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Context Menu */}
       {isOwner && (
@@ -240,15 +273,3 @@ function EditableDesktopItemComponent({
     </>
   );
 }
-
-// Memoized version to prevent unnecessary re-renders
-export const EditableDesktopItem = memo(EditableDesktopItemComponent, (prevProps, nextProps) => {
-  return (
-    prevProps.item.id === nextProps.item.id &&
-    prevProps.item.positionX === nextProps.item.positionX &&
-    prevProps.item.positionY === nextProps.item.positionY &&
-    prevProps.item.label === nextProps.item.label &&
-    prevProps.item.thumbnailUrl === nextProps.item.thumbnailUrl &&
-    prevProps.zIndex === nextProps.zIndex
-  );
-});

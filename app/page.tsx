@@ -127,8 +127,13 @@ export default function LandingPage() {
                 Beautiful, memorable, and uniquely yours.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/signup">
+                <Link href="/demo">
                   <Button size="lg" className="w-full sm:w-auto text-base px-8">
+                    View live demo
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button size="lg" variant="ghost" className="w-full sm:w-auto text-base px-8 border border-white/20 text-white hover:bg-white/10">
                     Create your desktop
                   </Button>
                 </Link>
@@ -353,11 +358,18 @@ export default function LandingPage() {
           <p className="text-white/50 text-lg mb-8">
             Join now and create something memorable
           </p>
-          <Link href="/signup">
-            <Button size="lg" className="text-base px-10">
-              Get started for free
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/demo">
+              <Button size="lg" className="text-base px-10">
+                Try the demo
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button size="lg" variant="ghost" className="text-base px-10 border border-white/20 text-white hover:bg-white/10">
+                Get started for free
+              </Button>
+            </Link>
+          </div>
         </motion.div>
       </section>
 

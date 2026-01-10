@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+
+const blockSchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  data: z.record(z.string(), z.unknown()),
+  order: z.number(),
+});
+
+const tabSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  icon: z.string().optional().nullable(),
+  order: z.number(),
+  blocks: z.array(blockSchema),
+});
 
 const createItemSchema = z.object({
   positionX: z.number().min(0).max(100),
@@ -12,7 +28,9 @@ const createItemSchema = z.object({
   windowTitle: z.string().min(1),
   windowSubtitle: z.string().optional().nullable(),
   windowHeaderImage: z.string().url().optional().nullable(),
-  windowDescription: z.string().min(1).max(5000),
+  windowDescription: z.string().max(5000).optional().default(''),
+  windowWidth: z.number().optional().nullable(),
+  useTabs: z.boolean().optional().default(false),
   windowDetails: z.array(z.object({
     label: z.string(),
     value: z.string(),
@@ -25,6 +43,8 @@ const createItemSchema = z.object({
     label: z.string(),
     url: z.string().url(),
   })).optional().nullable(),
+  blocks: z.array(blockSchema).optional().default([]),
+  tabs: z.array(tabSchema).optional().default([]),
 });
 
 export async function GET() {
@@ -52,6 +72,15 @@ export async function GET() {
     const items = await prisma.desktopItem.findMany({
       where: { desktopId: desktop.id },
       orderBy: { order: 'asc' },
+      include: {
+        blocks: { orderBy: { order: 'asc' } },
+        tabs: {
+          orderBy: { order: 'asc' },
+          include: {
+            blocks: { orderBy: { order: 'asc' } },
+          },
+        },
+      },
     });
 
     return NextResponse.json({ success: true, data: items });
@@ -102,6 +131,7 @@ export async function POST(request: NextRequest) {
       ? Math.max(...desktop.items.map(i => i.order))
       : -1;
 
+    // Create item with blocks and tabs
     const item = await prisma.desktopItem.create({
       data: {
         positionX: validatedData.positionX,
@@ -112,11 +142,44 @@ export async function POST(request: NextRequest) {
         windowSubtitle: validatedData.windowSubtitle,
         windowHeaderImage: validatedData.windowHeaderImage,
         windowDescription: validatedData.windowDescription,
+        windowWidth: validatedData.windowWidth,
+        useTabs: validatedData.useTabs,
         windowDetails: validatedData.windowDetails || undefined,
         windowGallery: validatedData.windowGallery || undefined,
         windowLinks: validatedData.windowLinks || undefined,
         desktopId: desktop.id,
         order: maxOrder + 1,
+        // Create blocks
+        blocks: {
+          create: validatedData.blocks.map(block => ({
+            type: block.type,
+            data: block.data as Prisma.InputJsonValue,
+            order: block.order,
+          })),
+        },
+        // Create tabs with their blocks
+        tabs: {
+          create: validatedData.tabs.map(tab => ({
+            label: tab.label,
+            icon: tab.icon,
+            order: tab.order,
+            blocks: {
+              create: tab.blocks.map(block => ({
+                type: block.type,
+                data: block.data as Prisma.InputJsonValue,
+                order: block.order,
+              })),
+            },
+          })),
+        },
+      },
+      include: {
+        blocks: true,
+        tabs: {
+          include: {
+            blocks: true,
+          },
+        },
       },
     });
 

@@ -8,7 +8,7 @@ import { useEditContextSafe } from '@/contexts/EditContext';
 import { EditableText, EditableImage } from '@/components/editing/Editable';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
-import { BLOCK_DEFINITIONS } from '@/types/blocks';
+import { BLOCK_DEFINITIONS, BLOCK_CATEGORIES } from '@/types/blocks';
 
 interface EditableInfoWindowProps {
   item: DesktopItem | null;
@@ -22,6 +22,7 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
   const constraintsRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [showBlockPicker, setShowBlockPicker] = useState(false);
+  const [blockPickerCategory, setBlockPickerCategory] = useState<string>('text');
   const dragControls = useDragControls();
 
   const isOwner = context?.isOwner ?? false;
@@ -187,42 +188,43 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
           <div
             ref={constraintsRef}
             className="fixed inset-0 z-[200] pointer-events-none"
-            style={{ padding: '20px' }}
+            style={{ padding: '40px' }}
           />
 
-          {/* Window */}
-          <motion.div
-            ref={windowRef}
-            className="fixed z-[200] max-w-[92vw] overflow-hidden flex flex-col glass-elevated"
-            drag
-            dragControls={dragControls}
-            dragListener={false}
-            dragConstraints={constraintsRef}
-            dragElastic={0.1}
-            dragMomentum={false}
-            style={{
-              width: item.windowWidth || 440,
-              maxHeight: 'calc(100vh - 80px)',
-              left: position?.x ?? '50%',
-              top: position?.y ?? '50%',
-              x: '-50%',
-              y: '-50%',
-              borderRadius: '14px',
-              background: 'var(--bg-glass-elevated)',
-              backdropFilter: 'blur(60px) saturate(200%)',
-              WebkitBackdropFilter: 'blur(60px) saturate(200%)',
-              boxShadow: 'var(--shadow-window)',
-            }}
-            initial={{ opacity: 0, scale: 0.88 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{
-              type: 'spring',
-              stiffness: 400,
-              damping: 30,
-              mass: 0.8
-            }}
+          {/* Centering wrapper */}
+          <div
+            className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none"
+            style={{ padding: '40px' }}
           >
+            {/* Window */}
+            <motion.div
+              ref={windowRef}
+              className="max-w-[92vw] overflow-hidden flex flex-col glass-elevated pointer-events-auto"
+              drag
+              dragControls={dragControls}
+              dragListener={false}
+              dragConstraints={constraintsRef}
+              dragElastic={0.05}
+              dragMomentum={false}
+              style={{
+                width: item.windowWidth || 440,
+                maxHeight: 'calc(100vh - 120px)',
+                borderRadius: '14px',
+                background: 'var(--bg-glass-elevated)',
+                backdropFilter: 'blur(60px) saturate(200%)',
+                WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                boxShadow: 'var(--shadow-window)',
+              }}
+              initial={{ opacity: 0, scale: 0.88, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 30,
+                mass: 0.8
+              }}
+            >
             {/* Title Bar */}
             <div
               className="flex items-center h-[52px] px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
@@ -280,7 +282,13 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto">
+            <div
+              className="flex-1 overflow-y-auto"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+              }}
+            >
               {/* Header Section */}
               <div className="flex items-start gap-4 px-6 pt-5 pb-4">
                 {/* Header Image */}
@@ -432,38 +440,88 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                       <div className="px-6 pt-4 pb-2">
                         {showBlockPicker ? (
                           <motion.div
-                            className="rounded-lg overflow-hidden"
+                            className="rounded-xl overflow-hidden"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             style={{
-                              background: 'var(--border-light)',
+                              background: 'var(--bg-elevated)',
                               border: '1px solid var(--border-medium)',
+                              boxShadow: 'var(--shadow-md)',
                             }}
                           >
-                            <div className="p-3">
-                              <div className="flex items-center justify-between mb-3">
-                                <span className="text-[12px] font-medium" style={{ color: 'var(--text-secondary)' }}>
-                                  Add Block
-                                </span>
+                            {/* Header */}
+                            <div
+                              className="flex items-center justify-between px-4 py-3"
+                              style={{ borderBottom: '1px solid var(--border-light)' }}
+                            >
+                              <span className="text-[13px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                Add Block
+                              </span>
+                              <button
+                                onClick={() => setShowBlockPicker(false)}
+                                className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                                style={{ background: 'var(--border-light)' }}
+                              >
+                                <svg className="w-3 h-3" style={{ color: 'var(--text-secondary)' }} viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                  <path d="M2 2l6 6M8 2l-6 6" strokeLinecap="round" />
+                                </svg>
+                              </button>
+                            </div>
+
+                            {/* Category Tabs */}
+                            <div
+                              className="flex gap-1 px-3 py-2 overflow-x-auto"
+                              style={{ borderBottom: '1px solid var(--border-light)' }}
+                            >
+                              {BLOCK_CATEGORIES.map((cat) => (
                                 <button
-                                  onClick={() => setShowBlockPicker(false)}
-                                  className="text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                                  key={cat.id}
+                                  onClick={() => setBlockPickerCategory(cat.id)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all"
+                                  style={{
+                                    background: blockPickerCategory === cat.id ? 'var(--accent-primary)' : 'transparent',
+                                    color: blockPickerCategory === cat.id ? 'white' : 'var(--text-secondary)',
+                                  }}
                                 >
-                                  Cancel
+                                  <span>{cat.icon}</span>
+                                  <span>{cat.label}</span>
                                 </button>
-                              </div>
+                              ))}
+                            </div>
+
+                            {/* Blocks Grid */}
+                            <div className="p-3 max-h-[280px] overflow-y-auto">
                               <div className="grid grid-cols-4 gap-2">
-                                {BLOCK_DEFINITIONS.slice(0, 12).map((blockDef) => (
+                                {BLOCK_DEFINITIONS
+                                  .filter(blockDef => blockDef.category === blockPickerCategory)
+                                  .map((blockDef) => (
                                   <button
                                     key={blockDef.type}
-                                    onClick={() => handleAddBlock(blockDef.type)}
-                                    className="flex flex-col items-center gap-1 p-2 rounded-md transition-colors"
+                                    onClick={() => {
+                                      handleAddBlock(blockDef.type);
+                                      setShowBlockPicker(false);
+                                    }}
+                                    className="flex flex-col items-center gap-1.5 p-3 rounded-lg transition-all group"
                                     style={{ background: 'transparent' }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-glass)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.background = 'var(--border-light)';
+                                      e.currentTarget.style.transform = 'scale(1.02)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.background = 'transparent';
+                                      e.currentTarget.style.transform = 'scale(1)';
+                                    }}
                                   >
-                                    <span className="text-lg">{blockDef.icon}</span>
-                                    <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                                    <span
+                                      className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
+                                      style={{
+                                        background: 'var(--border-light)',
+                                        boxShadow: 'inset 0 0 0 1px var(--border-medium)',
+                                      }}
+                                    >
+                                      {blockDef.icon}
+                                    </span>
+                                    <span className="text-[10px] font-medium text-center" style={{ color: 'var(--text-primary)' }}>
                                       {blockDef.label}
                                     </span>
                                   </button>
@@ -474,14 +532,22 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                         ) : (
                           <button
                             onClick={() => setShowBlockPicker(true)}
-                            className="w-full py-2 rounded-lg border border-dashed flex items-center justify-center gap-2 text-[13px] transition-all"
+                            className="w-full py-2.5 rounded-lg border border-dashed flex items-center justify-center gap-2 text-[13px] font-medium transition-all"
                             style={{
                               borderColor: 'var(--border-medium)',
                               color: 'var(--text-tertiary)',
                               background: 'transparent',
                             }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--border-light)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'var(--border-light)';
+                              e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                              e.currentTarget.style.color = 'var(--accent-primary)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                              e.currentTarget.style.borderColor = 'var(--border-medium)';
+                              e.currentTarget.style.color = 'var(--text-tertiary)';
+                            }}
                           >
                             <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                               <path d="M8 3v10M3 8h10" strokeLinecap="round" />
@@ -495,7 +561,8 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 </AnimatePresence>
               </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

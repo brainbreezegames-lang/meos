@@ -1,13 +1,28 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { EditableInfoWindow } from '@/components/desktop/EditableInfoWindow';
 import { EditableDesktopItem } from '@/components/desktop/EditableDesktopItem';
+import { BackgroundPanel } from '@/components/desktop/BackgroundPanel';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { ThemeTogglePill } from '@/components/ui/ThemeToggle';
 import type { DesktopItem, Desktop } from '@/types';
+
+// Background context for demo
+interface BackgroundContextType {
+  customBackground: string | null;
+  setCustomBackground: (url: string | null) => void;
+  showBackgroundPanel: boolean;
+  setShowBackgroundPanel: (show: boolean) => void;
+}
+const BackgroundContext = createContext<BackgroundContextType | null>(null);
+function useBackgroundContext() {
+  const ctx = useContext(BackgroundContext);
+  if (!ctx) throw new Error('useBackgroundContext must be used within provider');
+  return ctx;
+}
 
 // Background images that rotate
 const BACKGROUND_IMAGES = [
@@ -365,30 +380,45 @@ const DEMO_DESKTOP: Desktop = {
   ],
 };
 
-// Dock Item Component
+// Dock Icon Component - Width-based magnification (the correct approach)
 interface DockIconProps {
   item: typeof DEMO_DESKTOP.dockItems[0];
   mouseX: ReturnType<typeof useMotionValue<number>>;
 }
 
 function DockIcon({ item, mouseX }: DockIconProps) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  const distance = useTransform(mouseX, (val) => {
+  // Configuration - based on proven implementations
+  const baseSize = 48;
+  const maxSize = 72;
+  const distance = 140; // Effect radius in pixels
+
+  // Spring config for smooth, responsive feel
+  const springConfig = { mass: 0.1, stiffness: 150, damping: 12 };
+
+  // Calculate distance from mouse to icon center
+  const distanceFromMouse = useTransform(mouseX, (val) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
   });
 
-  const baseSize = 48;
-  const maxSize = 72;
-  const magnificationRange = 150;
+  // Map distance to width/height - icons grow as mouse approaches
+  const widthSync = useTransform(
+    distanceFromMouse,
+    [-distance, 0, distance],
+    [baseSize, maxSize, baseSize]
+  );
+  const width = useSpring(widthSync, springConfig);
 
-  const scaleSync = useTransform(distance, [-magnificationRange, 0, magnificationRange], [1, maxSize / baseSize, 1]);
-  const scale = useSpring(scaleSync, { stiffness: 400, damping: 25, mass: 0.5 });
-
-  const ySync = useTransform(scale, [1, maxSize / baseSize], [0, -12]);
-  const y = useSpring(ySync, { stiffness: 400, damping: 25, mass: 0.5 });
+  // Icon size scales proportionally
+  const iconSizeSync = useTransform(
+    distanceFromMouse,
+    [-distance, 0, distance],
+    [24, 36, 24]
+  );
+  const iconSize = useSpring(iconSizeSync, springConfig);
 
   const handleClick = () => {
     if (item.actionType === 'url') {
@@ -403,41 +433,62 @@ function DockIcon({ item, mouseX }: DockIconProps) {
   };
 
   return (
-    <motion.div className="relative" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+    <motion.div
+      ref={ref}
+      style={{ width, height: width }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative flex items-center justify-center cursor-pointer"
+    >
+      {/* Tooltip */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            className="absolute left-1/2 px-3 py-1.5 rounded-md whitespace-nowrap pointer-events-none"
-            style={{
-              bottom: 'calc(100% + 12px)',
-              x: '-50%',
-              background: 'var(--bg-tooltip)',
-              boxShadow: 'var(--shadow-md)',
-            }}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.12 }}
+            className="absolute left-1/2 pointer-events-none z-10"
+            style={{ bottom: 'calc(100% + 6px)' }}
+            initial={{ opacity: 0, y: 8, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 4, x: '-50%' }}
+            transition={{ duration: 0.15 }}
           >
-            <span className="text-[11px] font-medium" style={{ color: 'var(--text-on-dark)' }}>{item.label}</span>
+            <div
+              className="px-2.5 py-1 rounded-md whitespace-nowrap"
+              style={{
+                background: 'rgba(30, 30, 30, 0.9)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              <span className="text-[11px] font-medium text-white/95">
+                {item.label}
+              </span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Icon button */}
       <motion.button
-        ref={ref}
         onClick={handleClick}
-        className="dock-icon flex items-center justify-center rounded-xl cursor-pointer origin-bottom"
+        className="w-full h-full rounded-xl flex items-center justify-center"
         style={{
-          width: baseSize,
-          height: baseSize,
-          scale,
-          y,
-          background: 'var(--bg-glass-elevated)',
-          boxShadow: 'var(--shadow-item), inset 0 0.5px 0 var(--border-glass-inner)',
+          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 240, 245, 0.88) 100%)',
+          boxShadow: `
+            0 1px 2px rgba(0, 0, 0, 0.07),
+            0 2px 4px rgba(0, 0, 0, 0.07),
+            0 4px 8px rgba(0, 0, 0, 0.07),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9)
+          `,
         }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       >
-        <span className="text-[24px]">{item.icon}</span>
+        <motion.span
+          className="select-none"
+          style={{ fontSize: iconSize }}
+        >
+          {item.icon}
+        </motion.span>
       </motion.button>
     </motion.div>
   );
@@ -451,18 +502,22 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
     <motion.div
       className="fixed bottom-3 left-1/2 z-[100]"
       style={{ x: '-50%' }}
-      initial={{ y: 100 }}
-      animate={{ y: 0 }}
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30, delay: 0.3 }}
     >
       <motion.div
-        className="flex items-end gap-[4px] px-3 pb-2 pt-2"
+        className="flex items-end gap-1 px-2 pb-2 pt-2"
         style={{
           borderRadius: '18px',
-          background: 'var(--bg-dock)',
-          backdropFilter: 'blur(50px) saturate(200%)',
-          WebkitBackdropFilter: 'blur(50px) saturate(200%)',
-          boxShadow: 'var(--shadow-dock)',
+          background: 'rgba(255, 255, 255, 0.2)',
+          backdropFilter: 'blur(30px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(30px) saturate(180%)',
+          boxShadow: `
+            0 0 0 0.5px rgba(255, 255, 255, 0.25),
+            0 8px 32px rgba(0, 0, 0, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3)
+          `,
         }}
         onMouseMove={(e) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
@@ -478,6 +533,7 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
 // Menu Bar Component
 function MenuBar() {
   const context = useEditContextSafe();
+  const bgContext = useBackgroundContext();
   const [time, setTime] = useState<string>('');
 
   useEffect(() => {
@@ -514,6 +570,21 @@ function MenuBar() {
         <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>Demo Desktop</span>
       </div>
       <div className="flex items-center gap-3">
+        {/* Background settings button */}
+        <button
+          onClick={() => bgContext.setShowBackgroundPanel(true)}
+          className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all hover:bg-black/5"
+          style={{ color: 'var(--text-secondary)' }}
+          title="Change Background"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <path d="M21 15l-5-5L5 21" />
+          </svg>
+          <span>Background</span>
+        </button>
+
         {/* Edit mode toggle */}
         <button
           onClick={toggleEditMode}
@@ -551,11 +622,15 @@ function MenuBar() {
 
 // Rotating Background
 function RotatingBackground() {
+  const { customBackground } = useBackgroundContext();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
+    // If there's a custom background, don't rotate
+    if (customBackground) return;
+
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setNextIndex((currentIndex + 1) % BACKGROUND_IMAGES.length);
@@ -567,7 +642,32 @@ function RotatingBackground() {
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [currentIndex, customBackground]);
+
+  // If custom background is set, show it
+  if (customBackground) {
+    return (
+      <>
+        <motion.div
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: `url(${customBackground})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        />
+        <div
+          className="fixed inset-0 z-[1] pointer-events-none"
+          style={{
+            background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25) 100%)',
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -795,15 +895,42 @@ function DesktopContent() {
   );
 }
 
+// Demo Page Inner (needs access to background context)
+function DemoPageInner() {
+  const bgContext = useBackgroundContext();
+
+  return (
+    <main className="min-h-screen h-screen overflow-hidden relative">
+      <RotatingBackground />
+      <MenuBar />
+      <DesktopContent />
+
+      {/* Background Settings Panel */}
+      <BackgroundPanel
+        isOpen={bgContext.showBackgroundPanel}
+        onClose={() => bgContext.setShowBackgroundPanel(false)}
+        currentBackground={bgContext.customBackground}
+        onBackgroundChange={bgContext.setCustomBackground}
+      />
+    </main>
+  );
+}
+
 // Main Demo Page
 export default function DemoPage() {
+  const [customBackground, setCustomBackground] = useState<string | null>(null);
+  const [showBackgroundPanel, setShowBackgroundPanel] = useState(false);
+
   return (
-    <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
-      <main className="min-h-screen h-screen overflow-hidden relative">
-        <RotatingBackground />
-        <MenuBar />
-        <DesktopContent />
-      </main>
-    </EditProvider>
+    <BackgroundContext.Provider value={{
+      customBackground,
+      setCustomBackground,
+      showBackgroundPanel,
+      setShowBackgroundPanel,
+    }}>
+      <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
+        <DemoPageInner />
+      </EditProvider>
+    </BackgroundContext.Provider>
   );
 }

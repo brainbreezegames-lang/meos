@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import Image from 'next/image';
-import type { DesktopItem } from '@/types';
+import type { DesktopItem, BlockData } from '@/types';
+import BlockRenderer from '@/components/blocks/BlockRenderer';
 
 interface InfoWindowProps {
   item: DesktopItem | null;
@@ -13,6 +14,18 @@ interface InfoWindowProps {
 
 export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
   const windowRef = useRef<HTMLDivElement>(null);
+  const constraintsRef = useRef<HTMLDivElement>(null);
+  const [activeTabId, setActiveTabId] = useState<string | null>(null);
+  const dragControls = useDragControls();
+
+  // Reset active tab when item changes
+  useEffect(() => {
+    if (item?.useTabs && item.tabs?.length > 0) {
+      setActiveTabId(item.tabs[0].id);
+    } else {
+      setActiveTabId(null);
+    }
+  }, [item]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -39,6 +52,72 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
     };
   }, [handleKeyDown, handleClickOutside]);
 
+  // Get blocks to render - either from active tab or direct blocks
+  const getBlocksToRender = (): BlockData[] => {
+    if (!item) return [];
+
+    // New block system
+    if (item.useTabs && item.tabs?.length > 0 && activeTabId) {
+      const activeTab = item.tabs.find(t => t.id === activeTabId);
+      return activeTab?.blocks || [];
+    }
+
+    if (item.blocks?.length > 0) {
+      return item.blocks;
+    }
+
+    // Legacy fallback - convert old content to blocks
+    const legacyBlocks: BlockData[] = [];
+
+    // Description as text block
+    if (item.windowDescription) {
+      legacyBlocks.push({
+        id: 'legacy-description',
+        type: 'text',
+        data: { content: item.windowDescription },
+        order: 0,
+      });
+    }
+
+    // Details as details block
+    if (item.windowDetails?.length) {
+      legacyBlocks.push({
+        id: 'legacy-details',
+        type: 'details',
+        data: { items: item.windowDetails },
+        order: 1,
+      });
+    }
+
+    // Links as buttons block
+    if (item.windowLinks?.length) {
+      legacyBlocks.push({
+        id: 'legacy-links',
+        type: 'buttons',
+        data: {
+          buttons: item.windowLinks.map(link => ({
+            label: link.label,
+            url: link.url,
+            style: 'primary',
+            newTab: true,
+          })),
+        },
+        order: 2,
+      });
+    }
+
+    return legacyBlocks;
+  };
+
+  const blocksToRender = getBlocksToRender();
+  const sortedBlocks = [...blocksToRender].sort((a, b) => a.order - b.order);
+  const sortedTabs = item?.tabs ? [...item.tabs].sort((a, b) => a.order - b.order) : [];
+
+  // Function to start drag from title bar
+  const startDrag = (event: React.PointerEvent) => {
+    dragControls.start(event);
+  };
+
   return (
     <AnimatePresence>
       {item && (
@@ -57,52 +136,70 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
             transition={{ duration: 0.2 }}
           />
 
-          {/* Window */}
-          <motion.div
-            ref={windowRef}
-            className="fixed z-[200] w-[440px] max-w-[92vw] max-h-[85vh] overflow-hidden flex flex-col"
-            style={{
-              left: position?.x ?? '50%',
-              top: position?.y ?? '50%',
-              transform: 'translate(-50%, -50%)',
-              borderRadius: '14px',
-              background: `
-                linear-gradient(
-                  180deg,
-                  rgba(255, 255, 255, 0.92) 0%,
-                  rgba(255, 255, 255, 0.85) 100%
-                )
-              `,
-              backdropFilter: 'blur(60px) saturate(200%)',
-              WebkitBackdropFilter: 'blur(60px) saturate(200%)',
-              boxShadow: `
-                0 40px 80px -20px rgba(0, 0, 0, 0.4),
-                0 20px 40px -10px rgba(0, 0, 0, 0.25),
-                0 0 0 0.5px rgba(255, 255, 255, 0.4),
-                inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8)
-              `,
-            }}
-            initial={{ opacity: 0, scale: 0.88, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 10 }}
-            transition={{
-              type: 'spring',
-              stiffness: 400,
-              damping: 30,
-              mass: 0.8
-            }}
+          {/* Drag constraints container */}
+          <div
+            ref={constraintsRef}
+            className="fixed inset-0 z-[200] pointer-events-none"
+            style={{ padding: '40px' }}
+          />
+
+          {/* Centering wrapper */}
+          <div
+            className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none"
+            style={{ padding: '40px' }}
           >
-            {/* Title Bar */}
+            {/* Window */}
+            <motion.div
+              ref={windowRef}
+              className="max-w-[92vw] overflow-hidden flex flex-col pointer-events-auto"
+              drag
+              dragControls={dragControls}
+              dragListener={false}
+              dragConstraints={constraintsRef}
+              dragElastic={0.05}
+              dragMomentum={false}
+              style={{
+                width: item.windowWidth || 440,
+                maxHeight: 'calc(100vh - 120px)',
+                borderRadius: '14px',
+                background: `
+                  linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.92) 0%,
+                    rgba(255, 255, 255, 0.85) 100%
+                  )
+                `,
+                backdropFilter: 'blur(60px) saturate(200%)',
+                WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                boxShadow: `
+                  0 40px 80px -20px rgba(0, 0, 0, 0.4),
+                  0 20px 40px -10px rgba(0, 0, 0, 0.25),
+                  0 0 0 0.5px rgba(255, 255, 255, 0.4),
+                  inset 0 0 0 0.5px rgba(255, 255, 255, 0.6),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                `,
+              }}
+              initial={{ opacity: 0, scale: 0.88, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 30,
+                mass: 0.8
+              }}
+            >
+            {/* Title Bar - Drag Handle */}
             <div
-              className="flex items-center h-[52px] px-4 shrink-0 relative"
+              className="flex items-center h-[52px] px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
               style={{
                 borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
                 background: 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 100%)',
               }}
+              onPointerDown={startDrag}
             >
               {/* Traffic Lights */}
-              <div className="flex items-center gap-2 group/traffic">
+              <div className="flex items-center gap-2 group/traffic" onPointerDown={(e) => e.stopPropagation()}>
                 {/* Close */}
                 <button
                   onClick={onClose}
@@ -192,9 +289,9 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-5">
+            <div className="flex-1 overflow-y-auto">
               {/* Header Section */}
-              <div className="flex items-start gap-4 mb-5">
+              <div className="flex items-start gap-4 px-6 pt-5 pb-4">
                 {/* Header Image */}
                 <div
                   className="relative w-16 h-16 rounded-[12px] overflow-hidden shrink-0"
@@ -234,94 +331,59 @@ export function InfoWindow({ item, onClose, position }: InfoWindowProps) {
                 </div>
               </div>
 
-              {/* Description */}
-              <div
-                className="text-[13px] leading-[1.6] whitespace-pre-wrap"
-                style={{ color: '#3D3D3F' }}
-              >
-                {item.windowDescription}
-              </div>
-
-              {/* Details Section */}
-              {item.windowDetails && item.windowDetails.length > 0 && (
+              {/* Tabs (if enabled) */}
+              {item.useTabs && sortedTabs.length > 0 && (
                 <div
-                  className="pt-4 mt-5"
-                  style={{ borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}
+                  className="flex gap-1 px-6 pb-3"
+                  style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }}
                 >
-                  <div className="space-y-2.5">
-                    {item.windowDetails.map((detail, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <div
-                          className="w-[6px] h-[6px] rounded-full shrink-0"
-                          style={{
-                            background: 'linear-gradient(135deg, #34C759 0%, #28A745 100%)',
-                            boxShadow: '0 1px 3px rgba(52, 199, 89, 0.4)',
-                          }}
-                        />
-                        <span
-                          className="text-[12px]"
-                          style={{ color: '#8E8E93' }}
-                        >
-                          {detail.label}
-                        </span>
-                        <span
-                          className="text-[12px] font-medium ml-auto"
-                          style={{ color: '#3D3D3F' }}
-                        >
-                          {detail.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Links Section */}
-              {item.windowLinks && item.windowLinks.length > 0 && (
-                <div
-                  className="flex flex-wrap gap-2.5 mt-5 pt-4"
-                  style={{ borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}
-                >
-                  {item.windowLinks.map((link, index) => (
-                    <motion.a
-                      key={index}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-semibold transition-all"
+                  {sortedTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTabId(tab.id)}
+                      className="px-3 py-1.5 rounded-md text-[12px] font-medium transition-all"
                       style={{
-                        background: 'linear-gradient(180deg, #0A84FF 0%, #0070E0 100%)',
-                        color: '#FFFFFF',
-                        boxShadow: `
-                          0 4px 12px -2px rgba(0, 122, 255, 0.4),
-                          0 0 0 0.5px rgba(255, 255, 255, 0.2),
-                          inset 0 1px 0 rgba(255, 255, 255, 0.2)
-                        `,
+                        background: activeTabId === tab.id
+                          ? 'rgba(0, 122, 255, 0.1)'
+                          : 'transparent',
+                        color: activeTabId === tab.id
+                          ? 'var(--accent-primary)'
+                          : 'var(--text-secondary)',
                       }}
-                      whileHover={{ scale: 1.04, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                     >
-                      {link.label}
-                      <svg
-                        className="w-3.5 h-3.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.5}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </motion.a>
+                      {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+                      {tab.label}
+                    </button>
                   ))}
                 </div>
               )}
+
+              {/* Blocks Content */}
+              <div className="pb-5">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeTabId || 'main'}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    {sortedBlocks.map((block, index) => (
+                      <div
+                        key={block.id}
+                        style={{
+                          borderTop: index > 0 ? '1px solid rgba(0, 0, 0, 0.06)' : undefined,
+                        }}
+                      >
+                        <BlockRenderer block={block} />
+                      </div>
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

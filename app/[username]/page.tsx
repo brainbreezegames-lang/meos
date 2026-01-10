@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { DesktopCanvas, MenuBar, Dock, MadeWithBadge } from '@/components/desktop';
-import type { DesktopItem, DockItem } from '@prisma/client';
+import type { DesktopItem, DockItem, Tab, Block } from '@prisma/client';
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -19,6 +19,19 @@ async function getDesktop(username: string) {
         include: {
           items: {
             orderBy: { order: 'asc' },
+            include: {
+              tabs: {
+                orderBy: { order: 'asc' },
+                include: {
+                  blocks: {
+                    orderBy: { order: 'asc' },
+                  },
+                },
+              },
+              blocks: {
+                orderBy: { order: 'asc' },
+              },
+            },
           },
           dockItems: {
             orderBy: { order: 'asc' },
@@ -106,11 +119,26 @@ export default async function UserDesktopPage({ params }: PageProps) {
 
   const desktop = {
     ...user.desktop,
-    items: user.desktop.items.map((item: DesktopItem) => ({
+    items: user.desktop.items.map((item: DesktopItem & { tabs: (Tab & { blocks: Block[] })[]; blocks: Block[] }) => ({
       ...item,
       windowDetails: item.windowDetails as { label: string; value: string }[] | null,
       windowGallery: item.windowGallery as { type: 'image' | 'video'; url: string }[] | null,
       windowLinks: item.windowLinks as { label: string; url: string }[] | null,
+      tabs: item.tabs.map((tab) => ({
+        ...tab,
+        blocks: tab.blocks.map((block) => ({
+          id: block.id,
+          type: block.type,
+          data: block.data as Record<string, unknown>,
+          order: block.order,
+        })),
+      })),
+      blocks: item.blocks.map((block) => ({
+        id: block.id,
+        type: block.type,
+        data: block.data as Record<string, unknown>,
+        order: block.order,
+      })),
     })),
     dockItems: user.desktop.dockItems.map((item: DockItem) => ({
       ...item,

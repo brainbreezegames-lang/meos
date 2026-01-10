@@ -1,3 +1,5 @@
+export * from './blocks';
+
 export interface User {
   id: string;
   email: string;
@@ -32,10 +34,31 @@ export interface DesktopItem {
   windowSubtitle: string | null;
   windowHeaderImage: string | null;
   windowDescription: string;
+  // Legacy fields (for backwards compatibility)
   windowDetails: DetailItem[] | null;
   windowGallery: GalleryItem[] | null;
   windowLinks: LinkItem[] | null;
+  // New block system
+  useTabs: boolean;
+  windowWidth?: number | null;
+  tabs: TabData[];
+  blocks: BlockData[];
   zIndex: number;
+  order: number;
+}
+
+export interface TabData {
+  id: string;
+  label: string;
+  icon?: string | null;
+  order: number;
+  blocks: BlockData[];
+}
+
+export interface BlockData {
+  id: string;
+  type: string;
+  data: Record<string, unknown>;
   order: number;
 }
 

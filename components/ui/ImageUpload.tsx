@@ -10,7 +10,7 @@ interface ImageUploadProps {
   onUpload: (file: File) => Promise<string>;
   label?: string;
   className?: string;
-  aspectRatio?: 'square' | '16/9' | '4/3';
+  aspectRatio?: 'square' | '16/9' | '4/3' | 'wide';
 }
 
 export function ImageUpload({
@@ -58,6 +58,7 @@ export function ImageUpload({
     square: 'aspect-square',
     '16/9': 'aspect-video',
     '4/3': 'aspect-[4/3]',
+    'wide': 'aspect-[21/9]',
   };
 
   return (

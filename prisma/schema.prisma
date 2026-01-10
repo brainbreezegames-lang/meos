@@ -87,13 +87,45 @@ model DesktopItem {
   windowSubtitle     String?
   windowHeaderImage  String?
   windowDescription  String   @db.Text
+  // Legacy fields (kept for backwards compatibility during migration)
   windowDetails      Json?
   windowGallery      Json?
   windowLinks        Json?
+  // New block system
+  useTabs            Boolean  @default(false)
+  windowWidth        Int?     // Custom window width
+  tabs               Tab[]
+  blocks             Block[]  // Direct blocks when useTabs is false
   zIndex             Int      @default(0)
   order              Int      @default(0)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+model Tab {
+  id        String   @id @default(cuid())
+  itemId    String
+  item      DesktopItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  label     String
+  icon      String?
+  order     Int      @default(0)
+  blocks    Block[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  // Parent can be either a DesktopItem (no tabs) or a Tab
+  itemId    String?
+  item      DesktopItem? @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  tabId     String?
+  tab       Tab?     @relation(fields: [tabId], references: [id], onDelete: Cascade)
+  type      String   // 'text', 'details', 'gallery', 'stats', etc.
+  data      Json     // Block-specific data
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model DockItem {
