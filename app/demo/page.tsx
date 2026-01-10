@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { EditableInfoWindow } from '@/components/desktop/EditableInfoWindow';
 import { EditableDesktopItem } from '@/components/desktop/EditableDesktopItem';
 import { BackgroundPanel } from '@/components/desktop/BackgroundPanel';
@@ -381,7 +381,7 @@ const DEMO_DESKTOP: Desktop = {
   ],
 };
 
-// Dock Icon Component - Width-based magnification (the correct approach)
+// Theme-aware Dock Icon Component
 interface DockIconProps {
   item: typeof DEMO_DESKTOP.dockItems[0];
   mouseX: ReturnType<typeof useMotionValue<number>>;
@@ -390,22 +390,20 @@ interface DockIconProps {
 function DockIcon({ item, mouseX }: DockIconProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const { themeInfo } = useTheme();
+  const isDark = themeInfo.isDark;
 
-  // Configuration - based on proven implementations
   const baseSize = 48;
   const maxSize = 72;
-  const distance = 140; // Effect radius in pixels
+  const distance = 140;
 
-  // Spring config for smooth, responsive feel
   const springConfig = { mass: 0.1, stiffness: 150, damping: 12 };
 
-  // Calculate distance from mouse to icon center
   const distanceFromMouse = useTransform(mouseX, (val) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
   });
 
-  // Map distance to width/height - icons grow as mouse approaches
   const widthSync = useTransform(
     distanceFromMouse,
     [-distance, 0, distance],
@@ -413,7 +411,6 @@ function DockIcon({ item, mouseX }: DockIconProps) {
   );
   const width = useSpring(widthSync, springConfig);
 
-  // Icon size scales proportionally
   const iconSizeSync = useTransform(
     distanceFromMouse,
     [-distance, 0, distance],
@@ -441,7 +438,7 @@ function DockIcon({ item, mouseX }: DockIconProps) {
       onMouseLeave={() => setIsHovered(false)}
       className="relative flex items-center justify-center cursor-pointer"
     >
-      {/* Tooltip */}
+      {/* Tooltip - Theme aware */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
@@ -455,12 +452,15 @@ function DockIcon({ item, mouseX }: DockIconProps) {
             <div
               className="px-2.5 py-1 rounded-md whitespace-nowrap"
               style={{
-                background: 'rgba(30, 30, 30, 0.9)',
+                background: 'var(--bg-tooltip)',
                 backdropFilter: 'blur(12px)',
-                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.3)',
+                boxShadow: 'var(--shadow-md)',
               }}
             >
-              <span className="text-[11px] font-medium text-white/95">
+              <span
+                className="text-[11px] font-medium"
+                style={{ color: 'var(--text-on-dark)' }}
+              >
                 {item.label}
               </span>
             </div>
@@ -468,18 +468,17 @@ function DockIcon({ item, mouseX }: DockIconProps) {
         )}
       </AnimatePresence>
 
-      {/* Icon button */}
+      {/* Icon button - Theme aware */}
       <motion.button
         onClick={handleClick}
         className="w-full h-full rounded-xl flex items-center justify-center"
         style={{
-          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 240, 245, 0.88) 100%)',
-          boxShadow: `
-            0 1px 2px rgba(0, 0, 0, 0.07),
-            0 2px 4px rgba(0, 0, 0, 0.07),
-            0 4px 8px rgba(0, 0, 0, 0.07),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9)
-          `,
+          background: isDark
+            ? 'linear-gradient(145deg, rgba(60, 60, 70, 0.9) 0%, rgba(40, 40, 50, 0.85) 100%)'
+            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 240, 245, 0.88) 100%)',
+          boxShadow: isDark
+            ? `0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)`
+            : `0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9)`,
         }}
         whileTap={{ scale: 0.9 }}
         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
@@ -495,7 +494,7 @@ function DockIcon({ item, mouseX }: DockIconProps) {
   );
 }
 
-// Dock Component
+// Theme-aware Dock Component
 function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
   const mouseX = useMotionValue(Infinity);
 
@@ -511,14 +510,11 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
         className="flex items-end gap-1 px-2 pb-2 pt-2"
         style={{
           borderRadius: '18px',
-          background: 'rgba(255, 255, 255, 0.2)',
+          background: 'var(--bg-dock)',
           backdropFilter: 'blur(30px) saturate(180%)',
           WebkitBackdropFilter: 'blur(30px) saturate(180%)',
-          boxShadow: `
-            0 0 0 0.5px rgba(255, 255, 255, 0.25),
-            0 8px 32px rgba(0, 0, 0, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3)
-          `,
+          boxShadow: 'var(--shadow-dock)',
+          border: '1px solid var(--border-glass-outer)',
         }}
         onMouseMove={(e) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
@@ -531,10 +527,11 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
   );
 }
 
-// Menu Bar Component
+// Theme-aware Menu Bar Component
 function MenuBar() {
   const context = useEditContextSafe();
   const bgContext = useBackgroundContext();
+  const { themeInfo } = useTheme();
   const [time, setTime] = useState<string>('');
 
   useEffect(() => {
@@ -555,7 +552,7 @@ function MenuBar() {
 
   return (
     <motion.header
-      className="fixed top-0 left-0 right-0 z-[150] h-[28px] flex items-center justify-between px-4 menubar-glass"
+      className="fixed top-0 left-0 right-0 z-[150] h-[28px] flex items-center justify-between px-4"
       style={{
         background: 'var(--bg-menubar)',
         backdropFilter: 'blur(50px) saturate(180%)',
@@ -567,15 +564,28 @@ function MenuBar() {
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
       <div className="flex items-center gap-4">
-        <span className="text-[13px] font-semibold" style={{ color: 'var(--text-primary)' }}>MeOS</span>
+        <span
+          className="text-[13px] font-semibold"
+          style={{
+            color: 'var(--text-primary)',
+            fontFamily: themeInfo.id === 'refined' ? 'var(--font-display)' : undefined,
+          }}
+        >
+          MeOS
+        </span>
         <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>Demo Desktop</span>
       </div>
       <div className="flex items-center gap-3">
         {/* Background settings button */}
         <button
           onClick={() => bgContext.setShowBackgroundPanel(true)}
-          className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all hover:bg-black/5"
-          style={{ color: 'var(--text-secondary)' }}
+          className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all"
+          style={{
+            color: 'var(--text-secondary)',
+            background: 'transparent',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--border-light)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           title="Change Background"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -592,7 +602,7 @@ function MenuBar() {
           className="px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all"
           style={{
             background: context?.isOwner
-              ? 'rgba(91, 160, 255, 0.15)'
+              ? 'color-mix(in srgb, var(--accent-primary) 15%, transparent)'
               : 'var(--border-light)',
             color: context?.isOwner
               ? 'var(--accent-primary)'
@@ -621,15 +631,15 @@ function MenuBar() {
   );
 }
 
-// Rotating Background
+// Theme-aware Rotating Background
 function RotatingBackground() {
   const { customBackground } = useBackgroundContext();
+  const { themeInfo } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
-    // If there's a custom background, don't rotate
     if (customBackground) return;
 
     const interval = setInterval(() => {
@@ -645,7 +655,11 @@ function RotatingBackground() {
     return () => clearInterval(interval);
   }, [currentIndex, customBackground]);
 
-  // If custom background is set, show it
+  // Theme-aware overlay gradient
+  const overlayGradient = themeInfo.isDark
+    ? 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.45) 100%)'
+    : 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25) 100%)';
+
   if (customBackground) {
     return (
       <>
@@ -662,9 +676,7 @@ function RotatingBackground() {
         />
         <div
           className="fixed inset-0 z-[1] pointer-events-none"
-          style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25) 100%)',
-          }}
+          style={{ background: overlayGradient }}
         />
       </>
     );
@@ -694,17 +706,16 @@ function RotatingBackground() {
       />
       <div
         className="fixed inset-0 z-[1] pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25) 100%)',
-        }}
+        style={{ background: overlayGradient }}
       />
     </>
   );
 }
 
-// Desktop Content (needs access to context)
+// Theme-aware Desktop Content
 function DesktopContent() {
   const context = useEditContextSafe();
+  const { themeInfo } = useTheme();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [itemOrder, setItemOrder] = useState<string[]>(() =>
     context?.desktop?.items.map(i => i.id) || []
@@ -712,12 +723,10 @@ function DesktopContent() {
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [newItemPosition, setNewItemPosition] = useState({ x: 50, y: 50 });
 
-  // Get the current version of the selected item from context
   const selectedItem = selectedItemId
     ? context?.desktop?.items.find(i => i.id === selectedItemId) || null
     : null;
 
-  // Update item order when desktop changes
   useEffect(() => {
     if (context?.desktop?.items) {
       setItemOrder(context.desktop.items.map(i => i.id));
@@ -728,12 +737,10 @@ function DesktopContent() {
     setItemOrder(prev => [...prev.filter(i => i !== id), id]);
   };
 
-  // Handle double-click to add new item
   const handleDoubleClick = (e: React.MouseEvent) => {
     if (!context?.isOwner) return;
 
     const target = e.target as HTMLElement;
-    // Only trigger on the desktop canvas, not on items or windows
     if (!target.classList.contains('desktop-canvas')) return;
 
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -747,7 +754,6 @@ function DesktopContent() {
   const handleCreateItem = () => {
     if (!context?.desktop) return;
 
-    // For the demo, we create items locally without API calls
     const newItem: DesktopItem = {
       id: `item-${Date.now()}`,
       desktopId: 'demo',
@@ -771,7 +777,6 @@ function DesktopContent() {
       order: context.desktop.items.length,
     };
 
-    // Update the desktop state directly for the demo
     context.setDesktop({
       ...context.desktop,
       items: [...context.desktop.items, newItem],
@@ -801,15 +806,15 @@ function DesktopContent() {
           />
         ))}
 
-        {/* Double-click hint for owners */}
+        {/* Double-click hint for owners - Theme aware */}
         {context?.isOwner && items.length < 3 && (
           <motion.div
             className="absolute bottom-24 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full text-[12px] font-medium pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.7 }}
             style={{
-              background: 'rgba(0, 0, 0, 0.5)',
-              color: 'white',
+              background: 'var(--bg-tooltip)',
+              color: 'var(--text-on-dark)',
             }}
           >
             Double-click anywhere to add an item
@@ -823,12 +828,13 @@ function DesktopContent() {
         onClose={() => setSelectedItemId(null)}
       />
 
-      {/* New Item Modal */}
+      {/* New Item Modal - Theme aware */}
       <AnimatePresence>
         {showNewItemModal && (
           <>
             <motion.div
-              className="fixed inset-0 z-[300] bg-black/30"
+              className="fixed inset-0 z-[300]"
+              style={{ background: 'var(--bg-overlay)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -840,25 +846,48 @@ function DesktopContent() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(40px)',
-                boxShadow: '0 40px 80px rgba(0, 0, 0, 0.3)',
+                background: 'var(--bg-glass-elevated)',
+                backdropFilter: 'blur(40px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+                boxShadow: 'var(--shadow-window)',
+                border: '1px solid var(--border-light)',
               }}
             >
-              <h3 className="text-lg font-semibold mb-4">Create New Item</h3>
-              <p className="text-sm text-gray-600 mb-6">
+              <h3
+                className="text-lg font-semibold mb-4"
+                style={{
+                  color: 'var(--text-primary)',
+                  fontFamily: themeInfo.id === 'refined' ? 'var(--font-display)' : undefined,
+                }}
+              >
+                Create New Item
+              </h3>
+              <p
+                className="text-sm mb-6"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 A new item will be created at the clicked position.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowNewItemModal(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100"
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    background: 'var(--border-light)',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--border-medium)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'var(--border-light)'}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateItem}
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-500 hover:bg-blue-600"
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{
+                    background: 'var(--accent-primary)',
+                    color: themeInfo.id === 'refined' ? '#0d0d0d' : '#fff',
+                  }}
                 >
                   Create Item
                 </button>
@@ -875,15 +904,16 @@ function DesktopContent() {
       <SaveIndicator />
       <Toast />
 
-      {/* Made with badge */}
+      {/* Made with badge - Theme aware */}
       <motion.a
         href="/"
         className="fixed bottom-3 right-4 z-[50] px-3 py-1.5 rounded-full text-[10px] font-medium"
         style={{
-          background: 'rgba(255, 255, 255, 0.2)',
+          background: 'var(--bg-dock)',
           backdropFilter: 'blur(20px)',
-          color: 'rgba(255, 255, 255, 0.85)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+          color: 'var(--text-on-image)',
+          boxShadow: 'var(--shadow-sm)',
+          border: '1px solid var(--border-glass-outer)',
         }}
         whileHover={{ scale: 1.05 }}
         initial={{ opacity: 0 }}
