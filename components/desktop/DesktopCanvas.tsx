@@ -6,13 +6,16 @@ import { DesktopItem } from './DesktopItem';
 import { InfoWindow } from './InfoWindow';
 import type { DesktopItem as DesktopItemType, Desktop } from '@/types';
 
+export type ViewMode = 'recruiter' | 'visitor';
+
 interface DesktopCanvasProps {
   desktop: Desktop;
   isEditing?: boolean;
   onItemMove?: (id: string, x: number, y: number) => void;
+  viewMode?: ViewMode;
 }
 
-export function DesktopCanvas({ desktop, isEditing = false, onItemMove: _onItemMove }: DesktopCanvasProps) {
+export function DesktopCanvas({ desktop, isEditing = false, onItemMove: _onItemMove, viewMode = 'visitor' }: DesktopCanvasProps) {
   const [selectedItem, setSelectedItem] = useState<DesktopItemType | null>(null);
   const [windowPosition, setWindowPosition] = useState<{ x: number; y: number } | undefined>();
 

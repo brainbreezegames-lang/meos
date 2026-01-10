@@ -9,9 +9,29 @@ import { WindowManager } from '@/components/desktop/MultiWindow';
 import { EditableDesktopItem } from '@/components/desktop/EditableDesktopItem';
 import { BackgroundPanel } from '@/components/desktop/BackgroundPanel';
 import { WelcomeNotification } from '@/components/desktop/WelcomeNotification';
+import { PersonaLoginScreen, useVisitorPersona, PersonaModeToggle, type VisitorPersona } from '@/components/desktop/PersonaLoginScreen';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import type { DesktopItem, Desktop } from '@/types';
+
+// Persona visibility configuration for demo items
+// 'recruiter' = optimized for hiring decisions (resume, experience, skills, projects, testimonials, contact)
+// 'visitor' = full creative experience (everything)
+// 'guest' = same as visitor
+type PersonaVisibility = {
+  recruiter: string[];
+  visitor: string[];
+  guest: string[];
+};
+
+const PERSONA_VISIBLE_ITEMS: PersonaVisibility = {
+  // Recruiter sees: About Me, Resume, Skills, Projects, Testimonials, Recognition, Contact
+  recruiter: ['item-1', 'item-13', 'item-10', 'item-3', 'item-6', 'item-8', 'item-7'],
+  // Visitor sees everything
+  visitor: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13'],
+  // Guest sees everything too
+  guest: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13'],
+};
 
 // Background context for demo
 interface BackgroundContextType {
@@ -27,6 +47,18 @@ function useBackgroundContext() {
   return ctx;
 }
 
+// Persona context for demo
+interface PersonaContextType {
+  persona: VisitorPersona | null;
+  setPersona: (p: VisitorPersona) => void;
+}
+const PersonaContext = createContext<PersonaContextType | null>(null);
+function usePersonaContext() {
+  const ctx = useContext(PersonaContext);
+  if (!ctx) throw new Error('usePersonaContext must be used within provider');
+  return ctx;
+}
+
 // Background images that rotate
 const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2560&h=1440&fit=crop&q=90',
@@ -36,19 +68,23 @@ const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2560&h=1440&fit=crop&q=90',
 ];
 
-// Desktop items with new block system
+// Desktop items with comprehensive block showcase
 const DEMO_ITEMS: DesktopItem[] = [
+  // ============================================
+  // 1. ABOUT ME - Tabs, Timeline, Social, Details
+  // ============================================
   {
     id: 'item-1',
     desktopId: 'demo',
     label: 'About Me',
     thumbnailUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
-    positionX: 12,
-    positionY: 18,
-    windowTitle: 'About Me',
-    windowSubtitle: 'Designer & Developer',
+    positionX: 8,
+    positionY: 12,
+    windowTitle: 'Alex Chen',
+    windowSubtitle: 'Product Designer & Developer',
     windowHeaderImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
     windowDescription: '',
+    windowWidth: 480,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
@@ -59,28 +95,51 @@ const DEMO_ITEMS: DesktopItem[] = [
         label: 'About',
         order: 0,
         blocks: [
-          { id: 'b1', type: 'text', order: 0, data: { content: "Hey there! I'm a creative developer passionate about building beautiful digital experiences that feel alive.\n\nThis is MeOS — my personal web desktop where I showcase my work, thoughts, and connect with others." } },
+          { id: 'b1', type: 'text', order: 0, data: { content: "Hey there! I'm a creative developer passionate about building beautiful digital experiences that feel alive.\n\nI design and build products that people love to use. Currently at Figma, previously Stripe & Airbnb. I believe great design is invisible — it just works." } },
           { id: 'b2', type: 'details', order: 1, data: { items: [
             { label: 'Location', value: 'San Francisco, CA' },
-            { label: 'Experience', value: '5+ years' },
+            { label: 'Experience', value: '8 years' },
             { label: 'Focus', value: 'Product Design' },
+            { label: 'Status', value: 'Available for freelance' },
           ] } },
           { id: 'b3', type: 'social', order: 2, data: { profiles: [
             { platform: 'twitter', url: 'https://twitter.com' },
             { platform: 'linkedin', url: 'https://linkedin.com' },
             { platform: 'github', url: 'https://github.com' },
+            { platform: 'dribbble', url: 'https://dribbble.com' },
+            { platform: 'instagram', url: 'https://instagram.com' },
+          ] } },
+          { id: 'b4', type: 'buttons', order: 3, data: { buttons: [
+            { label: 'Download CV', url: '/resume.pdf', style: 'primary', icon: '📄', newTab: true },
+            { label: 'Book a Call', url: 'https://cal.com', style: 'secondary', newTab: true },
           ] } },
         ],
       },
       {
-        id: 'tab-cv',
-        label: 'CV',
+        id: 'tab-experience',
+        label: 'Experience',
         order: 1,
         blocks: [
-          { id: 'b4', type: 'timeline', order: 0, data: { items: [
-            { date: '2024', title: 'Senior Designer', subtitle: 'Anthropic' },
-            { date: '2021-2024', title: 'Product Designer', subtitle: 'Figma' },
-            { date: '2019-2021', title: 'UI Designer', subtitle: 'Startup Co' },
+          { id: 'b5', type: 'timeline', order: 0, data: { items: [
+            { date: '2022 - Present', title: 'Senior Product Designer', subtitle: 'Figma', description: 'Leading design system initiatives and core product features' },
+            { date: '2020 - 2022', title: 'Product Designer', subtitle: 'Stripe', description: 'Designed checkout flows used by millions of businesses' },
+            { date: '2018 - 2020', title: 'UI Designer', subtitle: 'Airbnb', description: 'Worked on the host experience team' },
+            { date: '2016 - 2018', title: 'Junior Designer', subtitle: 'Startup Inc', description: 'First design role, learned the fundamentals' },
+          ] } },
+        ],
+      },
+      {
+        id: 'tab-skills',
+        label: 'Skills',
+        order: 2,
+        blocks: [
+          { id: 'b6', type: 'list', order: 0, data: { style: 'check', items: [
+            'UI/UX Design',
+            'Design Systems',
+            'Prototyping & Animation',
+            'User Research',
+            'React & TypeScript',
+            'Figma & Framer',
           ] } },
         ],
       },
@@ -89,80 +148,272 @@ const DEMO_ITEMS: DesktopItem[] = [
     zIndex: 0,
     order: 0,
   },
+
+  // ============================================
+  // 2. CASE STUDY - Before/After, CaseStudy, Stats
+  // ============================================
   {
     id: 'item-2',
     desktopId: 'demo',
-    label: 'Projects',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200&h=200&fit=crop',
-    positionX: 28,
-    positionY: 14,
-    windowTitle: 'My Projects',
-    windowSubtitle: 'Selected Work',
-    windowHeaderImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=400&fit=crop',
+    label: 'Case Study',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200&h=200&fit=crop',
+    positionX: 24,
+    positionY: 8,
+    windowTitle: 'Spotify Redesign',
+    windowSubtitle: 'Reimagining Music Discovery',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=400&fit=crop',
     windowDescription: '',
-    windowType: 'browser',
+    windowWidth: 560,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
     useTabs: false,
     tabs: [],
     blocks: [
-      { id: 'p1', type: 'stats', order: 0, data: { items: [
-        { value: '4', label: 'Active' },
-        { value: '27', label: 'Completed' },
-        { value: '12', label: 'Open Source' },
+      { id: 'cs1', type: 'details', order: 0, data: { items: [
+        { label: 'Client', value: 'Spotify' },
+        { label: 'Role', value: 'Lead Designer' },
+        { label: 'Year', value: '2024' },
+        { label: 'Duration', value: '4 months' },
       ] } },
-      { id: 'p2', type: 'product', order: 1, data: { products: [
-        { image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200&h=200&fit=crop', name: 'DevTools Pro', description: 'A suite of developer productivity tools', url: 'https://github.com', status: 'active', metrics: '10k users' },
-        { image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=200&h=200&fit=crop', name: 'DesignKit', description: 'Open source design system for React', url: 'https://github.com', status: 'active', metrics: '5k stars' },
+      { id: 'cs2', type: 'divider', order: 1, data: { style: 'line' } },
+      { id: 'cs3', type: 'case-study', order: 2, data: { sections: {
+        challenge: 'Gen Z users were spending 40% less time in the app compared to millennials. Discovery felt stale and algorithmic playlists weren\'t resonating with younger audiences.',
+        approach: 'Conducted 30 user interviews, created journey maps, and identified 5 key friction points. Prototyped 12 different concepts and tested with 200+ users.',
+        solution: 'Redesigned the discovery flow with TikTok-style vertical scrolling and AI-powered suggestions. Added social features like listening parties and collaborative playlists.',
+        result: 'Shipped to 50M users with overwhelmingly positive feedback. Featured in Fast Company and nominated for a Webby Award.',
+      } } },
+      { id: 'cs4', type: 'stats', order: 3, data: { items: [
+        { value: '+47%', label: 'Time in App' },
+        { value: '+23%', label: 'Saves per User' },
+        { value: '4.8', label: 'App Rating', suffix: '★' },
       ] } },
-      { id: 'p3', type: 'buttons', order: 2, data: { buttons: [
-        { label: 'View All on GitHub', url: 'https://github.com', style: 'primary', newTab: true },
+      { id: 'cs5', type: 'heading', order: 4, data: { text: 'Before & After', level: 3 } },
+      { id: 'cs6', type: 'before-after', order: 5, data: {
+        before: { image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=600&h=400&fit=crop', label: 'Old Design' },
+        after: { image: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=600&h=400&fit=crop', label: 'New Design' },
+        style: 'slider',
+      } },
+      { id: 'cs7', type: 'buttons', order: 6, data: { buttons: [
+        { label: 'View Live Site', url: 'https://spotify.com', style: 'primary', newTab: true },
+        { label: 'Read Full Case Study', url: '#', style: 'secondary', newTab: true },
       ] } },
     ],
     zIndex: 0,
     order: 1,
   },
+
+  // ============================================
+  // 3. PROJECTS - Browser Window, Product Cards
+  // ============================================
   {
     id: 'item-3',
     desktopId: 'demo',
-    label: 'Photography',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=200&h=200&fit=crop',
-    positionX: 68,
-    positionY: 22,
-    windowTitle: 'Photography',
-    windowSubtitle: 'Moments Captured',
-    windowHeaderImage: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=400&fit=crop',
+    label: 'Projects',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200&h=200&fit=crop',
+    positionX: 42,
+    positionY: 15,
+    windowTitle: 'My Projects',
+    windowSubtitle: 'Things I\'ve Built',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=400&fit=crop',
     windowDescription: '',
-    windowWidth: 520,
+    windowType: 'browser',
+    windowWidth: 540,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
     useTabs: false,
     tabs: [],
     blocks: [
-      { id: 'ph1', type: 'text', order: 0, data: { content: "Photography is how I see the world when I'm not behind a screen. I'm drawn to street photography, architecture, and those fleeting golden hour moments." } },
-      { id: 'ph2', type: 'gallery', order: 1, data: { columns: 2, expandable: true, images: [
-        { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop', caption: 'Mountain sunrise' },
-        { url: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=400&fit=crop', caption: 'Forest path' },
-        { url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop', caption: 'Beach at dusk' },
-        { url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=400&fit=crop', caption: 'Misty mountains' },
+      { id: 'pr1', type: 'stats', order: 0, data: { items: [
+        { value: '4', label: 'Active' },
+        { value: '27', label: 'Shipped' },
+        { value: '12', label: 'Open Source' },
       ] } },
-      { id: 'ph3', type: 'details', order: 2, data: { items: [
-        { label: 'Camera', value: 'Fujifilm X-T4' },
-        { label: 'Favorite Lens', value: '35mm f/1.4' },
+      { id: 'pr2', type: 'product', order: 1, data: { products: [
+        { image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200&h=200&fit=crop', name: 'DevTools Pro', description: 'A suite of developer productivity tools', url: 'https://github.com', status: 'active', metrics: '10k users' },
+        { image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=200&h=200&fit=crop', name: 'DesignKit', description: 'Open source design system for React', url: 'https://github.com', status: 'active', metrics: '5k stars' },
+        { image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&h=200&fit=crop', name: 'ColorAI', description: 'AI-powered color palette generator', url: 'https://github.com', status: 'acquired', metrics: 'Acquired by Adobe' },
+      ] } },
+      { id: 'pr3', type: 'divider', order: 2, data: { style: 'space' } },
+      { id: 'pr4', type: 'callout', order: 3, data: { text: 'Looking to collaborate? I\'m open to interesting side projects.', style: 'info', icon: '💡' } },
+      { id: 'pr5', type: 'buttons', order: 4, data: { buttons: [
+        { label: 'View All on GitHub', url: 'https://github.com', style: 'primary', icon: '🐙', newTab: true },
       ] } },
     ],
     zIndex: 0,
     order: 2,
   },
+
+  // ============================================
+  // 4. PHOTOGRAPHY - Gallery, Image, Carousel
+  // ============================================
   {
     id: 'item-4',
     desktopId: 'demo',
+    label: 'Photography',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=200&h=200&fit=crop',
+    positionX: 72,
+    positionY: 10,
+    windowTitle: 'Photography',
+    windowSubtitle: 'Moments Captured',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=400&fit=crop',
+    windowDescription: '',
+    windowWidth: 540,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: true,
+    tabs: [
+      {
+        id: 'tab-grid',
+        label: 'Gallery',
+        order: 0,
+        blocks: [
+          { id: 'ph1', type: 'text', order: 0, data: { content: "Photography is how I see the world when I'm not behind a screen. I'm drawn to street photography, architecture, and those fleeting golden hour moments." } },
+          { id: 'ph2', type: 'gallery', order: 1, data: { columns: 3, expandable: true, images: [
+            { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop', caption: 'Mountain sunrise', alt: 'Mountain at sunrise' },
+            { url: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=400&fit=crop', caption: 'Forest path', alt: 'Path through forest' },
+            { url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop', caption: 'Beach at dusk', alt: 'Beach sunset' },
+            { url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=400&fit=crop', caption: 'Misty mountains', alt: 'Foggy mountain range' },
+            { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&h=400&fit=crop', caption: 'Starry night', alt: 'Mountain under stars' },
+            { url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop', caption: 'Sunlit forest', alt: 'Sun through trees' },
+          ] } },
+        ],
+      },
+      {
+        id: 'tab-featured',
+        label: 'Featured',
+        order: 1,
+        blocks: [
+          { id: 'ph3', type: 'image', order: 0, data: {
+            url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop',
+            caption: 'Dawn breaks over the Swiss Alps — my favorite shot from 2024',
+            alt: 'Swiss Alps at dawn',
+            aspectRatio: '16:9',
+          } },
+          { id: 'ph4', type: 'quote', order: 1, data: { text: 'Photography is the story I fail to put into words.', attribution: 'Destin Sparks', style: 'simple' } },
+        ],
+      },
+      {
+        id: 'tab-gear',
+        label: 'Gear',
+        order: 2,
+        blocks: [
+          { id: 'ph5', type: 'details', order: 0, data: { items: [
+            { label: 'Camera', value: 'Fujifilm X-T4' },
+            { label: 'Favorite Lens', value: '35mm f/1.4' },
+            { label: 'Backup', value: 'iPhone 15 Pro' },
+            { label: 'Editing', value: 'Lightroom + VSCO' },
+          ] } },
+          { id: 'ph6', type: 'buttons', order: 1, data: { buttons: [
+            { label: 'View on Instagram', url: 'https://instagram.com', style: 'primary', newTab: true },
+          ] } },
+        ],
+      },
+    ],
+    blocks: [],
+    zIndex: 0,
+    order: 3,
+  },
+
+  // ============================================
+  // 5. WRITING - Links, Quote, Stats, Embed
+  // ============================================
+  {
+    id: 'item-5',
+    desktopId: 'demo',
+    label: 'Writing',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=200&h=200&fit=crop',
+    positionX: 62,
+    positionY: 38,
+    windowTitle: 'Writing',
+    windowSubtitle: 'Thoughts & Essays',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=400&fit=crop',
+    windowDescription: '',
+    windowWidth: 480,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: false,
+    tabs: [],
+    blocks: [
+      { id: 'w1', type: 'stats', order: 0, data: { items: [
+        { value: '34', label: 'Posts' },
+        { value: '2.4k', label: 'Subscribers' },
+        { value: 'Weekly', label: 'Newsletter' },
+      ] } },
+      { id: 'w2', type: 'heading', order: 1, data: { text: 'Recent Articles', level: 3 } },
+      { id: 'w3', type: 'links', order: 2, data: { links: [
+        { title: 'The Future of Design Tools', url: 'https://medium.com', description: 'Why AI won\'t replace designers — it will make them 10x better' },
+        { title: 'Constraints Breed Creativity', url: 'https://medium.com', description: 'How limitations make better work and happier teams' },
+        { title: 'Building in Public', url: 'https://medium.com', description: 'Lessons from sharing my failures (and occasional wins)' },
+        { title: 'The Case for Boring Design', url: 'https://medium.com', description: 'Why the best interfaces are invisible' },
+      ] } },
+      { id: 'w4', type: 'divider', order: 3, data: { style: 'dots' } },
+      { id: 'w5', type: 'quote', order: 4, data: { text: 'Design is not just what it looks like and feels like. Design is how it works.', attribution: 'Steve Jobs', style: 'large' } },
+      { id: 'w6', type: 'buttons', order: 5, data: { buttons: [
+        { label: 'Subscribe on Substack', url: 'https://substack.com', style: 'primary', newTab: true },
+        { label: 'Read All Posts', url: 'https://medium.com', style: 'ghost', newTab: true },
+      ] } },
+    ],
+    zIndex: 0,
+    order: 4,
+  },
+
+  // ============================================
+  // 6. TESTIMONIALS - Testimonial Block, Logos
+  // ============================================
+  {
+    id: 'item-6',
+    desktopId: 'demo',
+    label: 'Testimonials',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=200&h=200&fit=crop',
+    positionX: 8,
+    positionY: 42,
+    windowTitle: 'What People Say',
+    windowSubtitle: 'Client Testimonials',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=400&fit=crop',
+    windowDescription: '',
+    windowWidth: 500,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: false,
+    tabs: [],
+    blocks: [
+      { id: 't1', type: 'testimonial', order: 0, data: { style: 'cards', testimonials: [
+        { quote: 'Working with Alex transformed our entire product. The attention to detail was incredible — every pixel mattered.', name: 'Sarah Chen', title: 'CEO', company: 'TechStart', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
+        { quote: 'Exceptional attention to detail and a deep understanding of user experience. Delivered ahead of schedule.', name: 'Marcus Johnson', title: 'Product Lead', company: 'DesignCo', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
+        { quote: '10/10 would hire again. Brought fresh perspective and solved problems we didn\'t know we had.', name: 'Emily Park', title: 'Founder', company: 'Startup Labs', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
+      ] } },
+      { id: 't2', type: 'divider', order: 1, data: { style: 'line' } },
+      { id: 't3', type: 'heading', order: 2, data: { text: 'Trusted By', level: 3 } },
+      { id: 't4', type: 'logos', order: 3, data: {
+        logos: [
+          { image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=120&h=60&fit=crop', name: 'Spotify', url: 'https://spotify.com' },
+          { image: 'https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=120&h=60&fit=crop', name: 'Meta', url: 'https://meta.com' },
+          { image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=120&h=60&fit=crop', name: 'Netflix', url: 'https://netflix.com' },
+          { image: 'https://images.unsplash.com/photo-1611605698335-8b1569810432?w=120&h=60&fit=crop', name: 'Airbnb', url: 'https://airbnb.com' },
+        ],
+        style: 'row',
+        grayscale: true,
+      } },
+    ],
+    zIndex: 0,
+    order: 5,
+  },
+
+  // ============================================
+  // 7. CONTACT - Mail Window Style
+  // ============================================
+  {
+    id: 'item-7',
+    desktopId: 'demo',
     label: 'Contact',
     thumbnailUrl: 'https://images.unsplash.com/photo-1596524430615-b46475ddff6e?w=200&h=200&fit=crop',
-    positionX: 52,
-    positionY: 55,
+    positionX: 82,
+    positionY: 45,
     windowTitle: 'Get in Touch',
     windowSubtitle: "Let's Connect",
     windowHeaderImage: 'https://images.unsplash.com/photo-1596524430615-b46475ddff6e?w=400&h=400&fit=crop',
@@ -175,107 +426,227 @@ const DEMO_ITEMS: DesktopItem[] = [
     tabs: [],
     blocks: [
       { id: 'c1', type: 'text', order: 0, data: { content: "I'm always open to discussing new projects, creative ideas, or opportunities to collaborate.\n\nWhether you have a question, want to work together, or just want to say hi — my inbox is open." } },
-      { id: 'c2', type: 'callout', order: 1, data: { text: 'Currently accepting new clients for Q2 2024', style: 'success', icon: '✓' } },
-      { id: 'c3', type: 'buttons', order: 2, data: { buttons: [
-        { label: 'Email Me', url: 'mailto:hello@example.com', style: 'primary', newTab: false },
-        { label: 'Twitter / X', url: 'https://twitter.com', style: 'secondary', newTab: true },
-        { label: 'Schedule a Call', url: 'https://cal.com', style: 'ghost', newTab: true },
+      { id: 'c2', type: 'callout', order: 1, data: { text: 'Currently accepting new clients for Q1 2025', style: 'success', icon: '✓' } },
+      { id: 'c3', type: 'social', order: 2, data: { profiles: [
+        { platform: 'twitter', url: 'https://twitter.com' },
+        { platform: 'linkedin', url: 'https://linkedin.com' },
+        { platform: 'email', url: 'mailto:hello@alexchen.design' },
       ] } },
-    ],
-    zIndex: 0,
-    order: 3,
-  },
-  {
-    id: 'item-5',
-    desktopId: 'demo',
-    label: 'Writing',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=200&h=200&fit=crop',
-    positionX: 78,
-    positionY: 48,
-    windowTitle: 'Writing',
-    windowSubtitle: 'Thoughts & Essays',
-    windowHeaderImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=400&fit=crop',
-    windowDescription: '',
-    windowDetails: null,
-    windowGallery: null,
-    windowLinks: null,
-    useTabs: false,
-    tabs: [],
-    blocks: [
-      { id: 'w1', type: 'text', order: 0, data: { content: "I write about design, technology, and the creative process. Recent topics include the future of design tools, why constraints breed creativity, and lessons from building products used by millions." } },
-      { id: 'w2', type: 'stats', order: 1, data: { items: [
-        { value: '34', label: 'Posts' },
-        { value: '2.4k', label: 'Subscribers' },
-        { value: '98', suffix: '%', label: 'Open Rate' },
+      { id: 'c4', type: 'buttons', order: 3, data: { buttons: [
+        { label: 'Email Me', url: 'mailto:hello@alexchen.design', style: 'primary', newTab: false },
+        { label: 'Schedule a Call', url: 'https://cal.com', style: 'secondary', newTab: true },
       ] } },
-      { id: 'w3', type: 'quote', order: 2, data: { text: 'Design is not just what it looks like and feels like. Design is how it works.', attribution: 'Steve Jobs', style: 'large' } },
-    ],
-    zIndex: 0,
-    order: 4,
-  },
-  {
-    id: 'item-6',
-    desktopId: 'demo',
-    label: 'Reading',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=200&fit=crop',
-    positionX: 24,
-    positionY: 42,
-    windowTitle: 'Bookshelf',
-    windowSubtitle: 'Currently Reading',
-    windowHeaderImage: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
-    windowDescription: '',
-    windowDetails: null,
-    windowGallery: null,
-    windowLinks: null,
-    useTabs: false,
-    tabs: [],
-    blocks: [
-      { id: 'bk1', type: 'book', order: 0, data: { books: [
-        { title: 'The Design of Everyday Things', author: 'Don Norman', cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200&h=300&fit=crop', status: 'reading', rating: 5, url: 'https://amazon.com' },
-        { title: 'Thinking, Fast and Slow', author: 'Daniel Kahneman', cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=200&h=300&fit=crop', status: 'completed', rating: 5 },
-      ] } },
-      { id: 'bk2', type: 'links', order: 1, data: { links: [
-        { label: 'View full reading list on Goodreads', url: 'https://goodreads.com', description: '47 books read this year' },
-      ] } },
-    ],
-    zIndex: 0,
-    order: 5,
-  },
-  {
-    id: 'item-7',
-    desktopId: 'demo',
-    label: 'Experiments',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop',
-    positionX: 88,
-    positionY: 75,
-    windowTitle: 'Experiments',
-    windowSubtitle: 'Creative Playground',
-    windowHeaderImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
-    windowDescription: '',
-    windowDetails: null,
-    windowGallery: null,
-    windowLinks: null,
-    useTabs: false,
-    tabs: [],
-    blocks: [
-      { id: 'e1', type: 'callout', order: 0, data: { text: 'This section features my creative experiments and side projects.', style: 'info', icon: '🧪' } },
-      { id: 'e2', type: 'image', order: 1, data: { url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=500&fit=crop', alt: 'Generative art experiment', caption: 'Generative art created with p5.js', expandable: true } },
     ],
     zIndex: 0,
     order: 6,
   },
+
+  // ============================================
+  // 8. AWARDS & PRESS
+  // ============================================
   {
     id: 'item-8',
     desktopId: 'demo',
+    label: 'Recognition',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=200&h=200&fit=crop',
+    positionX: 28,
+    positionY: 36,
+    windowTitle: 'Awards & Press',
+    windowSubtitle: 'Recognition',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=400&h=400&fit=crop',
+    windowDescription: '',
+    windowWidth: 460,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: false,
+    tabs: [],
+    blocks: [
+      { id: 'aw1', type: 'heading', order: 0, data: { text: 'Awards', level: 3 } },
+      { id: 'aw2', type: 'award', order: 1, data: { awards: [
+        { badge: '🏆', name: 'Awwwards Site of the Day', issuer: 'Awwwards', year: '2024' },
+        { badge: '🥇', name: 'CSS Design Awards', issuer: 'CSSDA', year: '2024' },
+        { badge: '⭐', name: 'Forbes 30 Under 30', issuer: 'Forbes — Design', year: '2023' },
+        { badge: '🍎', name: 'Apple Design Award Finalist', issuer: 'Apple', year: '2022' },
+      ] } },
+      { id: 'aw3', type: 'divider', order: 2, data: { style: 'line' } },
+      { id: 'aw4', type: 'heading', order: 3, data: { text: 'Featured In', level: 3 } },
+      { id: 'aw5', type: 'press', order: 4, data: { mentions: [
+        { publication: 'TechCrunch', headline: 'The Designer Redefining Product Thinking', url: 'https://techcrunch.com', date: 'March 2024' },
+        { publication: 'Fast Company', headline: 'Most Creative People in Business', url: 'https://fastcompany.com', date: 'January 2024' },
+        { publication: 'Wired', headline: 'How AI is Changing Design', url: 'https://wired.com', date: 'December 2023' },
+      ] } },
+    ],
+    zIndex: 0,
+    order: 7,
+  },
+
+  // ============================================
+  // 9. READING LIST - Book Block
+  // ============================================
+  {
+    id: 'item-9',
+    desktopId: 'demo',
+    label: 'Reading',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=200&fit=crop',
+    positionX: 48,
+    positionY: 58,
+    windowTitle: 'Bookshelf',
+    windowSubtitle: 'Currently Reading',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&fit=crop',
+    windowDescription: '',
+    windowWidth: 480,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: false,
+    tabs: [],
+    blocks: [
+      { id: 'bk1', type: 'heading', order: 0, data: { text: 'Currently Reading', level: 3 } },
+      { id: 'bk2', type: 'book', order: 1, data: { books: [
+        { title: 'The Creative Act', subtitle: 'A Way of Being', cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200&h=300&fit=crop', description: 'Rick Rubin\'s guide to creativity from the legendary producer.' },
+      ] } },
+      { id: 'bk3', type: 'heading', order: 2, data: { text: 'Favorites', level: 3 } },
+      { id: 'bk4', type: 'book', order: 3, data: { books: [
+        { title: 'The Design of Everyday Things', cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=200&h=300&fit=crop' },
+        { title: 'Thinking, Fast and Slow', cover: 'https://images.unsplash.com/photo-1589998059171-988d887df646?w=200&h=300&fit=crop' },
+        { title: 'Zero to One', cover: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=200&h=300&fit=crop' },
+        { title: 'Creative Confidence', cover: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=200&h=300&fit=crop' },
+      ] } },
+      { id: 'bk5', type: 'links', order: 4, data: { links: [
+        { title: 'View full reading list on Goodreads', url: 'https://goodreads.com', description: '47 books read this year' },
+      ] } },
+    ],
+    zIndex: 0,
+    order: 8,
+  },
+
+  // ============================================
+  // 10. SKILLS & TOOLS - Table, List
+  // ============================================
+  {
+    id: 'item-10',
+    desktopId: 'demo',
+    label: 'Skills',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=200&h=200&fit=crop',
+    positionX: 8,
+    positionY: 72,
+    windowTitle: 'Technical Skills',
+    windowSubtitle: 'What I Work With',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+    windowDescription: '',
+    windowWidth: 440,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: false,
+    tabs: [],
+    blocks: [
+      { id: 'sk1', type: 'heading', order: 0, data: { text: 'Languages & Frameworks', level: 3 } },
+      { id: 'sk2', type: 'table', order: 1, data: {
+        headers: ['Skill', 'Level', 'Years'],
+        rows: [
+          ['React / Next.js', 'Expert', '5+'],
+          ['TypeScript', 'Expert', '4+'],
+          ['Node.js', 'Advanced', '4+'],
+          ['Python', 'Intermediate', '3+'],
+          ['Swift', 'Intermediate', '2+'],
+        ],
+      } },
+      { id: 'sk3', type: 'heading', order: 2, data: { text: 'Design Tools', level: 3 } },
+      { id: 'sk4', type: 'list', order: 3, data: { style: 'bullet', items: [
+        'Figma (Expert)',
+        'Framer (Advanced)',
+        'After Effects (Intermediate)',
+        'Blender (Learning)',
+      ] } },
+      { id: 'sk5', type: 'callout', order: 4, data: { text: 'Always learning something new. Currently diving deep into AI/ML.', style: 'note', icon: '📚' } },
+    ],
+    zIndex: 0,
+    order: 9,
+  },
+
+  // ============================================
+  // 11. EXPERIMENTS - Video, Audio, Embed
+  // ============================================
+  {
+    id: 'item-11',
+    desktopId: 'demo',
+    label: 'Experiments',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop',
+    positionX: 30,
+    positionY: 68,
+    windowTitle: 'Experiments',
+    windowSubtitle: 'Creative Playground',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
+    windowDescription: '',
+    windowWidth: 520,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: true,
+    tabs: [
+      {
+        id: 'tab-videos',
+        label: 'Videos',
+        order: 0,
+        blocks: [
+          { id: 'e1', type: 'text', order: 0, data: { content: 'A collection of process videos, talks, and creative experiments.' } },
+          { id: 'e2', type: 'video', order: 1, data: {
+            url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            embedType: 'youtube',
+            aspectRatio: '16:9',
+          } },
+          { id: 'e3', type: 'callout', order: 2, data: { text: 'More videos on my YouTube channel', style: 'info', icon: '▶️' } },
+        ],
+      },
+      {
+        id: 'tab-music',
+        label: 'Music',
+        order: 1,
+        blocks: [
+          { id: 'e4', type: 'heading', order: 0, data: { text: 'What I\'m Listening To', level: 3 } },
+          { id: 'e5', type: 'audio', order: 1, data: {
+            url: 'https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M',
+            embedType: 'spotify',
+            title: 'Today\'s Top Hits',
+          } },
+        ],
+      },
+      {
+        id: 'tab-code',
+        label: 'Code',
+        order: 2,
+        blocks: [
+          { id: 'e6', type: 'heading', order: 0, data: { text: 'Code Experiments', level: 3 } },
+          { id: 'e7', type: 'embed', order: 1, data: {
+            embedType: 'codepen',
+            url: 'https://codepen.io/alexchen/pen/example',
+            aspectRatio: '4:3',
+          } },
+        ],
+      },
+    ],
+    blocks: [],
+    zIndex: 0,
+    order: 10,
+  },
+
+  // ============================================
+  // 12. PORTFOLIO - Carousel Block
+  // ============================================
+  {
+    id: 'item-12',
+    desktopId: 'demo',
     label: 'Portfolio',
     thumbnailUrl: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=200&h=200&fit=crop',
-    positionX: 42,
-    positionY: 75,
+    positionX: 68,
+    positionY: 70,
     windowTitle: 'Featured Work',
     windowSubtitle: 'Selected Projects',
     windowHeaderImage: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=400&fit=crop',
     windowDescription: '',
-    windowWidth: 520,
+    windowWidth: 540,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
@@ -283,83 +654,63 @@ const DEMO_ITEMS: DesktopItem[] = [
     tabs: [],
     blocks: [
       { id: 'pf1', type: 'carousel', order: 0, data: {
-        items: [
-          { image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop', title: 'E-commerce Redesign', description: 'Complete checkout flow overhaul', url: 'https://dribbble.com' },
-          { image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop', title: 'Analytics Dashboard', description: 'Real-time data visualization', url: 'https://dribbble.com' },
-          { image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=450&fit=crop', title: 'Developer Tools', description: 'Code editor extension', url: 'https://dribbble.com' },
+        images: [
+          { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop', caption: 'E-commerce Redesign — Complete checkout flow overhaul' },
+          { url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop', caption: 'Analytics Dashboard — Real-time data visualization' },
+          { url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=450&fit=crop', caption: 'Developer Tools — VS Code extension' },
+          { url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=450&fit=crop', caption: 'Generative Art — Created with p5.js' },
         ],
-        autoplay: true,
-        interval: 4000,
       } },
       { id: 'pf2', type: 'stats', order: 1, data: { items: [
         { value: '50+', label: 'Projects' },
         { value: '4.9', label: 'Rating', suffix: '★' },
         { value: '100%', label: 'On Time' },
       ] } },
-    ],
-    zIndex: 0,
-    order: 7,
-  },
-  {
-    id: 'item-9',
-    desktopId: 'demo',
-    label: 'Testimonials',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=200&h=200&fit=crop',
-    positionX: 8,
-    positionY: 52,
-    windowTitle: 'What People Say',
-    windowSubtitle: 'Client Testimonials',
-    windowHeaderImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=400&fit=crop',
-    windowDescription: '',
-    windowDetails: null,
-    windowGallery: null,
-    windowLinks: null,
-    useTabs: false,
-    tabs: [],
-    blocks: [
-      { id: 't1', type: 'testimonial', order: 0, data: { style: 'cards', testimonials: [
-        { quote: 'Working with them was an absolute pleasure. They delivered beyond our expectations.', name: 'Sarah Chen', title: 'CEO', company: 'TechStart', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
-        { quote: 'Exceptional attention to detail and a deep understanding of user experience.', name: 'Marcus Johnson', title: 'Product Lead', company: 'DesignCo', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
+      { id: 'pf3', type: 'buttons', order: 2, data: { buttons: [
+        { label: 'View on Dribbble', url: 'https://dribbble.com', style: 'primary', newTab: true },
+        { label: 'View on Behance', url: 'https://behance.net', style: 'secondary', newTab: true },
       ] } },
     ],
     zIndex: 0,
-    order: 8,
+    order: 11,
   },
+
+  // ============================================
+  // 13. RESUME/CV - Download Block
+  // ============================================
   {
-    id: 'item-10',
+    id: 'item-13',
     desktopId: 'demo',
-    label: 'Skills',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=200&h=200&fit=crop',
-    positionX: 8,
-    positionY: 78,
-    windowTitle: 'Technical Skills',
-    windowSubtitle: 'Proficiency Overview',
-    windowHeaderImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+    label: 'Resume',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=200&h=200&fit=crop',
+    positionX: 88,
+    positionY: 18,
+    windowTitle: 'Resume',
+    windowSubtitle: 'Download CV',
+    windowHeaderImage: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=400&fit=crop',
     windowDescription: '',
+    windowWidth: 400,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
     useTabs: false,
     tabs: [],
     blocks: [
-      { id: 'sk1', type: 'table', order: 0, data: {
-        headers: ['Skill', 'Level', 'Years'],
-        rows: [
-          ['React / Next.js', 'Expert', '5+'],
-          ['TypeScript', 'Expert', '4+'],
-          ['Node.js', 'Advanced', '4+'],
-          ['Python', 'Intermediate', '3+'],
-        ],
-        striped: true,
+      { id: 'r1', type: 'text', order: 0, data: { content: 'Download my resume to learn more about my experience, education, and skills.' } },
+      { id: 'r2', type: 'download', order: 1, data: {
+        url: '/alex-chen-resume.pdf',
+        fileName: 'Alex_Chen_Resume_2024.pdf',
+        fileSize: '245 KB',
+        fileType: 'PDF',
       } },
-      { id: 'sk2', type: 'list', order: 1, data: { style: 'check', items: [
-        { text: 'System Design & Architecture', checked: true },
-        { text: 'CI/CD & DevOps', checked: true },
-        { text: 'Machine Learning (learning)', checked: false },
+      { id: 'r3', type: 'divider', order: 2, data: { style: 'line' } },
+      { id: 'r4', type: 'callout', order: 3, data: { text: 'Last updated: January 2024', style: 'note', icon: '📅' } },
+      { id: 'r5', type: 'buttons', order: 4, data: { buttons: [
+        { label: 'View on LinkedIn', url: 'https://linkedin.com', style: 'secondary', newTab: true },
       ] } },
     ],
     zIndex: 0,
-    order: 9,
+    order: 12,
   },
 ];
 
@@ -548,7 +899,7 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
 }
 
 // Theme-aware Menu Bar Component - Uses CSS variables for all styling
-function MenuBar() {
+function MenuBar({ persona, onPersonaChange }: { persona: VisitorPersona | null; onPersonaChange: (p: VisitorPersona) => void }) {
   const context = useEditContextSafe();
   const bgContext = useBackgroundContext();
   const [time, setTime] = useState<string>('');
@@ -599,6 +950,14 @@ function MenuBar() {
         <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Demo Desktop</span>
       </div>
       <div className="flex items-center gap-3">
+        {/* Persona mode toggle */}
+        {persona && persona !== 'guest' && (
+          <PersonaModeToggle
+            currentMode={persona}
+            onChange={onPersonaChange}
+          />
+        )}
+
         {/* Background settings button */}
         <button
           onClick={() => bgContext.setShowBackgroundPanel(true)}
@@ -743,6 +1102,7 @@ function RotatingBackground() {
 function DesktopContent() {
   const context = useEditContextSafe();
   const windowContext = useWindowContext();
+  const { persona } = usePersonaContext();
   const [itemOrder, setItemOrder] = useState<string[]>(() =>
     context?.desktop?.items.map(i => i.id) || []
   );
@@ -809,7 +1169,10 @@ function DesktopContent() {
     context.showToast('Item created', 'success');
   };
 
-  const items = context?.desktop?.items || [];
+  // Get all items and filter based on persona
+  const allItems = context?.desktop?.items || [];
+  const visibleItemIds = persona ? PERSONA_VISIBLE_ITEMS[persona] : PERSONA_VISIBLE_ITEMS.visitor;
+  const items = allItems.filter(item => visibleItemIds.includes(item.id));
 
   return (
     <>
@@ -967,31 +1330,82 @@ function DesktopContent() {
 // Demo Page Inner (needs access to background context)
 function DemoPageInner() {
   const bgContext = useBackgroundContext();
+  const { persona, hasChecked, selectPersona, needsSelection } = useVisitorPersona();
+  const [showLoginScreen, setShowLoginScreen] = useState(false);
+
+  // Check if we need to show login screen
+  useEffect(() => {
+    if (!hasChecked) return;
+
+    const params = new URLSearchParams(window.location.search);
+
+    // Auto-detect recruiter mode from URL params
+    if (params.get('mode') === 'recruiter' || params.get('ref') === 'linkedin') {
+      selectPersona('recruiter');
+      return;
+    }
+
+    // Show login screen if no persona selected
+    if (needsSelection) {
+      setShowLoginScreen(true);
+    }
+  }, [hasChecked, needsSelection, selectPersona]);
+
+  const handlePersonaSelect = (selectedPersona: VisitorPersona) => {
+    selectPersona(selectedPersona);
+    setShowLoginScreen(false);
+  };
+
+  // Don't render until we've checked localStorage
+  if (!hasChecked) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)',
+        }}
+      />
+    );
+  }
+
+  // Show login screen
+  if (showLoginScreen) {
+    return (
+      <PersonaLoginScreen
+        profileImage="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+        name="Alex Chen"
+        title="Product Designer & Developer"
+        onSelect={handlePersonaSelect}
+      />
+    );
+  }
 
   return (
-    <main className="min-h-screen h-screen overflow-hidden relative">
-      <RotatingBackground />
-      <MenuBar />
-      <DesktopContent />
+    <PersonaContext.Provider value={{ persona, setPersona: selectPersona }}>
+      <main className="min-h-screen h-screen overflow-hidden relative">
+        <RotatingBackground />
+        <MenuBar persona={persona} onPersonaChange={selectPersona} />
+        <DesktopContent />
 
-      {/* Background Settings Panel */}
-      <BackgroundPanel
-        isOpen={bgContext.showBackgroundPanel}
-        onClose={() => bgContext.setShowBackgroundPanel(false)}
-        currentBackground={bgContext.customBackground}
-        onBackgroundChange={bgContext.setCustomBackground}
-      />
+        {/* Background Settings Panel */}
+        <BackgroundPanel
+          isOpen={bgContext.showBackgroundPanel}
+          onClose={() => bgContext.setShowBackgroundPanel(false)}
+          currentBackground={bgContext.customBackground}
+          onBackgroundChange={bgContext.setCustomBackground}
+        />
 
-      {/* Welcome Notification */}
-      <WelcomeNotification
-        title="Welcome to MeOS"
-        subtitle="Your personal web desktop"
-        body="Click any item to open its window. Use the traffic lights to minimize/maximize. Try the theme switcher!"
-        icon="🖥️"
-        delay={1500}
-        duration={10000}
-      />
-    </main>
+        {/* Welcome Notification */}
+        <WelcomeNotification
+          title="Welcome to MeOS"
+          subtitle="Your personal web desktop"
+          body="Click any item to open its window. Use the traffic lights to minimize/maximize. Try the theme switcher!"
+          icon="🖥️"
+          delay={1500}
+          duration={10000}
+        />
+      </main>
+    </PersonaContext.Provider>
   );
 }
 

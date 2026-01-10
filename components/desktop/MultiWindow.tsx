@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
 import { EditableText, EditableImage } from '@/components/editing/Editable';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
+import { InlineBlockPicker, useInlineBlockPicker } from '@/components/editing/InlineBlockPicker';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
-import { BLOCK_DEFINITIONS, BLOCK_CATEGORIES } from '@/types/blocks';
+import { BLOCK_DEFINITIONS } from '@/types/blocks';
 import { BrowserWindow } from './BrowserWindow';
 import { MailWindow } from './MailWindow';
 
@@ -22,11 +23,9 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
   const context = useEditContextSafe();
   const windowContext = useWindowContext();
   const windowRef = useRef<HTMLDivElement>(null);
-  const constraintsRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
-  const [showBlockPicker, setShowBlockPicker] = useState(false);
-  const [blockPickerCategory, setBlockPickerCategory] = useState<string>('text');
-  const dragControls = useDragControls();
+  const blockPicker = useInlineBlockPicker();
+  const addBlockButtonRef = useRef<HTMLButtonElement>(null);
 
   const isOwner = context?.isOwner ?? false;
   const isActive = windowContext.activeWindowId === windowInstance.id;
@@ -138,7 +137,15 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
       order: sortedBlocks.length,
     });
 
-    setShowBlockPicker(false);
+    blockPicker.close();
+  };
+
+  // Open inline block picker
+  const openBlockPicker = () => {
+    if (addBlockButtonRef.current) {
+      const rect = addBlockButtonRef.current.getBoundingClientRect();
+      blockPicker.open(rect.left, rect.top - 360);
+    }
   };
 
   // Handle item field updates
@@ -157,12 +164,6 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
     context.updateItem(item.id, { windowHeaderImage: url });
   };
 
-  const startDrag = (event: React.PointerEvent) => {
-    if (!isMaximized) {
-      dragControls.start(event);
-    }
-  };
-
   const handleWindowClick = () => {
     windowContext.focusWindow(windowInstance.id);
   };
@@ -179,59 +180,50 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
     windowContext.maximizeWindow(windowInstance.id);
   };
 
+  // Calculate window dimensions
+  const windowWidth = item.windowWidth || 440;
+  const windowHeight = 500;
+
   if (isMinimized) return null;
 
   return (
     <>
-      {/* Drag constraints */}
+      {/* Window container - handles centering */}
       <div
-        ref={constraintsRef}
-        className="fixed inset-0 z-[200] pointer-events-none"
-        style={{ padding: '40px' }}
-      />
-
-      {/* Window */}
-      <motion.div
-        ref={windowRef}
-        className="fixed overflow-hidden flex flex-col glass-elevated pointer-events-auto"
-        onClick={handleWindowClick}
-        drag={!isMaximized}
-        dragControls={dragControls}
-        dragListener={false}
-        dragConstraints={constraintsRef}
-        dragElastic={0.05}
-        dragMomentum={false}
+        className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center"
         style={{
-          zIndex: windowInstance.zIndex + 200,
-          width: isMaximized ? 'calc(100vw - 80px)' : (item.windowWidth || 440),
-          maxWidth: '92vw',
-          maxHeight: isMaximized ? 'calc(100vh - 120px)' : 'calc(100vh - 160px)',
-          borderRadius: isMaximized ? 'var(--radius-lg)' : 'var(--radius-window)',
-          background: 'var(--bg-glass-elevated)',
-          backdropFilter: 'var(--blur-glass)',
-          WebkitBackdropFilter: 'var(--blur-glass)',
-          boxShadow: isActive ? 'var(--shadow-window)' : 'var(--shadow-lg)',
-          border: 'var(--border-width) solid var(--border-glass-outer)',
-          top: isMaximized ? '60px' : '50%',
-          left: isMaximized ? '40px' : '50%',
-          transform: isMaximized ? 'none' : 'translate(-50%, -50%)',
-          opacity: isActive ? 1 : 0.95,
+          padding: isMaximized ? '40px' : '60px',
+          paddingTop: isMaximized ? '50px' : '60px',
         }}
-        initial={{ opacity: 0, scale: 0.88, y: 20 }}
-        animate={{
-          opacity: 1,
-          scale: 1,
-          y: 0,
-        }}
-        exit={{ opacity: 0, scale: 0.92, y: 10 }}
-        transition={{
-          type: 'spring',
-          stiffness: 400,
-          damping: 30,
-          mass: 0.8
-        }}
-        layout
       >
+        {/* Window */}
+        <motion.div
+          ref={windowRef}
+          className="overflow-hidden flex flex-col glass-elevated pointer-events-auto relative"
+          onClick={handleWindowClick}
+          drag={!isMaximized}
+          dragConstraints={{ top: -200, left: -300, right: 300, bottom: 200 }}
+          dragElastic={0.1}
+          dragMomentum={false}
+          style={{
+            zIndex: windowInstance.zIndex + 200,
+            width: isMaximized ? '100%' : windowWidth,
+            maxWidth: isMaximized ? '100%' : '90vw',
+            height: isMaximized ? '100%' : 'auto',
+            maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
+            borderRadius: isMaximized ? 'var(--radius-lg)' : 'var(--radius-window)',
+            background: 'var(--bg-glass-elevated)',
+            backdropFilter: 'var(--blur-glass)',
+            WebkitBackdropFilter: 'var(--blur-glass)',
+            boxShadow: isActive ? 'var(--shadow-window)' : 'var(--shadow-lg)',
+            border: 'var(--border-width) solid var(--border-glass-outer)',
+            opacity: isActive ? 1 : 0.95,
+          }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+        >
         {/* Title Bar */}
         <div
           className="flex items-center px-4 shrink-0 relative select-none"
@@ -241,7 +233,6 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             background: 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
             cursor: isMaximized ? 'default' : 'grab',
           }}
-          onPointerDown={startDrag}
         >
           {/* Traffic Lights */}
           <div
@@ -508,134 +499,61 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 {/* Add block button (owner only) */}
                 {isOwner && (
                   <div style={{ padding: `var(--spacing-window-padding) var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)` }}>
-                    {showBlockPicker ? (
-                      <motion.div
-                        className="overflow-hidden"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
+                    <button
+                      ref={addBlockButtonRef}
+                      onClick={openBlockPicker}
+                      className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
+                      style={{
+                        fontSize: '13px',
+                        borderRadius: 8,
+                        borderColor: 'var(--border-medium)',
+                        color: 'var(--text-tertiary)',
+                        background: 'transparent',
+                        fontFamily: 'var(--font-body)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'linear-gradient(180deg, rgba(0,122,255,0.06) 0%, rgba(0,122,255,0.02) 100%)';
+                        e.currentTarget.style.borderColor = 'rgba(0,122,255,0.4)';
+                        e.currentTarget.style.color = '#007AFF';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.borderColor = 'var(--border-medium)';
+                        e.currentTarget.style.color = 'var(--text-tertiary)';
+                      }}
+                    >
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M7 2v10M2 7h10" strokeLinecap="round" />
+                      </svg>
+                      Add block
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 rounded ml-1"
                         style={{
-                          borderRadius: 'var(--radius-lg)',
-                          background: 'var(--bg-elevated)',
-                          border: 'var(--border-width) solid var(--border-medium)',
-                          boxShadow: 'var(--shadow-md)',
-                        }}
-                      >
-                        {/* Header */}
-                        <div
-                          className="flex items-center justify-between px-4 py-3"
-                          style={{ borderBottom: '1px solid var(--border-light)' }}
-                        >
-                          <span className="text-[13px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-                            Add Block
-                          </span>
-                          <button
-                            onClick={() => setShowBlockPicker(false)}
-                            className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
-                            style={{ background: 'var(--border-light)' }}
-                          >
-                            <svg className="w-3 h-3" style={{ color: 'var(--text-secondary)' }} viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
-                              <path d="M2 2l6 6M8 2l-6 6" strokeLinecap="round" />
-                            </svg>
-                          </button>
-                        </div>
-
-                        {/* Category Tabs */}
-                        <div
-                          className="flex gap-1 px-3 py-2 overflow-x-auto"
-                          style={{ borderBottom: '1px solid var(--border-light)' }}
-                        >
-                          {BLOCK_CATEGORIES.map((cat) => (
-                            <button
-                              key={cat.id}
-                              onClick={() => setBlockPickerCategory(cat.id)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all"
-                              style={{
-                                background: blockPickerCategory === cat.id ? 'var(--accent-primary)' : 'transparent',
-                                color: blockPickerCategory === cat.id ? 'white' : 'var(--text-secondary)',
-                              }}
-                            >
-                              <span>{cat.icon}</span>
-                              <span>{cat.label}</span>
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Blocks Grid */}
-                        <div className="p-3 max-h-[280px] overflow-y-auto">
-                          <div className="grid grid-cols-4 gap-2">
-                            {BLOCK_DEFINITIONS
-                              .filter(blockDef => blockDef.category === blockPickerCategory)
-                              .map((blockDef) => (
-                              <button
-                                key={blockDef.type}
-                                onClick={() => {
-                                  handleAddBlock(blockDef.type);
-                                  setShowBlockPicker(false);
-                                }}
-                                className="flex flex-col items-center gap-1.5 p-3 rounded-lg transition-all group"
-                                style={{ background: 'transparent' }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.background = 'var(--border-light)';
-                                  e.currentTarget.style.transform = 'scale(1.02)';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.background = 'transparent';
-                                  e.currentTarget.style.transform = 'scale(1)';
-                                }}
-                              >
-                                <span
-                                  className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                                  style={{
-                                    background: 'var(--border-light)',
-                                    boxShadow: 'inset 0 0 0 1px var(--border-medium)',
-                                  }}
-                                >
-                                  {blockDef.icon}
-                                </span>
-                                <span className="text-[10px] font-medium text-center" style={{ color: 'var(--text-primary)' }}>
-                                  {blockDef.label}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ) : (
-                      <button
-                        onClick={() => setShowBlockPicker(true)}
-                        className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
-                        style={{
-                          fontSize: '13px',
-                          borderRadius: 'var(--radius-button)',
-                          borderColor: 'var(--border-medium)',
+                          fontFamily: 'var(--font-mono)',
+                          background: 'var(--border-light)',
                           color: 'var(--text-tertiary)',
-                          background: 'transparent',
-                          fontFamily: 'var(--font-body)',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'var(--border-light)';
-                          e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                          e.currentTarget.style.color = 'var(--accent-primary)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'transparent';
-                          e.currentTarget.style.borderColor = 'var(--border-medium)';
-                          e.currentTarget.style.color = 'var(--text-tertiary)';
                         }}
                       >
-                        <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <path d="M8 3v10M3 8h10" strokeLinecap="round" />
-                        </svg>
-                        Add block
-                      </button>
-                    )}
+                        /
+                      </span>
+                    </button>
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Inline Block Picker */}
+      <InlineBlockPicker
+        isOpen={blockPicker.isOpen}
+        position={blockPicker.position}
+        searchQuery={blockPicker.searchQuery}
+        onSelect={handleAddBlock}
+        onClose={blockPicker.close}
+      />
     </>
   );
 }

@@ -6,15 +6,29 @@ import { BlockData } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { EditableText } from './Editable';
+import { BlockHoverToolbar, InlineDeleteButton } from './BlockHoverToolbar';
 
 interface EditableBlockRendererProps {
   block: BlockData;
   itemId: string;
   onUpdate: (blockId: string, data: Record<string, unknown>) => void;
   onDelete: (blockId: string) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onDuplicate?: () => void;
+  showToolbar?: boolean;
 }
 
-export function EditableBlockRenderer({ block, itemId, onUpdate, onDelete }: EditableBlockRendererProps) {
+export function EditableBlockRenderer({
+  block,
+  itemId,
+  onUpdate,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  onDuplicate,
+  showToolbar = false,
+}: EditableBlockRendererProps) {
   const context = useEditContextSafe();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -200,36 +214,33 @@ export function EditableBlockRenderer({ block, itemId, onUpdate, onDelete }: Edi
     );
   }
 
-  // For all other block types, wrap with hover effects and delete button
+  // For all other block types, wrap with hover effects and toolbar
   return (
     <div
       className="relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Delete button */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.button
-            className="absolute -right-2 -top-2 w-5 h-5 rounded-full flex items-center justify-center z-10"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(block.id);
-            }}
-            style={{
-              background: 'rgba(239, 68, 68, 0.9)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-            }}
-          >
-            <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M2 2l6 6M8 2l-6 6" strokeLinecap="round" />
-            </svg>
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {/* Hover toolbar (shown when showToolbar is true) */}
+      {showToolbar && (
+        <BlockHoverToolbar
+          block={block}
+          isVisible={isHovered}
+          position="left"
+          onDelete={() => onDelete(block.id)}
+          onMoveUp={onMoveUp}
+          onMoveDown={onMoveDown}
+          onDuplicate={onDuplicate}
+        />
+      )}
+
+      {/* Simple delete button (fallback when toolbar is disabled) */}
+      {!showToolbar && (
+        <InlineDeleteButton
+          isVisible={isHovered}
+          onClick={() => onDelete(block.id)}
+        />
+      )}
 
       {/* Hover highlight */}
       <AnimatePresence>

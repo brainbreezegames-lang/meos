@@ -7,8 +7,9 @@ import type { DesktopItem, BlockData } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { EditableText, EditableImage } from '@/components/editing/Editable';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
+import { InlineBlockPicker, useInlineBlockPicker } from '@/components/editing/InlineBlockPicker';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
-import { BLOCK_DEFINITIONS, BLOCK_CATEGORIES } from '@/types/blocks';
+import { BLOCK_DEFINITIONS } from '@/types/blocks';
 
 interface EditableInfoWindowProps {
   item: DesktopItem | null;
@@ -21,9 +22,9 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
   const windowRef = useRef<HTMLDivElement>(null);
   const constraintsRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
-  const [showBlockPicker, setShowBlockPicker] = useState(false);
-  const [blockPickerCategory, setBlockPickerCategory] = useState<string>('text');
   const dragControls = useDragControls();
+  const blockPicker = useInlineBlockPicker();
+  const addBlockButtonRef = useRef<HTMLButtonElement>(null);
 
   const isOwner = context?.isOwner ?? false;
 
@@ -143,7 +144,15 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
       order: sortedBlocks.length,
     });
 
-    setShowBlockPicker(false);
+    blockPicker.close();
+  };
+
+  // Open inline block picker
+  const openBlockPicker = () => {
+    if (addBlockButtonRef.current) {
+      const rect = addBlockButtonRef.current.getBoundingClientRect();
+      blockPicker.open(rect.left, rect.top - 320);
+    }
   };
 
   // Handle item field updates
@@ -481,127 +490,43 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                     {/* Add block button (owner only) */}
                     {isOwner && (
                       <div style={{ padding: `var(--spacing-window-padding) var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)` }}>
-                        {showBlockPicker ? (
-                          <motion.div
-                            className="overflow-hidden"
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                        <button
+                          ref={addBlockButtonRef}
+                          onClick={openBlockPicker}
+                          className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
+                          style={{
+                            fontSize: '13px',
+                            borderRadius: 'var(--radius-button)',
+                            borderColor: 'var(--border-medium)',
+                            color: 'var(--text-tertiary)',
+                            background: 'transparent',
+                            fontFamily: 'var(--font-body)',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--border-light)';
+                            e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                            e.currentTarget.style.color = 'var(--accent-primary)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.borderColor = 'var(--border-medium)';
+                            e.currentTarget.style.color = 'var(--text-tertiary)';
+                          }}
+                        >
+                          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="M8 3v10M3 8h10" strokeLinecap="round" />
+                          </svg>
+                          Add block
+                          <span
+                            className="text-[10px] px-1 py-0.5 rounded ml-1"
                             style={{
-                              borderRadius: 'var(--radius-lg)',
-                              background: 'var(--bg-elevated)',
-                              border: 'var(--border-width) solid var(--border-medium)',
-                              boxShadow: 'var(--shadow-md)',
-                            }}
-                          >
-                            {/* Header */}
-                            <div
-                              className="flex items-center justify-between px-4 py-3"
-                              style={{ borderBottom: '1px solid var(--border-light)' }}
-                            >
-                              <span className="text-[13px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                Add Block
-                              </span>
-                              <button
-                                onClick={() => setShowBlockPicker(false)}
-                                className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
-                                style={{ background: 'var(--border-light)' }}
-                              >
-                                <svg className="w-3 h-3" style={{ color: 'var(--text-secondary)' }} viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                  <path d="M2 2l6 6M8 2l-6 6" strokeLinecap="round" />
-                                </svg>
-                              </button>
-                            </div>
-
-                            {/* Category Tabs */}
-                            <div
-                              className="flex gap-1 px-3 py-2 overflow-x-auto"
-                              style={{ borderBottom: '1px solid var(--border-light)' }}
-                            >
-                              {BLOCK_CATEGORIES.map((cat) => (
-                                <button
-                                  key={cat.id}
-                                  onClick={() => setBlockPickerCategory(cat.id)}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all"
-                                  style={{
-                                    background: blockPickerCategory === cat.id ? 'var(--accent-primary)' : 'transparent',
-                                    color: blockPickerCategory === cat.id ? 'white' : 'var(--text-secondary)',
-                                  }}
-                                >
-                                  <span>{cat.icon}</span>
-                                  <span>{cat.label}</span>
-                                </button>
-                              ))}
-                            </div>
-
-                            {/* Blocks Grid */}
-                            <div className="p-3 max-h-[280px] overflow-y-auto">
-                              <div className="grid grid-cols-4 gap-2">
-                                {BLOCK_DEFINITIONS
-                                  .filter(blockDef => blockDef.category === blockPickerCategory)
-                                  .map((blockDef) => (
-                                  <button
-                                    key={blockDef.type}
-                                    onClick={() => {
-                                      handleAddBlock(blockDef.type);
-                                      setShowBlockPicker(false);
-                                    }}
-                                    className="flex flex-col items-center gap-1.5 p-3 rounded-lg transition-all group"
-                                    style={{ background: 'transparent' }}
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.background = 'var(--border-light)';
-                                      e.currentTarget.style.transform = 'scale(1.02)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.background = 'transparent';
-                                      e.currentTarget.style.transform = 'scale(1)';
-                                    }}
-                                  >
-                                    <span
-                                      className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                                      style={{
-                                        background: 'var(--border-light)',
-                                        boxShadow: 'inset 0 0 0 1px var(--border-medium)',
-                                      }}
-                                    >
-                                      {blockDef.icon}
-                                    </span>
-                                    <span className="text-[10px] font-medium text-center" style={{ color: 'var(--text-primary)' }}>
-                                      {blockDef.label}
-                                    </span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </motion.div>
-                        ) : (
-                          <button
-                            onClick={() => setShowBlockPicker(true)}
-                            className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
-                            style={{
-                              fontSize: '13px',
-                              borderRadius: 'var(--radius-button)',
-                              borderColor: 'var(--border-medium)',
+                              background: 'var(--border-light)',
                               color: 'var(--text-tertiary)',
-                              background: 'transparent',
-                              fontFamily: 'var(--font-body)',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'var(--border-light)';
-                              e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                              e.currentTarget.style.color = 'var(--accent-primary)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'transparent';
-                              e.currentTarget.style.borderColor = 'var(--border-medium)';
-                              e.currentTarget.style.color = 'var(--text-tertiary)';
                             }}
                           >
-                            <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                              <path d="M8 3v10M3 8h10" strokeLinecap="round" />
-                            </svg>
-                            Add block
-                          </button>
-                        )}
+                            /
+                          </span>
+                        </button>
                       </div>
                     )}
                   </motion.div>
@@ -610,6 +535,15 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
             </div>
             </motion.div>
           </div>
+
+          {/* Inline Block Picker */}
+          <InlineBlockPicker
+            isOpen={blockPicker.isOpen}
+            position={blockPicker.position}
+            searchQuery={blockPicker.searchQuery}
+            onSelect={handleAddBlock}
+            onClose={blockPicker.close}
+          />
         </>
       )}
     </AnimatePresence>

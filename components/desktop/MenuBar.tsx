@@ -7,9 +7,10 @@ import { formatTime, formatDate } from '@/lib/utils';
 interface MenuBarProps {
   title?: string;
   onSettingsClick?: () => void;
+  rightContent?: React.ReactNode;
 }
 
-export function MenuBar({ title = 'MeOS', onSettingsClick }: MenuBarProps) {
+export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuBarProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -102,6 +103,9 @@ export function MenuBar({ title = 'MeOS', onSettingsClick }: MenuBarProps) {
 
       {/* Right side - Date & Time */}
       <div className="flex items-center gap-4">
+        {/* Custom right content (like persona toggle) */}
+        {rightContent}
+
         {/* Settings gear icon (for owners) */}
         {onSettingsClick && (
           <button

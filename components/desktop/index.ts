@@ -1,5 +1,5 @@
 export { MenuBar } from './MenuBar';
-export { DesktopCanvas } from './DesktopCanvas';
+export { DesktopCanvas, type ViewMode } from './DesktopCanvas';
 export { DesktopItem } from './DesktopItem';
 export { InfoWindow } from './InfoWindow';
 export { Dock } from './Dock';
@@ -7,3 +7,4 @@ export { DockItem } from './DockItem';
 export { MadeWithBadge } from './MadeWithBadge';
 export { PublicDesktop } from './PublicDesktop';
 export { SettingsWindow } from './SettingsWindow';
+export { PersonaLoginScreen, PersonaModeToggle, useVisitorPersona, type VisitorPersona } from './PersonaLoginScreen';

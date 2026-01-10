@@ -16,6 +16,7 @@ async function getDesktop(username: string) {
       id: true,
       username: true,
       name: true,
+      image: true,
       desktop: {
         include: {
           items: {
@@ -158,6 +159,8 @@ export default async function UserDesktopPage({ params }: PageProps) {
       desktop={desktop}
       title={desktop.title || user.name || user.username}
       theme={theme}
+      ownerImage={user.image}
+      ownerTitle={desktop.description}
     />
   );
 }

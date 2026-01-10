@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useDragControls } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
@@ -19,11 +19,9 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
   const context = useEditContextSafe();
   const windowContext = useWindowContext();
   const windowRef = useRef<HTMLDivElement>(null);
-  const constraintsRef = useRef<HTMLDivElement>(null);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [showBlockPicker, setShowBlockPicker] = useState(false);
   const [blockPickerCategory, setBlockPickerCategory] = useState<string>('text');
-  const dragControls = useDragControls();
 
   const isOwner = context?.isOwner ?? false;
   const isActive = windowContext.activeWindowId === windowInstance.id;
@@ -86,60 +84,52 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
     setShowBlockPicker(false);
   };
 
-  const startDrag = (event: React.PointerEvent) => {
-    if (!isMaximized) {
-      dragControls.start(event);
-    }
-  };
-
   const handleWindowClick = () => {
     windowContext.focusWindow(windowInstance.id);
   };
 
+  const windowWidth = Math.max(item.windowWidth || 560, 480);
+
   return (
     <>
-      {/* Drag constraints */}
+      {/* Window container - handles centering */}
       <div
-        ref={constraintsRef}
-        className="fixed inset-0 z-[200] pointer-events-none"
-        style={{ padding: '40px' }}
-      />
-
-      {/* Browser Window */}
-      <motion.div
-        ref={windowRef}
-        className="fixed overflow-hidden flex flex-col pointer-events-auto"
-        onClick={handleWindowClick}
-        drag={!isMaximized}
-        dragControls={dragControls}
-        dragListener={false}
-        dragConstraints={constraintsRef}
-        dragElastic={0.05}
-        dragMomentum={false}
+        className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center"
         style={{
-          zIndex: windowInstance.zIndex + 200,
-          width: isMaximized ? 'calc(100vw - 80px)' : Math.max(item.windowWidth || 560, 480),
-          maxWidth: '95vw',
-          maxHeight: isMaximized ? 'calc(100vh - 100px)' : 'calc(100vh - 140px)',
-          borderRadius: isMaximized ? 'var(--radius-md)' : 'var(--radius-window)',
-          background: 'var(--bg-glass-elevated)',
-          backdropFilter: 'var(--blur-glass)',
-          WebkitBackdropFilter: 'var(--blur-glass)',
-          boxShadow: isActive
-            ? '0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 12px 40px -8px rgba(0, 0, 0, 0.35)'
-            : 'var(--shadow-lg)',
-          border: 'var(--border-width) solid var(--border-glass-outer)',
-          top: isMaximized ? '50px' : '50%',
-          left: isMaximized ? '40px' : '50%',
-          transform: isMaximized ? 'none' : 'translate(-50%, -50%)',
-          opacity: isActive ? 1 : 0.95,
+          padding: isMaximized ? '40px' : '60px',
+          paddingTop: isMaximized ? '50px' : '60px',
         }}
-        initial={{ opacity: 0, scale: 0.88, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.92, y: 10 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 0.8 }}
-        layout
       >
+        {/* Browser Window */}
+        <motion.div
+          ref={windowRef}
+          className="overflow-hidden flex flex-col pointer-events-auto relative"
+          onClick={handleWindowClick}
+          drag={!isMaximized}
+          dragConstraints={{ top: -200, left: -300, right: 300, bottom: 200 }}
+          dragElastic={0.1}
+          dragMomentum={false}
+          style={{
+            zIndex: windowInstance.zIndex + 200,
+            width: isMaximized ? '100%' : windowWidth,
+            maxWidth: isMaximized ? '100%' : '90vw',
+            height: isMaximized ? '100%' : 'auto',
+            maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
+            borderRadius: isMaximized ? 'var(--radius-lg)' : 'var(--radius-window)',
+            background: 'var(--bg-glass-elevated)',
+            backdropFilter: 'var(--blur-glass)',
+            WebkitBackdropFilter: 'var(--blur-glass)',
+            boxShadow: isActive
+              ? '0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 12px 40px -8px rgba(0, 0, 0, 0.35)'
+              : 'var(--shadow-lg)',
+            border: 'var(--border-width) solid var(--border-glass-outer)',
+            opacity: isActive ? 1 : 0.95,
+          }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+        >
         {/* Browser Chrome - Tab Bar */}
         <div
           className="flex items-end shrink-0 select-none"
@@ -147,7 +137,6 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             background: 'var(--bg-elevated)',
             borderBottom: 'var(--border-width) solid var(--border-light)',
           }}
-          onPointerDown={startDrag}
         >
           {/* Traffic Lights */}
           <div
@@ -486,7 +475,8 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             )}
           </div>
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </>
   );
 }
