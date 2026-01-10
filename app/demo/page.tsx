@@ -13,9 +13,12 @@ import { PersonaLoginScreen, useVisitorPersona, PersonaModeToggle, type VisitorP
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import { StickyNotesContainer, type StickyNoteData } from '@/components/desktop/StickyNote';
-import { ParticleBackground, type ParticleSettings } from '@/components/desktop/ParticleBackground';
-import { LiveStatus, type LiveStatusData } from '@/components/desktop/LiveStatus';
+import { ParticleBackground, ParticleSettingsPanel, type ParticleSettings } from '@/components/desktop/ParticleBackground';
+import { LiveStatus, LiveStatusDropdown, type LiveStatusData } from '@/components/desktop/LiveStatus';
 import { QRCodeGenerator } from '@/components/desktop/QRCodeGenerator';
+import { Guestbook, type GuestbookEntry } from '@/components/desktop/Guestbook';
+import { AnalyticsDashboard } from '@/components/desktop/AnalyticsDashboard';
+import { CursorProvider, CursorSettingsPanel, type CursorSettings } from '@/components/desktop/CustomCursor';
 import type { DesktopItem, Desktop } from '@/types';
 
 // Persona visibility configuration for demo items
@@ -116,6 +119,89 @@ const DEMO_LIVE_STATUS: LiveStatusData = {
     timezone: 'America/Los_Angeles',
   },
   availability: 'available',
+};
+
+// Demo guestbook entries
+const DEMO_GUESTBOOK_ENTRIES: GuestbookEntry[] = [
+  {
+    id: 'gb-1',
+    message: 'Love the design! This is exactly what I was looking for.',
+    type: 'general',
+    authorType: 'anonymous',
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    isPublic: true,
+  },
+  {
+    id: 'gb-2',
+    message: 'Would love to chat about a potential collaboration!',
+    type: 'opportunity',
+    authorType: 'named',
+    authorName: 'Sarah K.',
+    createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+    isPublic: true,
+    ownerMarkedHelpful: true,
+  },
+  {
+    id: 'gb-3',
+    message: 'The particle effects are amazing. How did you build this?',
+    type: 'feedback',
+    authorType: 'named',
+    authorName: 'Dev_Mike',
+    createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
+    isPublic: true,
+  },
+];
+
+// Demo cursor settings
+const DEMO_CURSOR_SETTINGS: CursorSettings = {
+  style: 'default',
+  color: 'default',
+  clickRipple: false,
+  hoverGlow: false,
+  trail: false,
+  intensity: 50,
+};
+
+// Demo analytics data
+const DEMO_ANALYTICS_DATA = {
+  overview: {
+    visitors: 1247,
+    visitorsChange: 12,
+    pageViews: 4829,
+    pageViewsChange: 8,
+    avgTime: '2m 34s',
+    avgTimeChange: -3,
+  },
+  sources: [
+    { name: 'Direct', count: 523, percentage: 42 },
+    { name: 'LinkedIn', count: 312, percentage: 25 },
+    { name: 'Twitter', count: 187, percentage: 15 },
+    { name: 'Google', count: 148, percentage: 12 },
+    { name: 'Other', count: 77, percentage: 6 },
+  ],
+  visitorTypes: {
+    recruiters: { count: 89, percentage: 7 },
+    visitors: { count: 1023, percentage: 82 },
+    skipped: { count: 135, percentage: 11 },
+  },
+  topContent: [
+    { name: 'About Me', opens: 892, change: 5 },
+    { name: 'Projects', opens: 654, change: 12 },
+    { name: 'Resume', opens: 432, change: 23 },
+    { name: 'Photography', opens: 298, change: -2 },
+    { name: 'Contact', opens: 187, change: 8 },
+  ],
+  recruiterFunnel: {
+    visited: 89,
+    viewedWork: 67,
+    downloadedCV: 34,
+    contacted: 12,
+  },
+  liveVisitors: [
+    { location: 'San Francisco, US', viewing: 'Projects', duration: '3m 12s' },
+    { location: 'London, UK', viewing: 'About Me', duration: '1m 45s' },
+    { location: 'Tokyo, JP', viewing: 'Resume', duration: '0m 32s' },
+  ],
 };
 
 // Background images that rotate
@@ -788,10 +874,10 @@ const DEMO_DESKTOP: Desktop = {
   items: DEMO_ITEMS,
   dockItems: [
     { id: 'dock-1', desktopId: 'demo', icon: '🏠', label: 'Home', actionType: 'url', actionValue: '/', order: 0 },
-    { id: 'dock-2', desktopId: 'demo', icon: '📧', label: 'Email', actionType: 'email', actionValue: 'hello@example.com', order: 1 },
-    { id: 'dock-3', desktopId: 'demo', icon: '💼', label: 'LinkedIn', actionType: 'url', actionValue: 'https://linkedin.com', order: 2 },
-    { id: 'dock-4', desktopId: 'demo', icon: '🐙', label: 'GitHub', actionType: 'url', actionValue: 'https://github.com', order: 3 },
-    { id: 'dock-5', desktopId: 'demo', icon: '🐦', label: 'Twitter', actionType: 'url', actionValue: 'https://twitter.com', order: 4 },
+    { id: 'dock-2', desktopId: 'demo', icon: '📝', label: 'Guestbook', actionType: 'app', actionValue: 'guestbook', order: 1 },
+    { id: 'dock-3', desktopId: 'demo', icon: '📊', label: 'Analytics', actionType: 'app', actionValue: 'analytics', order: 2 },
+    { id: 'dock-4', desktopId: 'demo', icon: '⚙️', label: 'Settings', actionType: 'app', actionValue: 'settings', order: 3 },
+    { id: 'dock-5', desktopId: 'demo', icon: '🐙', label: 'GitHub', actionType: 'url', actionValue: 'https://github.com', order: 4 },
   ],
 };
 
@@ -799,9 +885,10 @@ const DEMO_DESKTOP: Desktop = {
 interface DockIconProps {
   item: typeof DEMO_DESKTOP.dockItems[0];
   mouseX: ReturnType<typeof useMotionValue<number>>;
+  onAppClick?: (appId: string) => void;
 }
 
-function DockIcon({ item, mouseX }: DockIconProps) {
+function DockIcon({ item, mouseX, onAppClick }: DockIconProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [sizes, setSizes] = useState({ base: 48, max: 72 });
@@ -853,6 +940,8 @@ function DockIcon({ item, mouseX }: DockIconProps) {
       }
     } else if (item.actionType === 'email') {
       window.location.href = `mailto:${item.actionValue}`;
+    } else if (item.actionType === 'app' && onAppClick) {
+      onAppClick(item.actionValue);
     }
   };
 
@@ -923,7 +1012,7 @@ function DockIcon({ item, mouseX }: DockIconProps) {
 }
 
 // Theme-aware Dock Component - Uses CSS variables for all styling
-function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
+function Dock({ items, onAppClick }: { items: typeof DEMO_DESKTOP.dockItems; onAppClick?: (appId: string) => void }) {
   const mouseX = useMotionValue(Infinity);
 
   return (
@@ -950,7 +1039,7 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
         onMouseLeave={() => mouseX.set(Infinity)}
       >
         {items.map((item) => (
-          <DockIcon key={item.id} item={item} mouseX={mouseX} />
+          <DockIcon key={item.id} item={item} mouseX={mouseX} onAppClick={onAppClick} />
         ))}
       </motion.div>
     </motion.div>
@@ -1313,7 +1402,7 @@ function RotatingBackground() {
 }
 
 // Theme-aware Desktop Content
-function DesktopContent() {
+function DesktopContent({ onAppClick }: { onAppClick: (appId: string) => void }) {
   const context = useEditContextSafe();
   const windowContext = useWindowContext();
   const { persona } = usePersonaContext();
@@ -1517,7 +1606,7 @@ function DesktopContent() {
       </AnimatePresence>
 
       {/* Dock */}
-      <Dock items={DEMO_DESKTOP.dockItems} />
+      <Dock items={DEMO_DESKTOP.dockItems} onAppClick={onAppClick} />
 
       {/* Save Indicator */}
       <SaveIndicator />
@@ -1549,12 +1638,166 @@ function DesktopContent() {
   );
 }
 
+// App Window Component - macOS-style floating window for dock apps
+function AppWindow({
+  title,
+  icon,
+  onClose,
+  width = 480,
+  children,
+}: {
+  title: string;
+  icon: string;
+  onClose: () => void;
+  width?: number;
+  children: React.ReactNode;
+}) {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef({ startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
+
+  // Center on mount
+  useEffect(() => {
+    setPosition({
+      x: (window.innerWidth - width) / 2,
+      y: Math.max(60, (window.innerHeight - 500) / 2),
+    });
+  }, [width]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    setIsDragging(true);
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetX: position.x,
+      offsetY: position.y,
+    };
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const dx = e.clientX - dragRef.current.startX;
+      const dy = e.clientY - dragRef.current.startY;
+      setPosition({
+        x: dragRef.current.offsetX + dx,
+        y: Math.max(28, dragRef.current.offsetY + dy),
+      });
+    };
+
+    const handleMouseUp = () => setIsDragging(false);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
+  return (
+    <motion.div
+      className="fixed z-[200]"
+      style={{
+        left: position.x,
+        top: position.y,
+        width,
+      }}
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+    >
+      {/* Window chrome */}
+      <div
+        className="rounded-xl overflow-hidden"
+        style={{
+          background: 'rgba(30, 30, 30, 0.92)',
+          backdropFilter: 'blur(40px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        }}
+      >
+        {/* Title bar */}
+        <div
+          className="flex items-center gap-3 px-4 py-3 cursor-move select-none"
+          onMouseDown={handleMouseDown}
+          style={{
+            background: 'rgba(255, 255, 255, 0.03)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          }}
+        >
+          {/* Traffic lights */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="w-3 h-3 rounded-full transition-all group relative"
+              style={{ background: '#ff5f57' }}
+            >
+              <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 text-[8px] text-black/70 font-bold">✕</span>
+            </button>
+            <div className="w-3 h-3 rounded-full" style={{ background: '#febd2e' }} />
+            <div className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+          </div>
+
+          {/* Title */}
+          <div className="flex items-center gap-2 flex-1 justify-center -ml-12">
+            <span className="text-lg">{icon}</span>
+            <span
+              className="text-sm font-medium"
+              style={{
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+              }}
+            >
+              {title}
+            </span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div
+          className="p-5 max-h-[70vh] overflow-y-auto"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(255,255,255,0.2) transparent',
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // Demo Page Inner (needs access to background context)
 function DemoPageInner() {
   const bgContext = useBackgroundContext();
   const { persona, hasChecked, selectPersona, needsSelection } = useVisitorPersona();
   const [showLoginScreen, setShowLoginScreen] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [showGuestbook, setShowGuestbook] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>(DEMO_GUESTBOOK_ENTRIES);
+  const [particleSettings, setParticleSettings] = useState<ParticleSettings>(DEMO_PARTICLE_SETTINGS);
+  const [cursorSettings, setCursorSettings] = useState<CursorSettings>(DEMO_CURSOR_SETTINGS);
+
+  const handleAppClick = (appId: string) => {
+    switch (appId) {
+      case 'guestbook':
+        setShowGuestbook(true);
+        break;
+      case 'analytics':
+        setShowAnalytics(true);
+        break;
+      case 'settings':
+        setShowSettings(true);
+        break;
+    }
+  };
 
   // Check if we need to show login screen
   useEffect(() => {
@@ -1603,50 +1846,122 @@ function DemoPageInner() {
     );
   }
 
+  // Count open windows for particle reduction
+  const openWindowCount = [showGuestbook, showAnalytics, showSettings, showQRCode].filter(Boolean).length;
+
   return (
     <PersonaContext.Provider value={{ persona, setPersona: selectPersona }}>
-      <main className="min-h-screen h-screen overflow-hidden relative">
-        {/* Particle Background */}
-        <ParticleBackground
-          settings={DEMO_PARTICLE_SETTINGS}
-          reduceWhenWindowsOpen={true}
-          windowsOpen={0}
-        />
+      <CursorProvider initialSettings={cursorSettings}>
+        <main className="min-h-screen h-screen overflow-hidden relative">
+          {/* Particle Background */}
+          <ParticleBackground
+            settings={particleSettings}
+            reduceWhenWindowsOpen={true}
+            windowsOpen={openWindowCount}
+          />
 
-        <RotatingBackground />
-        <MenuBar
-          persona={persona}
-          onPersonaChange={selectPersona}
-          onShowQRCode={() => setShowQRCode(true)}
-        />
-        <DesktopContent />
+          <RotatingBackground />
+          <MenuBar
+            persona={persona}
+            onPersonaChange={selectPersona}
+            onShowQRCode={() => setShowQRCode(true)}
+          />
+          <DesktopContent onAppClick={handleAppClick} />
 
-        {/* Background Settings Panel */}
-        <BackgroundPanel
-          isOpen={bgContext.showBackgroundPanel}
-          onClose={() => bgContext.setShowBackgroundPanel(false)}
-          currentBackground={bgContext.customBackground}
-          onBackgroundChange={bgContext.setCustomBackground}
-        />
+          {/* Background Settings Panel */}
+          <BackgroundPanel
+            isOpen={bgContext.showBackgroundPanel}
+            onClose={() => bgContext.setShowBackgroundPanel(false)}
+            currentBackground={bgContext.customBackground}
+            onBackgroundChange={bgContext.setCustomBackground}
+          />
 
-        {/* QR Code Generator */}
-        <QRCodeGenerator
-          baseUrl="https://meos-delta.vercel.app"
-          username="demo"
-          isOpen={showQRCode}
-          onClose={() => setShowQRCode(false)}
-        />
+          {/* QR Code Generator */}
+          <QRCodeGenerator
+            baseUrl="https://meos-delta.vercel.app"
+            username="demo"
+            isOpen={showQRCode}
+            onClose={() => setShowQRCode(false)}
+          />
 
-        {/* Welcome Notification */}
-        <WelcomeNotification
-          title="Welcome to MeOS"
-          subtitle="Your personal web desktop"
-          body="Click any item to open its window. Use the traffic lights to minimize/maximize. Try the theme switcher!"
-          icon="🖥️"
-          delay={1500}
-          duration={10000}
-        />
-      </main>
+          {/* Guestbook Window */}
+          <AnimatePresence>
+            {showGuestbook && (
+              <AppWindow
+                title="Guestbook"
+                icon="📝"
+                onClose={() => setShowGuestbook(false)}
+              >
+                <Guestbook
+                  entries={guestbookEntries}
+                  onSubmit={(entry) => {
+                    const newEntry: GuestbookEntry = {
+                      ...entry,
+                      id: `gb-${Date.now()}`,
+                      createdAt: new Date(),
+                      isPublic: true,
+                    };
+                    setGuestbookEntries([newEntry, ...guestbookEntries]);
+                  }}
+                  isOwnerView={false}
+                />
+              </AppWindow>
+            )}
+          </AnimatePresence>
+
+          {/* Analytics Window */}
+          <AnimatePresence>
+            {showAnalytics && (
+              <AppWindow
+                title="Analytics"
+                icon="📊"
+                onClose={() => setShowAnalytics(false)}
+                width={700}
+              >
+                <AnalyticsDashboard data={DEMO_ANALYTICS_DATA} />
+              </AppWindow>
+            )}
+          </AnimatePresence>
+
+          {/* Settings Window */}
+          <AnimatePresence>
+            {showSettings && (
+              <AppWindow
+                title="Settings"
+                icon="⚙️"
+                onClose={() => setShowSettings(false)}
+              >
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-sm font-semibold text-white/80 mb-3">Particles</h3>
+                    <ParticleSettingsPanel
+                      settings={particleSettings}
+                      onChange={setParticleSettings}
+                    />
+                  </div>
+                  <div className="border-t border-white/10 pt-6">
+                    <h3 className="text-sm font-semibold text-white/80 mb-3">Custom Cursor</h3>
+                    <CursorSettingsPanel
+                      settings={cursorSettings}
+                      onChange={setCursorSettings}
+                    />
+                  </div>
+                </div>
+              </AppWindow>
+            )}
+          </AnimatePresence>
+
+          {/* Welcome Notification */}
+          <WelcomeNotification
+            title="Welcome to MeOS"
+            subtitle="Your personal web desktop"
+            body="Click any item to open its window. Try the Guestbook and Analytics in the dock!"
+            icon="🖥️"
+            delay={1500}
+            duration={10000}
+          />
+        </main>
+      </CursorProvider>
     </PersonaContext.Provider>
   );
 }

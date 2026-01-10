@@ -71,7 +71,7 @@ export interface DockItem {
   desktopId: string;
   icon: string;
   label: string;
-  actionType: 'url' | 'email' | 'download';
+  actionType: 'url' | 'email' | 'download' | 'app';
   actionValue: string;
   order: number;
 }

@@ -17,7 +17,7 @@ export function DockItemForm({ item, onSave, onDelete, onClose }: DockItemFormPr
   const [formData, setFormData] = useState({
     icon: '🔗',
     label: '',
-    actionType: 'url' as 'url' | 'email' | 'download',
+    actionType: 'url' as 'url' | 'email' | 'download' | 'app',
     actionValue: '',
   });
   const [isSaving, setIsSaving] = useState(false);
