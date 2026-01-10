@@ -4,3 +4,4 @@ export { Textarea } from './Textarea';
 export { Modal } from './Modal';
 export { ImageUpload } from './ImageUpload';
 export { Toggle } from './Toggle';
+export { ThemeSwitcher } from './ThemeSwitcher';

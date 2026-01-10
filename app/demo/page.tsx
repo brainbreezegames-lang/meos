@@ -3,11 +3,12 @@
 import { useState, useRef, useEffect, createContext, useContext } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { EditableInfoWindow } from '@/components/desktop/EditableInfoWindow';
 import { EditableDesktopItem } from '@/components/desktop/EditableDesktopItem';
 import { BackgroundPanel } from '@/components/desktop/BackgroundPanel';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
-import { ThemeTogglePill } from '@/components/ui/ThemeToggle';
+import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import type { DesktopItem, Desktop } from '@/types';
 
 // Background context for demo
@@ -601,8 +602,8 @@ function MenuBar() {
           {context?.isOwner ? '✏️ Editing' : 'Try Editing'}
         </button>
 
-        {/* Theme toggle */}
-        <ThemeTogglePill />
+        {/* Theme switcher */}
+        <ThemeSwitcher />
 
         <div className="flex items-center gap-3">
           <svg className="w-[16px] h-[16px]" style={{ color: 'var(--text-primary)' }} viewBox="0 0 24 24" fill="currentColor">
@@ -922,15 +923,17 @@ export default function DemoPage() {
   const [showBackgroundPanel, setShowBackgroundPanel] = useState(false);
 
   return (
-    <BackgroundContext.Provider value={{
-      customBackground,
-      setCustomBackground,
-      showBackgroundPanel,
-      setShowBackgroundPanel,
-    }}>
-      <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
-        <DemoPageInner />
-      </EditProvider>
-    </BackgroundContext.Provider>
+    <ThemeProvider initialTheme="monterey">
+      <BackgroundContext.Provider value={{
+        customBackground,
+        setCustomBackground,
+        showBackgroundPanel,
+        setShowBackgroundPanel,
+      }}>
+        <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
+          <DemoPageInner />
+        </EditProvider>
+      </BackgroundContext.Provider>
+    </ThemeProvider>
   );
 }
