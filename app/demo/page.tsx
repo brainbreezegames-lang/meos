@@ -12,6 +12,10 @@ import { WelcomeNotification } from '@/components/desktop/WelcomeNotification';
 import { PersonaLoginScreen, useVisitorPersona, PersonaModeToggle, type VisitorPersona } from '@/components/desktop/PersonaLoginScreen';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
+import { StickyNotesContainer, type StickyNoteData } from '@/components/desktop/StickyNote';
+import { ParticleBackground, type ParticleSettings } from '@/components/desktop/ParticleBackground';
+import { LiveStatus, type LiveStatusData } from '@/components/desktop/LiveStatus';
+import { QRCodeGenerator } from '@/components/desktop/QRCodeGenerator';
 import type { DesktopItem, Desktop } from '@/types';
 
 // Persona visibility configuration for demo items
@@ -58,6 +62,61 @@ function usePersonaContext() {
   if (!ctx) throw new Error('usePersonaContext must be used within provider');
   return ctx;
 }
+
+// Demo sticky notes
+const DEMO_STICKY_NOTES: StickyNoteData[] = [
+  {
+    id: 'sticky-1',
+    content: 'Currently deep in a rebrand project! 🎨',
+    color: 'yellow',
+    positionX: 85,
+    positionY: 15,
+    rotation: -2,
+    zIndex: 1,
+  },
+  {
+    id: 'sticky-2',
+    content: 'New work coming soon →',
+    color: 'pink',
+    positionX: 88,
+    positionY: 75,
+    rotation: 1,
+    zIndex: 2,
+  },
+];
+
+// Demo particle settings
+const DEMO_PARTICLE_SETTINGS: ParticleSettings = {
+  type: 'stars',
+  density: 30,
+  speed: 30,
+  respondToMouse: true,
+};
+
+// Demo live status
+const DEMO_LIVE_STATUS: LiveStatusData = {
+  music: {
+    provider: 'spotify',
+    track: 'Awake',
+    artist: 'Tycho',
+    album: 'A Walk',
+    albumArt: 'https://i.scdn.co/image/ab67616d0000b273886a4879d79d5bde7c708693',
+    progress: 154000,
+    duration: 252000,
+    isPlaying: true,
+  },
+  status: {
+    emoji: '💻',
+    text: 'Working on MeOS',
+    updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+  },
+  location: {
+    city: 'San Francisco',
+    country: 'USA',
+    timezone: 'America/Los_Angeles',
+  },
+  availability: 'available',
+};
 
 // Background images that rotate
 const BACKGROUND_IMAGES = [
@@ -899,7 +958,15 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
 }
 
 // Refined macOS-style Menu Bar - Clean, minimal, Apple-like
-function MenuBar({ persona, onPersonaChange }: { persona: VisitorPersona | null; onPersonaChange: (p: VisitorPersona) => void }) {
+function MenuBar({
+  persona,
+  onPersonaChange,
+  onShowQRCode,
+}: {
+  persona: VisitorPersona | null;
+  onPersonaChange: (p: VisitorPersona) => void;
+  onShowQRCode: () => void;
+}) {
   const context = useEditContextSafe();
   const bgContext = useBackgroundContext();
   const [time, setTime] = useState<string>('');
@@ -999,10 +1066,40 @@ function MenuBar({ persona, onPersonaChange }: { persona: VisitorPersona | null;
             </svg>
           </button>
         )}
+
+        {/* Live Status - shows music/status */}
+        <LiveStatus data={DEMO_LIVE_STATUS} />
       </div>
 
       {/* Right side - System tray style */}
       <div className="flex items-center gap-1">
+        {/* QR Code button (owner only) */}
+        {context?.isOwner && (
+          <button
+            onClick={onShowQRCode}
+            className="flex items-center justify-center transition-all duration-150"
+            style={{
+              width: '26px',
+              height: '20px',
+              borderRadius: '4px',
+              background: 'transparent',
+              color: 'rgba(255, 255, 255, 0.75)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.95)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
+            }}
+            title="QR Code"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M0 2a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H2a2 2 0 01-2-2V2zm6 0v4H2V2h4zm2 0a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2h-4a2 2 0 01-2-2V2zm6 0v4h-4V2h4zM0 10a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2H2a2 2 0 01-2-2v-4zm6 0v4H2v-4h4zm4 2h2v2h-2v-2zm2-2h2v2h-2v-2zm-2 4h2v2h-2v-2zm2 0h2v2h-2v-2z"/>
+            </svg>
+          </button>
+        )}
         {/* Edit mode toggle - pill button */}
         <button
           onClick={toggleEditMode}
@@ -1225,6 +1322,7 @@ function DesktopContent() {
   );
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [newItemPosition, setNewItemPosition] = useState({ x: 50, y: 50 });
+  const [stickyNotes, setStickyNotes] = useState<StickyNoteData[]>(DEMO_STICKY_NOTES);
 
   useEffect(() => {
     if (context?.desktop?.items) {
@@ -1322,6 +1420,13 @@ function DesktopContent() {
             Double-click anywhere to add an item
           </motion.div>
         )}
+
+        {/* Sticky Notes */}
+        <StickyNotesContainer
+          notes={stickyNotes}
+          onNotesChange={setStickyNotes}
+          maxNotes={5}
+        />
       </div>
 
       {/* Multi-Window Manager */}
@@ -1449,6 +1554,7 @@ function DemoPageInner() {
   const bgContext = useBackgroundContext();
   const { persona, hasChecked, selectPersona, needsSelection } = useVisitorPersona();
   const [showLoginScreen, setShowLoginScreen] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
 
   // Check if we need to show login screen
   useEffect(() => {
@@ -1500,8 +1606,19 @@ function DemoPageInner() {
   return (
     <PersonaContext.Provider value={{ persona, setPersona: selectPersona }}>
       <main className="min-h-screen h-screen overflow-hidden relative">
+        {/* Particle Background */}
+        <ParticleBackground
+          settings={DEMO_PARTICLE_SETTINGS}
+          reduceWhenWindowsOpen={true}
+          windowsOpen={0}
+        />
+
         <RotatingBackground />
-        <MenuBar persona={persona} onPersonaChange={selectPersona} />
+        <MenuBar
+          persona={persona}
+          onPersonaChange={selectPersona}
+          onShowQRCode={() => setShowQRCode(true)}
+        />
         <DesktopContent />
 
         {/* Background Settings Panel */}
@@ -1510,6 +1627,14 @@ function DemoPageInner() {
           onClose={() => bgContext.setShowBackgroundPanel(false)}
           currentBackground={bgContext.customBackground}
           onBackgroundChange={bgContext.setCustomBackground}
+        />
+
+        {/* QR Code Generator */}
+        <QRCodeGenerator
+          baseUrl="https://meos-delta.vercel.app"
+          username="demo"
+          isOpen={showQRCode}
+          onClose={() => setShowQRCode(false)}
         />
 
         {/* Welcome Notification */}
