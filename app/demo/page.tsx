@@ -898,7 +898,7 @@ function Dock({ items }: { items: typeof DEMO_DESKTOP.dockItems }) {
   );
 }
 
-// Theme-aware Menu Bar Component - Uses CSS variables for all styling
+// Refined macOS-style Menu Bar - Clean, minimal, Apple-like
 function MenuBar({ persona, onPersonaChange }: { persona: VisitorPersona | null; onPersonaChange: (p: VisitorPersona) => void }) {
   const context = useEditContextSafe();
   const bgContext = useBackgroundContext();
@@ -907,7 +907,11 @@ function MenuBar({ persona, onPersonaChange }: { persona: VisitorPersona | null;
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setTime(now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }));
+      setTime(now.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }));
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
@@ -920,97 +924,210 @@ function MenuBar({ persona, onPersonaChange }: { persona: VisitorPersona | null;
     }
   };
 
+  // Get persona label for display
+  const getPersonaLabel = () => {
+    if (!persona || persona === 'guest') return null;
+    return persona === 'recruiter' ? 'Recruiter View' : 'Explorer View';
+  };
+
   return (
     <motion.header
-      className="fixed top-0 left-0 right-0 z-[150] flex items-center justify-between px-4"
+      className="fixed top-0 left-0 right-0 z-[150] flex items-center justify-between"
       style={{
-        height: 'var(--menubar-height)',
-        background: 'var(--bg-menubar)',
-        backdropFilter: 'var(--blur-glass)',
-        WebkitBackdropFilter: 'var(--blur-glass)',
-        boxShadow: '0 0.5px 0 var(--border-light), inset 0 -0.5px 0 var(--border-glass-inner)',
-        fontFamily: 'var(--font-body)',
+        height: '28px',
+        paddingLeft: '12px',
+        paddingRight: '8px',
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+        borderBottom: '0.5px solid rgba(255, 255, 255, 0.1)',
       }}
-      initial={{ y: -32 }}
+      initial={{ y: -28 }}
       animate={{ y: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 35 }}
     >
-      <div className="flex items-center gap-4">
+      {/* Left side - App name and menu items */}
+      <div className="flex items-center gap-5">
+        {/* Apple-style bold app name */}
         <span
-          className="font-semibold"
           style={{
-            fontSize: '13px',
-            color: 'var(--text-primary)',
-            fontFamily: 'var(--font-display)',
-            letterSpacing: 'var(--letter-spacing-tight)',
+            fontSize: '13.5px',
+            fontWeight: 600,
+            color: 'rgba(255, 255, 255, 0.95)',
+            letterSpacing: '-0.01em',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
           }}
         >
           MeOS
         </span>
-        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Demo Desktop</span>
-      </div>
-      <div className="flex items-center gap-3">
-        {/* Persona mode toggle */}
-        {persona && persona !== 'guest' && (
-          <PersonaModeToggle
-            currentMode={persona}
-            onChange={onPersonaChange}
-          />
+
+        {/* Persona indicator - subtle but informative */}
+        {getPersonaLabel() && (
+          <button
+            onClick={() => onPersonaChange(persona === 'recruiter' ? 'visitor' : 'recruiter')}
+            className="flex items-center gap-1.5 transition-all duration-200"
+            style={{
+              fontSize: '13px',
+              color: 'rgba(255, 255, 255, 0.65)',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+              background: 'transparent',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              marginLeft: '-4px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.65)';
+            }}
+          >
+            <span style={{ fontSize: '11px' }}>
+              {persona === 'recruiter' ? '👔' : '✨'}
+            </span>
+            <span>{getPersonaLabel()}</span>
+            <svg
+              width="8"
+              height="8"
+              viewBox="0 0 8 8"
+              fill="currentColor"
+              style={{ opacity: 0.6, marginLeft: '2px' }}
+            >
+              <path d="M1.5 2.5L4 5L6.5 2.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         )}
+      </div>
 
-        {/* Background settings button */}
-        <button
-          onClick={() => bgContext.setShowBackgroundPanel(true)}
-          className="flex items-center gap-1.5 px-2.5 py-0.5 font-medium transition-all"
-          style={{
-            fontSize: '11px',
-            color: 'var(--text-secondary)',
-            background: 'transparent',
-            borderRadius: 'var(--radius-full)',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--border-light)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          title="Change Background"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <path d="M21 15l-5-5L5 21" />
-          </svg>
-          <span>Background</span>
-        </button>
-
-        {/* Edit mode toggle */}
+      {/* Right side - System tray style */}
+      <div className="flex items-center gap-1">
+        {/* Edit mode toggle - pill button */}
         <button
           onClick={toggleEditMode}
-          className="px-2.5 py-0.5 font-medium transition-all"
+          className="transition-all duration-200"
           style={{
             fontSize: '11px',
-            borderRadius: 'var(--radius-full)',
+            fontWeight: 500,
+            padding: '3px 10px',
+            borderRadius: '10px',
             background: context?.isOwner
-              ? 'color-mix(in srgb, var(--accent-primary) 15%, transparent)'
-              : 'var(--border-light)',
+              ? 'rgba(52, 199, 89, 0.85)'
+              : 'rgba(255, 255, 255, 0.12)',
             color: context?.isOwner
-              ? 'var(--accent-primary)'
-              : 'var(--text-secondary)',
+              ? 'rgba(255, 255, 255, 0.95)'
+              : 'rgba(255, 255, 255, 0.75)',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            if (!context?.isOwner) {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!context?.isOwner) {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
+            }
           }}
         >
-          {context?.isOwner ? '✏️ Editing' : 'Try Editing'}
+          {context?.isOwner ? 'Editing' : 'Try Editing'}
+        </button>
+
+        {/* Divider */}
+        <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)', margin: '0 4px' }} />
+
+        {/* Background button - icon only */}
+        <button
+          onClick={() => bgContext.setShowBackgroundPanel(true)}
+          className="flex items-center justify-center transition-all duration-150"
+          style={{
+            width: '26px',
+            height: '20px',
+            borderRadius: '4px',
+            background: 'transparent',
+            color: 'rgba(255, 255, 255, 0.75)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.95)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
+          }}
+          title="Background"
+        >
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 3.5A1.5 1.5 0 013.5 2h9A1.5 1.5 0 0114 3.5v9a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 012 12.5v-9zm1.5-.5a.5.5 0 00-.5.5v6.293l2.146-2.147a.5.5 0 01.708 0L8 9.793l2.146-2.147a.5.5 0 01.708 0L13 9.793V3.5a.5.5 0 00-.5-.5h-9zM13 11.207l-2.646-2.647a.5.5 0 00-.708 0L7.5 10.707 5.354 8.56a.5.5 0 00-.708 0L3 10.207V12.5a.5.5 0 00.5.5h9a.5.5 0 00.5-.5v-1.293z"/>
+          </svg>
         </button>
 
         {/* Theme switcher */}
         <ThemeSwitcher />
 
-        <div className="flex items-center gap-3">
-          <svg className="w-[16px] h-[16px]" style={{ color: 'var(--text-primary)' }} viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-4.9-2.3l1.4 1.4C9.8 18.3 10.9 18 12 18s2.2.3 3.5 1.1l1.4-1.4C15.3 16.6 13.7 16 12 16s-3.3.6-4.9 1.7zm-2.8-2.8l1.4 1.4C7.3 13.2 9.6 12 12 12s4.7 1.2 6.3 2.3l1.4-1.4C17.5 11.2 14.9 10 12 10s-5.5 1.2-7.7 2.9zM2 10.3l1.4 1.4C5.8 9.8 8.8 9 12 9s6.2.8 8.6 2.7l1.4-1.4C19.1 8 15.7 7 12 7s-7.1 1-10 3.3z"/>
+        {/* Divider */}
+        <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)', margin: '0 4px' }} />
+
+        {/* System icons - WiFi, Battery, Time */}
+        <div className="flex items-center gap-2" style={{ marginLeft: '2px' }}>
+          {/* WiFi */}
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 16 16"
+            fill="rgba(255, 255, 255, 0.85)"
+          >
+            <path d="M8 10a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm4.596-1.404a.5.5 0 01-.707.707A4.97 4.97 0 008 8a4.97 4.97 0 00-3.889 1.303.5.5 0 11-.707-.707A5.97 5.97 0 018 7a5.97 5.97 0 014.596 1.596zm2.12-2.12a.5.5 0 01-.707.707A8.96 8.96 0 008 5a8.96 8.96 0 00-6.01 2.182.5.5 0 11-.707-.707A9.96 9.96 0 018 4a9.96 9.96 0 016.717 2.475z"/>
           </svg>
-          <svg className="w-[22px] h-[12px]" style={{ color: 'var(--text-primary)' }} viewBox="0 0 25 12" fill="none">
-            <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" stroke="currentColor" strokeWidth="1"/>
-            <rect x="2" y="2" width="17" height="8" rx="1" fill="currentColor"/>
-            <path d="M23 4v4a2 2 0 001-1.73v-.54A2 2 0 0023 4z" fill="currentColor"/>
+
+          {/* Battery */}
+          <svg
+            width="20"
+            height="10"
+            viewBox="0 0 20 10"
+            fill="none"
+            style={{ marginLeft: '-2px' }}
+          >
+            <rect
+              x="0.5"
+              y="0.5"
+              width="16"
+              height="9"
+              rx="2"
+              stroke="rgba(255, 255, 255, 0.7)"
+              strokeWidth="1"
+            />
+            <rect
+              x="2"
+              y="2"
+              width="13"
+              height="6"
+              rx="1"
+              fill="rgba(255, 255, 255, 0.85)"
+            />
+            <path
+              d="M18 3.5v3a1.5 1.5 0 001-1.42v-.16a1.5 1.5 0 00-1-1.42z"
+              fill="rgba(255, 255, 255, 0.5)"
+            />
           </svg>
-          <span className="font-medium tabular-nums ml-1" style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{time}</span>
+
+          {/* Time */}
+          <span
+            style={{
+              fontSize: '13px',
+              fontWeight: 500,
+              color: 'rgba(255, 255, 255, 0.9)',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '0.01em',
+              marginLeft: '2px',
+            }}
+          >
+            {time}
+          </span>
         </div>
       </div>
     </motion.header>
