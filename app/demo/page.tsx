@@ -20,6 +20,8 @@ import { Guestbook, type GuestbookEntry } from '@/components/desktop/Guestbook';
 import { AnalyticsDashboard } from '@/components/desktop/AnalyticsDashboard';
 import { CursorProvider, CursorSettingsPanel, type CursorSettings } from '@/components/desktop/CustomCursor';
 import type { DesktopItem, Desktop } from '@/types';
+import { useMobileDetection } from '@/hooks/useMobileDetection';
+import { MobileContainer } from '@/components/mobile';
 
 // Persona visibility configuration for demo items
 // 'recruiter' = optimized for hiring decisions (resume, experience, skills, projects, testimonials, contact)
@@ -1966,11 +1968,86 @@ function DemoPageInner() {
   );
 }
 
+// Mobile Demo Component
+function MobileDemoPage() {
+  const { theme, setTheme } = useTheme();
+  const [showQRCode, setShowQRCode] = useState(false);
+
+  // Convert guestbook entries to mobile format
+  const mobileGuestbookEntries = DEMO_GUESTBOOK_ENTRIES.map(entry => ({
+    id: entry.id,
+    author: entry.authorName || 'Anonymous',
+    message: entry.message,
+    timestamp: entry.createdAt,
+    isOwner: false,
+  }));
+
+  return (
+    <>
+      <MobileContainer
+        items={DEMO_ITEMS}
+        dockItems={DEMO_DESKTOP.dockItems}
+        profileImage="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+        profileName="Alex Chen"
+        profileTitle="Product Designer & Developer"
+        profileBio="Creative developer passionate about building beautiful digital experiences. Currently at Figma, previously Stripe & Airbnb."
+        username="alexchen"
+        backgroundUrl={BACKGROUND_IMAGES[0]}
+        personas={[
+          { id: 'recruiter', name: 'Recruiter', title: 'Looking to hire', color: 'rgba(59, 130, 246, 0.3)' },
+          { id: 'visitor', name: 'Visitor', title: 'Just exploring', color: 'rgba(255, 255, 255, 0.15)' },
+        ]}
+        email="alex@example.com"
+        twitter="@alexchen"
+        linkedin="https://linkedin.com/in/alexchen"
+        github="alexchen"
+        website="https://alexchen.dev"
+        calendly="https://cal.com/alexchen"
+        guestbookEntries={mobileGuestbookEntries}
+        theme={theme === 'dark' ? 'dark' : 'dark'}
+        onThemeToggle={() => setTheme(theme === 'dark' ? 'monterey' : 'dark')}
+        onQRCodeOpen={() => setShowQRCode(true)}
+        resumeUrl="/resume.pdf"
+        startUnlocked={false}
+      />
+      <QRCodeGenerator
+        baseUrl={typeof window !== 'undefined' ? window.location.origin : ''}
+        username="alexchen"
+        isOpen={showQRCode}
+        onClose={() => setShowQRCode(false)}
+      />
+    </>
+  );
+}
+
 // Main Demo Page
 export default function DemoPage() {
   const [customBackground, setCustomBackground] = useState<string | null>(null);
   const [showBackgroundPanel, setShowBackgroundPanel] = useState(false);
+  const { isMobile, isLoading } = useMobileDetection();
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)',
+        }}
+      />
+    );
+  }
+
+  // Mobile version
+  if (isMobile) {
+    return (
+      <ThemeProvider initialTheme="dark">
+        <MobileDemoPage />
+      </ThemeProvider>
+    );
+  }
+
+  // Desktop version
   return (
     <ThemeProvider initialTheme="monterey">
       <BackgroundContext.Provider value={{
