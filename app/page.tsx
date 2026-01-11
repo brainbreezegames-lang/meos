@@ -25,143 +25,36 @@ interface DragState {
   startWindowPos: { x: number; y: number };
 }
 
-interface DesktopIcon {
-  id: string;
-  label: string;
-  position: { x: number; y: number };
-}
-
 // =============================================================================
-// DESIGN SYSTEM - Warm Stone Palette
-// Based on user's HTML mockup: #FAFAF9 bg, stone colors, Instrument Serif
+// DESIGN SYSTEM - Warm Editorial Palette
 // =============================================================================
 
 const COLORS = {
-  bg: {
-    primary: '#FAFAF9',      // stone-50 warm off-white
-    secondary: '#F5F5F4',    // stone-100
-    tertiary: '#E7E5E4',     // stone-200
-    elevated: '#FFFFFF',
-  },
+  bg: '#FAFAF9',
   text: {
-    primary: '#1C1917',      // stone-900
-    secondary: '#57534E',    // stone-600
-    tertiary: '#78716C',     // stone-500
-    muted: '#A8A29E',        // stone-400
+    primary: '#1C1917',
+    secondary: '#57534E',
+    tertiary: '#78716C',
+    muted: '#A8A29E',
   },
-  accent: {
-    primary: '#EA580C',      // orange-600
-    hover: '#DC2626',        // slightly darker
-    light: 'rgba(234, 88, 12, 0.08)',
-  },
-  window: {
-    bg: '#FAFAF9',
-    header: '#FFFFFF',
-    border: 'rgba(28, 25, 23, 0.08)',
+  accent: '#EA580C',
+  stone: {
+    50: '#FAFAF9',
+    100: '#F5F5F4',
+    200: '#E7E5E4',
+    300: '#D6D3D1',
+    400: '#A8A29E',
+    500: '#78716C',
+    600: '#57534E',
+    700: '#44403C',
+    800: '#292524',
+    900: '#1C1917',
   },
   traffic: {
     close: '#FF5F57',
     minimize: '#FFBD2E',
     maximize: '#28CA41',
   },
-  shadow: {
-    soft: '0 25px 50px -12px rgba(28, 25, 23, 0.08), 0 12px 24px -8px rgba(28, 25, 23, 0.04)',
-    medium: '0 25px 50px -12px rgba(28, 25, 23, 0.15), 0 12px 24px -8px rgba(28, 25, 23, 0.08)',
-    elevated: '0 32px 64px -16px rgba(28, 25, 23, 0.18), 0 16px 32px -8px rgba(28, 25, 23, 0.1)',
-  }
-};
-
-// =============================================================================
-// CUSTOM ICONS - Warm Stone Style with Orange Accent
-// =============================================================================
-
-const WelcomeIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <rect x="4" y="6" width="20" height="16" rx="2" stroke={COLORS.accent.primary} strokeWidth="1.5" fill="none" />
-    <path d="M4 10L14 16L24 10" stroke={COLORS.accent.primary} strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-);
-
-const FeaturesIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <circle cx="14" cy="14" r="9" stroke={COLORS.accent.primary} strokeWidth="1.5" fill="none" />
-    <circle cx="14" cy="14" r="3" fill={COLORS.accent.primary} />
-    <path d="M14 5V8M14 20V23M5 14H8M20 14H23" stroke={COLORS.accent.primary} strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-);
-
-const ExamplesIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <rect x="4" y="4" width="8" height="8" rx="2" fill={COLORS.accent.light} stroke={COLORS.accent.primary} strokeWidth="1.5" />
-    <rect x="16" y="4" width="8" height="8" rx="2" stroke={COLORS.accent.primary} strokeWidth="1.5" />
-    <rect x="4" y="16" width="8" height="8" rx="2" stroke={COLORS.accent.primary} strokeWidth="1.5" />
-    <rect x="16" y="16" width="8" height="8" rx="2" fill={COLORS.accent.light} stroke={COLORS.accent.primary} strokeWidth="1.5" />
-  </svg>
-);
-
-const PricingIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <rect x="3" y="7" width="22" height="14" rx="2" stroke={COLORS.accent.primary} strokeWidth="1.5" fill="none" />
-    <circle cx="14" cy="14" r="4" stroke={COLORS.accent.primary} strokeWidth="1.5" />
-    <path d="M14 12V16M12.5 13.5H15.5" stroke={COLORS.accent.primary} strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-);
-
-const ReviewsIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <path d="M6 6H22V18H13L8 22V18H6V6Z" stroke={COLORS.accent.primary} strokeWidth="1.5" strokeLinejoin="round" fill="none" />
-    <circle cx="10" cy="12" r="1.5" fill={COLORS.accent.primary} />
-    <circle cx="14" cy="12" r="1.5" fill={COLORS.accent.primary} />
-    <circle cx="18" cy="12" r="1.5" fill={COLORS.accent.primary} />
-  </svg>
-);
-
-const HelpIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <circle cx="14" cy="14" r="10" stroke={COLORS.accent.primary} strokeWidth="1.5" fill="none" />
-    <path d="M11 11C11 9.34 12.34 8 14 8C15.66 8 17 9.34 17 11C17 12.66 15.66 14 14 14V16" stroke={COLORS.accent.primary} strokeWidth="1.5" strokeLinecap="round" />
-    <circle cx="14" cy="19" r="1" fill={COLORS.accent.primary} />
-  </svg>
-);
-
-const HowItWorksIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <circle cx="7" cy="14" r="3" stroke={COLORS.accent.primary} strokeWidth="1.5" fill="none" />
-    <circle cx="14" cy="14" r="3" fill={COLORS.accent.light} stroke={COLORS.accent.primary} strokeWidth="1.5" />
-    <circle cx="21" cy="14" r="3" fill={COLORS.accent.primary} />
-    <path d="M10 14H11M17 14H18" stroke={COLORS.accent.primary} strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-);
-
-const MobileIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <rect x="8" y="3" width="12" height="22" rx="2" stroke={COLORS.accent.primary} strokeWidth="1.5" fill="none" />
-    <path d="M12 5H16" stroke={COLORS.accent.primary} strokeWidth="1.5" strokeLinecap="round" />
-    <circle cx="14" cy="21" r="1.5" fill={COLORS.accent.primary} />
-  </svg>
-);
-
-const APP_ICONS: Record<string, React.FC> = {
-  welcome: WelcomeIcon,
-  features: FeaturesIcon,
-  examples: ExamplesIcon,
-  pricing: PricingIcon,
-  reviews: ReviewsIcon,
-  help: HelpIcon,
-  howItWorks: HowItWorksIcon,
-  mobile: MobileIcon,
-};
-
-// Icon background colors - warm stone tones
-const ICON_BG: Record<string, string> = {
-  welcome: '#F5F5F4',
-  features: '#E7E5E4',
-  examples: '#F5F5F4',
-  pricing: '#E7E5E4',
-  reviews: '#F5F5F4',
-  help: '#E7E5E4',
-  howItWorks: '#F5F5F4',
-  mobile: '#E7E5E4',
 };
 
 // =============================================================================
@@ -181,9 +74,9 @@ const FEATURES_DATA = [
 ];
 
 const TESTIMONIALS_DATA = [
-  { text: "Got 3 interview requests in the first week. Recruiters always mention how unique my portfolio looks.", name: "Sarah Kim", role: "Product Designer", place: "San Francisco" },
-  { text: "Finally something that doesn't look like every other portfolio. My clients always comment on it.", name: "Marcus Chen", role: "Brand Designer", place: "New York" },
-  { text: "The case study format is perfect for showing process.", name: "Yuki Tanaka", role: "UX Lead", place: "Tokyo" },
+  { text: "Got 3 interview requests in the first week. Recruiters always mention how unique my portfolio looks.", name: "Sarah Kim", role: "Product Designer" },
+  { text: "Finally something that doesn't look like every other portfolio. My clients always comment on it.", name: "Marcus Chen", role: "Brand Designer" },
+  { text: "The case study format is perfect for showing process.", name: "Yuki Tanaka", role: "UX Lead" },
 ];
 
 const EXAMPLES_DATA = [
@@ -204,34 +97,123 @@ const FAQ_DATA = [
 ];
 
 const INITIAL_WINDOWS: WindowState[] = [
-  { id: 'welcome', title: 'Welcome', isOpen: true, isMinimized: false, zIndex: 100, position: { x: 80, y: 60 }, size: { width: 400, height: 480 } },
-  { id: 'features', title: 'Features', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 160, y: 80 }, size: { width: 500, height: 420 } },
-  { id: 'examples', title: 'Examples', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 200, y: 100 }, size: { width: 520, height: 380 } },
-  { id: 'pricing', title: 'Pricing', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 140, y: 90 }, size: { width: 480, height: 460 } },
-  { id: 'reviews', title: 'Reviews', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 220, y: 70 }, size: { width: 420, height: 420 } },
-  { id: 'help', title: 'FAQ', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 180, y: 110 }, size: { width: 440, height: 400 } },
-  { id: 'howItWorks', title: 'How It Works', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 240, y: 80 }, size: { width: 400, height: 360 } },
-  { id: 'mobile', title: 'Mobile', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 300, y: 60 }, size: { width: 340, height: 480 } },
-];
-
-const INITIAL_DESKTOP_ICONS: DesktopIcon[] = [
-  { id: 'features', label: 'Features', position: { x: 40, y: 70 } },
-  { id: 'howItWorks', label: 'How It Works', position: { x: 50, y: 190 } },
-  { id: 'examples', label: 'Examples', position: { x: 35, y: 320 } },
-  { id: 'pricing', label: 'Pricing', position: { x: 60, y: 450 } },
-  { id: 'reviews', label: 'Reviews', position: { x: -120, y: 90 } },
-  { id: 'help', label: 'FAQ', position: { x: -100, y: 230 } },
-  { id: 'mobile', label: 'Mobile', position: { x: -130, y: 370 } },
+  { id: 'welcome', title: 'Welcome', isOpen: true, isMinimized: false, zIndex: 100, position: { x: 80, y: 60 }, size: { width: 420, height: 500 } },
+  { id: 'features', title: 'Features', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 200, y: 80 }, size: { width: 480, height: 420 } },
+  { id: 'examples', title: 'Examples', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 240, y: 100 }, size: { width: 520, height: 380 } },
+  { id: 'pricing', title: 'Pricing', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 180, y: 90 }, size: { width: 500, height: 460 } },
+  { id: 'reviews', title: 'Reviews', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 260, y: 70 }, size: { width: 420, height: 420 } },
+  { id: 'help', title: 'FAQ', isOpen: false, isMinimized: false, zIndex: 1, position: { x: 220, y: 110 }, size: { width: 440, height: 400 } },
 ];
 
 const DOCK_APPS = ['welcome', 'features', 'examples', 'pricing', 'reviews', 'help'];
 
 // =============================================================================
-// FONT STYLES - Instrument Serif for display, system for body
+// NOISE TEXTURE COMPONENT
 // =============================================================================
 
-const fontDisplay = '"Instrument Serif", Georgia, serif';
-const fontBody = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+const NoiseOverlay = () => (
+  <div className="fixed inset-0 z-[1] pointer-events-none opacity-[0.03]">
+    <svg className="w-full h-full">
+      <filter id="noise">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
+        <feColorMatrix type="saturate" values="0" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#noise)" />
+    </svg>
+  </div>
+);
+
+// =============================================================================
+// GENERATIVE GRADIENT WALLPAPER
+// =============================================================================
+
+const GradientWallpaper = () => (
+  <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none" style={{ background: COLORS.bg }}>
+    {/* Orange/Rose orb - top left */}
+    <div
+      className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] rounded-full"
+      style={{
+        background: 'linear-gradient(to bottom right, rgba(255, 237, 213, 0.5), rgba(254, 205, 211, 0.35), transparent)',
+        filter: 'blur(120px)',
+      }}
+    />
+    {/* Stone/Indigo orb - bottom right */}
+    <div
+      className="absolute bottom-[0%] right-[0%] w-[50%] h-[50%] rounded-full"
+      style={{
+        background: 'linear-gradient(to top left, rgba(214, 211, 209, 0.5), rgba(224, 231, 255, 0.25), transparent)',
+        filter: 'blur(100px)',
+      }}
+    />
+    {/* White center glow */}
+    <div
+      className="absolute top-[40%] left-[40%] w-[30%] h-[30%] rounded-full"
+      style={{
+        background: 'rgba(255, 255, 255, 0.7)',
+        filter: 'blur(80px)',
+      }}
+    />
+    {/* Subtle warm accent orb */}
+    <div
+      className="absolute top-[20%] right-[20%] w-[25%] h-[25%] rounded-full"
+      style={{
+        background: 'rgba(234, 88, 12, 0.06)',
+        filter: 'blur(60px)',
+      }}
+    />
+  </div>
+);
+
+// =============================================================================
+// DOCK ICONS
+// =============================================================================
+
+const DockIcon = ({ id, isActive }: { id: string; isActive?: boolean }) => {
+  const icons: Record<string, React.ReactNode> = {
+    welcome: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="5" width="18" height="14" rx="2" stroke={COLORS.accent} strokeWidth="1.5" />
+        <path d="M3 9L12 14L21 9" stroke={COLORS.accent} strokeWidth="1.5" />
+      </svg>
+    ),
+    features: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="8" stroke={COLORS.accent} strokeWidth="1.5" />
+        <circle cx="12" cy="12" r="3" fill={COLORS.accent} />
+      </svg>
+    ),
+    examples: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" stroke={COLORS.accent} strokeWidth="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" stroke={COLORS.accent} strokeWidth="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" stroke={COLORS.accent} strokeWidth="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" fill={isActive ? COLORS.accent : 'none'} stroke={COLORS.accent} strokeWidth="1.5" />
+      </svg>
+    ),
+    pricing: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="6" width="20" height="12" rx="2" stroke={COLORS.accent} strokeWidth="1.5" />
+        <circle cx="12" cy="12" r="3" stroke={COLORS.accent} strokeWidth="1.5" />
+      </svg>
+    ),
+    reviews: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M5 5H19V16H12L7 20V16H5V5Z" stroke={COLORS.accent} strokeWidth="1.5" strokeLinejoin="round" />
+        <circle cx="8" cy="10" r="1" fill={COLORS.accent} />
+        <circle cx="12" cy="10" r="1" fill={COLORS.accent} />
+        <circle cx="16" cy="10" r="1" fill={COLORS.accent} />
+      </svg>
+    ),
+    help: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke={COLORS.accent} strokeWidth="1.5" />
+        <path d="M9 9C9 7.34 10.34 6 12 6C13.66 6 15 7.34 15 9C15 10.66 13.66 12 12 12V14" stroke={COLORS.accent} strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="12" cy="17" r="1" fill={COLORS.accent} />
+      </svg>
+    ),
+  };
+  return icons[id] || icons.welcome;
+};
 
 // =============================================================================
 // MAIN COMPONENT
@@ -240,22 +222,14 @@ const fontBody = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-se
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const [windows, setWindows] = useState<WindowState[]>(INITIAL_WINDOWS);
-  const [desktopIcons, setDesktopIcons] = useState<DesktopIcon[]>(INITIAL_DESKTOP_ICONS);
   const [highestZ, setHighestZ] = useState(100);
   const [dragState, setDragState] = useState<DragState>({ isDragging: false, windowId: null, startPos: { x: 0, y: 0 }, startWindowPos: { x: 0, y: 0 } });
-  const [iconDragState, setIconDragState] = useState<{ isDragging: boolean; iconId: string | null; startPos: { x: number; y: number }; startIconPos: { x: number; y: number } }>({ isDragging: false, iconId: null, startPos: { x: 0, y: 0 }, startIconPos: { x: 0, y: 0 } });
   const [currentTime, setCurrentTime] = useState('');
-  const [showHint, setShowHint] = useState(false);
-  const [hintDismissed, setHintDismissed] = useState(false);
-  const [howItWorksStep, setHowItWorksStep] = useState(0);
+  const [hoveredDock, setHoveredDock] = useState<string | null>(null);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [selectedFeature, setSelectedFeature] = useState<number | null>(null);
-  const [hoveredDock, setHoveredDock] = useState<string | null>(null);
-  const [pressedIcon, setPressedIcon] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const backgroundImage = '/bg.jpg';
 
   // Load Instrument Serif font
   useEffect(() => {
@@ -263,6 +237,11 @@ export default function LandingPage() {
     link.href = 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
+
+    const interLink = document.createElement('link');
+    interLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap';
+    interLink.rel = 'stylesheet';
+    document.head.appendChild(interLink);
   }, []);
 
   useEffect(() => {
@@ -278,18 +257,7 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (hintDismissed) return;
-    const timer = setTimeout(() => {
-      const openCount = windows.filter(w => w.isOpen && w.id !== 'welcome').length;
-      if (openCount === 0) setShowHint(true);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, [windows, hintDismissed]);
-
   const openWindow = useCallback((id: string) => {
-    setShowHint(false);
-    setHintDismissed(true);
     setHighestZ(prev => prev + 1);
     setWindows(prev => prev.map(w =>
       w.id === id ? { ...w, isOpen: true, isMinimized: false, zIndex: highestZ + 1 } : w
@@ -312,14 +280,6 @@ export default function LandingPage() {
     setDragState({ isDragging: true, windowId, startPos: { x: e.clientX, y: e.clientY }, startWindowPos: { x: win.position.x, y: win.position.y } });
   }, [windows, focusWindow]);
 
-  const handleIconMouseDown = useCallback((e: React.MouseEvent, iconId: string) => {
-    e.preventDefault();
-    const icon = desktopIcons.find(i => i.id === iconId);
-    if (!icon) return;
-    setPressedIcon(iconId);
-    setIconDragState({ isDragging: true, iconId, startPos: { x: e.clientX, y: e.clientY }, startIconPos: { x: icon.position.x, y: icon.position.y } });
-  }, [desktopIcons]);
-
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (dragState.isDragging && dragState.windowId) {
       const dx = e.clientX - dragState.startPos.x;
@@ -330,32 +290,14 @@ export default function LandingPage() {
           : w
       ));
     }
-    if (iconDragState.isDragging && iconDragState.iconId) {
-      const dx = e.clientX - iconDragState.startPos.x;
-      const dy = e.clientY - iconDragState.startPos.y;
-      setDesktopIcons(prev => prev.map(i =>
-        i.id === iconDragState.iconId
-          ? { ...i, position: { x: iconDragState.startIconPos.x + dx, y: iconDragState.startIconPos.y + dy } }
-          : i
-      ));
-    }
-  }, [dragState, iconDragState]);
+  }, [dragState]);
 
-  const handleMouseUp = useCallback((e: MouseEvent) => {
-    if (iconDragState.isDragging && iconDragState.iconId) {
-      const dx = Math.abs(e.clientX - iconDragState.startPos.x);
-      const dy = Math.abs(e.clientY - iconDragState.startPos.y);
-      if (dx < 5 && dy < 5) {
-        openWindow(iconDragState.iconId);
-      }
-    }
+  const handleMouseUp = useCallback(() => {
     setDragState({ isDragging: false, windowId: null, startPos: { x: 0, y: 0 }, startWindowPos: { x: 0, y: 0 } });
-    setIconDragState({ isDragging: false, iconId: null, startPos: { x: 0, y: 0 }, startIconPos: { x: 0, y: 0 } });
-    setPressedIcon(null);
-  }, [iconDragState, openWindow]);
+  }, []);
 
   useEffect(() => {
-    if (dragState.isDragging || iconDragState.isDragging) {
+    if (dragState.isDragging) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
       return () => {
@@ -363,7 +305,7 @@ export default function LandingPage() {
         window.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [dragState.isDragging, iconDragState.isDragging, handleMouseMove, handleMouseUp]);
+  }, [dragState.isDragging, handleMouseMove, handleMouseUp]);
 
   // =============================================================================
   // WINDOW CONTENT
@@ -373,25 +315,34 @@ export default function LandingPage() {
     <div className="flex flex-col h-full p-8">
       <div className="flex-1">
         <div className="mb-8">
-          <h1 className="text-4xl tracking-tight" style={{ color: COLORS.text.primary, fontFamily: fontDisplay }}>
-            Me<span style={{ color: COLORS.accent.primary }}>OS</span>
+          <h1
+            className="text-5xl tracking-tight"
+            style={{ fontFamily: '"Instrument Serif", Georgia, serif', color: COLORS.text.primary }}
+          >
+            Me<span style={{ color: COLORS.accent }}>OS</span>
           </h1>
         </div>
-        <p className="text-xl leading-relaxed mb-6" style={{ color: COLORS.text.secondary, fontFamily: fontDisplay, fontStyle: 'italic' }}>
+        <p
+          className="text-2xl leading-relaxed mb-6"
+          style={{ fontFamily: '"Instrument Serif", Georgia, serif', fontStyle: 'italic', color: COLORS.text.secondary }}
+        >
           The portfolio that feels<br />like home.
         </p>
-        <p className="text-sm leading-relaxed mb-8" style={{ color: COLORS.text.tertiary, fontFamily: fontBody }}>
+        <p
+          className="text-sm leading-relaxed mb-8"
+          style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.tertiary }}
+        >
           You&apos;re experiencing it now. Click the icons. Open windows. Drag them around. This is your future portfolio.
         </p>
-        <div className="flex items-center gap-6 text-xs mb-8" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>
+        <div className="flex items-center gap-6 text-xs mb-8" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>
           <div>
-            <span className="text-lg font-light" style={{ color: COLORS.text.primary, fontFamily: fontDisplay }}>2.4k</span>
-            <span className="ml-1.5">designers</span>
+            <span className="text-2xl" style={{ fontFamily: '"Instrument Serif", Georgia, serif', color: COLORS.text.primary }}>2.4k</span>
+            <span className="ml-2">designers</span>
           </div>
-          <div className="w-px h-4" style={{ background: COLORS.bg.tertiary }} />
+          <div className="w-px h-5" style={{ background: COLORS.stone[200] }} />
           <div>
-            <span className="text-lg font-light" style={{ color: COLORS.text.primary, fontFamily: fontDisplay }}>4.9</span>
-            <span className="ml-1.5">rating</span>
+            <span className="text-2xl" style={{ fontFamily: '"Instrument Serif", Georgia, serif', color: COLORS.text.primary }}>4.9</span>
+            <span className="ml-2">rating</span>
           </div>
         </div>
       </div>
@@ -400,17 +351,19 @@ export default function LandingPage() {
           <button
             className="w-full py-4 text-sm font-medium tracking-wide transition-all hover:brightness-110 active:scale-[0.98]"
             style={{
-              background: COLORS.accent.primary,
+              background: COLORS.accent,
               color: '#fff',
               borderRadius: '12px',
-              fontFamily: fontBody,
-              boxShadow: '0 4px 12px rgba(234, 88, 12, 0.25)',
+              fontFamily: '"Inter", sans-serif',
+              boxShadow: '0 8px 24px rgba(234, 88, 12, 0.25)',
             }}
           >
             Create Your Desktop
           </button>
         </Link>
-        <p className="text-center text-xs mt-4" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>Free forever · No credit card</p>
+        <p className="text-center text-xs mt-4" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>
+          Free forever · No credit card
+        </p>
       </div>
     </div>
   );
@@ -419,19 +372,23 @@ export default function LandingPage() {
     <div className="h-full overflow-auto">
       {selectedFeature === null ? (
         <div className="p-6">
-          <p className="text-xs uppercase tracking-widest mb-6" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>Everything you need</p>
+          <p className="text-xs uppercase tracking-widest mb-6" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>
+            Everything you need
+          </p>
           <div className="space-y-1">
             {FEATURES_DATA.map((feature, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedFeature(i)}
-                className="w-full flex items-center gap-4 p-3 text-left transition-all hover:bg-stone-100 group rounded-xl"
+                className="w-full flex items-center gap-4 p-3 text-left transition-all hover:bg-stone-100/80 group rounded-xl"
               >
-                <span className="text-base w-6" style={{ color: COLORS.accent.primary }}>{feature.icon}</span>
-                <span className="flex-1 text-sm font-medium" style={{ color: COLORS.text.primary, fontFamily: fontBody }}>{feature.title}</span>
+                <span className="text-base w-6" style={{ color: COLORS.accent }}>{feature.icon}</span>
+                <span className="flex-1 text-sm font-medium" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.primary }}>
+                  {feature.title}
+                </span>
                 <span
                   className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md"
-                  style={{ color: COLORS.text.muted, background: COLORS.bg.secondary, fontFamily: fontBody }}
+                  style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted, background: COLORS.stone[100] }}
                 >
                   {feature.tag}
                 </span>
@@ -441,12 +398,20 @@ export default function LandingPage() {
         </div>
       ) : (
         <div className="p-8">
-          <button onClick={() => setSelectedFeature(null)} className="text-sm mb-8 flex items-center gap-1" style={{ color: COLORS.accent.primary, fontFamily: fontBody }}>
+          <button
+            onClick={() => setSelectedFeature(null)}
+            className="text-sm mb-8 flex items-center gap-1"
+            style={{ fontFamily: '"Inter", sans-serif', color: COLORS.accent }}
+          >
             ← Back
           </button>
-          <span className="text-3xl block mb-4" style={{ color: COLORS.accent.primary }}>{FEATURES_DATA[selectedFeature].icon}</span>
-          <h3 className="text-2xl mb-3" style={{ color: COLORS.text.primary, fontFamily: fontDisplay }}>{FEATURES_DATA[selectedFeature].title}</h3>
-          <p className="text-base leading-relaxed" style={{ color: COLORS.text.secondary, fontFamily: fontBody }}>{FEATURES_DATA[selectedFeature].description}</p>
+          <span className="text-4xl block mb-4" style={{ color: COLORS.accent }}>{FEATURES_DATA[selectedFeature].icon}</span>
+          <h3 className="text-2xl mb-3" style={{ fontFamily: '"Instrument Serif", Georgia, serif', color: COLORS.text.primary }}>
+            {FEATURES_DATA[selectedFeature].title}
+          </h3>
+          <p className="text-base leading-relaxed" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.secondary }}>
+            {FEATURES_DATA[selectedFeature].description}
+          </p>
         </div>
       )}
     </div>
@@ -454,18 +419,22 @@ export default function LandingPage() {
 
   const renderExamplesContent = () => (
     <div className="p-6 h-full overflow-auto">
-      <p className="text-xs uppercase tracking-widest mb-6" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>Real portfolios</p>
+      <p className="text-xs uppercase tracking-widest mb-6" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>
+        Real portfolios
+      </p>
       <div className="grid grid-cols-3 gap-4">
         {EXAMPLES_DATA.map((ex, i) => (
           <div key={i} className="group cursor-pointer">
             <div
               className="aspect-square mb-3 flex items-center justify-center transition-all group-hover:scale-[1.02] rounded-2xl"
-              style={{ background: COLORS.bg.secondary }}
+              style={{ background: COLORS.stone[100] }}
             >
-              <span className="text-2xl font-light" style={{ color: COLORS.text.muted, fontFamily: fontDisplay }}>{ex.initial}</span>
+              <span className="text-2xl" style={{ fontFamily: '"Instrument Serif", Georgia, serif', color: COLORS.text.muted }}>
+                {ex.initial}
+              </span>
             </div>
-            <p className="text-sm font-medium" style={{ color: COLORS.text.primary, fontFamily: fontBody }}>{ex.name}</p>
-            <p className="text-xs" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>{ex.role}</p>
+            <p className="text-sm font-medium" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.primary }}>{ex.name}</p>
+            <p className="text-xs" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>{ex.role}</p>
           </div>
         ))}
       </div>
@@ -476,20 +445,20 @@ export default function LandingPage() {
     <div className="p-6 h-full overflow-auto">
       <div className="grid grid-cols-2 gap-5 h-full">
         {/* Free Plan */}
-        <div className="p-5 flex flex-col rounded-2xl" style={{ background: COLORS.bg.secondary }}>
-          <p className="text-xs uppercase tracking-widest mb-3" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>Free</p>
-          <span className="text-3xl font-light mb-4" style={{ color: COLORS.text.primary, fontFamily: fontDisplay }}>$0</span>
-          <ul className="space-y-3 flex-1 text-sm" style={{ color: COLORS.text.secondary, fontFamily: fontBody }}>
+        <div className="p-5 flex flex-col rounded-2xl" style={{ background: COLORS.stone[100] }}>
+          <p className="text-xs uppercase tracking-widest mb-3" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>Free</p>
+          <span className="text-4xl mb-4" style={{ fontFamily: '"Instrument Serif", Georgia, serif', color: COLORS.text.primary }}>$0</span>
+          <ul className="space-y-3 flex-1 text-sm" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.secondary }}>
             {['Full desktop', '5 projects', 'MeOS subdomain', 'Mobile version'].map((f, i) => (
               <li key={i} className="flex items-center gap-3">
-                <span style={{ color: COLORS.accent.primary }}>·</span>{f}
+                <span style={{ color: COLORS.accent }}>·</span>{f}
               </li>
             ))}
           </ul>
           <Link href="/signup" className="block mt-4">
             <button
               className="w-full py-2.5 text-sm font-medium rounded-xl transition-all hover:bg-stone-200"
-              style={{ border: `1px solid ${COLORS.bg.tertiary}`, color: COLORS.text.primary, fontFamily: fontBody }}
+              style={{ fontFamily: '"Inter", sans-serif', border: `1px solid ${COLORS.stone[300]}`, color: COLORS.text.primary }}
             >
               Get Started
             </button>
@@ -499,23 +468,23 @@ export default function LandingPage() {
         {/* Pro Plan */}
         <div className="p-5 flex flex-col rounded-2xl" style={{ background: COLORS.text.primary }}>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs uppercase tracking-widest" style={{ color: COLORS.bg.tertiary, fontFamily: fontBody }}>Pro</p>
-            <span className="text-[10px] uppercase px-2.5 py-1 rounded-md font-medium" style={{ background: COLORS.accent.primary, color: '#fff', fontFamily: fontBody }}>Popular</span>
+            <p className="text-xs uppercase tracking-widest" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.stone[400] }}>Pro</p>
+            <span className="text-[10px] uppercase px-2.5 py-1 rounded-md font-medium" style={{ fontFamily: '"Inter", sans-serif', background: COLORS.accent, color: '#fff' }}>Popular</span>
           </div>
-          <span className="text-3xl font-light mb-4" style={{ color: COLORS.bg.primary, fontFamily: fontDisplay }}>
-            $12<span className="text-sm ml-1" style={{ color: COLORS.text.muted }}>/mo</span>
+          <span className="text-4xl mb-4" style={{ fontFamily: '"Instrument Serif", Georgia, serif', color: COLORS.stone[50] }}>
+            $12<span className="text-sm ml-1" style={{ color: COLORS.stone[500] }}>/mo</span>
           </span>
-          <ul className="space-y-3 flex-1 text-sm" style={{ color: COLORS.bg.tertiary, fontFamily: fontBody }}>
+          <ul className="space-y-3 flex-1 text-sm" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.stone[300] }}>
             {['Everything free', 'Unlimited projects', 'Custom domain', 'Analytics', 'No branding'].map((f, i) => (
               <li key={i} className="flex items-center gap-3">
-                <span style={{ color: COLORS.accent.primary }}>·</span>{f}
+                <span style={{ color: COLORS.accent }}>·</span>{f}
               </li>
             ))}
           </ul>
           <Link href="/signup" className="block mt-4">
             <button
               className="w-full py-2.5 text-sm font-medium rounded-xl transition-all hover:brightness-95"
-              style={{ background: COLORS.bg.primary, color: COLORS.text.primary, fontFamily: fontBody }}
+              style={{ fontFamily: '"Inter", sans-serif', background: COLORS.stone[50], color: COLORS.text.primary }}
             >
               Go Pro
             </button>
@@ -527,23 +496,28 @@ export default function LandingPage() {
 
   const renderReviewsContent = () => (
     <div className="p-6 h-full overflow-auto">
-      <p className="text-xs uppercase tracking-widest mb-6" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>What they say</p>
+      <p className="text-xs uppercase tracking-widest mb-6" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>
+        What they say
+      </p>
       <div className="space-y-6">
         {TESTIMONIALS_DATA.map((t, i) => (
           <div key={i}>
-            <p className="text-base leading-relaxed mb-3" style={{ color: COLORS.text.primary, fontFamily: fontDisplay, fontStyle: 'italic' }}>
+            <p
+              className="text-lg leading-relaxed mb-3"
+              style={{ fontFamily: '"Instrument Serif", Georgia, serif', fontStyle: 'italic', color: COLORS.text.primary }}
+            >
               &ldquo;{t.text}&rdquo;
             </p>
             <div className="flex items-center gap-3">
               <div
                 className="w-8 h-8 flex items-center justify-center text-xs font-medium rounded-lg"
-                style={{ background: COLORS.bg.tertiary, color: COLORS.text.secondary, fontFamily: fontBody }}
+                style={{ fontFamily: '"Inter", sans-serif', background: COLORS.stone[200], color: COLORS.text.secondary }}
               >
                 {t.name.charAt(0)}
               </div>
               <div>
-                <p className="text-sm font-medium" style={{ color: COLORS.text.primary, fontFamily: fontBody }}>{t.name}</p>
-                <p className="text-xs" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>{t.role}</p>
+                <p className="text-sm font-medium" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.primary }}>{t.name}</p>
+                <p className="text-xs" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>{t.role}</p>
               </div>
             </div>
           </div>
@@ -554,15 +528,17 @@ export default function LandingPage() {
 
   const renderHelpContent = () => (
     <div className="p-6 h-full overflow-auto">
-      <p className="text-xs uppercase tracking-widest mb-6" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>Questions</p>
+      <p className="text-xs uppercase tracking-widest mb-6" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>
+        Questions
+      </p>
       <div className="space-y-0">
         {FAQ_DATA.map((faq, i) => (
-          <div key={i} style={{ borderBottom: `1px solid ${COLORS.bg.tertiary}` }}>
+          <div key={i} style={{ borderBottom: `1px solid ${COLORS.stone[200]}` }}>
             <button
               className="w-full py-4 flex items-center justify-between text-left"
               onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
             >
-              <span className="text-sm font-medium" style={{ color: COLORS.text.primary, fontFamily: fontBody }}>{faq.q}</span>
+              <span className="text-sm font-medium" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.primary }}>{faq.q}</span>
               <span
                 className="text-lg transition-transform duration-200"
                 style={{ color: COLORS.text.muted, transform: expandedFaq === i ? 'rotate(45deg)' : 'none' }}
@@ -579,87 +555,13 @@ export default function LandingPage() {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <p className="pb-4 text-sm" style={{ color: COLORS.text.secondary, fontFamily: fontBody }}>{faq.a}</p>
+                  <p className="pb-4 text-sm" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.secondary }}>{faq.a}</p>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         ))}
       </div>
-    </div>
-  );
-
-  const renderHowItWorksContent = () => {
-    const steps = [
-      { num: '01', title: 'Sign up', desc: 'Create your account in seconds.' },
-      { num: '02', title: 'Add your work', desc: 'Drop in your projects and content.' },
-      { num: '03', title: 'Go live', desc: 'Share your unique portfolio link.' },
-    ];
-    return (
-      <div className="p-6 h-full flex flex-col">
-        <p className="text-xs uppercase tracking-widest mb-6" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>Three steps</p>
-        <div className="space-y-3 flex-1">
-          {steps.map((step, i) => (
-            <div
-              key={i}
-              className="flex gap-4 p-4 transition-colors cursor-pointer rounded-xl"
-              style={{ background: howItWorksStep === i ? COLORS.bg.secondary : 'transparent' }}
-              onClick={() => setHowItWorksStep(i)}
-            >
-              <span
-                className="text-xl font-light"
-                style={{ color: howItWorksStep === i ? COLORS.accent.primary : COLORS.text.muted, fontFamily: fontDisplay }}
-              >
-                {step.num}
-              </span>
-              <div>
-                <h4 className="font-medium mb-1" style={{ color: COLORS.text.primary, fontFamily: fontBody }}>{step.title}</h4>
-                <p className="text-sm" style={{ color: COLORS.text.tertiary, fontFamily: fontBody }}>{step.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <Link href="/signup" className="block mt-4">
-          <button
-            className="w-full py-3 text-sm font-medium rounded-xl transition-all hover:brightness-110"
-            style={{ background: COLORS.accent.primary, color: '#fff', fontFamily: fontBody }}
-          >
-            Start Now
-          </button>
-        </Link>
-      </div>
-    );
-  };
-
-  const renderMobileContent = () => (
-    <div className="flex flex-col items-center justify-center h-full p-6">
-      <div className="relative mb-6">
-        <div className="relative w-40 h-[300px] p-1" style={{ background: COLORS.text.primary, borderRadius: '28px' }}>
-          <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-16 h-4 z-10" style={{ background: '#000', borderRadius: '8px' }} />
-          <div className="w-full h-full overflow-hidden" style={{ background: COLORS.bg.primary, borderRadius: '24px' }}>
-            <div className="h-8 flex items-center justify-center pt-1.5">
-              <span className="text-xs font-medium" style={{ color: COLORS.text.primary, fontFamily: fontBody }}>9:41</span>
-            </div>
-            <div className="px-3 py-3">
-              <div className="grid grid-cols-3 gap-3">
-                {['◈', '◐', '¶', '◉', '⬡', '✦'].map((sym, i) => (
-                  <div key={i} className="flex flex-col items-center">
-                    <div className="w-10 h-10 flex items-center justify-center mb-1" style={{ background: COLORS.bg.secondary, borderRadius: '10px' }}>
-                      <span style={{ color: COLORS.accent.primary }}>{sym}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p className="text-base text-center" style={{ color: COLORS.text.secondary, fontFamily: fontDisplay, fontStyle: 'italic' }}>
-        Automatic iOS interface.
-      </p>
-      <p className="text-sm text-center mt-1" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>
-        Same content. Native feel.
-      </p>
     </div>
   );
 
@@ -671,8 +573,6 @@ export default function LandingPage() {
       case 'pricing': return renderPricingContent();
       case 'reviews': return renderReviewsContent();
       case 'help': return renderHelpContent();
-      case 'howItWorks': return renderHowItWorksContent();
-      case 'mobile': return renderMobileContent();
       default: return null;
     }
   };
@@ -681,91 +581,54 @@ export default function LandingPage() {
   // RENDER
   // =============================================================================
 
-  if (!mounted) return <div className="fixed inset-0" style={{ background: COLORS.bg.primary }} />;
+  if (!mounted) return <div className="fixed inset-0" style={{ background: COLORS.bg }} />;
 
   return (
-    <div ref={containerRef} className="fixed inset-0 overflow-hidden select-none" style={{ background: COLORS.bg.primary }}>
-      {/* Background Image */}
-      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${backgroundImage}')` }} />
+    <div ref={containerRef} className="fixed inset-0 overflow-hidden select-none">
+      {/* Generative Gradient Wallpaper */}
+      <GradientWallpaper />
 
-      {/* Menu Bar - Warm glassmorphism */}
+      {/* Noise Texture Overlay */}
+      <NoiseOverlay />
+
+      {/* Menu Bar - Glass effect */}
       <header
         className="fixed top-0 left-0 right-0 h-7 z-[200] flex items-center justify-between px-5"
         style={{
-          background: 'rgba(250, 250, 249, 0.85)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          borderBottom: `1px solid ${COLORS.window.border}`
+          background: 'rgba(255, 255, 255, 0.75)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
         }}
       >
         <div className="flex items-center gap-6">
-          <button onClick={() => openWindow('welcome')} style={{ color: COLORS.text.primary }}>
-            <span style={{ fontFamily: fontDisplay, fontSize: '14px' }}>Me<span style={{ color: COLORS.accent.primary }}>OS</span></span>
+          <button onClick={() => openWindow('welcome')}>
+            <span style={{ fontFamily: '"Instrument Serif", Georgia, serif', fontSize: '14px', color: COLORS.text.primary }}>
+              Me<span style={{ color: COLORS.accent }}>OS</span>
+            </span>
           </button>
-          <div className="flex items-center gap-5 text-xs" style={{ color: COLORS.text.secondary, fontFamily: fontBody }}>
-            <button onClick={() => openWindow('features')} className="hover:opacity-70 transition-opacity">File</button>
-            <button onClick={() => openWindow('help')} className="hover:opacity-70 transition-opacity">Help</button>
+          <div className="flex items-center gap-5 text-xs" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.secondary }}>
+            <button onClick={() => openWindow('features')} className="hover:text-stone-900 transition-colors">File</button>
+            <button onClick={() => openWindow('help')} className="hover:text-stone-900 transition-colors">Help</button>
           </div>
         </div>
         <div className="flex items-center gap-5">
           <Link href="/login">
-            <span className="text-xs cursor-pointer hover:opacity-70 transition-opacity" style={{ color: COLORS.text.secondary, fontFamily: fontBody }}>Sign in</span>
+            <span className="text-xs cursor-pointer hover:text-stone-900 transition-colors" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.secondary }}>
+              Sign in
+            </span>
           </Link>
           <Link href="/signup">
             <button
               className="px-3.5 py-1 text-xs font-medium hover:brightness-110 rounded-lg transition-all"
-              style={{ background: COLORS.accent.primary, color: '#fff', fontFamily: fontBody }}
+              style={{ fontFamily: '"Inter", sans-serif', background: COLORS.accent, color: '#fff' }}
             >
               Get Started
             </button>
           </Link>
-          <span className="text-xs tabular-nums" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>{currentTime}</span>
+          <span className="text-xs tabular-nums" style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.muted }}>{currentTime}</span>
         </div>
       </header>
-
-      {/* Desktop Icons */}
-      {desktopIcons.map((icon) => {
-        const isPressed = pressedIcon === icon.id;
-        const IconComp = APP_ICONS[icon.id] || WelcomeIcon;
-        const iconBg = ICON_BG[icon.id] || COLORS.bg.secondary;
-
-        return (
-          <motion.div
-            key={icon.id}
-            className="absolute flex flex-col items-center gap-2 cursor-pointer z-10"
-            style={{
-              left: icon.position.x > 0 ? icon.position.x : undefined,
-              right: icon.position.x < 0 ? Math.abs(icon.position.x) : undefined,
-              top: icon.position.y,
-            }}
-            onMouseDown={(e) => handleIconMouseDown(e, icon.id)}
-            animate={{ scale: isPressed ? 0.92 : 1 }}
-            whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          >
-            <motion.div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center transition-shadow"
-              style={{
-                background: iconBg,
-                boxShadow: isPressed ? COLORS.shadow.soft : COLORS.shadow.medium,
-              }}
-              whileHover={{ boxShadow: COLORS.shadow.elevated }}
-            >
-              <IconComp />
-            </motion.div>
-            <span
-              className="text-[11px] font-medium px-2 py-0.5 rounded-md max-w-[80px] truncate"
-              style={{
-                color: COLORS.text.primary,
-                background: 'rgba(250, 250, 249, 0.9)',
-                backdropFilter: 'blur(8px)',
-                fontFamily: fontBody,
-              }}
-            >
-              {icon.label}
-            </span>
-          </motion.div>
-        );
-      })}
 
       {/* Windows */}
       <AnimatePresence>
@@ -779,23 +642,24 @@ export default function LandingPage() {
               width: win.size.width,
               height: win.size.height,
               zIndex: win.zIndex,
-              background: COLORS.window.bg,
-              boxShadow: COLORS.shadow.elevated,
+              background: 'rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
               borderRadius: '12px',
-              border: `1px solid ${COLORS.window.border}`,
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.03), 0 24px 64px -8px rgba(28, 25, 23, 0.08), 0 8px 24px -4px rgba(28, 25, 23, 0.04)',
             }}
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            initial={{ opacity: 0, scale: 0.96, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 4 }}
-            transition={{ duration: prefersReducedMotion ? 0.1 : 0.2, ease: [0.23, 1, 0.32, 1] }}
+            exit={{ opacity: 0, scale: 0.98, y: 6 }}
+            transition={{ duration: prefersReducedMotion ? 0.1 : 0.25, ease: [0.23, 1, 0.32, 1] }}
             onClick={() => focusWindow(win.id)}
           >
             {/* Window Title Bar */}
             <div
-              className="h-10 flex items-center px-3.5 cursor-move"
+              className="h-11 flex items-center px-3.5 cursor-move"
               style={{
-                background: COLORS.window.header,
-                borderBottom: `1px solid ${COLORS.window.border}`
+                background: 'rgba(255, 255, 255, 0.6)',
+                borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
               }}
               onMouseDown={(e) => handleWindowMouseDown(e, win.id)}
             >
@@ -812,7 +676,7 @@ export default function LandingPage() {
               </div>
               <span
                 className="flex-1 text-center text-xs font-medium pointer-events-none"
-                style={{ color: COLORS.text.secondary, fontFamily: fontBody }}
+                style={{ fontFamily: '"Inter", sans-serif', color: COLORS.text.secondary }}
               >
                 {win.title}
               </span>
@@ -820,29 +684,28 @@ export default function LandingPage() {
             </div>
 
             {/* Window Content */}
-            <div className="h-[calc(100%-40px)] overflow-hidden" style={{ background: COLORS.window.bg }}>
+            <div className="h-[calc(100%-44px)] overflow-hidden">
               {getWindowContent(win.id)}
             </div>
           </motion.div>
         ))}
       </AnimatePresence>
 
-      {/* Dock */}
+      {/* Dock - Glass effect */}
       <nav
-        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] flex items-end gap-2 px-3 py-2"
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] flex items-end gap-2 px-3 py-2.5"
         style={{
-          background: 'rgba(250, 250, 249, 0.8)',
-          backdropFilter: 'blur(20px) saturate(180%)',
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(32px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(32px) saturate(180%)',
           borderRadius: '20px',
-          boxShadow: `0 0 0 1px ${COLORS.window.border}, ${COLORS.shadow.medium}`
+          boxShadow: '0 0 0 1px rgba(0,0,0,0.04), 0 16px 48px -8px rgba(28, 25, 23, 0.1)',
         }}
       >
         {DOCK_APPS.map((appId) => {
           const win = windows.find(w => w.id === appId);
           const isOpen = win?.isOpen;
           const isHovered = hoveredDock === appId;
-          const IconComp = APP_ICONS[appId] || WelcomeIcon;
-          const iconBg = ICON_BG[appId] || COLORS.bg.secondary;
 
           return (
             <motion.button
@@ -862,7 +725,7 @@ export default function LandingPage() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 4, scale: 0.95 }}
                     className="absolute -top-10 px-3 py-1.5 text-xs font-medium whitespace-nowrap rounded-lg"
-                    style={{ background: COLORS.text.primary, color: COLORS.bg.primary, fontFamily: fontBody }}
+                    style={{ fontFamily: '"Inter", sans-serif', background: COLORS.text.primary, color: COLORS.stone[50] }}
                   >
                     {win?.title || appId}
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45" style={{ background: COLORS.text.primary }} />
@@ -873,11 +736,13 @@ export default function LandingPage() {
               <motion.div
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
                 style={{
-                  background: iconBg,
-                  boxShadow: isHovered ? COLORS.shadow.elevated : COLORS.shadow.soft,
+                  background: COLORS.stone[100],
+                  boxShadow: isHovered
+                    ? '0 8px 24px -4px rgba(28, 25, 23, 0.12)'
+                    : '0 2px 8px -2px rgba(28, 25, 23, 0.08)',
                 }}
               >
-                <IconComp />
+                <DockIcon id={appId} isActive={isOpen} />
               </motion.div>
 
               <AnimatePresence>
@@ -895,16 +760,16 @@ export default function LandingPage() {
           );
         })}
 
-        <div className="w-px h-10 mx-1.5 self-center" style={{ background: COLORS.bg.tertiary }} />
+        <div className="w-px h-10 mx-2 self-center" style={{ background: COLORS.stone[200] }} />
 
         <Link href="/signup">
           <motion.button
-            className="px-4 py-2.5 text-xs font-medium rounded-xl"
+            className="px-5 py-2.5 text-xs font-medium rounded-xl"
             style={{
-              background: COLORS.accent.primary,
+              fontFamily: '"Inter", sans-serif',
+              background: COLORS.accent,
               color: '#fff',
-              fontFamily: fontBody,
-              boxShadow: '0 4px 12px rgba(234, 88, 12, 0.2)',
+              boxShadow: '0 8px 24px -4px rgba(234, 88, 12, 0.3)',
             }}
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.98 }}
@@ -913,39 +778,6 @@ export default function LandingPage() {
           </motion.button>
         </Link>
       </nav>
-
-      {/* Hint Tooltip */}
-      <AnimatePresence>
-        {showHint && !hintDismissed && (
-          <motion.div
-            className="fixed top-12 right-5 z-[300] w-64"
-            initial={{ opacity: 0, y: -8, x: 8 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-          >
-            <div
-              className="p-4 flex items-start gap-3 rounded-xl"
-              style={{
-                background: COLORS.window.bg,
-                boxShadow: `0 0 0 1px ${COLORS.window.border}, ${COLORS.shadow.medium}`
-              }}
-            >
-              <span className="text-lg" style={{ color: COLORS.accent.primary }}>✦</span>
-              <div className="flex-1">
-                <p className="text-sm font-medium mb-0.5" style={{ color: COLORS.text.primary, fontFamily: fontBody }}>Explore</p>
-                <p className="text-xs" style={{ color: COLORS.text.muted, fontFamily: fontBody }}>Click icons or use the dock below.</p>
-              </div>
-              <button
-                onClick={() => { setShowHint(false); setHintDismissed(true); }}
-                className="text-lg leading-none hover:opacity-60 transition-opacity"
-                style={{ color: COLORS.text.muted }}
-              >
-                ×
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
