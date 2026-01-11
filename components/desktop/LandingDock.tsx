@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { LANDING_PAGE_ICONS, USE_IMAGE_ICONS } from '@/lib/icons/config';
 import {
   FinderIcon,
   SafariIcon,
@@ -17,12 +18,12 @@ interface DockProps {
 
 export default function LandingDock({ onOpenWindow }: DockProps) {
   const dockItems = [
-    { id: 'welcome', Icon: FinderIcon, label: 'Finder', isActive: true },
-    { id: 'features', Icon: SafariIcon, label: 'Safari' },
-    { id: 'examples', Icon: PhotosIcon, label: 'Photos' },
-    { id: 'pricing', Icon: NotesIcon, label: 'Notes' },
-    { id: null, Icon: MailIcon, label: 'Mail' },
-    { id: null, Icon: MessagesIcon, label: 'Messages' },
+    { id: 'welcome', Icon: FinderIcon, imgSrc: LANDING_PAGE_ICONS.dock.finder, label: 'Finder', isActive: true },
+    { id: 'features', Icon: SafariIcon, imgSrc: LANDING_PAGE_ICONS.dock.safari, label: 'Safari' },
+    { id: 'examples', Icon: PhotosIcon, imgSrc: LANDING_PAGE_ICONS.dock.photos, label: 'Photos' },
+    { id: 'pricing', Icon: NotesIcon, imgSrc: LANDING_PAGE_ICONS.dock.notes, label: 'Notes' },
+    { id: null, Icon: MailIcon, imgSrc: LANDING_PAGE_ICONS.dock.mail, label: 'Mail' },
+    { id: null, Icon: MessagesIcon, imgSrc: LANDING_PAGE_ICONS.dock.messages, label: 'Messages' },
   ];
 
   return (
@@ -62,11 +63,13 @@ export default function LandingDock({ onOpenWindow }: DockProps) {
             {/* Icon */}
             <div
               className="w-12 h-12 rounded-xl overflow-hidden"
-              style={{
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-              }}
+              style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
             >
-              <item.Icon size={48} />
+              {USE_IMAGE_ICONS ? (
+                <img src={item.imgSrc} alt={item.label} className="w-full h-full object-cover" />
+              ) : (
+                <item.Icon size={48} />
+              )}
             </div>
 
             {/* Active indicator */}
@@ -98,9 +101,7 @@ export default function LandingDock({ onOpenWindow }: DockProps) {
       <div className="flex justify-center mt-2">
         <div
           className="w-40 h-1 rounded-full"
-          style={{
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
-          }}
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }}
         />
       </div>
     </div>
