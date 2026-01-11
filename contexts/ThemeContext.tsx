@@ -130,7 +130,7 @@ export function ThemeProvider({
   // Initialize theme
   useEffect(() => {
     // Check localStorage first (for visitor preference)
-    const stored = localStorage.getItem('meos-theme') as ThemeId | null;
+    const stored = localStorage.getItem('meos-theme-v2') as ThemeId | null;
 
     // Use initial theme from desktop if provided, otherwise use stored or default
     const themeToApply = stored && THEMES[stored] ? stored : initialTheme;
@@ -150,7 +150,7 @@ export function ThemeProvider({
     loadThemeFonts(newTheme);
 
     // Always save to localStorage for visitor preference
-    localStorage.setItem('meos-theme', newTheme);
+    localStorage.setItem('meos-theme-v2', newTheme);
 
     // If owner, also save to database
     if (isOwner && desktopId) {
