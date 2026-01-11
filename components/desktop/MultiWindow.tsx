@@ -320,7 +320,7 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
         {/* Window */}
         <motion.div
           ref={windowRef}
-          className="overflow-hidden flex flex-col glass-elevated pointer-events-auto relative"
+          className="overflow-hidden flex flex-col pointer-events-auto relative"
           onClick={handleWindowClick}
           drag={!isMaximized}
           dragConstraints={{ top: -200, left: -300, right: 300, bottom: 200 }}
