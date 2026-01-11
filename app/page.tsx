@@ -6,6 +6,7 @@ import { Sparkles, Layers, Image as ImageIcon, CreditCard, Command, ArrowRight, 
 import Wallpaper from '@/components/desktop/Wallpaper';
 import LandingDock from '@/components/desktop/LandingDock';
 import DesktopIcon from '@/components/desktop/DesktopIcon';
+import { useLandingIcons } from '@/lib/hooks/useLandingIcons';
 
 // =============================================================================
 // DESIGN TOKENS - macOS Atomic Uniformity
@@ -37,12 +38,12 @@ const DESIGN = {
   },
   // Animation timing - expo ease out for natural deceleration
   motion: {
-    spring: { type: 'spring', stiffness: 400, damping: 30 },
-    springGentle: { type: 'spring', stiffness: 300, damping: 35 },
-    springBouncy: { type: 'spring', stiffness: 500, damping: 25 },
+    spring: { type: 'spring' as const, stiffness: 400, damping: 30 },
+    springGentle: { type: 'spring' as const, stiffness: 300, damping: 35 },
+    springBouncy: { type: 'spring' as const, stiffness: 500, damping: 25 },
     duration: { fast: 0.15, normal: 0.25, slow: 0.4 },
-    ease: [0.16, 1, 0.3, 1], // expo out
-    easeIn: [0.4, 0, 1, 1],
+    ease: [0.16, 1, 0.3, 1] as const, // expo out
+    easeIn: [0.4, 0, 1, 1] as const,
   },
   // Shadows - layered for depth
   shadow: {
@@ -59,20 +60,22 @@ const DESIGN = {
 interface WindowConfig {
   id: string;
   title: string;
-  icon: React.ReactNode;
+  iconId: string; // Maps to uploaded icon in Supabase
+  fallbackIcon: React.ReactNode; // Only used in window title bar
   stackOrder: number;
   width: number;
   height: number;
 }
 
 // Windows sized with golden ratio proportions, centered on screen
+// Desktop icons use the same iconId as dock icons for consistency
 const WINDOWS: WindowConfig[] = [
-  { id: 'welcome', title: 'Welcome', icon: <Command size={14} />, stackOrder: 0, width: 480, height: 400 },
-  { id: 'features', title: 'Features', icon: <Layers size={14} />, stackOrder: 1, width: 640, height: 440 },
-  { id: 'examples', title: 'Showcase', icon: <ImageIcon size={14} />, stackOrder: 2, width: 560, height: 400 },
-  { id: 'reviews', title: 'Kind Words', icon: <MessageSquare size={14} />, stackOrder: 3, width: 400, height: 440 },
-  { id: 'pricing', title: 'Pricing', icon: <CreditCard size={14} />, stackOrder: 4, width: 340, height: 420 },
-  { id: 'help', title: 'Help', icon: <HelpCircle size={14} />, stackOrder: 5, width: 380, height: 400 },
+  { id: 'welcome', title: 'Welcome', iconId: 'dock-finder', fallbackIcon: <Command size={14} />, stackOrder: 0, width: 480, height: 400 },
+  { id: 'features', title: 'Features', iconId: 'dock-safari', fallbackIcon: <Layers size={14} />, stackOrder: 1, width: 640, height: 440 },
+  { id: 'examples', title: 'Showcase', iconId: 'dock-photos', fallbackIcon: <ImageIcon size={14} />, stackOrder: 2, width: 560, height: 400 },
+  { id: 'reviews', title: 'Kind Words', iconId: 'dock-mail', fallbackIcon: <MessageSquare size={14} />, stackOrder: 3, width: 400, height: 440 },
+  { id: 'pricing', title: 'Pricing', iconId: 'dock-notes', fallbackIcon: <CreditCard size={14} />, stackOrder: 4, width: 340, height: 420 },
+  { id: 'help', title: 'Help', iconId: 'dock-messages', fallbackIcon: <HelpCircle size={14} />, stackOrder: 5, width: 380, height: 400 },
 ];
 
 // Stack configuration - windows cascade from center
@@ -84,6 +87,20 @@ const STACK = {
 };
 
 // =============================================================================
+// HELPER - Initial z-indexes for all windows
+// =============================================================================
+
+function getInitialZIndexes(): Record<string, number> {
+  const zIndexes: Record<string, number> = {};
+  WINDOWS.forEach((w, i) => {
+    // First window (stackOrder 0) gets highest z-index
+    zIndexes[w.id] = STACK.baseZ + (WINDOWS.length - i) * STACK.zStep;
+  });
+  zIndexes['signup'] = STACK.baseZ + WINDOWS.length * STACK.zStep + 50;
+  return zIndexes;
+}
+
+// =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 
@@ -93,30 +110,27 @@ export default function Desktop() {
   const [showHint, setShowHint] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Window state - always start with all windows open
-  const [openWindows, setOpenWindows] = useState<string[]>([]);
+  // Fetch custom icons from Supabase
+  const { icons, loading: iconsLoading } = useLandingIcons();
+
+  // Window state - initialize with ALL windows open
+  const [openWindows, setOpenWindows] = useState<string[]>(() => WINDOWS.map(w => w.id));
   const [focusedWindow, setFocusedWindow] = useState<string>('welcome');
-  const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>({});
+  const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>(getInitialZIndexes);
   const [topZIndex, setTopZIndex] = useState(STACK.baseZ + WINDOWS.length * STACK.zStep);
   const [closingWindow, setClosingWindow] = useState<string | null>(null);
 
-  // Initialize - always fresh, no localStorage
+  // Mount and clear any old localStorage
   useEffect(() => {
     setMounted(true);
 
-    // All windows open in stack order (first = top)
-    const allIds = WINDOWS.map(w => w.id);
-    setOpenWindows(allIds);
+    // Clear old localStorage from previous implementation
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('meos_landing_visited');
+      localStorage.removeItem('meos_landing_open');
+    }
 
-    // Set initial z-indexes - first window on top
-    const zIndexes: Record<string, number> = {};
-    WINDOWS.forEach((w, i) => {
-      zIndexes[w.id] = STACK.baseZ + (WINDOWS.length - i) * STACK.zStep;
-    });
-    zIndexes['signup'] = STACK.baseZ + WINDOWS.length * STACK.zStep + 50;
-    setWindowZIndexes(zIndexes);
-
-    // Time
+    // Time updater
     const updateTime = () => {
       setCurrentTime(new Date().toLocaleTimeString('en-US', {
         hour: 'numeric',
@@ -197,7 +211,8 @@ export default function Desktop() {
     setWindowZIndexes(prev => ({ ...prev, [id]: newZ }));
   }, [focusedWindow, topZIndex]);
 
-  if (!mounted) {
+  // Don't render until mounted AND icons are loaded
+  if (!mounted || iconsLoading) {
     return <div className="h-screen w-screen" style={{ background: 'var(--bg-solid)' }} />;
   }
 
@@ -215,17 +230,30 @@ export default function Desktop() {
       {/* Desktop Icons */}
       <main className="absolute inset-0 pt-14 px-6 z-10 pointer-events-none">
         <div className="grid grid-flow-col grid-rows-6 gap-y-4 gap-x-3 w-max pointer-events-auto">
-          {WINDOWS.map((w, i) => (
-            <DesktopIcon
-              key={w.id}
-              icon={w.icon}
-              label={w.title}
-              onOpen={() => handleOpenWindow(w.id)}
-              onFocus={() => handleFocusWindow(w.id)}
-              isOpen={openWindows.includes(w.id)}
-              delay={0.05 + i * 0.04}
-            />
-          ))}
+          {WINDOWS.map((w, i) => {
+            const customIconUrl = icons[w.iconId];
+            return (
+              <DesktopIcon
+                key={w.id}
+                icon={
+                  customIconUrl ? (
+                    <img
+                      src={customIconUrl}
+                      alt={w.title}
+                      className="w-10 h-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    w.fallbackIcon
+                  )
+                }
+                label={w.title}
+                onOpen={() => handleOpenWindow(w.id)}
+                onFocus={() => handleFocusWindow(w.id)}
+                isOpen={openWindows.includes(w.id)}
+                delay={0.05 + i * 0.04}
+              />
+            );
+          })}
         </div>
       </main>
 
@@ -248,7 +276,7 @@ export default function Desktop() {
                 key={w.id}
                 id={w.id}
                 title={w.title}
-                icon={w.icon}
+                icon={w.fallbackIcon}
                 width={w.width}
                 height={w.height}
                 offsetX={offsetX}
