@@ -346,7 +346,7 @@ export default function Desktop() {
             <div className="mb-6 p-3 bg-orange-50 rounded-2xl">
               <Sparkles size={24} className="text-orange-600" />
             </div>
-            <h2 className="text-2xl font-serif text-stone-900 mb-2">Let's get you set up.</h2>
+            <h2 className="text-2xl font-serif text-stone-900 mb-2">Let&apos;s get you set up.</h2>
             <p className="text-stone-500 mb-8 max-w-[260px]">Create your personal desktop in seconds. No credit card required.</p>
 
             <button className="w-full bg-white border border-stone-200 text-stone-700 font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-stone-50 transition-colors mb-4 relative overflow-hidden group">
