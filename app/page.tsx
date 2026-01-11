@@ -734,80 +734,104 @@ function FeaturesContent() {
 }
 
 // =============================================================================
-// SHOWCASE
+// SHOWCASE - Gallery of user creations
 // =============================================================================
 
 function ShowcaseContent() {
-  return (
-    <div className="flex-1 p-5 grid grid-cols-2 gap-3 overflow-y-auto" style={{ background: 'var(--bg-solid)' }}>
-      {[1, 2, 3, 4].map((i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ ...DESIGN.motion.spring, delay: i * 0.08 }}
-          className="aspect-video rounded-lg flex items-center justify-center cursor-pointer transition-shadow hover:shadow-md"
-          style={{
-            background: 'var(--bg-glass)',
-            color: 'var(--text-tertiary)',
-            borderRadius: DESIGN.radius.window,
-            border: '0.5px solid var(--border-light)',
-          }}
-        >
-          <span className="text-xs font-medium">Portfolio {i}</span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-// =============================================================================
-// REVIEWS
-// =============================================================================
-
-function ReviewsContent() {
-  const reviews = [
-    { quote: 'The case study format is perfect. Got me my role at Linear.', author: 'Sarah K.', role: 'Product Designer' },
-    { quote: 'Finally, a portfolio builder that feels like a design tool.', author: 'Marcus C.', role: 'Brand Director' },
-    { quote: 'Set up in 15 minutes. Better than weeks of coding.', author: 'Alex R.', role: 'Illustrator' },
+  const showcases = [
+    {
+      name: 'Maya Chen',
+      role: 'Brand Designer',
+      style: 'Minimal Light',
+      gradient: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%)',
+    },
+    {
+      name: 'Obi Nwosu',
+      role: '3D Artist',
+      style: 'Dark Neon',
+      gradient: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)',
+    },
+    {
+      name: 'Lena Kowalski',
+      role: 'Photographer',
+      style: 'Warm Earth',
+      gradient: 'linear-gradient(135deg, #fef2f2 0%, #fecaca 50%, #f87171 100%)',
+    },
+    {
+      name: 'Kai Tanaka',
+      role: 'Product Designer',
+      style: 'Ocean Blue',
+      gradient: 'linear-gradient(135deg, #ecfeff 0%, #a5f3fc 50%, #22d3ee 100%)',
+    },
   ];
 
   return (
-    <div className="flex-1 p-5 overflow-y-auto" style={{ background: 'var(--bg-elevated)' }}>
-      <h2
-        className="font-serif text-xl mb-5 leading-snug"
-        style={{ color: 'var(--text-primary)' }}
+    <div className="flex-1 flex flex-col" style={{ background: 'var(--bg-solid)' }}>
+      {/* Header */}
+      <div className="px-5 pt-5 pb-3">
+        <p className="text-[10px] uppercase tracking-[0.2em] font-medium mb-1" style={{ color: 'var(--text-tertiary)' }}>
+          Community
+        </p>
+        <h2 className="font-serif text-2xl leading-tight" style={{ color: 'var(--text-primary)' }}>
+          Made with MeOS
+        </h2>
+      </div>
+
+      {/* Featured showcase - full width */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...DESIGN.motion.spring, delay: 0.1 }}
+        className="mx-5 mb-3 relative overflow-hidden cursor-pointer group"
+        style={{
+          borderRadius: 12,
+          background: showcases[0].gradient,
+          aspectRatio: '16/9',
+        }}
       >
-        Kind words from<br />the community.
-      </h2>
-      <div className="space-y-4">
-        {reviews.map((r, i) => (
+        {/* Mock window chrome */}
+        <div className="absolute top-3 left-3 flex gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-white/40" />
+          <div className="w-2 h-2 rounded-full bg-white/40" />
+          <div className="w-2 h-2 rounded-full bg-white/40" />
+        </div>
+        {/* Floating elements to suggest desktop */}
+        <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+          <div className="w-8 h-8 rounded-lg bg-white/30 backdrop-blur-sm" />
+          <div className="w-8 h-8 rounded-lg bg-white/30 backdrop-blur-sm" />
+        </div>
+        {/* Info overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/40 to-transparent">
+          <p className="text-white text-sm font-medium">{showcases[0].name}</p>
+          <p className="text-white/70 text-xs">{showcases[0].role} · {showcases[0].style}</p>
+        </div>
+      </motion.div>
+
+      {/* Grid of smaller showcases */}
+      <div className="flex-1 px-5 pb-5 grid grid-cols-3 gap-2">
+        {showcases.slice(1).map((s, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ ...DESIGN.motion.spring, delay: i * 0.1 }}
-            className="pb-4 border-b last:border-0"
-            style={{ borderColor: 'var(--border-light)' }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ ...DESIGN.motion.spring, delay: 0.15 + i * 0.05 }}
+            className="relative overflow-hidden cursor-pointer group"
+            style={{
+              borderRadius: 8,
+              background: s.gradient,
+              aspectRatio: '1',
+            }}
           >
-            <p
-              className="text-sm font-serif leading-relaxed mb-2"
-              style={{ color: 'var(--text-primary)' }}
-            >
-              &ldquo;{r.quote}&rdquo;
-            </p>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-5 h-5 rounded-full"
-                style={{ background: 'var(--bg-solid)' }}
-              />
+            {/* Mini window chrome */}
+            <div className="absolute top-2 left-2 flex gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
+              <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
+            </div>
+            {/* Hover info */}
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
               <div>
-                <span className="text-xs font-medium block" style={{ color: 'var(--text-primary)' }}>
-                  {r.author}
-                </span>
-                <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>
-                  {r.role}
-                </span>
+                <p className="text-white text-[10px] font-medium truncate">{s.name}</p>
+                <p className="text-white/70 text-[9px] truncate">{s.style}</p>
               </div>
             </div>
           </motion.div>
@@ -818,129 +842,313 @@ function ReviewsContent() {
 }
 
 // =============================================================================
-// PRICING
+// REVIEWS - Editorial magazine style testimonials
 // =============================================================================
 
-function PricingContent({ onOpenWindow }: { onOpenWindow: (id: string) => void }) {
-  const features = ['Unlimited projects', 'Custom domain', 'Analytics', 'Priority support'];
+function ReviewsContent() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const reviews = [
+    {
+      quote: 'Got me my dream role at Linear. The recruiters loved navigating my case studies.',
+      author: 'Sarah Kim',
+      role: 'Product Designer',
+      company: 'Linear',
+      initials: 'SK',
+      color: '#10b981',
+    },
+    {
+      quote: 'Finally, a portfolio that feels as polished as my work. Clients are always impressed.',
+      author: 'Marcus Cole',
+      role: 'Brand Director',
+      company: 'Pentagram',
+      initials: 'MC',
+      color: '#6366f1',
+    },
+    {
+      quote: 'Set up in 15 minutes. My developer friends couldn\'t believe I didn\'t write code.',
+      author: 'Alex Rivera',
+      role: 'Illustrator',
+      company: 'Freelance',
+      initials: 'AR',
+      color: '#f59e0b',
+    },
+  ];
+
+  const review = reviews[activeIndex];
 
   return (
-    <div className="flex-1 p-5 flex flex-col" style={{ background: 'var(--bg-elevated)' }}>
-      <div className="text-center mb-5">
-        <motion.span
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-widest font-medium mb-3"
-          style={{ background: 'var(--bg-solid)', color: 'var(--text-secondary)' }}
+    <div className="flex-1 flex flex-col" style={{ background: 'var(--bg-elevated)' }}>
+      {/* Large quote */}
+      <div className="flex-1 px-6 pt-6 pb-4 flex flex-col">
+        <motion.div
+          key={activeIndex}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={DESIGN.motion.spring}
+          className="flex-1 flex flex-col"
         >
-          Pro
-        </motion.span>
-        <div className="flex items-baseline justify-center gap-0.5">
-          <span className="font-serif text-4xl" style={{ color: 'var(--text-primary)' }}>$12</span>
-          <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>/mo</span>
-        </div>
-      </div>
-
-      <div className="space-y-2.5 mb-5 flex-1">
-        {features.map((item, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ ...DESIGN.motion.spring, delay: 0.05 * i }}
-            className="flex items-center gap-2.5"
+          {/* Quote mark */}
+          <span
+            className="font-serif text-6xl leading-none mb-2 select-none"
+            style={{ color: 'var(--text-tertiary)', opacity: 0.3 }}
           >
+            &ldquo;
+          </span>
+
+          {/* Quote text */}
+          <p
+            className="font-serif text-xl leading-snug flex-1"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {review.quote}
+          </p>
+
+          {/* Author */}
+          <div className="flex items-center gap-3 mt-4">
             <div
-              className="w-4 h-4 rounded-full flex items-center justify-center"
-              style={{ background: 'var(--bg-solid)', color: 'var(--text-primary)' }}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold text-white"
+              style={{ background: review.color }}
             >
-              <Check size={8} strokeWidth={3} />
+              {review.initials}
             </div>
-            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{item}</span>
-          </motion.div>
-        ))}
+            <div>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                {review.author}
+              </p>
+              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                {review.role} at {review.company}
+              </p>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
-      <motion.button
-        onClick={() => onOpenWindow('signup')}
-        className="w-full py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
-        style={{
-          background: 'var(--text-primary)',
-          color: 'var(--bg-elevated)',
-          borderRadius: DESIGN.radius.button,
-        }}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
+      {/* Navigation dots */}
+      <div
+        className="px-6 py-4 flex items-center justify-between"
+        style={{ borderTop: '0.5px solid var(--border-light)' }}
       >
-        <span>Start free trial</span>
-        <ArrowRight size={14} />
-      </motion.button>
-      <p className="text-center text-[10px] mt-2.5" style={{ color: 'var(--text-tertiary)' }}>
-        14 days free. Cancel anytime.
-      </p>
+        <div className="flex gap-2">
+          {reviews.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveIndex(i)}
+              className="transition-all"
+              style={{
+                width: activeIndex === i ? 20 : 6,
+                height: 6,
+                borderRadius: 3,
+                background: activeIndex === i ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                opacity: activeIndex === i ? 1 : 0.3,
+              }}
+            />
+          ))}
+        </div>
+        <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-tertiary)' }}>
+          {activeIndex + 1} / {reviews.length}
+        </p>
+      </div>
     </div>
   );
 }
 
 // =============================================================================
-// HELP / FAQ
+// PRICING - Premium confident aesthetic
 // =============================================================================
 
-function HelpContent() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const faqs = [
-    { q: 'Do I need coding skills?', a: 'None at all. MeOS is drag-and-drop.' },
-    { q: 'Can I use a custom domain?', a: 'Yes, Pro plans include custom domain support.' },
-    { q: 'Is it mobile responsive?', a: '100%. Renders as a native-feeling app.' },
-    { q: 'How do I add case studies?', a: 'Use the Notes app for rich content.' },
+function PricingContent({ onOpenWindow }: { onOpenWindow: (id: string) => void }) {
+  const features = [
+    { text: 'Unlimited projects', highlight: false },
+    { text: 'Custom domain', highlight: false },
+    { text: 'Analytics dashboard', highlight: false },
+    { text: 'Remove MeOS branding', highlight: true },
+    { text: 'Priority support', highlight: false },
   ];
 
   return (
     <div className="flex-1 flex flex-col" style={{ background: 'var(--bg-elevated)' }}>
-      <div className="p-4 border-b" style={{ borderColor: 'var(--border-light)' }}>
-        <div className="relative">
-          <Command
-            size={12}
-            className="absolute left-3 top-1/2 -translate-y-1/2"
-            style={{ color: 'var(--text-tertiary)' }}
-          />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full py-2 pl-8 pr-3 text-sm border-none outline-none"
-            style={{
-              background: 'var(--bg-solid)',
-              color: 'var(--text-primary)',
-              borderRadius: DESIGN.radius.input,
-            }}
-          />
+      {/* Price hero */}
+      <div className="px-5 pt-6 pb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={DESIGN.motion.spring}
+        >
+          {/* Free callout */}
+          <div
+            className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full mb-4"
+            style={{ background: 'var(--accent-primary)', opacity: 0.1 }}
+          >
+            <Sparkles size={10} style={{ color: 'var(--accent-primary)' }} />
+            <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--accent-primary)' }}>
+              14 days free
+            </span>
+          </div>
+
+          {/* Price */}
+          <div className="flex items-baseline gap-1">
+            <span className="font-serif text-5xl tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              $12
+            </span>
+            <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
+              /month
+            </span>
+          </div>
+
+          {/* Value comparison */}
+          <p className="text-xs mt-2" style={{ color: 'var(--text-secondary)' }}>
+            Less than a coffee a week.
+            <span className="line-through ml-1.5 opacity-50">$50+ alternatives</span>
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Divider */}
+      <div className="mx-5 h-px" style={{ background: 'var(--border-light)' }} />
+
+      {/* Features */}
+      <div className="flex-1 px-5 py-4">
+        <p className="text-[10px] uppercase tracking-widest font-medium mb-3" style={{ color: 'var(--text-tertiary)' }}>
+          Everything included
+        </p>
+        <div className="space-y-2.5">
+          {features.map((f, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -6 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ ...DESIGN.motion.spring, delay: 0.03 * i }}
+              className="flex items-center gap-2.5"
+            >
+              <Check
+                size={14}
+                strokeWidth={2.5}
+                style={{ color: f.highlight ? 'var(--accent-primary)' : 'var(--text-primary)' }}
+              />
+              <span
+                className="text-sm"
+                style={{
+                  color: f.highlight ? 'var(--accent-primary)' : 'var(--text-primary)',
+                  fontWeight: f.highlight ? 500 : 400,
+                }}
+              >
+                {f.text}
+              </span>
+            </motion.div>
+          ))}
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto p-4">
-        <h3
-          className="text-[10px] font-semibold uppercase tracking-wider mb-3"
-          style={{ color: 'var(--text-tertiary)' }}
+
+      {/* CTA */}
+      <div className="px-5 pb-5">
+        <motion.button
+          onClick={() => onOpenWindow('signup')}
+          className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2"
+          style={{
+            background: 'var(--text-primary)',
+            color: 'var(--bg-elevated)',
+          }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
         >
-          FAQ
-        </h3>
-        <div className="space-y-1">
+          <span>Start building free</span>
+          <ArrowRight size={14} />
+        </motion.button>
+        <p className="text-center text-[10px] mt-2" style={{ color: 'var(--text-tertiary)' }}>
+          No card required · Cancel anytime
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// HELP / FAQ - Conversational, helpful design
+// =============================================================================
+
+function HelpContent() {
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const faqs = [
+    {
+      q: 'Do I need to code?',
+      a: 'Nope! Everything is drag-and-drop. If you can use Figma, you can use MeOS.',
+      icon: '✨',
+    },
+    {
+      q: 'Can I use my own domain?',
+      a: 'Absolutely. Connect any domain in settings. We handle SSL automatically.',
+      icon: '🔗',
+    },
+    {
+      q: 'How does it look on mobile?',
+      a: 'Gorgeous. We render a native-feeling app experience, not a shrunken desktop.',
+      icon: '📱',
+    },
+    {
+      q: 'How do I add projects?',
+      a: 'Use the Notes app for case studies, Photos for galleries. Just like a real Mac.',
+      icon: '📁',
+    },
+    {
+      q: 'Can I export my site?',
+      a: 'Your content is always yours. Export as JSON anytime from settings.',
+      icon: '💾',
+    },
+  ];
+
+  return (
+    <div className="flex-1 flex flex-col" style={{ background: 'var(--bg-solid)' }}>
+      {/* Header */}
+      <div className="px-5 pt-5 pb-4">
+        <h2 className="font-serif text-xl mb-1" style={{ color: 'var(--text-primary)' }}>
+          Questions?
+        </h2>
+        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+          We&apos;ve got answers.
+        </p>
+      </div>
+
+      {/* FAQ list */}
+      <div className="flex-1 overflow-y-auto px-5 pb-5">
+        <div className="space-y-2">
           {faqs.map((faq, i) => (
-            <div key={i}>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...DESIGN.motion.spring, delay: i * 0.03 }}
+              className="rounded-xl overflow-hidden"
+              style={{
+                background: openFaq === i ? 'var(--bg-elevated)' : 'transparent',
+                border: openFaq === i ? '0.5px solid var(--border-light)' : '0.5px solid transparent',
+              }}
+            >
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="w-full flex items-start justify-between py-2 text-left"
+                className="w-full flex items-center gap-3 p-3 text-left transition-colors"
               >
-                <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                <span className="text-base">{faq.icon}</span>
+                <span
+                  className="text-sm font-medium flex-1"
+                  style={{ color: 'var(--text-primary)' }}
+                >
                   {faq.q}
                 </span>
-                <motion.span
-                  animate={{ rotate: openFaq === i ? 45 : 0 }}
+                <motion.div
+                  animate={{ rotate: openFaq === i ? 180 : 0 }}
                   transition={DESIGN.motion.spring}
-                  className="text-sm ml-2"
                   style={{ color: 'var(--text-tertiary)' }}
                 >
-                  +
-                </motion.span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path
+                      d="M2.5 4.5L6 8L9.5 4.5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </motion.div>
               </button>
               <AnimatePresence>
                 {openFaq === i && (
@@ -951,15 +1159,37 @@ function HelpContent() {
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <p className="text-sm leading-relaxed pb-2" style={{ color: 'var(--text-secondary)' }}>
+                    <p
+                      className="text-sm leading-relaxed px-3 pb-3 pl-10"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
                       {faq.a}
                     </p>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           ))}
         </div>
+      </div>
+
+      {/* Contact footer */}
+      <div
+        className="px-5 py-4 flex items-center justify-between"
+        style={{ borderTop: '0.5px solid var(--border-light)', background: 'var(--bg-elevated)' }}
+      >
+        <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+          Still stuck?
+        </p>
+        <button
+          className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+          style={{
+            background: 'var(--bg-solid)',
+            color: 'var(--text-primary)',
+          }}
+        >
+          Contact us
+        </button>
       </div>
     </div>
   );
