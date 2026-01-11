@@ -7,174 +7,116 @@
    Replaced from [data-theme="warm"]
    ============================================ */
 :root {
-  /* === STRUCTURAL - Soft, organic === */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-full: 9999px;
-  --radius-window: 12px;
-  --radius-dock: 20px;
-  --radius-dock-icon: 14px;
-  --radius-button: 10px;
-  --radius-input: 10px;
-  --radius-menubar: 0;
+    /* === STRUCTURAL VARIABLES (Shared) === */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-full: 9999px;
+    --radius-window: 12px;
+    --radius-dock: 20px;
+    --radius-dock-icon: 14px;
+    --radius-button: 10px;
+    --radius-input: 10px;
+    --radius-menubar: 0;
 
-  /* Spacing - generous, breathable */
-  --spacing-dock-gap: 6px;
-  --spacing-dock-padding: 12px;
-  --spacing-window-padding: 20px;
+    --spacing-dock-gap: 6px;
+    --spacing-dock-padding: 12px;
+    --spacing-window-padding: 20px;
 
-  /* Sizing - comfortable proportions */
-  --dock-icon-size: 48px;
-  --dock-icon-size-hover: 68px;
-  --menubar-height: 36px;
-  --window-header-height: 40px;
+    --dock-icon-size: 48px;
+    --dock-icon-size-hover: 68px;
+    --menubar-height: 36px;
 
-  /* Typography - Serif display, clean body */
-  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono: "SF Mono", ui-monospace, Menlo, Monaco, monospace;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 600;
-  --letter-spacing-tight: -0.04em;
-  --letter-spacing-normal: 0;
-  --letter-spacing-label: 0.04em;
-  --letter-spacing-button: 0;
-  --line-height-tight: 0.95;
-  --line-height-normal: 1.5;
-  --line-height-body: 1.6;
-  --text-transform-label: uppercase;
-  --text-transform-button: none;
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 400ms ease;
 
-  /* Block Typography - editorial, warm */
-  --font-size-body: 14px;
-  --font-size-label: 11px;
-  --font-size-heading-1: 24px;
-  --font-size-heading-2: 18px;
-  --font-size-heading-3: 14px;
-  --font-size-stat-value: 32px;
-  --font-size-stat-label: 10px;
-  --font-size-quote: 16px;
-  --font-size-quote-large: 22px;
-  --font-size-button: 13px;
-  --font-size-button-icon: 16px;
-  --font-size-social-icon: 14px;
-  --font-size-timeline-date: 10px;
-  --font-size-timeline-title: 15px;
-  --font-size-timeline-subtitle: 13px;
+    --z-dock: 100;
+    --z-menubar: 100;
+    --z-window: 200;
+}
 
-  /* Block Spacing - generous */
-  --spacing-block-gap: 10px;
-  --spacing-inline-gap: 14px;
-  --spacing-button-gap: 12px;
-  --spacing-social-gap: 10px;
-  --spacing-button-padding: 10px 20px;
+/* ============================================
+   THEME: WARM (Default)
+   ============================================ */
+:root,
+[data-theme="warm"] {
+    /* Typography */
+    --font-display: "Instrument Serif", Georgia, serif;
+    --font-body: "Inter", system-ui, sans-serif;
 
-  /* Block Element Sizes */
-  --detail-dot-size: 6px;
-  --social-button-size: 44px;
-  --timeline-dot-size: 10px;
-  --quote-border-width: 2px;
+    /* Colors */
+    --bg-solid: #FAFAF9;
+    --bg-elevated: #FFFFFF;
+    --bg-glass: rgba(255, 255, 255, 0.85);
+    --bg-dock: rgba(255, 255, 255, 0.7);
+    --bg-menubar: rgba(255, 255, 255, 0.4);
 
-  /* Block Radii - soft, organic */
-  --radius-detail-dot: 9999px;
-  --radius-social: 12px;
-  --radius-stat: 12px;
-  --radius-quote: 0;
+    --text-primary: #1C1917;
+    --text-secondary: #57534E;
 
-  /* Block Borders */
-  --border-social: 1px solid rgba(120, 113, 108, 0.15);
-  --border-button-secondary: 1px solid rgba(120, 113, 108, 0.2);
+    --border-light: rgba(120, 113, 108, 0.08);
+    --border-glass-outer: rgba(255, 255, 255, 0.5);
+    --border-glass-inner: rgba(255, 255, 255, 0.6);
 
-  /* === COLORS - Warm stone palette === */
-  --bg-solid: #FAFAF9;
-  --bg-elevated: #FFFFFF;
-  --bg-glass: rgba(255, 255, 255, 0.85);
-  --bg-glass-elevated: rgba(255, 255, 255, 0.92);
-  --bg-dock: rgba(255, 255, 255, 0.7);
-  --bg-dock-icon: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 249, 0.9) 100%);
-  --bg-menubar: rgba(255, 255, 255, 0.4);
-  --bg-tooltip: rgba(28, 25, 23, 0.95);
-  --bg-overlay: rgba(28, 25, 23, 0.4);
-  --bg-button: rgba(120, 113, 108, 0.06);
-  --bg-button-hover: rgba(120, 113, 108, 0.1);
-  --bg-input: rgba(120, 113, 108, 0.04);
+    --shadow-dock: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 0 0 1px rgba(120, 113, 108, 0.06), 0 12px 24px -6px rgba(28, 25, 23, 0.06);
+    --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
+}
 
-  /* Text - warm stone */
-  --text-primary: #1C1917;
-  --text-secondary: #57534E;
-  --text-tertiary: #A8A29E;
-  --text-quaternary: #D6D3D1;
-  --text-on-glass: rgba(28, 25, 23, 0.9);
-  --text-on-dark: #FAFAF9;
-  --text-on-image: #FAFAF9;
-  --text-on-accent: #FAFAF9;
+/* ============================================
+   THEME: MONTEREY (Classic Light)
+   ============================================ */
+[data-theme="monterey"],
+[data-theme="bluren"] {
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 
-  /* Additional Backgrounds */
-  --bg-secondary: rgba(120, 113, 108, 0.05);
-  --bg-tertiary: rgba(120, 113, 108, 0.08);
+    --bg-solid: #F5F5F7;
+    --bg-elevated: #FFFFFF;
+    --bg-glass: rgba(255, 255, 255, 0.75);
+    --bg-dock: rgba(255, 255, 255, 0.4);
+    --bg-menubar: rgba(255, 255, 255, 0.6);
 
-  /* Additional Borders */
-  --border-subtle: rgba(120, 113, 108, 0.04);
+    --text-primary: #1D1D1F;
+    --text-secondary: #86868B;
 
-  /* Additional Shadows - soft, diffuse */
-  --shadow-xl: 0 25px 60px rgba(28, 25, 23, 0.12);
+    --border-light: rgba(0, 0, 0, 0.05);
+    --border-glass-outer: rgba(255, 255, 255, 0.2);
+    --border-glass-inner: rgba(255, 255, 255, 0.2);
 
-  /* Borders - subtle warm */
-  --border-light: rgba(120, 113, 108, 0.08);
-  --border-medium: rgba(120, 113, 108, 0.12);
-  --border-glass-outer: rgba(255, 255, 255, 0.5);
-  --border-glass-inner: rgba(255, 255, 255, 0.6);
-  --border-width: 1px;
+    --shadow-dock: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 20px 40px rgba(0, 0, 0, 0.15);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
 
-  /* Shadows - soft, layered, diffuse */
-  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04), 0 2px 4px rgba(28, 25, 23, 0.02);
-  --shadow-md: 0 4px 8px rgba(28, 25, 23, 0.04), 0 8px 16px rgba(28, 25, 23, 0.03);
-  --shadow-lg: 0 8px 24px rgba(28, 25, 23, 0.06), 0 16px 32px rgba(28, 25, 23, 0.04);
-  --shadow-window: 0 0 0 1px rgba(120, 113, 108, 0.05), 0 4px 8px rgba(28, 25, 23, 0.03), 0 16px 32px -4px rgba(28, 25, 23, 0.08), 0 24px 64px -8px rgba(28, 25, 23, 0.05);
-  --shadow-dock: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 0 0 1px rgba(120, 113, 108, 0.06), 0 12px 24px -6px rgba(28, 25, 23, 0.06);
-  --shadow-dock-icon: 0 1px 2px rgba(28, 25, 23, 0.04), 0 2px 4px rgba(28, 25, 23, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  --shadow-item: 0 2px 8px rgba(28, 25, 23, 0.08);
-  --shadow-item-hover: 0 8px 24px rgba(28, 25, 23, 0.12);
-  --shadow-button: 0 1px 2px rgba(28, 25, 23, 0.03);
+/* ============================================
+   THEME: DARK (Dark Mode)
+   ============================================ */
+[data-theme="dark"],
+[data-theme="refined"] {
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 
-  /* Traffic Lights */
-  --traffic-red: #FF5F57;
-  --traffic-red-hover: #FF3B30;
-  --traffic-yellow: #FFBD2E;
-  --traffic-yellow-hover: #FFAA00;
-  --traffic-green: #28CA41;
-  --traffic-green-hover: #1AAD2E;
-  --traffic-size: 12px;
-  --traffic-gap: 8px;
+    --bg-solid: #1E1E1E;
+    --bg-elevated: #2C2C2E;
+    --bg-glass: rgba(30, 30, 30, 0.75);
+    --bg-dock: rgba(30, 30, 30, 0.4);
+    --bg-menubar: rgba(30, 30, 30, 0.6);
 
-  /* Accent - Warm Orange */
-  --accent-primary: #EA580C;
-  --accent-success: #34C759;
-  --accent-warning: #FF9500;
-  --accent-danger: #FF3B30;
-  --dot-color: #EA580C;
+    --text-primary: #F5F5F7;
+    --text-secondary: #86868B;
 
-  /* Effects */
-  --blur-glass: blur(24px) saturate(180%);
-  --blur-dock: blur(32px) saturate(180%);
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 400ms ease;
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-glass-outer: rgba(255, 255, 255, 0.08);
+    --border-glass-inner: rgba(255, 255, 255, 0.05);
 
-  /* Z-Index */
-  --z-desktop-items: 1;
-  --z-desktop-item-hover: 10;
-  --z-desktop-item-dragging: 50;
-  --z-dock: 100;
-  --z-menubar: 100;
-  --z-window: 200;
-  --z-tooltip: 300;
-  --z-modal: 400;
-  --z-toast: 500;
+    --shadow-dock: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Refined Specific Override for Font */
+[data-theme="refined"] {
+    --font-display: "Halant", serif;
 }
 
 /* ============================================
@@ -184,7 +126,10 @@
 /* Subtle Noise Texture */
 .noise-overlay {
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     z-index: 50;
     opacity: 0.03;
@@ -197,11 +142,11 @@
     background: var(--bg-glass, rgba(255, 255, 255, 0.85));
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    box-shadow: 
-        0 0 0 1px rgba(0,0,0,0.03),
-        0 1px 1px rgba(0,0,0,0.02),
-        0 4px 8px rgba(0,0,0,0.02),
-        0 16px 32px -4px rgba(0,0,0,0.06),
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.03),
+        0 1px 1px rgba(0, 0, 0, 0.02),
+        0 4px 8px rgba(0, 0, 0, 0.02),
+        0 16px 32px -4px rgba(0, 0, 0, 0.06),
         0 24px 64px -8px rgba(28, 25, 23, 0.04);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
@@ -211,16 +156,23 @@
     background: var(--bg-dock, rgba(255, 255, 255, 0.7));
     backdrop-filter: blur(32px);
     -webkit-backdrop-filter: blur(32px);
-    box-shadow: 
-        0 0 0 1px rgba(255,255,255,0.4) inset,
-        0 0 0 1px rgba(0,0,0,0.05),
-        0 12px 24px -6px rgba(0,0,0,0.05);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.4) inset,
+        0 0 0 1px rgba(0, 0, 0, 0.05),
+        0 12px 24px -6px rgba(0, 0, 0, 0.05);
 }
 
 /* Animations */
 @keyframes openWindow {
-    0% { opacity: 0; transform: scale(0.96) translateY(8px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+    0% {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .animate-open {
@@ -230,6 +182,7 @@
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
+
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

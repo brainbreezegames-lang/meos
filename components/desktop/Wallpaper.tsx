@@ -10,6 +10,7 @@ export default function Wallpaper() {
                 fill
                 priority
                 quality={100}
+                unoptimized
                 className="object-cover object-center"
                 sizes="100vw"
             />
