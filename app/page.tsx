@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { Button } from '@/components/ui';
+import { motion, useReducedMotion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 
+// Demo data
 const DEMO_ITEMS = [
   { id: '1', x: 12, y: 20, label: 'Projects', thumbnail: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=200&h=200&fit=crop' },
   { id: '2', x: 32, y: 55, label: 'About', thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
@@ -15,10 +15,85 @@ const DEMO_ITEMS = [
 
 const DOCK_ITEMS = ['🌐', '📧', '💼', '🎨', '📱'];
 
+const FEATURES = [
+  { icon: '📄', title: 'Rich Case Studies', app: 'Pages', description: 'Full documents with process, insights, and outcomes. Tell the story behind your work.' },
+  { icon: '🖼️', title: 'Beautiful Galleries', app: 'Photos', description: 'Masonry grids, albums, and lightbox viewing. Your visual work, beautifully displayed.' },
+  { icon: '👤', title: 'Professional Contact', app: 'Contacts', description: 'Email, calendar, social links, availability status. Make it easy to reach you.' },
+  { icon: '📝', title: 'Long-form Writing', app: 'Notes', description: 'Blog posts, essays, and ideas with markdown support. Share your thoughts.' },
+  { icon: '📁', title: 'File Downloads', app: 'Finder', description: 'Resume, assets, resources — organized and downloadable. Everything in one place.' },
+  { icon: '📊', title: 'Know Your Visitors', app: 'Analytics', description: 'See who visits, what they view, where they are from. Understand your audience.' },
+];
+
+const TESTIMONIALS = [
+  {
+    text: "I got 3 interview requests in the first week after launching my MeOS portfolio. Recruiters actually mention how unique it looks.",
+    name: "Sarah Kim",
+    title: "Product Designer at Google",
+    isRight: true,
+  },
+  {
+    text: "Finally something that doesn't look like every other Squarespace site. My clients always comment on it.",
+    name: "Marcus Chen",
+    title: "Freelance Brand Designer",
+    isRight: false,
+  },
+  {
+    text: "The case study format is perfect for showing process. Way better than cramming everything into a scroll.",
+    name: "Yuki Tanaka",
+    title: "UX Lead at Spotify",
+    isRight: true,
+  },
+];
+
+const FAQS = [
+  {
+    question: "Do I need to know how to code?",
+    answer: "No. MeOS is entirely visual. Drag, drop, click, done. If you can use a Mac, you can use MeOS."
+  },
+  {
+    question: "Can I use my own domain?",
+    answer: "Yes, on the Pro plan. Free users get a yourname.meos.app subdomain."
+  },
+  {
+    question: "How does it look on mobile?",
+    answer: "MeOS automatically transforms into an iOS-style interface on mobile. Same content, native feel."
+  },
+  {
+    question: "Can recruiters actually use this?",
+    answer: "Yes. We've tested with 50+ recruiters. The desktop metaphor is familiar — they know how to click icons and open windows."
+  },
+  {
+    question: "What if I want to switch away from MeOS?",
+    answer: "Export your content anytime. No lock-in. Your work is yours."
+  },
+  {
+    question: "Is my portfolio SEO-friendly?",
+    answer: "Yes. Despite the desktop interface, all content is fully indexable by search engines."
+  },
+];
+
+const SHOWCASE_PORTFOLIOS = [
+  { name: 'Sarah K.', title: 'Product Designer', gradient: 'from-violet-600 to-indigo-600' },
+  { name: 'Marcus T.', title: 'Brand Designer', gradient: 'from-rose-600 to-pink-600' },
+  { name: 'Yuki M.', title: 'UX Design', gradient: 'from-cyan-600 to-blue-600' },
+  { name: 'Alex R.', title: 'Creative Director', gradient: 'from-amber-600 to-orange-600' },
+  { name: 'Jordan L.', title: 'Illustrator', gradient: 'from-emerald-600 to-teal-600' },
+];
+
+const NAV_SECTIONS = [
+  { id: 'hero', icon: '🏠', label: 'Home' },
+  { id: 'features', icon: '✨', label: 'Features' },
+  { id: 'showcase', icon: '📸', label: 'Examples' },
+  { id: 'pricing', icon: '💰', label: 'Pricing' },
+  { id: 'faq', icon: '❓', label: 'FAQ' },
+];
+
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [showcaseIndex, setShowcaseIndex] = useState(0);
   const prefersReducedMotion = useReducedMotion();
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +109,37 @@ export default function LandingPage() {
     setMounted(true);
   }, []);
 
+  // Track active section on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = NAV_SECTIONS.map(s => document.getElementById(s.id));
+      const scrollPos = window.scrollY + window.innerHeight / 3;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section && section.offsetTop <= scrollPos) {
+          setActiveSection(NAV_SECTIONS[i].id);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Auto-advance showcase
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowcaseIndex(i => (i + 1) % SHOWCASE_PORTFOLIOS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen relative overflow-x-hidden bg-[#0a0a0f]">
       {/* Noise texture overlay */}
@@ -47,7 +153,6 @@ export default function LandingPage() {
 
       {/* Dramatic ambient lighting */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        {/* Top-left warm glow */}
         <div
           className="absolute -top-[40%] -left-[20%] w-[80vw] h-[80vw] rounded-full"
           style={{
@@ -55,7 +160,6 @@ export default function LandingPage() {
             filter: 'blur(60px)',
           }}
         />
-        {/* Bottom-right cool glow */}
         <div
           className="absolute -bottom-[30%] -right-[10%] w-[70vw] h-[70vw] rounded-full"
           style={{
@@ -63,7 +167,6 @@ export default function LandingPage() {
             filter: 'blur(80px)',
           }}
         />
-        {/* Center accent */}
         <motion.div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] rounded-full"
           style={{
@@ -82,7 +185,9 @@ export default function LandingPage() {
         />
       </div>
 
-      {/* Header - Mobile-first with hamburger */}
+      {/* ============================================
+          MENU BAR (Fixed Top)
+          ============================================ */}
       <header className="fixed top-0 left-0 right-0 z-40">
         <div
           className="mx-4 mt-4 md:mx-6 md:mt-6 rounded-2xl px-4 py-3 md:px-6 md:py-4"
@@ -100,7 +205,8 @@ export default function LandingPage() {
               transition={{ duration: 0.4 }}
             >
               <span
-                className="text-xl md:text-2xl font-bold tracking-tight"
+                className="text-xl md:text-2xl font-bold tracking-tight cursor-pointer"
+                onClick={() => scrollToSection('hero')}
                 style={{
                   background: 'linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%)',
                   WebkitBackgroundClip: 'text',
@@ -111,23 +217,11 @@ export default function LandingPage() {
               </span>
             </motion.div>
 
-            {/* Desktop nav */}
-            <motion.nav
-              className="hidden md:flex items-center gap-3"
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <Link href="/demo">
-                <button className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors">
-                  Demo
-                </button>
-              </Link>
-              <Link href="/login">
-                <button className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors">
-                  Log in
-                </button>
-              </Link>
               <Link href="/signup">
                 <button
                   className="px-5 py-2.5 text-sm font-medium rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -137,67 +231,18 @@ export default function LandingPage() {
                     boxShadow: '0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)',
                   }}
                 >
-                  Get started
-                </button>
-              </Link>
-            </motion.nav>
-
-            {/* Mobile hamburger */}
-            <button
-              className="md:hidden p-2 -mr-2"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileMenuOpen}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                {mobileMenuOpen ? (
-                  <path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" />
-                ) : (
-                  <>
-                    <path d="M4 8h16" strokeLinecap="round" />
-                    <path d="M4 16h16" strokeLinecap="round" />
-                  </>
-                )}
-              </svg>
-            </button>
-          </div>
-
-          {/* Mobile menu dropdown */}
-          {mobileMenuOpen && (
-            <motion.div
-              className="md:hidden pt-4 pb-2 flex flex-col gap-2"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              transition={{ duration: 0.2 }}
-            >
-              <Link href="/demo" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full text-left px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-colors">
-                  Demo
-                </button>
-              </Link>
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full text-left px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-colors">
-                  Log in
-                </button>
-              </Link>
-              <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                <button
-                  className="w-full mt-2 px-4 py-3 text-sm font-medium rounded-xl"
-                  style={{
-                    background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
-                    color: '#0a0a0f',
-                  }}
-                >
-                  Get started free
+                  Get Started Free
                 </button>
               </Link>
             </motion.div>
-          )}
+          </div>
         </div>
       </header>
 
-      {/* HERO - Asymmetric, dramatic */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col justify-center">
+      {/* ============================================
+          HERO SECTION
+          ============================================ */}
+      <section id="hero" ref={heroRef} className="relative min-h-screen flex flex-col justify-center">
         <motion.div
           className="relative z-10 px-6 md:px-12 lg:px-20 pt-32 pb-12 md:pt-40 md:pb-20"
           style={{ y: prefersReducedMotion ? 0 : heroParallax, opacity: heroOpacity }}
@@ -223,11 +268,11 @@ export default function LandingPage() {
               </span>
             </motion.div>
 
-            {/* MASSIVE headline - fluid sizing */}
+            {/* Headline */}
             <motion.h1
               className="font-bold tracking-tight leading-[0.9] mb-8 md:mb-12"
               style={{
-                fontSize: 'clamp(3rem, 12vw, 9rem)',
+                fontSize: 'clamp(2.5rem, 10vw, 7rem)',
                 color: '#fafafa',
                 textWrap: 'balance',
               }}
@@ -235,12 +280,12 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Build your
+              Your portfolio.
               <br />
-              <span style={{ color: 'rgba(255, 255, 255, 0.4)' }}>web desktop</span>
+              <span style={{ color: 'rgba(255, 255, 255, 0.4)' }}>Your operating system.</span>
             </motion.h1>
 
-            {/* Subhead and CTA - asymmetric layout */}
+            {/* Subhead and CTA */}
             <div className="grid lg:grid-cols-[1fr_1.5fr] gap-8 lg:gap-16 items-end">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -254,13 +299,12 @@ export default function LandingPage() {
                     maxWidth: '480px',
                   }}
                 >
-                  An explorable desktop experience for creatives.
-                  Drag icons, open windows, make it uniquely yours.
+                  The portfolio platform that feels like home. Create a stunning desktop-style experience in minutes. No code required.
                 </p>
 
-                {/* CTAs - stacked on mobile, row on desktop */}
+                {/* CTAs */}
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/demo" className="w-full sm:w-auto">
+                  <Link href="/signup" className="w-full sm:w-auto">
                     <button
                       className="w-full sm:w-auto px-8 py-4 text-base font-medium rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                       style={{
@@ -269,10 +313,10 @@ export default function LandingPage() {
                         boxShadow: '0 4px 24px rgba(255,255,255,0.15), inset 0 1px 0 rgba(255,255,255,0.5)',
                       }}
                     >
-                      View live demo
+                      Create Your Desktop — Free
                     </button>
                   </Link>
-                  <Link href="/signup" className="w-full sm:w-auto">
+                  <Link href="/demo" className="w-full sm:w-auto">
                     <button
                       className="w-full sm:w-auto px-8 py-4 text-base font-medium rounded-2xl transition-all hover:bg-white/10"
                       style={{
@@ -281,13 +325,13 @@ export default function LandingPage() {
                         border: '1px solid rgba(255,255,255,0.2)',
                       }}
                     >
-                      Start building →
+                      See Examples
                     </button>
                   </Link>
                 </div>
               </motion.div>
 
-              {/* Stats - bold numbers */}
+              {/* Stats */}
               <motion.div
                 className="hidden lg:flex items-end justify-end gap-16"
                 initial={{ opacity: 0 }}
@@ -319,7 +363,7 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        {/* Interactive Desktop Preview - the hero moment */}
+        {/* Interactive Desktop Preview */}
         <motion.div
           className="relative z-20 px-4 md:px-12 lg:px-20 pb-20"
           initial={{ opacity: 0, y: 40 }}
@@ -436,7 +480,7 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Floating interaction hint */}
+              {/* Interaction hint */}
               <motion.div
                 className="absolute bottom-6 md:bottom-8 right-4 md:right-6 hidden sm:block"
                 initial={{ opacity: 0, x: 20 }}
@@ -452,7 +496,7 @@ export default function LandingPage() {
                   }}
                 >
                   <span className="text-base">✨</span>
-                  Drag anywhere
+                  Try it — click around
                 </div>
               </motion.div>
             </div>
@@ -461,7 +505,7 @@ export default function LandingPage() {
 
         {/* Scroll indicator */}
         <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
@@ -476,12 +520,146 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* FEATURES - Not a card grid */}
-      <section className="relative py-24 md:py-40 px-6 md:px-12" aria-labelledby="features-heading">
-        <div className="max-w-[1400px] mx-auto">
-          {/* Section header - left aligned, not centered */}
+      {/* ============================================
+          SOCIAL PROOF BAR
+          ============================================ */}
+      <section className="relative py-16 md:py-20 px-6" aria-labelledby="social-proof-heading">
+        <div className="max-w-[1200px] mx-auto">
           <motion.div
-            className="mb-16 md:mb-24 max-w-2xl"
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* Metrics */}
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16 mb-10">
+              {[
+                { icon: '🎨', value: '2,400+', label: 'designers' },
+                { icon: '⭐', value: '4.9', label: 'rating' },
+                { icon: '🌍', value: '120', label: 'countries' },
+              ].map((metric, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-lg">{metric.icon}</span>
+                  <span className="text-white/90 font-semibold">{metric.value}</span>
+                  <span className="text-white/40">{metric.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Company logos */}
+            <p className="text-white/30 text-sm mb-6" id="social-proof-heading">Used by designers at</p>
+            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-40">
+              {['Google', 'Stripe', 'Figma', 'Airbnb', 'Netflix', 'Spotify'].map((company, i) => (
+                <span
+                  key={i}
+                  className="text-white/60 font-semibold text-lg md:text-xl tracking-tight"
+                  style={{ fontFamily: 'var(--font-display)' }}
+                >
+                  {company}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================
+          PROBLEM → SOLUTION
+          ============================================ */}
+      <section className="relative py-24 md:py-32 px-6" aria-labelledby="problem-solution-heading">
+        <div className="max-w-[1000px] mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.6 }}
+          >
+            {/* Window container */}
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                boxShadow: '0 25px 60px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)',
+              }}
+            >
+              {/* Window header */}
+              <div
+                className="h-12 flex items-center px-5"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  borderBottom: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
+                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                  <div className="w-3 h-3 rounded-full bg-[#28ca41]" />
+                </div>
+                <h2 id="problem-solution-heading" className="flex-1 text-center text-sm text-white/60 font-medium">
+                  About Your Portfolio
+                </h2>
+              </div>
+
+              {/* Content */}
+              <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/5">
+                {/* Problem */}
+                <div className="p-8 md:p-10">
+                  <div className="text-red-400/80 text-xs font-semibold uppercase tracking-widest mb-4">The Problem</div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                    Your portfolio looks like everyone else's.
+                  </h3>
+                  <ul className="space-y-3 text-white/50">
+                    <li className="flex items-start gap-3">
+                      <span className="text-red-400/60 mt-1">✕</span>
+                      Template sites blend together
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-red-400/60 mt-1">✕</span>
+                      Recruiters scroll past in seconds
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-red-400/60 mt-1">✕</span>
+                      You're competing with 10,000 identical Webflow sites
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Solution */}
+                <div className="p-8 md:p-10">
+                  <div className="text-green-400/80 text-xs font-semibold uppercase tracking-widest mb-4">The Solution</div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                    MeOS gives you a complete operating system.
+                  </h3>
+                  <ul className="space-y-3 text-white/50">
+                    <li className="flex items-start gap-3">
+                      <span className="text-green-400/60 mt-1">✓</span>
+                      Your work lives in windows
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-green-400/60 mt-1">✓</span>
+                      Visitors explore, not scroll
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-green-400/60 mt-1">✓</span>
+                      First impression that lasts
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================
+          FEATURES SECTION
+          ============================================ */}
+      <section id="features" className="relative py-24 md:py-40 px-6" aria-labelledby="features-heading">
+        <div className="max-w-[1400px] mx-auto">
+          {/* Section header */}
+          <motion.div
+            className="mb-16 md:mb-24 text-center max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
@@ -489,91 +667,617 @@ export default function LandingPage() {
           >
             <h2
               id="features-heading"
-              className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
               style={{ color: '#fafafa' }}
             >
-              Not another
+              Everything you need.
               <br />
-              <span style={{ color: 'rgba(255,255,255,0.3)' }}>link-in-bio</span>
+              <span style={{ color: 'rgba(255,255,255,0.3)' }}>Nothing you don't.</span>
             </h2>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
-              A full desktop experience. Windows, icons, themes—all draggable,
-              all customizable, all yours.
-            </p>
           </motion.div>
 
-          {/* Feature items - varied layout, not identical cards */}
-          <div className="space-y-16 md:space-y-24">
-            {[
-              {
-                number: '01',
-                title: 'Drag. Drop. Done.',
-                description: 'Position icons anywhere. No grid constraints. Your layout, your rules.',
-                visual: '🖱️',
-              },
-              {
-                number: '02',
-                title: 'Windows that tell stories',
-                description: 'Click any icon to open a rich detail window. Add images, links, descriptions—everything.',
-                visual: '🪟',
-              },
-              {
-                number: '03',
-                title: 'Four distinct themes',
-                description: 'From playful Monterey to refined Editorial. Each completely transforms the feel.',
-                visual: '🎨',
-              },
-            ].map((feature, index) => (
+          {/* Feature windows grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {FEATURES.map((feature, index) => (
               <motion.article
                 key={index}
-                className="grid md:grid-cols-[auto_1fr_auto] gap-6 md:gap-12 items-start"
+                className="group"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                {/* Number */}
                 <div
-                  className="text-sm font-mono tracking-wider"
-                  style={{ color: 'rgba(255,255,255,0.2)' }}
-                >
-                  {feature.number}
-                </div>
-
-                {/* Content */}
-                <div className="max-w-xl">
-                  <h3
-                    className="text-2xl md:text-3xl font-semibold mb-3"
-                    style={{ color: '#fafafa' }}
-                  >
-                    {feature.title}
-                  </h3>
-                  <p
-                    className="text-base md:text-lg leading-relaxed"
-                    style={{ color: 'rgba(255,255,255,0.4)' }}
-                  >
-                    {feature.description}
-                  </p>
-                </div>
-
-                {/* Visual accent */}
-                <div
-                  className="hidden md:flex w-20 h-20 rounded-2xl items-center justify-center text-4xl"
+                  className="h-full rounded-2xl overflow-hidden transition-all duration-300 group-hover:-translate-y-2"
                   style={{
                     background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    boxShadow: '0 8px 32px -8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)',
                   }}
                 >
-                  {feature.visual}
+                  {/* Window header */}
+                  <div
+                    className="h-10 flex items-center px-4"
+                    style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    }}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#28ca41]/80" />
+                    </div>
+                    <span className="flex-1 text-center text-xs text-white/40">{feature.app}</span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="text-4xl mb-4">{feature.icon}</div>
+                    <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
+                    <p className="text-white/40 text-sm leading-relaxed">{feature.description}</p>
+                  </div>
                 </div>
               </motion.article>
             ))}
           </div>
+
+          {/* See all features link */}
+          <motion.div
+            className="text-center mt-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 transition-colors"
+            >
+              See all features
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
-      {/* CTA - Full-bleed, dramatic */}
-      <section className="relative py-32 md:py-48 px-6" aria-labelledby="cta-heading">
+      {/* ============================================
+          HOW IT WORKS
+          ============================================ */}
+      <section className="relative py-24 md:py-32 px-6" aria-labelledby="how-it-works-heading">
+        <div className="max-w-[1000px] mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2
+              id="how-it-works-heading"
+              className="text-4xl md:text-5xl font-bold text-white mb-16"
+            >
+              Ready in minutes.
+            </h2>
+          </motion.div>
+
+          {/* Steps */}
+          <div className="grid md:grid-cols-3 gap-12 md:gap-8 mb-16">
+            {[
+              { step: '1', icon: '👤', title: 'Create Account', description: 'Sign up with Google or email. 30 seconds.' },
+              { step: '2', icon: '🎨', title: 'Add Your Work', description: 'Drop in projects, write case studies, arrange your desktop.' },
+              { step: '3', icon: '🚀', title: 'Go Live', description: "Share your link. You're done. Get discovered." },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                className="relative"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.15 }}
+              >
+                {/* Step number */}
+                <div className="text-6xl font-bold text-white/10 mb-4">{item.step}</div>
+                {/* Icon */}
+                <div
+                  className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center text-4xl"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
+                <p className="text-white/40 text-sm">{item.description}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Time indicator */}
+          <motion.p
+            className="text-white/30 mb-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            Average setup time: <span className="text-white/60">15 minutes</span>
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <Link href="/signup">
+              <button
+                className="px-8 py-4 text-base font-medium rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: 'linear-gradient(180deg, #fff 0%, #e5e5e5 100%)',
+                  color: '#0a0a0f',
+                  boxShadow: '0 4px 24px rgba(255,255,255,0.15)',
+                }}
+              >
+                Start Building — Free
+              </button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================
+          SHOWCASE
+          ============================================ */}
+      <section id="showcase" className="relative py-24 md:py-32 px-6 overflow-hidden" aria-labelledby="showcase-heading">
+        <div className="max-w-[1400px] mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2
+              id="showcase-heading"
+              className="text-4xl md:text-5xl font-bold text-white mb-4"
+            >
+              Portfolios that get noticed.
+            </h2>
+            <p className="text-white/40">See how designers around the world use MeOS.</p>
+          </motion.div>
+
+          {/* Carousel */}
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+              {SHOWCASE_PORTFOLIOS.map((portfolio, index) => (
+                <motion.div
+                  key={index}
+                  className="flex-shrink-0 w-[300px] md:w-[400px] snap-center"
+                  animate={{
+                    scale: index === showcaseIndex ? 1 : 0.95,
+                    opacity: index === showcaseIndex ? 1 : 0.6,
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {/* Desktop preview */}
+                  <div
+                    className="aspect-[16/10] rounded-xl mb-4 overflow-hidden"
+                    style={{
+                      boxShadow: '0 20px 40px -12px rgba(0,0,0,0.5)',
+                    }}
+                  >
+                    <div className={`w-full h-full bg-gradient-to-br ${portfolio.gradient} flex items-center justify-center`}>
+                      <div className="w-3/4 h-3/4 rounded-lg bg-white/10 backdrop-blur flex items-center justify-center">
+                        <span className="text-white/60 text-sm">Portfolio Preview</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-white font-medium">{portfolio.name}</p>
+                    <p className="text-white/40 text-sm">{portfolio.title}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Pagination dots */}
+            <div className="flex justify-center gap-2 mt-8">
+              {SHOWCASE_PORTFOLIOS.map((_, index) => (
+                <button
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === showcaseIndex ? 'bg-white w-6' : 'bg-white/30'
+                  }`}
+                  onClick={() => setShowcaseIndex(index)}
+                  aria-label={`Go to portfolio ${index + 1}`}
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            className="text-center mt-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 text-white/50 hover:text-white/80 transition-colors"
+            >
+              Explore All Examples
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================
+          TESTIMONIALS
+          ============================================ */}
+      <section className="relative py-24 md:py-32 px-6" aria-labelledby="testimonials-heading">
+        <div className="max-w-[800px] mx-auto">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2
+              id="testimonials-heading"
+              className="text-4xl md:text-5xl font-bold text-white"
+            >
+              What designers are saying.
+            </h2>
+          </motion.div>
+
+          {/* Messages window */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                boxShadow: '0 25px 60px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)',
+              }}
+            >
+              {/* Window header */}
+              <div
+                className="h-12 flex items-center px-5"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  borderBottom: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
+                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                  <div className="w-3 h-3 rounded-full bg-[#28ca41]" />
+                </div>
+                <span className="flex-1 text-center text-sm text-white/60 font-medium">Messages</span>
+              </div>
+
+              {/* Messages */}
+              <div className="p-6 space-y-8">
+                {TESTIMONIALS.map((testimonial, index) => (
+                  <motion.div
+                    key={index}
+                    className={`flex flex-col ${testimonial.isRight ? 'items-end' : 'items-start'}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.15 }}
+                  >
+                    <div
+                      className={`max-w-[85%] p-4 rounded-2xl ${
+                        testimonial.isRight
+                          ? 'rounded-br-md bg-blue-500/20'
+                          : 'rounded-bl-md bg-white/5'
+                      }`}
+                    >
+                      <p className="text-white/80 text-sm leading-relaxed">{testimonial.text}</p>
+                    </div>
+                    <p className="text-white/40 text-xs mt-2">
+                      {testimonial.name} • {testimonial.title}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ============================================
+          PRICING
+          ============================================ */}
+      <section id="pricing" className="relative py-24 md:py-32 px-6" aria-labelledby="pricing-heading">
+        <div className="max-w-[900px] mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2
+              id="pricing-heading"
+              className="text-4xl md:text-5xl font-bold text-white mb-4"
+            >
+              Simple, transparent pricing.
+            </h2>
+            <p className="text-white/40">Start free. Upgrade when you're ready.</p>
+          </motion.div>
+
+          {/* Pricing cards */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Free tier */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <div
+                className="h-full rounded-2xl p-8"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-white mb-2">Free</h3>
+                  <div className="text-5xl font-bold text-white">$0</div>
+                  <p className="text-white/40 mt-1">forever</p>
+                </div>
+
+                <div className="border-t border-white/10 pt-8 mb-8">
+                  <ul className="space-y-4">
+                    {[
+                      'Custom desktop',
+                      '5 projects',
+                      'Basic templates',
+                      'MeOS subdomain',
+                      'Mobile version',
+                    ].map((feature, i) => (
+                      <li key={i} className="flex items-center gap-3 text-white/60">
+                        <svg className="w-5 h-5 text-green-400/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <Link href="/signup" className="block">
+                  <button
+                    className="w-full py-4 rounded-xl font-medium transition-all hover:bg-white/10"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      color: '#fff',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                    }}
+                  >
+                    Get Started
+                  </button>
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Pro tier */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+            >
+              <div
+                className="h-full rounded-2xl p-8 relative overflow-hidden"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                }}
+              >
+                {/* Popular badge */}
+                <div className="absolute top-4 right-4">
+                  <span
+                    className="px-3 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      background: 'linear-gradient(180deg, #fff 0%, #e5e5e5 100%)',
+                      color: '#0a0a0f',
+                    }}
+                  >
+                    Popular
+                  </span>
+                </div>
+
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
+                  <div className="text-5xl font-bold text-white">$12</div>
+                  <p className="text-white/40 mt-1">per month or $99/year</p>
+                </div>
+
+                <div className="border-t border-white/10 pt-8 mb-8">
+                  <ul className="space-y-4">
+                    {[
+                      'Everything in Free',
+                      'Unlimited projects',
+                      'Custom domain',
+                      'Analytics dashboard',
+                      'Remove branding',
+                      'Priority support',
+                      'Early features',
+                    ].map((feature, i) => (
+                      <li key={i} className="flex items-center gap-3 text-white/60">
+                        <svg className="w-5 h-5 text-green-400/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <Link href="/signup" className="block">
+                  <button
+                    className="w-full py-4 rounded-xl font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{
+                      background: 'linear-gradient(180deg, #fff 0%, #e5e5e5 100%)',
+                      color: '#0a0a0f',
+                      boxShadow: '0 4px 24px rgba(255,255,255,0.15)',
+                    }}
+                  >
+                    Go Pro
+                  </button>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Trust line */}
+          <motion.p
+            className="text-center text-white/30 text-sm mt-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            Questions? See FAQ below or contact us.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* ============================================
+          FAQ
+          ============================================ */}
+      <section id="faq" className="relative py-24 md:py-32 px-6" aria-labelledby="faq-heading">
+        <div className="max-w-[800px] mx-auto">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2
+              id="faq-heading"
+              className="text-4xl md:text-5xl font-bold text-white"
+            >
+              Frequently Asked
+            </h2>
+          </motion.div>
+
+          {/* FAQ window */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                boxShadow: '0 25px 60px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)',
+              }}
+            >
+              {/* Window header */}
+              <div
+                className="h-12 flex items-center px-5"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  borderBottom: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
+                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                  <div className="w-3 h-3 rounded-full bg-[#28ca41]" />
+                </div>
+                <span className="flex-1 text-center text-sm text-white/60 font-medium">Help</span>
+              </div>
+
+              {/* FAQ items */}
+              <div className="divide-y divide-white/5">
+                {FAQS.map((faq, index) => (
+                  <div key={index}>
+                    <button
+                      className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/[0.02] transition-colors"
+                      onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
+                      aria-expanded={expandedFaq === index}
+                    >
+                      <span className="text-white/80 font-medium flex items-center gap-3">
+                        <span className="text-white/30">▶</span>
+                        {faq.question}
+                      </span>
+                      <motion.span
+                        className="text-white/30"
+                        animate={{ rotate: expandedFaq === index ? 90 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        ›
+                      </motion.span>
+                    </button>
+                    <AnimatePresence>
+                      {expandedFaq === index && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-6 pb-5 pl-12 text-white/50 text-sm leading-relaxed">
+                            {faq.answer}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Contact */}
+          <motion.p
+            className="text-center text-white/30 text-sm mt-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            Still have questions?{' '}
+            <a href="mailto:hello@meos.app" className="text-white/50 hover:text-white/80 transition-colors">
+              hello@meos.app
+            </a>
+          </motion.p>
+        </div>
+      </section>
+
+      {/* ============================================
+          FINAL CTA
+          ============================================ */}
+      <section className="relative py-32 md:py-48 px-6" aria-labelledby="final-cta-heading">
         {/* Background accent */}
         <div
           className="absolute inset-0"
@@ -583,67 +1287,55 @@ export default function LandingPage() {
           aria-hidden="true"
         />
 
-        <div className="relative max-w-[1400px] mx-auto text-center">
+        <div className="relative max-w-[600px] mx-auto">
           <motion.div
+            className="text-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2
-              id="cta-heading"
-              className="font-bold tracking-tight mb-8"
+            {/* Dialog-style container */}
+            <div
+              className="rounded-3xl p-10 md:p-14"
               style={{
-                fontSize: 'clamp(2.5rem, 8vw, 6rem)',
-                color: '#fafafa',
-                lineHeight: 1,
+                background: 'rgba(255,255,255,0.03)',
+                boxShadow: '0 40px 80px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)',
               }}
             >
-              Your corner of
-              <br />
-              the internet
-            </h2>
-            <p
-              className="text-lg md:text-xl mb-12 mx-auto"
-              style={{
-                color: 'rgba(255,255,255,0.4)',
-                maxWidth: '480px',
-              }}
-            >
-              Stop blending in. Start building something memorable.
-            </p>
-
-            {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="text-6xl mb-6">🖥️</div>
+              <h2
+                id="final-cta-heading"
+                className="text-3xl md:text-4xl font-bold text-white mb-4"
+              >
+                Ready to stand out?
+              </h2>
+              <p className="text-white/40 mb-8">
+                Join 2,400+ designers who've already created their MeOS portfolio.
+              </p>
               <Link href="/signup">
                 <button
-                  className="w-full sm:w-auto px-10 py-5 text-lg font-medium rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="px-10 py-5 text-lg font-medium rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                   style={{
                     background: 'linear-gradient(180deg, #fff 0%, #e5e5e5 100%)',
                     color: '#0a0a0f',
                     boxShadow: '0 4px 24px rgba(255,255,255,0.15)',
                   }}
                 >
-                  Create your desktop
+                  Create Your Desktop — Free
                 </button>
               </Link>
-              <Link href="/demo">
-                <button
-                  className="w-full sm:w-auto px-10 py-5 text-lg font-medium rounded-2xl transition-colors hover:bg-white/10"
-                  style={{
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                  }}
-                >
-                  See it in action
-                </button>
-              </Link>
+              <p className="text-white/30 text-sm mt-6">
+                No credit card required.
+              </p>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Footer - Minimal */}
+      {/* ============================================
+          FOOTER
+          ============================================ */}
       <footer className="relative py-8 px-6 border-t border-white/5">
         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-sm" style={{ color: 'rgba(255,255,255,0.3)' }}>
@@ -674,6 +1366,86 @@ export default function LandingPage() {
           </nav>
         </div>
       </footer>
+
+      {/* ============================================
+          FIXED DOCK (Bottom Navigation)
+          ============================================ */}
+      <nav
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 hidden md:flex items-center gap-2"
+        style={{
+          background: 'rgba(10, 10, 15, 0.85)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '20px',
+          padding: '8px 12px',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
+        }}
+        aria-label="Page navigation"
+      >
+        {NAV_SECTIONS.map((section) => (
+          <motion.button
+            key={section.id}
+            className={`relative w-12 h-12 rounded-xl flex items-center justify-center text-xl transition-colors ${
+              activeSection === section.id ? 'bg-white/10' : 'hover:bg-white/5'
+            }`}
+            onClick={() => scrollToSection(section.id)}
+            whileHover={prefersReducedMotion ? {} : { scale: 1.1, y: -4 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            aria-label={section.label}
+            aria-current={activeSection === section.id ? 'true' : undefined}
+          >
+            {section.icon}
+            {activeSection === section.id && (
+              <motion.div
+                className="absolute -bottom-1 w-1 h-1 rounded-full bg-white"
+                layoutId="activeDot"
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            )}
+          </motion.button>
+        ))}
+
+        {/* Divider */}
+        <div className="w-px h-8 bg-white/10 mx-2" />
+
+        {/* CTA */}
+        <Link href="/signup">
+          <motion.button
+            className="px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
+              color: '#0a0a0f',
+            }}
+            whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Get Started
+          </motion.button>
+        </Link>
+      </nav>
+
+      {/* Mobile sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 md:hidden z-40" style={{
+        background: 'linear-gradient(180deg, transparent 0%, rgba(10,10,15,0.95) 40%)',
+      }}>
+        <Link href="/signup" className="block">
+          <button
+            className="w-full py-4 rounded-xl font-medium"
+            style={{
+              background: 'linear-gradient(180deg, #fff 0%, #e5e5e5 100%)',
+              color: '#0a0a0f',
+              boxShadow: '0 4px 24px rgba(255,255,255,0.15)',
+            }}
+          >
+            Create Your Desktop — Free
+          </button>
+        </Link>
+      </div>
+
+      {/* Extra padding for mobile CTA */}
+      <div className="h-24 md:h-0" />
     </div>
   );
 }
