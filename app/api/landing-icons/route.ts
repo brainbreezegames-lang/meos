@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
 
-// Use existing 'icons' bucket with 'landing' subfolder
-const BUCKET = 'icons';
-const FOLDER = 'landing';
+// Use existing 'gallery' bucket with 'landing-icons' subfolder
+const BUCKET = 'gallery';
+const FOLDER = 'landing-icons';
 
 // GET - Fetch all landing page icon URLs
 export async function GET() {
