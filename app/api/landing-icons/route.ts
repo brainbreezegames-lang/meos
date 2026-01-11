@@ -1,28 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
 
-const BUCKET = 'landing-icons';
+// Use existing 'icons' bucket with 'landing' subfolder
+const BUCKET = 'icons';
+const FOLDER = 'landing';
 
 // GET - Fetch all landing page icon URLs
 export async function GET() {
   try {
     const supabase = getSupabase();
 
-    // List all files in the landing-icons bucket
+    // List all files in the landing folder
     const { data: files, error } = await supabase.storage
       .from(BUCKET)
-      .list('', { limit: 100 });
+      .list(FOLDER, { limit: 100 });
 
     if (error) {
       console.error('Error listing icons:', error);
+      // Return empty icons, don't error out
       return NextResponse.json({ icons: {} });
     }
 
     // Build icon URL map
     const icons: Record<string, string> = {};
     for (const file of files || []) {
-      const { data } = supabase.storage.from(BUCKET).getPublicUrl(file.name);
-      // Extract icon ID from filename (e.g., "finder.png" -> "finder")
+      if (file.name === '.emptyFolderPlaceholder') continue;
+      const filePath = `${FOLDER}/${file.name}`;
+      const { data } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
+      // Extract icon ID from filename (e.g., "dock-finder.png" -> "dock-finder")
       const iconId = file.name.replace(/\.[^.]+$/, '');
       icons[iconId] = data.publicUrl;
     }
@@ -68,10 +73,14 @@ export async function POST(request: NextRequest) {
 
     // Get file extension
     const ext = file.name.split('.').pop() || 'png';
-    const fileName = `${iconId}.${ext}`;
+    const filePath = `${FOLDER}/${iconId}.${ext}`;
 
-    // Delete existing file if it exists
-    await supabase.storage.from(BUCKET).remove([fileName]);
+    // Delete existing files with this iconId (any extension)
+    const { data: existingFiles } = await supabase.storage.from(BUCKET).list(FOLDER);
+    const toDelete = existingFiles?.filter(f => f.name.startsWith(iconId + '.')) || [];
+    if (toDelete.length > 0) {
+      await supabase.storage.from(BUCKET).remove(toDelete.map(f => `${FOLDER}/${f.name}`));
+    }
 
     // Upload new file
     const arrayBuffer = await file.arrayBuffer();
@@ -79,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
-      .upload(fileName, buffer, {
+      .upload(filePath, buffer, {
         contentType: file.type,
         cacheControl: '3600',
         upsert: true,
@@ -88,13 +97,13 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       console.error('Upload error:', uploadError);
       return NextResponse.json(
-        { error: 'Failed to upload icon' },
+        { error: `Failed to upload icon: ${uploadError.message}` },
         { status: 500 }
       );
     }
 
     // Get public URL
-    const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
+    const { data } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
 
     return NextResponse.json({
       success: true,
@@ -104,7 +113,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Icon upload error:', error);
     return NextResponse.json(
-      { error: 'Failed to upload icon' },
+      { error: error instanceof Error ? error.message : 'Failed to upload icon' },
       { status: 500 }
     );
   }
@@ -126,11 +135,11 @@ export async function DELETE(request: NextRequest) {
     const supabase = getSupabase();
 
     // List files to find the one with this iconId
-    const { data: files } = await supabase.storage.from(BUCKET).list('');
+    const { data: files } = await supabase.storage.from(BUCKET).list(FOLDER);
     const fileToDelete = files?.find(f => f.name.startsWith(iconId + '.'));
 
     if (fileToDelete) {
-      await supabase.storage.from(BUCKET).remove([fileToDelete.name]);
+      await supabase.storage.from(BUCKET).remove([`${FOLDER}/${fileToDelete.name}`]);
     }
 
     return NextResponse.json({ success: true });
