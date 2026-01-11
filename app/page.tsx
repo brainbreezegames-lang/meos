@@ -6,6 +6,7 @@ import { Sparkles, Layers, Image as ImageIcon, CreditCard, Command, ArrowRight, 
 import Wallpaper from '@/components/desktop/Wallpaper';
 import LandingDock from '@/components/desktop/LandingDock';
 import LandingWindow from '@/components/desktop/LandingWindow';
+import DesktopIcon from '@/components/desktop/DesktopIcon';
 
 export default function Desktop() {
   console.log('MeOS Warm Theme Loaded');
@@ -97,57 +98,68 @@ export default function Desktop() {
         <div className="grid grid-flow-col grid-rows-6 gap-y-6 gap-x-6 w-max pointer-events-auto items-start justify-items-center">
 
           {/* Icon: Welcome */}
-          <button onDoubleClick={() => handleOpenWindow('welcome')} onClick={() => handleFocusWindow('welcome')} className="group flex flex-col items-center gap-2 w-20 focus:outline-none">
-            <div className="w-14 h-14 rounded-[14px] bg-stone-100 shadow-sm border border-stone-200/50 flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-              <Sparkles size={24} className="text-stone-700" />
-            </div>
-            <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Start Here</span>
-          </button>
+          <DesktopIcon
+            icon={<Sparkles size={32} strokeWidth={1} />}
+            label="Start Here"
+            onOpen={() => handleOpenWindow('welcome')}
+            onFocus={() => handleFocusWindow('welcome')}
+            className="bg-gradient-to-br from-stone-50 to-stone-100"
+            delay={0.1}
+          />
 
           {/* Icon: Features */}
-          <button onDoubleClick={() => handleOpenWindow('features')} onClick={() => handleFocusWindow('features')} className="group flex flex-col items-center gap-2 w-20 focus:outline-none">
-            <div className="w-14 h-14 rounded-[14px] bg-white shadow-sm border border-stone-200/50 flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-              <Layers size={24} className="text-stone-600" />
-            </div>
-            <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Features</span>
-          </button>
+          <DesktopIcon
+            icon={<Layers size={32} strokeWidth={1} />}
+            label="Features"
+            onOpen={() => handleOpenWindow('features')}
+            onFocus={() => handleFocusWindow('features')}
+            className="bg-white"
+            delay={0.15}
+          />
 
-          {/* Icon: Portfolio */}
-          <button onDoubleClick={() => handleOpenWindow('examples')} onClick={() => handleFocusWindow('examples')} className="group flex flex-col items-center gap-2 w-20 focus:outline-none">
-            <div className="w-14 h-14 rounded-[14px] bg-stone-50 shadow-sm border border-stone-200/50 flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-stone-100 to-transparent opacity-50"></div>
-              <ImageIcon size={24} className="text-stone-600 relative z-10" />
-            </div>
-            <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Showcase</span>
-          </button>
+          {/* Icon: Portfolio/Showcase */}
+          <DesktopIcon
+            icon={<ImageIcon size={32} strokeWidth={1} />}
+            label="Showcase"
+            onOpen={() => handleOpenWindow('examples')}
+            onFocus={() => handleFocusWindow('examples')}
+            className="bg-stone-50"
+            delay={0.2}
+          />
 
           {/* Icon: Pricing */}
-          <button onDoubleClick={() => handleOpenWindow('pricing')} onClick={() => handleFocusWindow('pricing')} className="group flex flex-col items-center gap-2 w-20 focus:outline-none">
-            <div className="w-14 h-14 rounded-[14px] bg-white shadow-sm border border-stone-200/50 flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-              <CreditCard size={24} className="text-stone-600" />
-            </div>
-            <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Pricing</span>
-          </button>
+          <DesktopIcon
+            icon={<CreditCard size={32} strokeWidth={1} />}
+            label="Pricing"
+            onOpen={() => handleOpenWindow('pricing')}
+            onFocus={() => handleFocusWindow('pricing')}
+            className="bg-white"
+            delay={0.25}
+          />
 
           {/* Icon: Reviews */}
-          <button onDoubleClick={() => handleOpenWindow('reviews')} onClick={() => handleFocusWindow('reviews')} className="group flex flex-col items-center gap-2 w-20 focus:outline-none">
-            <div className="w-14 h-14 rounded-[14px] bg-white shadow-sm border border-stone-200/50 flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-              <div className="text-stone-600">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-              </div>
-            </div>
-            <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Reviews</span>
-          </button>
+          <DesktopIcon
+            icon={
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            }
+            label="Reviews"
+            onOpen={() => handleOpenWindow('reviews')}
+            onFocus={() => handleFocusWindow('reviews')}
+            className="bg-white"
+            delay={0.3}
+          />
 
           {/* Icon: Help */}
-          <button onDoubleClick={() => handleOpenWindow('help')} onClick={() => handleFocusWindow('help')} className="group flex flex-col items-center gap-2 w-20 focus:outline-none">
-            <div className="w-14 h-14 rounded-[14px] bg-white shadow-sm border border-stone-200/50 flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-              <div className="text-stone-600">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-              </div>
-            </div>
-            <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Help</span>
-          </button>
+          <DesktopIcon
+            icon={
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            }
+            label="Help"
+            onOpen={() => handleOpenWindow('help')}
+            onFocus={() => handleFocusWindow('help')}
+            className="bg-stone-50"
+            delay={0.35}
+          />
 
         </div>
       </main>

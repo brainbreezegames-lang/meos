@@ -68,7 +68,7 @@ export default function Window({
                     <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-black/10"></div>
                     <div className="w-3 h-3 rounded-full bg-[#28CA41] border border-black/10"></div>
                 </div>
-                <span className="text-xs font-medium text-stone-400 tracking-wide uppercase pointer-events-none">
+                <span className="text-sm font-serif font-medium text-stone-500 tracking-wide pointer-events-none">
                     {title}
                 </span>
                 <div className="w-10"></div> {/* Spacer for centering */}
