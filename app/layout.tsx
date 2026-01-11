@@ -4,7 +4,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MeOS - Your Personal Web Desktop",
+  title: "MeOS — Portfolio Operating System",
   description: "Create an explorable desktop experience for your portfolio, links, or personal brand. Beautiful, memorable, and uniquely yours.",
   keywords: ["portfolio", "personal website", "link in bio", "desktop", "web OS"],
   authors: [{ name: "MeOS" }],

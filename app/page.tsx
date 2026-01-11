@@ -8,6 +8,7 @@ import LandingDock from '@/components/desktop/LandingDock';
 import LandingWindow from '@/components/desktop/LandingWindow';
 
 export default function Desktop() {
+  console.log('MeOS Warm Theme Loaded');
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
 
