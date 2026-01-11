@@ -18,12 +18,12 @@ interface DockProps {
 
 export default function LandingDock({ onOpenWindow }: DockProps) {
   const dockItems = [
-    { id: 'welcome', Icon: FinderIcon, imgSrc: LANDING_PAGE_ICONS.dock.finder, label: 'Welcome', isActive: true },
-    { id: 'features', Icon: SafariIcon, imgSrc: LANDING_PAGE_ICONS.dock.safari, label: 'Features' },
-    { id: 'examples', Icon: PhotosIcon, imgSrc: LANDING_PAGE_ICONS.dock.photos, label: 'Examples' },
-    { id: 'pricing', Icon: NotesIcon, imgSrc: LANDING_PAGE_ICONS.dock.notes, label: 'Pricing' },
-    { id: 'reviews', Icon: MessagesIcon, imgSrc: LANDING_PAGE_ICONS.dock.messages, label: 'Reviews' },
-    { id: 'help', Icon: MailIcon, imgSrc: LANDING_PAGE_ICONS.dock.mail, label: 'Help' },
+    { id: 'welcome', Icon: FinderIcon, imgSrc: LANDING_PAGE_ICONS.dock.finder, label: 'Finder', isActive: true },
+    { id: 'features', Icon: SafariIcon, imgSrc: LANDING_PAGE_ICONS.dock.safari, label: 'Safari' },
+    { id: 'examples', Icon: PhotosIcon, imgSrc: LANDING_PAGE_ICONS.dock.photos, label: 'Photos' },
+    { id: 'pricing', Icon: NotesIcon, imgSrc: LANDING_PAGE_ICONS.dock.notes, label: 'Notes' },
+    { id: null, Icon: MailIcon, imgSrc: LANDING_PAGE_ICONS.dock.mail, label: 'Mail' },
+    { id: null, Icon: MessagesIcon, imgSrc: LANDING_PAGE_ICONS.dock.messages, label: 'Messages' },
   ];
 
   return (
@@ -84,7 +84,6 @@ export default function LandingDock({ onOpenWindow }: DockProps) {
 
         {/* CTA Button */}
         <motion.button
-          onClick={() => onOpenWindow('signup')}
           className="px-5 h-12 rounded-xl text-white text-sm font-semibold"
           style={{
             background: 'linear-gradient(180deg, #F97316 0%, #EA580C 100%)',
