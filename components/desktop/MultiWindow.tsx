@@ -111,9 +111,9 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
     case 'warm':
       return {
         windowBg: '#FAFAF9',
-        windowShadow: '0 25px 50px -12px rgba(28,25,23,0.15), 0 12px 24px -8px rgba(28,25,23,0.08), 0 0 0 1px rgba(28,25,23,0.05)',
-        windowBorder: '1px solid rgba(28,25,23,0.08)',
-        headerBg: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 100%)',
+        windowShadow: '0 25px 50px -12px rgba(28,25,23,0.15), 0 10px 15px -3px rgba(28,25,23,0.05), 0 0 0 1px rgba(28,25,23,0.05)',
+        windowBorder: '1px solid rgba(28,25,23,0.06)',
+        headerBg: 'transparent',
         headerBorder: '1px solid rgba(28,25,23,0.06)',
         titleColor: '#1C1917',
         subtitleColor: '#57534E',
@@ -122,8 +122,8 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         textTertiary: '#A8A29E',
         borderLight: 'rgba(28,25,23,0.06)',
         borderMedium: 'rgba(28,25,23,0.1)',
-        tabActiveBg: 'rgba(234,88,12,0.1)',
-        tabActiveColor: '#EA580C',
+        tabActiveBg: '#FFFFFF',
+        tabActiveColor: '#1C1917',
         tabInactiveColor: '#78716C',
         accentColor: '#EA580C',
         buttonBg: 'rgba(28,25,23,0.04)',
@@ -364,116 +364,133 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
         >
-        {/* Title Bar */}
-        <div
-          className="flex items-center px-4 shrink-0 relative select-none"
-          style={{
-            height: 52,
-            borderBottom: colors.headerBorder,
-            background: colors.headerBg,
-            cursor: isMaximized ? 'default' : 'grab',
-          }}
-        >
-          {/* Traffic Lights */}
+          {/* Title Bar */}
           <div
-            className="flex items-center gap-2 group/traffic"
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            {/* Close */}
-            <button
-              onClick={handleClose}
-              aria-label="Close window"
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1"
-              style={{
-                width: 12,
-                height: 12,
-                background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
-                boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-              }}
-            >
-              <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-            </button>
-
-            {/* Minimize */}
-            <button
-              onClick={handleMinimize}
-              aria-label="Minimize window"
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-1"
-              style={{
-                width: 12,
-                height: 12,
-                background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
-                boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-              }}
-            >
-              <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-            </button>
-
-            {/* Maximize */}
-            <button
-              onClick={handleMaximize}
-              aria-label={isMaximized ? "Restore window" : "Maximize window"}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-1"
-              style={{
-                width: 12,
-                height: 12,
-                background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
-                boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-              }}
-            >
-              <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                {isMaximized ? (
-                  // Restore icon (two overlapping rectangles)
-                  <>
-                    <rect x="1" y="2.5" width="4" height="4" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1" fill="none" />
-                    <rect x="3" y="0.5" width="4" height="4" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1" fill="none" />
-                  </>
-                ) : (
-                  // Maximize icon (expand arrows)
-                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                )}
-              </svg>
-            </button>
-          </div>
-
-          {/* Title */}
-          <span
-            className="absolute left-1/2 -translate-x-1/2 font-medium truncate max-w-[55%]"
+            className="flex items-center px-4 shrink-0 relative select-none"
             style={{
-              fontSize: 13,
-              color: colors.titleColor,
-              opacity: isActive ? 0.85 : 0.6,
-              letterSpacing: '-0.01em',
+              height: 52,
+              borderBottom: colors.headerBorder,
+              background: colors.headerBg,
+              cursor: isMaximized ? 'default' : 'grab',
             }}
           >
-            {item.windowTitle}
-          </span>
-        </div>
-
-        {/* Content */}
-        <div
-          className="flex-1 overflow-y-auto"
-          style={{
-            WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'contain',
-          }}
-        >
-          {/* Header Section */}
-          <div
-            className="flex items-start gap-4"
-            style={{ padding: '16px 20px' }}
-          >
-            {/* Header Image */}
-            {isOwner ? (
-              <EditableImage
-                id={`${item.id}-header-image`}
-                value={item.windowHeaderImage || item.thumbnailUrl}
-                onChange={handleHeaderImageChange}
+            {/* Traffic Lights */}
+            <div
+              className="flex items-center gap-2 group/traffic"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              {/* Close */}
+              <button
+                onClick={handleClose}
+                aria-label="Close window"
+                className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1"
+                style={{
+                  width: 12,
+                  height: 12,
+                  background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                }}
               >
+                <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
+                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+              </button>
+
+              {/* Minimize */}
+              <button
+                onClick={handleMinimize}
+                aria-label="Minimize window"
+                className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-1"
+                style={{
+                  width: 12,
+                  height: 12,
+                  background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                }}
+              >
+                <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
+                  <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+              </button>
+
+              {/* Maximize */}
+              <button
+                onClick={handleMaximize}
+                aria-label={isMaximized ? "Restore window" : "Maximize window"}
+                className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-1"
+                style={{
+                  width: 12,
+                  height: 12,
+                  background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                }}
+              >
+                <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
+                  {isMaximized ? (
+                    // Restore icon (two overlapping rectangles)
+                    <>
+                      <rect x="1" y="2.5" width="4" height="4" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1" fill="none" />
+                      <rect x="3" y="0.5" width="4" height="4" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1" fill="none" />
+                    </>
+                  ) : (
+                    // Maximize icon (expand arrows)
+                    <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                  )}
+                </svg>
+              </button>
+            </div>
+
+            {/* Title */}
+            <span
+              className="absolute left-1/2 -translate-x-1/2 font-medium truncate max-w-[55%]"
+              style={{
+                fontSize: 13,
+                color: colors.titleColor,
+                opacity: isActive ? 0.85 : 0.6,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {item.windowTitle}
+            </span>
+          </div>
+
+          {/* Content */}
+          <div
+            className="flex-1 overflow-y-auto"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'contain',
+            }}
+          >
+            {/* Header Section */}
+            <div
+              className="flex items-start gap-4"
+              style={{ padding: '16px 20px' }}
+            >
+              {/* Header Image */}
+              {isOwner ? (
+                <EditableImage
+                  id={`${item.id}-header-image`}
+                  value={item.windowHeaderImage || item.thumbnailUrl}
+                  onChange={handleHeaderImageChange}
+                >
+                  <div
+                    className="relative w-16 h-16 overflow-hidden shrink-0"
+                    style={{
+                      borderRadius: 12,
+                      boxShadow: colors.imageShadow,
+                    }}
+                  >
+                    <Image
+                      src={item.windowHeaderImage || item.thumbnailUrl}
+                      alt={item.windowTitle}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                    />
+                  </div>
+                </EditableImage>
+              ) : (
                 <div
                   className="relative w-16 h-16 overflow-hidden shrink-0"
                   style={{
@@ -489,35 +506,48 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                     sizes="64px"
                   />
                 </div>
-              </EditableImage>
-            ) : (
-              <div
-                className="relative w-16 h-16 overflow-hidden shrink-0"
-                style={{
-                  borderRadius: 12,
-                  boxShadow: colors.imageShadow,
-                }}
-              >
-                <Image
-                  src={item.windowHeaderImage || item.thumbnailUrl}
-                  alt={item.windowTitle}
-                  fill
-                  className="object-cover"
-                  sizes="64px"
-                />
-              </div>
-            )}
+              )}
 
-            {/* Title + Subtitle */}
-            <div className="flex flex-col min-w-0 pt-1.5 flex-1">
-              {isOwner ? (
-                <>
-                  <EditableText
-                    id={`${item.id}-title`}
-                    value={item.windowTitle}
-                    onChange={handleTitleChange}
-                    placeholder="Window title..."
-                  >
+              {/* Title + Subtitle */}
+              <div className="flex flex-col min-w-0 pt-1.5 flex-1">
+                {isOwner ? (
+                  <>
+                    <EditableText
+                      id={`${item.id}-title`}
+                      value={item.windowTitle}
+                      onChange={handleTitleChange}
+                      placeholder="Window title..."
+                    >
+                      <h2
+                        className="font-semibold truncate leading-tight info-window-title"
+                        style={{
+                          fontSize: 17,
+                          color: colors.textPrimary,
+                          letterSpacing: '-0.02em',
+                        }}
+                      >
+                        {item.windowTitle}
+                      </h2>
+                    </EditableText>
+                    <EditableText
+                      id={`${item.id}-subtitle`}
+                      value={item.windowSubtitle || ''}
+                      onChange={handleSubtitleChange}
+                      placeholder="Add subtitle..."
+                    >
+                      <p
+                        className="mt-0.5 truncate"
+                        style={{
+                          fontSize: 13,
+                          color: colors.textSecondary,
+                        }}
+                      >
+                        {item.windowSubtitle || (isOwner && <span style={{ opacity: 0.4 }}>Add subtitle...</span>)}
+                      </p>
+                    </EditableText>
+                  </>
+                ) : (
+                  <>
                     <h2
                       className="font-semibold truncate leading-tight info-window-title"
                       style={{
@@ -528,155 +558,125 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                     >
                       {item.windowTitle}
                     </h2>
-                  </EditableText>
-                  <EditableText
-                    id={`${item.id}-subtitle`}
-                    value={item.windowSubtitle || ''}
-                    onChange={handleSubtitleChange}
-                    placeholder="Add subtitle..."
-                  >
-                    <p
-                      className="mt-0.5 truncate"
-                      style={{
-                        fontSize: 13,
-                        color: colors.textSecondary,
-                      }}
-                    >
-                      {item.windowSubtitle || (isOwner && <span style={{ opacity: 0.4 }}>Add subtitle...</span>)}
-                    </p>
-                  </EditableText>
-                </>
-              ) : (
-                <>
-                  <h2
-                    className="font-semibold truncate leading-tight info-window-title"
-                    style={{
-                      fontSize: 17,
-                      color: colors.textPrimary,
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    {item.windowTitle}
-                  </h2>
-                  {item.windowSubtitle && (
-                    <p
-                      className="mt-0.5 truncate"
-                      style={{
-                        fontSize: 13,
-                        color: colors.textSecondary,
-                      }}
-                    >
-                      {item.windowSubtitle}
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Tabs */}
-          {item.useTabs && sortedTabs.length > 0 && (
-            <div
-              className="flex gap-1"
-              style={{
-                padding: '0 20px 10px',
-                borderBottom: `1px solid ${colors.borderLight}`,
-              }}
-            >
-              {sortedTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTabId(tab.id)}
-                  className="px-3 py-1.5 font-medium transition-all"
-                  style={{
-                    fontSize: 12,
-                    borderRadius: 6,
-                    background: activeTabId === tab.id ? colors.tabActiveBg : 'transparent',
-                    color: activeTabId === tab.id ? colors.tabActiveColor : colors.tabInactiveColor,
-                  }}
-                >
-                  {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Blocks */}
-          <div className="pb-5">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTabId || 'main'}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.15 }}
-              >
-                {sortedBlocks.map((block, index) => (
-                  <div
-                    key={block.id}
-                    style={{
-                      borderTop: index > 0 ? `1px solid ${colors.borderLight}` : undefined,
-                    }}
-                  >
-                    {isOwner ? (
-                      <EditableBlockRenderer
-                        block={block}
-                        itemId={item.id}
-                        onUpdate={handleBlockUpdate}
-                        onDelete={handleBlockDelete}
-                      />
-                    ) : (
-                      <BlockRenderer block={block} />
-                    )}
-                  </div>
-                ))}
-
-                {/* Add block button (owner only) */}
-                {isOwner && (
-                  <div style={{ padding: '20px 20px 10px' }}>
-                    <button
-                      ref={addBlockButtonRef}
-                      onClick={openBlockPicker}
-                      className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
-                      style={{
-                        fontSize: 13,
-                        borderRadius: 8,
-                        borderColor: colors.borderMedium,
-                        color: colors.textTertiary,
-                        background: 'transparent',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = colors.tabActiveBg;
-                        e.currentTarget.style.borderColor = colors.accentColor;
-                        e.currentTarget.style.color = colors.accentColor;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.borderColor = colors.borderMedium;
-                        e.currentTarget.style.color = colors.textTertiary;
-                      }}
-                    >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <path d="M7 2v10M2 7h10" strokeLinecap="round" />
-                      </svg>
-                      Add block
-                      <span
-                        className="text-[10px] px-1.5 py-0.5 rounded ml-1"
+                    {item.windowSubtitle && (
+                      <p
+                        className="mt-0.5 truncate"
                         style={{
-                          background: colors.buttonBg,
-                          color: colors.textTertiary,
+                          fontSize: 13,
+                          color: colors.textSecondary,
                         }}
                       >
-                        /
-                      </span>
-                    </button>
-                  </div>
+                        {item.windowSubtitle}
+                      </p>
+                    )}
+                  </>
                 )}
-              </motion.div>
-            </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Tabs */}
+            {item.useTabs && sortedTabs.length > 0 && (
+              <div
+                className="flex gap-1"
+                style={{
+                  padding: '0 20px 10px',
+                  borderBottom: `1px solid ${colors.borderLight}`,
+                }}
+              >
+                {sortedTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTabId(tab.id)}
+                    className="px-3 py-1.5 font-medium transition-all"
+                    style={{
+                      fontSize: 12,
+                      borderRadius: 6,
+                      background: activeTabId === tab.id ? colors.tabActiveBg : 'transparent',
+                      color: activeTabId === tab.id ? colors.tabActiveColor : colors.tabInactiveColor,
+                    }}
+                  >
+                    {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Blocks */}
+            <div className="pb-5">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTabId || 'main'}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  {sortedBlocks.map((block, index) => (
+                    <div
+                      key={block.id}
+                      style={{
+                        borderTop: index > 0 ? `1px solid ${colors.borderLight}` : undefined,
+                      }}
+                    >
+                      {isOwner ? (
+                        <EditableBlockRenderer
+                          block={block}
+                          itemId={item.id}
+                          onUpdate={handleBlockUpdate}
+                          onDelete={handleBlockDelete}
+                        />
+                      ) : (
+                        <BlockRenderer block={block} />
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Add block button (owner only) */}
+                  {isOwner && (
+                    <div style={{ padding: '20px 20px 10px' }}>
+                      <button
+                        ref={addBlockButtonRef}
+                        onClick={openBlockPicker}
+                        className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
+                        style={{
+                          fontSize: 13,
+                          borderRadius: 8,
+                          borderColor: colors.borderMedium,
+                          color: colors.textTertiary,
+                          background: 'transparent',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = colors.tabActiveBg;
+                          e.currentTarget.style.borderColor = colors.accentColor;
+                          e.currentTarget.style.color = colors.accentColor;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                          e.currentTarget.style.borderColor = colors.borderMedium;
+                          e.currentTarget.style.color = colors.textTertiary;
+                        }}
+                      >
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M7 2v10M2 7h10" strokeLinecap="round" />
+                        </svg>
+                        Add block
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 rounded ml-1"
+                          style={{
+                            background: colors.buttonBg,
+                            color: colors.textTertiary,
+                          }}
+                        >
+                          /
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
-        </div>
         </motion.div>
       </div>
 
