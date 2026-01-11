@@ -6,7 +6,6 @@ import { Sparkles, Layers, Image as ImageIcon, CreditCard, Command, ArrowRight, 
 import Wallpaper from '@/components/desktop/Wallpaper';
 import LandingDock from '@/components/desktop/LandingDock';
 import DesktopIcon from '@/components/desktop/DesktopIcon';
-import { ProgressiveBlur, BlurEdge } from '@/components/ui/ProgressiveBlur';
 import { useLandingIcons } from '@/lib/hooks/useLandingIcons';
 
 // =============================================================================
@@ -324,13 +323,6 @@ export default function Desktop() {
         </AnimatePresence>
       </div>
 
-      {/* Progressive blur at bottom of screen */}
-      <ProgressiveBlur
-        height={100}
-        direction="bottom"
-        zIndex={40}
-      />
-
       <LandingDock onOpenWindow={handleOpenWindow} />
     </div>
   );
@@ -567,10 +559,8 @@ function Window({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto relative">
+      <div className="flex-1 overflow-auto">
         {children}
-        {/* Progressive blur at bottom of window */}
-        <BlurEdge height={32} direction="bottom" className="sticky bottom-0" />
       </div>
     </motion.div>
   );
