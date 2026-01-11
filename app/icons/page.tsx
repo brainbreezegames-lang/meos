@@ -1,5 +1,6 @@
 'use client';
 
+// Icon Manager v2 - Click to upload icons
 import { useState, useRef } from 'react';
 import { Upload, Check, X, Image as ImageIcon } from 'lucide-react';
 import {
