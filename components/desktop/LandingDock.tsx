@@ -30,15 +30,15 @@ export default function LandingDock({ onOpenWindow }: DockProps) {
   const { icons, loading } = useLandingIcons();
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
       <motion.div
-        className="flex items-end gap-1 px-3 py-2"
+        className="flex items-end gap-2 px-4 py-3"
         style={{
-          background: 'rgba(30, 28, 26, 0.7)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '20px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.1)',
+          background: 'var(--bg-dock)',
+          backdropFilter: 'blur(40px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+          borderRadius: '18px',
+          boxShadow: '0 0 0 0.5px var(--border-glass-outer), 0 8px 32px rgba(0,0,0,0.2)',
         }}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -100,15 +100,19 @@ export default function LandingDock({ onOpenWindow }: DockProps) {
         })}
 
         {/* Separator */}
-        <div className="w-px h-10 bg-white/20 mx-2 self-center" />
+        <div
+          className="w-px h-10 mx-2 self-center"
+          style={{ background: 'var(--border-glass-inner)' }}
+        />
 
         {/* CTA Button */}
         <motion.button
           onClick={() => onOpenWindow('signup')}
-          className="px-5 h-12 rounded-xl text-white text-sm font-semibold"
+          className="px-5 h-12 rounded-xl text-sm font-semibold"
           style={{
-            background: 'linear-gradient(180deg, #F97316 0%, #EA580C 100%)',
-            boxShadow: '0 4px 16px rgba(234,88,12,0.4)',
+            background: 'var(--text-primary)',
+            color: 'var(--bg-solid)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
           }}
           whileHover={{ y: -4, scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -117,14 +121,6 @@ export default function LandingDock({ onOpenWindow }: DockProps) {
           Get Started
         </motion.button>
       </motion.div>
-
-      {/* Dock reflection */}
-      <div className="flex justify-center mt-2">
-        <div
-          className="w-40 h-1 rounded-full"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }}
-        />
-      </div>
     </div>
   );
 }

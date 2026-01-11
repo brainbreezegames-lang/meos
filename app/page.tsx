@@ -258,7 +258,7 @@ export default function Desktop() {
       </main>
 
       {/* Centered Window Stack */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none pt-9 pb-20">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none pt-9 pb-32">
         <AnimatePresence mode="popLayout">
           {WINDOWS.map((w, index) => {
             if (!openWindows.includes(w.id)) return null;
@@ -424,7 +424,6 @@ function Window({
 
   return (
     <motion.div
-      layout
       initial={{ opacity: 0, scale: 0.92, y: 20 }}
       animate={{
         opacity: isClosing ? 0 : 1,
@@ -435,7 +434,6 @@ function Window({
       }}
       exit={{ opacity: 0, scale: 0.92, y: -20 }}
       transition={{
-        layout: { ...DESIGN.motion.springGentle },
         opacity: { duration: DESIGN.motion.duration.fast },
         scale: { ...DESIGN.motion.spring },
         y: { ...DESIGN.motion.spring },
@@ -612,24 +610,24 @@ function WelcomeContent({
 }) {
   return (
     <div
-      className="flex-1 h-full flex flex-col items-center justify-center text-center px-8 py-10"
+      className="flex-1 h-full flex flex-col items-center justify-center text-center px-10 py-12"
       style={{ background: 'var(--bg-elevated)' }}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ ...DESIGN.motion.springBouncy, delay: 0.1 }}
-        className="mb-5 p-3 rounded-2xl"
+        className="mb-6 p-4 rounded-2xl"
         style={{ background: 'var(--bg-solid)' }}
       >
-        <Command size={24} style={{ color: 'var(--text-primary)' }} />
+        <Command size={32} style={{ color: 'var(--text-primary)' }} />
       </motion.div>
 
       <motion.h1
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ ...DESIGN.motion.spring, delay: 0.15 }}
-        className="font-serif text-3xl mb-3 leading-tight tracking-tight"
+        className="font-serif text-4xl mb-4 leading-[1.1] tracking-tight"
         style={{ color: 'var(--text-primary)' }}
       >
         Your portfolio,<br />reimagined.
@@ -639,7 +637,7 @@ function WelcomeContent({
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ ...DESIGN.motion.spring, delay: 0.2 }}
-        className="text-sm max-w-[280px] leading-relaxed mb-6"
+        className="text-base max-w-[320px] leading-relaxed mb-8"
         style={{ color: 'var(--text-secondary)' }}
       >
         Build an immersive desktop experience for your creative work.
@@ -649,11 +647,11 @@ function WelcomeContent({
         initial={{ y: 10, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ ...DESIGN.motion.spring, delay: 0.25 }}
-        className="flex items-center gap-2.5"
+        className="flex items-center gap-3"
       >
         <motion.button
           onClick={() => onOpenWindow('signup')}
-          className="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+          className="px-5 py-2.5 rounded-lg text-base font-medium flex items-center gap-2"
           style={{
             background: 'var(--text-primary)',
             color: 'var(--bg-elevated)',
@@ -663,11 +661,11 @@ function WelcomeContent({
           whileTap={{ scale: 0.98 }}
         >
           <span>Get Started</span>
-          <ArrowRight size={14} />
+          <ArrowRight size={16} />
         </motion.button>
         <motion.button
           onClick={() => onCloseWindow('welcome')}
-          className="px-4 py-2 text-sm font-medium"
+          className="px-5 py-2.5 text-base font-medium"
           style={{
             color: 'var(--text-secondary)',
             borderRadius: DESIGN.radius.button,
