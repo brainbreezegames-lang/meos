@@ -1,15 +1,16 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DesktopIconProps {
     icon: React.ReactNode;
     label: string;
     onOpen: () => void;
-    onFocus?: () => void; // Optional focus handler
+    onFocus?: () => void;
+    isOpen?: boolean;
     delay?: number;
-    className?: string; // For custom styling on the icon container if needed
+    className?: string;
 }
 
 export default function DesktopIcon({
@@ -17,8 +18,8 @@ export default function DesktopIcon({
     label,
     onOpen,
     onFocus,
+    isOpen = false,
     delay = 0,
-    className = 'bg-white',
 }: DesktopIconProps) {
     return (
         <motion.button
@@ -27,46 +28,58 @@ export default function DesktopIcon({
             transition={{
                 delay,
                 duration: 0.4,
-                ease: [0.16, 1, 0.3, 1] // Soft, elegant ease
+                ease: [0.16, 1, 0.3, 1]
             }}
             onDoubleClick={onOpen}
             onClick={onFocus}
-            className="group flex flex-col items-center gap-3 w-[84px] focus:outline-none"
+            className="group flex flex-col items-center gap-2.5 w-[80px] focus:outline-none relative"
         >
-            {/* Icon Container - "Furniture" */}
+            {/* Icon Container */}
             <div
-                className={`
-          relative w-[68px] h-[68px] rounded-[18px] 
-          flex items-center justify-center 
-          shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_12px_-4px_rgba(0,0,0,0.04)] 
-          group-hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.08),0_4px_8px_-2px_rgba(0,0,0,0.04)]
-          group-active:scale-95 group-active:shadow-sm
-          border border-white/60
-          transition-all duration-300 ease-out
-          ${className}
-        `}
+                className="relative w-[64px] h-[64px] rounded-[16px] flex items-center justify-center transition-all duration-300 ease-out group-active:scale-95"
+                style={{
+                    background: 'var(--bg-item)',
+                    boxShadow: 'var(--shadow-item)',
+                    border: '1px solid var(--border-glass-inner)',
+                }}
             >
-                {/* Shine effect logic or gradient could go here */}
-                <div className="text-stone-600/90 group-hover:text-stone-800 transition-colors duration-300">
+                <div style={{ color: 'var(--text-secondary)' }} className="group-hover:opacity-80 transition-opacity duration-300">
                     {icon}
                 </div>
             </div>
 
-            {/* Label - Editorial */}
+            {/* Label */}
             <span
-                className="
-          text-[11px] font-medium tracking-wide 
-          text-stone-600/90 
-          px-2.5 py-1 rounded-full 
-          bg-white/40 backdrop-blur-md 
-          border border-white/20
-          shadow-sm
-          group-hover:bg-white/70 group-hover:text-stone-900
-          transition-all duration-300
-        "
+                className="text-[10px] font-medium tracking-wide px-2 py-0.5 rounded-full backdrop-blur-md transition-all duration-300"
+                style={{
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-dock)',
+                    border: '1px solid var(--border-glass-outer)',
+                }}
             >
                 {label}
             </span>
+
+            {/* Open indicator dot */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2"
+                    >
+                        <div
+                            className="w-1 h-1 rounded-full"
+                            style={{
+                                background: 'var(--accent-primary)',
+                                boxShadow: '0 0 4px var(--accent-primary)',
+                            }}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.button>
     );
 }
