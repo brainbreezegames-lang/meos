@@ -8,41 +8,80 @@ import LandingDock from '@/components/desktop/LandingDock';
 import DesktopIcon from '@/components/desktop/DesktopIcon';
 
 // =============================================================================
-// STACKED WINDOW CONFIGURATION
+// DESIGN TOKENS - macOS Atomic Uniformity
 // =============================================================================
 
-interface StackedWindow {
+const DESIGN = {
+  // Radii - consistent across all elements
+  radius: {
+    window: 10,      // macOS Big Sur window corners
+    button: 6,
+    input: 6,
+    icon: 8,
+    pill: 9999,
+  },
+  // Spacing - 4px base unit
+  space: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+    xxl: 32,
+  },
+  // Title bar
+  titleBar: {
+    height: 44,
+    trafficLightSize: 12,
+    trafficLightGap: 8,
+  },
+  // Animation timing - expo ease out for natural deceleration
+  motion: {
+    spring: { type: 'spring', stiffness: 400, damping: 30 },
+    springGentle: { type: 'spring', stiffness: 300, damping: 35 },
+    springBouncy: { type: 'spring', stiffness: 500, damping: 25 },
+    duration: { fast: 0.15, normal: 0.25, slow: 0.4 },
+    ease: [0.16, 1, 0.3, 1], // expo out
+    easeIn: [0.4, 0, 1, 1],
+  },
+  // Shadows - layered for depth
+  shadow: {
+    window: '0 0 0 0.5px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.02), 0 8px 16px rgba(0,0,0,0.04), 0 24px 48px rgba(0,0,0,0.08)',
+    windowFocused: '0 0 0 0.5px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.04), 0 16px 32px rgba(0,0,0,0.08), 0 32px 64px rgba(0,0,0,0.12)',
+    subtle: '0 1px 2px rgba(0,0,0,0.04)',
+  },
+};
+
+// =============================================================================
+// WINDOW CONFIGURATION - Centered Stack
+// =============================================================================
+
+interface WindowConfig {
   id: string;
   title: string;
   icon: React.ReactNode;
-  stackOrder: number; // 0 = topmost when loaded
+  stackOrder: number;
   width: number;
-  height: number | 'auto';
+  height: number;
 }
 
-const STACK_CONFIG = {
-  basePosition: { x: 25, y: 12 }, // % from left/top
-  stackOffset: { x: 1.5, y: 2 },   // % offset per layer
-  baseZIndex: 100,
-  zIndexStep: 10,
-};
-
-const LANDING_WINDOWS: StackedWindow[] = [
-  { id: 'welcome', title: 'Read Me', icon: <Command size={16} />, stackOrder: 0, width: 620, height: 480 },
-  { id: 'features', title: 'Features', icon: <Layers size={16} />, stackOrder: 1, width: 850, height: 520 },
-  { id: 'examples', title: 'Showcase', icon: <ImageIcon size={16} />, stackOrder: 2, width: 750, height: 480 },
-  { id: 'reviews', title: 'Kind Words', icon: <MessageSquare size={16} />, stackOrder: 3, width: 460, height: 520 },
-  { id: 'pricing', title: 'Membership', icon: <CreditCard size={16} />, stackOrder: 4, width: 360, height: 520 },
-  { id: 'help', title: 'FAQ', icon: <HelpCircle size={16} />, stackOrder: 5, width: 450, height: 480 },
+// Windows sized with golden ratio proportions, centered on screen
+const WINDOWS: WindowConfig[] = [
+  { id: 'welcome', title: 'Welcome', icon: <Command size={14} />, stackOrder: 0, width: 480, height: 400 },
+  { id: 'features', title: 'Features', icon: <Layers size={14} />, stackOrder: 1, width: 640, height: 440 },
+  { id: 'examples', title: 'Showcase', icon: <ImageIcon size={14} />, stackOrder: 2, width: 560, height: 400 },
+  { id: 'reviews', title: 'Kind Words', icon: <MessageSquare size={14} />, stackOrder: 3, width: 400, height: 440 },
+  { id: 'pricing', title: 'Pricing', icon: <CreditCard size={14} />, stackOrder: 4, width: 340, height: 420 },
+  { id: 'help', title: 'Help', icon: <HelpCircle size={14} />, stackOrder: 5, width: 380, height: 400 },
 ];
 
-function getWindowPosition(stackIndex: number) {
-  return {
-    x: STACK_CONFIG.basePosition.x + (stackIndex * STACK_CONFIG.stackOffset.x),
-    y: STACK_CONFIG.basePosition.y + (stackIndex * STACK_CONFIG.stackOffset.y),
-    zIndex: STACK_CONFIG.baseZIndex - (stackIndex * STACK_CONFIG.zIndexStep),
-  };
-}
+// Stack configuration - windows cascade from center
+const STACK = {
+  offsetX: 24,    // px offset per layer
+  offsetY: 24,    // px offset per layer
+  baseZ: 100,
+  zStep: 10,
+};
 
 // =============================================================================
 // MAIN COMPONENT
@@ -51,66 +90,35 @@ function getWindowPosition(stackIndex: number) {
 export default function Desktop() {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
-  const [hasInteracted, setHasInteracted] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Window state
+  // Window state - always start with all windows open
   const [openWindows, setOpenWindows] = useState<string[]>([]);
   const [focusedWindow, setFocusedWindow] = useState<string>('welcome');
   const [windowZIndexes, setWindowZIndexes] = useState<Record<string, number>>({});
-  const [topZIndex, setTopZIndex] = useState(STACK_CONFIG.baseZIndex);
+  const [topZIndex, setTopZIndex] = useState(STACK.baseZ + WINDOWS.length * STACK.zStep);
   const [closingWindow, setClosingWindow] = useState<string | null>(null);
 
-  // Initialize all windows as open with stacked positions
+  // Initialize - always fresh, no localStorage
   useEffect(() => {
     setMounted(true);
 
-    // Check if first visit
-    const hasVisited = localStorage.getItem('meos_landing_visited');
+    // All windows open in stack order (first = top)
+    const allIds = WINDOWS.map(w => w.id);
+    setOpenWindows(allIds);
 
-    if (!hasVisited) {
-      // First visit: All windows open in stack
-      localStorage.setItem('meos_landing_visited', 'true');
-      const allIds = LANDING_WINDOWS.map(w => w.id);
-      setOpenWindows(allIds);
+    // Set initial z-indexes - first window on top
+    const zIndexes: Record<string, number> = {};
+    WINDOWS.forEach((w, i) => {
+      zIndexes[w.id] = STACK.baseZ + (WINDOWS.length - i) * STACK.zStep;
+    });
+    zIndexes['signup'] = STACK.baseZ + WINDOWS.length * STACK.zStep + 50;
+    setWindowZIndexes(zIndexes);
 
-      // Set initial z-indexes based on stack order
-      const zIndexes: Record<string, number> = {};
-      LANDING_WINDOWS.forEach((w) => {
-        const pos = getWindowPosition(w.stackOrder);
-        zIndexes[w.id] = pos.zIndex;
-      });
-      zIndexes['signup'] = 200; // Always on top when opened
-      setWindowZIndexes(zIndexes);
-      setFocusedWindow('welcome');
-    } else {
-      // Return visit: Restore previous state or just welcome
-      const saved = localStorage.getItem('meos_landing_open');
-      if (saved) {
-        try {
-          const openIds = JSON.parse(saved);
-          setOpenWindows(openIds.length > 0 ? openIds : ['welcome']);
-        } catch {
-          setOpenWindows(['welcome']);
-        }
-      } else {
-        setOpenWindows(['welcome']);
-      }
-
-      const zIndexes: Record<string, number> = {};
-      LANDING_WINDOWS.forEach((w) => {
-        const pos = getWindowPosition(w.stackOrder);
-        zIndexes[w.id] = pos.zIndex;
-      });
-      zIndexes['signup'] = 200;
-      setWindowZIndexes(zIndexes);
-      setFocusedWindow('welcome');
-    }
-
-    // Time updater
+    // Time
     const updateTime = () => {
-      const now = new Date();
-      setCurrentTime(now.toLocaleTimeString('en-US', {
+      setCurrentTime(new Date().toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
       }));
@@ -120,40 +128,27 @@ export default function Desktop() {
     return () => clearInterval(interval);
   }, []);
 
-  // Save open windows to localStorage
-  useEffect(() => {
-    if (mounted && openWindows.length > 0) {
-      localStorage.setItem('meos_landing_open', JSON.stringify(openWindows));
-    }
-  }, [openWindows, mounted]);
-
-  // Show hint after 8 seconds if no interaction
+  // Show hint after delay
   useEffect(() => {
     if (!hasInteracted && mounted && openWindows.includes('welcome')) {
-      const timer = setTimeout(() => {
-        setShowHint(true);
-      }, 8000);
+      const timer = setTimeout(() => setShowHint(true), 6000);
       return () => clearTimeout(timer);
     }
   }, [hasInteracted, mounted, openWindows]);
 
   // Keyboard navigation
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      // Cmd/Ctrl + W: Close focused window
+    const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'w') {
         e.preventDefault();
-        const focused = LANDING_WINDOWS.find(w => w.id === focusedWindow && openWindows.includes(w.id));
-        if (focused) handleCloseWindow(focused.id);
+        if (focusedWindow && openWindows.includes(focusedWindow)) {
+          handleCloseWindow(focusedWindow);
+        }
       }
-
-      // Escape: Close focused window
-      if (e.key === 'Escape') {
-        const focused = LANDING_WINDOWS.find(w => w.id === focusedWindow && openWindows.includes(w.id));
-        if (focused) handleCloseWindow(focused.id);
+      if (e.key === 'Escape' && focusedWindow && openWindows.includes(focusedWindow)) {
+        handleCloseWindow(focusedWindow);
       }
-    }
-
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [focusedWindow, openWindows]);
@@ -163,7 +158,6 @@ export default function Desktop() {
     if (!openWindows.includes(id)) {
       setOpenWindows(prev => [...prev, id]);
     }
-    // Bring to front
     const newZ = topZIndex + 1;
     setTopZIndex(newZ);
     setWindowZIndexes(prev => ({ ...prev, [id]: newZ }));
@@ -175,153 +169,131 @@ export default function Desktop() {
     setShowHint(false);
     setClosingWindow(id);
 
-    // After animation, actually close
     setTimeout(() => {
       setOpenWindows(prev => {
         const newOpen = prev.filter(w => w !== id);
-
-        // Focus next window in stack order
-        const closedWindow = LANDING_WINDOWS.find(w => w.id === id);
-        if (closedWindow) {
-          const nextWindow = LANDING_WINDOWS
-            .filter(w => newOpen.includes(w.id))
-            .sort((a, b) => a.stackOrder - b.stackOrder)[0];
-
-          if (nextWindow) {
-            setFocusedWindow(nextWindow.id);
-            const newZ = topZIndex + 1;
-            setTopZIndex(newZ);
-            setWindowZIndexes(prev => ({ ...prev, [nextWindow.id]: newZ }));
-          }
+        // Focus next window
+        const nextWindow = WINDOWS
+          .filter(w => newOpen.includes(w.id))
+          .sort((a, b) => a.stackOrder - b.stackOrder)[0];
+        if (nextWindow) {
+          setFocusedWindow(nextWindow.id);
+          const newZ = topZIndex + 1;
+          setTopZIndex(newZ);
+          setWindowZIndexes(prev => ({ ...prev, [nextWindow.id]: newZ }));
         }
-
         return newOpen;
       });
       setClosingWindow(null);
-    }, 250);
+    }, 200);
   }, [topZIndex]);
 
   const handleFocusWindow = useCallback((id: string) => {
+    if (focusedWindow === id) return;
     setHasInteracted(true);
     setFocusedWindow(id);
     const newZ = topZIndex + 1;
     setTopZIndex(newZ);
     setWindowZIndexes(prev => ({ ...prev, [id]: newZ }));
-  }, [topZIndex]);
+  }, [focusedWindow, topZIndex]);
 
-  if (!mounted) return <div className="h-screen w-screen" style={{ background: 'var(--bg-solid)' }} />;
+  if (!mounted) {
+    return <div className="h-screen w-screen" style={{ background: 'var(--bg-solid)' }} />;
+  }
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative font-sans selection:bg-stone-200" style={{ color: 'var(--text-primary)' }}>
-      <div className="noise-overlay"></div>
+    <div
+      className="h-screen w-screen overflow-hidden relative font-sans"
+      style={{ color: 'var(--text-primary)' }}
+    >
+      <div className="noise-overlay" />
       <Wallpaper />
 
       {/* Menu Bar */}
-      <header
-        className="fixed top-0 inset-x-0 h-9 z-50 flex items-center justify-between px-5 backdrop-blur-md border-b shadow-sm text-xs font-medium select-none"
-        style={{
-          background: 'var(--bg-menubar)',
-          borderColor: 'var(--border-light)',
-          color: 'var(--text-secondary)'
-        }}
-      >
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-1 group cursor-pointer" style={{ color: 'var(--text-primary)' }}>
-            <Apple size={14} className="fill-current" />
-            <span className="font-serif tracking-tight text-base ml-1 group-hover:opacity-70 transition-opacity">MeOS</span>
-          </div>
-          <nav className="hidden sm:flex gap-5">
-            <button className="hover:opacity-100 opacity-80 transition-opacity">File</button>
-            <button className="hover:opacity-100 opacity-80 transition-opacity">Edit</button>
-            <button className="hover:opacity-100 opacity-80 transition-opacity">View</button>
-            <button className="hover:opacity-100 opacity-80 transition-opacity">Window</button>
-            <button className="hover:opacity-100 opacity-80 transition-opacity">Help</button>
-          </nav>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-3">
-            <Wifi size={14} />
-            <BatteryMedium size={14} />
-          </div>
-          <span className="tabular-nums">{currentTime}</span>
-        </div>
-      </header>
+      <MenuBar currentTime={currentTime} />
 
-      {/* Desktop Grid (Icons) */}
+      {/* Desktop Icons */}
       <main className="absolute inset-0 pt-14 px-6 z-10 pointer-events-none">
-        <div className="grid grid-flow-col grid-rows-6 gap-y-4 gap-x-4 w-max pointer-events-auto items-start justify-items-center">
-          {LANDING_WINDOWS.map((window, index) => (
+        <div className="grid grid-flow-col grid-rows-6 gap-y-4 gap-x-3 w-max pointer-events-auto">
+          {WINDOWS.map((w, i) => (
             <DesktopIcon
-              key={window.id}
-              icon={window.icon}
-              label={window.title}
-              onOpen={() => handleOpenWindow(window.id)}
-              onFocus={() => handleFocusWindow(window.id)}
-              isOpen={openWindows.includes(window.id)}
-              delay={0.1 + index * 0.05}
+              key={w.id}
+              icon={w.icon}
+              label={w.title}
+              onOpen={() => handleOpenWindow(w.id)}
+              onFocus={() => handleFocusWindow(w.id)}
+              isOpen={openWindows.includes(w.id)}
+              delay={0.05 + i * 0.04}
             />
           ))}
         </div>
       </main>
 
-      {/* Stacked Windows */}
-      <AnimatePresence mode="popLayout">
-        {LANDING_WINDOWS.map((window) => {
-          const isOpen = openWindows.includes(window.id);
-          const isFocused = focusedWindow === window.id;
-          const isClosing = closingWindow === window.id;
-          const position = getWindowPosition(window.stackOrder);
+      {/* Centered Window Stack */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none pt-9 pb-20">
+        <AnimatePresence mode="popLayout">
+          {WINDOWS.map((w, index) => {
+            if (!openWindows.includes(w.id)) return null;
 
-          if (!isOpen) return null;
+            const isFocused = focusedWindow === w.id;
+            const isClosing = closingWindow === w.id;
+            const zIndex = windowZIndexes[w.id] || (STACK.baseZ + (WINDOWS.length - index) * STACK.zStep);
 
-          return (
-            <StackedWindow
-              key={window.id}
-              id={window.id}
-              title={window.title}
-              icon={window.icon}
-              isClosing={isClosing}
-              isFocused={isFocused}
-              zIndex={windowZIndexes[window.id] || position.zIndex}
-              position={position}
-              width={window.width}
-              height={window.height}
-              onClose={() => handleCloseWindow(window.id)}
-              onFocus={() => handleFocusWindow(window.id)}
-              showHint={showHint && window.id === 'welcome'}
-              stackIndex={window.stackOrder}
+            // Calculate offset from center based on stack position
+            const offsetX = index * STACK.offsetX;
+            const offsetY = index * STACK.offsetY;
+
+            return (
+              <Window
+                key={w.id}
+                id={w.id}
+                title={w.title}
+                icon={w.icon}
+                width={w.width}
+                height={w.height}
+                offsetX={offsetX}
+                offsetY={offsetY}
+                zIndex={zIndex}
+                isFocused={isFocused}
+                isClosing={isClosing}
+                showHint={showHint && w.id === 'welcome'}
+                stackIndex={index}
+                onClose={() => handleCloseWindow(w.id)}
+                onFocus={() => handleFocusWindow(w.id)}
+              >
+                <WindowContent
+                  windowId={w.id}
+                  onOpenWindow={handleOpenWindow}
+                  onCloseWindow={handleCloseWindow}
+                />
+              </Window>
+            );
+          })}
+
+          {/* Signup Window */}
+          {openWindows.includes('signup') && (
+            <Window
+              key="signup"
+              id="signup"
+              title="Account"
+              icon={<Apple size={14} />}
+              width={360}
+              height={400}
+              offsetX={WINDOWS.length * STACK.offsetX + 40}
+              offsetY={0}
+              zIndex={windowZIndexes['signup'] || 999}
+              isFocused={focusedWindow === 'signup'}
+              isClosing={closingWindow === 'signup'}
+              showHint={false}
+              stackIndex={-1}
+              onClose={() => handleCloseWindow('signup')}
+              onFocus={() => handleFocusWindow('signup')}
             >
-              <WindowContent
-                windowId={window.id}
-                onOpenWindow={handleOpenWindow}
-                onCloseWindow={handleCloseWindow}
-              />
-            </StackedWindow>
-          );
-        })}
-
-        {/* Signup Window (special, not in stack) */}
-        {openWindows.includes('signup') && (
-          <StackedWindow
-            key="signup"
-            id="signup"
-            title="Account"
-            icon={<Apple size={16} />}
-            isClosing={closingWindow === 'signup'}
-            isFocused={focusedWindow === 'signup'}
-            zIndex={windowZIndexes['signup'] || 200}
-            position={{ x: 55, y: 15, zIndex: 200 }}
-            width={380}
-            height="auto"
-            onClose={() => handleCloseWindow('signup')}
-            onFocus={() => handleFocusWindow('signup')}
-            showHint={false}
-            stackIndex={-1}
-          >
-            <SignupContent />
-          </StackedWindow>
-        )}
-      </AnimatePresence>
+              <SignupContent />
+            </Window>
+          )}
+        </AnimatePresence>
+      </div>
 
       <LandingDock onOpenWindow={handleOpenWindow} />
     </div>
@@ -329,140 +301,239 @@ export default function Desktop() {
 }
 
 // =============================================================================
-// STACKED WINDOW COMPONENT
+// MENU BAR
 // =============================================================================
 
-interface StackedWindowProps {
+function MenuBar({ currentTime }: { currentTime: string }) {
+  return (
+    <motion.header
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: DESIGN.motion.ease }}
+      className="fixed top-0 inset-x-0 h-9 z-50 flex items-center justify-between px-5 select-none"
+      style={{
+        background: 'var(--bg-menubar)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        borderBottom: '0.5px solid var(--border-light)',
+      }}
+    >
+      <div className="flex items-center gap-6">
+        <motion.div
+          className="flex items-center gap-1 cursor-pointer"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          style={{ color: 'var(--text-primary)' }}
+        >
+          <Apple size={14} className="fill-current" />
+          <span className="font-serif text-sm ml-0.5 tracking-tight">MeOS</span>
+        </motion.div>
+        <nav className="hidden sm:flex gap-5 text-[13px]" style={{ color: 'var(--text-secondary)' }}>
+          {['File', 'Edit', 'View', 'Window', 'Help'].map((item) => (
+            <motion.button
+              key={item}
+              className="hover:text-[var(--text-primary)] transition-colors"
+              whileHover={{ y: -0.5 }}
+              whileTap={{ y: 0 }}
+            >
+              {item}
+            </motion.button>
+          ))}
+        </nav>
+      </div>
+      <div className="flex items-center gap-4 text-[13px]" style={{ color: 'var(--text-secondary)' }}>
+        <div className="hidden sm:flex items-center gap-3">
+          <Wifi size={14} />
+          <BatteryMedium size={14} />
+        </div>
+        <span className="tabular-nums font-medium">{currentTime}</span>
+      </div>
+    </motion.header>
+  );
+}
+
+// =============================================================================
+// WINDOW COMPONENT - Liquid Glass
+// =============================================================================
+
+interface WindowProps {
   id: string;
   title: string;
   icon: React.ReactNode;
-  isClosing: boolean;
-  isFocused: boolean;
-  zIndex: number;
-  position: { x: number; y: number; zIndex: number };
   width: number;
-  height: number | 'auto';
-  onClose: () => void;
-  onFocus: () => void;
+  height: number;
+  offsetX: number;
+  offsetY: number;
+  zIndex: number;
+  isFocused: boolean;
+  isClosing: boolean;
   showHint: boolean;
   stackIndex: number;
+  onClose: () => void;
+  onFocus: () => void;
   children: React.ReactNode;
 }
 
-function StackedWindow({
-  id,
+function Window({
+  id: _id,
   title,
   icon,
-  isClosing,
-  isFocused,
-  zIndex,
-  position,
   width,
   height,
-  onClose,
-  onFocus,
+  offsetX,
+  offsetY,
+  zIndex,
+  isFocused,
+  isClosing,
   showHint,
   stackIndex,
+  onClose,
+  onFocus,
   children,
-}: StackedWindowProps) {
+}: WindowProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [closeHovered, setCloseHovered] = useState(false);
+
   return (
     <motion.div
-      layoutId={id}
-      initial={{
-        opacity: 0,
-        scale: 0.96,
-        y: -20,
-      }}
+      layout
+      initial={{ opacity: 0, scale: 0.92, y: 20 }}
       animate={{
         opacity: isClosing ? 0 : 1,
         scale: isClosing ? 0.95 : 1,
-        y: 0,
+        y: isClosing ? -10 : 0,
+        x: offsetX,
+        translateY: offsetY,
       }}
-      exit={{
-        opacity: 0,
-        scale: 0.95,
-      }}
+      exit={{ opacity: 0, scale: 0.92, y: -20 }}
       transition={{
-        duration: 0.3,
-        ease: [0.16, 1, 0.3, 1],
-        delay: stackIndex >= 0 ? stackIndex * 0.06 : 0,
+        layout: { ...DESIGN.motion.springGentle },
+        opacity: { duration: DESIGN.motion.duration.fast },
+        scale: { ...DESIGN.motion.spring },
+        y: { ...DESIGN.motion.spring },
+        x: { ...DESIGN.motion.springGentle },
+        translateY: { ...DESIGN.motion.springGentle },
+        delay: stackIndex >= 0 ? stackIndex * 0.05 : 0,
       }}
-      className="absolute flex flex-col rounded-xl overflow-hidden"
+      className="absolute pointer-events-auto flex flex-col overflow-hidden"
       style={{
-        zIndex,
-        left: `${position.x}%`,
-        top: `${position.y}%`,
         width,
-        height: height === 'auto' ? 'auto' : height,
+        height,
+        zIndex,
+        borderRadius: DESIGN.radius.window,
         background: 'var(--bg-glass)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        boxShadow: isFocused
-          ? '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-light)'
-          : '0 10px 30px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--border-light)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+        boxShadow: isFocused ? DESIGN.shadow.windowFocused : DESIGN.shadow.window,
+        border: '0.5px solid var(--border-glass-outer)',
         transition: 'box-shadow 0.2s ease',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onPointerDown={onFocus}
     >
       {/* Title Bar */}
       <div
-        className="h-11 flex items-center px-4 justify-between select-none cursor-default border-b"
+        className="flex items-center px-4 justify-between select-none cursor-default shrink-0"
         style={{
-          background: isFocused ? 'var(--bg-elevated)' : 'var(--bg-glass)',
-          borderColor: 'var(--border-light)',
+          height: DESIGN.titleBar.height,
+          background: isFocused ? 'var(--bg-glass-elevated)' : 'transparent',
+          borderBottom: '0.5px solid var(--border-light)',
         }}
       >
-        <div className="flex gap-2 items-center">
-          {/* Traffic Lights */}
-          <div className="flex gap-1.5 relative">
-            <button
+        {/* Traffic Lights */}
+        <div className="flex items-center gap-2">
+          <div className="flex" style={{ gap: DESIGN.titleBar.trafficLightGap }}>
+            <motion.button
               onClick={(e) => { e.stopPropagation(); onClose(); }}
-              className={`flex items-center justify-center w-3 h-3 rounded-full transition-all group ${showHint ? 'animate-pulse' : ''}`}
+              onMouseEnter={() => setCloseHovered(true)}
+              onMouseLeave={() => setCloseHovered(false)}
+              className="relative flex items-center justify-center transition-colors"
               style={{
-                background: isFocused ? '#FF5F57' : 'var(--text-tertiary)',
-                boxShadow: showHint ? '0 0 0 4px rgba(255, 95, 87, 0.3)' : 'none',
+                width: DESIGN.titleBar.trafficLightSize,
+                height: DESIGN.titleBar.trafficLightSize,
+                borderRadius: DESIGN.radius.pill,
+                background: isFocused || isHovered ? '#FF5F57' : 'var(--text-tertiary)',
               }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
-              <span className="opacity-0 group-hover:opacity-100 text-[8px] font-bold text-white/90">×</span>
-            </button>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: closeHovered ? 1 : 0 }}
+                className="text-[10px] font-bold leading-none"
+                style={{ color: 'rgba(0,0,0,0.5)' }}
+              >
+                ×
+              </motion.span>
+              {/* Hint ring */}
+              {showHint && (
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  initial={{ scale: 1, opacity: 0.6 }}
+                  animate={{ scale: 2, opacity: 0 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
+                  style={{ border: '2px solid #FF5F57' }}
+                />
+              )}
+            </motion.button>
             <div
-              className="w-3 h-3 rounded-full"
-              style={{ background: isFocused ? '#FFBD2E' : 'var(--text-tertiary)' }}
+              className="transition-colors"
+              style={{
+                width: DESIGN.titleBar.trafficLightSize,
+                height: DESIGN.titleBar.trafficLightSize,
+                borderRadius: DESIGN.radius.pill,
+                background: isFocused || isHovered ? '#FFBD2E' : 'var(--text-tertiary)',
+              }}
             />
             <div
-              className="w-3 h-3 rounded-full"
-              style={{ background: isFocused ? '#28CA41' : 'var(--text-tertiary)' }}
+              className="transition-colors"
+              style={{
+                width: DESIGN.titleBar.trafficLightSize,
+                height: DESIGN.titleBar.trafficLightSize,
+                borderRadius: DESIGN.radius.pill,
+                background: isFocused || isHovered ? '#28CA41' : 'var(--text-tertiary)',
+              }}
             />
+          </div>
 
-            {/* Hint tooltip */}
+          {/* Hint tooltip */}
+          <AnimatePresence>
             {showHint && (
               <motion.div
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="absolute left-10 top-1/2 -translate-y-1/2 px-2 py-1 rounded text-[10px] font-medium whitespace-nowrap"
+                exit={{ opacity: 0, x: -8 }}
+                transition={DESIGN.motion.springGentle}
+                className="ml-2 px-2 py-1 rounded text-[10px] font-medium whitespace-nowrap"
                 style={{
                   background: 'var(--bg-elevated)',
                   color: 'var(--text-secondary)',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: DESIGN.shadow.subtle,
                 }}
               >
-                Close to continue →
+                Click to close & explore
               </motion.div>
             )}
-          </div>
+          </AnimatePresence>
         </div>
 
         {/* Title */}
-        <div className="flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
-          <span className="opacity-60">{icon}</span>
-          <span className="text-sm font-medium">{title}</span>
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+          <span className="opacity-50" style={{ color: 'var(--text-secondary)' }}>{icon}</span>
+          <span
+            className="text-[13px] font-medium"
+            style={{ color: isFocused ? 'var(--text-primary)' : 'var(--text-secondary)' }}
+          >
+            {title}
+          </span>
         </div>
 
-        <div className="w-16" /> {/* Spacer */}
+        <div style={{ width: 52 }} />
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto relative">
+      <div className="flex-1 overflow-auto">
         {children}
       </div>
     </motion.div>
@@ -470,7 +541,7 @@ function StackedWindow({
 }
 
 // =============================================================================
-// WINDOW CONTENT COMPONENTS
+// WINDOW CONTENT
 // =============================================================================
 
 function WindowContent({
@@ -500,6 +571,10 @@ function WindowContent({
   }
 }
 
+// =============================================================================
+// WELCOME
+// =============================================================================
+
 function WelcomeContent({
   onOpenWindow,
   onCloseWindow,
@@ -508,77 +583,123 @@ function WelcomeContent({
   onCloseWindow: (id: string) => void;
 }) {
   return (
-    <div className="flex-1 p-10 flex flex-col justify-center items-center text-center" style={{ background: 'var(--bg-elevated)' }}>
-      <div className="mb-6 p-3 rounded-2xl" style={{ background: 'var(--bg-solid)' }}>
-        <Command size={28} style={{ color: 'var(--text-primary)' }} />
-      </div>
-      <h1 className="font-serif text-4xl sm:text-5xl mb-4 leading-[1.1] tracking-tight" style={{ color: 'var(--text-primary)' }}>
-        Your portfolio,<br />reimagined as an OS.
-      </h1>
-      <p className="text-base max-w-sm mx-auto leading-relaxed mb-8 font-light" style={{ color: 'var(--text-secondary)' }}>
-        MeOS transforms your creative work into an immersive desktop experience. Quiet, tactile, and deeply personal.
-      </p>
-      <div className="flex items-center gap-3">
-        <button
+    <div
+      className="flex-1 h-full flex flex-col items-center justify-center text-center px-8 py-10"
+      style={{ background: 'var(--bg-elevated)' }}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ ...DESIGN.motion.springBouncy, delay: 0.1 }}
+        className="mb-5 p-3 rounded-2xl"
+        style={{ background: 'var(--bg-solid)' }}
+      >
+        <Command size={24} style={{ color: 'var(--text-primary)' }} />
+      </motion.div>
+
+      <motion.h1
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ ...DESIGN.motion.spring, delay: 0.15 }}
+        className="font-serif text-3xl mb-3 leading-tight tracking-tight"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        Your portfolio,<br />reimagined.
+      </motion.h1>
+
+      <motion.p
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ ...DESIGN.motion.spring, delay: 0.2 }}
+        className="text-sm max-w-[280px] leading-relaxed mb-6"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        Build an immersive desktop experience for your creative work.
+      </motion.p>
+
+      <motion.div
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ ...DESIGN.motion.spring, delay: 0.25 }}
+        className="flex items-center gap-2.5"
+      >
+        <motion.button
           onClick={() => onOpenWindow('signup')}
-          className="px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-lg flex items-center gap-2"
+          className="px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
           style={{
             background: 'var(--text-primary)',
             color: 'var(--bg-elevated)',
+            borderRadius: DESIGN.radius.button,
           }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           <span>Get Started</span>
           <ArrowRight size={14} />
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           onClick={() => onCloseWindow('welcome')}
-          className="px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border"
+          className="px-4 py-2 text-sm font-medium"
           style={{
-            background: 'var(--bg-elevated)',
             color: 'var(--text-secondary)',
-            borderColor: 'var(--border-light)',
+            borderRadius: DESIGN.radius.button,
           }}
+          whileHover={{ color: 'var(--text-primary)' }}
+          whileTap={{ scale: 0.98 }}
         >
-          Explore Features
-        </button>
-      </div>
+          Explore
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
 
+// =============================================================================
+// FEATURES
+// =============================================================================
+
 function FeaturesContent() {
   const features = [
-    { icon: <Layers size={18} />, title: 'Drag & Drop Layout', desc: 'Arrange your portfolio windows exactly how you want visitors to see them.' },
-    { icon: <CreditCard size={18} />, title: 'Editorial Typography', desc: 'Curated font pairings that make your case studies read like a magazine.' },
-    { icon: <Wifi size={18} />, title: 'Mobile Adaptive', desc: 'Translates the desktop metaphor into a clean feed for smaller screens.' },
-    { icon: <Apple size={18} />, title: 'Custom Domain', desc: 'Connect your own domain with one click. Free SSL included.' },
-    { icon: <Command size={18} />, title: 'Visitor Analytics', desc: 'See which windows are being opened and how long people stay.' },
-    { icon: <Sparkles size={18} />, title: 'Dark Mode', desc: 'Automatically respects user system preferences. Looks stunning in dark.' },
+    { icon: <Layers size={16} />, title: 'Drag & Drop', desc: 'Arrange windows exactly how you want.' },
+    { icon: <CreditCard size={16} />, title: 'Typography', desc: 'Curated fonts for your case studies.' },
+    { icon: <Wifi size={16} />, title: 'Mobile Ready', desc: 'Adapts beautifully to any screen.' },
+    { icon: <Apple size={16} />, title: 'Custom Domain', desc: 'Connect your domain with one click.' },
+    { icon: <Command size={16} />, title: 'Analytics', desc: 'See how visitors explore your work.' },
+    { icon: <Sparkles size={16} />, title: 'Dark Mode', desc: 'Respects system preferences.' },
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto p-6" style={{ background: 'var(--bg-solid)' }}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="flex-1 p-5 overflow-y-auto" style={{ background: 'var(--bg-solid)' }}>
+      <div className="grid grid-cols-2 gap-3">
         {features.map((f, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="p-5 rounded-xl border transition-shadow hover:shadow-md"
+            transition={{ ...DESIGN.motion.spring, delay: 0.05 * i }}
+            className="p-4 rounded-lg"
             style={{
               background: 'var(--bg-elevated)',
-              borderColor: 'var(--border-light)',
+              borderRadius: DESIGN.radius.window,
+              border: '0.5px solid var(--border-light)',
             }}
           >
             <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
-              style={{ background: 'var(--bg-solid)', color: 'var(--text-secondary)' }}
+              className="w-7 h-7 rounded-md flex items-center justify-center mb-2.5"
+              style={{
+                background: 'var(--bg-solid)',
+                color: 'var(--text-secondary)',
+                borderRadius: DESIGN.radius.icon,
+              }}
             >
               {f.icon}
             </div>
-            <h3 className="font-medium mb-1.5 text-sm" style={{ color: 'var(--text-primary)' }}>{f.title}</h3>
-            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{f.desc}</p>
+            <h3 className="text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
+              {f.title}
+            </h3>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              {f.desc}
+            </p>
           </motion.div>
         ))}
       </div>
@@ -586,17 +707,26 @@ function FeaturesContent() {
   );
 }
 
+// =============================================================================
+// SHOWCASE
+// =============================================================================
+
 function ShowcaseContent() {
   return (
-    <div className="flex-1 p-6 grid grid-cols-2 gap-4 overflow-y-auto" style={{ background: 'var(--bg-solid)' }}>
+    <div className="flex-1 p-5 grid grid-cols-2 gap-3 overflow-y-auto" style={{ background: 'var(--bg-solid)' }}>
       {[1, 2, 3, 4].map((i) => (
         <motion.div
           key={i}
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: i * 0.1 }}
-          className="aspect-video rounded-lg flex items-center justify-center"
-          style={{ background: 'var(--bg-glass)', color: 'var(--text-tertiary)' }}
+          transition={{ ...DESIGN.motion.spring, delay: i * 0.08 }}
+          className="aspect-video rounded-lg flex items-center justify-center cursor-pointer transition-shadow hover:shadow-md"
+          style={{
+            background: 'var(--bg-glass)',
+            color: 'var(--text-tertiary)',
+            borderRadius: DESIGN.radius.window,
+            border: '0.5px solid var(--border-light)',
+          }}
         >
           <span className="text-xs font-medium">Portfolio {i}</span>
         </motion.div>
@@ -605,30 +735,39 @@ function ShowcaseContent() {
   );
 }
 
+// =============================================================================
+// REVIEWS
+// =============================================================================
+
 function ReviewsContent() {
   const reviews = [
-    { quote: "The case study format is perfect. It's what got me my role at Linear.", author: "Sarah K.", role: "Product Designer" },
-    { quote: "Finally, a portfolio builder that feels like a design tool, not a website builder.", author: "Marcus C.", role: "Brand Director" },
-    { quote: "I set this up in 15 minutes and it looks better than the site I spent weeks coding.", author: "Alex R.", role: "Illustrator" },
-    { quote: "Recruiters actually commented on the OS feel. It's memorable.", author: "Yuki T.", role: "UX Lead" },
+    { quote: 'The case study format is perfect. Got me my role at Linear.', author: 'Sarah K.', role: 'Product Designer' },
+    { quote: 'Finally, a portfolio builder that feels like a design tool.', author: 'Marcus C.', role: 'Brand Director' },
+    { quote: 'Set up in 15 minutes. Better than weeks of coding.', author: 'Alex R.', role: 'Illustrator' },
   ];
 
   return (
-    <div className="flex-1 p-6 overflow-y-auto" style={{ background: 'var(--bg-elevated)' }}>
-      <h2 className="font-serif text-2xl mb-6 leading-tight" style={{ color: 'var(--text-primary)' }}>
-        Selected feedback from<br />the community.
+    <div className="flex-1 p-5 overflow-y-auto" style={{ background: 'var(--bg-elevated)' }}>
+      <h2
+        className="font-serif text-xl mb-5 leading-snug"
+        style={{ color: 'var(--text-primary)' }}
+      >
+        Kind words from<br />the community.
       </h2>
-      <div className="space-y-5">
+      <div className="space-y-4">
         {reviews.map((r, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, x: -10 }}
+            initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="pb-5 border-b last:border-0"
+            transition={{ ...DESIGN.motion.spring, delay: i * 0.1 }}
+            className="pb-4 border-b last:border-0"
             style={{ borderColor: 'var(--border-light)' }}
           >
-            <p className="text-base font-serif leading-relaxed mb-2" style={{ color: 'var(--text-primary)' }}>
+            <p
+              className="text-sm font-serif leading-relaxed mb-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
               &ldquo;{r.quote}&rdquo;
             </p>
             <div className="flex items-center gap-2">
@@ -637,8 +776,12 @@ function ReviewsContent() {
                 style={{ background: 'var(--bg-solid)' }}
               />
               <div>
-                <span className="text-xs font-medium block" style={{ color: 'var(--text-primary)' }}>{r.author}</span>
-                <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>{r.role}</span>
+                <span className="text-xs font-medium block" style={{ color: 'var(--text-primary)' }}>
+                  {r.author}
+                </span>
+                <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--text-tertiary)' }}>
+                  {r.role}
+                </span>
               </div>
             </div>
           </motion.div>
@@ -648,97 +791,130 @@ function ReviewsContent() {
   );
 }
 
+// =============================================================================
+// PRICING
+// =============================================================================
+
 function PricingContent({ onOpenWindow }: { onOpenWindow: (id: string) => void }) {
+  const features = ['Unlimited projects', 'Custom domain', 'Analytics', 'Priority support'];
+
   return (
-    <div className="p-6" style={{ background: 'var(--bg-elevated)' }}>
-      <div className="flex flex-col items-center mb-6">
-        <span
-          className="px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-widest font-medium mb-3"
+    <div className="flex-1 p-5 flex flex-col" style={{ background: 'var(--bg-elevated)' }}>
+      <div className="text-center mb-5">
+        <motion.span
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-widest font-medium mb-3"
           style={{ background: 'var(--bg-solid)', color: 'var(--text-secondary)' }}
         >
-          Pro License
-        </span>
-        <div className="flex items-baseline gap-1">
+          Pro
+        </motion.span>
+        <div className="flex items-baseline justify-center gap-0.5">
           <span className="font-serif text-4xl" style={{ color: 'var(--text-primary)' }}>$12</span>
-          <span className="font-medium" style={{ color: 'var(--text-tertiary)' }}>/mo</span>
+          <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>/mo</span>
         </div>
-        <p className="text-xs mt-2 text-center max-w-[180px]" style={{ color: 'var(--text-secondary)' }}>
-          Everything you need to build a world-class portfolio.
-        </p>
       </div>
 
-      <div className="space-y-3 mb-6">
-        {['Unlimited windows & projects', 'Custom domain support', 'Visitor analytics & insights', 'Search engine optimization'].map((item, i) => (
-          <div key={i} className="flex items-center gap-2.5 text-sm" style={{ color: 'var(--text-primary)' }}>
+      <div className="space-y-2.5 mb-5 flex-1">
+        {features.map((item, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ ...DESIGN.motion.spring, delay: 0.05 * i }}
+            className="flex items-center gap-2.5"
+          >
             <div
               className="w-4 h-4 rounded-full flex items-center justify-center"
               style={{ background: 'var(--bg-solid)', color: 'var(--text-primary)' }}
             >
               <Check size={8} strokeWidth={3} />
             </div>
-            <span className="text-xs">{item}</span>
-          </div>
+            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{item}</span>
+          </motion.div>
         ))}
       </div>
 
-      <button
+      <motion.button
         onClick={() => onOpenWindow('signup')}
-        className="w-full h-10 rounded-lg text-sm font-medium transition-colors shadow-md flex items-center justify-center gap-2 group"
-        style={{ background: 'var(--text-primary)', color: 'var(--bg-elevated)' }}
+        className="w-full py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
+        style={{
+          background: 'var(--text-primary)',
+          color: 'var(--bg-elevated)',
+          borderRadius: DESIGN.radius.button,
+        }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
       >
-        <span>Start 14-day free trial</span>
-        <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-      </button>
-      <p className="text-center text-[10px] mt-3" style={{ color: 'var(--text-tertiary)' }}>
-        Cancel anytime. No questions asked.
+        <span>Start free trial</span>
+        <ArrowRight size={14} />
+      </motion.button>
+      <p className="text-center text-[10px] mt-2.5" style={{ color: 'var(--text-tertiary)' }}>
+        14 days free. Cancel anytime.
       </p>
     </div>
   );
 }
 
+// =============================================================================
+// HELP / FAQ
+// =============================================================================
+
 function HelpContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const faqs = [
-    { q: 'Do I need coding skills?', a: 'None at all. MeOS is strictly drag-and-drop.' },
+    { q: 'Do I need coding skills?', a: 'None at all. MeOS is drag-and-drop.' },
     { q: 'Can I use a custom domain?', a: 'Yes, Pro plans include custom domain support.' },
-    { q: 'Is it mobile responsive?', a: '100%. It renders as a native-feeling app on phones.' },
-    { q: 'How do I add case studies?', a: "Use the 'Notes' app to write rich, formatted case studies." },
+    { q: 'Is it mobile responsive?', a: '100%. Renders as a native-feeling app.' },
+    { q: 'How do I add case studies?', a: 'Use the Notes app for rich content.' },
   ];
 
   return (
-    <div className="flex flex-col h-full" style={{ background: 'var(--bg-elevated)' }}>
+    <div className="flex-1 flex flex-col" style={{ background: 'var(--bg-elevated)' }}>
       <div className="p-4 border-b" style={{ borderColor: 'var(--border-light)' }}>
         <div className="relative">
-          <Command size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
+          <Command
+            size={12}
+            className="absolute left-3 top-1/2 -translate-y-1/2"
+            style={{ color: 'var(--text-tertiary)' }}
+          />
           <input
             type="text"
-            placeholder="Search documentation..."
-            className="w-full rounded-lg py-2 pl-8 pr-3 text-xs border-none focus:ring-0"
-            style={{ background: 'var(--bg-solid)', color: 'var(--text-primary)' }}
+            placeholder="Search..."
+            className="w-full py-2 pl-8 pr-3 text-sm border-none outline-none"
+            style={{
+              background: 'var(--bg-solid)',
+              color: 'var(--text-primary)',
+              borderRadius: DESIGN.radius.input,
+            }}
           />
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
-        <h3 className="text-[10px] font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-tertiary)' }}>
-          Common Questions
+        <h3
+          className="text-[10px] font-semibold uppercase tracking-wider mb-3"
+          style={{ color: 'var(--text-tertiary)' }}
+        >
+          FAQ
         </h3>
-        <div className="space-y-2">
+        <div className="space-y-1">
           {faqs.map((faq, i) => (
             <div key={i}>
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 className="w-full flex items-start justify-between py-2 text-left"
               >
-                <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{faq.q}</span>
-                <span
-                  className="text-sm transition-transform"
-                  style={{
-                    color: 'var(--text-tertiary)',
-                    transform: openFaq === i ? 'rotate(45deg)' : 'none',
-                  }}
+                <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {faq.q}
+                </span>
+                <motion.span
+                  animate={{ rotate: openFaq === i ? 45 : 0 }}
+                  transition={DESIGN.motion.spring}
+                  className="text-sm ml-2"
+                  style={{ color: 'var(--text-tertiary)' }}
                 >
                   +
-                </span>
+                </motion.span>
               </button>
               <AnimatePresence>
                 {openFaq === i && (
@@ -746,9 +922,10 @@ function HelpContent() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <p className="text-xs leading-relaxed pb-2" style={{ color: 'var(--text-secondary)' }}>
+                    <p className="text-sm leading-relaxed pb-2" style={{ color: 'var(--text-secondary)' }}>
                       {faq.a}
                     </p>
                   </motion.div>
@@ -762,39 +939,56 @@ function HelpContent() {
   );
 }
 
+// =============================================================================
+// SIGNUP
+// =============================================================================
+
 function SignupContent() {
   return (
-    <div className="p-6 flex flex-col items-center text-center" style={{ background: 'var(--bg-elevated)' }}>
-      <div
+    <div className="flex-1 p-5 flex flex-col items-center text-center" style={{ background: 'var(--bg-elevated)' }}>
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={DESIGN.motion.springBouncy}
         className="w-10 h-10 rounded-full flex items-center justify-center mb-4"
         style={{ background: 'var(--bg-solid)', color: 'var(--text-secondary)' }}
       >
         <Apple size={18} />
-      </div>
+      </motion.div>
 
-      <h2 className="font-serif text-xl mb-1" style={{ color: 'var(--text-primary)' }}>Create your desktop.</h2>
-      <p className="text-xs mb-6" style={{ color: 'var(--text-secondary)' }}>Join 2,400+ designers building on MeOS.</p>
+      <h2 className="font-serif text-xl mb-1" style={{ color: 'var(--text-primary)' }}>
+        Create your desktop
+      </h2>
+      <p className="text-xs mb-5" style={{ color: 'var(--text-secondary)' }}>
+        Join 2,400+ designers on MeOS.
+      </p>
 
       <div className="w-full space-y-2.5">
-        <button
-          className="w-full py-2 rounded-lg flex items-center justify-center gap-2 text-xs font-medium border"
+        <motion.button
+          className="w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium"
           style={{
-            background: 'var(--bg-elevated)',
+            background: 'var(--bg-solid)',
             color: 'var(--text-primary)',
-            borderColor: 'var(--border-light)',
+            border: '0.5px solid var(--border-light)',
+            borderRadius: DESIGN.radius.button,
           }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
         >
-          <img src="https://www.google.com/favicon.ico" alt="Google" className="w-3.5 h-3.5 opacity-70" />
+          <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4 opacity-80" />
           <span>Continue with Google</span>
-        </button>
+        </motion.button>
 
-        <div className="relative py-1.5">
+        <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t" style={{ borderColor: 'var(--border-light)' }} />
           </div>
           <div className="relative flex justify-center">
-            <span className="px-2 text-[9px] uppercase tracking-widest" style={{ background: 'var(--bg-elevated)', color: 'var(--text-tertiary)' }}>
-              Or use email
+            <span
+              className="px-2 text-[9px] uppercase tracking-widest"
+              style={{ background: 'var(--bg-elevated)', color: 'var(--text-tertiary)' }}
+            >
+              or
             </span>
           </div>
         </div>
@@ -802,23 +996,30 @@ function SignupContent() {
         <input
           type="email"
           placeholder="name@example.com"
-          className="w-full px-3 py-2 rounded-lg text-xs border focus:outline-none"
+          className="w-full px-3 py-2.5 text-sm outline-none"
           style={{
             background: 'var(--bg-solid)',
             color: 'var(--text-primary)',
-            borderColor: 'var(--border-light)',
+            border: '0.5px solid var(--border-light)',
+            borderRadius: DESIGN.radius.input,
           }}
         />
-        <button
-          className="w-full py-2 rounded-lg text-xs font-medium"
-          style={{ background: 'var(--text-primary)', color: 'var(--bg-elevated)' }}
+        <motion.button
+          className="w-full py-2.5 rounded-lg text-sm font-medium"
+          style={{
+            background: 'var(--text-primary)',
+            color: 'var(--bg-elevated)',
+            borderRadius: DESIGN.radius.button,
+          }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
         >
-          Continue with Email
-        </button>
+          Continue
+        </motion.button>
       </div>
 
       <p className="mt-4 text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
-        By joining, you agree to our Terms of Service.
+        By joining, you agree to our Terms.
       </p>
     </div>
   );
