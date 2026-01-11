@@ -56,6 +56,18 @@ export function ThemeSwitcher() {
       }
     }
 
+    // Load Instrument Serif font for Warm theme
+    if (themeId === 'warm') {
+      const existingLink = document.querySelector('link[data-theme-font="instrument-serif"]');
+      if (!existingLink) {
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap';
+        link.rel = 'stylesheet';
+        link.setAttribute('data-theme-font', 'instrument-serif');
+        document.head.appendChild(link);
+      }
+    }
+
     setIsOpen(false);
   };
 
