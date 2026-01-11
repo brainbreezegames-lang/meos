@@ -2,7 +2,7 @@ export { MenuBar } from './MenuBar';
 export { DesktopCanvas, type ViewMode } from './DesktopCanvas';
 export { DesktopItem } from './DesktopItem';
 export { InfoWindow } from './InfoWindow';
-export { Dock } from './Dock';
+export { default as Dock } from './Dock';
 export { DockItem } from './DockItem';
 export { MadeWithBadge } from './MadeWithBadge';
 export { PublicDesktop } from './PublicDesktop';

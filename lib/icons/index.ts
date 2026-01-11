@@ -2,3 +2,4 @@
 
 export * from './types';
 export * from './landing-icons';
+export * from './validation';

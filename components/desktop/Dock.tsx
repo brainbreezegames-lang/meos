@@ -9,7 +9,7 @@ interface DockProps {
   items: DockItemType[];
 }
 
-export function Dock({ items }: DockProps) {
+export default function Dock({ items }: DockProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [mouseX, setMouseX] = useState<number | null>(null);
   const dockRef = useRef<HTMLDivElement>(null);
