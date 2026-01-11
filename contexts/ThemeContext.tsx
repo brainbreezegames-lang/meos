@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 // Theme IDs
-export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined';
+export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm';
 
 // Theme metadata
 export interface ThemeInfo {
@@ -40,6 +40,13 @@ export const THEMES: Record<ThemeId, ThemeInfo> = {
     description: 'Elegant dark editorial',
     isDark: true,
     fontFamily: 'Halant',
+  },
+  warm: {
+    id: 'warm',
+    name: 'Warm',
+    description: 'Organic & editorial light',
+    isDark: false,
+    fontFamily: 'InstrumentSerif',
   },
 };
 
@@ -98,13 +105,23 @@ export function ThemeProvider({
     const themeInfo = THEMES[themeId];
 
     if (themeInfo.fontFamily === 'Halant') {
-      // Check if already loaded
       const existingLink = document.querySelector('link[data-theme-font="halant"]');
       if (!existingLink) {
         const link = document.createElement('link');
         link.href = 'https://fonts.googleapis.com/css2?family=Halant:wght@400;500;600;700&display=swap';
         link.rel = 'stylesheet';
         link.setAttribute('data-theme-font', 'halant');
+        document.head.appendChild(link);
+      }
+    }
+
+    if (themeInfo.fontFamily === 'InstrumentSerif') {
+      const existingLink = document.querySelector('link[data-theme-font="instrument-serif"]');
+      if (!existingLink) {
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap';
+        link.rel = 'stylesheet';
+        link.setAttribute('data-theme-font', 'instrument-serif');
         document.head.appendChild(link);
       }
     }

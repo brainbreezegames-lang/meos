@@ -665,6 +665,172 @@
 }
 
 /* ============================================
+   WARM THEME - Organic Editorial
+   Soft corners, warm tones, serif display, tactile
+   ============================================ */
+[data-theme="warm"] {
+  /* === STRUCTURAL - Soft, organic === */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+  --radius-window: 12px;
+  --radius-dock: 20px;
+  --radius-dock-icon: 14px;
+  --radius-button: 10px;
+  --radius-input: 10px;
+  --radius-menubar: 0;
+
+  /* Spacing - generous, breathable */
+  --spacing-dock-gap: 6px;
+  --spacing-dock-padding: 12px;
+  --spacing-window-padding: 20px;
+
+  /* Sizing - comfortable proportions */
+  --dock-icon-size: 48px;
+  --dock-icon-size-hover: 68px;
+  --menubar-height: 36px;
+  --window-header-height: 40px;
+
+  /* Typography - Serif display, clean body */
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, Menlo, Monaco, monospace;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 600;
+  --letter-spacing-tight: -0.04em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-label: 0.04em;
+  --letter-spacing-button: 0;
+  --line-height-tight: 0.95;
+  --line-height-normal: 1.5;
+  --line-height-body: 1.6;
+  --text-transform-label: uppercase;
+  --text-transform-button: none;
+
+  /* Block Typography - editorial, warm */
+  --font-size-body: 14px;
+  --font-size-label: 11px;
+  --font-size-heading-1: 24px;
+  --font-size-heading-2: 18px;
+  --font-size-heading-3: 14px;
+  --font-size-stat-value: 32px;
+  --font-size-stat-label: 10px;
+  --font-size-quote: 16px;
+  --font-size-quote-large: 22px;
+  --font-size-button: 13px;
+  --font-size-button-icon: 16px;
+  --font-size-social-icon: 14px;
+  --font-size-timeline-date: 10px;
+  --font-size-timeline-title: 15px;
+  --font-size-timeline-subtitle: 13px;
+
+  /* Block Spacing - generous */
+  --spacing-block-gap: 10px;
+  --spacing-inline-gap: 14px;
+  --spacing-button-gap: 12px;
+  --spacing-social-gap: 10px;
+  --spacing-button-padding: 10px 20px;
+
+  /* Block Element Sizes */
+  --detail-dot-size: 6px;
+  --social-button-size: 44px;
+  --timeline-dot-size: 10px;
+  --quote-border-width: 2px;
+
+  /* Block Radii - soft, organic */
+  --radius-detail-dot: 9999px;
+  --radius-social: 12px;
+  --radius-stat: 12px;
+  --radius-quote: 0;
+
+  /* Block Borders */
+  --border-social: 1px solid rgba(120, 113, 108, 0.15);
+  --border-button-secondary: 1px solid rgba(120, 113, 108, 0.2);
+
+  /* === COLORS - Warm stone palette === */
+  --bg-solid: #FAFAF9;
+  --bg-elevated: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-elevated: rgba(255, 255, 255, 0.92);
+  --bg-dock: rgba(255, 255, 255, 0.7);
+  --bg-dock-icon: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 249, 0.9) 100%);
+  --bg-menubar: rgba(255, 255, 255, 0.4);
+  --bg-tooltip: rgba(28, 25, 23, 0.95);
+  --bg-overlay: rgba(28, 25, 23, 0.4);
+  --bg-button: rgba(120, 113, 108, 0.06);
+  --bg-button-hover: rgba(120, 113, 108, 0.1);
+  --bg-input: rgba(120, 113, 108, 0.04);
+
+  /* Text - warm stone */
+  --text-primary: #1C1917;
+  --text-secondary: #57534E;
+  --text-tertiary: #A8A29E;
+  --text-quaternary: #D6D3D1;
+  --text-on-glass: rgba(28, 25, 23, 0.9);
+  --text-on-dark: #FAFAF9;
+  --text-on-image: #FAFAF9;
+  --text-on-accent: #FAFAF9;
+
+  /* Additional Backgrounds */
+  --bg-secondary: rgba(120, 113, 108, 0.05);
+  --bg-tertiary: rgba(120, 113, 108, 0.08);
+
+  /* Additional Borders */
+  --border-subtle: rgba(120, 113, 108, 0.04);
+
+  /* Additional Shadows - soft, diffuse */
+  --shadow-xl: 0 25px 60px rgba(28, 25, 23, 0.12);
+
+  /* Borders - subtle warm */
+  --border-light: rgba(120, 113, 108, 0.08);
+  --border-medium: rgba(120, 113, 108, 0.12);
+  --border-glass-outer: rgba(255, 255, 255, 0.5);
+  --border-glass-inner: rgba(255, 255, 255, 0.6);
+  --border-width: 1px;
+
+  /* Shadows - soft, layered, diffuse */
+  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04), 0 2px 4px rgba(28, 25, 23, 0.02);
+  --shadow-md: 0 4px 8px rgba(28, 25, 23, 0.04), 0 8px 16px rgba(28, 25, 23, 0.03);
+  --shadow-lg: 0 8px 24px rgba(28, 25, 23, 0.06), 0 16px 32px rgba(28, 25, 23, 0.04);
+  --shadow-window: 0 0 0 1px rgba(120, 113, 108, 0.05), 0 4px 8px rgba(28, 25, 23, 0.03), 0 16px 32px -4px rgba(28, 25, 23, 0.08), 0 24px 64px -8px rgba(28, 25, 23, 0.05);
+  --shadow-dock: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 0 0 1px rgba(120, 113, 108, 0.06), 0 12px 24px -6px rgba(28, 25, 23, 0.06);
+  --shadow-dock-icon: 0 1px 2px rgba(28, 25, 23, 0.04), 0 2px 4px rgba(28, 25, 23, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --shadow-item: 0 2px 8px rgba(28, 25, 23, 0.08);
+  --shadow-item-hover: 0 8px 24px rgba(28, 25, 23, 0.12);
+  --shadow-button: 0 1px 2px rgba(28, 25, 23, 0.03);
+
+  /* Traffic Lights - same across themes */
+  --traffic-red: #FF5F57;
+  --traffic-red-hover: #FF3B30;
+  --traffic-yellow: #FFBD2E;
+  --traffic-yellow-hover: #FFAA00;
+  --traffic-green: #28CA41;
+  --traffic-green-hover: #1AAD2E;
+  --traffic-size: 12px;
+  --traffic-gap: 8px;
+
+  /* Accent - warm orange */
+  --accent-primary: #EA580C;
+  --accent-success: #22C55E;
+  --accent-warning: #F59E0B;
+  --accent-danger: #EF4444;
+  --dot-color: #22C55E;
+
+  /* Effects - softer blur */
+  --blur-glass: blur(24px) saturate(150%);
+  --blur-dock: blur(32px) saturate(140%);
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 450ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
+}
+
+/* ============================================
    THEME-SPECIFIC COMPONENT OVERRIDES
    ============================================ */
 
