@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LANDING_PAGE_ICONS, USE_IMAGE_ICONS } from '@/lib/icons/config';
+import { useLandingIcons } from '@/lib/hooks/useLandingIcons';
 import {
   FinderIcon,
   SafariIcon,
@@ -16,15 +16,18 @@ interface DockProps {
   onOpenWindow: (id: string) => void;
 }
 
+// Map dock icon IDs to their API icon IDs and default components
+const DOCK_ICON_MAP = [
+  { windowId: 'welcome', iconId: 'dock-finder', Icon: FinderIcon, label: 'Welcome', isActive: true },
+  { windowId: 'features', iconId: 'dock-safari', Icon: SafariIcon, label: 'Features' },
+  { windowId: 'examples', iconId: 'dock-photos', Icon: PhotosIcon, label: 'Examples' },
+  { windowId: 'pricing', iconId: 'dock-notes', Icon: NotesIcon, label: 'Pricing' },
+  { windowId: 'reviews', iconId: 'dock-mail', Icon: MailIcon, label: 'Reviews' },
+  { windowId: 'help', iconId: 'dock-messages', Icon: MessagesIcon, label: 'Help' },
+];
+
 export default function LandingDock({ onOpenWindow }: DockProps) {
-  const dockItems = [
-    { id: 'welcome', Icon: FinderIcon, imgSrc: LANDING_PAGE_ICONS.dock.finder, label: 'Welcome', isActive: true },
-    { id: 'features', Icon: SafariIcon, imgSrc: LANDING_PAGE_ICONS.dock.safari, label: 'Features' },
-    { id: 'examples', Icon: PhotosIcon, imgSrc: LANDING_PAGE_ICONS.dock.photos, label: 'Examples' },
-    { id: 'pricing', Icon: NotesIcon, imgSrc: LANDING_PAGE_ICONS.dock.notes, label: 'Pricing' },
-    { id: 'reviews', Icon: MessagesIcon, imgSrc: LANDING_PAGE_ICONS.dock.messages, label: 'Reviews' },
-    { id: 'help', Icon: MailIcon, imgSrc: LANDING_PAGE_ICONS.dock.mail, label: 'Help' },
-  ];
+  const { icons, loading } = useLandingIcons();
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
@@ -41,43 +44,60 @@ export default function LandingDock({ onOpenWindow }: DockProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
       >
-        {dockItems.map((item, index) => (
-          <motion.button
-            key={index}
-            onClick={() => item.id && onOpenWindow(item.id)}
-            className="relative group"
-            whileHover={{ y: -12, scale: 1.15 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
-            {/* Tooltip */}
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              <div
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-white whitespace-nowrap"
-                style={{ background: 'rgba(0,0,0,0.8)' }}
-              >
-                {item.label}
-              </div>
-            </div>
+        {DOCK_ICON_MAP.map((item, index) => {
+          const customIconUrl = icons[item.iconId];
 
-            {/* Icon */}
-            <div
-              className="w-12 h-12 rounded-xl overflow-hidden"
-              style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+          return (
+            <motion.button
+              key={index}
+              onClick={() => onOpenWindow(item.windowId)}
+              className="relative group"
+              whileHover={{ y: -12, scale: 1.15 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
-              {USE_IMAGE_ICONS ? (
-                <img src={item.imgSrc} alt={item.label} className="w-full h-full object-cover" />
-              ) : (
-                <item.Icon size={48} />
-              )}
-            </div>
+              {/* Tooltip */}
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-white whitespace-nowrap"
+                  style={{ background: 'rgba(0,0,0,0.8)' }}
+                >
+                  {item.label}
+                </div>
+              </div>
 
-            {/* Active indicator */}
-            {item.isActive && (
-              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/60" />
-            )}
-          </motion.button>
-        ))}
+              {/* Icon */}
+              <div
+                className="w-12 h-12 rounded-xl overflow-hidden"
+                style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+              >
+                {loading ? (
+                  // Show default while loading
+                  <item.Icon size={48} />
+                ) : customIconUrl ? (
+                  // Show custom icon if available
+                  <img
+                    src={customIconUrl}
+                    alt={item.label}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // If custom icon fails to load, hide it and show default
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  // Show default SVG icon
+                  <item.Icon size={48} />
+                )}
+              </div>
+
+              {/* Active indicator */}
+              {item.isActive && (
+                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/60" />
+              )}
+            </motion.button>
+          );
+        })}
 
         {/* Separator */}
         <div className="w-px h-10 bg-white/20 mx-2 self-center" />

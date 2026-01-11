@@ -129,6 +129,26 @@ export default function Desktop() {
             <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Pricing</span>
           </button>
 
+          {/* Icon: Reviews */}
+          <button onDoubleClick={() => handleOpenWindow('reviews')} onClick={() => handleFocusWindow('reviews')} className="group flex flex-col items-center gap-2 w-20 focus:outline-none">
+            <div className="w-14 h-14 rounded-[14px] bg-white shadow-sm border border-stone-200/50 flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
+              <div className="text-stone-600">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </div>
+            </div>
+            <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Reviews</span>
+          </button>
+
+          {/* Icon: Help */}
+          <button onDoubleClick={() => handleOpenWindow('help')} onClick={() => handleFocusWindow('help')} className="group flex flex-col items-center gap-2 w-20 focus:outline-none">
+            <div className="w-14 h-14 rounded-[14px] bg-white shadow-sm border border-stone-200/50 flex items-center justify-center group-hover:scale-105 group-active:scale-95 transition-all duration-300">
+              <div className="text-stone-600">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              </div>
+            </div>
+            <span className="text-[11px] font-medium text-stone-600 drop-shadow-sm bg-white/40 px-2 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-white/60">Help</span>
+          </button>
+
         </div>
       </main>
 
@@ -158,7 +178,10 @@ export default function Desktop() {
               MeOS transforms your creative work into an immersive desktop experience. Quiet, tactile, and deeply personal.
             </p>
             <div className="flex items-center gap-4">
-              <button className="bg-stone-900 text-stone-50 px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors shadow-lg shadow-stone-900/10 flex items-center gap-2">
+              <button
+                onClick={() => handleOpenWindow('signup')}
+                className="bg-stone-900 text-stone-50 px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors shadow-lg shadow-stone-900/10 flex items-center gap-2"
+              >
                 <span>Get Started</span>
                 <ArrowRight size={14} />
               </button>
