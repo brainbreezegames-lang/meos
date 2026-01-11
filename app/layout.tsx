@@ -36,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${instrumentSerif.variable} antialiased font-sans bg-[#FAFAF9] text-stone-800 selection:bg-stone-200 overflow-hidden`}>
+        <div className="noise-overlay"></div>
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
