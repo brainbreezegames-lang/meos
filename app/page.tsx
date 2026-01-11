@@ -258,7 +258,7 @@ export default function Desktop() {
       </main>
 
       {/* Centered Window Stack */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none pt-9 pb-32">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none pt-9 pb-40">
         <AnimatePresence mode="popLayout">
           {WINDOWS.map((w, index) => {
             if (!openWindows.includes(w.id)) return null;

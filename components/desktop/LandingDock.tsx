@@ -30,7 +30,7 @@ export default function LandingDock({ onOpenWindow }: DockProps) {
   const { icons, loading } = useLandingIcons();
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
       <motion.div
         className="flex items-end gap-2 px-4 py-3"
         style={{
