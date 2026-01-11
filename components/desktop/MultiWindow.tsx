@@ -355,18 +355,18 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
         >
           {/* Traffic Lights */}
           <div
-            className="flex items-center group/traffic"
-            style={{ gap: 'var(--traffic-gap)' }}
+            className="flex items-center gap-2 group/traffic"
             onPointerDown={(e) => e.stopPropagation()}
           >
             {/* Close */}
             <button
               onClick={handleClose}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"
+              aria-label="Close window"
+              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1"
               style={{
-                width: 'var(--traffic-size)',
-                height: 'var(--traffic-size)',
-                background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
+                width: 12,
+                height: 12,
+                background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
                 boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
               }}
             >
@@ -378,11 +378,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             {/* Minimize */}
             <button
               onClick={handleMinimize}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"
+              aria-label="Minimize window"
+              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-1"
               style={{
-                width: 'var(--traffic-size)',
-                height: 'var(--traffic-size)',
-                background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
+                width: 12,
+                height: 12,
+                background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
                 boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
               }}
             >
@@ -394,11 +395,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             {/* Maximize */}
             <button
               onClick={handleMaximize}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"
+              aria-label={isMaximized ? "Restore window" : "Maximize window"}
+              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-1"
               style={{
-                width: 'var(--traffic-size)',
-                height: 'var(--traffic-size)',
-                background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
+                width: 12,
+                height: 12,
+                background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
                 boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
               }}
             >

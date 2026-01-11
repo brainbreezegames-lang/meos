@@ -171,14 +171,6 @@ export function EditableDesktopItem({
     // hasDragged tells us if significant movement happened
     const shouldBlock = isInDragInteraction.current && dragDataRef.current.hasDragged;
 
-    console.log('EditableDesktopItem click:', {
-      itemId: item.id,
-      isOwner,
-      isInDragInteraction: isInDragInteraction.current,
-      hasDragged: dragDataRef.current.hasDragged,
-      shouldBlock,
-    });
-
     if (!shouldBlock) {
       onClick(e);
     }
