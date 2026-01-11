@@ -12,7 +12,6 @@ import { WelcomeNotification } from '@/components/desktop/WelcomeNotification';
 import { PersonaLoginScreen, useVisitorPersona, PersonaModeToggle, type VisitorPersona } from '@/components/desktop/PersonaLoginScreen';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
-import { StickyNotesContainer, type StickyNoteData } from '@/components/desktop/StickyNote';
 import { ParticleBackground, ParticleSettingsPanel, type ParticleSettings } from '@/components/desktop/ParticleBackground';
 import { LiveStatus, LiveStatusDropdown, type LiveStatusData } from '@/components/desktop/LiveStatus';
 import { QRCodeGenerator } from '@/components/desktop/QRCodeGenerator';
@@ -69,27 +68,6 @@ function usePersonaContext() {
   return ctx;
 }
 
-// Demo sticky notes
-const DEMO_STICKY_NOTES: StickyNoteData[] = [
-  {
-    id: 'sticky-1',
-    content: 'Currently deep in a rebrand project! 🎨',
-    color: 'yellow',
-    positionX: 85,
-    positionY: 15,
-    rotation: -2,
-    zIndex: 1,
-  },
-  {
-    id: 'sticky-2',
-    content: 'New work coming soon →',
-    color: 'pink',
-    positionX: 88,
-    positionY: 75,
-    rotation: 1,
-    zIndex: 2,
-  },
-];
 
 // Demo particle settings
 const DEMO_PARTICLE_SETTINGS: ParticleSettings = {
@@ -1486,7 +1464,6 @@ function DesktopContent({ onAppClick }: { onAppClick: (appId: string) => void })
   );
   const [showNewItemModal, setShowNewItemModal] = useState(false);
   const [newItemPosition, setNewItemPosition] = useState({ x: 50, y: 50 });
-  const [stickyNotes, setStickyNotes] = useState<StickyNoteData[]>(DEMO_STICKY_NOTES);
 
   useEffect(() => {
     if (context?.desktop?.items) {
@@ -1585,13 +1562,7 @@ function DesktopContent({ onAppClick }: { onAppClick: (appId: string) => void })
           </motion.div>
         )}
 
-        {/* Sticky Notes */}
-        <StickyNotesContainer
-          notes={stickyNotes}
-          onNotesChange={setStickyNotes}
-          maxNotes={5}
-        />
-      </div>
+              </div>
 
       {/* Multi-Window Manager */}
       <WindowManager items={items} />
