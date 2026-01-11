@@ -6,6 +6,7 @@ import Image from 'next/image';
 import type { DesktopItem as DesktopItemType } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContextSafe } from '@/contexts/WindowContext';
+import { useThemeSafe } from '@/contexts/ThemeContext';
 import { ContextMenu, useContextMenu } from '@/components/editing/ContextMenu';
 
 interface EditableDesktopItemProps {
@@ -23,6 +24,8 @@ export function EditableDesktopItem({
 }: EditableDesktopItemProps) {
   const context = useEditContextSafe();
   const windowContext = useWindowContextSafe();
+  const themeContext = useThemeSafe();
+  const theme = themeContext?.theme || 'monterey';
   const isOwner = context?.isOwner ?? false;
   const isWindowOpen = windowContext?.isItemOpen(item.id) ?? false;
 
@@ -222,6 +225,9 @@ export function EditableDesktopItem({
     },
   ];
 
+  // Theme-aware rendering
+  const isWarmTheme = theme === 'warm';
+
   return (
     <>
       <div
@@ -238,76 +244,154 @@ export function EditableDesktopItem({
         onClick={handleClick}
         onContextMenu={handleContextMenu}
       >
-        {/* Icon Card - "Furniture" Style */}
-        <motion.div
-          className="relative flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100"
-          style={{
-            width: '84px',
-            height: '84px',
-            borderRadius: '24px',
-            boxShadow: isDragging
-              ? '0 20px 40px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)'
-              : '0 10px 20px -5px rgba(28,25,23,0.05), 0 0 0 1px rgba(28,25,23,0.02)',
-            border: '1px solid rgba(255,255,255,0.8)',
-          }}
-          animate={{
-            scale: isDragging ? 1.05 : 1,
-            y: isDragging ? -5 : 0,
-          }}
-          whileHover={{
-            scale: isDragging ? 1.05 : 1.02,
-            y: isDragging ? -5 : -2,
-            boxShadow: '0 15px 30px -8px rgba(28,25,23,0.08), 0 0 0 1px rgba(28,25,23,0.02)'
-          }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-        >
-          {/* Inner White Glow */}
-          <div className="absolute inset-0 rounded-[24px] bg-white opacity-40 pointer-events-none" />
+        {isWarmTheme ? (
+          // FURNITURE STYLE (Warm Theme)
+          <>
+            <motion.div
+              className="relative flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100"
+              style={{
+                width: '84px',
+                height: '84px',
+                borderRadius: '24px',
+                boxShadow: isDragging
+                  ? '0 20px 40px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)'
+                  : '0 10px 20px -5px rgba(28,25,23,0.05), 0 0 0 1px rgba(28,25,23,0.02)',
+                border: '1px solid rgba(255,255,255,0.8)',
+              }}
+              animate={{
+                scale: isDragging ? 1.05 : 1,
+                y: isDragging ? -5 : 0,
+              }}
+              whileHover={{
+                scale: isDragging ? 1.05 : 1.02,
+                y: isDragging ? -5 : -2,
+                boxShadow: '0 15px 30px -8px rgba(28,25,23,0.08), 0 0 0 1px rgba(28,25,23,0.02)'
+              }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            >
+              {/* Inner White Glow */}
+              <div className="absolute inset-0 rounded-[24px] bg-white opacity-40 pointer-events-none" />
 
-          {/* Icon Image */}
-          <div className="relative w-10 h-10 z-10">
-            <Image
-              src={item.thumbnailUrl}
-              alt={item.label}
-              fill
-              className="object-contain pointer-events-none drop-shadow-sm"
-              sizes="84px"
-              draggable={false}
-            />
-          </div>
-
-          {/* Owner Edit indicator */}
-          {isOwner && !isDragging && (
-            <div
-              className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"
-            />
-          )}
-
-          {/* Open window indicator */}
-          <AnimatePresence>
-            {isWindowOpen && (
-              <motion.div
-                className="absolute -bottom-1.5 left-1/2 -translate-x-1/2"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-              >
-                <div
-                  className="w-1.5 h-1.5 rounded-full bg-stone-400"
-                  style={{ boxShadow: '0 0 0 2px white' }}
+              {/* Icon Image */}
+              <div className="relative w-10 h-10 z-10">
+                <Image
+                  src={item.thumbnailUrl}
+                  alt={item.label}
+                  fill
+                  className="object-contain pointer-events-none drop-shadow-sm"
+                  sizes="84px"
+                  draggable={false}
                 />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+              </div>
 
-        {/* Label */}
-        <span
-          className="px-3 py-1 text-sm font-medium text-stone-600 bg-white/40 backdrop-blur-md rounded-full shadow-sm border border-white/20 transition-colors group-hover:text-stone-900 group-hover:bg-white/60"
-        >
-          {item.label}
-        </span>
+              {/* Owner Edit indicator */}
+              {isOwner && !isDragging && (
+                <div
+                  className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                />
+              )}
+
+              {/* Open window indicator */}
+              <AnimatePresence>
+                {isWindowOpen && (
+                  <motion.div
+                    className="absolute -bottom-1.5 left-1/2 -translate-x-1/2"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                  >
+                    <div
+                      className="w-1.5 h-1.5 rounded-full bg-stone-400"
+                      style={{ boxShadow: '0 0 0 2px white' }}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Label */}
+            <span
+              className="px-3 py-1 text-sm font-medium text-stone-600 bg-white/40 backdrop-blur-md rounded-full shadow-sm border border-white/20 transition-colors group-hover:text-stone-900 group-hover:bg-white/60"
+            >
+              {item.label}
+            </span>
+          </>
+        ) : (
+          // CLASSIC STYLE (Other Themes)
+          <>
+            <motion.div
+              className="relative w-[76px] h-[76px] overflow-hidden"
+              style={{
+                borderRadius: 'var(--radius-lg)',
+                boxShadow: isDragging ? 'var(--shadow-item-hover)' : 'var(--shadow-item)',
+              }}
+              animate={{
+                y: isDragging ? -8 : 0,
+                scale: isDragging ? 1.08 : 1,
+              }}
+              whileHover={{ scale: isDragging ? 1.08 : 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            >
+              <Image
+                src={item.thumbnailUrl}
+                alt={item.label}
+                fill
+                className="object-cover pointer-events-none"
+                sizes="76px"
+                draggable={false}
+              />
+              <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)' }}
+              />
+            </motion.div>
+
+            <span
+              className="px-2 py-0.5 font-medium text-white text-center leading-tight max-w-[90px] truncate pointer-events-none"
+              style={{
+                fontSize: '11px',
+                fontFamily: 'var(--font-body)',
+                borderRadius: 'var(--radius-sm)',
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.6)',
+                background: 'rgba(0, 0, 0, 0.35)',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              {item.label}
+            </span>
+
+            <AnimatePresence>
+              {isWindowOpen && (
+                <motion.div
+                  className="absolute -bottom-3 left-1/2 -translate-x-1/2"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                >
+                  <div
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{
+                      background: 'var(--accent-primary)',
+                      boxShadow: '0 0 6px var(--accent-primary), 0 0 12px var(--accent-primary)',
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {isOwner && !isDragging && (
+              <div
+                className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+                style={{ background: 'var(--accent-primary)', boxShadow: 'var(--shadow-sm)' }}
+              >
+                <svg className="w-2 h-2 text-white" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M6 1l1 1M1 7l.5-2L5.5 1l1 1-4 4-2 .5z" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Context Menu */}

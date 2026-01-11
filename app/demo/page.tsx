@@ -1521,13 +1521,16 @@ function MenuBar({
 // Theme-aware Rotating Background
 function RotatingBackground() {
   const { customBackground } = useBackgroundContext();
-  const { themeInfo } = useTheme();
+  const { themeInfo, theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (customBackground) return;
+
+    // If warm theme (Wallpaper component), don't rotate images
+    if (theme === 'warm') return;
 
     const interval = setInterval(() => {
       setIsTransitioning(true);
@@ -1540,7 +1543,7 @@ function RotatingBackground() {
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [currentIndex, customBackground]);
+  }, [currentIndex, customBackground, theme]);
 
   // Theme-aware overlay gradient
   const overlayGradient = themeInfo.isDark
@@ -1567,6 +1570,10 @@ function RotatingBackground() {
         />
       </>
     );
+  }
+
+  if (theme === 'warm') {
+    return <Wallpaper />;
   }
 
   return (
@@ -2062,7 +2069,9 @@ function DemoPageInner() {
             windowsOpen={openWindowCount}
           />
 
-          <Wallpaper />
+          <RotatingBackground />
+
+          {/* ... rest of the component ... */}
           <MenuBar
             persona={persona}
             onPersonaChange={selectPersona}
