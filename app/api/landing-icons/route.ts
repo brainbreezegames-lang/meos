@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabase } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 // Use existing 'gallery' bucket with 'landing-icons' subfolder
 const BUCKET = 'gallery';
@@ -8,7 +8,8 @@ const FOLDER = 'landing-icons';
 // GET - Fetch all landing page icon URLs
 export async function GET() {
   try {
-    const supabase = getSupabase();
+    // Use admin client for listing (in case bucket is not fully public)
+    const supabase = getSupabaseAdmin();
 
     // List all files in the landing folder
     const { data: files, error } = await supabase.storage
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
 
     // Get file extension
     const ext = file.name.split('.').pop() || 'png';
@@ -132,7 +133,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
 
     // List files to find the one with this iconId
     const { data: files } = await supabase.storage.from(BUCKET).list(FOLDER);

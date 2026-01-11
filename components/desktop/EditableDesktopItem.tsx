@@ -319,4 +319,5 @@ export function EditableDesktopItem({
         />
       )}
     </>
+  );
 }

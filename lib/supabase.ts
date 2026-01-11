@@ -2,9 +2,11 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 // Create client lazily to avoid build-time errors
 let _supabase: SupabaseClient | null = null;
+let _supabaseAdmin: SupabaseClient | null = null;
 
 export const getSupabase = () => {
   if (!_supabase && supabaseUrl && supabaseAnonKey) {
@@ -14,6 +16,19 @@ export const getSupabase = () => {
     throw new Error('Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.');
   }
   return _supabase;
+};
+
+// Admin client for server-side operations (uses service role key)
+export const getSupabaseAdmin = () => {
+  if (!_supabaseAdmin && supabaseUrl && supabaseServiceKey) {
+    _supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { persistSession: false }
+    });
+  }
+  if (!_supabaseAdmin) {
+    throw new Error('Supabase admin not configured. Set SUPABASE_SERVICE_ROLE_KEY.');
+  }
+  return _supabaseAdmin;
 };
 
 // For backwards compatibility
