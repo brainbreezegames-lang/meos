@@ -326,10 +326,8 @@ export default function Desktop() {
 
       {/* Progressive blur at bottom of screen */}
       <ProgressiveBlur
-        height={120}
+        height={100}
         direction="bottom"
-        tint="var(--bg-solid)"
-        tintOpacity={0.4}
         zIndex={40}
       />
 

@@ -3,14 +3,10 @@
 import React from 'react';
 
 interface ProgressiveBlurProps {
-  /** Height of the blur area */
+  /** Height of the blur area in pixels */
   height?: number;
-  /** Direction of the blur gradient */
-  direction?: 'top' | 'bottom';
-  /** Base color for the gradient overlay (helps hide artifacts) */
-  tint?: string;
-  /** Opacity of the color tint (0-1) */
-  tintOpacity?: number;
+  /** Direction: which edge is blurred */
+  direction?: 'top' | 'bottom' | 'left' | 'right';
   /** Additional className */
   className?: string;
   /** Z-index for layering */
@@ -18,108 +14,83 @@ interface ProgressiveBlurProps {
 }
 
 /**
- * Progressive blur effect inspired by Apple/Framer design
- * Uses 5 optimized layers for smooth blur transition
+ * Modern progressive blur effect (Apple/Framer style)
  *
- * Performance optimizations:
- * - Uses GPU-accelerated backdrop-filter
- * - Limited to 5 layers (vs 7+ in typical implementations)
- * - Max blur of 24px (higher values hurt mobile performance)
- * - will-change hint for compositor optimization
- * - pointer-events: none to avoid blocking interactions
+ * Uses stacked backdrop-filter layers with CSS mask gradients
+ * Each layer has increasing blur strength and overlapping masks
+ * for smooth gradient transition.
+ *
+ * Inspired by: https://github.com/AndrewPrifer/progressive-blur
  */
 export function ProgressiveBlur({
-  height = 80,
+  height = 100,
   direction = 'bottom',
-  tint = 'transparent',
-  tintOpacity = 0,
   className = '',
   zIndex = 10,
 }: ProgressiveBlurProps) {
-  // Blur layers with progressive intensity
-  // Each layer covers a portion of the height with increasing blur
-  const layers = [
-    { blur: 1, start: 0, end: 30 },
-    { blur: 2, start: 15, end: 45 },
-    { blur: 4, start: 30, end: 60 },
-    { blur: 8, start: 45, end: 80 },
-    { blur: 16, start: 60, end: 100 },
+  // 8 layers with exponentially increasing blur
+  // This creates a smooth gradient from clear to fully blurred
+  const blurLayers = [
+    { blur: 0.5, maskStart: 0, maskEnd: 12.5 },
+    { blur: 1, maskStart: 0, maskEnd: 25 },
+    { blur: 2, maskStart: 12.5, maskEnd: 37.5 },
+    { blur: 4, maskStart: 25, maskEnd: 50 },
+    { blur: 8, maskStart: 37.5, maskEnd: 62.5 },
+    { blur: 12, maskStart: 50, maskEnd: 75 },
+    { blur: 16, maskStart: 62.5, maskEnd: 87.5 },
+    { blur: 24, maskStart: 75, maskEnd: 100 },
   ];
 
-  const isTop = direction === 'top';
+  const isVertical = direction === 'top' || direction === 'bottom';
+  const gradientDir = direction === 'bottom' ? 'to top' :
+                      direction === 'top' ? 'to bottom' :
+                      direction === 'left' ? 'to right' : 'to left';
+
+  const positionStyle: React.CSSProperties = {
+    [direction]: 0,
+    left: isVertical ? 0 : undefined,
+    right: isVertical ? 0 : undefined,
+    top: !isVertical ? 0 : undefined,
+    bottom: !isVertical ? 0 : undefined,
+    [isVertical ? 'height' : 'width']: height,
+    [isVertical ? 'width' : 'height']: '100%',
+  };
 
   return (
     <div
-      className={`absolute left-0 right-0 pointer-events-none ${className}`}
+      className={`absolute pointer-events-none ${className}`}
       style={{
-        [isTop ? 'top' : 'bottom']: 0,
-        height,
+        ...positionStyle,
         zIndex,
       }}
     >
-      {/* Blur layers */}
-      {layers.map((layer, i) => (
+      {blurLayers.map((layer, i) => (
         <div
           key={i}
           className="absolute inset-0"
           style={{
             backdropFilter: `blur(${layer.blur}px)`,
             WebkitBackdropFilter: `blur(${layer.blur}px)`,
-            mask: `linear-gradient(to ${isTop ? 'bottom' : 'top'},
-              transparent ${layer.start}%,
-              black ${(layer.start + layer.end) / 2}%,
-              transparent ${layer.end}%
+            maskImage: `linear-gradient(${gradientDir},
+              rgba(0, 0, 0, 0) ${layer.maskStart}%,
+              rgba(0, 0, 0, 1) ${layer.maskEnd}%
             )`,
-            WebkitMask: `linear-gradient(to ${isTop ? 'bottom' : 'top'},
-              transparent ${layer.start}%,
-              black ${(layer.start + layer.end) / 2}%,
-              transparent ${layer.end}%
+            WebkitMaskImage: `linear-gradient(${gradientDir},
+              rgba(0, 0, 0, 0) ${layer.maskStart}%,
+              rgba(0, 0, 0, 1) ${layer.maskEnd}%
             )`,
-            willChange: 'backdrop-filter',
           }}
         />
       ))}
-
-      {/* Final blur layer - strongest */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          mask: `linear-gradient(to ${isTop ? 'bottom' : 'top'},
-            transparent 70%,
-            black 100%
-          )`,
-          WebkitMask: `linear-gradient(to ${isTop ? 'bottom' : 'top'},
-            transparent 70%,
-            black 100%
-          )`,
-          willChange: 'backdrop-filter',
-        }}
-      />
-
-      {/* Color tint overlay to eliminate artifacts */}
-      {tintOpacity > 0 && (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to ${isTop ? 'bottom' : 'top'},
-              transparent 0%,
-              ${tint} 100%
-            )`,
-            opacity: tintOpacity,
-          }}
-        />
-      )}
     </div>
   );
 }
 
 /**
- * Simplified blur edge for windows (fewer layers, less GPU intensive)
+ * Lighter blur edge for windows (3 layers instead of 8)
  */
 export function BlurEdge({
-  height = 40,
+  height = 48,
   direction = 'bottom',
   className = '',
 }: {
@@ -127,47 +98,41 @@ export function BlurEdge({
   direction?: 'top' | 'bottom';
   className?: string;
 }) {
-  const isTop = direction === 'top';
+  const gradientDir = direction === 'bottom' ? 'to top' : 'to bottom';
+
+  const blurLayers = [
+    { blur: 2, maskStart: 0, maskEnd: 40 },
+    { blur: 6, maskStart: 30, maskEnd: 70 },
+    { blur: 12, maskStart: 60, maskEnd: 100 },
+  ];
 
   return (
     <div
       className={`absolute left-0 right-0 pointer-events-none ${className}`}
       style={{
-        [isTop ? 'top' : 'bottom']: 0,
+        [direction]: 0,
         height,
         zIndex: 5,
       }}
     >
-      {/* Simple 3-layer blur for window edges */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backdropFilter: 'blur(2px)',
-          WebkitBackdropFilter: 'blur(2px)',
-          mask: `linear-gradient(to ${isTop ? 'bottom' : 'top'}, transparent, black 70%, transparent)`,
-          WebkitMask: `linear-gradient(to ${isTop ? 'bottom' : 'top'}, transparent, black 70%, transparent)`,
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          mask: `linear-gradient(to ${isTop ? 'bottom' : 'top'}, transparent 40%, black)`,
-          WebkitMask: `linear-gradient(to ${isTop ? 'bottom' : 'top'}, transparent 40%, black)`,
-        }}
-      />
-      {/* Subtle gradient overlay */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(to ${isTop ? 'bottom' : 'top'},
-            transparent 0%,
-            var(--bg-elevated) 100%
-          )`,
-          opacity: 0.7,
-        }}
-      />
+      {blurLayers.map((layer, i) => (
+        <div
+          key={i}
+          className="absolute inset-0"
+          style={{
+            backdropFilter: `blur(${layer.blur}px)`,
+            WebkitBackdropFilter: `blur(${layer.blur}px)`,
+            maskImage: `linear-gradient(${gradientDir},
+              rgba(0, 0, 0, 0) ${layer.maskStart}%,
+              rgba(0, 0, 0, 1) ${layer.maskEnd}%
+            )`,
+            WebkitMaskImage: `linear-gradient(${gradientDir},
+              rgba(0, 0, 0, 0) ${layer.maskStart}%,
+              rgba(0, 0, 0, 1) ${layer.maskEnd}%
+            )`,
+          }}
+        />
+      ))}
     </div>
   );
 }
