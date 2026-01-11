@@ -19,7 +19,10 @@ export default function Desktop() {
     welcome: 30,
     features: 29,
     examples: 29,
-    pricing: 29
+    pricing: 29,
+    reviews: 29,
+    help: 29,
+    signup: 100
   });
   const [topZIndex, setTopZIndex] = useState(30);
 
@@ -251,6 +254,125 @@ export default function Desktop() {
           </div>
         </LandingWindow>
 
+        {/* REVIEWS WINDOW */}
+        <LandingWindow
+          key="reviews"
+          id="reviews"
+          title="Reviews"
+          isOpen={openWindows.includes('reviews')}
+          onClose={() => handleCloseWindow('reviews')}
+          onFocus={() => handleFocusWindow('reviews')}
+          zIndex={windowZIndexes['reviews']}
+          initialPosition={{ x: 300, y: 150 }}
+          width="400px"
+          height="600px"
+        >
+          <div className="flex flex-col h-full bg-white">
+            <div className="p-4 border-b border-stone-100 bg-white/50 backdrop-blur-sm sticky top-0 z-10">
+              <h3 className="text-center font-medium text-stone-900">What designers are saying</h3>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-stone-50/30">
+              <ReviewBubble
+                name="Sarah Kim"
+                role="Product Designer @ Google"
+                text="Got 3 interview requests in the first week. Recruiters always mention how unique my portfolio looks now."
+                align="left"
+              />
+              <ReviewBubble
+                name="Marcus Chen"
+                role="Freelance Brand Designer"
+                text="Finally something that doesn't look like every other portfolio. My clients always comment on it."
+                align="right"
+              />
+              <ReviewBubble
+                name="Yuki Tanaka"
+                role="UX Lead @ Spotify"
+                text="The case study format is perfect for showing process. So much better than cramming everything into one scroll."
+                align="left"
+              />
+              <ReviewBubble
+                name="Alex Rivera"
+                role="Illustrator"
+                text="Setup took 20 minutes. I've been putting off redoing my portfolio for 2 years. Finally done."
+                align="right"
+              />
+            </div>
+          </div>
+        </LandingWindow>
+
+        {/* HELP WINDOW */}
+        <LandingWindow
+          key="help"
+          id="help"
+          title="Help"
+          isOpen={openWindows.includes('help')}
+          onClose={() => handleCloseWindow('help')}
+          onFocus={() => handleFocusWindow('help')}
+          zIndex={windowZIndexes['help']}
+          initialPosition={{ x: 400, y: 200 }}
+          width="500px"
+          height="500px"
+        >
+          <div className="p-8 bg-white h-full overflow-y-auto">
+            <h2 className="text-2xl font-serif text-stone-900 mb-6">Frequently Asked Questions</h2>
+            <div className="space-y-2">
+              <FAQItem q="Do I need to know how to code?" a="No. MeOS is entirely visual. Drag, drop, click, done. If you can use a Mac, you can use MeOS." />
+              <FAQItem q="How does it look on mobile?" a="MeOS automatically adapts to a native app-like experience on mobile devices. Your content remains accessible and beautiful." />
+              <FAQItem q="Can I use my own domain?" a="Yes! Pro plans support custom domains with automatic SSL provisioning." />
+              <FAQItem q="Is it SEO friendly?" a="Absolutely. We use server-side rendering and semantic HTML to ensure your portfolio ranks well." />
+              <FAQItem q="How long does setup take?" a="Most users get their portfolio live in under 15 minutes." />
+            </div>
+            <div className="mt-8 pt-8 border-t border-stone-100 text-center">
+              <p className="text-stone-500 text-sm">Still have questions?</p>
+              <a href="mailto:hello@meos.app" className="text-orange-600 hover:underline text-sm font-medium">hello@meos.app</a>
+            </div>
+          </div>
+        </LandingWindow>
+
+        {/* SIGNUP WINDOW */}
+        <LandingWindow
+          key="signup"
+          id="signup"
+          title="Create Your Desktop"
+          isOpen={openWindows.includes('signup')}
+          onClose={() => handleCloseWindow('signup')}
+          onFocus={() => handleFocusWindow('signup')}
+          zIndex={windowZIndexes['signup']}
+          initialPosition={{ x: 600, y: 100 }}
+          width="400px"
+          height="auto"
+        >
+          <div className="p-8 bg-white flex flex-col items-center text-center">
+            <div className="mb-6 p-3 bg-orange-50 rounded-2xl">
+              <Sparkles size={24} className="text-orange-600" />
+            </div>
+            <h2 className="text-2xl font-serif text-stone-900 mb-2">Let's get you set up.</h2>
+            <p className="text-stone-500 mb-8 max-w-[260px]">Create your personal desktop in seconds. No credit card required.</p>
+
+            <button className="w-full bg-white border border-stone-200 text-stone-700 font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-stone-50 transition-colors mb-4 relative overflow-hidden group">
+              <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
+              <span>Continue with Google</span>
+            </button>
+
+            <div className="relative w-full my-4">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-stone-100"></div></div>
+              <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-stone-400">or</span></div>
+            </div>
+
+            <form className="w-full space-y-3" onSubmit={(e) => e.preventDefault()}>
+              <input type="email" placeholder="Email address" className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all" />
+              <input type="password" placeholder="Password" className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all" />
+              <button className="w-full bg-stone-900 text-white font-medium py-2.5 rounded-lg hover:bg-stone-800 transition-colors shadow-lg shadow-stone-900/10">
+                Create Account
+              </button>
+            </form>
+
+            <p className="mt-6 text-xs text-stone-400">
+              Already have an account? <button className="text-stone-900 font-medium hover:underline">Sign in</button>
+            </p>
+          </div>
+        </LandingWindow>
+
       </AnimatePresence>
 
       <LandingDock onOpenWindow={handleOpenWindow} />
@@ -266,6 +388,53 @@ function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: stri
       </div>
       <h3 className="font-medium text-stone-900 mb-2">{title}</h3>
       <p className="text-sm text-stone-500 leading-relaxed">{desc}</p>
+    </div>
+  );
+}
+function ReviewBubble({ name, role, text, align }: { name: string, role: string, text: string, align: 'left' | 'right' }) {
+  return (
+    <div className={`flex flex-col ${align === 'right' ? 'items-end' : 'items-start'}`}>
+      <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm ${align === 'right'
+        ? 'bg-orange-500 text-white rounded-tr-sm'
+        : 'bg-white border border-stone-200/50 text-stone-700 rounded-tl-sm'
+        }`}>
+        {text}
+      </div>
+      <div className={`mt-2 flex flex-col ${align === 'right' ? 'items-end' : 'items-start'}`}>
+        <span className="text-xs font-medium text-stone-900">{name}</span>
+        <span className="text-[10px] text-stone-500">{role}</span>
+      </div>
+    </div>
+  );
+}
+
+function FAQItem({ q, a }: { q: string, a: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border border-stone-200 rounded-lg overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-stone-50 transition-colors"
+      >
+        <span className="font-medium text-stone-800 text-sm">{q}</span>
+        <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+          <ArrowRight size={14} className="text-stone-400 rotate-90" />
+        </motion.div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="p-4 pt-0 text-sm text-stone-500 leading-relaxed border-t border-stone-100 bg-stone-50/50">
+              {a}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
