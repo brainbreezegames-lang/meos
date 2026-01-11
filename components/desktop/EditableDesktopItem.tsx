@@ -248,15 +248,16 @@ export function EditableDesktopItem({
           // FURNITURE STYLE (Warm Theme)
           <>
             <motion.div
-              className="relative flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100"
+              className="relative flex items-center justify-center"
               style={{
                 width: '84px',
                 height: '84px',
                 borderRadius: '24px',
+                background: 'var(--bg-item)',
                 boxShadow: isDragging
-                  ? '0 20px 40px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)'
-                  : '0 10px 20px -5px rgba(28,25,23,0.05), 0 0 0 1px rgba(28,25,23,0.02)',
-                border: '1px solid rgba(255,255,255,0.8)',
+                  ? 'var(--shadow-item-hover)'
+                  : 'var(--shadow-item)',
+                border: '1px solid var(--border-glass-inner)',
               }}
               animate={{
                 scale: isDragging ? 1.05 : 1,
@@ -265,13 +266,15 @@ export function EditableDesktopItem({
               whileHover={{
                 scale: isDragging ? 1.05 : 1.02,
                 y: isDragging ? -5 : -2,
-                boxShadow: '0 15px 30px -8px rgba(28,25,23,0.08), 0 0 0 1px rgba(28,25,23,0.02)'
               }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             >
-              {/* Inner White Glow */}
-              <div className="absolute inset-0 rounded-[24px] bg-white opacity-40 pointer-events-none" />
+              {/* Inner Glow */}
+              <div
+                className="absolute inset-0 rounded-[24px] opacity-40 pointer-events-none"
+                style={{ background: 'var(--bg-elevated)' }}
+              />
 
               {/* Icon Image */}
               <div className="relative w-10 h-10 z-10">
@@ -288,7 +291,8 @@ export function EditableDesktopItem({
               {/* Owner Edit indicator */}
               {isOwner && !isDragging && (
                 <div
-                  className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ background: 'var(--accent-primary)' }}
                 />
               )}
 
@@ -302,8 +306,11 @@ export function EditableDesktopItem({
                     exit={{ scale: 0, opacity: 0 }}
                   >
                     <div
-                      className="w-1.5 h-1.5 rounded-full bg-stone-400"
-                      style={{ boxShadow: '0 0 0 2px white' }}
+                      className="w-1.5 h-1.5 rounded-full"
+                      style={{
+                        background: 'var(--text-secondary)',
+                        boxShadow: '0 0 0 2px var(--bg-elevated)'
+                      }}
                     />
                   </motion.div>
                 )}
@@ -312,7 +319,12 @@ export function EditableDesktopItem({
 
             {/* Label */}
             <span
-              className="px-3 py-1 text-sm font-medium text-stone-600 bg-white/40 backdrop-blur-md rounded-full shadow-sm border border-white/20 transition-colors group-hover:text-stone-900 group-hover:bg-white/60"
+              className="px-3 py-1 text-sm font-medium backdrop-blur-md rounded-full shadow-sm transition-colors"
+              style={{
+                color: 'var(--text-secondary)',
+                background: 'var(--bg-dock)',
+                border: '1px solid var(--border-glass-outer)',
+              }}
             >
               {item.label}
             </span>

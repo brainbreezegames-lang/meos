@@ -91,10 +91,10 @@ export function LiveStatusMenuBarItem({
   return (
     <button
       onClick={onClick}
-      className="flex items-center text-xs transition-all hover:bg-white/10 px-2 py-0.5 rounded"
+      className="flex items-center text-xs transition-all hover:bg-black/5 dark:hover:bg-white/10 px-2 py-0.5 rounded"
       style={{
-        color: 'rgba(255, 255, 255, 0.7)',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+        color: 'var(--text-secondary)',
+        fontFamily: 'var(--font-body)',
       }}
     >
       {content}
@@ -147,10 +147,10 @@ export function LiveStatusDropdown({ data, isOpen, onClose }: LiveStatusProps & 
             style={{
               top: '32px',
               right: '200px',
-              background: 'rgba(30, 30, 30, 0.95)',
+              background: 'var(--bg-glass-elevated)',
               backdropFilter: 'blur(40px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+              border: '1px solid var(--border-light)',
+              boxShadow: 'var(--shadow-xl)',
             }}
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -159,15 +159,15 @@ export function LiveStatusDropdown({ data, isOpen, onClose }: LiveStatusProps & 
           >
             {/* Music Section */}
             {data.music && (
-              <div className="p-4 border-b border-white/10">
-                <div className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">
+              <div className="p-4 border-b" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="text-xs font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-tertiary)' }}>
                   Now Playing
                 </div>
                 <div className="flex gap-3">
                   {/* Album Art */}
                   <div
                     className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0"
-                    style={{ background: 'rgba(255, 255, 255, 0.1)' }}
+                    style={{ background: 'var(--bg-tertiary)' }}
                   >
                     {data.music.albumArt && (
                       <img
@@ -180,11 +180,11 @@ export function LiveStatusDropdown({ data, isOpen, onClose }: LiveStatusProps & 
 
                   {/* Track Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-white/90 truncate">
+                    <div className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
                       {data.music.artist}
                     </div>
-                    <div className="text-xs text-white/50 truncate">{data.music.album}</div>
-                    <div className="text-xs text-white/70 truncate mt-0.5">{data.music.track}</div>
+                    <div className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>{data.music.album}</div>
+                    <div className="text-xs truncate mt-0.5" style={{ color: 'var(--text-tertiary)' }}>{data.music.track}</div>
                   </div>
                 </div>
 
@@ -192,21 +192,21 @@ export function LiveStatusDropdown({ data, isOpen, onClose }: LiveStatusProps & 
                 <div className="mt-3">
                   <div
                     className="h-1 rounded-full overflow-hidden"
-                    style={{ background: 'rgba(255, 255, 255, 0.1)' }}
+                    style={{ background: 'var(--bg-tertiary)' }}
                   >
                     <div
                       className="h-full rounded-full"
                       style={{
                         width: `${(data.music.progress / data.music.duration) * 100}%`,
-                        background: 'rgba(255, 255, 255, 0.6)',
+                        background: 'var(--text-primary)',
                       }}
                     />
                   </div>
                   <div className="flex justify-between mt-1">
-                    <span className="text-[10px] text-white/40">
+                    <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
                       {formatDuration(data.music.progress)}
                     </span>
-                    <span className="text-[10px] text-white/40">
+                    <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
                       {formatDuration(data.music.duration)}
                     </span>
                   </div>
@@ -216,15 +216,15 @@ export function LiveStatusDropdown({ data, isOpen, onClose }: LiveStatusProps & 
 
             {/* Status Section */}
             {data.status && (
-              <div className="p-4 border-b border-white/10">
-                <div className="text-xs font-medium text-white/40 uppercase tracking-wider mb-2">
+              <div className="p-4 border-b" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--text-tertiary)' }}>
                   Status
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-lg">{data.status.emoji}</span>
                   <div>
-                    <div className="text-sm text-white/90">{data.status.text}</div>
-                    <div className="text-xs text-white/40 mt-0.5">
+                    <div className="text-sm" style={{ color: 'var(--text-primary)' }}>{data.status.text}</div>
+                    <div className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                       Updated {getTimeAgo(data.status.updatedAt)}
                     </div>
                   </div>
@@ -238,11 +238,11 @@ export function LiveStatusDropdown({ data, isOpen, onClose }: LiveStatusProps & 
                 <div className="flex items-center gap-2">
                   <span className="text-lg">📍</span>
                   <div>
-                    <div className="text-sm text-white/90">
+                    <div className="text-sm" style={{ color: 'var(--text-primary)' }}>
                       {data.location.city}, {data.location.country}
                     </div>
                     {data.location.timezone && (
-                      <div className="text-xs text-white/40 mt-0.5">
+                      <div className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                         🌙 {getLocalTime(data.location.timezone)} local
                       </div>
                     )}
@@ -253,7 +253,7 @@ export function LiveStatusDropdown({ data, isOpen, onClose }: LiveStatusProps & 
 
             {/* Empty State */}
             {!data.music && !data.status && !data.location && (
-              <div className="p-6 text-center text-white/40 text-sm">
+              <div className="p-6 text-center text-sm" style={{ color: 'var(--text-tertiary)' }}>
                 No status available
               </div>
             )}
@@ -337,7 +337,7 @@ export function LiveStatusSettings({
             className="w-full p-3 rounded-lg bg-[#1DB954]/20 text-[#1DB954] flex items-center justify-center gap-2 hover:bg-[#1DB954]/30 transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
             </svg>
             Connect Spotify
           </button>
@@ -354,9 +354,8 @@ export function LiveStatusSettings({
               <button
                 key={emoji}
                 onClick={() => setStatusEmoji(emoji)}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg transition-all ${
-                  statusEmoji === emoji ? 'bg-white/20 ring-2 ring-blue-500' : 'bg-white/5 hover:bg-white/10'
-                }`}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg transition-all ${statusEmoji === emoji ? 'bg-white/20 ring-2 ring-blue-500' : 'bg-white/5 hover:bg-white/10'
+                  }`}
               >
                 {emoji}
               </button>

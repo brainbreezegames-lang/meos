@@ -292,6 +292,72 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         accentLight: 'rgba(202,232,189,0.1)',
       };
 
+    case 'warm':
+      // Warm: Organic, stone, paper-like, editorial
+      return {
+        windowBg: '#FAFAF9',
+        windowShadow: '0 24px 60px -12px rgba(28,25,23,0.15), 0 0 0 1px rgba(28,25,23,0.05)',
+        windowShadowInactive: '0 12px 32px -8px rgba(28,25,23,0.1), 0 0 0 1px rgba(28,25,23,0.04)',
+        windowBorder: 'rgba(28,25,23,0.05)',
+
+        titleBarBg: '#F5F5F4',
+        titleBarBorder: 'rgba(28,25,23,0.06)',
+        titleText: '#1C1917',
+        iconColor: '#EA580C',
+
+        sidebarBg: '#F5F5F4',
+        sidebarBorder: 'rgba(28,25,23,0.06)',
+        searchBg: 'rgba(28,25,23,0.04)',
+        searchBgFocused: '#FFFFFF',
+        searchBorder: 'transparent',
+        searchBorderFocused: 'rgba(234,88,12,0.3)',
+        searchShadowFocused: '0 0 0 3px rgba(234,88,12,0.1)',
+        searchIcon: '#A8A29E',
+        searchIconFocused: '#EA580C',
+        searchText: '#1C1917',
+
+        folderText: '#44403C',
+        folderCount: '#A8A29E',
+        folderHoverBg: 'rgba(28,25,23,0.04)',
+
+        noteCardBg: '#FFFFFF',
+        noteCardShadow: '0 1px 2px rgba(28,25,23,0.06), 0 0 0 1px rgba(28,25,23,0.04)',
+        noteCardHoverShadow: '0 4px 12px rgba(28,25,23,0.08), 0 0 0 1px rgba(28,25,23,0.06)',
+        noteCardSelectedBg: '#FFFFFF',
+        noteCardSelectedShadow: '0 8px 20px -4px rgba(234,88,12,0.15), 0 0 0 1.5px #EA580C',
+        noteTitle: '#1C1917',
+        noteTitleSelected: '#EA580C',
+        noteDate: '#EA580C',
+        noteDateSelected: '#EA580C',
+        notePreview: '#78716C',
+        notePreviewSelected: '#78716C',
+        noteDot: 'rgba(28,25,23,0.1)',
+        noteDotSelected: '#EA580C',
+
+        contentBg: '#FAFAF9',
+        contentHeaderBg: 'linear-gradient(180deg, rgba(245,245,244,0.5) 0%, transparent 100%)',
+        contentBorder: 'rgba(28,25,23,0.04)',
+        contentTitle: '#1C1917',
+        contentMeta: '#78716C',
+        contentText: '#1C1917',
+
+        emptyBg: 'linear-gradient(135deg, rgba(234,88,12,0.08) 0%, rgba(234,88,12,0.03) 100%)',
+        emptyShadow: '0 8px 24px rgba(234,88,12,0.08)',
+        emptyIconColor: '#EA580C',
+        emptyTitle: '#1C1917',
+        emptyText: '#78716C',
+
+        buttonText: '#78716C',
+        buttonHoverBg: 'rgba(28,25,23,0.05)',
+        buttonHoverText: '#1C1917',
+        primaryButtonBg: '#EA580C',
+        primaryButtonText: '#FFFFFF',
+        primaryButtonShadow: '0 4px 12px rgba(234,88,12,0.3)',
+
+        accent: '#EA580C',
+        accentLight: 'rgba(234,88,12,0.1)',
+      };
+
     case 'monterey':
     default:
       // Monterey: Classic macOS, warm orange Notes accent
@@ -385,21 +451,21 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
   // Use tabs as individual notes, or blocks as a single note
   const notes = item.useTabs && item.tabs?.length > 0
     ? item.tabs.map(t => ({
-        id: t.id,
-        title: t.label,
-        blocks: t.blocks,
-        preview: getPreviewText(t.blocks),
-        date: new Date(),
-        folder: t.icon || 'Notes',
-      }))
+      id: t.id,
+      title: t.label,
+      blocks: t.blocks,
+      preview: getPreviewText(t.blocks),
+      date: new Date(),
+      folder: t.icon || 'Notes',
+    }))
     : [{
-        id: 'main',
-        title: item.windowTitle,
-        blocks: item.blocks || [],
-        preview: getPreviewText(item.blocks || []),
-        date: new Date(),
-        folder: 'Notes',
-      }];
+      id: 'main',
+      title: item.windowTitle,
+      blocks: item.blocks || [],
+      preview: getPreviewText(item.blocks || []),
+      date: new Date(),
+      folder: 'Notes',
+    }];
 
   const folders = [...new Set(notes.map(n => n.folder))];
 
@@ -436,9 +502,9 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
 
   const filteredNotes = searchQuery
     ? notes.filter(n =>
-        n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        n.preview.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      n.preview.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : notes;
 
   const handleBlockUpdate = (blockId: string, data: Record<string, unknown>) => {
@@ -594,8 +660,8 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
             {/* Title */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" style={{ color: colors.iconColor }}>
-                <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" fill="currentColor" fillOpacity="0.15"/>
-                <path d="M7 7H17M7 11H17M7 15H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" fill="currentColor" fillOpacity="0.15" />
+                <path d="M7 7H17M7 11H17M7 15H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
               <span className="text-[13px] font-medium" style={{ color: colors.titleText }}>
                 Notes
@@ -689,8 +755,8 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
                           style={{ color: colors.searchIcon }}
                         >
                           <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
-                            <circle cx="6" cy="6" r="6" fill="currentColor" fillOpacity="0.3"/>
-                            <path d="M4 4L8 8M8 4L4 8" stroke={isDark ? 'black' : 'white'} strokeWidth="1.2" strokeLinecap="round"/>
+                            <circle cx="6" cy="6" r="6" fill="currentColor" fillOpacity="0.3" />
+                            <path d="M4 4L8 8M8 4L4 8" stroke={isDark ? 'black' : 'white'} strokeWidth="1.2" strokeLinecap="round" />
                           </svg>
                         </button>
                       )}
@@ -799,7 +865,7 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
                           style={{ background: colors.accentLight, boxShadow: `0 4px 12px ${colors.accentLight}` }}
                         >
                           <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" style={{ color: colors.accent }}>
-                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                           </svg>
                         </div>
                         <p className="text-[14px] font-semibold mb-1" style={{ color: colors.emptyTitle }}>

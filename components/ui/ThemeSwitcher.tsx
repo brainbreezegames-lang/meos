@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { THEMES, type ThemeId } from '@/contexts/ThemeContext';
+import { useTheme, THEMES, type ThemeId } from '@/contexts/ThemeContext';
 
 // Theme preview colors for the dropdown
 const themePreviewColors: Record<ThemeId, { bg: string; accent: string; isDark: boolean }> = {
@@ -14,19 +14,13 @@ const themePreviewColors: Record<ThemeId, { bg: string; accent: string; isDark: 
 };
 
 export function ThemeSwitcher() {
-  const [currentTheme, setCurrentTheme] = useState<ThemeId>('monterey');
+  const { theme: currentTheme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
-    // Check for stored preference
-    const stored = localStorage.getItem('meos-theme') as ThemeId | null;
-    if (stored && THEMES[stored]) {
-      setCurrentTheme(stored);
-      document.documentElement.setAttribute('data-theme', stored);
-    }
   }, []);
 
   useEffect(() => {
@@ -40,34 +34,7 @@ export function ThemeSwitcher() {
   }, []);
 
   const switchTheme = (themeId: ThemeId) => {
-    setCurrentTheme(themeId);
-    document.documentElement.setAttribute('data-theme', themeId);
-    localStorage.setItem('meos-theme', themeId);
-
-    // Load Halant font for Refined theme
-    if (themeId === 'refined') {
-      const existingLink = document.querySelector('link[data-theme-font="halant"]');
-      if (!existingLink) {
-        const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Halant:wght@400;500;600;700&display=swap';
-        link.rel = 'stylesheet';
-        link.setAttribute('data-theme-font', 'halant');
-        document.head.appendChild(link);
-      }
-    }
-
-    // Load Instrument Serif font for Warm theme
-    if (themeId === 'warm') {
-      const existingLink = document.querySelector('link[data-theme-font="instrument-serif"]');
-      if (!existingLink) {
-        const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap';
-        link.rel = 'stylesheet';
-        link.setAttribute('data-theme-font', 'instrument-serif');
-        document.head.appendChild(link);
-      }
-    }
-
+    setTheme(themeId);
     setIsOpen(false);
   };
 

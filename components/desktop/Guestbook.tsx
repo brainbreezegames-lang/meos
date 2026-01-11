@@ -97,7 +97,7 @@ export function Guestbook({
       <div className="px-5 py-4 border-b border-white/10">
         <p
           className="text-sm"
-          style={{ color: 'rgba(255, 255, 255, 0.6)' }}
+          style={{ color: 'var(--text-secondary)' }}
         >
           Leave a note, feedback, or just say hi.
           <br />
@@ -114,9 +114,9 @@ export function Guestbook({
           placeholder="Write something..."
           className="w-full h-24 px-3 py-2 rounded-lg resize-none outline-none transition-all"
           style={{
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: 'rgba(255, 255, 255, 0.9)',
+            background: 'var(--bg-input)',
+            border: '1px solid var(--border-light)',
+            color: 'var(--text-primary)',
             fontSize: '14px',
           }}
           maxLength={500}
@@ -128,17 +128,21 @@ export function Guestbook({
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setAuthorType('anonymous')}
-              className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                authorType === 'anonymous' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+              style={{
+                background: authorType === 'anonymous' ? 'var(--bg-button-hover)' : 'var(--bg-button)',
+                color: authorType === 'anonymous' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              }}
             >
               Anonymous
             </button>
             <button
               onClick={() => setAuthorType('named')}
-              className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                authorType === 'named' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50`}
+              style={{
+                background: authorType === 'named' ? 'var(--bg-button-hover)' : 'var(--bg-button)',
+                color: authorType === 'named' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              }}
             >
               With Name
             </button>
@@ -152,9 +156,9 @@ export function Guestbook({
               placeholder="Your name"
               className="w-full px-3 py-2 rounded-lg outline-none mt-2"
               style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: 'rgba(255, 255, 255, 0.9)',
+                background: 'var(--bg-input)',
+                border: '1px solid var(--border-light)',
+                color: 'var(--text-primary)',
                 fontSize: '14px',
               }}
             />
@@ -169,9 +173,11 @@ export function Guestbook({
               <button
                 key={type}
                 onClick={() => setNoteType(type)}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all flex items-center gap-1.5 ${
-                  noteType === type ? 'bg-white/20 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-sm transition-all flex items-center gap-1.5`}
+                style={{
+                  background: noteType === type ? 'var(--bg-button-hover)' : 'var(--bg-button)',
+                  color: noteType === type ? 'var(--text-primary)' : 'var(--text-secondary)',
+                }}
               >
                 <span>{icon}</span>
                 <span>{label}</span>
@@ -189,9 +195,9 @@ export function Guestbook({
               onChange={(e) => setSelectedProject(e.target.value)}
               className="w-full px-3 py-2 rounded-lg outline-none"
               style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: 'rgba(255, 255, 255, 0.9)',
+                background: 'var(--bg-input)',
+                border: '1px solid var(--border-light)',
+                color: 'var(--text-primary)',
                 fontSize: '14px',
               }}
             >
@@ -209,8 +215,8 @@ export function Guestbook({
           disabled={!message.trim() || isSubmitting}
           className="w-full py-2.5 rounded-lg font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            background: 'rgba(59, 130, 246, 0.8)',
-            color: 'white',
+            background: 'var(--accent-primary)',
+            color: 'var(--text-on-accent)',
           }}
         >
           {isSubmitting ? 'Submitting...' : 'Leave Note'}
@@ -229,9 +235,9 @@ export function Guestbook({
             onChange={(e) => setFilter(e.target.value as NoteType | 'all')}
             className="px-2 py-1 rounded text-xs"
             style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: 'rgba(255, 255, 255, 0.7)',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border-light)',
+              color: 'var(--text-secondary)',
             }}
           >
             <option value="all">All</option>
@@ -258,16 +264,16 @@ export function Guestbook({
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="p-4 rounded-xl"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-light)',
                   }}
                 >
-                  <p className="text-sm text-white/90 leading-relaxed mb-3">
+                  <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-primary)' }}>
                     &ldquo;{entry.message}&rdquo;
                   </p>
 
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs text-white/50">
+                    <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-tertiary)' }}>
                       <span>
                         {entry.authorType === 'anonymous'
                           ? '— Anonymous'
@@ -287,21 +293,19 @@ export function Guestbook({
                     <div className="mt-3 pt-3 border-t border-white/10 flex gap-2">
                       <button
                         onClick={() => onMarkHelpful?.(entry.id)}
-                        className={`px-2 py-1 rounded text-xs transition-all ${
-                          entry.ownerMarkedHelpful
+                        className={`px-2 py-1 rounded text-xs transition-all ${entry.ownerMarkedHelpful
                             ? 'bg-green-500/20 text-green-400'
                             : 'bg-white/5 text-white/50 hover:bg-white/10'
-                        }`}
+                          }`}
                       >
                         {entry.ownerMarkedHelpful ? '✓ Helpful' : 'Mark Helpful 👍'}
                       </button>
                       <button
                         onClick={() => onTogglePublic?.(entry.id)}
-                        className={`px-2 py-1 rounded text-xs transition-all ${
-                          entry.isPublic
+                        className={`px-2 py-1 rounded text-xs transition-all ${entry.isPublic
                             ? 'bg-white/5 text-white/50 hover:bg-white/10'
                             : 'bg-yellow-500/20 text-yellow-400'
-                        }`}
+                          }`}
                       >
                         {entry.isPublic ? 'Hide' : 'Make Public'}
                       </button>
