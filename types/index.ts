@@ -23,7 +23,7 @@ export interface Desktop {
   dockItems: DockItem[];
 }
 
-export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document';
+export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document' | 'pages' | 'notes' | 'photos' | 'finder' | 'preview';
 
 export interface DesktopItem {
   id: string;

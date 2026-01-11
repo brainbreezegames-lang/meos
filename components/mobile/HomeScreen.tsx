@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { AppGrid } from './AppGrid';
 import { MobileDock } from './MobileDock';
 import { useMobileNav } from '@/contexts/MobileNavigationContext';
@@ -76,10 +76,12 @@ export function HomeScreen({
   return (
     <motion.div
       className="fixed inset-0 z-10 flex flex-col select-none"
+      role="main"
+      aria-label="Home screen"
       style={{
         background: backgroundUrl
           ? `url(${backgroundUrl}) center/cover no-repeat`
-          : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+          : 'linear-gradient(145deg, var(--bg-solid) 0%, #1a1a2e 100%)',
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -87,48 +89,51 @@ export function HomeScreen({
       transition={{ duration: 0.3 }}
     >
       {/* Status bar area */}
-      <div
+      <header
         className="flex-shrink-0 flex items-center justify-between px-6"
         style={{
           paddingTop: 'max(env(safe-area-inset-top, 44px), 44px)',
           height: 'calc(env(safe-area-inset-top, 44px) + 28px)',
         }}
+        role="banner"
       >
         {/* Time (left) */}
-        <span
+        <time
           className="text-sm font-semibold"
           style={{
-            color: 'white',
+            color: 'var(--text-on-image)',
             textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+            fontFamily: 'var(--font-body)',
           }}
+          aria-label={`Current time: ${formatTime(currentTime)}`}
         >
           {formatTime(currentTime)}
-        </span>
+        </time>
 
         {/* Status icons (right) */}
         <div className="flex items-center gap-1">
           <motion.button
             onClick={toggleControlCenter}
-            className="flex items-center gap-1 px-2 py-1 rounded-full"
-            style={{ background: 'rgba(0, 0, 0, 0.1)' }}
+            aria-label="Open Control Center"
+            className="flex items-center gap-1 px-2 py-1 rounded-full min-h-[44px] min-w-[44px] justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            style={{ background: 'rgba(0, 0, 0, 0.15)' }}
             whileTap={{ scale: 0.95 }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ color: 'var(--text-on-image)' }} aria-hidden="true">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
             </svg>
             <span
               className="text-xs"
               style={{
-                color: 'white',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+                color: 'var(--text-on-image)',
+                fontFamily: 'var(--font-body)',
               }}
             >
               100%
             </span>
           </motion.button>
         </div>
-      </div>
+      </header>
 
       {/* App grid */}
       <AppGrid
@@ -141,20 +146,20 @@ export function HomeScreen({
       />
 
       {/* Dock */}
-      <div className="flex-shrink-0">
+      <footer className="flex-shrink-0">
         <MobileDock items={dockItems} onItemTap={handleDockTap} maxItems={4} />
 
         {/* Home indicator */}
-        <div className="flex justify-center pb-2">
+        <div className="flex justify-center pb-2" aria-hidden="true">
           <div
             className="w-32 h-1 rounded-full"
-            style={{ background: 'rgba(255, 255, 255, 0.3)' }}
+            style={{ background: 'var(--text-on-image)', opacity: 0.3 }}
           />
         </div>
 
         {/* Safe area bottom */}
         <div style={{ height: 'env(safe-area-inset-bottom, 8px)' }} />
-      </div>
+      </footer>
     </motion.div>
   );
 }

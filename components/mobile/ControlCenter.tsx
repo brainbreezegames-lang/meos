@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useMobileNav } from '@/contexts/MobileNavigationContext';
 
 interface ControlCenterProps {
@@ -31,6 +31,7 @@ export function ControlCenter({
 }: ControlCenterProps) {
   const { state, toggleControlCenter } = useMobileNav();
   const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   // Spring-based swipe dismiss
   const rawY = useMotionValue(0);
@@ -75,6 +76,13 @@ export function ControlCenter({
     };
   }, [state.showControlCenter, toggleControlCenter, rawY]);
 
+  // Keyboard handling
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      toggleControlCenter();
+    }
+  };
+
   return (
     <AnimatePresence>
       {state.showControlCenter && (
@@ -86,6 +94,7 @@ export function ControlCenter({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleControlCenter}
+            aria-hidden="true"
           >
             {/* Base blur layer */}
             <div
@@ -98,26 +107,29 @@ export function ControlCenter({
             {/* Dark overlay */}
             <div
               className="absolute inset-0"
-              style={{
-                background: 'rgba(0, 0, 0, 0.35)',
-              }}
+              style={{ background: 'rgba(0, 0, 0, 0.35)' }}
             />
           </motion.div>
 
           {/* Control Center Panel */}
           <motion.div
             ref={containerRef}
+            role="dialog"
+            aria-label="Control Center"
+            aria-modal="true"
+            tabIndex={-1}
+            onKeyDown={handleKeyDown}
             className="fixed top-0 right-0 z-[201] w-[88%] max-w-[340px]"
             style={{
               paddingTop: 'env(safe-area-inset-top, 44px)',
-              y,
-              opacity: panelOpacity,
-              scale: panelScale,
+              y: prefersReducedMotion ? 0 : y,
+              opacity: prefersReducedMotion ? 1 : panelOpacity,
+              scale: prefersReducedMotion ? 1 : panelScale,
             }}
             initial={{ y: '-100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '-100%', opacity: 0 }}
-            transition={{
+            transition={prefersReducedMotion ? { duration: 0 } : {
               type: 'spring',
               stiffness: 400,
               damping: 40,
@@ -127,51 +139,36 @@ export function ControlCenter({
             <div
               className="m-3 rounded-[32px] overflow-hidden"
               style={{
-                background: 'linear-gradient(145deg, rgba(45, 45, 55, 0.98) 0%, rgba(35, 35, 45, 0.96) 100%)',
+                background: 'var(--bg-glass)',
                 backdropFilter: 'blur(50px) saturate(200%)',
                 WebkitBackdropFilter: 'blur(50px) saturate(200%)',
-                boxShadow: `
-                  0 25px 60px rgba(0, 0, 0, 0.45),
-                  0 10px 20px rgba(0, 0, 0, 0.25),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.08),
-                  inset 0 -1px 0 rgba(0, 0, 0, 0.1)
-                `,
+                boxShadow: 'var(--shadow-xl)',
+                border: '1px solid var(--border-subtle)',
               }}
             >
-              {/* Inner highlight border */}
-              <div
-                className="absolute inset-0 rounded-[32px] pointer-events-none"
-                style={{
-                  border: '1px solid rgba(255, 255, 255, 0.06)',
-                }}
-              />
-
               {/* Profile Section */}
               {(profileImage || profileName) && (
                 <motion.div
                   className="relative p-4 flex items-center gap-3"
-                  initial={{ opacity: 0, y: -10 }}
+                  initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 }}
+                  transition={{ delay: prefersReducedMotion ? 0 : 0.05 }}
                 >
                   {/* Bottom separator with gradient */}
                   <div
                     className="absolute bottom-0 left-4 right-4 h-px"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)',
-                    }}
+                    style={{ background: 'linear-gradient(90deg, transparent 0%, var(--border-light) 50%, transparent 100%)' }}
+                    aria-hidden="true"
                   />
 
                   {profileImage && (
                     <div
                       className="relative w-14 h-14 rounded-2xl overflow-hidden"
-                      style={{
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1)',
-                      }}
+                      style={{ boxShadow: 'var(--shadow-md)' }}
                     >
                       <img
                         src={profileImage}
-                        alt={profileName || ''}
+                        alt={`${profileName || 'User'}'s profile`}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -180,9 +177,9 @@ export function ControlCenter({
                     <p
                       className="font-semibold"
                       style={{
-                        color: 'white',
+                        color: 'var(--text-primary)',
                         fontSize: 16,
-                        fontFamily: '"SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                        fontFamily: 'var(--font-display)',
                         letterSpacing: '-0.01em',
                       }}
                     >
@@ -192,8 +189,8 @@ export function ControlCenter({
                       <p
                         className="text-sm"
                         style={{
-                          color: 'rgba(255, 255, 255, 0.45)',
-                          fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                          color: 'var(--text-tertiary)',
+                          fontFamily: 'var(--font-body)',
                         }}
                       >
                         @{username}
@@ -204,7 +201,7 @@ export function ControlCenter({
               )}
 
               {/* Quick Actions Grid */}
-              <div className="p-3 grid grid-cols-2 gap-2.5">
+              <div className="p-3 grid grid-cols-2 gap-2.5" role="group" aria-label="Quick actions">
                 {/* Theme Toggle */}
                 <ControlButton
                   icon={theme === 'dark' ? '🌙' : '☀️'}
@@ -212,6 +209,7 @@ export function ControlCenter({
                   isActive={theme === 'dark'}
                   onClick={onThemeToggle}
                   delay={0.1}
+                  ariaLabel={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                 />
 
                 {/* Share */}
@@ -220,6 +218,7 @@ export function ControlCenter({
                   label="Share"
                   onClick={onShare}
                   delay={0.12}
+                  ariaLabel="Share this profile"
                 />
 
                 {/* QR Code */}
@@ -228,6 +227,7 @@ export function ControlCenter({
                   label="QR Code"
                   onClick={onQRCode}
                   delay={0.14}
+                  ariaLabel="Show QR code"
                 />
 
                 {/* Contact */}
@@ -236,43 +236,39 @@ export function ControlCenter({
                   label="Contact"
                   onClick={onContact}
                   delay={0.16}
+                  ariaLabel="Contact this person"
                 />
               </div>
 
               {/* Brightness Slider */}
               <motion.div
                 className="px-3 pb-3"
-                initial={{ opacity: 0, y: 10 }}
+                initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.18 }}
+                transition={{ delay: prefersReducedMotion ? 0 : 0.18 }}
               >
                 <div
                   className="p-4 rounded-2xl relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
-                  }}
+                  style={{ background: 'var(--bg-secondary)' }}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg opacity-60">☀️</span>
+                  <label className="flex items-center gap-3">
+                    <span className="text-lg opacity-60" aria-hidden="true">☀️</span>
                     <div className="flex-1 relative h-8">
                       {/* Custom slider track */}
                       <div
                         className="absolute inset-0 rounded-full overflow-hidden"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.08)',
-                        }}
+                        style={{ background: 'var(--bg-tertiary)' }}
+                        aria-hidden="true"
                       >
                         {/* Filled portion */}
                         <motion.div
                           className="absolute left-0 top-0 bottom-0 rounded-full"
                           style={{
                             width: `${brightness}%`,
-                            background: 'linear-gradient(90deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.4) 100%)',
-                            boxShadow: '0 0 8px rgba(255,255,255,0.2)',
+                            background: 'linear-gradient(90deg, var(--text-quaternary) 0%, var(--text-secondary) 100%)',
                           }}
                           animate={{ width: `${brightness}%` }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                          transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 }}
                         />
                       </div>
                       <input
@@ -281,25 +277,38 @@ export function ControlCenter({
                         max="100"
                         value={brightness}
                         onChange={(e) => onBrightnessChange?.(parseInt(e.target.value))}
-                        className="absolute inset-0 w-full h-full appearance-none bg-transparent cursor-pointer"
+                        aria-label="Brightness"
+                        aria-valuemin={20}
+                        aria-valuemax={100}
+                        aria-valuenow={brightness}
+                        className="absolute inset-0 w-full h-full appearance-none bg-transparent cursor-pointer focus-visible:outline-none"
                         style={{ WebkitAppearance: 'none' }}
                       />
                     </div>
-                    <span className="text-lg">☀️</span>
-                  </div>
+                    <span className="text-lg" aria-hidden="true">☀️</span>
+                  </label>
                 </div>
               </motion.div>
 
-              {/* Drag indicator */}
+              {/* Drag indicator - larger touch target */}
               <div className="flex justify-center pb-3">
-                <motion.div
-                  className="w-10 h-1 rounded-full"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    boxShadow: '0 0 4px rgba(255,255,255,0.1)',
+                <div
+                  className="py-2 px-8"
+                  role="button"
+                  aria-label="Swipe up to close"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      toggleControlCenter();
+                    }
                   }}
-                  whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.35)' }}
-                />
+                >
+                  <div
+                    className="w-10 h-1 rounded-full"
+                    style={{ background: 'var(--text-quaternary)' }}
+                  />
+                </div>
               </div>
             </div>
           </motion.div>
@@ -315,44 +324,40 @@ interface ControlButtonProps {
   isActive?: boolean;
   onClick?: () => void;
   delay?: number;
+  ariaLabel: string;
 }
 
-function ControlButton({ icon, label, isActive = false, onClick, delay = 0 }: ControlButtonProps) {
+function ControlButton({ icon, label, isActive = false, onClick, delay = 0, ariaLabel }: ControlButtonProps) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <motion.button
       onClick={() => {
         if ('vibrate' in navigator) navigator.vibrate(3);
         onClick?.();
       }}
-      className="relative flex flex-col items-center justify-center py-4 rounded-2xl overflow-hidden"
+      aria-label={ariaLabel}
+      aria-pressed={isActive}
+      className="relative flex flex-col items-center justify-center py-4 rounded-2xl overflow-hidden min-h-[80px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
       style={{
         background: isActive
-          ? 'linear-gradient(145deg, rgba(59, 130, 246, 0.35) 0%, rgba(59, 130, 246, 0.2) 100%)'
-          : 'rgba(255, 255, 255, 0.04)',
+          ? 'color-mix(in srgb, var(--accent-primary) 25%, transparent)'
+          : 'var(--bg-secondary)',
         boxShadow: isActive
-          ? 'inset 0 1px 0 rgba(255,255,255,0.15), 0 4px 12px rgba(59, 130, 246, 0.15)'
-          : 'inset 0 1px 0 rgba(255,255,255,0.05)',
+          ? 'inset 0 1px 0 rgba(255,255,255,0.1)'
+          : 'inset 0 1px 0 rgba(255,255,255,0.03)',
       }}
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay, type: 'spring', stiffness: 400, damping: 25 }}
-      whileTap={{ scale: 0.92, backgroundColor: isActive ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255, 255, 255, 0.08)' }}
+      transition={{ delay: prefersReducedMotion ? 0 : delay, type: 'spring', stiffness: 400, damping: 25 }}
+      whileTap={prefersReducedMotion ? {} : { scale: 0.92 }}
     >
-      {/* Shine overlay for active state */}
-      {isActive && (
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%)',
-          }}
-        />
-      )}
-      <span className="text-2xl mb-1.5">{icon}</span>
+      <span className="text-2xl mb-1.5" aria-hidden="true">{icon}</span>
       <span
         className="text-xs font-medium"
         style={{
-          color: isActive ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.55)',
-          fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+          color: isActive ? 'var(--text-primary)' : 'var(--text-tertiary)',
+          fontFamily: 'var(--font-body)',
           letterSpacing: '-0.01em',
         }}
       >

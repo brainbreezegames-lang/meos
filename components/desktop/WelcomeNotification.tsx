@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SparkleEffect, haptic } from '@/components/ui/Delight';
 
 interface WelcomeNotificationProps {
   title?: string;
@@ -16,7 +17,7 @@ interface WelcomeNotificationProps {
 export function WelcomeNotification({
   title = 'Welcome to MeOS',
   subtitle = 'Your personal web desktop',
-  body = 'Click any item to open it. Try the theme switcher in the menu bar!',
+  body = 'Click any icon to explore. Use the menu bar to switch themes.',
   icon = '🖥️',
   delay = 1500,
   duration = 8000,
@@ -24,6 +25,7 @@ export function WelcomeNotification({
 }: WelcomeNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasSeenWelcome, setHasSeenWelcome] = useState(true);
+  const [showSparkles, setShowSparkles] = useState(false);
 
   useEffect(() => {
     // Check if user has seen welcome notification
@@ -49,9 +51,13 @@ export function WelcomeNotification({
   }, [isVisible, duration]);
 
   const handleDismiss = () => {
-    setIsVisible(false);
-    localStorage.setItem('meos-welcome-seen', 'true');
-    onDismiss?.();
+    setShowSparkles(true);
+    haptic('success');
+    setTimeout(() => {
+      setIsVisible(false);
+      localStorage.setItem('meos-welcome-seen', 'true');
+      onDismiss?.();
+    }, 300);
   };
 
   if (hasSeenWelcome) return null;
@@ -93,6 +99,17 @@ export function WelcomeNotification({
               border: 'var(--border-width) solid var(--border-light)',
             }}
           >
+            {/* Dismiss celebration */}
+            <SparkleEffect
+              trigger={showSparkles}
+              config={{
+                count: 15,
+                spread: 80,
+                colors: ['var(--accent-primary)', '#FFD700', '#4ECDC4', '#FF6B6B'],
+                duration: 400,
+              }}
+            />
+
             {/* Progress bar */}
             <motion.div
               className="absolute top-0 left-0 h-[2px]"

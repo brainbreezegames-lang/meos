@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, RefObject } from 'react';
-import { motion, AnimatePresence, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useSpring, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import type { DockItem as DockItemType } from '@/types';
+import { SparkleEffect, haptic } from '@/components/ui/Delight';
 
 interface DockItemProps {
   item: DockItemType;
@@ -20,20 +21,17 @@ const MAGNIFICATION_RANGE = 160; // pixels from center where magnification appli
 
 export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }: DockItemProps) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showLaunchEffect, setShowLaunchEffect] = useState(false);
   const itemRef = useRef<HTMLButtonElement>(null);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout>();
+  const prefersReducedMotion = useReducedMotion();
 
-  const scale = useSpring(1, {
-    stiffness: 400,
-    damping: 30,
-    mass: 0.5
-  });
+  const springConfig = prefersReducedMotion
+    ? { stiffness: 1000, damping: 100, mass: 0.1 }
+    : { stiffness: 400, damping: 30, mass: 0.5 };
 
-  const translateY = useSpring(0, {
-    stiffness: 400,
-    damping: 30,
-    mass: 0.5
-  });
+  const scale = useSpring(1, springConfig);
+  const translateY = useSpring(0, springConfig);
 
   // Calculate distance-based scale
   const getScale = useCallback(() => {
@@ -58,6 +56,11 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
   }, [mouseX, hoveredIndex, getScale, scale, translateY]);
 
   const handleClick = () => {
+    // Trigger launch celebration
+    setShowLaunchEffect(true);
+    haptic('light');
+    setTimeout(() => setShowLaunchEffect(false), 500);
+
     if (item.actionType === 'url') {
       window.open(item.actionValue, '_blank', 'noopener,noreferrer');
     } else if (item.actionType === 'email') {
@@ -94,7 +97,7 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
   return (
     <motion.button
       ref={itemRef}
-      className="relative flex items-center justify-center focus:outline-none"
+      className="relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-[13px]"
       style={{
         width: BASE_SIZE,
         height: BASE_SIZE,
@@ -102,10 +105,11 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
         scale,
         y: translateY,
       }}
+      aria-label={`${item.label}${item.actionType === 'url' ? ' (opens in new tab)' : item.actionType === 'email' ? ' (opens email)' : ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      whileTap={{ scale: 0.92 }}
+      whileTap={prefersReducedMotion ? {} : { scale: 0.92 }}
     >
       {/* Tooltip */}
       <AnimatePresence>
@@ -149,6 +153,22 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
         )}
       </AnimatePresence>
 
+      {/* Glow effect on hover */}
+      {isHovered && !prefersReducedMotion && (
+        <motion.div
+          className="absolute inset-0 rounded-[13px] pointer-events-none"
+          style={{
+            background: 'var(--accent-primary)',
+            filter: 'blur(16px)',
+            opacity: 0.4,
+          }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.4, scale: 1.2 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Icon Container */}
       <div
         className="dock-icon w-full h-full rounded-[13px] flex items-center justify-center overflow-hidden relative"
@@ -156,10 +176,13 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
           background: isEmoji
             ? 'var(--bg-elevated)'
             : 'transparent',
-          boxShadow: isEmoji
-            ? 'var(--shadow-item)'
-            : `0 4px 16px -3px rgba(0, 0, 0, 0.15), 0 0 0 0.5px var(--border-glass-inner)`,
+          boxShadow: isHovered
+            ? `0 8px 32px -4px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border-glass-inner)`
+            : isEmoji
+              ? 'var(--shadow-item)'
+              : `0 4px 16px -3px rgba(0, 0, 0, 0.15), 0 0 0 0.5px var(--border-glass-inner)`,
           border: isEmoji ? '1px solid var(--border-light)' : undefined,
+          transition: 'box-shadow 0.2s ease-out',
         }}
       >
         {isEmoji ? (
@@ -191,6 +214,17 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
           </>
         )}
       </div>
+
+      {/* Launch celebration effect */}
+      <SparkleEffect
+        trigger={showLaunchEffect}
+        config={{
+          count: 8,
+          spread: 40,
+          colors: ['var(--accent-primary)', '#FFD700', '#4ECDC4', '#F472B6'],
+          duration: 500,
+        }}
+      />
 
       {/* Active indicator dot */}
       <motion.div

@@ -107,10 +107,21 @@
   --text-primary: #1D1D1F;
   --text-secondary: #6E6E73;
   --text-tertiary: #AEAEB2;
+  --text-quaternary: #C7C7CC;
   --text-on-glass: rgba(0, 0, 0, 0.85);
   --text-on-dark: #FFFFFF;
   --text-on-image: #FFFFFF;
   --text-on-accent: #FFFFFF;
+
+  /* Additional Backgrounds */
+  --bg-secondary: rgba(0, 0, 0, 0.04);
+  --bg-tertiary: rgba(0, 0, 0, 0.08);
+
+  /* Additional Borders */
+  --border-subtle: rgba(0, 0, 0, 0.03);
+
+  /* Additional Shadows */
+  --shadow-xl: 0 25px 60px rgba(0, 0, 0, 0.25);
 
   /* Borders */
   --border-light: rgba(0, 0, 0, 0.06);
@@ -268,10 +279,21 @@
   --text-primary: #F8F8FA;
   --text-secondary: #94949C;
   --text-tertiary: #56565C;
+  --text-quaternary: #3A3A3E;
   --text-on-glass: rgba(255, 255, 255, 0.94);
   --text-on-dark: #FFFFFF;
   --text-on-image: #FFFFFF;
   --text-on-accent: #000000;
+
+  /* Additional Backgrounds */
+  --bg-secondary: rgba(255, 255, 255, 0.04);
+  --bg-tertiary: rgba(255, 255, 255, 0.08);
+
+  /* Additional Borders */
+  --border-subtle: rgba(255, 255, 255, 0.02);
+
+  /* Additional Shadows */
+  --shadow-xl: 0 25px 60px rgba(0, 0, 0, 0.5);
 
   /* Borders - glowing edges */
   --border-light: rgba(255, 255, 255, 0.045);
@@ -418,10 +440,21 @@
   --text-primary: #000000;
   --text-secondary: rgba(0, 0, 0, 0.55);
   --text-tertiary: rgba(0, 0, 0, 0.35);
+  --text-quaternary: rgba(0, 0, 0, 0.2);
   --text-on-glass: rgba(0, 0, 0, 0.88);
   --text-on-dark: #FFFFFF;
   --text-on-image: #FFFFFF;
   --text-on-accent: #FFFFFF;
+
+  /* Additional Backgrounds */
+  --bg-secondary: rgba(0, 0, 0, 0.02);
+  --bg-tertiary: rgba(0, 0, 0, 0.05);
+
+  /* Additional Borders */
+  --border-subtle: rgba(0, 0, 0, 0.02);
+
+  /* Additional Shadows */
+  --shadow-xl: 0 25px 60px rgba(0, 0, 0, 0.15);
 
   /* Borders - razor thin, barely there */
   --border-light: rgba(0, 0, 0, 0.04);
@@ -570,10 +603,21 @@
   --text-primary: #f5f5f0;
   --text-secondary: rgba(245, 245, 240, 0.55);
   --text-tertiary: rgba(245, 245, 240, 0.35);
+  --text-quaternary: rgba(245, 245, 240, 0.2);
   --text-on-glass: rgba(245, 245, 240, 0.92);
   --text-on-dark: #f5f5f0;
   --text-on-image: #f5f5f0;
   --text-on-accent: #0d0d0d;
+
+  /* Additional Backgrounds */
+  --bg-secondary: rgba(255, 255, 255, 0.03);
+  --bg-tertiary: rgba(255, 255, 255, 0.06);
+
+  /* Additional Borders */
+  --border-subtle: rgba(255, 255, 255, 0.02);
+
+  /* Additional Shadows */
+  --shadow-xl: 0 25px 60px rgba(0, 0, 0, 0.45);
 
   /* Borders - subtle warm edges */
   --border-light: rgba(255, 255, 255, 0.05);
@@ -800,9 +844,9 @@ body {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 12px rgba(0, 0, 0, 0.5), 0 0 24px rgba(0, 0, 0, 0.3);
 }
 
-/* Default desktop background */
+/* Default desktop background - macOS-inspired gradient */
 .default-background {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6B8DD6 100%);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
 
 /* ============================================
@@ -833,6 +877,11 @@ body {
   to { transform: rotate(360deg); }
 }
 
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
@@ -858,6 +907,10 @@ body {
 
 .animate-spin {
   animation: spin 800ms linear infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
 }
 
 .animate-pulse {

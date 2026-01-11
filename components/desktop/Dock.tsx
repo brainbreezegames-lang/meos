@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useRef, useCallback } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { DockItem } from './DockItem';
 import type { DockItem as DockItemType } from '@/types';
 
@@ -13,6 +13,39 @@ export function Dock({ items }: DockProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [mouseX, setMouseX] = useState<number | null>(null);
   const dockRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Keyboard navigation for dock - moves focus between items
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (items.length === 0) return;
+
+    const currentIndex = itemRefs.current.findIndex(ref => ref === document.activeElement);
+    let nextIndex = currentIndex;
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault();
+        nextIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+        break;
+      case 'Home':
+        e.preventDefault();
+        nextIndex = 0;
+        break;
+      case 'End':
+        e.preventDefault();
+        nextIndex = items.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    itemRefs.current[nextIndex]?.focus();
+  }, [items.length]);
 
   if (items.length === 0) return null;
 
@@ -29,19 +62,22 @@ export function Dock({ items }: DockProps) {
   };
 
   return (
-    <motion.div
+    <motion.nav
       className="fixed bottom-5 left-1/2 z-[100]"
-      initial={{ y: 100, x: '-50%' }}
+      initial={prefersReducedMotion ? { x: '-50%' } : { y: 100, x: '-50%' }}
       animate={{ y: 0, x: '-50%' }}
-      transition={{
+      transition={prefersReducedMotion ? { duration: 0.15 } : {
         type: 'spring',
         stiffness: 300,
         damping: 30,
         delay: 0.2
       }}
+      aria-label="Application dock"
     >
-      <motion.div
+      <div
         ref={dockRef}
+        role="toolbar"
+        aria-label="Quick launch applications"
         className="dock flex items-end gap-1 px-3 pb-2.5 pt-2"
         style={{
           borderRadius: '22px',
@@ -53,6 +89,7 @@ export function Dock({ items }: DockProps) {
         }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        onKeyDown={handleKeyDown}
       >
         {items.map((item, index) => (
           <DockItem
@@ -65,7 +102,7 @@ export function Dock({ items }: DockProps) {
             onHover={(hovered) => setHoveredIndex(hovered ? index : null)}
           />
         ))}
-      </motion.div>
+      </div>
 
       {/* Reflection/glow underneath */}
       <div
@@ -75,7 +112,8 @@ export function Dock({ items }: DockProps) {
           filter: 'blur(10px)',
           opacity: 0.5,
         }}
+        aria-hidden="true"
       />
-    </motion.div>
+    </motion.nav>
   );
 }

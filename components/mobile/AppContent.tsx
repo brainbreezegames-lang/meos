@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { DesktopItem, BlockData } from '@/types';
 
 interface AppContentProps {
@@ -11,6 +11,7 @@ interface AppContentProps {
 
 export function AppContent({ item, renderBlock }: AppContentProps) {
   const [activeTab, setActiveTab] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
   // Determine which blocks to show
   const blocksToRender = item.useTabs && item.tabs && item.tabs.length > 0
@@ -18,43 +19,43 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
     : item.blocks || [];
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden" role="main">
       {/* iOS Segmented Tabs */}
       {item.useTabs && item.tabs && item.tabs.length > 0 && (
-        <div className="flex-shrink-0 px-4 pt-3 pb-2">
+        <div className="flex-shrink-0 px-4 pt-3 pb-2" role="tablist" aria-label="Content tabs">
           <div
             className="flex p-1 rounded-xl relative"
-            style={{
-              background: 'rgba(118, 118, 128, 0.24)',
-            }}
+            style={{ background: 'var(--bg-secondary)' }}
           >
             {/* Animated selection indicator */}
             <motion.div
               className="absolute rounded-lg"
               style={{
-                background: 'rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                background: 'var(--bg-elevated)',
+                boxShadow: 'var(--shadow-sm)',
                 top: 4,
                 bottom: 4,
                 width: `calc(${100 / item.tabs.length}% - 4px)`,
               }}
               initial={false}
-              animate={{
-                x: `calc(${activeTab * 100}% + ${activeTab * 4}px)`,
-              }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              animate={{ x: `calc(${activeTab * 100}% + ${activeTab * 4}px)` }}
+              transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 }}
+              aria-hidden="true"
             />
 
             {item.tabs.map((tab, index) => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === index}
+                aria-controls={`tabpanel-${tab.id}`}
                 onClick={() => setActiveTab(index)}
-                className="flex-1 relative z-10 py-2 text-center transition-colors duration-200"
+                className="flex-1 relative z-10 py-2 text-center transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
                 style={{
                   fontSize: 13,
                   fontWeight: 500,
-                  color: activeTab === index ? 'white' : 'rgba(255, 255, 255, 0.6)',
-                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                  color: activeTab === index ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                  fontFamily: 'var(--font-body)',
                 }}
               >
                 {tab.label}
@@ -72,11 +73,13 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
+            id={item.useTabs && item.tabs ? `tabpanel-${item.tabs[activeTab]?.id}` : undefined}
+            role={item.useTabs ? 'tabpanel' : undefined}
             className="px-4 py-4"
-            initial={{ opacity: 0, x: 20 }}
+            initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
+            exit={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
           >
             {/* Description */}
             {item.windowDescription && (
@@ -85,12 +88,12 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
                 style={{
                   fontSize: 15,
                   lineHeight: 1.6,
-                  color: 'rgba(255, 255, 255, 0.85)',
-                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                  color: 'var(--text-secondary)',
+                  fontFamily: 'var(--font-body)',
                 }}
-                initial={{ opacity: 0 }}
+                initial={prefersReducedMotion ? {} : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                transition={{ delay: prefersReducedMotion ? 0 : 0.1 }}
               >
                 {item.windowDescription}
               </motion.p>
@@ -101,9 +104,9 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
               {blocksToRender.map((block, index) => (
                 <motion.div
                   key={block.id}
-                  initial={{ opacity: 0, y: 15 }}
+                  initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{
+                  transition={prefersReducedMotion ? { duration: 0 } : {
                     delay: index * 0.05,
                     type: 'spring',
                     stiffness: 400,
@@ -119,92 +122,99 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
             {item.windowGallery && item.windowGallery.length > 0 && (
               <motion.div
                 className="grid grid-cols-2 gap-2 mt-4"
-                initial={{ opacity: 0 }}
+                initial={prefersReducedMotion ? {} : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: prefersReducedMotion ? 0 : 0.2 }}
+                role="group"
+                aria-label="Gallery"
               >
                 {item.windowGallery.map((media, i) => (
-                  <motion.div
+                  <div
                     key={i}
                     className="aspect-square rounded-2xl overflow-hidden"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                    }}
-                    whileTap={{ scale: 0.98 }}
+                    style={{ background: 'var(--bg-secondary)' }}
                   >
                     {media.type === 'image' ? (
-                      <img src={media.url} alt="" className="w-full h-full object-cover" />
+                      <img
+                        src={media.url}
+                        alt={`Gallery image ${i + 1}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
                     ) : (
-                      <video src={media.url} className="w-full h-full object-cover" playsInline />
+                      <video
+                        src={media.url}
+                        className="w-full h-full object-cover"
+                        playsInline
+                        aria-label={`Gallery video ${i + 1}`}
+                      />
                     )}
-                  </motion.div>
+                  </div>
                 ))}
               </motion.div>
             )}
 
             {/* Legacy details */}
             {item.windowDetails && item.windowDetails.length > 0 && (
-              <motion.div
+              <motion.dl
                 className="mt-4 rounded-2xl overflow-hidden"
-                style={{ background: 'rgba(255, 255, 255, 0.05)' }}
-                initial={{ opacity: 0 }}
+                style={{ background: 'var(--bg-secondary)' }}
+                initial={prefersReducedMotion ? {} : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.15 }}
+                transition={{ delay: prefersReducedMotion ? 0 : 0.15 }}
               >
                 {item.windowDetails.map((detail, i) => (
                   <div
                     key={i}
                     className="flex justify-between px-4 py-3"
                     style={{
-                      borderBottom: i < item.windowDetails!.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                      borderBottom: i < item.windowDetails!.length - 1 ? '1px solid var(--border-light)' : 'none',
                     }}
                   >
-                    <span
+                    <dt
                       style={{
                         fontSize: 15,
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                        color: 'var(--text-tertiary)',
+                        fontFamily: 'var(--font-body)',
                       }}
                     >
                       {detail.label}
-                    </span>
-                    <span
+                    </dt>
+                    <dd
                       style={{
                         fontSize: 15,
-                        color: 'white',
-                        fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                        color: 'var(--text-primary)',
+                        fontFamily: 'var(--font-body)',
                       }}
                     >
                       {detail.value}
-                    </span>
+                    </dd>
                   </div>
                 ))}
-              </motion.div>
+              </motion.dl>
             )}
 
             {/* Legacy links */}
             {item.windowLinks && item.windowLinks.length > 0 && (
-              <div className="space-y-2 mt-4">
+              <nav className="space-y-2 mt-4" aria-label="Related links">
                 {item.windowLinks.map((link, i) => (
                   <motion.a
                     key={i}
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-2xl"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                    }}
-                    initial={{ opacity: 0, y: 10 }}
+                    className="flex items-center justify-between p-4 rounded-2xl focus-visible:outline-none focus-visible:ring-2"
+                    style={{ background: 'var(--bg-secondary)' }}
+                    initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 + i * 0.05 }}
-                    whileTap={{ scale: 0.98, background: 'rgba(255, 255, 255, 0.1)' }}
+                    transition={{ delay: prefersReducedMotion ? 0 : 0.2 + i * 0.05 }}
+                    whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                   >
                     <span
                       style={{
                         fontSize: 15,
-                        color: '#0A84FF',
-                        fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                        color: 'var(--accent-primary)',
+                        fontFamily: 'var(--font-body)',
                       }}
                     >
                       {link.label}
@@ -214,30 +224,33 @@ export function AppContent({ item, renderBlock }: AppContentProps) {
                       height="16"
                       viewBox="0 0 24 24"
                       fill="none"
-                      stroke="rgba(255,255,255,0.3)"
+                      stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      style={{ color: 'var(--text-quaternary)' }}
+                      aria-hidden="true"
                     >
                       <polyline points="9 18 15 12 9 6" />
                     </svg>
                   </motion.a>
                 ))}
-              </div>
+              </nav>
             )}
           </motion.div>
         </AnimatePresence>
 
         {/* Bottom safe area */}
-        <div className="h-8" />
+        <div className="h-8" aria-hidden="true" />
       </div>
     </div>
   );
 }
 
-// Premium iOS block renderer
+// Premium iOS block renderer with proper tokens
 function BlockRenderer({ block }: { block: BlockData }) {
   const data = block.data as Record<string, unknown>;
+  const prefersReducedMotion = useReducedMotion();
 
   switch (block.type) {
     case 'text':
@@ -246,8 +259,8 @@ function BlockRenderer({ block }: { block: BlockData }) {
           style={{
             fontSize: 15,
             lineHeight: 1.6,
-            color: 'rgba(255, 255, 255, 0.85)',
-            fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+            color: 'var(--text-secondary)',
+            fontFamily: 'var(--font-body)',
           }}
         >
           {String(data.content || data.text || '')}
@@ -260,8 +273,8 @@ function BlockRenderer({ block }: { block: BlockData }) {
           style={{
             fontSize: 20,
             fontWeight: 600,
-            color: 'white',
-            fontFamily: '"SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+            color: 'var(--text-primary)',
+            fontFamily: 'var(--font-display)',
             letterSpacing: '-0.3px',
           }}
         >
@@ -271,59 +284,59 @@ function BlockRenderer({ block }: { block: BlockData }) {
 
     case 'image':
       return (
-        <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+        <figure className="rounded-2xl overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
           <img
             src={String(data.url || data.src || '')}
-            alt={String(data.alt || '')}
+            alt={String(data.alt || 'Image')}
             className="w-full"
             loading="lazy"
           />
           {data.caption ? (
-            <p
+            <figcaption
               className="px-4 py-3"
               style={{
                 fontSize: 13,
-                color: 'rgba(255, 255, 255, 0.5)',
-                fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                color: 'var(--text-tertiary)',
+                fontFamily: 'var(--font-body)',
               }}
             >
               {String(data.caption)}
-            </p>
+            </figcaption>
           ) : null}
-        </div>
+        </figure>
       );
 
     case 'gallery':
       const images = Array.isArray(data.images) ? data.images : [];
       return (
-        <div className="grid grid-cols-2 gap-2">
-          {images.map((img: { url?: string; src?: string }, i: number) => (
-            <motion.div
+        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Image gallery">
+          {images.map((img: { url?: string; src?: string; alt?: string }, i: number) => (
+            <div
               key={i}
               className="aspect-square rounded-2xl overflow-hidden"
-              style={{ background: 'rgba(255,255,255,0.05)' }}
-              whileTap={{ scale: 0.98 }}
+              style={{ background: 'var(--bg-secondary)' }}
             >
               <img
                 src={String(img.url || img.src || '')}
-                alt=""
+                alt={String(img.alt || `Gallery image ${i + 1}`)}
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-            </motion.div>
+            </div>
           ))}
         </div>
       );
 
     case 'video':
       return (
-        <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
           <video
             src={String(data.url || data.src || '')}
             controls
             playsInline
             className="w-full"
             poster={String(data.thumbnail || data.poster || '')}
+            aria-label={String(data.title || 'Video')}
           />
         </div>
       );
@@ -340,21 +353,21 @@ function BlockRenderer({ block }: { block: BlockData }) {
               href={String(btn.url || btn.href || '#')}
               target={btn.newTab ? '_blank' : undefined}
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-4 rounded-2xl"
+              className="flex items-center justify-between p-4 rounded-2xl focus-visible:outline-none focus-visible:ring-2"
               style={{
-                background: btn.style === 'primary' ? '#0A84FF' : 'rgba(255, 255, 255, 0.08)',
+                background: btn.style === 'primary' ? 'var(--accent-primary)' : 'var(--bg-secondary)',
               }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
             >
               <span
                 style={{
                   fontSize: 15,
                   fontWeight: 500,
-                  color: btn.style === 'primary' ? 'white' : '#0A84FF',
-                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                  color: btn.style === 'primary' ? 'var(--text-on-accent)' : 'var(--accent-primary)',
+                  fontFamily: 'var(--font-body)',
                 }}
               >
-                {btn.icon ? <span className="mr-2">{String(btn.icon)}</span> : null}
+                {btn.icon ? <span className="mr-2" aria-hidden="true">{String(btn.icon)}</span> : null}
                 {String(btn.label || btn.text || 'Link')}
               </span>
               <svg
@@ -362,10 +375,12 @@ function BlockRenderer({ block }: { block: BlockData }) {
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={btn.style === 'primary' ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.3)'}
+                stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                style={{ color: btn.style === 'primary' ? 'var(--text-on-accent)' : 'var(--text-quaternary)', opacity: btn.style === 'primary' ? 0.7 : 1 }}
+                aria-hidden="true"
               >
                 <polyline points="9 18 15 12 9 6" />
               </svg>
@@ -377,220 +392,160 @@ function BlockRenderer({ block }: { block: BlockData }) {
     case 'details':
       const details = Array.isArray(data.items) ? data.items : [];
       return (
-        <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255, 255, 255, 0.05)' }}>
+        <dl className="rounded-2xl overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
           {details.map((item: { label?: string; value?: string }, i: number) => (
             <div
               key={i}
               className="flex justify-between px-4 py-3"
               style={{
-                borderBottom: i < details.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                borderBottom: i < details.length - 1 ? '1px solid var(--border-light)' : 'none',
               }}
             >
-              <span
-                style={{
-                  fontSize: 15,
-                  color: 'rgba(255, 255, 255, 0.6)',
-                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-                }}
-              >
+              <dt style={{ fontSize: 15, color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}>
                 {String(item.label || '')}
-              </span>
-              <span
-                style={{
-                  fontSize: 15,
-                  color: 'white',
-                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-                }}
-              >
+              </dt>
+              <dd style={{ fontSize: 15, color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>
                 {String(item.value || '')}
-              </span>
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
       );
 
     case 'timeline':
       const timelineItems = Array.isArray(data.items) ? data.items : [];
       return (
-        <div className="space-y-4 pl-4 border-l-2 border-white/20">
+        <ol className="space-y-4 pl-4 border-l-2" style={{ borderColor: 'var(--border-medium)' }} aria-label="Timeline">
           {timelineItems.map((item: { date?: string; title?: string; subtitle?: string; description?: string }, i: number) => (
-            <motion.div
+            <motion.li
               key={i}
               className="relative pl-4"
-              initial={{ opacity: 0, x: -10 }}
+              initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: prefersReducedMotion ? 0 : i * 0.1 }}
             >
               <div
                 className="absolute -left-[21px] w-3 h-3 rounded-full"
-                style={{ background: i === 0 ? '#0A84FF' : 'rgba(255,255,255,0.3)' }}
+                style={{ background: i === 0 ? 'var(--accent-primary)' : 'var(--text-quaternary)' }}
+                aria-hidden="true"
               />
-              <span
+              <time
                 style={{
                   fontSize: 12,
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                  color: 'var(--text-tertiary)',
+                  fontFamily: 'var(--font-body)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                 }}
               >
                 {String(item.date || '')}
-              </span>
-              <h4
-                style={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: 'white',
-                  marginTop: 2,
-                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-                }}
-              >
+              </time>
+              <h4 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginTop: 2, fontFamily: 'var(--font-body)' }}>
                 {String(item.title || '')}
               </h4>
               {item.subtitle && (
-                <p
-                  style={{
-                    fontSize: 14,
-                    color: '#0A84FF',
-                    fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-                  }}
-                >
+                <p style={{ fontSize: 14, color: 'var(--accent-primary)', fontFamily: 'var(--font-body)' }}>
                   {String(item.subtitle)}
                 </p>
               )}
               {item.description && (
-                <p
-                  style={{
-                    fontSize: 14,
-                    color: 'rgba(255, 255, 255, 0.6)',
-                    marginTop: 4,
-                    fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-                  }}
-                >
+                <p style={{ fontSize: 14, color: 'var(--text-tertiary)', marginTop: 4, fontFamily: 'var(--font-body)' }}>
                   {String(item.description)}
                 </p>
               )}
-            </motion.div>
+            </motion.li>
           ))}
-        </div>
+        </ol>
       );
 
     case 'social':
       const profiles = Array.isArray(data.profiles) ? data.profiles : [];
       const socialIcons: Record<string, string> = {
-        twitter: '𝕏',
-        linkedin: 'in',
-        github: '⌘',
-        dribbble: '◉',
-        instagram: '◎',
-        youtube: '▶',
-        facebook: 'f',
-        tiktok: '♪',
+        twitter: '𝕏', linkedin: 'in', github: '⌘', dribbble: '◉',
+        instagram: '◎', youtube: '▶', facebook: 'f', tiktok: '♪',
       };
       return (
-        <div className="flex flex-wrap gap-2">
+        <nav className="flex flex-wrap gap-2" aria-label="Social links">
           {profiles.map((profile: { platform?: string; url?: string }, i: number) => (
             <motion.a
               key={i}
               href={String(profile.url || '#')}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center rounded-xl"
+              aria-label={`Visit ${profile.platform || 'social'} profile`}
+              className="flex items-center justify-center rounded-xl focus-visible:outline-none focus-visible:ring-2"
               style={{
                 width: 48,
                 height: 48,
-                background: 'rgba(255, 255, 255, 0.08)',
+                background: 'var(--bg-secondary)',
                 fontSize: 18,
-                color: 'white',
-                fontFamily: '-apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-body)',
               }}
-              whileTap={{ scale: 0.92 }}
+              whileTap={prefersReducedMotion ? {} : { scale: 0.92 }}
             >
               {socialIcons[String(profile.platform || '').toLowerCase()] || '🔗'}
             </motion.a>
           ))}
-        </div>
+        </nav>
       );
 
     case 'list':
       const listItems = Array.isArray(data.items) ? data.items : [];
       const listStyle = data.style || 'bullet';
+      const ListTag = listStyle === 'number' ? 'ol' : 'ul';
       return (
-        <div className="space-y-2">
+        <ListTag className="space-y-2">
           {listItems.map((item: string | { text?: string }, i: number) => (
-            <div key={i} className="flex items-start gap-3">
+            <li key={i} className="flex items-start gap-3">
               <span
                 style={{
-                  color: listStyle === 'check' ? '#30D158' : 'rgba(255,255,255,0.4)',
+                  color: listStyle === 'check' ? 'var(--accent-success)' : 'var(--text-quaternary)',
                   fontSize: 14,
                   marginTop: 2,
                 }}
+                aria-hidden="true"
               >
                 {listStyle === 'check' ? '✓' : listStyle === 'number' ? `${i + 1}.` : '•'}
               </span>
-              <span
-                style={{
-                  fontSize: 15,
-                  color: 'rgba(255, 255, 255, 0.85)',
-                  fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-                }}
-              >
+              <span style={{ fontSize: 15, color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
                 {typeof item === 'string' ? item : String(item.text || '')}
               </span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ListTag>
       );
 
     case 'quote':
       return (
-        <div
-          className="pl-4 py-2"
-          style={{
-            borderLeft: '3px solid #0A84FF',
-          }}
-        >
-          <p
-            style={{
-              fontSize: 16,
-              fontStyle: 'italic',
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-            }}
-          >
+        <blockquote className="pl-4 py-2" style={{ borderLeft: '3px solid var(--accent-primary)' }}>
+          <p style={{ fontSize: 16, fontStyle: 'italic', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
             {String(data.content || data.text || '')}
           </p>
           {data.author ? (
-            <p
-              style={{
-                fontSize: 13,
-                color: 'rgba(255, 255, 255, 0.5)',
-                marginTop: 8,
-                fontFamily: '"SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-              }}
-            >
+            <cite style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 8, display: 'block', fontStyle: 'normal', fontFamily: 'var(--font-body)' }}>
               — {String(data.author)}
-            </p>
+            </cite>
           ) : null}
-        </div>
+        </blockquote>
       );
 
     case 'divider':
       return (
-        <div
+        <hr
           className="my-4"
           style={{
             height: 1,
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0.15) 80%, transparent 100%)',
+            border: 'none',
+            background: 'linear-gradient(90deg, transparent 0%, var(--border-light) 20%, var(--border-light) 80%, transparent 100%)',
           }}
         />
       );
 
     case 'spacer':
-      return <div style={{ height: Number(data.height) || 24 }} />;
+      return <div style={{ height: Number(data.height) || 24 }} aria-hidden="true" />;
 
     default:
-      // For any unrecognized block types, show nothing
       return null;
   }
 }

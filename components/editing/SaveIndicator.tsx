@@ -1,14 +1,39 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useEditContextSafe } from '@/contexts/EditContext';
+import { SparkleEffect, haptic } from '@/components/ui/Delight';
 
 export function SaveIndicator() {
   const context = useEditContextSafe();
+  const prefersReducedMotion = useReducedMotion();
+  const [showSparkles, setShowSparkles] = useState(false);
+  const [prevStatus, setPrevStatus] = useState<string | null>(null);
+
+  const saveStatus = context?.saveStatus;
+
+  // Trigger celebration effects on status change
+  useEffect(() => {
+    if (!context?.isOwner) return;
+
+    if (saveStatus === 'saved' && prevStatus === 'saving') {
+      setShowSparkles(true);
+      haptic('success');
+      setTimeout(() => setShowSparkles(false), 600);
+    } else if (saveStatus === 'error' && prevStatus === 'saving') {
+      haptic('error');
+    }
+
+    setPrevStatus(saveStatus || null);
+  }, [saveStatus, prevStatus, context?.isOwner]);
 
   if (!context?.isOwner) return null;
 
-  const { saveStatus } = context;
+  // Error shake animation
+  const shakeAnimation = saveStatus === 'error' && !prefersReducedMotion
+    ? { x: [0, -6, 6, -4, 4, -2, 2, 0] }
+    : {};
 
   return (
     <AnimatePresence>
@@ -16,18 +41,37 @@ export function SaveIndicator() {
         <motion.div
           className="fixed bottom-20 right-4 z-[100] flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-medium"
           initial={{ opacity: 0, y: 10, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ...shakeAnimation,
+          }}
           exit={{ opacity: 0, y: 10, scale: 0.95 }}
           transition={{ duration: 0.2 }}
           style={{
             background: saveStatus === 'error'
               ? 'rgba(239, 68, 68, 0.9)'
-              : 'rgba(255, 255, 255, 0.9)',
+              : saveStatus === 'saved'
+                ? 'rgba(34, 197, 94, 0.9)'
+                : 'rgba(255, 255, 255, 0.9)',
             backdropFilter: 'blur(20px)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-            color: saveStatus === 'error' ? 'white' : '#1d1d1f',
+            boxShadow: saveStatus === 'saved'
+              ? '0 4px 20px rgba(34, 197, 94, 0.3)'
+              : '0 4px 20px rgba(0, 0, 0, 0.1)',
+            color: saveStatus === 'error' || saveStatus === 'saved' ? 'white' : '#1d1d1f',
           }}
         >
+          {/* Sparkle celebration for save success */}
+          <SparkleEffect
+            trigger={showSparkles}
+            config={{
+              count: 10,
+              spread: 50,
+              colors: ['#22c55e', '#4ade80', '#86efac', '#fbbf24', '#f472b6'],
+            }}
+          />
+
           {saveStatus === 'saving' && (
             <>
               <motion.div
@@ -41,19 +85,22 @@ export function SaveIndicator() {
           {saveStatus === 'saved' && (
             <>
               <motion.svg
-                className="w-3 h-3"
-                viewBox="0 0 12 12"
+                className="w-3.5 h-3.5"
+                viewBox="0 0 16 16"
                 fill="none"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                initial={{ scale: 0, rotate: -45 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
               >
-                <path
-                  d="M2 6l3 3 5-6"
+                <motion.path
+                  d="M3 8l4 4 6-7"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
                 />
               </motion.svg>
               <span>Saved</span>
@@ -66,7 +113,7 @@ export function SaveIndicator() {
                 <path d="M6 3.5v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 <circle cx="6" cy="8.5" r="0.75" fill="currentColor" />
               </svg>
-              <span>Failed to save</span>
+              <span>Save failed — try again</span>
             </>
           )}
         </motion.div>

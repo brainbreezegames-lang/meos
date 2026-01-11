@@ -360,7 +360,7 @@ export function BlockItemForm({ item, onSave, onDelete, onClose, onUpload }: Blo
               style={{ border: '2px dashed var(--border-medium)' }}
             >
               <p className="text-[13px] mb-2" style={{ color: 'var(--text-tertiary)' }}>
-                No blocks yet
+                This window is empty
               </p>
               <button
                 type="button"
@@ -368,7 +368,7 @@ export function BlockItemForm({ item, onSave, onDelete, onClose, onUpload }: Blo
                 className="text-[12px] font-medium"
                 style={{ color: 'var(--accent-primary)' }}
               >
-                Add your first block
+                Add a content block
               </button>
             </div>
           )}

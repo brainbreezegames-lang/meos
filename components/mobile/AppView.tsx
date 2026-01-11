@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion, useMotionValue, useTransform, AnimatePresence, PanInfo } from 'framer-motion';
+import { motion, useMotionValue, useTransform, AnimatePresence, PanInfo, useReducedMotion } from 'framer-motion';
 import { useMobileNav } from '@/contexts/MobileNavigationContext';
 import { DesktopItem, BlockData } from '@/types';
 import { AppHeader } from './AppHeader';
@@ -17,10 +17,9 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
   const { closeApp } = useMobileNav();
   const containerRef = useRef<HTMLDivElement>(null);
   const dragX = useMotionValue(0);
+  const prefersReducedMotion = useReducedMotion();
 
-  // iOS-style parallax transforms for back gesture
-  const backgroundX = useTransform(dragX, [0, 300], [0, 80]);
-  const backgroundScale = useTransform(dragX, [0, 300], [0.94, 1]);
+  // iOS-style transforms for back gesture
   const shadowOpacity = useTransform(dragX, [0, 300], [0.5, 0]);
   const edgeGlowOpacity = useTransform(dragX, [0, 50], [0, 1]);
 
@@ -34,6 +33,13 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeApp();
+    }
+  };
+
   return (
     <>
       {/* Shadow layer - iOS depth effect */}
@@ -43,33 +49,39 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
           opacity: shadowOpacity,
           background: 'linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 30%)',
         }}
+        aria-hidden="true"
       />
 
       {/* Main app view - draggable */}
       <motion.div
         ref={containerRef}
         className="fixed inset-0 z-[100] flex flex-col overflow-hidden"
+        role="dialog"
+        aria-label={`${item.windowTitle || item.label} app view`}
+        aria-modal="true"
+        tabIndex={-1}
+        onKeyDown={handleKeyDown}
         style={{
           x: dragX,
-          background: 'linear-gradient(180deg, #1c1c1e 0%, #000000 100%)',
+          background: 'var(--bg-solid)',
           boxShadow: '-10px 0 40px rgba(0,0,0,0.5)',
         }}
-        drag="x"
+        drag={prefersReducedMotion ? false : "x"}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={{ left: 0.15, right: 0 }}
         dragMomentum={false}
         onDragEnd={handleDragEnd}
-        initial={{ x: '100%' }}
+        initial={{ x: prefersReducedMotion ? 0 : '100%' }}
         animate={{ x: 0 }}
         exit={{
           x: '100%',
-          transition: {
+          transition: prefersReducedMotion ? { duration: 0 } : {
             type: 'spring',
             stiffness: 400,
             damping: 40,
           }
         }}
-        transition={{
+        transition={prefersReducedMotion ? { duration: 0 } : {
           type: 'spring',
           stiffness: 400,
           damping: 40,
@@ -77,13 +89,16 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
         }}
       >
         {/* Edge glow indicator for swipe */}
-        <motion.div
-          className="absolute left-0 top-0 bottom-0 w-1 pointer-events-none"
-          style={{
-            opacity: edgeGlowOpacity,
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%)',
-          }}
-        />
+        {!prefersReducedMotion && (
+          <motion.div
+            className="absolute left-0 top-0 bottom-0 w-1 pointer-events-none"
+            style={{
+              opacity: edgeGlowOpacity,
+              background: 'linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%)',
+            }}
+            aria-hidden="true"
+          />
+        )}
 
         {/* Header */}
         <AppHeader
@@ -106,14 +121,15 @@ export function AppView({ item, renderBlock, rightAction }: AppViewProps) {
             paddingBottom: 'max(env(safe-area-inset-bottom, 8px), 8px)',
           }}
         >
-          <motion.div
+          <div
             className="rounded-full"
             style={{
               width: 134,
               height: 5,
-              background: 'rgba(255, 255, 255, 0.25)',
+              background: 'var(--text-tertiary)',
+              opacity: 0.5,
             }}
-            whileHover={{ background: 'rgba(255, 255, 255, 0.4)' }}
+            aria-hidden="true"
           />
         </div>
       </motion.div>

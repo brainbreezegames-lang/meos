@@ -26,13 +26,13 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        setError("That email and password combination didn't work. Try again or reset your password.");
       } else {
         router.push('/edit');
         router.refresh();
       }
     } catch {
-      setError('Something went wrong');
+      setError('Unable to sign in right now. Please try again in a moment.');
     } finally {
       setIsLoading(false);
     }

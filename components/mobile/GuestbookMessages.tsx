@@ -229,7 +229,7 @@ export function GuestbookMessages({
                   className="text-white/50 text-center"
                   style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
                 >
-                  No messages yet.<br />Be the first to leave a note!
+                  No messages yet.<br />Leave the first note!
                 </p>
               </div>
             )}

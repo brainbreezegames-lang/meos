@@ -308,7 +308,7 @@ export default function EditPage() {
             }}
           />
           <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>
-            Loading...
+            Loading your desktop
           </span>
         </div>
       </div>

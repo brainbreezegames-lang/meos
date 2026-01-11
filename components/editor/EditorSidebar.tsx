@@ -128,7 +128,7 @@ export function EditorSidebar({
                       className="text-center py-8 text-[13px]"
                       style={{ color: 'var(--text-tertiary)' }}
                     >
-                      No items yet. Add your first project!
+                      Your desktop is empty. Tap + Add to create your first item.
                     </div>
                   ) : (
                     <div className="space-y-2">

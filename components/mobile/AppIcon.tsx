@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import { haptic } from '@/components/ui/Delight';
 
 interface AppIconProps {
   id: string;
@@ -13,8 +14,10 @@ interface AppIconProps {
   size?: number;
 }
 
+const LONG_PRESS_DURATION = 500;
+
 export function AppIcon({
-  id: _id,
+  id,
   icon,
   label,
   onTap,
@@ -25,9 +28,12 @@ export function AppIcon({
   const [isPressed, setIsPressed] = useState(false);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const longPressTriggeredRef = useRef(false);
+  const prefersReducedMotion = useReducedMotion();
 
   const isImageIcon = icon.startsWith('http') || icon.startsWith('/') || icon.startsWith('data:');
   const cornerRadius = size * 0.22;
+  // Ensure minimum 44px touch target
+  const touchTargetSize = Math.max(size + 20, 44);
 
   const clearLongPress = () => {
     if (longPressTimerRef.current) {
@@ -45,7 +51,7 @@ export function AppIcon({
         longPressTriggeredRef.current = true;
         onLongPress();
         if ('vibrate' in navigator) navigator.vibrate(10);
-      }, 500);
+      }, LONG_PRESS_DURATION);
     }
   };
 
@@ -59,14 +65,39 @@ export function AppIcon({
       longPressTriggeredRef.current = false;
       return;
     }
-    if ('vibrate' in navigator) navigator.vibrate(3);
+    haptic('light');
+    setShowTapGlow(true);
+    setTimeout(() => setShowTapGlow(false), 300);
     onTap();
   };
 
+  const [showTapGlow, setShowTapGlow] = useState(false);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (!isEditing) {
+        onTap();
+      }
+    }
+  };
+
+  const [imageError, setImageError] = useState(false);
+
   return (
-    <motion.div
-      className="flex flex-col items-center select-none cursor-pointer"
-      style={{ width: size + 20 }}
+    <motion.button
+      type="button"
+      data-app-id={id}
+      aria-label={`Open ${label}${isEditing ? ' (editing mode)' : ''}`}
+      aria-pressed={isPressed}
+      className="flex flex-col items-center select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-xl"
+      style={{
+        width: touchTargetSize,
+        minHeight: touchTargetSize + 24, // Account for label
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+      }}
       onMouseDown={handlePressStart}
       onMouseUp={handlePressEnd}
       onMouseLeave={handlePressEnd}
@@ -74,57 +105,69 @@ export function AppIcon({
       onTouchEnd={handlePressEnd}
       onTouchCancel={handlePressEnd}
       onClick={handleClick}
-      animate={isEditing ? { rotate: [-1.5, 1.5, -1.5] } : { rotate: 0 }}
-      transition={isEditing ? { duration: 0.12, repeat: Infinity, repeatType: 'reverse' } : {}}
+      onKeyDown={handleKeyDown}
+      animate={isEditing && !prefersReducedMotion ? { rotate: [-1.5, 1.5, -1.5] } : { rotate: 0 }}
+      transition={isEditing && !prefersReducedMotion ? { duration: 0.12, repeat: Infinity, repeatType: 'reverse' } : {}}
     >
       {/* Icon container */}
       <motion.div
         className="relative overflow-hidden flex items-center justify-center"
-        animate={{ scale: isPressed ? 0.9 : 1 }}
+        animate={{ scale: isPressed && !prefersReducedMotion ? 0.9 : 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         style={{
           width: size,
           height: size,
           borderRadius: cornerRadius,
-          background: isImageIcon
+          background: isImageIcon && !imageError
             ? 'transparent'
             : 'linear-gradient(145deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)',
           boxShadow: isPressed
             ? '0 2px 8px rgba(0, 0, 0, 0.3)'
-            : '0 6px 20px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15)',
+            : showTapGlow
+              ? '0 0 24px rgba(255, 255, 255, 0.5), 0 6px 20px rgba(0, 0, 0, 0.25)'
+              : '0 6px 20px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15)',
           border: '0.5px solid rgba(255, 255, 255, 0.15)',
+          transition: 'box-shadow 0.15s ease-out',
         }}
+        aria-hidden="true"
       >
-        {isImageIcon ? (
+        {isImageIcon && !imageError ? (
           <img
             src={icon}
-            alt={label}
+            alt=""
             className="w-full h-full object-cover"
             style={{ borderRadius: cornerRadius }}
             draggable={false}
+            onError={() => setImageError(true)}
           />
         ) : (
-          <span style={{ fontSize: size * 0.5 }}>{icon}</span>
+          <span style={{ fontSize: size * 0.5 }} role="img" aria-hidden="true">
+            {imageError ? '📁' : icon}
+          </span>
         )}
 
         {/* Delete badge */}
         {isEditing && (
           <motion.div
-            className="absolute -top-1 -left-1 w-5 h-5 rounded-full flex items-center justify-center bg-red-500"
+            className="absolute -top-1 -left-1 w-5 h-5 rounded-full flex items-center justify-center"
+            style={{ background: 'var(--accent-danger, #FF3B30)' }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
+            aria-label="Delete app"
           >
-            <span className="text-white text-xs font-bold">−</span>
+            <span className="text-xs font-bold" style={{ color: 'var(--text-on-accent, white)' }}>−</span>
           </motion.div>
         )}
       </motion.div>
 
       {/* Label */}
       <span
-        className="text-center mt-1.5 text-white"
+        className="text-center mt-1.5"
         style={{
           fontSize: 11,
           fontWeight: 500,
+          fontFamily: 'var(--font-body)',
+          color: 'var(--text-on-image, white)',
           textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
           maxWidth: size + 12,
           overflow: 'hidden',
@@ -134,6 +177,6 @@ export function AppIcon({
       >
         {label}
       </span>
-    </motion.div>
+    </motion.button>
   );
 }

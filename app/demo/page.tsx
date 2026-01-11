@@ -22,6 +22,7 @@ import { CursorProvider, CursorSettingsPanel, type CursorSettings } from '@/comp
 import type { DesktopItem, Desktop } from '@/types';
 import { useMobileDetection } from '@/hooks/useMobileDetection';
 import { MobileContainer } from '@/components/mobile';
+import { ConfettiBurst, useKonamiCode } from '@/components/ui/Delight';
 
 // Persona visibility configuration for demo items
 // 'recruiter' = optimized for hiring decisions (resume, experience, skills, projects, testimonials, contact)
@@ -297,7 +298,7 @@ const DEMO_ITEMS: DesktopItem[] = [
   },
 
   // ============================================
-  // 2. CASE STUDY - Before/After, CaseStudy, Stats
+  // 2. CASE STUDY - Pages Window (Document Style)
   // ============================================
   {
     id: 'item-2',
@@ -310,42 +311,83 @@ const DEMO_ITEMS: DesktopItem[] = [
     windowSubtitle: 'Reimagining Music Discovery',
     windowHeaderImage: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&h=400&fit=crop',
     windowDescription: '',
-    windowWidth: 560,
+    windowType: 'pages',
+    windowWidth: 720,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
-    useTabs: false,
-    tabs: [],
-    blocks: [
-      { id: 'cs1', type: 'details', order: 0, data: { items: [
-        { label: 'Client', value: 'Spotify' },
-        { label: 'Role', value: 'Lead Designer' },
-        { label: 'Year', value: '2024' },
-        { label: 'Duration', value: '4 months' },
-      ] } },
-      { id: 'cs2', type: 'divider', order: 1, data: { style: 'line' } },
-      { id: 'cs3', type: 'case-study', order: 2, data: { sections: {
-        challenge: 'Gen Z users were spending 40% less time in the app compared to millennials. Discovery felt stale and algorithmic playlists weren\'t resonating with younger audiences.',
-        approach: 'Conducted 30 user interviews, created journey maps, and identified 5 key friction points. Prototyped 12 different concepts and tested with 200+ users.',
-        solution: 'Redesigned the discovery flow with TikTok-style vertical scrolling and AI-powered suggestions. Added social features like listening parties and collaborative playlists.',
-        result: 'Shipped to 50M users with overwhelmingly positive feedback. Featured in Fast Company and nominated for a Webby Award.',
-      } } },
-      { id: 'cs4', type: 'stats', order: 3, data: { items: [
-        { value: '+47%', label: 'Time in App' },
-        { value: '+23%', label: 'Saves per User' },
-        { value: '4.8', label: 'App Rating', suffix: '★' },
-      ] } },
-      { id: 'cs5', type: 'heading', order: 4, data: { text: 'Before & After', level: 3 } },
-      { id: 'cs6', type: 'before-after', order: 5, data: {
-        before: { image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=600&h=400&fit=crop', label: 'Old Design' },
-        after: { image: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=600&h=400&fit=crop', label: 'New Design' },
-        style: 'slider',
-      } },
-      { id: 'cs7', type: 'buttons', order: 6, data: { buttons: [
-        { label: 'View Live Site', url: 'https://spotify.com', style: 'primary', newTab: true },
-        { label: 'Read Full Case Study', url: '#', style: 'secondary', newTab: true },
-      ] } },
+    useTabs: true,
+    tabs: [
+      {
+        id: 'tab-overview',
+        label: 'Overview',
+        order: 0,
+        blocks: [
+          { id: 'cs1', type: 'details', order: 0, data: { items: [
+            { label: 'Client', value: 'Spotify' },
+            { label: 'Role', value: 'Lead Designer' },
+            { label: 'Year', value: '2024' },
+            { label: 'Duration', value: '4 months' },
+          ] } },
+          { id: 'cs2', type: 'divider', order: 1, data: { style: 'line' } },
+          { id: 'cs3', type: 'text', order: 2, data: { content: 'This case study explores how we reimagined the music discovery experience for Generation Z users, resulting in a 47% increase in time spent in the app and widespread critical acclaim.' } },
+          { id: 'cs4', type: 'stats', order: 3, data: { items: [
+            { value: '+47%', label: 'Time in App' },
+            { value: '+23%', label: 'Saves per User' },
+            { value: '4.8', label: 'App Rating', suffix: '★' },
+          ] } },
+        ],
+      },
+      {
+        id: 'tab-challenge',
+        label: 'The Challenge',
+        order: 1,
+        blocks: [
+          { id: 'cs5', type: 'heading', order: 0, data: { text: 'Understanding the Problem', level: 2 } },
+          { id: 'cs6', type: 'text', order: 1, data: { content: 'Gen Z users were spending 40% less time in the app compared to millennials. Discovery felt stale and algorithmic playlists were not resonating with younger audiences. We needed to fundamentally rethink how users find and connect with music.' } },
+          { id: 'cs7', type: 'callout', order: 2, data: { text: 'Key insight: Gen Z users crave authenticity and social connection, not just algorithmic recommendations.', style: 'warning', icon: '💡' } },
+        ],
+      },
+      {
+        id: 'tab-solution',
+        label: 'Solution',
+        order: 2,
+        blocks: [
+          { id: 'cs8', type: 'heading', order: 0, data: { text: 'Our Approach', level: 2 } },
+          { id: 'cs9', type: 'text', order: 1, data: { content: 'We conducted 30 user interviews, created journey maps, and identified 5 key friction points. We prototyped 12 different concepts and tested with 200+ users before landing on our final solution.' } },
+          { id: 'cs10', type: 'heading', order: 2, data: { text: 'Key Features', level: 3 } },
+          { id: 'cs11', type: 'list', order: 3, data: { style: 'check', items: [
+            'TikTok-style vertical scrolling for music discovery',
+            'AI-powered suggestions based on mood and context',
+            'Social features like listening parties',
+            'Collaborative playlists with friends',
+          ] } },
+          { id: 'cs12', type: 'before-after', order: 4, data: {
+            before: { image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?w=600&h=400&fit=crop', label: 'Old Design' },
+            after: { image: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=600&h=400&fit=crop', label: 'New Design' },
+            style: 'slider',
+          } },
+        ],
+      },
+      {
+        id: 'tab-results',
+        label: 'Results',
+        order: 3,
+        blocks: [
+          { id: 'cs13', type: 'heading', order: 0, data: { text: 'Impact & Recognition', level: 2 } },
+          { id: 'cs14', type: 'text', order: 1, data: { content: 'Shipped to 50M users with overwhelmingly positive feedback. Featured in Fast Company and nominated for a Webby Award. The project fundamentally changed how Spotify approaches younger demographics.' } },
+          { id: 'cs15', type: 'stats', order: 2, data: { items: [
+            { value: '50M', label: 'Users Reached' },
+            { value: '#1', label: 'Product Hunt' },
+            { value: '2', label: 'Awards Won' },
+          ] } },
+          { id: 'cs16', type: 'buttons', order: 3, data: { buttons: [
+            { label: 'View Live Site', url: 'https://spotify.com', style: 'primary', newTab: true },
+          ] } },
+        ],
+      },
     ],
+    blocks: [],
     zIndex: 0,
     order: 1,
   },
@@ -393,7 +435,7 @@ const DEMO_ITEMS: DesktopItem[] = [
   },
 
   // ============================================
-  // 4. PHOTOGRAPHY - Gallery, Image, Carousel
+  // 4. PHOTOGRAPHY - Photos Window (Apple Photos Style)
   // ============================================
   {
     id: 'item-4',
@@ -406,7 +448,8 @@ const DEMO_ITEMS: DesktopItem[] = [
     windowSubtitle: 'Moments Captured',
     windowHeaderImage: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=400&fit=crop',
     windowDescription: '',
-    windowWidth: 540,
+    windowType: 'photos',
+    windowWidth: 800,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
@@ -465,7 +508,7 @@ const DEMO_ITEMS: DesktopItem[] = [
   },
 
   // ============================================
-  // 5. WRITING - Links, Quote, Stats, Embed
+  // 5. WRITING - Notes Window (Apple Notes Style)
   // ============================================
   {
     id: 'item-5',
@@ -474,6 +517,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     thumbnailUrl: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=200&h=200&fit=crop',
     positionX: 62,
     positionY: 38,
+    windowType: 'notes',
     windowTitle: 'Writing',
     windowSubtitle: 'Thoughts & Essays',
     windowHeaderImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=400&fit=crop',
@@ -823,7 +867,7 @@ const DEMO_ITEMS: DesktopItem[] = [
   },
 
   // ============================================
-  // 13. RESUME/CV - Download Block
+  // 13. RESUME/CV - Finder Window (File Browser Style)
   // ============================================
   {
     id: 'item-13',
@@ -832,30 +876,59 @@ const DEMO_ITEMS: DesktopItem[] = [
     thumbnailUrl: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=200&h=200&fit=crop',
     positionX: 88,
     positionY: 18,
-    windowTitle: 'Resume',
-    windowSubtitle: 'Download CV',
+    windowTitle: 'Documents',
+    windowSubtitle: 'My Files',
     windowHeaderImage: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=400&fit=crop',
     windowDescription: '',
-    windowWidth: 400,
+    windowType: 'finder',
+    windowWidth: 700,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
-    useTabs: false,
-    tabs: [],
-    blocks: [
-      { id: 'r1', type: 'text', order: 0, data: { content: 'Download my resume to learn more about my experience, education, and skills.' } },
-      { id: 'r2', type: 'download', order: 1, data: {
-        url: '/alex-chen-resume.pdf',
-        fileName: 'Alex_Chen_Resume_2024.pdf',
-        fileSize: '245 KB',
-        fileType: 'PDF',
-      } },
-      { id: 'r3', type: 'divider', order: 2, data: { style: 'line' } },
-      { id: 'r4', type: 'callout', order: 3, data: { text: 'Last updated: January 2024', style: 'note', icon: '📅' } },
-      { id: 'r5', type: 'buttons', order: 4, data: { buttons: [
-        { label: 'View on LinkedIn', url: 'https://linkedin.com', style: 'secondary', newTab: true },
-      ] } },
+    useTabs: true,
+    tabs: [
+      {
+        id: 'tab-resume',
+        label: 'Resume',
+        order: 0,
+        blocks: [
+          { id: 'r1', type: 'text', order: 0, data: { content: 'Download my resume to learn more about my experience, education, and skills.' } },
+          { id: 'r2', type: 'download', order: 1, data: {
+            url: '/alex-chen-resume.pdf',
+            fileName: 'Alex_Chen_Resume_2024.pdf',
+            fileSize: '245 KB',
+            fileType: 'PDF',
+          } },
+        ],
+      },
+      {
+        id: 'tab-portfolio',
+        label: 'Portfolio',
+        order: 1,
+        blocks: [
+          { id: 'r3', type: 'text', order: 0, data: { content: 'Selected case studies and project documentation.' } },
+          { id: 'r4', type: 'download', order: 1, data: {
+            url: '/portfolio.pdf',
+            fileName: 'Alex_Chen_Portfolio_2024.pdf',
+            fileSize: '12.4 MB',
+            fileType: 'PDF',
+          } },
+        ],
+      },
+      {
+        id: 'tab-certificates',
+        label: 'Certificates',
+        order: 2,
+        blocks: [
+          { id: 'r5', type: 'list', order: 0, data: { style: 'check', items: [
+            'AWS Solutions Architect',
+            'Google UX Design',
+            'Meta Frontend Developer',
+          ] } },
+        ],
+      },
     ],
+    blocks: [],
     zIndex: 0,
     order: 12,
   },
@@ -1787,6 +1860,14 @@ function DemoPageInner() {
   const [particleSettings, setParticleSettings] = useState<ParticleSettings>(DEMO_PARTICLE_SETTINGS);
   const [cursorSettings, setCursorSettings] = useState<CursorSettings>(DEMO_CURSOR_SETTINGS);
 
+  // Easter egg: Konami code triggers confetti celebration
+  const [showConfetti, setShowConfetti] = useState(false);
+  useKonamiCode(() => {
+    setShowConfetti(true);
+    if ('vibrate' in navigator) navigator.vibrate([50, 30, 50, 30, 100]);
+    setTimeout(() => setShowConfetti(false), 2000);
+  });
+
   const handleAppClick = (appId: string) => {
     switch (appId) {
       case 'guestbook':
@@ -1855,6 +1936,9 @@ function DemoPageInner() {
     <PersonaContext.Provider value={{ persona, setPersona: selectPersona }}>
       <CursorProvider initialSettings={cursorSettings}>
         <main className="min-h-screen h-screen overflow-hidden relative">
+          {/* Konami Code Easter Egg Confetti */}
+          <ConfettiBurst trigger={showConfetti} count={50} duration={2000} />
+
           {/* Particle Background */}
           <ParticleBackground
             settings={particleSettings}

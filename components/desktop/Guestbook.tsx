@@ -246,7 +246,7 @@ export function Guestbook({
           <AnimatePresence mode="popLayout">
             {filteredEntries.length === 0 ? (
               <p className="text-center text-white/40 text-sm py-8">
-                No notes yet. Be the first!
+                No messages yet. Leave the first one!
               </p>
             ) : (
               filteredEntries.map((entry) => (

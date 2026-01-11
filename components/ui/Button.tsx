@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion, HTMLMotionProps, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
@@ -13,19 +13,21 @@ interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus-visible:outline-none disabled:opacity-50 disabled:pointer-events-none';
+    const prefersReducedMotion = useReducedMotion();
+
+    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
     const variants = {
-      primary: 'text-white hover:brightness-110',
-      secondary: 'border hover:brightness-95',
-      ghost: 'hover:bg-black/5',
-      danger: 'text-white hover:brightness-110',
+      primary: 'text-white hover:brightness-110 focus-visible:ring-[var(--accent-primary)]',
+      secondary: 'border hover:brightness-95 focus-visible:ring-[var(--accent-primary)]',
+      ghost: 'hover:bg-black/5 focus-visible:ring-[var(--accent-primary)]',
+      danger: 'text-white hover:brightness-110 focus-visible:ring-[var(--accent-danger)]',
     };
 
     const variantStyles = {
       primary: {
         background: 'var(--accent-primary)',
-        boxShadow: '0 2px 8px rgba(0, 122, 255, 0.3)',
+        boxShadow: 'var(--shadow-button)',
       },
       secondary: {
         background: 'var(--bg-elevated)',
@@ -38,14 +40,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       },
       danger: {
         background: 'var(--accent-danger)',
-        boxShadow: '0 2px 8px rgba(255, 59, 48, 0.3)',
+        boxShadow: 'var(--shadow-button)',
       },
     };
 
     const sizes = {
-      sm: 'text-[12px] px-3 py-1.5',
-      md: 'text-[13px] px-4 py-2',
-      lg: 'text-[14px] px-5 py-2.5',
+      sm: 'text-[12px] px-3 py-1.5 min-h-[32px]',
+      md: 'text-[13px] px-4 py-2 min-h-[36px]',
+      lg: 'text-[14px] px-5 py-2.5 min-h-[44px]',
     };
 
     return (
@@ -54,9 +56,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(baseStyles, variants[variant], sizes[size], className)}
         style={variantStyles[variant]}
         disabled={disabled || isLoading}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ duration: 0.1 }}
+        whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+        whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.1 }}
         {...props}
       >
         {isLoading && (

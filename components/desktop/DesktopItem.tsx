@@ -1,8 +1,10 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem as DesktopItemType } from '@/types';
+import { SparkleEffect, haptic } from '@/components/ui/Delight';
 
 interface DesktopItemProps {
   item: DesktopItemType;
@@ -11,42 +13,74 @@ interface DesktopItemProps {
 }
 
 export function DesktopItem({ item, onClick, isEditing = false }: DesktopItemProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const [showClickEffect, setShowClickEffect] = useState(false);
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Trigger delight effects
+    setShowClickEffect(true);
+    haptic('light');
+    setTimeout(() => setShowClickEffect(false), 600);
+    onClick(e);
+  };
+
   return (
     <motion.button
-      onClick={(e) => onClick(e)}
-      className="absolute flex flex-col items-center gap-2.5 p-3 rounded-2xl group focus:outline-none select-none"
+      onClick={handleClick}
+      aria-label={`Open ${item.label}${isEditing ? ' (editing mode)' : ''}`}
+      className="absolute flex flex-col items-center gap-2.5 p-3 rounded-2xl group select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
       style={{
         left: `${item.positionX}%`,
         top: `${item.positionY}%`,
         transform: 'translate(-50%, -50%)',
       }}
       initial={false}
-      whileHover={{ y: -6 }}
-      whileTap={{ scale: 0.94 }}
-      transition={{
+      whileHover={prefersReducedMotion ? {} : { y: -6 }}
+      whileTap={prefersReducedMotion ? {} : { scale: 0.94 }}
+      transition={prefersReducedMotion ? { duration: 0 } : {
         type: 'spring',
         stiffness: 500,
         damping: 30,
         mass: 0.8
       }}
     >
+      {/* Click celebration effect */}
+      <SparkleEffect
+        trigger={showClickEffect}
+        config={{
+          count: 10,
+          spread: 50,
+          colors: ['var(--accent-primary)', '#FFD700', '#4ECDC4', '#FF6B6B', '#A78BFA'],
+          duration: 500,
+        }}
+      />
+
       {/* Thumbnail Container */}
       <motion.div
         className="relative"
-        whileHover={{ scale: 1.12 }}
-        transition={{
+        whileHover={prefersReducedMotion ? {} : { scale: 1.12 }}
+        transition={prefersReducedMotion ? { duration: 0 } : {
           type: 'spring',
           stiffness: 400,
           damping: 25
         }}
       >
-        {/* Outer glow on hover */}
+        {/* Outer glow on hover - bolder accent color */}
         <div
-          className="absolute -inset-3 rounded-[22px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          className="absolute -inset-4 rounded-[24px] opacity-0 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%)',
-            filter: 'blur(8px)',
+            background: 'radial-gradient(ellipse at center, var(--accent-primary) 0%, transparent 70%)',
+            filter: 'blur(20px)',
           }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute -inset-3 rounded-[22px] opacity-0 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, transparent 70%)',
+            filter: 'blur(10px)',
+          }}
+          aria-hidden="true"
         />
 
         {/* Thumbnail */}
@@ -104,20 +138,16 @@ export function DesktopItem({ item, onClick, isEditing = false }: DesktopItemPro
         />
       </motion.div>
 
-      {/* Label */}
+      {/* Label - bolder styling */}
       <div className="relative">
         <span
-          className="block text-[11px] font-semibold text-center max-w-[90px] leading-[1.3] px-2 py-1 rounded-md tracking-tight"
+          className="block text-[12px] font-bold text-center max-w-[100px] leading-[1.3] px-2.5 py-1.5 rounded-lg tracking-tight group-hover:scale-105 transition-transform duration-200"
           style={{
-            color: '#FFFFFF',
-            textShadow: `
-              0 1px 3px rgba(0, 0, 0, 0.8),
-              0 0 20px rgba(0, 0, 0, 0.6),
-              0 0 40px rgba(0, 0, 0, 0.4)
-            `,
-            background: 'rgba(0, 0, 0, 0.25)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            color: 'var(--text-on-image)',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.9), 0 0 24px rgba(0, 0, 0, 0.7), 0 0 48px rgba(0, 0, 0, 0.5)',
+            background: 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(12px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(12px) saturate(150%)',
           }}
         >
           {item.label}
@@ -129,12 +159,14 @@ export function DesktopItem({ item, onClick, isEditing = false }: DesktopItemPro
         <motion.div
           className="absolute -inset-2 rounded-2xl pointer-events-none"
           style={{
-            border: '2px dashed rgba(0, 122, 255, 0.6)',
-            background: 'rgba(0, 122, 255, 0.05)',
+            border: '2px dashed var(--accent-primary)',
+            borderColor: 'color-mix(in srgb, var(--accent-primary) 60%, transparent)',
+            background: 'color-mix(in srgb, var(--accent-primary) 5%, transparent)',
           }}
-          initial={{ opacity: 0 }}
+          initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
+          aria-hidden="true"
         />
       )}
     </motion.button>

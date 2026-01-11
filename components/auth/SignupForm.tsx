@@ -49,7 +49,7 @@ export function SignupForm() {
     }
 
     if (formData.password.length < 8) {
-      setErrors({ password: 'Password must be at least 8 characters' });
+      setErrors({ password: 'Use 8 or more characters for your password' });
       setIsLoading(false);
       return;
     }
@@ -88,7 +88,7 @@ export function SignupForm() {
       router.push('/edit');
       router.refresh();
     } catch {
-      setErrors({ general: 'Something went wrong' });
+      setErrors({ general: 'Unable to create your account right now. Please try again in a moment.' });
     } finally {
       setIsLoading(false);
     }
