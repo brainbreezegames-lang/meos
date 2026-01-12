@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import type { StatusWidget as StatusWidgetType, StatusType } from '@/types';
 
 interface StatusWidgetProps {
@@ -11,67 +11,89 @@ interface StatusWidgetProps {
   onEdit?: () => void;
 }
 
-const STATUS_CONFIG: Record<StatusType, { color: string; bgColor: string; label: string }> = {
+const STATUS_CONFIG: Record<StatusType, {
+  emoji: string;
+  gradient: string;
+  glow: string;
+  label: string;
+  color: string;
+  bgColor: string;
+}> = {
   available: {
-    color: '#22c55e',
-    bgColor: 'rgba(34, 197, 94, 0.15)',
+    emoji: '✦',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    glow: '0 0 20px rgba(16, 185, 129, 0.4)',
     label: 'Available',
+    color: '#10b981',
+    bgColor: 'rgba(16, 185, 129, 0.1)',
   },
   looking: {
-    color: '#3b82f6',
-    bgColor: 'rgba(59, 130, 246, 0.15)',
+    emoji: '◈',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    glow: '0 0 20px rgba(59, 130, 246, 0.4)',
     label: 'Looking for',
+    color: '#3b82f6',
+    bgColor: 'rgba(59, 130, 246, 0.1)',
   },
   taking: {
-    color: '#f59e0b',
-    bgColor: 'rgba(245, 158, 11, 0.15)',
+    emoji: '◇',
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    glow: '0 0 20px rgba(245, 158, 11, 0.4)',
     label: 'Taking',
+    color: '#f59e0b',
+    bgColor: 'rgba(245, 158, 11, 0.1)',
   },
   open: {
-    color: '#a855f7',
-    bgColor: 'rgba(168, 85, 247, 0.15)',
+    emoji: '○',
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+    glow: '0 0 20px rgba(139, 92, 246, 0.4)',
     label: 'Open to',
+    color: '#8b5cf6',
+    bgColor: 'rgba(139, 92, 246, 0.1)',
   },
   consulting: {
-    color: '#14b8a6',
-    bgColor: 'rgba(20, 184, 166, 0.15)',
-    label: 'Consulting on',
+    emoji: '◎',
+    gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+    glow: '0 0 20px rgba(6, 182, 212, 0.4)',
+    label: 'Consulting',
+    color: '#06b6d4',
+    bgColor: 'rgba(6, 182, 212, 0.1)',
   },
 };
 
 export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWidgetProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  // Don't render if no status widget or not visible
   if (!statusWidget || !statusWidget.isVisible) {
-    // Show placeholder for owner to add status
     if (isOwner) {
       return (
         <motion.button
           onClick={onEdit}
-          className="fixed z-[150] cursor-pointer"
+          className="fixed cursor-pointer"
           style={{
-            bottom: '120px',
-            right: '24px',
+            bottom: '96px',
+            right: '20px',
+            zIndex: 9999,
           }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           <div
-            className="px-4 py-3 rounded-2xl flex items-center gap-2"
+            className="px-4 py-2.5 rounded-full flex items-center gap-2"
             style={{
-              background: 'var(--bg-glass)',
+              background: 'var(--bg-glass, rgba(255,255,255,0.8))',
               backdropFilter: 'blur(20px)',
-              border: '1px dashed var(--border-medium)',
-              color: 'var(--text-tertiary)',
-              fontFamily: 'var(--font-body)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px dashed var(--border-medium, rgba(0,0,0,0.15))',
+              color: 'var(--text-tertiary, #888)',
               fontSize: '13px',
+              fontFamily: 'var(--font-body, system-ui)',
             }}
           >
-            <span className="text-lg">+</span>
-            <span>Add availability status</span>
+            <span style={{ opacity: 0.6 }}>+</span>
+            <span>Add status</span>
           </div>
         </motion.button>
       );
@@ -85,157 +107,209 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
     <motion.div
       className="fixed"
       style={{
-        bottom: '100px',
+        bottom: '96px',
         right: '20px',
         zIndex: 9999,
       }}
-      initial={{ opacity: 1, y: 0, scale: 1 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Main pill */}
       <motion.div
-        className="rounded-2xl overflow-hidden cursor-pointer"
+        className="relative cursor-pointer"
         style={{
-          background: 'var(--bg-glass-elevated, rgba(255, 255, 255, 0.95))',
-          backdropFilter: 'blur(40px)',
-          WebkitBackdropFilter: 'blur(40px)',
-          border: '2px solid var(--border-light, rgba(34, 197, 94, 0.5))',
-          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(34, 197, 94, 0.3)',
-          maxWidth: '280px',
-          minWidth: '200px',
+          borderRadius: '24px',
+          overflow: 'hidden',
         }}
-        whileHover={{ scale: 1.02 }}
+        animate={{
+          boxShadow: isHovered
+            ? `0 8px 32px rgba(0,0,0,0.12), ${config.glow}`
+            : '0 4px 20px rgba(0,0,0,0.08)',
+        }}
         transition={{ duration: 0.2 }}
-        onClick={() => setIsExpanded(!isExpanded)}
       >
-        {/* Header - Always visible */}
-        <div className="px-4 py-3 flex items-center gap-3">
-          {/* Status indicator dot */}
-          <motion.div
-            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-            style={{ backgroundColor: config.color }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [1, 0.7, 1],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
+        {/* Glass background */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'var(--bg-glass-elevated, rgba(255,255,255,0.92))',
+            backdropFilter: 'blur(40px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+          }}
+        />
 
-          {/* Title */}
-          <div className="flex-1 min-w-0">
-            <div
-              className="text-sm font-medium truncate"
+        {/* Content */}
+        <div
+          className="relative flex items-center gap-3"
+          style={{
+            padding: '10px 16px 10px 12px',
+          }}
+        >
+          {/* Status indicator */}
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: config.gradient,
+              color: 'white',
+              fontSize: '12px',
+              fontWeight: 500,
+              boxShadow: isHovered ? config.glow : 'none',
+              transition: 'box-shadow 0.2s ease',
+            }}
+          >
+            {config.emoji}
+          </div>
+
+          {/* Text */}
+          <div className="flex flex-col" style={{ minWidth: 0 }}>
+            <span
               style={{
-                color: 'var(--text-primary)',
-                fontFamily: 'var(--font-body)',
+                fontSize: '10px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'var(--text-tertiary, #888)',
+                fontFamily: 'var(--font-body, system-ui)',
+              }}
+            >
+              {config.label}
+            </span>
+            <span
+              style={{
+                fontSize: '13px',
+                fontWeight: 500,
+                color: 'var(--text-primary, #1a1a1a)',
+                fontFamily: 'var(--font-body, system-ui)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '160px',
               }}
             >
               {statusWidget.title}
-            </div>
+            </span>
           </div>
 
-          {/* Expand indicator */}
-          {(statusWidget.description || statusWidget.ctaUrl) && (
+          {/* CTA arrow */}
+          {statusWidget.ctaUrl && (
             <motion.div
-              animate={{ rotate: isExpanded ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-              style={{ color: 'var(--text-tertiary)' }}
+              animate={{
+                x: isHovered ? 2 : 0,
+                opacity: isHovered ? 1 : 0.5,
+              }}
+              transition={{ duration: 0.15 }}
             >
-              <ChevronDown size={16} />
+              <ArrowUpRight
+                size={14}
+                style={{ color: 'var(--text-tertiary, #888)' }}
+              />
             </motion.div>
           )}
         </div>
 
-        {/* Expanded content */}
-        <AnimatePresence>
-          {isExpanded && (statusWidget.description || statusWidget.ctaUrl) && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              style={{ overflow: 'hidden' }}
-            >
-              <div
-                className="px-4 pb-4 pt-1"
-                style={{ borderTop: '1px solid var(--border-light)' }}
-              >
-                {/* Description */}
-                {statusWidget.description && (
-                  <p
-                    className="text-sm mb-3"
-                    style={{
-                      color: 'var(--text-secondary)',
-                      fontFamily: 'var(--font-body)',
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {statusWidget.description}
-                  </p>
-                )}
-
-                {/* CTA Button */}
-                {statusWidget.ctaUrl && (
-                  <a
-                    href={statusWidget.ctaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:opacity-90"
-                    style={{
-                      background: config.bgColor,
-                      color: config.color,
-                      fontFamily: 'var(--font-body)',
-                    }}
-                  >
-                    {statusWidget.ctaLabel || 'Learn more'}
-                    <ExternalLink size={14} />
-                  </a>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Status type badge */}
-        <div
-          className="px-4 py-2 flex items-center gap-2"
-          style={{
-            background: config.bgColor,
-            borderTop: '1px solid var(--border-light)',
-          }}
-        >
-          <span
-            className="text-xs font-medium uppercase tracking-wider"
-            style={{ color: config.color }}
-          >
-            {config.label}
-          </span>
-        </div>
+        {/* Clickable link overlay */}
+        {statusWidget.ctaUrl && (
+          <a
+            href={statusWidget.ctaUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute inset-0"
+            style={{ zIndex: 1 }}
+          />
+        )}
       </motion.div>
 
-      {/* Edit button for owner */}
+      {/* Expanded tooltip on hover */}
+      <AnimatePresence>
+        {isHovered && statusWidget.description && (
+          <motion.div
+            className="absolute right-0 mt-2"
+            style={{
+              bottom: '100%',
+              marginBottom: '8px',
+              width: '240px',
+            }}
+            initial={{ opacity: 0, y: 4, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+          >
+            <div
+              style={{
+                background: 'var(--bg-glass-elevated, rgba(255,255,255,0.95))',
+                backdropFilter: 'blur(40px)',
+                WebkitBackdropFilter: 'blur(40px)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                border: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+              }}
+            >
+              <p
+                style={{
+                  fontSize: '12px',
+                  lineHeight: 1.5,
+                  color: 'var(--text-secondary, #666)',
+                  fontFamily: 'var(--font-body, system-ui)',
+                  margin: 0,
+                }}
+              >
+                {statusWidget.description}
+              </p>
+              {statusWidget.ctaLabel && statusWidget.ctaUrl && (
+                <div
+                  className="mt-2 pt-2"
+                  style={{ borderTop: '1px solid var(--border-light, rgba(0,0,0,0.06))' }}
+                >
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 500,
+                      color: 'var(--accent-primary, #3b82f6)',
+                      fontFamily: 'var(--font-body, system-ui)',
+                    }}
+                  >
+                    {statusWidget.ctaLabel} →
+                  </span>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Owner edit button */}
       {isOwner && (
         <motion.button
           onClick={(e) => {
             e.stopPropagation();
+            e.preventDefault();
             onEdit?.();
           }}
-          className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center"
+          className="absolute flex items-center justify-center"
           style={{
-            background: 'var(--bg-glass-elevated)',
-            border: '1px solid var(--border-medium)',
-            color: 'var(--text-secondary)',
-            boxShadow: 'var(--shadow-md)',
+            top: '-6px',
+            right: '-6px',
+            width: '22px',
+            height: '22px',
+            borderRadius: '50%',
+            background: 'var(--bg-solid, white)',
+            border: '1px solid var(--border-medium, rgba(0,0,0,0.1))',
+            color: 'var(--text-secondary, #666)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            zIndex: 2,
           }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
           </svg>

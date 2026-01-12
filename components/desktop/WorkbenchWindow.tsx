@@ -1,163 +1,20 @@
 'use client';
 
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Plus, Archive, ArchiveRestore, Trash2, Calendar, Image as ImageIcon, X } from 'lucide-react';
-import type { DesktopItem, WorkbenchEntry } from '@/types';
+import { Plus, Archive, ArchiveRestore, Trash2, X, Sparkles } from 'lucide-react';
+import type { DesktopItem } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
-import { useThemeSafe, ThemeId } from '@/contexts/ThemeContext';
 
 interface WorkbenchWindowProps {
   window: WindowInstance;
   item: DesktopItem;
 }
 
-interface ThemeColors {
-  windowBg: string;
-  windowShadow: string;
-  windowShadowInactive: string;
-  titleBarBg: string;
-  titleBarBorder: string;
-  titleText: string;
-  iconColor: string;
-  contentBg: string;
-  cardBg: string;
-  cardBorder: string;
-  cardHoverBorder: string;
-  cardSelectedBorder: string;
-  textPrimary: string;
-  textSecondary: string;
-  textTertiary: string;
-  accent: string;
-  accentLight: string;
-  buttonBg: string;
-  buttonHoverBg: string;
-  inputBg: string;
-  inputBorder: string;
-  inputFocusBorder: string;
-  emptyBg: string;
-}
-
-function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
-  const isDark = themeId === 'dark' || themeId === 'refined';
-
-  if (themeId === 'dark') {
-    return {
-      windowBg: 'linear-gradient(180deg, rgba(32,32,38,0.98) 0%, rgba(22,22,26,0.96) 100%)',
-      windowShadow: '0 35px 80px -20px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(255,255,255,0.08)',
-      windowShadowInactive: '0 20px 50px -15px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.05)',
-      titleBarBg: 'linear-gradient(180deg, rgba(40,40,48,1) 0%, rgba(32,32,38,1) 100%)',
-      titleBarBorder: 'rgba(255,255,255,0.06)',
-      titleText: '#F8F8FA',
-      iconColor: '#5BA0FF',
-      contentBg: 'rgba(22,22,26,1)',
-      cardBg: 'rgba(255,255,255,0.04)',
-      cardBorder: 'rgba(255,255,255,0.06)',
-      cardHoverBorder: 'rgba(255,255,255,0.12)',
-      cardSelectedBorder: '#5BA0FF',
-      textPrimary: '#F8F8FA',
-      textSecondary: '#94949C',
-      textTertiary: '#56565C',
-      accent: '#5BA0FF',
-      accentLight: 'rgba(91,160,255,0.15)',
-      buttonBg: 'rgba(255,255,255,0.06)',
-      buttonHoverBg: 'rgba(255,255,255,0.1)',
-      inputBg: 'rgba(255,255,255,0.06)',
-      inputBorder: 'rgba(255,255,255,0.08)',
-      inputFocusBorder: 'rgba(91,160,255,0.5)',
-      emptyBg: 'linear-gradient(135deg, rgba(91,160,255,0.1) 0%, rgba(91,160,255,0.05) 100%)',
-    };
-  }
-
-  if (themeId === 'refined') {
-    return {
-      windowBg: 'linear-gradient(180deg, rgba(28,28,28,0.98) 0%, rgba(21,21,21,0.96) 100%)',
-      windowShadow: '0 24px 64px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)',
-      windowShadowInactive: '0 16px 48px -16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-      titleBarBg: 'linear-gradient(180deg, rgba(32,32,32,1) 0%, rgba(24,24,24,1) 100%)',
-      titleBarBorder: 'rgba(255,255,255,0.05)',
-      titleText: '#f5f5f0',
-      iconColor: '#cae8bd',
-      contentBg: 'rgba(21,21,21,1)',
-      cardBg: 'rgba(255,255,255,0.03)',
-      cardBorder: 'rgba(255,255,255,0.05)',
-      cardHoverBorder: 'rgba(255,255,255,0.1)',
-      cardSelectedBorder: '#cae8bd',
-      textPrimary: '#f5f5f0',
-      textSecondary: 'rgba(245,245,240,0.6)',
-      textTertiary: 'rgba(245,245,240,0.35)',
-      accent: '#cae8bd',
-      accentLight: 'rgba(202,232,189,0.1)',
-      buttonBg: 'rgba(255,255,255,0.04)',
-      buttonHoverBg: 'rgba(255,255,255,0.08)',
-      inputBg: 'rgba(255,255,255,0.04)',
-      inputBorder: 'rgba(255,255,255,0.06)',
-      inputFocusBorder: 'rgba(202,232,189,0.4)',
-      emptyBg: 'linear-gradient(135deg, rgba(202,232,189,0.08) 0%, rgba(202,232,189,0.03) 100%)',
-    };
-  }
-
-  if (themeId === 'bluren') {
-    return {
-      windowBg: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.96) 100%)',
-      windowShadow: '0 16px 48px -8px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.04)',
-      windowShadowInactive: '0 8px 32px -8px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.03)',
-      titleBarBg: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(252,252,254,1) 100%)',
-      titleBarBorder: 'rgba(0,0,0,0.04)',
-      titleText: '#000000',
-      iconColor: '#0071E3',
-      contentBg: '#FEFEFE',
-      cardBg: 'rgba(255,255,255,0.9)',
-      cardBorder: 'rgba(0,0,0,0.04)',
-      cardHoverBorder: 'rgba(0,0,0,0.08)',
-      cardSelectedBorder: '#0071E3',
-      textPrimary: '#000000',
-      textSecondary: 'rgba(0,0,0,0.55)',
-      textTertiary: 'rgba(0,0,0,0.35)',
-      accent: '#0071E3',
-      accentLight: 'rgba(0,113,227,0.08)',
-      buttonBg: 'rgba(0,0,0,0.04)',
-      buttonHoverBg: 'rgba(0,0,0,0.06)',
-      inputBg: 'rgba(0,0,0,0.03)',
-      inputBorder: 'rgba(0,0,0,0.06)',
-      inputFocusBorder: 'rgba(0,113,227,0.4)',
-      emptyBg: 'linear-gradient(135deg, rgba(0,113,227,0.06) 0%, rgba(0,113,227,0.02) 100%)',
-    };
-  }
-
-  // Monterey default
-  return {
-    windowBg: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,250,252,0.96) 100%)',
-    windowShadow: '0 32px 80px -20px rgba(0,0,0,0.35), 0 0 1px rgba(0,0,0,0.1), inset 0 0.5px 0 rgba(255,255,255,0.8)',
-    windowShadowInactive: '0 20px 50px -15px rgba(0,0,0,0.25), 0 0 1px rgba(0,0,0,0.08)',
-    titleBarBg: 'linear-gradient(180deg, rgba(253,253,253,1) 0%, rgba(247,247,250,1) 100%)',
-    titleBarBorder: 'rgba(0,0,0,0.08)',
-    titleText: '#1D1D1F',
-    iconColor: '#A855F7',
-    contentBg: '#FAFAFA',
-    cardBg: 'white',
-    cardBorder: 'rgba(0,0,0,0.06)',
-    cardHoverBorder: 'rgba(0,0,0,0.12)',
-    cardSelectedBorder: '#A855F7',
-    textPrimary: '#1D1D1F',
-    textSecondary: '#6B6B6B',
-    textTertiary: '#86868B',
-    accent: '#A855F7',
-    accentLight: 'rgba(168,85,247,0.1)',
-    buttonBg: 'rgba(0,0,0,0.04)',
-    buttonHoverBg: 'rgba(0,0,0,0.06)',
-    inputBg: 'rgba(0,0,0,0.04)',
-    inputBorder: 'rgba(0,0,0,0.08)',
-    inputFocusBorder: 'rgba(168,85,247,0.4)',
-    emptyBg: 'linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.03) 100%)',
-  };
-}
-
 export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindowProps) {
   const context = useEditContextSafe();
   const windowContext = useWindowContext();
-  const themeContext = useThemeSafe();
   const windowRef = useRef<HTMLDivElement>(null);
   const constraintsRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -170,7 +27,6 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
   const isOwner = context?.isOwner ?? false;
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
-  const colors = useMemo(() => getThemeColors(themeContext?.theme), [themeContext?.theme]);
 
   // Get workbench entries from desktop context
   const allEntries = context?.desktop?.workbenchEntries || [];
@@ -180,23 +36,6 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
 
   const sortedEntries = [...entries].sort((a, b) =>
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
-
-  const selectedEntry = sortedEntries.find(e => e.id === selectedEntryId);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isActive) {
-        if (isAddingEntry) {
-          setIsAddingEntry(false);
-        } else if (selectedEntryId) {
-          setSelectedEntryId(null);
-        } else {
-          windowContext.closeWindow(windowInstance.id);
-        }
-      }
-    },
-    [windowContext, windowInstance.id, isActive, isAddingEntry, selectedEntryId]
   );
 
   const handleWindowClick = () => {
@@ -237,15 +76,17 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
     const d = new Date(date);
     const now = new Date();
     const diff = now.getTime() - d.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    if (days === 0) return 'Today';
+    if (hours < 1) return 'Just now';
+    if (hours < 24) return `${hours}h ago`;
     if (days === 1) return 'Yesterday';
-    if (days < 7) return `${days} days ago`;
+    if (days < 7) return `${days}d ago`;
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const windowWidth = Math.max(item.windowWidth || 720, 600);
+  const windowWidth = Math.max(item.windowWidth || 560, 480);
 
   return (
     <>
@@ -273,28 +114,32 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
             maxWidth: isMaximized ? '100%' : '95vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 120px)',
-            minHeight: 480,
-            borderRadius: isMaximized ? '0' : '12px',
-            background: colors.windowBg,
-            boxShadow: isActive ? colors.windowShadow : colors.windowShadowInactive,
+            minHeight: 400,
+            borderRadius: isMaximized ? '0' : 'var(--radius-window, 12px)',
+            background: 'var(--bg-glass-elevated, rgba(255,255,255,0.95))',
+            backdropFilter: 'blur(40px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+            boxShadow: isActive
+              ? 'var(--shadow-window, 0 24px 80px -12px rgba(0,0,0,0.25))'
+              : 'var(--shadow-window-inactive, 0 12px 40px -8px rgba(0,0,0,0.15))',
+            border: '1px solid var(--border-glass-outer, rgba(255,255,255,0.2))',
             opacity: isActive ? 1 : 0.96,
           }}
-          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 20 }}
+          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 16 }}
           animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10 }}
+          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 8 }}
           transition={prefersReducedMotion ? { duration: 0.15 } : {
             type: 'spring',
             stiffness: 400,
-            damping: 32,
-            mass: 0.8
+            damping: 30,
           }}
         >
           {/* Title Bar */}
           <div
             className="flex items-center h-[52px] px-4 shrink-0 relative select-none"
             style={{
-              background: colors.titleBarBg,
-              borderBottom: `1px solid ${colors.titleBarBorder}`,
+              background: 'var(--bg-titlebar, linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(250,250,252,0.85) 100%))',
+              borderBottom: '1px solid var(--border-light, rgba(0,0,0,0.06))',
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
@@ -311,9 +156,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
-                </svg>
+                <X className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" strokeWidth={2.5} style={{ color: 'rgba(77,0,0,0.7)' }} />
               </button>
               <button
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
@@ -323,8 +166,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 2" fill="none">
+                  <path d="M1 1H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
                 </svg>
               </button>
               <button
@@ -336,46 +179,49 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                 }}
               >
                 <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                  <path d="M1 3L4 6L7 3" stroke="rgba(0,70,0,0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
             </div>
 
             {/* Title */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" style={{ color: colors.iconColor }}>
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" fillOpacity="0.2" />
-                <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="text-[13px] font-medium" style={{ color: colors.titleText }}>
-                {item.windowTitle || 'Now Thinking'}
+              <Sparkles size={14} style={{ color: 'var(--accent-primary, #8b5cf6)' }} />
+              <span
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  color: 'var(--text-primary, #1a1a1a)',
+                  fontFamily: 'var(--font-body, system-ui)',
+                }}
+              >
+                {item.windowTitle || 'Now Working On'}
               </span>
             </div>
 
             {/* Toolbar */}
-            <div className="ml-auto flex items-center gap-1">
+            <div className="ml-auto flex items-center gap-2">
               <button
                 onClick={() => setShowArchived(!showArchived)}
-                className="p-2 rounded-md transition-all duration-150"
+                className="p-1.5 rounded-md transition-all duration-150"
                 style={{
-                  color: showArchived ? colors.accent : colors.textTertiary,
-                  background: showArchived ? colors.accentLight : 'transparent',
+                  color: showArchived ? 'var(--accent-primary, #8b5cf6)' : 'var(--text-tertiary, #888)',
+                  background: showArchived ? 'var(--accent-light, rgba(139,92,246,0.1))' : 'transparent',
                 }}
               >
-                <Archive size={16} />
+                <Archive size={15} />
               </button>
               {isOwner && (
                 <button
                   onClick={() => setIsAddingEntry(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150"
                   style={{
-                    background: colors.accent,
+                    background: 'var(--accent-primary, #8b5cf6)',
                     color: 'white',
                   }}
                 >
-                  <Plus size={14} />
-                  Add Entry
+                  <Plus size={13} />
+                  New
                 </button>
               )}
             </div>
@@ -383,93 +229,93 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
 
           {/* Content */}
           <div
-            className="flex-1 overflow-y-auto p-6"
-            style={{ background: colors.contentBg }}
+            className="flex-1 overflow-y-auto"
+            style={{ background: 'var(--bg-secondary, #fafafa)' }}
           >
             {/* Add Entry Form */}
             <AnimatePresence>
               {isAddingEntry && (
                 <motion.div
-                  className="mb-6 p-5 rounded-xl"
-                  style={{ background: colors.cardBg, border: `1px solid ${colors.cardBorder}` }}
+                  className="p-4"
+                  style={{ borderBottom: '1px solid var(--border-light, rgba(0,0,0,0.06))' }}
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-[14px] font-semibold" style={{ color: colors.textPrimary }}>
-                      New Workbench Entry
-                    </h3>
-                    <button onClick={() => setIsAddingEntry(false)} style={{ color: colors.textTertiary }}>
-                      <X size={18} />
-                    </button>
-                  </div>
-
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="What are you working on?"
-                      value={newEntry.title}
-                      onChange={(e) => setNewEntry(prev => ({ ...prev, title: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-lg text-[14px] outline-none transition-all"
-                      style={{
-                        background: colors.inputBg,
-                        border: `1px solid ${colors.inputBorder}`,
-                        color: colors.textPrimary,
-                      }}
-                    />
-                    <textarea
-                      placeholder="Brief description (optional)"
-                      value={newEntry.description}
-                      onChange={(e) => setNewEntry(prev => ({ ...prev, description: e.target.value }))}
-                      rows={2}
-                      className="w-full px-4 py-2.5 rounded-lg text-[14px] outline-none transition-all resize-none"
-                      style={{
-                        background: colors.inputBg,
-                        border: `1px solid ${colors.inputBorder}`,
-                        color: colors.textPrimary,
-                      }}
-                    />
-                    <input
-                      type="url"
-                      placeholder="Image URL (optional)"
-                      value={newEntry.imageUrl}
-                      onChange={(e) => setNewEntry(prev => ({ ...prev, imageUrl: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-lg text-[14px] outline-none transition-all"
-                      style={{
-                        background: colors.inputBg,
-                        border: `1px solid ${colors.inputBorder}`,
-                        color: colors.textPrimary,
-                      }}
-                    />
-                    <textarea
-                      placeholder="Context / deeper thoughts (optional)"
-                      value={newEntry.context}
-                      onChange={(e) => setNewEntry(prev => ({ ...prev, context: e.target.value }))}
-                      rows={3}
-                      className="w-full px-4 py-2.5 rounded-lg text-[14px] outline-none transition-all resize-none"
-                      style={{
-                        background: colors.inputBg,
-                        border: `1px solid ${colors.inputBorder}`,
-                        color: colors.textPrimary,
-                      }}
-                    />
-                    <div className="flex justify-end gap-2">
+                  <div
+                    className="p-4 rounded-xl"
+                    style={{
+                      background: 'var(--bg-elevated, white)',
+                      border: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          color: 'var(--text-primary, #1a1a1a)',
+                          fontFamily: 'var(--font-body, system-ui)',
+                        }}
+                      >
+                        What are you working on?
+                      </span>
                       <button
                         onClick={() => setIsAddingEntry(false)}
-                        className="px-4 py-2 rounded-lg text-[13px] font-medium"
-                        style={{ color: colors.textSecondary }}
+                        style={{ color: 'var(--text-tertiary, #888)' }}
                       >
-                        Cancel
+                        <X size={16} />
                       </button>
-                      <button
-                        onClick={handleAddEntry}
-                        disabled={!newEntry.title.trim()}
-                        className="px-4 py-2 rounded-lg text-[13px] font-medium transition-all disabled:opacity-50"
-                        style={{ background: colors.accent, color: 'white' }}
-                      >
-                        Add Entry
-                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        placeholder="Title"
+                        value={newEntry.title}
+                        onChange={(e) => setNewEntry(prev => ({ ...prev, title: e.target.value }))}
+                        autoFocus
+                        className="w-full px-3 py-2 rounded-lg text-[13px] outline-none transition-all"
+                        style={{
+                          background: 'var(--bg-secondary, #fafafa)',
+                          border: '1px solid var(--border-medium, rgba(0,0,0,0.1))',
+                          color: 'var(--text-primary, #1a1a1a)',
+                          fontFamily: 'var(--font-body, system-ui)',
+                        }}
+                      />
+                      <textarea
+                        placeholder="Brief description (optional)"
+                        value={newEntry.description}
+                        onChange={(e) => setNewEntry(prev => ({ ...prev, description: e.target.value }))}
+                        rows={2}
+                        className="w-full px-3 py-2 rounded-lg text-[13px] outline-none transition-all resize-none"
+                        style={{
+                          background: 'var(--bg-secondary, #fafafa)',
+                          border: '1px solid var(--border-medium, rgba(0,0,0,0.1))',
+                          color: 'var(--text-primary, #1a1a1a)',
+                          fontFamily: 'var(--font-body, system-ui)',
+                        }}
+                      />
+                      <div className="flex justify-end gap-2 pt-1">
+                        <button
+                          onClick={() => setIsAddingEntry(false)}
+                          className="px-3 py-1.5 rounded-lg text-[12px] font-medium"
+                          style={{ color: 'var(--text-secondary, #666)' }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleAddEntry}
+                          disabled={!newEntry.title.trim()}
+                          className="px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all disabled:opacity-40"
+                          style={{
+                            background: 'var(--accent-primary, #8b5cf6)',
+                            color: 'white',
+                          }}
+                        >
+                          Add
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -478,144 +324,232 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
 
             {/* Timeline */}
             {sortedEntries.length > 0 ? (
-              <div className="space-y-4">
-                {sortedEntries.map((entry, index) => (
-                  <motion.div
-                    key={entry.id}
-                    className="p-5 rounded-xl cursor-pointer transition-all"
-                    style={{
-                      background: colors.cardBg,
-                      border: `1px solid ${selectedEntryId === entry.id ? colors.cardSelectedBorder : colors.cardBorder}`,
-                    }}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.03 }}
-                    onClick={() => setSelectedEntryId(selectedEntryId === entry.id ? null : entry.id)}
-                    whileHover={{ borderColor: colors.cardHoverBorder }}
-                  >
-                    <div className="flex gap-4">
-                      {/* Image */}
-                      {entry.imageUrl && (
+              <div className="p-4">
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div
+                    className="absolute left-[11px] top-6 bottom-6 w-[2px]"
+                    style={{ background: 'var(--border-light, rgba(0,0,0,0.08))' }}
+                  />
+
+                  {/* Entries */}
+                  <div className="space-y-4">
+                    {sortedEntries.map((entry, index) => (
+                      <motion.div
+                        key={entry.id}
+                        className="relative pl-8"
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        {/* Timeline dot */}
                         <div
-                          className="w-24 h-24 rounded-lg shrink-0 overflow-hidden"
-                          style={{ background: colors.inputBg }}
+                          className="absolute left-0 top-3 w-6 h-6 rounded-full flex items-center justify-center"
+                          style={{
+                            background: selectedEntryId === entry.id
+                              ? 'var(--accent-primary, #8b5cf6)'
+                              : 'var(--bg-elevated, white)',
+                            border: selectedEntryId === entry.id
+                              ? 'none'
+                              : '2px solid var(--border-medium, rgba(0,0,0,0.1))',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                          }}
                         >
-                          <img
-                            src={entry.imageUrl}
-                            alt=""
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-3 mb-2">
-                          <h3 className="text-[15px] font-semibold" style={{ color: colors.textPrimary }}>
-                            {entry.title}
-                          </h3>
-                          <span
-                            className="text-[11px] font-medium shrink-0 flex items-center gap-1"
-                            style={{ color: colors.textTertiary }}
-                          >
-                            <Calendar size={12} />
-                            {formatDate(entry.createdAt)}
-                          </span>
+                          {selectedEntryId === entry.id && (
+                            <div className="w-2 h-2 rounded-full bg-white" />
+                          )}
                         </div>
 
-                        {entry.description && (
-                          <p
-                            className="text-[13px] leading-relaxed mb-2"
-                            style={{ color: colors.textSecondary }}
-                          >
-                            {entry.description}
-                          </p>
-                        )}
+                        {/* Entry card */}
+                        <div
+                          className="rounded-xl cursor-pointer transition-all duration-200"
+                          style={{
+                            background: 'var(--bg-elevated, white)',
+                            border: `1px solid ${selectedEntryId === entry.id ? 'var(--accent-primary, #8b5cf6)' : 'var(--border-light, rgba(0,0,0,0.06))'}`,
+                            boxShadow: selectedEntryId === entry.id
+                              ? '0 4px 12px rgba(139,92,246,0.15)'
+                              : '0 1px 3px rgba(0,0,0,0.04)',
+                          }}
+                          onClick={() => setSelectedEntryId(selectedEntryId === entry.id ? null : entry.id)}
+                        >
+                          {/* Entry header */}
+                          <div className="p-4">
+                            <div className="flex items-start gap-3">
+                              {/* Image thumbnail */}
+                              {entry.imageUrl && (
+                                <div
+                                  className="w-16 h-16 rounded-lg shrink-0 overflow-hidden"
+                                  style={{ background: 'var(--bg-secondary, #fafafa)' }}
+                                >
+                                  <img
+                                    src={entry.imageUrl}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              )}
 
-                        {/* Expanded context */}
-                        <AnimatePresence>
-                          {selectedEntryId === entry.id && entry.context && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              className="mt-3 pt-3"
-                              style={{ borderTop: `1px solid ${colors.cardBorder}` }}
-                            >
-                              <p
-                                className="text-[13px] leading-relaxed"
-                                style={{ color: colors.textPrimary }}
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2 mb-1">
+                                  <h3
+                                    style={{
+                                      fontSize: '14px',
+                                      fontWeight: 600,
+                                      color: 'var(--text-primary, #1a1a1a)',
+                                      fontFamily: 'var(--font-body, system-ui)',
+                                    }}
+                                  >
+                                    {entry.title}
+                                  </h3>
+                                  <span
+                                    style={{
+                                      fontSize: '11px',
+                                      color: 'var(--text-tertiary, #888)',
+                                      fontFamily: 'var(--font-body, system-ui)',
+                                      whiteSpace: 'nowrap',
+                                    }}
+                                  >
+                                    {formatDate(entry.createdAt)}
+                                  </span>
+                                </div>
+
+                                {entry.description && (
+                                  <p
+                                    style={{
+                                      fontSize: '13px',
+                                      color: 'var(--text-secondary, #666)',
+                                      fontFamily: 'var(--font-body, system-ui)',
+                                      lineHeight: 1.5,
+                                    }}
+                                  >
+                                    {entry.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Expanded context */}
+                          <AnimatePresence>
+                            {selectedEntryId === entry.id && entry.context && (
+                              <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="px-4 pb-4"
                               >
-                                {entry.context}
-                              </p>
+                                <div
+                                  className="p-3 rounded-lg"
+                                  style={{
+                                    background: 'var(--bg-secondary, #fafafa)',
+                                    borderLeft: '3px solid var(--accent-primary, #8b5cf6)',
+                                  }}
+                                >
+                                  <p
+                                    style={{
+                                      fontSize: '12px',
+                                      color: 'var(--text-secondary, #666)',
+                                      fontFamily: 'var(--font-body, system-ui)',
+                                      lineHeight: 1.6,
+                                      fontStyle: 'italic',
+                                    }}
+                                  >
+                                    {entry.context}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          {/* Owner actions */}
+                          {isOwner && selectedEntryId === entry.id && (
+                            <motion.div
+                              className="px-4 pb-3 flex items-center gap-2"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                            >
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleArchiveEntry(entry.id); }}
+                                className="flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-all"
+                                style={{
+                                  background: 'var(--bg-secondary, #fafafa)',
+                                  color: 'var(--text-secondary, #666)',
+                                }}
+                              >
+                                {entry.isArchived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
+                                {entry.isArchived ? 'Restore' : 'Archive'}
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDeleteEntry(entry.id); }}
+                                className="flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium transition-all"
+                                style={{
+                                  background: 'rgba(239,68,68,0.08)',
+                                  color: '#dc2626',
+                                }}
+                              >
+                                <Trash2 size={12} />
+                                Delete
+                              </button>
                             </motion.div>
                           )}
-                        </AnimatePresence>
-
-                        {/* Owner actions */}
-                        {isOwner && selectedEntryId === entry.id && (
-                          <motion.div
-                            className="flex items-center gap-2 mt-4 pt-3"
-                            style={{ borderTop: `1px solid ${colors.cardBorder}` }}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                          >
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleArchiveEntry(entry.id); }}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all"
-                              style={{ background: colors.buttonBg, color: colors.textSecondary }}
-                            >
-                              {entry.isArchived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
-                              {entry.isArchived ? 'Restore' : 'Archive'}
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleDeleteEntry(entry.id); }}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all"
-                              style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}
-                            >
-                              <Trash2 size={14} />
-                              Delete
-                            </button>
-                          </motion.div>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : (
               /* Empty State */
               <motion.div
-                className="flex flex-col items-center justify-center py-20"
-                initial={{ opacity: 0, scale: 0.95 }}
+                className="flex flex-col items-center justify-center py-16 px-8"
+                initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
                 <div
-                  className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5"
-                  style={{ background: colors.emptyBg }}
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--accent-light, rgba(139,92,246,0.1)) 0%, var(--accent-light, rgba(139,92,246,0.05)) 100%)',
+                  }}
                 >
-                  <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" style={{ color: colors.accent }}>
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="currentColor" fillOpacity="0.2" />
-                    <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
+                  <Sparkles size={24} style={{ color: 'var(--accent-primary, #8b5cf6)' }} />
                 </div>
-                <h3 className="text-[16px] font-semibold mb-2" style={{ color: colors.textPrimary }}>
-                  {showArchived ? 'No archived entries' : 'Your workbench is empty'}
+                <h3
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    color: 'var(--text-primary, #1a1a1a)',
+                    fontFamily: 'var(--font-body, system-ui)',
+                    marginBottom: '6px',
+                  }}
+                >
+                  {showArchived ? 'No archived items' : 'Nothing here yet'}
                 </h3>
-                <p className="text-[13px] text-center max-w-[260px]" style={{ color: colors.textSecondary }}>
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: 'var(--text-tertiary, #888)',
+                    fontFamily: 'var(--font-body, system-ui)',
+                    textAlign: 'center',
+                    maxWidth: '220px',
+                    lineHeight: 1.5,
+                  }}
+                >
                   {showArchived
-                    ? 'Entries you archive will appear here'
-                    : 'Share what you\'re working on, thinking about, or exploring'}
+                    ? 'Archived items will appear here'
+                    : 'Share what you\'re exploring, building, or thinking about'}
                 </p>
                 {isOwner && !showArchived && (
                   <button
                     onClick={() => setIsAddingEntry(true)}
-                    className="mt-5 flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium"
-                    style={{ background: colors.accent, color: 'white' }}
+                    className="mt-5 flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium"
+                    style={{
+                      background: 'var(--accent-primary, #8b5cf6)',
+                      color: 'white',
+                    }}
                   >
-                    <Plus size={16} />
-                    Add Your First Entry
+                    <Plus size={15} />
+                    Add first entry
                   </button>
                 )}
               </motion.div>
@@ -624,14 +558,29 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
 
           {/* Footer */}
           <div
-            className="px-6 py-3 flex items-center justify-between shrink-0"
-            style={{ borderTop: `1px solid ${colors.cardBorder}` }}
+            className="px-4 py-2.5 flex items-center justify-between shrink-0"
+            style={{
+              borderTop: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+              background: 'var(--bg-elevated, white)',
+            }}
           >
-            <span className="text-[11px] font-medium" style={{ color: colors.textTertiary }}>
+            <span
+              style={{
+                fontSize: '11px',
+                color: 'var(--text-tertiary, #888)',
+                fontFamily: 'var(--font-body, system-ui)',
+              }}
+            >
               {sortedEntries.length} {sortedEntries.length === 1 ? 'entry' : 'entries'}
-              {showArchived ? ' (archived)' : ''}
+              {showArchived ? ' archived' : ''}
             </span>
-            <span className="text-[11px]" style={{ color: colors.textTertiary }}>
+            <span
+              style={{
+                fontSize: '11px',
+                color: 'var(--text-tertiary, #888)',
+                fontFamily: 'var(--font-body, system-ui)',
+              }}
+            >
               {item.windowSubtitle || 'Work in progress'}
             </span>
           </div>

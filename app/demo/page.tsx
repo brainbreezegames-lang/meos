@@ -995,70 +995,57 @@ const DEMO_ITEMS: DesktopItem[] = [
   },
 
   // ============================================
-  // 13. RESUME/CV - Finder Window (File Browser Style)
+  // 13. EXPERIENCE - Professional Journey & Timeline
   // ============================================
   {
     id: 'item-13',
     desktopId: 'demo',
-    label: 'Resume',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=200&h=200&fit=crop',
+    label: 'Experience',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=200&h=200&fit=crop',
     positionX: 88,
     positionY: 18,
-    windowTitle: 'Documents',
-    windowSubtitle: 'My Files',
-    windowHeaderImage: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=400&fit=crop',
+    windowTitle: 'Experience',
+    windowSubtitle: 'My Journey',
+    windowHeaderImage: null,
     windowDescription: '',
-    windowType: 'finder',
-    windowWidth: 700,
+    windowType: 'default',
+    windowWidth: 560,
     windowDetails: null,
     windowGallery: null,
     windowLinks: null,
     useTabs: true,
     tabs: [
       {
-        id: 'tab-resume',
-        label: 'Resume',
+        id: 'tab-work',
+        label: 'Work',
         order: 0,
         blocks: [
-          { id: 'r1', type: 'text', order: 0, data: { content: 'Download my resume to learn more about my experience, education, and skills.' } },
-          {
-            id: 'r2', type: 'download', order: 1, data: {
-              url: '/alex-chen-resume.pdf',
-              fileName: 'Alex_Chen_Resume_2024.pdf',
-              fileSize: '245 KB',
-              fileType: 'PDF',
-            }
-          },
+          { id: 'exp-1', type: 'text', order: 0, data: { content: '**Senior Product Designer** · Stripe\n2022 – Present · San Francisco\n\nLeading design for payment infrastructure products. Shipped new invoicing experience used by 50K+ businesses.' } },
+          { id: 'exp-2', type: 'text', order: 1, data: { content: '**Product Designer** · Figma\n2020 – 2022 · San Francisco\n\nDesigned FigJam\'s collaborative features. Led accessibility improvements across the platform.' } },
+          { id: 'exp-3', type: 'text', order: 2, data: { content: '**UX Designer** · Google\n2018 – 2020 · New York\n\nWorked on Material Design components. Contributed to design system documentation.' } },
         ],
       },
       {
-        id: 'tab-portfolio',
-        label: 'Portfolio',
+        id: 'tab-education',
+        label: 'Education',
         order: 1,
         blocks: [
-          { id: 'r3', type: 'text', order: 0, data: { content: 'Selected case studies and project documentation.' } },
-          {
-            id: 'r4', type: 'download', order: 1, data: {
-              url: '/portfolio.pdf',
-              fileName: 'Alex_Chen_Portfolio_2024.pdf',
-              fileSize: '12.4 MB',
-              fileType: 'PDF',
-            }
-          },
+          { id: 'edu-1', type: 'text', order: 0, data: { content: '**MFA Interaction Design**\nSchool of Visual Arts · 2018\n\nThesis: "Designing for Delight" – exploring emotional design in digital products.' } },
+          { id: 'edu-2', type: 'text', order: 1, data: { content: '**BA Graphic Design**\nRISD · 2016\n\nConcentration in typography and brand identity.' } },
         ],
       },
       {
-        id: 'tab-certificates',
-        label: 'Certificates',
+        id: 'tab-download',
+        label: 'Download',
         order: 2,
         blocks: [
+          { id: 'dl-1', type: 'text', order: 0, data: { content: 'Get my complete resume as a PDF.' } },
           {
-            id: 'r5', type: 'list', order: 0, data: {
-              style: 'check', items: [
-                'AWS Solutions Architect',
-                'Google UX Design',
-                'Meta Frontend Developer',
-              ]
+            id: 'dl-2', type: 'download', order: 1, data: {
+              url: '/alex-chen-resume.pdf',
+              fileName: 'Alex_Chen_Resume.pdf',
+              fileSize: '245 KB',
+              fileType: 'PDF',
             }
           },
         ],
@@ -1066,7 +1053,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     ],
     blocks: [],
     zIndex: 0,
-    commentsEnabled: true,
+    commentsEnabled: false,
     order: 12,
   },
 

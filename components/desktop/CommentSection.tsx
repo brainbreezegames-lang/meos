@@ -2,10 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, ChevronDown, ChevronUp, Send, Mail, Loader2 } from 'lucide-react';
-import { useCommentContextSafe } from '@/contexts/CommentContext';
-import { useEditContextSafe } from '@/contexts/EditContext';
-import type { Comment, CommentCategory } from '@/types';
+import { MessageCircle, Heart, Send, ChevronDown } from 'lucide-react';
+
+interface Comment {
+  id: string;
+  content: string;
+  createdAt: Date;
+  likes: number;
+  ownerReply?: string;
+}
 
 interface CommentSectionProps {
   itemId: string;
@@ -13,430 +18,372 @@ interface CommentSectionProps {
   onToggle?: () => void;
 }
 
-const CATEGORY_LABELS: Record<CommentCategory, { label: string; color: string }> = {
-  general: { label: 'General', color: '#6B7280' },
-  feedback: { label: 'Feedback', color: '#3B82F6' },
-  question: { label: 'Question', color: '#F59E0B' },
-  appreciation: { label: 'Appreciation', color: '#10B981' },
+// Simple local storage for demo - in production this would be an API
+const getStoredComments = (itemId: string): Comment[] => {
+  if (typeof window === 'undefined') return [];
+  const stored = localStorage.getItem(`comments-${itemId}`);
+  if (stored) {
+    try {
+      return JSON.parse(stored).map((c: Comment) => ({
+        ...c,
+        createdAt: new Date(c.createdAt)
+      }));
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+const storeComments = (itemId: string, comments: Comment[]) => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(`comments-${itemId}`, JSON.stringify(comments));
+};
+
+const getLikedComments = (): Set<string> => {
+  if (typeof window === 'undefined') return new Set();
+  const stored = localStorage.getItem('liked-comments');
+  if (stored) {
+    try {
+      return new Set(JSON.parse(stored));
+    } catch {
+      return new Set();
+    }
+  }
+  return new Set();
+};
+
+const storeLikedComments = (liked: Set<string>) => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('liked-comments', JSON.stringify([...liked]));
 };
 
 export function CommentSection({ itemId, isOpen = false, onToggle }: CommentSectionProps) {
-  const commentContext = useCommentContextSafe();
-  const editContext = useEditContextSafe();
   const [expanded, setExpanded] = useState(isOpen);
-  const [showVerification, setShowVerification] = useState(false);
-  const [email, setEmail] = useState('');
-  const [verificationSent, setVerificationSent] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<CommentCategory>('general');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState('');
+  const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
 
-  const isOwner = editContext?.isOwner ?? false;
-  const comments = commentContext?.comments[itemId] || [];
-  const isLoading = commentContext?.loadingItems.has(itemId);
-  const session = commentContext?.session;
-
-  // Load comments when expanded
+  // Load comments and liked state
   useEffect(() => {
-    if (expanded && commentContext && !comments.length && !isLoading) {
-      commentContext.loadComments(itemId);
-    }
-  }, [expanded, itemId, commentContext, comments.length, isLoading]);
+    setComments(getStoredComments(itemId));
+    setLikedComments(getLikedComments());
+  }, [itemId]);
 
   const handleToggle = () => {
     setExpanded(!expanded);
     onToggle?.();
   };
 
-  const handleSendVerification = async () => {
-    if (!commentContext || !email.trim()) return;
-
-    const success = await commentContext.initiateVerification(email.trim(), itemId);
-    if (success) {
-      setVerificationSent(true);
-    }
-  };
-
   const handleSubmitComment = async () => {
-    if (!commentContext || !session || !newComment.trim()) return;
+    if (!newComment.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
-    const result = await commentContext.addComment(itemId, newComment.trim(), selectedCategory);
 
-    if (result) {
-      setNewComment('');
-      setSelectedCategory('general');
-    }
+    // Simulate brief delay for realism
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    const comment: Comment = {
+      id: `comment-${Date.now()}`,
+      content: newComment.trim(),
+      createdAt: new Date(),
+      likes: 0,
+    };
+
+    const updatedComments = [comment, ...comments];
+    setComments(updatedComments);
+    storeComments(itemId, updatedComments);
+    setNewComment('');
     setIsSubmitting(false);
   };
 
-  const handleOwnerReply = async (commentId: string) => {
-    if (!commentContext || !replyContent.trim()) return;
+  const handleLike = (commentId: string) => {
+    const newLiked = new Set(likedComments);
+    const updatedComments = comments.map(c => {
+      if (c.id === commentId) {
+        if (newLiked.has(commentId)) {
+          newLiked.delete(commentId);
+          return { ...c, likes: Math.max(0, c.likes - 1) };
+        } else {
+          newLiked.add(commentId);
+          return { ...c, likes: c.likes + 1 };
+        }
+      }
+      return c;
+    });
 
-    setIsSubmitting(true);
-    const success = await commentContext.replyToComment(commentId, replyContent.trim());
-
-    if (success) {
-      setReplyContent('');
-      setReplyingTo(null);
-    }
-    setIsSubmitting(false);
+    setLikedComments(newLiked);
+    setComments(updatedComments);
+    storeLikedComments(newLiked);
+    storeComments(itemId, updatedComments);
   };
 
-  const formatDate = (date: Date | string) => {
-    const d = new Date(date);
+  const formatDate = (date: Date) => {
     const now = new Date();
-    const diff = now.getTime() - d.getTime();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-    if (days < 7) return `${days} days ago`;
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m`;
+    if (hours < 24) return `${hours}h`;
+    if (days < 7) return `${days}d`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  if (!commentContext) {
-    return null;
-  }
+  const totalLikes = comments.reduce((sum, c) => sum + c.likes, 0);
 
   return (
     <div
-      className="border-t"
-      style={{ borderColor: 'var(--border-light)' }}
+      style={{
+        borderTop: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+        background: 'var(--bg-secondary, #fafafa)',
+      }}
     >
       {/* Header - Always visible */}
       <button
         onClick={handleToggle}
-        className="w-full px-5 py-3 flex items-center justify-between transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+        className="w-full px-4 py-3 flex items-center justify-between transition-colors"
+        style={{
+          background: expanded ? 'var(--bg-elevated, white)' : 'transparent',
+        }}
       >
-        <div className="flex items-center gap-2">
-          <MessageCircle size={16} style={{ color: 'var(--text-tertiary)' }} />
-          <span
-            className="text-[13px] font-medium"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            Feedback
-          </span>
-          {comments.length > 0 && (
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <MessageCircle size={14} style={{ color: 'var(--text-tertiary, #888)' }} />
             <span
-              className="px-1.5 py-0.5 rounded-full text-[11px] font-medium"
               style={{
-                background: 'var(--accent-primary)',
-                color: 'white',
+                fontSize: '12px',
+                fontWeight: 500,
+                color: 'var(--text-secondary, #666)',
+                fontFamily: 'var(--font-body, system-ui)',
               }}
             >
-              {comments.length}
+              {comments.length === 0 ? 'Leave feedback' : `${comments.length} ${comments.length === 1 ? 'comment' : 'comments'}`}
             </span>
+          </div>
+          {totalLikes > 0 && (
+            <div className="flex items-center gap-1">
+              <Heart size={12} fill="var(--accent-primary, #ec4899)" style={{ color: 'var(--accent-primary, #ec4899)' }} />
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--text-tertiary, #888)',
+                  fontFamily: 'var(--font-body, system-ui)',
+                }}
+              >
+                {totalLikes}
+              </span>
+            </div>
           )}
         </div>
-        {expanded ? (
-          <ChevronUp size={16} style={{ color: 'var(--text-tertiary)' }} />
-        ) : (
-          <ChevronDown size={16} style={{ color: 'var(--text-tertiary)' }} />
-        )}
+        <motion.div
+          animate={{ rotate: expanded ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronDown size={14} style={{ color: 'var(--text-tertiary, #888)' }} />
+        </motion.div>
       </button>
 
       {/* Expanded Content */}
       <AnimatePresence>
         {expanded && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ overflow: 'hidden' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
           >
             <div
-              className="px-5 pb-5"
-              style={{ borderTop: '1px solid var(--border-light)' }}
+              className="px-4 pb-4"
+              style={{
+                background: 'var(--bg-elevated, white)',
+                borderTop: '1px solid var(--border-light, rgba(0,0,0,0.04))',
+              }}
             >
-              {/* Comment Form */}
-              {!session && !showVerification && !verificationSent && (
-                <div className="py-4">
-                  <p
-                    className="text-[13px] mb-3"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    Leave feedback, ask questions, or share appreciation.
-                  </p>
-                  <button
-                    onClick={() => setShowVerification(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-medium transition-colors"
-                    style={{
-                      background: 'var(--accent-primary)',
-                      color: 'white',
-                    }}
-                  >
-                    <Mail size={14} />
-                    Add Comment
-                  </button>
-                </div>
-              )}
-
-              {/* Email Verification Form */}
-              {showVerification && !session && !verificationSent && (
-                <div className="py-4">
-                  <p
-                    className="text-[13px] mb-3"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    Enter your email to verify and comment.
-                  </p>
-                  <div className="flex gap-2">
+              {/* Comment Input - Always visible, no auth required */}
+              <div className="pt-3 pb-4">
+                <div className="flex gap-2">
+                  <div className="flex-1 relative">
                     <input
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="flex-1 px-4 py-2.5 rounded-lg text-[13px] outline-none"
-                      style={{
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-medium)',
-                        color: 'var(--text-primary)',
-                      }}
-                    />
-                    <button
-                      onClick={handleSendVerification}
-                      disabled={!email.trim() || commentContext.isVerifying}
-                      className="px-4 py-2.5 rounded-lg text-[13px] font-medium transition-colors disabled:opacity-50"
-                      style={{
-                        background: 'var(--accent-primary)',
-                        color: 'white',
-                      }}
-                    >
-                      {commentContext.isVerifying ? (
-                        <Loader2 size={14} className="animate-spin" />
-                      ) : (
-                        'Verify'
-                      )}
-                    </button>
-                  </div>
-                  {commentContext.verificationError && (
-                    <p className="text-[12px] text-red-500 mt-2">
-                      {commentContext.verificationError}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Verification Sent */}
-              {verificationSent && !session && (
-                <div className="py-4 text-center">
-                  <Mail size={32} style={{ color: 'var(--accent-primary)' }} className="mx-auto mb-3" />
-                  <h4
-                    className="text-[14px] font-medium mb-1"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    Check your email
-                  </h4>
-                  <p
-                    className="text-[12px]"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    We sent a verification link to {email}
-                  </p>
-                </div>
-              )}
-
-              {/* Logged In Comment Form */}
-              {session && (
-                <div className="py-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className="text-[12px]"
-                      style={{ color: 'var(--text-tertiary)' }}
-                    >
-                      Commenting as {session.email}
-                    </span>
-                    <button
-                      onClick={() => commentContext.clearSession()}
-                      className="text-[11px]"
-                      style={{ color: 'var(--text-tertiary)' }}
-                    >
-                      Sign out
-                    </button>
-                  </div>
-
-                  {/* Category Selector */}
-                  <div className="flex gap-1.5">
-                    {(Object.keys(CATEGORY_LABELS) as CommentCategory[]).map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
-                        style={{
-                          background: selectedCategory === cat
-                            ? CATEGORY_LABELS[cat].color
-                            : 'var(--bg-secondary)',
-                          color: selectedCategory === cat ? 'white' : 'var(--text-secondary)',
-                        }}
-                      >
-                        {CATEGORY_LABELS[cat].label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Comment Input */}
-                  <div className="flex gap-2">
-                    <textarea
-                      placeholder="Write your comment..."
+                      type="text"
+                      placeholder="Share your thoughts..."
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      rows={2}
-                      className="flex-1 px-4 py-2.5 rounded-lg text-[13px] outline-none resize-none"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSubmitComment();
+                        }
+                      }}
+                      className="w-full pl-3 pr-10 py-2 rounded-full text-[13px] outline-none transition-all"
                       style={{
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-medium)',
-                        color: 'var(--text-primary)',
+                        background: 'var(--bg-secondary, #f5f5f5)',
+                        border: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+                        color: 'var(--text-primary, #1a1a1a)',
+                        fontFamily: 'var(--font-body, system-ui)',
                       }}
                     />
                     <button
                       onClick={handleSubmitComment}
                       disabled={!newComment.trim() || isSubmitting}
-                      className="self-end p-2.5 rounded-lg transition-colors disabled:opacity-50"
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-all disabled:opacity-30"
                       style={{
-                        background: 'var(--accent-primary)',
-                        color: 'white',
+                        background: newComment.trim() ? 'var(--accent-primary, #3b82f6)' : 'transparent',
+                        color: newComment.trim() ? 'white' : 'var(--text-tertiary, #888)',
                       }}
                     >
-                      {isSubmitting ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <Send size={16} />
-                      )}
+                      <Send size={12} />
                     </button>
                   </div>
                 </div>
-              )}
+                <p
+                  className="mt-2 text-center"
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-tertiary, #aaa)',
+                    fontFamily: 'var(--font-body, system-ui)',
+                  }}
+                >
+                  Anonymous • Be kind
+                </p>
+              </div>
 
               {/* Comments List */}
-              {isLoading ? (
-                <div className="py-8 flex justify-center">
-                  <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-tertiary)' }} />
-                </div>
-              ) : comments.length > 0 ? (
-                <div className="space-y-4 pt-2">
-                  {comments.map((comment) => (
-                    <div
+              {comments.length > 0 ? (
+                <div className="space-y-3">
+                  {comments.map((comment, index) => (
+                    <motion.div
                       key={comment.id}
-                      className="p-4 rounded-xl"
-                      style={{ background: 'var(--bg-secondary)' }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className="group"
                     >
-                      {/* Comment Header */}
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
+                      <div
+                        className="p-3 rounded-xl"
+                        style={{
+                          background: 'var(--bg-secondary, #f8f8f8)',
+                        }}
+                      >
+                        {/* Comment content */}
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            color: 'var(--text-primary, #1a1a1a)',
+                            fontFamily: 'var(--font-body, system-ui)',
+                            lineHeight: 1.5,
+                            marginBottom: '8px',
+                          }}
+                        >
+                          {comment.content}
+                        </p>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between">
                           <span
-                            className="px-2 py-0.5 rounded text-[10px] font-medium"
                             style={{
-                              background: CATEGORY_LABELS[comment.category as CommentCategory].color,
-                              color: 'white',
+                              fontSize: '11px',
+                              color: 'var(--text-tertiary, #999)',
+                              fontFamily: 'var(--font-body, system-ui)',
                             }}
-                          >
-                            {CATEGORY_LABELS[comment.category as CommentCategory].label}
-                          </span>
-                          <span
-                            className="text-[12px]"
-                            style={{ color: 'var(--text-tertiary)' }}
                           >
                             {formatDate(comment.createdAt)}
                           </span>
-                        </div>
-                        <span
-                          className="text-[11px]"
-                          style={{ color: 'var(--text-tertiary)' }}
-                        >
-                          {comment.commenter?.email?.split('@')[0] || 'Anonymous'}
-                        </span>
-                      </div>
 
-                      {/* Comment Content */}
-                      <p
-                        className="text-[13px] leading-relaxed"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        {comment.content}
-                      </p>
-
-                      {/* Owner Reply */}
-                      {comment.ownerReply && (
-                        <div
-                          className="mt-3 pt-3 pl-4"
-                          style={{ borderTop: '1px solid var(--border-light)', borderLeft: '2px solid var(--accent-primary)' }}
-                        >
-                          <span
-                            className="text-[11px] font-medium"
-                            style={{ color: 'var(--accent-primary)' }}
+                          {/* Like button */}
+                          <button
+                            onClick={() => handleLike(comment.id)}
+                            className="flex items-center gap-1 px-2 py-1 rounded-full transition-all"
+                            style={{
+                              background: likedComments.has(comment.id)
+                                ? 'rgba(236,72,153,0.1)'
+                                : 'transparent',
+                            }}
                           >
-                            Owner Reply
-                          </span>
-                          <p
-                            className="text-[13px] mt-1"
-                            style={{ color: 'var(--text-primary)' }}
-                          >
-                            {comment.ownerReply}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Owner Reply Form */}
-                      {isOwner && !comment.ownerReply && (
-                        <>
-                          {replyingTo === comment.id ? (
-                            <div className="mt-3 flex gap-2">
-                              <input
-                                type="text"
-                                placeholder="Write a reply..."
-                                value={replyContent}
-                                onChange={(e) => setReplyContent(e.target.value)}
-                                className="flex-1 px-3 py-2 rounded-lg text-[12px] outline-none"
+                            <Heart
+                              size={13}
+                              fill={likedComments.has(comment.id) ? '#ec4899' : 'none'}
+                              style={{
+                                color: likedComments.has(comment.id) ? '#ec4899' : 'var(--text-tertiary, #999)',
+                                transition: 'all 0.15s ease',
+                              }}
+                            />
+                            {comment.likes > 0 && (
+                              <span
                                 style={{
-                                  background: 'var(--bg-primary)',
-                                  border: '1px solid var(--border-medium)',
-                                  color: 'var(--text-primary)',
+                                  fontSize: '11px',
+                                  fontWeight: 500,
+                                  color: likedComments.has(comment.id) ? '#ec4899' : 'var(--text-tertiary, #999)',
+                                  fontFamily: 'var(--font-body, system-ui)',
                                 }}
-                              />
-                              <button
-                                onClick={() => handleOwnerReply(comment.id)}
-                                disabled={!replyContent.trim() || isSubmitting}
-                                className="px-3 py-2 rounded-lg text-[11px] font-medium disabled:opacity-50"
+                              >
+                                {comment.likes}
+                              </span>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Owner Reply */}
+                        {comment.ownerReply && (
+                          <div
+                            className="mt-3 pt-3"
+                            style={{
+                              borderTop: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+                            }}
+                          >
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <div
+                                className="w-4 h-4 rounded-full flex items-center justify-center"
                                 style={{
-                                  background: 'var(--accent-primary)',
+                                  background: 'var(--accent-primary, #3b82f6)',
+                                  fontSize: '8px',
                                   color: 'white',
                                 }}
                               >
-                                Reply
-                              </button>
-                              <button
-                                onClick={() => { setReplyingTo(null); setReplyContent(''); }}
-                                className="px-3 py-2 rounded-lg text-[11px]"
-                                style={{ color: 'var(--text-tertiary)' }}
+                                ✓
+                              </div>
+                              <span
+                                style={{
+                                  fontSize: '10px',
+                                  fontWeight: 600,
+                                  color: 'var(--accent-primary, #3b82f6)',
+                                  fontFamily: 'var(--font-body, system-ui)',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.03em',
+                                }}
                               >
-                                Cancel
-                              </button>
+                                Owner
+                              </span>
                             </div>
-                          ) : (
-                            <button
-                              onClick={() => setReplyingTo(comment.id)}
-                              className="mt-2 text-[11px] font-medium"
-                              style={{ color: 'var(--accent-primary)' }}
+                            <p
+                              style={{
+                                fontSize: '12px',
+                                color: 'var(--text-secondary, #666)',
+                                fontFamily: 'var(--font-body, system-ui)',
+                                lineHeight: 1.5,
+                              }}
                             >
-                              Reply
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
+                              {comment.ownerReply}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
                   ))}
                 </div>
               ) : (
                 <div className="py-6 text-center">
                   <p
-                    className="text-[13px]"
-                    style={{ color: 'var(--text-tertiary)' }}
+                    style={{
+                      fontSize: '12px',
+                      color: 'var(--text-tertiary, #999)',
+                      fontFamily: 'var(--font-body, system-ui)',
+                    }}
                   >
-                    No comments yet. Be the first to share your thoughts.
+                    No feedback yet. Be the first!
                   </p>
                 </div>
               )}
