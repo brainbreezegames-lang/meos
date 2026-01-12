@@ -39,9 +39,9 @@ const PERSONA_VISIBLE_ITEMS: PersonaVisibility = {
   // Recruiter sees: About Me, Resume, Skills, Projects, Testimonials, Recognition, Contact, Workbench
   recruiter: ['item-1', 'item-13', 'item-10', 'item-3', 'item-6', 'item-8', 'item-7', 'item-14'],
   // Visitor sees everything
-  visitor: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14', 'item-15'],
+  visitor: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14'],
   // Guest sees everything too
-  guest: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14', 'item-15'],
+  guest: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14'],
 };
 
 // Background context for demo
@@ -1082,33 +1082,6 @@ const DEMO_ITEMS: DesktopItem[] = [
     zIndex: 0,
     commentsEnabled: true,
     order: 13,
-  },
-
-  // ============================================
-  // 15. GAME - Physics Letter Puzzle
-  // ============================================
-  {
-    id: 'item-15',
-    desktopId: 'demo',
-    label: 'meOS Game',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=200&h=200&fit=crop',
-    positionX: 74,
-    positionY: 10,
-    windowTitle: 'meOS Puzzle',
-    windowSubtitle: 'Shake to solve',
-    windowHeaderImage: null,
-    windowDescription: '',
-    windowType: 'game',
-    windowWidth: 600,
-    windowDetails: null,
-    windowGallery: null,
-    windowLinks: null,
-    useTabs: false,
-    tabs: [],
-    blocks: [],
-    zIndex: 0,
-    commentsEnabled: false,
-    order: 14,
   },
 ];
 
