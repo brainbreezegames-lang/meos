@@ -95,10 +95,11 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
       <motion.div
         className="rounded-2xl overflow-hidden cursor-pointer"
         style={{
-          background: 'var(--bg-glass-elevated)',
+          background: 'var(--bg-glass-elevated, rgba(255, 255, 255, 0.95))',
           backdropFilter: 'blur(40px)',
-          border: '1px solid var(--border-light)',
-          boxShadow: 'var(--shadow-lg)',
+          WebkitBackdropFilter: 'blur(40px)',
+          border: '1px solid var(--border-light, rgba(0, 0, 0, 0.1))',
+          boxShadow: 'var(--shadow-lg, 0 12px 32px rgba(0, 0, 0, 0.15))',
           maxWidth: '280px',
           minWidth: '200px',
         }}
