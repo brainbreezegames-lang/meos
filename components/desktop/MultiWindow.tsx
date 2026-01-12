@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
 
-type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm';
+type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
 import { useThemeSafe } from '@/contexts/ThemeContext';
@@ -130,6 +130,27 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         accentColor: '#EA580C',
         buttonBg: 'rgba(28,25,23,0.04)',
         imageShadow: '0 4px 12px rgba(28,25,23,0.1)',
+      };
+    case 'clay':
+      return {
+        windowBg: 'linear-gradient(165deg, #FFFDFB 0%, #F5F1EB 50%, #EDE8E1 100%)',
+        windowShadow: '0 0 0 1px rgba(255,255,255,0.5) inset, 0 -6px 20px rgba(255,255,255,0.6) inset, 8px 16px 24px rgba(107,114,128,0.04) inset, 0 32px 64px -16px rgba(107,114,128,0.2)',
+        windowBorder: 'none',
+        headerBg: 'linear-gradient(180deg, rgba(255,253,251,0.95) 0%, rgba(245,241,235,0.9) 100%)',
+        headerBorder: '1px solid rgba(107,114,128,0.06)',
+        titleColor: '#3D3D3D',
+        subtitleColor: '#5C5C5C',
+        textPrimary: '#3D3D3D',
+        textSecondary: '#5C5C5C',
+        textTertiary: '#8E8E8E',
+        borderLight: 'rgba(107,114,128,0.08)',
+        borderMedium: 'rgba(107,114,128,0.15)',
+        tabActiveBg: 'rgba(201,120,92,0.12)',
+        tabActiveColor: '#C9785C',
+        tabInactiveColor: '#8E8E8E',
+        accentColor: '#C9785C',
+        buttonBg: 'linear-gradient(145deg, #FFFDFB 0%, #EDE8E1 100%)',
+        imageShadow: '0 0 0 1px rgba(255,255,255,0.4) inset, 0 8px 24px -4px rgba(107,114,128,0.15)',
       };
     case 'monterey':
     default:

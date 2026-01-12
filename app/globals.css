@@ -152,6 +152,141 @@
 }
 
 /* ============================================
+   THEME: CLAY (Stop-Motion Claymorphism)
+   Physical studio aesthetic with pillowy geometry
+   ============================================ */
+[data-theme="clay"] {
+    /* Typography - Chunky rounded display, soft body */
+    --font-display: "Fredoka", "Nunito", system-ui, sans-serif;
+    --font-body: "Nunito", "Fredoka", system-ui, sans-serif;
+
+    /* Clay Structural Overrides - Extreme pillowy radius */
+    --radius-sm: 16px;
+    --radius-md: 24px;
+    --radius-lg: 32px;
+    --radius-xl: 40px;
+    --radius-full: 9999px;
+    --radius-window: 32px;
+    --radius-dock: 40px;
+    --radius-dock-icon: 24px;
+    --radius-button: 20px;
+    --radius-input: 20px;
+    --radius-menubar: 0;
+
+    /* Clay Spacing - More generous */
+    --spacing-dock-gap: 10px;
+    --spacing-dock-padding: 16px;
+    --spacing-window-padding: 24px;
+
+    /* Clay Dimensions */
+    --dock-icon-size: 56px;
+    --dock-icon-size-hover: 72px;
+    --menubar-height: 40px;
+
+    /* Clay Animation - Slightly slower for physical feel */
+    --transition-fast: 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-normal: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-slow: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Earth Tone Palette */
+    --clay-cream: #F7F4F0;
+    --clay-bone: #EDE8E1;
+    --clay-sand: #E5DED4;
+    --clay-terracotta: #C9785C;
+    --clay-terracotta-light: #D99B84;
+    --clay-sage: #8BA888;
+    --clay-sage-light: #A8C4A5;
+    --clay-dusty-blue: #7E9AB8;
+    --clay-dusty-blue-light: #A4BDCF;
+    --clay-mauve: #B39EB5;
+    --clay-amber: #D4A574;
+    --clay-slate: #6B7280;
+    --clay-charcoal: #3D3D3D;
+
+    /* Colors */
+    --bg-solid: var(--clay-cream);
+    --bg-elevated: #FFFDFB;
+    --bg-glass: rgba(247, 244, 240, 0.92);
+    --bg-glass-elevated: rgba(255, 253, 251, 0.96);
+    --bg-dock: rgba(237, 232, 225, 0.85);
+    --bg-menubar: rgba(247, 244, 240, 0.75);
+    --bg-item: linear-gradient(145deg, #FFFDFB 0%, var(--clay-bone) 100%);
+    --bg-tooltip: rgba(61, 61, 61, 0.92);
+
+    --text-primary: var(--clay-charcoal);
+    --text-secondary: #5C5C5C;
+    --text-tertiary: #8E8E8E;
+    --text-on-dark: #FFFDFB;
+
+    --accent-primary: var(--clay-terracotta);
+    --accent-secondary: var(--clay-sage);
+
+    --border-light: rgba(107, 114, 128, 0.08);
+    --border-medium: rgba(107, 114, 128, 0.15);
+    --border-glass-outer: rgba(255, 255, 255, 0.6);
+    --border-glass-inner: rgba(255, 255, 255, 0.8);
+
+    /* Clay Multi-Layered Shadows - The secret sauce */
+    --clay-shadow-outer: 0 20px 50px -15px rgba(107, 114, 128, 0.18);
+    --clay-shadow-rim: 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    --clay-shadow-highlight: 0 -4px 12px rgba(255, 255, 255, 0.7) inset;
+    --clay-shadow-depth: 0 8px 16px rgba(107, 114, 128, 0.08) inset;
+
+    --shadow-dock:
+        var(--clay-shadow-rim),
+        var(--clay-shadow-highlight),
+        6px 12px 24px rgba(107, 114, 128, 0.12) inset,
+        0 24px 48px -12px rgba(107, 114, 128, 0.15);
+
+    --shadow-sm:
+        0 0 0 1px rgba(255, 255, 255, 0.4) inset,
+        0 2px 4px rgba(107, 114, 128, 0.06);
+
+    --shadow-md:
+        var(--clay-shadow-rim),
+        0 -2px 8px rgba(255, 255, 255, 0.5) inset,
+        4px 8px 16px rgba(107, 114, 128, 0.06) inset,
+        0 8px 24px -4px rgba(107, 114, 128, 0.12);
+
+    --shadow-lg:
+        var(--clay-shadow-rim),
+        var(--clay-shadow-highlight),
+        var(--clay-shadow-depth),
+        var(--clay-shadow-outer);
+
+    --shadow-item:
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 -3px 10px rgba(255, 255, 255, 0.6) inset,
+        4px 8px 12px rgba(107, 114, 128, 0.05) inset,
+        0 12px 32px -8px rgba(107, 114, 128, 0.12);
+
+    --shadow-item-hover:
+        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+        0 -4px 14px rgba(255, 255, 255, 0.7) inset,
+        4px 8px 12px rgba(107, 114, 128, 0.04) inset,
+        0 20px 48px -12px rgba(107, 114, 128, 0.18);
+
+    --shadow-window:
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 -6px 20px rgba(255, 255, 255, 0.6) inset,
+        8px 16px 24px rgba(107, 114, 128, 0.04) inset,
+        0 32px 64px -16px rgba(107, 114, 128, 0.2),
+        0 0 0 1px rgba(107, 114, 128, 0.05);
+
+    --shadow-button:
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+        0 -2px 6px rgba(255, 255, 255, 0.4) inset,
+        2px 4px 8px rgba(107, 114, 128, 0.04) inset,
+        0 4px 12px -2px rgba(107, 114, 128, 0.15);
+
+    --shadow-button-hover:
+        0 0 0 1px rgba(255, 255, 255, 0.4) inset,
+        0 -3px 10px rgba(255, 255, 255, 0.5) inset,
+        2px 4px 8px rgba(107, 114, 128, 0.03) inset,
+        0 8px 20px -4px rgba(107, 114, 128, 0.2);
+}
+
+/* ============================================
    MEOS CUSTOM STYLES
    ============================================ */
 
@@ -218,4 +353,350 @@
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* ============================================
+   CLAY THEME - Component Overrides & Animations
+   ============================================ */
+
+/* Clay Texture Overlay - Matte grainy finish */
+[data-theme="clay"] .noise-overlay {
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='clayNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23clayNoise)'/%3E%3C/svg%3E");
+}
+
+/* Stop-Motion Animation Keyframes */
+@keyframes clayWiggle {
+    0%, 100% { transform: rotate(-0.3deg) translateY(0); }
+    25% { transform: rotate(0.2deg) translateY(-0.5px); }
+    50% { transform: rotate(-0.2deg) translateY(0.5px); }
+    75% { transform: rotate(0.3deg) translateY(-0.3px); }
+}
+
+@keyframes clayBounce {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.02) translateY(-2px); }
+}
+
+@keyframes clayPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.95; transform: scale(0.98); }
+}
+
+@keyframes clayFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-3px) rotate(0.5deg); }
+    66% { transform: translateY(-1px) rotate(-0.5deg); }
+}
+
+/* Clay Window Styles */
+[data-theme="clay"] .window-glass {
+    background: linear-gradient(165deg, #FFFDFB 0%, #F5F1EB 50%, #EDE8E1 100%);
+    backdrop-filter: blur(20px) saturate(120%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    border-radius: var(--radius-window);
+    box-shadow: var(--shadow-window);
+    border: none;
+}
+
+/* Clay Dock Styles */
+[data-theme="clay"] .dock-glass {
+    background: linear-gradient(180deg, rgba(255, 253, 251, 0.9) 0%, rgba(237, 232, 225, 0.85) 100%);
+    backdrop-filter: blur(24px) saturate(130%);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+    border-radius: var(--radius-dock);
+    box-shadow: var(--shadow-dock);
+    border: none;
+    padding: var(--spacing-dock-padding);
+}
+
+/* Clay Desktop Icons */
+[data-theme="clay"] .desktop-icon {
+    border-radius: var(--radius-dock-icon);
+    box-shadow: var(--shadow-item);
+    background: linear-gradient(145deg, #FFFDFB 0%, #EDE8E1 100%);
+    transition: all var(--transition-normal);
+}
+
+[data-theme="clay"] .desktop-icon:hover {
+    box-shadow: var(--shadow-item-hover);
+    transform: translateY(-4px) scale(1.03);
+    animation: clayFloat 3s ease-in-out infinite;
+}
+
+/* Clay Menu Bar */
+[data-theme="clay"] .menubar {
+    background: linear-gradient(180deg, rgba(255, 253, 251, 0.92) 0%, rgba(247, 244, 240, 0.88) 100%);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 1px 0 rgba(107, 114, 128, 0.06);
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* Clay Buttons */
+[data-theme="clay"] button,
+[data-theme="clay"] .btn {
+    border-radius: var(--radius-button);
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: all var(--transition-fast);
+}
+
+[data-theme="clay"] button:not([disabled]):hover,
+[data-theme="clay"] .btn:not([disabled]):hover {
+    transform: translateY(-1px) scale(1.01);
+}
+
+[data-theme="clay"] button:not([disabled]):active,
+[data-theme="clay"] .btn:not([disabled]):active {
+    transform: translateY(1px) scale(0.98);
+}
+
+/* Clay Primary Button */
+[data-theme="clay"] .btn-primary,
+[data-theme="clay"] button[data-primary="true"] {
+    background: linear-gradient(145deg, var(--clay-terracotta-light) 0%, var(--clay-terracotta) 100%);
+    color: white;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+        0 -2px 8px rgba(255, 255, 255, 0.15) inset,
+        2px 4px 8px rgba(201, 120, 92, 0.1) inset,
+        0 4px 16px -4px rgba(201, 120, 92, 0.4);
+}
+
+[data-theme="clay"] .btn-primary:hover,
+[data-theme="clay"] button[data-primary="true"]:hover {
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.25) inset,
+        0 -3px 12px rgba(255, 255, 255, 0.2) inset,
+        2px 4px 8px rgba(201, 120, 92, 0.08) inset,
+        0 8px 24px -4px rgba(201, 120, 92, 0.5);
+}
+
+/* Clay Secondary Button */
+[data-theme="clay"] .btn-secondary,
+[data-theme="clay"] button[data-secondary="true"] {
+    background: linear-gradient(145deg, var(--clay-sage-light) 0%, var(--clay-sage) 100%);
+    color: white;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+        0 -2px 8px rgba(255, 255, 255, 0.15) inset,
+        2px 4px 8px rgba(139, 168, 136, 0.1) inset,
+        0 4px 16px -4px rgba(139, 168, 136, 0.4);
+}
+
+/* Clay Inputs */
+[data-theme="clay"] input,
+[data-theme="clay"] textarea,
+[data-theme="clay"] select {
+    border-radius: var(--radius-input);
+    background: linear-gradient(180deg, #FFFDFB 0%, #F7F4F0 100%);
+    border: 1px solid rgba(107, 114, 128, 0.12);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 2px 4px rgba(107, 114, 128, 0.04) inset;
+    font-family: var(--font-body);
+    transition: all var(--transition-fast);
+}
+
+[data-theme="clay"] input:focus,
+[data-theme="clay"] textarea:focus,
+[data-theme="clay"] select:focus {
+    outline: none;
+    border-color: var(--clay-terracotta);
+    box-shadow:
+        0 0 0 3px rgba(201, 120, 92, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 2px 4px rgba(107, 114, 128, 0.04) inset;
+}
+
+/* Clay Cards */
+[data-theme="clay"] .card {
+    border-radius: var(--radius-lg);
+    background: linear-gradient(155deg, #FFFDFB 0%, #F5F1EB 60%, #EDE8E1 100%);
+    box-shadow: var(--shadow-md);
+    border: none;
+}
+
+/* Clay Typography */
+[data-theme="clay"] h1,
+[data-theme="clay"] h2,
+[data-theme="clay"] h3,
+[data-theme="clay"] h4,
+[data-theme="clay"] h5,
+[data-theme="clay"] h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+}
+
+[data-theme="clay"] p,
+[data-theme="clay"] span,
+[data-theme="clay"] div {
+    font-family: var(--font-body);
+}
+
+/* Clay Scrollbar */
+[data-theme="clay"] ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+[data-theme="clay"] ::-webkit-scrollbar-track {
+    background: rgba(237, 232, 225, 0.5);
+    border-radius: 10px;
+}
+
+[data-theme="clay"] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--clay-sand) 0%, #D4CEC4 100%);
+    border-radius: 10px;
+    border: 2px solid rgba(237, 232, 225, 0.5);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+        0 -1px 4px rgba(255, 255, 255, 0.2) inset;
+}
+
+[data-theme="clay"] ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #D4CEC4 0%, #C9C2B8 100%);
+}
+
+/* Clay Traffic Lights */
+[data-theme="clay"] .traffic-light-red {
+    background: linear-gradient(145deg, #E88B7D 0%, #D97165 100%);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+        0 -1px 4px rgba(255, 255, 255, 0.2) inset,
+        0 2px 6px rgba(217, 113, 101, 0.4);
+}
+
+[data-theme="clay"] .traffic-light-yellow {
+    background: linear-gradient(145deg, #E8C97D 0%, #D9B665 100%);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+        0 -1px 4px rgba(255, 255, 255, 0.2) inset,
+        0 2px 6px rgba(217, 182, 101, 0.4);
+}
+
+[data-theme="clay"] .traffic-light-green {
+    background: linear-gradient(145deg, #9BC492 0%, #8BA888 100%);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+        0 -1px 4px rgba(255, 255, 255, 0.2) inset,
+        0 2px 6px rgba(139, 168, 136, 0.4);
+}
+
+/* Clay Tooltip */
+[data-theme="clay"] .tooltip,
+[data-theme="clay"] .dock-tooltip {
+    background: linear-gradient(145deg, #4A4A4A 0%, #3D3D3D 100%);
+    border-radius: var(--radius-md);
+    font-family: var(--font-display);
+    font-weight: 500;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+        0 -2px 8px rgba(255, 255, 255, 0.05) inset,
+        0 8px 24px -4px rgba(0, 0, 0, 0.3);
+}
+
+/* Clay Dropdown/Popover */
+[data-theme="clay"] .dropdown,
+[data-theme="clay"] .popover,
+[data-theme="clay"] [role="menu"] {
+    border-radius: var(--radius-lg);
+    background: linear-gradient(165deg, #FFFDFB 0%, #F5F1EB 50%, #EDE8E1 100%);
+    box-shadow: var(--shadow-lg);
+    border: none;
+}
+
+/* Clay Modal */
+[data-theme="clay"] .modal,
+[data-theme="clay"] [role="dialog"] {
+    border-radius: var(--radius-xl);
+    background: linear-gradient(165deg, #FFFDFB 0%, #F5F1EB 50%, #EDE8E1 100%);
+    box-shadow:
+        var(--shadow-window),
+        0 0 100px 20px rgba(107, 114, 128, 0.1);
+}
+
+/* Clay Icon styling */
+[data-theme="clay"] .dock-icon {
+    border-radius: var(--radius-dock-icon);
+    background: linear-gradient(145deg, #FFFDFB 0%, #EDE8E1 100%);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 -2px 8px rgba(255, 255, 255, 0.4) inset,
+        2px 4px 8px rgba(107, 114, 128, 0.06) inset,
+        0 6px 16px -4px rgba(107, 114, 128, 0.15);
+    transition: all var(--transition-normal);
+}
+
+[data-theme="clay"] .dock-icon:hover {
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+        0 -3px 12px rgba(255, 255, 255, 0.5) inset,
+        2px 4px 8px rgba(107, 114, 128, 0.04) inset,
+        0 12px 28px -6px rgba(107, 114, 128, 0.2);
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* Clay Tab styling */
+[data-theme="clay"] .tab,
+[data-theme="clay"] [role="tab"] {
+    border-radius: var(--radius-md);
+    font-family: var(--font-display);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+[data-theme="clay"] .tab[data-state="active"],
+[data-theme="clay"] [role="tab"][aria-selected="true"] {
+    background: linear-gradient(145deg, #FFFDFB 0%, #F5F1EB 100%);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Clay Badge/Tag */
+[data-theme="clay"] .badge,
+[data-theme="clay"] .tag {
+    border-radius: var(--radius-full);
+    font-family: var(--font-display);
+    font-weight: 500;
+    padding: 4px 12px;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+        0 -1px 4px rgba(255, 255, 255, 0.2) inset,
+        0 2px 6px rgba(107, 114, 128, 0.1);
+}
+
+/* Clay Status Widget Overrides */
+[data-theme="clay"] .status-widget {
+    border-radius: var(--radius-xl);
+    background: linear-gradient(155deg, #FFFDFB 0%, #F5F1EB 60%, #EDE8E1 100%);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Clay Selection */
+[data-theme="clay"] ::selection {
+    background: rgba(201, 120, 92, 0.25);
+    color: var(--text-primary);
+}
+
+/* Subtle wiggle for idle elements in clay theme */
+[data-theme="clay"] .animate-clay-idle {
+    animation: clayWiggle 4s ease-in-out infinite;
+}
+
+/* Clay hover lift effect class */
+[data-theme="clay"] .clay-lift {
+    transition: all var(--transition-normal);
+}
+
+[data-theme="clay"] .clay-lift:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: var(--shadow-item-hover);
 }

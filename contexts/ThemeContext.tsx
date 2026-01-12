@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 // Theme IDs
-export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm';
+export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay';
 
 // Theme metadata
 export interface ThemeInfo {
@@ -47,6 +47,13 @@ export const THEMES: Record<ThemeId, ThemeInfo> = {
     description: 'Organic & editorial light',
     isDark: false,
     fontFamily: 'InstrumentSerif',
+  },
+  clay: {
+    id: 'clay',
+    name: 'Clay',
+    description: 'Stop-motion studio',
+    isDark: false,
+    fontFamily: 'Fredoka',
   },
 };
 
@@ -122,6 +129,17 @@ export function ThemeProvider({
         link.href = 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap';
         link.rel = 'stylesheet';
         link.setAttribute('data-theme-font', 'instrument-serif');
+        document.head.appendChild(link);
+      }
+    }
+
+    if (themeInfo.fontFamily === 'Fredoka') {
+      const existingLink = document.querySelector('link[data-theme-font="fredoka"]');
+      if (!existingLink) {
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap';
+        link.rel = 'stylesheet';
+        link.setAttribute('data-theme-font', 'fredoka');
         document.head.appendChild(link);
       }
     }

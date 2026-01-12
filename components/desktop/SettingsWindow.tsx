@@ -35,6 +35,11 @@ const themePreviewStyles: Record<ThemeId, { bg: string; window: string; dock: st
     window: 'rgba(250, 250, 249, 0.95)',
     dock: 'rgba(255, 255, 255, 0.7)',
   },
+  clay: {
+    bg: 'linear-gradient(165deg, #F7F4F0 0%, #EDE8E1 100%)',
+    window: 'linear-gradient(165deg, #FFFDFB 0%, #F5F1EB 50%, #EDE8E1 100%)',
+    dock: 'rgba(237, 232, 225, 0.85)',
+  },
 };
 
 function ThemePreview({ themeId, isActive, onClick }: { themeId: ThemeId; isActive: boolean; onClick: () => void }) {

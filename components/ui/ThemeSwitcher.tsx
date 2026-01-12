@@ -11,6 +11,7 @@ const themePreviewColors: Record<ThemeId, { bg: string; accent: string; isDark: 
   bluren: { bg: '#ffffff', accent: '#1E6EF4', isDark: false },
   refined: { bg: '#0d0d0d', accent: '#cae8bd', isDark: true },
   warm: { bg: '#FAFAF9', accent: '#EA580C', isDark: false },
+  clay: { bg: '#F7F4F0', accent: '#C9785C', isDark: false },
 };
 
 export function ThemeSwitcher() {
