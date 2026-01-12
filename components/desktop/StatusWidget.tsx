@@ -49,9 +49,9 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
       return (
         <motion.button
           onClick={onEdit}
-          className="fixed z-[100] cursor-pointer"
+          className="fixed z-[150] cursor-pointer"
           style={{
-            bottom: '100px',
+            bottom: '120px',
             right: '24px',
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -83,9 +83,9 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
 
   return (
     <motion.div
-      className="fixed z-[100]"
+      className="fixed z-[150]"
       style={{
-        bottom: '100px',
+        bottom: '120px',
         right: '24px',
       }}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
