@@ -7,6 +7,7 @@ import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
 import { WindowManager } from '@/components/desktop/MultiWindow';
 import { EditableDesktopItem } from '@/components/desktop/EditableDesktopItem';
+import { StatusWidget } from '@/components/desktop/StatusWidget';
 import { BackgroundPanel } from '@/components/desktop/BackgroundPanel';
 import { WelcomeNotification } from '@/components/desktop/WelcomeNotification';
 import { PersonaLoginScreen, useVisitorPersona, PersonaModeToggle, type VisitorPersona } from '@/components/desktop/PersonaLoginScreen';
@@ -35,12 +36,12 @@ type PersonaVisibility = {
 };
 
 const PERSONA_VISIBLE_ITEMS: PersonaVisibility = {
-  // Recruiter sees: About Me, Resume, Skills, Projects, Testimonials, Recognition, Contact
-  recruiter: ['item-1', 'item-13', 'item-10', 'item-3', 'item-6', 'item-8', 'item-7'],
+  // Recruiter sees: About Me, Resume, Skills, Projects, Testimonials, Recognition, Contact, Workbench
+  recruiter: ['item-1', 'item-13', 'item-10', 'item-3', 'item-6', 'item-8', 'item-7', 'item-14'],
   // Visitor sees everything
-  visitor: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13'],
+  visitor: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14'],
   // Guest sees everything too
-  guest: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13'],
+  guest: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14'],
 };
 
 // Background context for demo
@@ -1068,6 +1069,33 @@ const DEMO_ITEMS: DesktopItem[] = [
     commentsEnabled: true,
     order: 12,
   },
+
+  // ============================================
+  // 14. WORKBENCH - Work in Progress timeline
+  // ============================================
+  {
+    id: 'item-14',
+    desktopId: 'demo',
+    label: 'Workbench',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=200&h=200&fit=crop',
+    positionX: 57,
+    positionY: 55,
+    windowTitle: 'Live Workbench',
+    windowSubtitle: 'What I\'m working on',
+    windowHeaderImage: null,
+    windowDescription: '',
+    windowType: 'workbench',
+    windowWidth: 500,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: false,
+    tabs: [],
+    blocks: [],
+    zIndex: 0,
+    commentsEnabled: true,
+    order: 13,
+  },
 ];
 
 // Create demo desktop
@@ -1090,8 +1118,56 @@ const DEMO_DESKTOP: Desktop = {
     { id: 'dock-4', desktopId: 'demo', icon: '⚙️', label: 'Settings', actionType: 'app', actionValue: 'settings', order: 3 },
     { id: 'dock-5', desktopId: 'demo', icon: '🐙', label: 'GitHub', actionType: 'url', actionValue: 'https://github.com', order: 4 },
   ],
-  statusWidget: null,
-  workbenchEntries: [],
+  statusWidget: {
+    id: 'status-1',
+    desktopId: 'demo',
+    statusType: 'available' as const,
+    title: 'Design collaborations',
+    description: 'Currently accepting new projects for Q1. Particularly interested in product design and design systems work.',
+    ctaUrl: 'https://cal.com',
+    ctaLabel: 'Book a call',
+    isVisible: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  workbenchEntries: [
+    {
+      id: 'wb-1',
+      desktopId: 'demo',
+      title: 'Exploring new navigation patterns',
+      description: 'Working on a more intuitive way to navigate between projects',
+      imageUrl: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&h=600&fit=crop',
+      context: 'Early exploration of a new navigation concept. Testing with vertical scrolling and card-based layouts.',
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+      updatedAt: new Date(),
+      isArchived: false,
+      order: 0,
+    },
+    {
+      id: 'wb-2',
+      desktopId: 'demo',
+      title: 'Color palette refinements',
+      description: 'Iterating on the accent colors for better accessibility',
+      imageUrl: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&h=600&fit=crop',
+      context: 'Testing WCAG AA compliance across all theme variants. The warm theme needed the most adjustments.',
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+      updatedAt: new Date(),
+      isArchived: false,
+      order: 1,
+    },
+    {
+      id: 'wb-3',
+      desktopId: 'demo',
+      title: 'Mobile responsive updates',
+      description: 'Making the desktop experience work beautifully on smaller screens',
+      imageUrl: null,
+      context: 'Decided to go with a native iOS-style interface for mobile rather than trying to shrink the desktop metaphor.',
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 days ago
+      updatedAt: new Date(),
+      isArchived: false,
+      order: 2,
+    },
+  ],
 };
 
 // Theme-aware Dock Icon Component - Uses CSS variables for theming
@@ -1734,6 +1810,11 @@ function DesktopContent({ onAppClick }: { onAppClick: (appId: string) => void })
 
       {/* Multi-Window Manager */}
       <WindowManager items={items} />
+
+      {/* Status Widget */}
+      {context?.desktop?.statusWidget && (
+        <StatusWidget statusWidget={context.desktop.statusWidget} />
+      )}
 
       {/* New Item Modal - Uses CSS variables for all styling */}
       <AnimatePresence>
