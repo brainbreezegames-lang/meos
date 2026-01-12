@@ -21,6 +21,7 @@ import { NotesWindow } from './NotesWindow';
 import { PhotosWindow } from './PhotosWindow';
 import { FinderWindow } from './FinderWindow';
 import { WorkbenchWindow } from './WorkbenchWindow';
+import { GameWindow } from './GameWindow';
 import { CommentSection } from './CommentSection';
 
 // Theme-aware colors for MultiWindow
@@ -793,6 +794,8 @@ function WindowRenderer({ windowInstance, item }: { windowInstance: WindowInstan
       return <FinderWindow key={windowInstance.id} window={windowInstance} item={item} />;
     case 'workbench':
       return <WorkbenchWindow key={windowInstance.id} window={windowInstance} item={item} />;
+    case 'game':
+      return <GameWindow key={windowInstance.id} window={windowInstance} item={item} />;
     default:
       return <MultiWindow key={windowInstance.id} window={windowInstance} item={item} />;
   }

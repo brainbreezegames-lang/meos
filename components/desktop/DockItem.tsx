@@ -115,7 +115,7 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
       <AnimatePresence>
         {showTooltip && isHovered && (
           <motion.div
-            className="dock-tooltip absolute bottom-full mb-3 px-3.5 py-2 rounded-lg text-[11px] font-semibold whitespace-nowrap pointer-events-none z-50"
+            className="dock-tooltip absolute bottom-full mb-3 px-3.5 py-2 rounded-lg text-[11px] font-semibold whitespace-nowrap pointer-events-none z-[110]"
             style={{
               background: 'var(--bg-tooltip)',
               backdropFilter: 'blur(20px)',

@@ -39,9 +39,9 @@ const PERSONA_VISIBLE_ITEMS: PersonaVisibility = {
   // Recruiter sees: About Me, Resume, Skills, Projects, Testimonials, Recognition, Contact, Workbench
   recruiter: ['item-1', 'item-13', 'item-10', 'item-3', 'item-6', 'item-8', 'item-7', 'item-14'],
   // Visitor sees everything
-  visitor: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14'],
+  visitor: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14', 'item-15'],
   // Guest sees everything too
-  guest: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14'],
+  guest: ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6', 'item-7', 'item-8', 'item-9', 'item-10', 'item-11', 'item-12', 'item-13', 'item-14', 'item-15'],
 };
 
 // Background context for demo
@@ -1083,6 +1083,33 @@ const DEMO_ITEMS: DesktopItem[] = [
     commentsEnabled: true,
     order: 13,
   },
+
+  // ============================================
+  // 15. GAME - Physics Letter Puzzle
+  // ============================================
+  {
+    id: 'item-15',
+    desktopId: 'demo',
+    label: 'meOS Game',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=200&h=200&fit=crop',
+    positionX: 74,
+    positionY: 10,
+    windowTitle: 'meOS Puzzle',
+    windowSubtitle: 'Shake to solve',
+    windowHeaderImage: null,
+    windowDescription: '',
+    windowType: 'game',
+    windowWidth: 600,
+    windowDetails: null,
+    windowGallery: null,
+    windowLinks: null,
+    useTabs: false,
+    tabs: [],
+    blocks: [],
+    zIndex: 0,
+    commentsEnabled: false,
+    order: 14,
+  },
 ];
 
 // Create demo desktop
@@ -1233,7 +1260,7 @@ function DockIcon({ item, mouseX, onAppClick }: DockIconProps) {
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            className="absolute left-1/2 pointer-events-none z-10"
+            className="absolute left-1/2 pointer-events-none z-[110]"
             style={{ bottom: 'calc(100% + 6px)' }}
             initial={{ opacity: 0, y: 8, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
@@ -1369,10 +1396,10 @@ function MenuBar({
         height: '28px',
         paddingLeft: '12px',
         paddingRight: '8px',
-        background: 'rgba(0, 0, 0, 0.25)',
+        background: 'var(--bg-menubar, rgba(255, 255, 255, 0.75))',
         backdropFilter: 'blur(40px) saturate(180%)',
         WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        borderBottom: '0.5px solid rgba(255, 255, 255, 0.1)',
+        borderBottom: '0.5px solid var(--border-light, rgba(0, 0, 0, 0.1))',
       }}
       initial={{ y: -28 }}
       animate={{ y: 0 }}
@@ -1385,7 +1412,7 @@ function MenuBar({
           style={{
             fontSize: '13.5px',
             fontWeight: 600,
-            color: 'rgba(255, 255, 255, 0.95)',
+            color: 'var(--text-primary, #1a1a1a)',
             letterSpacing: '-0.01em',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
           }}
@@ -1397,23 +1424,15 @@ function MenuBar({
         {getPersonaLabel() && (
           <button
             onClick={() => onPersonaChange(persona === 'recruiter' ? 'visitor' : 'recruiter')}
-            className="flex items-center gap-1.5 transition-all duration-200"
+            className="flex items-center gap-1.5 transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10"
             style={{
               fontSize: '13px',
-              color: 'rgba(255, 255, 255, 0.65)',
+              color: 'var(--text-secondary, #666)',
               fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
               background: 'transparent',
               padding: '2px 8px',
               borderRadius: '4px',
               marginLeft: '-4px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.65)';
             }}
           >
             <span style={{ fontSize: '11px' }}>
@@ -1442,21 +1461,13 @@ function MenuBar({
         {context?.isOwner && (
           <button
             onClick={onShowQRCode}
-            className="flex items-center justify-center transition-all duration-150"
+            className="flex items-center justify-center transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/10"
             style={{
               width: '26px',
               height: '20px',
               borderRadius: '4px',
               background: 'transparent',
-              color: 'rgba(255, 255, 255, 0.75)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.95)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
+              color: 'var(--text-secondary, #666)',
             }}
             title="QR Code"
           >
@@ -1468,57 +1479,39 @@ function MenuBar({
         {/* Edit mode toggle - pill button */}
         <button
           onClick={toggleEditMode}
-          className="transition-all duration-200"
+          className="transition-all duration-200 hover:opacity-90"
           style={{
             fontSize: '11px',
             fontWeight: 500,
             padding: '3px 10px',
             borderRadius: '10px',
             background: context?.isOwner
-              ? 'rgba(52, 199, 89, 0.85)'
-              : 'rgba(255, 255, 255, 0.12)',
+              ? 'var(--accent-success, #34c759)'
+              : 'var(--bg-button, rgba(0, 0, 0, 0.06))',
             color: context?.isOwner
-              ? 'rgba(255, 255, 255, 0.95)'
-              : 'rgba(255, 255, 255, 0.75)',
+              ? 'white'
+              : 'var(--text-secondary, #666)',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
             border: 'none',
             cursor: 'pointer',
-          }}
-          onMouseEnter={(e) => {
-            if (!context?.isOwner) {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!context?.isOwner) {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
-            }
           }}
         >
           {context?.isOwner ? 'Editing' : 'Try Editing'}
         </button>
 
         {/* Divider */}
-        <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)', margin: '0 4px' }} />
+        <div style={{ width: '1px', height: '12px', background: 'var(--border-medium, rgba(0, 0, 0, 0.1))', margin: '0 4px' }} />
 
         {/* Background button - icon only */}
         <button
           onClick={() => bgContext.setShowBackgroundPanel(true)}
-          className="flex items-center justify-center transition-all duration-150"
+          className="flex items-center justify-center transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/10"
           style={{
             width: '26px',
             height: '20px',
             borderRadius: '4px',
             background: 'transparent',
-            color: 'rgba(255, 255, 255, 0.75)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.95)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
+            color: 'var(--text-secondary, #666)',
           }}
           title="Background"
         >
@@ -1531,7 +1524,7 @@ function MenuBar({
         <ThemeSwitcher />
 
         {/* Divider */}
-        <div style={{ width: '1px', height: '12px', background: 'rgba(255, 255, 255, 0.15)', margin: '0 4px' }} />
+        <div style={{ width: '1px', height: '12px', background: 'var(--border-medium, rgba(0, 0, 0, 0.1))', margin: '0 4px' }} />
 
         {/* System icons - WiFi, Battery, Time */}
         <div className="flex items-center gap-2" style={{ marginLeft: '2px' }}>
@@ -1540,7 +1533,8 @@ function MenuBar({
             width="15"
             height="15"
             viewBox="0 0 16 16"
-            fill="rgba(255, 255, 255, 0.85)"
+            style={{ color: 'var(--text-secondary, #666)' }}
+            fill="currentColor"
           >
             <path d="M8 10a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm4.596-1.404a.5.5 0 01-.707.707A4.97 4.97 0 008 8a4.97 4.97 0 00-3.889 1.303.5.5 0 11-.707-.707A5.97 5.97 0 018 7a5.97 5.97 0 014.596 1.596zm2.12-2.12a.5.5 0 01-.707.707A8.96 8.96 0 008 5a8.96 8.96 0 00-6.01 2.182.5.5 0 11-.707-.707A9.96 9.96 0 018 4a9.96 9.96 0 016.717 2.475z" />
           </svg>
@@ -1551,7 +1545,7 @@ function MenuBar({
             height="10"
             viewBox="0 0 20 10"
             fill="none"
-            style={{ marginLeft: '-2px' }}
+            style={{ marginLeft: '-2px', color: 'var(--text-secondary, #666)' }}
           >
             <rect
               x="0.5"
@@ -1559,8 +1553,9 @@ function MenuBar({
               width="16"
               height="9"
               rx="2"
-              stroke="rgba(255, 255, 255, 0.7)"
+              stroke="currentColor"
               strokeWidth="1"
+              opacity="0.7"
             />
             <rect
               x="2"
@@ -1568,11 +1563,13 @@ function MenuBar({
               width="13"
               height="6"
               rx="1"
-              fill="rgba(255, 255, 255, 0.85)"
+              fill="currentColor"
+              opacity="0.85"
             />
             <path
               d="M18 3.5v3a1.5 1.5 0 001-1.42v-.16a1.5 1.5 0 00-1-1.42z"
-              fill="rgba(255, 255, 255, 0.5)"
+              fill="currentColor"
+              opacity="0.5"
             />
           </svg>
 
@@ -1581,7 +1578,7 @@ function MenuBar({
             style={{
               fontSize: '13px',
               fontWeight: 500,
-              color: 'rgba(255, 255, 255, 0.9)',
+              color: 'var(--text-primary, #1a1a1a)',
               fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
               fontVariantNumeric: 'tabular-nums',
               letterSpacing: '0.01em',

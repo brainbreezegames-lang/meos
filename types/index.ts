@@ -25,7 +25,7 @@ export interface Desktop {
   workbenchEntries: WorkbenchEntry[];
 }
 
-export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document' | 'pages' | 'notes' | 'photos' | 'finder' | 'preview' | 'workbench';
+export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document' | 'pages' | 'notes' | 'photos' | 'finder' | 'preview' | 'workbench' | 'game';
 
 // Status Widget types
 export type StatusType = 'available' | 'looking' | 'taking' | 'open' | 'consulting';
