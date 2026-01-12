@@ -83,12 +83,13 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
 
   return (
     <motion.div
-      className="fixed z-[150]"
+      className="fixed"
       style={{
-        bottom: '120px',
-        right: '24px',
+        bottom: '100px',
+        right: '20px',
+        zIndex: 9999,
       }}
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      initial={{ opacity: 1, y: 0, scale: 1 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
     >
@@ -98,8 +99,8 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
           background: 'var(--bg-glass-elevated, rgba(255, 255, 255, 0.95))',
           backdropFilter: 'blur(40px)',
           WebkitBackdropFilter: 'blur(40px)',
-          border: '1px solid var(--border-light, rgba(0, 0, 0, 0.1))',
-          boxShadow: 'var(--shadow-lg, 0 12px 32px rgba(0, 0, 0, 0.15))',
+          border: '2px solid var(--border-light, rgba(34, 197, 94, 0.5))',
+          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(34, 197, 94, 0.3)',
           maxWidth: '280px',
           minWidth: '200px',
         }}
