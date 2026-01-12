@@ -38,6 +38,11 @@ async function getDesktop(username: string) {
           dockItems: {
             orderBy: { order: 'asc' },
           },
+          statusWidget: true,
+          workbenchEntries: {
+            orderBy: { createdAt: 'desc' },
+            where: { isArchived: false },
+          },
         },
       },
     },
@@ -123,6 +128,7 @@ export default async function UserDesktopPage({ params }: PageProps) {
     ...user.desktop,
     items: user.desktop.items.map((item: DesktopItem & { tabs: (Tab & { blocks: Block[] })[]; blocks: Block[] }) => ({
       ...item,
+      windowType: (item.windowType || undefined) as 'default' | 'browser' | 'mail' | 'gallery' | 'document' | 'pages' | 'notes' | 'photos' | 'finder' | 'preview' | 'workbench' | undefined,
       windowDetails: item.windowDetails as { label: string; value: string }[] | null,
       windowGallery: item.windowGallery as { type: 'image' | 'video'; url: string }[] | null,
       windowLinks: item.windowLinks as { label: string; url: string }[] | null,
@@ -146,6 +152,11 @@ export default async function UserDesktopPage({ params }: PageProps) {
       ...item,
       actionType: item.actionType as 'url' | 'email' | 'download',
     })),
+    statusWidget: user.desktop.statusWidget ? {
+      ...user.desktop.statusWidget,
+      statusType: user.desktop.statusWidget.statusType as 'available' | 'looking' | 'taking' | 'open' | 'consulting',
+    } : null,
+    workbenchEntries: user.desktop.workbenchEntries || [],
   };
 
   // Validate theme value from database

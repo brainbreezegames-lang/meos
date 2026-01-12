@@ -293,6 +293,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     ],
     blocks: [],
     zIndex: 0,
+    commentsEnabled: true,
     order: 0,
   },
 
@@ -410,6 +411,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     ],
     blocks: [],
     zIndex: 0,
+    commentsEnabled: true,
     order: 1,
   },
 
@@ -464,6 +466,7 @@ const DEMO_ITEMS: DesktopItem[] = [
       },
     ],
     zIndex: 0,
+    commentsEnabled: true,
     order: 2,
   },
 
@@ -551,6 +554,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     ],
     blocks: [],
     zIndex: 0,
+    commentsEnabled: true,
     order: 3,
   },
 
@@ -608,6 +612,7 @@ const DEMO_ITEMS: DesktopItem[] = [
       },
     ],
     zIndex: 0,
+    commentsEnabled: true,
     order: 4,
   },
 
@@ -657,6 +662,7 @@ const DEMO_ITEMS: DesktopItem[] = [
       },
     ],
     zIndex: 0,
+    commentsEnabled: true,
     order: 5,
   },
 
@@ -702,6 +708,7 @@ const DEMO_ITEMS: DesktopItem[] = [
       },
     ],
     zIndex: 0,
+    commentsEnabled: true,
     order: 6,
   },
 
@@ -750,6 +757,7 @@ const DEMO_ITEMS: DesktopItem[] = [
       },
     ],
     zIndex: 0,
+    commentsEnabled: true,
     order: 7,
   },
 
@@ -802,6 +810,7 @@ const DEMO_ITEMS: DesktopItem[] = [
       },
     ],
     zIndex: 0,
+    commentsEnabled: true,
     order: 8,
   },
 
@@ -853,6 +862,7 @@ const DEMO_ITEMS: DesktopItem[] = [
       { id: 'sk5', type: 'callout', order: 4, data: { text: 'Always learning something new. Currently diving deep into AI/ML.', style: 'note', icon: '📚' } },
     ],
     zIndex: 0,
+    commentsEnabled: true,
     order: 9,
   },
 
@@ -925,6 +935,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     ],
     blocks: [],
     zIndex: 0,
+    commentsEnabled: true,
     order: 10,
   },
 
@@ -978,6 +989,7 @@ const DEMO_ITEMS: DesktopItem[] = [
       },
     ],
     zIndex: 0,
+    commentsEnabled: true,
     order: 11,
   },
 
@@ -1053,6 +1065,7 @@ const DEMO_ITEMS: DesktopItem[] = [
     ],
     blocks: [],
     zIndex: 0,
+    commentsEnabled: true,
     order: 12,
   },
 ];
@@ -1077,6 +1090,8 @@ const DEMO_DESKTOP: Desktop = {
     { id: 'dock-4', desktopId: 'demo', icon: '⚙️', label: 'Settings', actionType: 'app', actionValue: 'settings', order: 3 },
     { id: 'dock-5', desktopId: 'demo', icon: '🐙', label: 'GitHub', actionType: 'url', actionValue: 'https://github.com', order: 4 },
   ],
+  statusWidget: null,
+  workbenchEntries: [],
 };
 
 // Theme-aware Dock Icon Component - Uses CSS variables for theming
@@ -1664,6 +1679,7 @@ function DesktopContent({ onAppClick }: { onAppClick: (appId: string) => void })
         { id: `block-${Date.now()}`, type: 'text', data: { content: 'Click to edit this text...' }, order: 0 }
       ],
       zIndex: 0,
+      commentsEnabled: true,
       order: context.desktop.items.length,
     };
 

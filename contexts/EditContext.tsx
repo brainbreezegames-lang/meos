@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
-import type { DesktopItem, BlockData, Desktop } from '@/types';
+import type { DesktopItem, BlockData, Desktop, StatusWidget, WorkbenchEntry } from '@/types';
 
 // Types for undo/redo
 interface HistoryEntry {
@@ -42,6 +42,14 @@ interface EditContextType {
   deleteBlock: (itemId: string, blockId: string) => void;
   addBlock: (itemId: string, block: Omit<BlockData, 'id'>, afterBlockId?: string) => void;
   reorderBlocks: (itemId: string, blockIds: string[]) => void;
+
+  // Status Widget operations
+  updateStatusWidget: (updates: Partial<StatusWidget>) => void;
+
+  // Workbench operations
+  addWorkbenchEntry: (entry: Omit<WorkbenchEntry, 'id' | 'desktopId' | 'createdAt' | 'updatedAt' | 'order'>) => void;
+  updateWorkbenchEntry: (entryId: string, updates: Partial<WorkbenchEntry>) => void;
+  deleteWorkbenchEntry: (entryId: string) => void;
 
   // Save status
   saveStatus: SaveStatus;
@@ -492,6 +500,180 @@ export function EditProvider({ children, initialDesktop = null, initialIsOwner =
     debouncedSave(itemId, { blocks: updatedBlocks });
   }, [desktop, debouncedSave]);
 
+  // Update status widget
+  const updateStatusWidget = useCallback(async (updates: Partial<StatusWidget>) => {
+    // Update local state first
+    setDesktop(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        statusWidget: prev.statusWidget
+          ? { ...prev.statusWidget, ...updates }
+          : {
+              id: `status-${Date.now()}`,
+              desktopId: prev.id,
+              statusType: 'available',
+              title: 'Available for work',
+              description: null,
+              ctaUrl: null,
+              ctaLabel: null,
+              isVisible: true,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              ...updates,
+            } as StatusWidget,
+      };
+    });
+
+    // Skip API calls in demo mode
+    if (demoMode) {
+      showToast('Status updated', 'success');
+      return;
+    }
+
+    // Save to server
+    try {
+      const response = await fetch('/api/desktop/status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) throw new Error('Failed to save status');
+
+      const { data } = await response.json();
+
+      // Update with server response
+      setDesktop(prev => {
+        if (!prev) return prev;
+        return { ...prev, statusWidget: data };
+      });
+
+      showToast('Status updated', 'success');
+    } catch {
+      showToast('Failed to update status', 'error');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoMode]);
+
+  // Add workbench entry
+  const addWorkbenchEntry = useCallback(async (entry: Omit<WorkbenchEntry, 'id' | 'desktopId' | 'createdAt' | 'updatedAt' | 'order'>) => {
+    const newEntry: WorkbenchEntry = {
+      ...entry,
+      id: `workbench-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      desktopId: desktop?.id || 'demo',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      order: 0,
+    };
+
+    // Update local state - add to beginning
+    setDesktop(prev => {
+      if (!prev) return prev;
+      const updatedEntries = [newEntry, ...(prev.workbenchEntries || [])].map((e, i) => ({ ...e, order: i }));
+      return { ...prev, workbenchEntries: updatedEntries };
+    });
+
+    // Skip API calls in demo mode
+    if (demoMode) {
+      showToast('Entry added', 'success');
+      return;
+    }
+
+    // Save to server
+    try {
+      const response = await fetch('/api/desktop/workbench', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      });
+
+      if (!response.ok) throw new Error('Failed to add entry');
+
+      const { data } = await response.json();
+
+      // Update with server response
+      setDesktop(prev => {
+        if (!prev) return prev;
+        const updatedEntries = [data, ...(prev.workbenchEntries || []).filter(e => e.id !== newEntry.id)];
+        return { ...prev, workbenchEntries: updatedEntries };
+      });
+
+      showToast('Entry added', 'success');
+    } catch {
+      showToast('Failed to add entry', 'error');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [desktop, demoMode]);
+
+  // Update workbench entry
+  const updateWorkbenchEntry = useCallback(async (entryId: string, updates: Partial<WorkbenchEntry>) => {
+    // Update local state
+    setDesktop(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        workbenchEntries: (prev.workbenchEntries || []).map(e =>
+          e.id === entryId ? { ...e, ...updates, updatedAt: new Date() } : e
+        ),
+      };
+    });
+
+    // Skip API calls in demo mode
+    if (demoMode) {
+      showToast('Entry updated', 'success');
+      return;
+    }
+
+    // Save to server
+    try {
+      const response = await fetch(`/api/desktop/workbench/${entryId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) throw new Error('Failed to update entry');
+
+      showToast('Entry updated', 'success');
+    } catch {
+      showToast('Failed to update entry', 'error');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoMode]);
+
+  // Delete workbench entry
+  const deleteWorkbenchEntry = useCallback(async (entryId: string) => {
+    // Update local state
+    setDesktop(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        workbenchEntries: (prev.workbenchEntries || []).filter(e => e.id !== entryId),
+      };
+    });
+
+    // Skip API calls in demo mode
+    if (demoMode) {
+      showToast('Entry deleted', 'success');
+      return;
+    }
+
+    // Delete from server
+    try {
+      const response = await fetch(`/api/desktop/workbench/${entryId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete entry');
+
+      showToast('Entry deleted', 'success');
+    } catch {
+      showToast('Failed to delete entry', 'error');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoMode]);
+
   // Undo
   const undo = useCallback(() => {
     if (historyIndex < 0) return;
@@ -610,6 +792,10 @@ export function EditProvider({ children, initialDesktop = null, initialIsOwner =
     deleteBlock,
     addBlock,
     reorderBlocks,
+    updateStatusWidget,
+    addWorkbenchEntry,
+    updateWorkbenchEntry,
+    deleteWorkbenchEntry,
     saveStatus,
     lastSaved,
     pendingChanges,

@@ -8,3 +8,7 @@ export { MadeWithBadge } from './MadeWithBadge';
 export { PublicDesktop } from './PublicDesktop';
 export { SettingsWindow } from './SettingsWindow';
 export { PersonaLoginScreen, PersonaModeToggle, useVisitorPersona, type VisitorPersona } from './PersonaLoginScreen';
+export { StatusWidget, STATUS_CONFIG } from './StatusWidget';
+export { StatusWidgetEditor } from './StatusWidgetEditor';
+export { WorkbenchWindow } from './WorkbenchWindow';
+export { CommentSection } from './CommentSection';

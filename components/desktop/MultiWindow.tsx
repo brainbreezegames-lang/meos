@@ -20,6 +20,8 @@ import { PagesWindow } from './PagesWindow';
 import { NotesWindow } from './NotesWindow';
 import { PhotosWindow } from './PhotosWindow';
 import { FinderWindow } from './FinderWindow';
+import { WorkbenchWindow } from './WorkbenchWindow';
+import { CommentSection } from './CommentSection';
 
 // Theme-aware colors for MultiWindow
 interface ThemeColors {
@@ -676,6 +678,11 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 </motion.div>
               </AnimatePresence>
             </div>
+
+            {/* Comment Section */}
+            {item.commentsEnabled !== false && (
+              <CommentSection itemId={item.id} />
+            )}
           </div>
         </motion.div>
       </div>
@@ -784,6 +791,8 @@ function WindowRenderer({ windowInstance, item }: { windowInstance: WindowInstan
       return <PhotosWindow key={windowInstance.id} window={windowInstance} item={item} />;
     case 'finder':
       return <FinderWindow key={windowInstance.id} window={windowInstance} item={item} />;
+    case 'workbench':
+      return <WorkbenchWindow key={windowInstance.id} window={windowInstance} item={item} />;
     default:
       return <MultiWindow key={windowInstance.id} window={windowInstance} item={item} />;
   }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { CommentProvider } from "@/contexts/CommentContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -37,7 +38,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${instrumentSerif.variable} antialiased font-sans bg-[#FAFAF9] text-stone-800 selection:bg-stone-200 overflow-hidden`}>
         <div className="noise-overlay"></div>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <CommentProvider>{children}</CommentProvider>
+        </SessionProvider>
       </body>
     </html>
   );

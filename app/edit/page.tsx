@@ -6,8 +6,9 @@ import { redirect } from 'next/navigation';
 import { EditorToolbar } from '@/components/editor/EditorToolbar';
 import { EditorSidebar } from '@/components/editor/EditorSidebar';
 import { EditableDesktopCanvas } from '@/components/editor/EditableDesktopCanvas';
-import { DesktopCanvas, MenuBar, Dock, MadeWithBadge } from '@/components/desktop';
+import { DesktopCanvas, MenuBar, Dock, MadeWithBadge, StatusWidget, StatusWidgetEditor } from '@/components/desktop';
 import { SettingsWindow } from '@/components/desktop/SettingsWindow';
+import type { StatusWidget as StatusWidgetType } from '@/types';
 import { ThemeProvider, type ThemeId } from '@/contexts/ThemeContext';
 import type { Desktop, DesktopItem, DockItem } from '@/types';
 
@@ -21,6 +22,7 @@ export default function EditPage() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [showStatusEditor, setShowStatusEditor] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -293,6 +295,31 @@ export default function EditPage() {
     return data.data.url;
   }, []);
 
+  const handleUpdateStatusWidget = useCallback(async (updates: Partial<StatusWidgetType>) => {
+    if (!desktop) return;
+
+    setIsSaving(true);
+    try {
+      const res = await fetch('/api/desktop/status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDesktop({
+          ...desktop,
+          statusWidget: data.data,
+        });
+        setLastSaved(new Date());
+      }
+    } catch (error) {
+      console.error('Failed to update status widget:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [desktop]);
+
   if (status === 'loading' || isLoading) {
     return (
       <div
@@ -345,6 +372,11 @@ export default function EditPage() {
             />
             <DesktopCanvas desktop={desktop} />
             <Dock items={desktop.dockItems} />
+            <StatusWidget
+              statusWidget={desktop.statusWidget}
+              isOwner={true}
+              onEdit={() => setShowStatusEditor(true)}
+            />
             <MadeWithBadge />
           </>
         ) : (
@@ -372,6 +404,11 @@ export default function EditPage() {
               onUpload={handleUpload}
             />
             <Dock items={desktop.dockItems} />
+            <StatusWidget
+              statusWidget={desktop.statusWidget}
+              isOwner={true}
+              onEdit={() => setShowStatusEditor(true)}
+            />
           </>
         )}
 
@@ -379,6 +416,14 @@ export default function EditPage() {
         <SettingsWindow
           isOpen={showSettings}
           onClose={() => setShowSettings(false)}
+        />
+
+        {/* Status Widget Editor */}
+        <StatusWidgetEditor
+          statusWidget={desktop.statusWidget}
+          isOpen={showStatusEditor}
+          onClose={() => setShowStatusEditor(false)}
+          onSave={handleUpdateStatusWidget}
         />
       </div>
     </ThemeProvider>

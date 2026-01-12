@@ -44,6 +44,10 @@ export async function GET() {
         dockItems: {
           orderBy: { order: 'asc' },
         },
+        statusWidget: true,
+        workbenchEntries: {
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
 
@@ -59,6 +63,8 @@ export async function GET() {
             },
           },
           dockItems: true,
+          statusWidget: true,
+          workbenchEntries: true,
         },
       });
       return NextResponse.json({ success: true, data: newDesktop });
@@ -106,6 +112,10 @@ export async function PUT(request: NextRequest) {
         },
         dockItems: {
           orderBy: { order: 'asc' },
+        },
+        statusWidget: true,
+        workbenchEntries: {
+          orderBy: { createdAt: 'desc' },
         },
       },
     });

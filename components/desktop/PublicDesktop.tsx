@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ThemeProvider, type ThemeId } from '@/contexts/ThemeContext';
-import { DesktopCanvas, MenuBar, Dock, MadeWithBadge } from '@/components/desktop';
+import { DesktopCanvas, MenuBar, Dock, MadeWithBadge, StatusWidget } from '@/components/desktop';
 import { PersonaLoginScreen, useVisitorPersona, PersonaModeToggle, type VisitorPersona } from './PersonaLoginScreen';
 import type { Desktop } from '@/types';
 
@@ -102,6 +102,7 @@ export function PublicDesktop({
             viewMode={persona === 'recruiter' ? 'recruiter' : 'visitor'}
           />
           <Dock items={desktop.dockItems} />
+          <StatusWidget statusWidget={desktop.statusWidget} />
           <MadeWithBadge />
         </main>
       )}

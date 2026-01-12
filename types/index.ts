@@ -21,9 +21,68 @@ export interface Desktop {
   isPublic: boolean;
   items: DesktopItem[];
   dockItems: DockItem[];
+  statusWidget: StatusWidget | null;
+  workbenchEntries: WorkbenchEntry[];
 }
 
-export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document' | 'pages' | 'notes' | 'photos' | 'finder' | 'preview';
+export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document' | 'pages' | 'notes' | 'photos' | 'finder' | 'preview' | 'workbench';
+
+// Status Widget types
+export type StatusType = 'available' | 'looking' | 'taking' | 'open' | 'consulting';
+
+export interface StatusWidget {
+  id: string;
+  desktopId: string;
+  statusType: StatusType;
+  title: string;
+  description: string | null;
+  ctaUrl: string | null;
+  ctaLabel: string | null;
+  isVisible: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Workbench types
+export interface WorkbenchEntry {
+  id: string;
+  desktopId: string;
+  title: string;
+  description: string | null;
+  imageUrl: string | null;
+  context: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  isArchived: boolean;
+  order: number;
+}
+
+// Comment types
+export type CommentCategory = 'general' | 'feedback' | 'question' | 'appreciation';
+
+export interface Commenter {
+  id: string;
+  email: string;
+  displayName: string | null;
+  verifiedAt: Date | null;
+  createdAt: Date;
+}
+
+export interface Comment {
+  id: string;
+  itemId: string;
+  commenterId: string;
+  commenter: Commenter;
+  content: string;
+  category: CommentCategory;
+  parentId: string | null;
+  replies: Comment[];
+  ownerReply: string | null;
+  ownerRepliedAt: Date | null;
+  isPublic: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface DesktopItem {
   id: string;
@@ -49,6 +108,9 @@ export interface DesktopItem {
   blocks: BlockData[];
   zIndex: number;
   order: number;
+  // Comments
+  comments?: Comment[];
+  commentsEnabled: boolean;
 }
 
 export interface TabData {

@@ -73,6 +73,8 @@ model Desktop {
   updatedAt          DateTime @updatedAt
   items              DesktopItem[]
   dockItems          DockItem[]
+  statusWidget       StatusWidget?
+  workbenchEntries   WorkbenchEntry[]
 }
 
 model DesktopItem {
@@ -87,6 +89,7 @@ model DesktopItem {
   windowSubtitle     String?
   windowHeaderImage  String?
   windowDescription  String   @db.Text
+  windowType         String?  // default, browser, mail, gallery, etc.
   // Legacy fields (kept for backwards compatibility during migration)
   windowDetails      Json?
   windowGallery      Json?
@@ -98,6 +101,9 @@ model DesktopItem {
   blocks             Block[]  // Direct blocks when useTabs is false
   zIndex             Int      @default(0)
   order              Int      @default(0)
+  // Comments
+  comments           Comment[]
+  commentsEnabled    Boolean  @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }
@@ -139,4 +145,78 @@ model DockItem {
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// Status Widget - "Available for" floating indicator
+model StatusWidget {
+  id          String   @id @default(cuid())
+  desktopId   String   @unique
+  desktop     Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  statusType  String   @default("available") // available, looking, taking, open, consulting
+  title       String   @default("Available for work")
+  description String?  @db.Text
+  ctaUrl      String?
+  ctaLabel    String?
+  isVisible   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Workbench - Work-in-progress timeline entries
+model WorkbenchEntry {
+  id          String   @id @default(cuid())
+  desktopId   String
+  desktop     Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  title       String
+  description String?  @db.Text
+  imageUrl    String?
+  context     String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isArchived  Boolean  @default(false)
+  order       Int      @default(0)
+}
+
+// Comment system - Email-verified commenters
+model Commenter {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  displayName String?
+  verifiedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  comments    Comment[]
+}
+
+// Email verification tokens for commenters
+model CommentVerification {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  itemId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+// Comments on DesktopItems
+model Comment {
+  id             String      @id @default(cuid())
+  itemId         String
+  item           DesktopItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  commenterId    String
+  commenter      Commenter   @relation(fields: [commenterId], references: [id], onDelete: Cascade)
+  content        String      @db.Text
+  category       String      @default("general") // general, feedback, question, appreciation
+  parentId       String?
+  parent         Comment?    @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies        Comment[]   @relation("CommentReplies")
+  ownerReply     String?     @db.Text
+  ownerRepliedAt DateTime?
+  isPublic       Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([itemId])
+  @@index([commenterId])
 }
