@@ -59,6 +59,9 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
           {/* Modal */}
           <motion.div
             ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
             className="fixed left-1/2 top-1/2 z-[401] w-[480px] max-w-[90vw] max-h-[85vh] overflow-hidden rounded-xl flex flex-col"
             style={{
               background: 'var(--bg-glass-elevated)',
@@ -78,6 +81,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
               style={{ borderBottom: '1px solid var(--border-light)' }}
             >
               <h2
+                id="modal-title"
                 className="text-[15px] font-semibold"
                 style={{ color: 'var(--text-primary)' }}
               >
@@ -85,7 +89,8 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
               </h2>
               <button
                 onClick={onClose}
-                className="w-6 h-6 rounded-md flex items-center justify-center transition-colors hover:bg-black/5"
+                aria-label="Close modal"
+                className="w-6 h-6 rounded-md flex items-center justify-center transition-colors hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

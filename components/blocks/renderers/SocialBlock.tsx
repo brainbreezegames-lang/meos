@@ -16,14 +16,14 @@ interface SocialBlockRendererProps {
 }
 
 const socialIcons: Record<SocialPlatform, { icon: string; color: string; label: string }> = {
-  twitter: { icon: '𝕏', color: '#000000', label: 'Twitter' },
+  twitter: { icon: '𝕏', color: '#0a0a0a', label: 'Twitter' },
   linkedin: { icon: 'in', color: '#0A66C2', label: 'LinkedIn' },
   github: { icon: 'gh', color: '#181717', label: 'GitHub' },
   instagram: { icon: '📷', color: '#E4405F', label: 'Instagram' },
   dribbble: { icon: '🏀', color: '#EA4C89', label: 'Dribbble' },
   behance: { icon: 'Bē', color: '#1769FF', label: 'Behance' },
   youtube: { icon: '▶', color: '#FF0000', label: 'YouTube' },
-  tiktok: { icon: '♪', color: '#000000', label: 'TikTok' },
+  tiktok: { icon: '♪', color: '#0a0a0a', label: 'TikTok' },
   facebook: { icon: 'f', color: '#1877F2', label: 'Facebook' },
   email: { icon: '✉', color: '#007AFF', label: 'Email' },
   website: { icon: '🌐', color: '#007AFF', label: 'Website' },

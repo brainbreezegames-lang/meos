@@ -159,8 +159,8 @@ function MobileContainerInner({
           text: item.windowDescription || '',
           url: window.location.href,
         });
-      } catch (err) {
-        console.log('Share cancelled or failed');
+      } catch {
+        // Share was cancelled or failed - this is expected behavior
       }
     }
   };
@@ -168,8 +168,8 @@ function MobileContainerInner({
   const handleCopyLink = async (item: DesktopItem) => {
     try {
       await navigator.clipboard.writeText(`${window.location.origin}/${username}#${item.id}`);
-    } catch (err) {
-      console.error('Failed to copy link');
+    } catch {
+      // Clipboard write failed - silent fail for now
     }
   };
 

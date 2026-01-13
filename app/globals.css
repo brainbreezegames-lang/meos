@@ -35,6 +35,27 @@
     --z-dock: 100;
     --z-menubar: 100;
     --z-window: 200;
+
+    /* === SHARED STRUCTURAL === */
+    --border-width: 1px;
+    --blur-glass: blur(40px) saturate(180%);
+    --blur-glass-light: blur(20px) saturate(150%);
+    --blur-glass-strong: blur(60px) saturate(200%);
+
+    /* Traffic Light Colors (macOS style) */
+    --traffic-size: 12px;
+    --traffic-gap: 8px;
+    --traffic-red: #FF5F57;
+    --traffic-red-hover: #E14942;
+    --traffic-yellow: #FEBC2E;
+    --traffic-yellow-hover: #D9A123;
+    --traffic-green: #28C840;
+    --traffic-green-hover: #1EAD31;
+
+    /* Typography */
+    --font-mono: "SF Mono", "Fira Code", "Consolas", monospace;
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0;
 }
 
 /* ============================================
@@ -61,10 +82,16 @@
 
     --accent-primary: #EA580C;
     --accent-secondary: #FB923C;
+    --accent-danger: #DC2626;
+    --accent-success: #16A34A;
 
+    --bg-surface: #FAFAF9;
     --border-light: rgba(120, 113, 108, 0.08);
+    --border-medium: rgba(120, 113, 108, 0.15);
     --border-glass-outer: rgba(255, 255, 255, 0.5);
     --border-glass-inner: rgba(255, 255, 255, 0.6);
+
+    --bg-overlay: rgba(28, 25, 23, 0.4);
 
     --shadow-dock: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 0 0 1px rgba(120, 113, 108, 0.06), 0 12px 24px -6px rgba(28, 25, 23, 0.06);
     --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
@@ -72,6 +99,7 @@
     --shadow-lg: 0 12px 32px rgba(28, 25, 23, 0.12);
     --shadow-item: 0 4px 12px -2px rgba(28, 25, 23, 0.06), 0 0 0 1px rgba(28, 25, 23, 0.03);
     --shadow-item-hover: 0 12px 24px -4px rgba(28, 25, 23, 0.1), 0 0 0 1px rgba(28, 25, 23, 0.05);
+    --shadow-window: 0 0 0 1px rgba(28, 25, 23, 0.04), 0 4px 16px rgba(28, 25, 23, 0.08), 0 24px 48px -8px rgba(28, 25, 23, 0.12);
 }
 
 /* ============================================
@@ -96,10 +124,16 @@
 
     --accent-primary: #007AFF;
     --accent-secondary: #5AC8FA;
+    --accent-danger: #FF3B30;
+    --accent-success: #34C759;
 
+    --bg-surface: #FFFFFF;
     --border-light: rgba(0, 0, 0, 0.05);
+    --border-medium: rgba(0, 0, 0, 0.1);
     --border-glass-outer: rgba(255, 255, 255, 0.2);
     --border-glass-inner: rgba(255, 255, 255, 0.2);
+
+    --bg-overlay: rgba(0, 0, 0, 0.4);
 
     --shadow-dock: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 20px 40px rgba(0, 0, 0, 0.15);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -107,6 +141,7 @@
     --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.15);
     --shadow-item: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
     --shadow-item-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    --shadow-window: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.12), 0 32px 64px -12px rgba(0, 0, 0, 0.2);
 }
 
 /* ============================================
@@ -131,10 +166,16 @@
 
     --accent-primary: #5BA0FF;
     --accent-secondary: #64D2FF;
+    --accent-danger: #FF453A;
+    --accent-success: #30D158;
 
+    --bg-surface: #1E1E1E;
     --border-light: rgba(255, 255, 255, 0.1);
+    --border-medium: rgba(255, 255, 255, 0.15);
     --border-glass-outer: rgba(255, 255, 255, 0.08);
     --border-glass-inner: rgba(255, 255, 255, 0.05);
+
+    --bg-overlay: rgba(0, 0, 0, 0.6);
 
     --shadow-dock: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.4);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -142,6 +183,7 @@
     --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
     --shadow-item: 0 4px 12px -2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
     --shadow-item-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --shadow-window: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 32px rgba(0, 0, 0, 0.4), 0 32px 64px -12px rgba(0, 0, 0, 0.5);
 }
 
 /* Refined Specific Override */
@@ -149,6 +191,7 @@
     --font-display: "Halant", serif;
     --accent-primary: #CAE8BD;
     --accent-secondary: #A8D99C;
+    --accent-danger: #FF6B6B;
 }
 
 /* ============================================
@@ -220,11 +263,16 @@
 
     --accent-primary: var(--clay-terracotta);
     --accent-secondary: var(--clay-sage);
+    --accent-danger: #D97165;
+    --accent-success: #8BA888;
 
+    --bg-surface: var(--clay-cream);
     --border-light: rgba(107, 114, 128, 0.08);
     --border-medium: rgba(107, 114, 128, 0.15);
     --border-glass-outer: rgba(255, 255, 255, 0.6);
     --border-glass-inner: rgba(255, 255, 255, 0.8);
+
+    --bg-overlay: rgba(61, 61, 61, 0.4);
 
     /* Clay Multi-Layered Shadows - The secret sauce */
     --clay-shadow-outer: 0 20px 50px -15px rgba(107, 114, 128, 0.18);

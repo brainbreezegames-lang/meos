@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
@@ -26,6 +26,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
   const isOwner = context?.isOwner ?? false;
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
+  const prefersReducedMotion = useReducedMotion();
 
   // Browser tabs - use item tabs if available, otherwise create a single tab
   const browserTabs = item.useTabs && item.tabs?.length > 0
@@ -125,10 +126,10 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             border: 'var(--border-width) solid var(--border-glass-outer)',
             opacity: isActive ? 1 : 0.95,
           }}
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+          transition={prefersReducedMotion ? { duration: 0.15 } : { duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
         >
         {/* Browser Chrome - Tab Bar */}
         <div
@@ -146,7 +147,8 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
           >
             <button
               onClick={() => windowContext.closeWindow(windowInstance.id)}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"
+              aria-label="Close window"
+              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"
               style={{
                 width: 'var(--traffic-size)',
                 height: 'var(--traffic-size)',
@@ -160,7 +162,8 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             </button>
             <button
               onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"
+              aria-label="Minimize window"
+              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"
               style={{
                 width: 'var(--traffic-size)',
                 height: 'var(--traffic-size)',
@@ -174,7 +177,8 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             </button>
             <button
               onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"
+              aria-label="Maximize window"
+              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"
               style={{
                 width: 'var(--traffic-size)',
                 height: 'var(--traffic-size)',
@@ -191,7 +195,8 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
           {/* Navigation Buttons */}
           <div className="flex items-center gap-1 px-2" onPointerDown={(e) => e.stopPropagation()}>
             <button
-              className="w-7 h-7 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--border-light)]"
+              aria-label="Go back"
+              className="w-7 h-7 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--border-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
               style={{ color: 'var(--text-tertiary)' }}
             >
               <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -199,7 +204,8 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
               </svg>
             </button>
             <button
-              className="w-7 h-7 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--border-light)]"
+              aria-label="Go forward"
+              className="w-7 h-7 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--border-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
               style={{ color: 'var(--text-tertiary)' }}
             >
               <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -214,7 +220,9 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
               <button
                 key={tab.id}
                 onClick={() => setActiveTabIndex(index)}
-                className="flex items-center gap-2 px-3 py-2 max-w-[180px] min-w-[100px] rounded-t-lg relative transition-all"
+                aria-selected={activeTabIndex === index}
+                role="tab"
+                className="flex items-center gap-2 px-3 py-2 max-w-[180px] min-w-[100px] rounded-t-lg relative transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-inset"
                 style={{
                   background: activeTabIndex === index
                     ? 'var(--bg-glass-elevated)'
@@ -251,7 +259,8 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
 
             {/* New Tab Button */}
             <button
-              className="w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors hover:bg-[var(--border-light)]"
+              aria-label="New tab"
+              className="w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors hover:bg-[var(--border-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
               style={{ color: 'var(--text-tertiary)' }}
               onPointerDown={(e) => e.stopPropagation()}
             >

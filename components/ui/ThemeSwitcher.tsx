@@ -8,7 +8,7 @@ import { useTheme, THEMES, type ThemeId } from '@/contexts/ThemeContext';
 const themePreviewColors: Record<ThemeId, { bg: string; accent: string; isDark: boolean }> = {
   monterey: { bg: '#F5F5F7', accent: '#007AFF', isDark: false },
   dark: { bg: '#0A0A0C', accent: '#5BA0FF', isDark: true },
-  bluren: { bg: '#ffffff', accent: '#1E6EF4', isDark: false },
+  bluren: { bg: '#fafafa', accent: '#1E6EF4', isDark: false },
   refined: { bg: '#0d0d0d', accent: '#cae8bd', isDark: true },
   warm: { bg: '#FAFAF9', accent: '#EA580C', isDark: false },
   clay: { bg: '#F7F4F0', accent: '#C9785C', isDark: false },
@@ -49,7 +49,10 @@ export function ThemeSwitcher() {
       {/* Trigger Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
+        aria-label={`Theme: ${current.name}. Click to change theme`}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        className="flex items-center gap-2 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
         style={{
           background: 'var(--border-light)',
           color: 'var(--text-primary)',
@@ -80,6 +83,8 @@ export function ThemeSwitcher() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            role="listbox"
+            aria-label="Available themes"
             className="absolute top-full mt-2 right-0 z-[200] min-w-[180px] p-1.5 rounded-xl"
             style={{
               background: 'var(--bg-glass-elevated)',
@@ -100,10 +105,12 @@ export function ThemeSwitcher() {
                 <motion.button
                   key={theme.id}
                   onClick={() => switchTheme(theme.id)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors"
+                  role="option"
+                  aria-selected={isActive}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent-primary)]"
                   style={{
                     background: isActive ? 'var(--accent-primary)' : 'transparent',
-                    color: isActive ? '#fff' : 'var(--text-primary)',
+                    color: isActive ? 'var(--bg-elevated)' : 'var(--text-primary)',
                   }}
                   whileHover={{
                     background: isActive ? 'var(--accent-primary)' : 'var(--border-light)',
