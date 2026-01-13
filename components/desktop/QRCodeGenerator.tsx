@@ -201,7 +201,12 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200]"
+            className="fixed inset-0 z-[200]"
+            style={{
+              background: 'var(--bg-overlay)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -210,25 +215,40 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
 
           {/* Panel */}
           <motion.div
-            className="fixed top-1/2 left-1/2 z-[201] w-[400px] max-h-[90vh] overflow-y-auto rounded-2xl"
+            className="fixed top-1/2 left-1/2 z-[201] w-[400px] max-h-[90vh] overflow-y-auto"
             style={{
-              background: 'rgba(30, 30, 30, 0.95)',
-              backdropFilter: 'blur(40px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
+              borderRadius: '16px',
+              background: 'var(--bg-glass-elevated)',
+              backdropFilter: 'blur(60px) saturate(200%)',
+              WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+              border: '1px solid var(--border-glass-outer)',
+              boxShadow: 'var(--shadow-window)',
             }}
             initial={{ opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
             animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
             exit={{ opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-              <h2 className="text-lg font-semibold text-white">QR Code</h2>
+            <div
+              className="flex items-center justify-between px-5 py-4"
+              style={{ borderBottom: '1px solid var(--border-light)' }}
+            >
+              <h2
+                className="text-[15px] font-semibold"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                QR Code
+              </h2>
               <button
                 onClick={onClose}
-                className="w-6 h-6 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label="Close"
+                className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-[var(--border-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                style={{ color: 'var(--text-tertiary)' }}
               >
-                ✕
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M3 3l8 8M11 3l-8 8" strokeLinecap="round" />
+                </svg>
               </button>
             </div>
 
@@ -238,30 +258,38 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
               <div className="flex flex-col items-center">
                 <div
                   className="p-4 rounded-xl"
-                  style={{ background: 'white' }}
+                  style={{ background: '#fafafa' }}
                 >
                   <canvas ref={canvasRef} className="w-[200px] h-[200px]" />
                 </div>
-                <p className="mt-3 text-xs text-white/50 text-center">
+                <p
+                  className="mt-3 text-xs text-center"
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
                   {getFullUrl()}
                 </p>
               </div>
 
               {/* Link Target */}
               <div className="space-y-2">
-                <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Link to:</label>
+                <label
+                  className="text-xs font-medium uppercase tracking-wider"
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
+                  Link to:
+                </label>
                 <div className="space-y-1">
                   {LINK_TARGETS.map(({ value, label }) => (
                     <button
                       key={value}
                       onClick={() => setLinkTarget(value)}
-                      className={`w-full px-3 py-2 rounded-lg text-left text-sm transition-all ${
-                        linkTarget === value
-                          ? 'bg-white/15 text-white'
-                          : 'text-white/60 hover:bg-white/5'
-                      }`}
+                      className="w-full px-3 py-2 rounded-lg text-left text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                      style={{
+                        background: linkTarget === value ? 'var(--accent-primary)' : 'transparent',
+                        color: linkTarget === value ? 'var(--bg-elevated)' : 'var(--text-secondary)',
+                      }}
                     >
-                      <span className={linkTarget === value ? '' : 'opacity-0'}>● </span>
+                      <span style={{ opacity: linkTarget === value ? 1 : 0 }}>● </span>
                       {label}
                     </button>
                   ))}
@@ -270,17 +298,22 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
 
               {/* Style */}
               <div className="space-y-2">
-                <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Style:</label>
+                <label
+                  className="text-xs font-medium uppercase tracking-wider"
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
+                  Style:
+                </label>
                 <div className="flex gap-2">
                   {(['standard', 'rounded', 'dots'] as QRStyle[]).map((style) => (
                     <button
                       key={style}
                       onClick={() => setQRStyle(style)}
-                      className={`flex-1 px-3 py-2 rounded-lg text-sm capitalize transition-all ${
-                        qrStyle === style
-                          ? 'bg-white/15 text-white'
-                          : 'bg-white/5 text-white/60 hover:bg-white/10'
-                      }`}
+                      className="flex-1 px-3 py-2 rounded-lg text-sm capitalize transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                      style={{
+                        background: qrStyle === style ? 'var(--border-medium)' : 'var(--border-light)',
+                        color: qrStyle === style ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      }}
                     >
                       {style}
                     </button>
@@ -290,17 +323,22 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
 
               {/* Color */}
               <div className="space-y-2">
-                <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Color:</label>
+                <label
+                  className="text-xs font-medium uppercase tracking-wider"
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
+                  Color:
+                </label>
                 <div className="flex gap-2">
                   {(['black', 'theme', 'custom'] as QRColor[]).map((color) => (
                     <button
                       key={color}
                       onClick={() => setQRColor(color)}
-                      className={`flex-1 px-3 py-2 rounded-lg text-sm capitalize transition-all ${
-                        qrColor === color
-                          ? 'bg-white/15 text-white'
-                          : 'bg-white/5 text-white/60 hover:bg-white/10'
-                      }`}
+                      className="flex-1 px-3 py-2 rounded-lg text-sm capitalize transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                      style={{
+                        background: qrColor === color ? 'var(--border-medium)' : 'var(--border-light)',
+                        color: qrColor === color ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      }}
                     >
                       {color === 'theme' ? 'Theme' : color}
                     </button>
@@ -318,7 +356,12 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
                       type="text"
                       value={customColor}
                       onChange={(e) => setCustomColor(e.target.value)}
-                      className="flex-1 px-3 py-1.5 rounded-lg text-sm bg-white/5 text-white/80 border border-white/10"
+                      className="flex-1 px-3 py-1.5 rounded-lg text-sm"
+                      style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-medium)',
+                        color: 'var(--text-primary)',
+                      }}
                     />
                   </div>
                 )}
@@ -326,10 +369,13 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
 
               {/* Use Cases */}
               <div
-                className="p-3 rounded-lg text-xs text-white/50 space-y-1"
-                style={{ background: 'rgba(255, 255, 255, 0.03)' }}
+                className="p-3 rounded-lg text-xs space-y-1"
+                style={{
+                  background: 'var(--border-light)',
+                  color: 'var(--text-tertiary)',
+                }}
               >
-                <p className="font-medium text-white/70">Perfect for:</p>
+                <p className="font-medium" style={{ color: 'var(--text-secondary)' }}>Perfect for:</p>
                 <p>• Business cards • Conference badges</p>
                 <p>• Email signatures • Resume footers</p>
               </div>
@@ -338,19 +384,31 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
               <div className="flex gap-2">
                 <button
                   onClick={() => downloadQR('png')}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-white/10 text-white hover:bg-white/15 transition-colors"
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                  style={{
+                    background: 'var(--border-light)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
                   PNG
                 </button>
                 <button
                   onClick={() => downloadQR('svg')}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-white/10 text-white hover:bg-white/15 transition-colors"
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                  style={{
+                    background: 'var(--border-light)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
                   SVG
                 </button>
                 <button
                   onClick={copyToClipboard}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-blue-500/80 text-white hover:bg-blue-500 transition-colors"
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  style={{
+                    background: 'var(--accent-primary)',
+                    color: 'var(--bg-elevated)',
+                  }}
                 >
                   Copy
                 </button>

@@ -318,20 +318,25 @@ export function ParticleSettingsPanel({ settings, onChange }: ParticleSettingsPa
     <div className="space-y-6">
       {/* Particle Type */}
       <div className="space-y-3">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Background Effect</label>
+        <label
+          className="text-xs font-medium uppercase tracking-wider"
+          style={{ color: 'var(--text-tertiary)' }}
+        >
+          Background Effect
+        </label>
         <div className="grid grid-cols-2 gap-2">
           {particleTypes.map(({ value, label, desc }) => (
             <button
               key={value}
               onClick={() => updateSetting('type', value)}
-              className={`px-3 py-2 rounded-lg text-left transition-all ${
-                settings.type === value
-                  ? 'bg-white/15 ring-2 ring-blue-500'
-                  : 'bg-white/5 hover:bg-white/10'
-              }`}
+              className="px-3 py-2 rounded-lg text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+              style={{
+                background: settings.type === value ? 'var(--border-medium)' : 'var(--border-light)',
+                boxShadow: settings.type === value ? '0 0 0 2px var(--accent-primary)' : 'none',
+              }}
             >
-              <div className="text-sm text-white/90">{label}</div>
-              <div className="text-xs text-white/40">{desc}</div>
+              <div className="text-sm" style={{ color: 'var(--text-primary)' }}>{label}</div>
+              <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{desc}</div>
             </button>
           ))}
         </div>
@@ -341,7 +346,10 @@ export function ParticleSettingsPanel({ settings, onChange }: ParticleSettingsPa
         <>
           {/* Density */}
           <div className="space-y-2">
-            <label className="text-xs font-medium text-white/50 uppercase tracking-wider">
+            <label
+              className="text-xs font-medium uppercase tracking-wider"
+              style={{ color: 'var(--text-tertiary)' }}
+            >
               Density: {settings.density < 33 ? 'Low' : settings.density < 66 ? 'Medium' : 'High'}
             </label>
             <input
@@ -350,13 +358,17 @@ export function ParticleSettingsPanel({ settings, onChange }: ParticleSettingsPa
               max="100"
               value={settings.density}
               onChange={(e) => updateSetting('density', parseInt(e.target.value))}
-              className="w-full accent-blue-500"
+              className="w-full"
+              style={{ accentColor: 'var(--accent-primary)' }}
             />
           </div>
 
           {/* Speed */}
           <div className="space-y-2">
-            <label className="text-xs font-medium text-white/50 uppercase tracking-wider">
+            <label
+              className="text-xs font-medium uppercase tracking-wider"
+              style={{ color: 'var(--text-tertiary)' }}
+            >
               Speed: {settings.speed < 33 ? 'Slow' : settings.speed < 66 ? 'Medium' : 'Fast'}
             </label>
             <input
@@ -365,23 +377,29 @@ export function ParticleSettingsPanel({ settings, onChange }: ParticleSettingsPa
               max="100"
               value={settings.speed}
               onChange={(e) => updateSetting('speed', parseInt(e.target.value))}
-              className="w-full accent-blue-500"
+              className="w-full"
+              style={{ accentColor: 'var(--accent-primary)' }}
             />
           </div>
 
           {/* Mouse Response */}
           <label className="flex items-center justify-between">
-            <span className="text-sm text-white/80">Respond to mouse movement</span>
+            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              Respond to mouse movement
+            </span>
             <button
               onClick={() => updateSetting('respondToMouse', !settings.respondToMouse)}
-              className={`w-10 h-6 rounded-full transition-colors ${
-                settings.respondToMouse ? 'bg-blue-500' : 'bg-white/20'
-              }`}
+              className="w-10 h-6 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2"
+              style={{
+                background: settings.respondToMouse ? 'var(--accent-primary)' : 'var(--border-medium)',
+              }}
             >
               <div
-                className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                  settings.respondToMouse ? 'translate-x-5' : 'translate-x-1'
-                }`}
+                className="w-4 h-4 rounded-full shadow transition-transform"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  transform: settings.respondToMouse ? 'translateX(18px)' : 'translateX(2px)',
+                }}
               />
             </button>
           </label>
@@ -390,8 +408,11 @@ export function ParticleSettingsPanel({ settings, onChange }: ParticleSettingsPa
 
       {/* Info */}
       <div
-        className="p-3 rounded-lg text-xs text-white/50"
-        style={{ background: 'rgba(255, 255, 255, 0.03)' }}
+        className="p-3 rounded-lg text-xs"
+        style={{
+          background: 'var(--border-light)',
+          color: 'var(--text-tertiary)',
+        }}
       >
         <p>Particles are automatically reduced when windows are open and disabled for visitors who prefer reduced motion.</p>
       </div>

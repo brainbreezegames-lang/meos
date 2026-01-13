@@ -164,7 +164,11 @@ export function BackgroundPanel({
           {/* Backdrop */}
           <motion.div
             className="fixed inset-0 z-[400]"
-            style={{ background: 'rgba(0, 0, 0, 0.4)' }}
+            style={{
+              background: 'var(--bg-overlay)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -175,15 +179,12 @@ export function BackgroundPanel({
           <motion.div
             className="fixed z-[401] top-1/2 left-1/2 w-[560px] max-h-[85vh] overflow-hidden"
             style={{
-              borderRadius: '20px',
+              borderRadius: '16px',
               background: 'var(--bg-glass-elevated)',
               backdropFilter: 'blur(60px) saturate(200%)',
               WebkitBackdropFilter: 'blur(60px) saturate(200%)',
-              boxShadow: `
-                0 50px 100px -20px rgba(0, 0, 0, 0.5),
-                0 0 0 0.5px rgba(255, 255, 255, 0.1),
-                inset 0 0.5px 0 rgba(255, 255, 255, 0.2)
-              `,
+              border: '1px solid var(--border-glass-outer)',
+              boxShadow: 'var(--shadow-window)',
             }}
             initial={{ opacity: 0, scale: 0.92, x: '-50%', y: '-45%' }}
             animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
@@ -226,7 +227,8 @@ export function BackgroundPanel({
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:bg-black/5"
+                aria-label="Close"
+                className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-[var(--border-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
                 style={{ color: 'var(--text-tertiary)' }}
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">

@@ -314,19 +314,31 @@ export function LiveStatusSettings({
     <div className="space-y-6">
       {/* Music Integration */}
       <div className="space-y-3">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Music</label>
+        <label
+          className="text-xs font-medium uppercase tracking-wider"
+          style={{ color: 'var(--text-tertiary)' }}
+        >
+          Music
+        </label>
         {spotifyConnected ? (
-          <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+          <div
+            className="flex items-center justify-between p-3 rounded-lg"
+            style={{ background: 'var(--border-light)' }}
+          >
             <div className="flex items-center gap-2">
               <span className="text-xl">🎵</span>
               <div>
-                <div className="text-sm text-white/90">Spotify Connected</div>
-                <div className="text-xs text-white/50">Shows what you&apos;re playing</div>
+                <div className="text-sm" style={{ color: 'var(--text-primary)' }}>Spotify Connected</div>
+                <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Shows what you&apos;re playing</div>
               </div>
             </div>
             <button
               onClick={onDisconnectSpotify}
-              className="px-3 py-1.5 rounded-lg text-xs bg-white/10 text-white/70 hover:bg-white/15"
+              className="px-3 py-1.5 rounded-lg text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+              style={{
+                background: 'var(--border-medium)',
+                color: 'var(--text-secondary)',
+              }}
             >
               Disconnect
             </button>
@@ -334,7 +346,11 @@ export function LiveStatusSettings({
         ) : (
           <button
             onClick={onConnectSpotify}
-            className="w-full p-3 rounded-lg bg-[#1DB954]/20 text-[#1DB954] flex items-center justify-center gap-2 hover:bg-[#1DB954]/30 transition-colors"
+            className="w-full p-3 rounded-lg flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1DB954]"
+            style={{
+              background: 'rgba(29, 185, 84, 0.15)',
+              color: '#1DB954',
+            }}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
@@ -346,7 +362,12 @@ export function LiveStatusSettings({
 
       {/* Status */}
       <div className="space-y-3">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Status</label>
+        <label
+          className="text-xs font-medium uppercase tracking-wider"
+          style={{ color: 'var(--text-tertiary)' }}
+        >
+          Status
+        </label>
         <div className="space-y-2">
           {/* Emoji picker */}
           <div className="flex gap-1 flex-wrap">
@@ -354,8 +375,11 @@ export function LiveStatusSettings({
               <button
                 key={emoji}
                 onClick={() => setStatusEmoji(emoji)}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg transition-all ${statusEmoji === emoji ? 'bg-white/20 ring-2 ring-blue-500' : 'bg-white/5 hover:bg-white/10'
-                  }`}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                style={{
+                  background: statusEmoji === emoji ? 'var(--border-medium)' : 'var(--border-light)',
+                  boxShadow: statusEmoji === emoji ? '0 0 0 2px var(--accent-primary)' : 'none',
+                }}
               >
                 {emoji}
               </button>
@@ -368,13 +392,22 @@ export function LiveStatusSettings({
             value={statusText}
             onChange={(e) => setStatusText(e.target.value.slice(0, 50))}
             placeholder="What are you up to?"
-            className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/90 text-sm outline-none"
+            className="w-full px-3 py-2 rounded-lg text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-medium)',
+              color: 'var(--text-primary)',
+            }}
             maxLength={50}
           />
 
           <button
             onClick={handleStatusUpdate}
-            className="w-full py-2 rounded-lg bg-blue-500/80 text-white text-sm font-medium hover:bg-blue-500 transition-colors"
+            className="w-full py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            style={{
+              background: 'var(--accent-primary)',
+              color: 'var(--bg-elevated)',
+            }}
           >
             Update Status
           </button>
@@ -383,18 +416,32 @@ export function LiveStatusSettings({
 
       {/* Location */}
       <div className="space-y-3">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Location</label>
+        <label
+          className="text-xs font-medium uppercase tracking-wider"
+          style={{ color: 'var(--text-tertiary)' }}
+        >
+          Location
+        </label>
         <input
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="City, Country"
-          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/90 text-sm outline-none"
+          className="w-full px-3 py-2 rounded-lg text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+          style={{
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border-medium)',
+            color: 'var(--text-primary)',
+          }}
         />
-        <label className="flex items-center gap-2 text-sm text-white/70">
+        <label
+          className="flex items-center gap-2 text-sm"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           <input
             type="checkbox"
-            className="w-4 h-4 rounded accent-blue-500"
+            className="w-4 h-4 rounded"
+            style={{ accentColor: 'var(--accent-primary)' }}
             defaultChecked
           />
           Show local time to visitors
