@@ -1,7 +1,22 @@
+'use client';
 import Link from 'next/link';
 import { Search, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function TopNav() {
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+    // Close on Cmd+K
+    useEffect(() => {
+        const down = (e: KeyboardEvent) => {
+            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                setIsSearchOpen((open) => !open);
+            }
+        };
+        document.addEventListener('keydown', down);
+        return () => document.removeEventListener('keydown', down);
+    }, []);
     return (
         <nav className="fixed top-0 left-0 right-0 h-14 bg-[var(--bg-glass-heavy)] backdrop-blur-xl border-b border-[var(--border-subtle)] flex items-center justify-between px-6 z-[1000]">
             {/* Left Side */}
@@ -39,12 +54,42 @@ export default function TopNav() {
                 </Link>
 
                 <div className="hidden md:flex relative group">
-                    <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-secondary)] w-48 hover:border-[var(--border-medium)] transition-colors text-[13px]">
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-secondary)] w-48 hover:border-[var(--border-medium)] transition-colors text-[13px]"
+                    >
                         <Search size={14} />
                         <span>Search docs...</span>
                         <span className="ml-auto text-[10px] opacity-60">⌘K</span>
                     </button>
                 </div>
+
+                {isSearchOpen && (
+                    <div className="fixed inset-0 z-[2000] flex items-start justify-center pt-[20vh] px-4">
+                        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setIsSearchOpen(false)} />
+                        <div className="relative w-full max-w-lg bg-[var(--bg-app)] rounded-xl shadow-2xl border border-[var(--border-subtle)] overflow-hidden animate-in fade-in zoom-in-95 duration-100 p-2">
+                            <div className="flex items-center gap-3 px-3 py-2 border-b border-[var(--border-light)] mb-2">
+                                <Search size={16} className="text-[var(--text-tertiary)]" />
+                                <input
+                                    autoFocus
+                                    placeholder="Search..."
+                                    className="flex-1 bg-transparent border-none outline-none text-[14px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
+                                />
+                                <button onClick={() => setIsSearchOpen(false)} className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--border-light)] text-[var(--text-tertiary)]">ESC</button>
+                            </div>
+                            <div className="space-y-1">
+                                {['Documentation', 'Getting Started', 'Components', 'API Reference'].map((item, i) => (
+                                    <button key={i} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--bg-highlight)] text-left group">
+                                        <div className="p-1 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] group-hover:bg-white group-hover:text-[var(--brand-primary)] transition-colors">
+                                            <Search size={14} />
+                                        </div>
+                                        <span className="text-[13px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{item}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="h-6 w-[1px] bg-[var(--border-light)] mx-1" />
 
