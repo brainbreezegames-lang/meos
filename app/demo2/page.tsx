@@ -1164,7 +1164,104 @@ function Demo2PageInner() {
       >
         🦔
       </div>
+
+      <Dock onAppClick={(id) => {
+        const map: Record<string, string> = {
+          finder: 'home',
+          terminal: 'changelog',
+          mail: 'contact',
+          photos: 'gallery',
+          calculator: 'pricing',
+          trash: 'trash'
+        };
+        const targetId = map[id] || 'home';
+        const iconInfo = [...LEFT_ICONS, ...RIGHT_ICONS].find(i => i.id === targetId);
+        if (iconInfo) {
+          openWindow(iconInfo);
+        }
+      }} />
     </div>
+  );
+}
+
+// ============================================
+// Dock Component
+// ============================================
+const DOCK_ITEMS = [
+  { id: 'finder', label: 'Finder', icon: 'folder' as const, color: '#2F80FA' },
+  { id: 'terminal', label: 'Terminal', icon: 'code' as const, color: '#23251D' },
+  { id: 'mail', label: 'Mail', icon: 'email' as const, color: '#F54E00' },
+  { id: 'photos', label: 'Photos', icon: 'image' as const, color: '#EB9D2A' },
+  { id: 'calculator', label: 'Calculator', icon: 'calculator' as const, color: '#6AA84F' },
+  { id: 'trash', label: 'Trash', icon: 'trash' as const, color: '#73756B' },
+];
+
+function Dock({ onAppClick }: { onAppClick: (id: string) => void }) {
+  return (
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000] px-4 pb-2 pt-2.5 rounded-2xl flex items-end gap-3 glass-dock shadow-2xl border"
+      style={{
+        background: 'rgba(255, 255, 255, 0.4)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.2)'
+      }}
+    >
+      {DOCK_ITEMS.map((item) => (
+        <DockItem key={item.id} item={item} onClick={() => onAppClick(item.id)} />
+      ))}
+    </div>
+  );
+}
+
+function DockItem({ item, onClick }: { item: typeof DOCK_ITEMS[0], onClick: () => void }) {
+  return (
+    <motion.button
+      onClick={onClick}
+      className="relative flex flex-col items-center justify-center rounded-xl overflow-hidden shadow-lg group"
+      style={{
+        width: 50,
+        height: 50,
+        background: '#FFFFFF',
+      }}
+      whileHover={{
+        scale: 1.2,
+        y: -10,
+        marginBottom: 10,
+        zIndex: 50,
+        transition: { type: "spring", stiffness: 400, damping: 20 }
+      }}
+      whileTap={{ scale: 0.9 }}
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
+    >
+      <div
+        className="w-full h-full flex items-center justify-center relative"
+        style={{
+          background: `linear-gradient(135deg, ${item.color}15, ${item.color}05)`,
+        }}
+      >
+        <FileIconSVG type={item.icon} size={32} />
+
+        {/* Shine effect */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+
+      {/* Label Tooltip */}
+      <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
+        style={{
+          background: 'rgba(35, 37, 29, 0.9)',
+          color: '#FDFDF8',
+          backdropFilter: 'blur(4px)'
+        }}
+      >
+        {item.label}
+      </div>
+
+      {/* Active Dot indicator (mock) */}
+      <div className="absolute -bottom-2 w-1 h-1 rounded-full bg-[#4D4F46] opacity-0 group-hover:opacity-100" />
+    </motion.button>
   );
 }
 
