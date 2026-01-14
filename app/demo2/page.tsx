@@ -1215,7 +1215,12 @@ function Demo2PageInner() {
       ref={containerRef}
       className="min-h-screen relative overflow-hidden"
       style={{
-        background: 'radial-gradient(circle at 50% 30%, #FDFDF8 0%, #EEEFE9 100%)',
+        backgroundColor: '#FBFBF9',
+        backgroundImage: `
+          radial-gradient(circle at 50% 0%, rgba(235, 157, 42, 0.03) 0%, transparent 60%),
+          radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.03) 0%, transparent 40%),
+          linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(0,0,0,0.01) 100%)
+        `,
         paddingTop: '48px'
       }}
       onClick={handleDesktopClick}
