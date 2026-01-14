@@ -184,9 +184,6 @@ function DesktopIcon({ data, onDoubleClick, isSelected, onSelect, position }: De
         scale: 1.05
       }}
       whileTap={{ scale: 0.95 }}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
       <div className="mb-1">
         <FileIconSVG type={data.icon} size={48} />
@@ -936,8 +933,8 @@ function Demo2PageInner() {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen relative overflow-hidden"
-      style={{ background: '#EEEFE9', paddingTop: '48px' }}
+      className="min-h-screen relative overflow-hidden desktop-bg"
+      style={{ background: 'var(--bg-app)', paddingTop: '48px' }}
       onClick={handleDesktopClick}
     >
       <TopNav minimizedWindows={minimizedWindows} onRestoreWindow={restoreWindow} />
@@ -946,7 +943,7 @@ function Demo2PageInner() {
       <div className="flex min-h-[calc(100vh-48px)]">
         {/* Left Icons */}
         <aside
-          className="hidden lg:flex flex-col gap-1 p-3 w-[100px]"
+          className="hidden md:flex flex-col gap-1 p-3 w-[100px]"
           onClick={(e) => e.stopPropagation()}
         >
           {LEFT_ICONS.map((icon) => (
@@ -994,7 +991,7 @@ function Demo2PageInner() {
 
         {/* Right Icons */}
         <aside
-          className="hidden lg:flex flex-col gap-1 p-3 w-[100px] items-end"
+          className="hidden md:flex flex-col gap-1 p-3 w-[100px] items-end"
           onClick={(e) => e.stopPropagation()}
         >
           {RIGHT_ICONS.map((icon) => (
