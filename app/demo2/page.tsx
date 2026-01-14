@@ -307,7 +307,10 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
         onDoubleClick={onMaximize}
       >
         {/* Left - File menu */}
-        <div className="flex items-center gap-2 min-w-[80px]">
+        <div
+          className="flex items-center gap-2 min-w-[80px]"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
           <button className="flex items-center gap-1 px-1.5 py-1 rounded hover:bg-black/5">
             <FileIconSVG type={win.icon} size={16} />
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -327,7 +330,10 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
         </div>
 
         {/* Right - Window controls */}
-        <div className="flex items-center gap-2 min-w-[80px] justify-end">
+        <div
+          className="flex items-center gap-2 min-w-[80px] justify-end"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
           <motion.button
             onClick={(e) => { e.stopPropagation(); onMinimize(); }}
             className="w-6 h-6 rounded flex items-center justify-center hover:bg-black/10 transition-colors"
