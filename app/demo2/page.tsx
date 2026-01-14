@@ -741,6 +741,148 @@ function DemoContent() {
   );
 }
 
+
+function DocsContent() {
+  return (
+    <div className="p-8 max-w-2xl mx-auto" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+      <h2 className="text-2xl font-bold mb-4" style={{ color: '#23251D' }}>Documentation</h2>
+      <div className="space-y-4">
+        <div className="p-4 rounded border border-[#E5E7E0] bg-[#FDFDF8]">
+          <h3 className="font-semibold mb-2" style={{ color: '#23251D' }}>Getting Started</h3>
+          <p className="text-sm" style={{ color: '#4D4F46' }}>Learn how to set up your portfolio in minutes using our quickstart guide.</p>
+        </div>
+        <div className="p-4 rounded border border-[#E5E7E0] bg-[#FDFDF8]">
+          <h3 className="font-semibold mb-2" style={{ color: '#23251D' }}>Components</h3>
+          <p className="text-sm" style={{ color: '#4D4F46' }}>Explore our library of pre-built components for your desktop environment.</p>
+        </div>
+        <div className="p-4 rounded border border-[#E5E7E0] bg-[#FDFDF8]">
+          <h3 className="font-semibold mb-2" style={{ color: '#23251D' }}>API Reference</h3>
+          <p className="text-sm" style={{ color: '#4D4F46' }}>Detailed documentation for the MeOS API and customization options.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ContactContent() {
+  return (
+    <div className="p-8 flex flex-col items-center justify-center h-full text-center" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+      <div className="w-16 h-16 rounded-full bg-[#E5E7E0] flex items-center justify-center mb-4 text-2xl">👋</div>
+      <h2 className="text-2xl font-bold mb-2" style={{ color: '#23251D' }}>Let's Talk</h2>
+      <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: '#4D4F46' }}>We're here to help you build the perfect portfolio. Reach out for support or enterprise inquiries.</p>
+      <button className="px-6 py-2 rounded bg-[#23251D] text-white text-sm font-medium hover:opacity-90">
+        Send us an email
+      </button>
+    </div>
+  );
+}
+
+function WhyContent() {
+  return (
+    <div className="p-8" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+      <h2 className="text-2xl font-bold mb-6" style={{ color: '#23251D' }}>Why MeOS?</h2>
+      <div className="grid gap-6">
+        <div>
+          <h3 className="font-semibold mb-1" style={{ color: '#23251D' }}>Stand Out</h3>
+          <p className="text-sm" style={{ color: '#4D4F46' }}>In a sea of identical static sites, give your visitors a memorable, interactive experience they'll actually remember.</p>
+        </div>
+        <div>
+          <h3 className="font-semibold mb-1" style={{ color: '#23251D' }}>Show, Don't Just Tell</h3>
+          <p className="text-sm" style={{ color: '#4D4F46' }}>Demonstrate your technical capability by presenting your work in a fully functional simulated OS environment.</p>
+        </div>
+        <div>
+          <h3 className="font-semibold mb-1" style={{ color: '#23251D' }}>Joy of Computing</h3>
+          <p className="text-sm" style={{ color: '#4D4F46' }}>Bring back the fun of personal computing with a retro-inspired yet modern interface.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChangelogContent() {
+  return (
+    <div className="p-6" style={{ fontFamily: '"Source Code Pro", monospace' }}>
+      <h2 className="text-xl font-bold mb-4" style={{ color: '#23251D' }}>CHANGELOG.md</h2>
+      <div className="space-y-6 border-l-2 border-[#E5E7E0] pl-4">
+        <div>
+          <div className="text-xs font-bold text-[#EB9D2A] mb-1">v2.1.0 (Current)</div>
+          <ul className="text-sm space-y-1" style={{ color: '#4D4F46' }}>
+            <li>- Added spring physics to window interactions</li>
+            <li>- Implemented dark/light mode toggle system</li>
+            <li>- Improved mobile responsiveness</li>
+          </ul>
+        </div>
+        <div>
+          <div className="text-xs font-bold text-[#4D4F46] mb-1">v2.0.0</div>
+          <ul className="text-sm space-y-1" style={{ color: '#4D4F46' }}>
+            <li>- Complete rewrite of the window manager</li>
+            <li>- Added support for multiple workspaces</li>
+            <li>- New file system architecture</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GalleryContent() {
+  return (
+    <div className="p-6 grid grid-cols-2 gap-4" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="aspect-video bg-[#E5E7E0] rounded flex items-center justify-center relative overflow-hidden group cursor-pointer">
+          <span className="text-xs text-[#73756B]">Image {i}</span>
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function StoreContent() {
+  return (
+    <div className="p-6" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold" style={{ color: '#23251D' }}>App Store</h2>
+        <span className="text-xs bg-[#E5E7E0] px-2 py-1 rounded">2 Updates</span>
+      </div>
+      <div className="space-y-3">
+        {['Terminal', 'Notes', 'Music Player', 'Browser'].map(app => (
+          <div key={app} className="flex items-center justify-between p-3 rounded border border-[#E5E7E0] bg-[#FDFDF8]">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded bg-[#E5E7E0]" />
+              <div>
+                <div className="text-sm font-semibold" style={{ color: '#23251D' }}>{app}</div>
+                <div className="text-xs text-[#73756B]">Productivity</div>
+              </div>
+            </div>
+            <button className="px-3 py-1 rounded-full bg-[#E5E7E0] text-xs font-semibold text-[#4D4F46]">GET</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CareersContent() {
+  return (
+    <div className="p-8 text-center" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+      <h2 className="text-2xl font-bold mb-2" style={{ color: '#23251D' }}>Join the team</h2>
+      <p className="text-sm text-[#4D4F46] mb-8">We're building the future of personal websites. Help us make the web fun again.</p>
+
+      <div className="text-left space-y-4">
+        <div className="p-4 border border-[#E5E7E0] rounded hover:border-[#BFC1B7] cursor-pointer transition-colors bg-[#FDFDF8]">
+          <div className="font-semibold text-[#23251D]">Senior Frontend Engineer</div>
+          <div className="text-xs text-[#73756B]">Remote • React, WebGL, Next.js</div>
+        </div>
+        <div className="p-4 border border-[#E5E7E0] rounded hover:border-[#BFC1B7] cursor-pointer transition-colors bg-[#FDFDF8]">
+          <div className="font-semibold text-[#23251D]">Product Designer</div>
+          <div className="text-xs text-[#73756B]">Remote • UI/UX, Motion</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function GenericContent({ title }: { title: string }) {
   return (
     <div className="p-8 flex flex-col items-center justify-center h-full" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
@@ -848,6 +990,13 @@ function Demo2PageInner() {
       case 'customers': return <CustomersContent />;
       case 'demo': return <DemoContent />;
       case 'trash': return <TrashContent />;
+      case 'docs': return <DocsContent />;
+      case 'contact': return <ContactContent />;
+      case 'why': return <WhyContent />;
+      case 'changelog': return <ChangelogContent />;
+      case 'gallery': return <GalleryContent />;
+      case 'store': return <StoreContent />;
+      case 'careers': return <CareersContent />;
       default: return <GenericContent title={contentId} />;
     }
   }, []);
