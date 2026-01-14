@@ -219,6 +219,7 @@ interface WindowProps {
 function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragEnd, containerRef }: WindowProps) {
   const dragControls = useDragControls();
   const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, winX: 0, winY: 0 });
 
   if (win.isMinimized) return null;
 
@@ -251,18 +252,30 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
           : '0 0 0 1px rgba(0,0,0,0.06), 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 30px rgba(0,0,0,0.03)',
       }}
       initial={{ opacity: 0, scale: 0.9, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
+      animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 10 }}
       transition={{ type: "spring", stiffness: 350, damping: 25 }}
       drag={!win.isMaximized}
       dragControls={dragControls}
       dragListener={false}
       dragMomentum={false}
-      dragConstraints={containerRef}
-      onDragStart={() => setIsDragging(true)}
+      dragElastic={0}
+      onDragStart={(_, info) => {
+        setIsDragging(true);
+        dragStartRef.current = {
+          x: info.point.x,
+          y: info.point.y,
+          winX: win.x,
+          winY: win.y
+        };
+      }}
       onDragEnd={(_, info) => {
         setIsDragging(false);
-        onDragEnd(win.x + info.offset.x, win.y + info.offset.y);
+        const deltaX = info.point.x - dragStartRef.current.x;
+        const deltaY = info.point.y - dragStartRef.current.y;
+        const newX = Math.max(0, dragStartRef.current.winX + deltaX);
+        const newY = Math.max(48, dragStartRef.current.winY + deltaY);
+        onDragEnd(newX, newY);
       }}
       onMouseDown={onFocus}
     >
