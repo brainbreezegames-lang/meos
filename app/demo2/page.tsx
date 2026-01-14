@@ -173,17 +173,18 @@ function DesktopIcon({ data, onDoubleClick, isSelected, onSelect, position }: De
     <motion.button
       onClick={onSelect}
       onDoubleClick={onDoubleClick}
-      className="flex flex-col items-center p-2 rounded cursor-default select-none"
+      className="flex flex-col items-center p-2 rounded-lg cursor-default select-none relative"
       style={{
         width: '84px',
         background: isSelected ? 'rgba(47, 128, 250, 0.15)' : 'transparent',
         outline: isSelected ? '2px solid rgba(47, 128, 250, 0.4)' : 'none',
       }}
       whileHover={{
-        background: isSelected ? 'rgba(47, 128, 250, 0.15)' : 'rgba(229, 231, 224, 0.5)',
-        scale: 1.05
+        background: isSelected ? 'rgba(47, 128, 250, 0.15)' : 'rgba(229, 231, 224, 0.6)',
+        scale: 1.08,
+        boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
       }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.92 }}
     >
       <div className="mb-1">
         <FileIconSVG type={data.icon} size={48} />
@@ -241,13 +242,13 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
 
   return (
     <motion.div
-      className="rounded-md overflow-hidden flex flex-col"
+      className="rounded-xl overflow-hidden flex flex-col backdrop-blur-sm"
       style={{
         ...windowStyle,
-        background: '#FFFFFF',
+        background: 'rgba(255, 255, 255, 0.95)',
         boxShadow: isDragging
-          ? '0 0 0 1px #BFC1B7, 0 35px 60px -15px rgba(0, 0, 0, 0.35)'
-          : '0 0 0 1px #BFC1B7, 0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          ? '0 0 0 1px rgba(0,0,0,0.08), 0 40px 80px -20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0,0,0,0.05)'
+          : '0 0 0 1px rgba(0,0,0,0.06), 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 30px rgba(0,0,0,0.03)',
       }}
       initial={{ opacity: 0, scale: 0.9, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -267,10 +268,10 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
     >
       {/* Title Bar */}
       <div
-        className="h-10 flex items-center justify-between px-3 cursor-default select-none"
+        className="h-11 flex items-center justify-between px-4 cursor-default select-none"
         style={{
-          background: '#E5E7E0',
-          borderBottom: '1px solid #BFC1B7',
+          background: 'linear-gradient(180deg, #F5F6F3 0%, #E8EAE5 100%)',
+          borderBottom: '1px solid #D4D6CF',
         }}
         onPointerDown={(e) => {
           if (!win.isMaximized) {
@@ -299,33 +300,41 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
           </svg>
         </div>
 
-        {/* Right - Window controls */}
-        <div className="flex items-center gap-1 min-w-[80px] justify-end">
-          <button
-            onClick={(e) => { e.stopPropagation(); onMinimize(); }}
-            className="w-7 h-7 rounded flex items-center justify-center hover:bg-black/10 transition-colors"
-          >
-            <svg width="10" height="10" viewBox="0 0 10 10">
-              <line x1="2" y1="5" x2="8" y2="5" stroke="#73756B" strokeWidth="1.5" />
-            </svg>
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onMaximize(); }}
-            className="w-7 h-7 rounded flex items-center justify-center hover:bg-black/10 transition-colors"
-          >
-            <svg width="10" height="10" viewBox="0 0 10 10">
-              <rect x="2" y="2" width="6" height="6" fill="none" stroke="#73756B" strokeWidth="1.5" />
-            </svg>
-          </button>
-          <button
+        {/* Right - Traffic Light Controls */}
+        <div className="flex items-center gap-2 min-w-[80px] justify-end">
+          <motion.button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
-            className="w-7 h-7 rounded flex items-center justify-center hover:bg-[#F54E00] hover:text-white transition-colors group"
+            className="w-3 h-3 rounded-full flex items-center justify-center group"
+            style={{ background: '#FF5F57', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)' }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10">
-              <line x1="2" y1="2" x2="8" y2="8" stroke="currentColor" strokeWidth="1.5" className="text-[#73756B] group-hover:text-white" />
-              <line x1="8" y1="2" x2="2" y2="8" stroke="currentColor" strokeWidth="1.5" className="text-[#73756B] group-hover:text-white" />
+            <svg width="6" height="6" viewBox="0 0 6 6" className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <path d="M1 1l4 4M5 1l-4 4" stroke="#4a0002" strokeWidth="1.2" />
             </svg>
-          </button>
+          </motion.button>
+          <motion.button
+            onClick={(e) => { e.stopPropagation(); onMinimize(); }}
+            className="w-3 h-3 rounded-full flex items-center justify-center group"
+            style={{ background: '#FFBD2E', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)' }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <svg width="6" height="6" viewBox="0 0 6 6" className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <path d="M1 3h4" stroke="#995700" strokeWidth="1.2" />
+            </svg>
+          </motion.button>
+          <motion.button
+            onClick={(e) => { e.stopPropagation(); onMaximize(); }}
+            className="w-3 h-3 rounded-full flex items-center justify-center group"
+            style={{ background: '#28CA41', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)' }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <svg width="6" height="6" viewBox="0 0 6 6" className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <path d="M1 1l2 2m0 0l2-2m-2 2v2" stroke="#006500" strokeWidth="1" />
+            </svg>
+          </motion.button>
         </div>
       </div>
 
@@ -396,16 +405,18 @@ function WindowToolbar() {
         <ToolbarButton icon="search" />
       </ToolbarGroup>
 
-      <button
-        className="ml-2 px-3 py-1.5 text-[12px] font-semibold rounded"
+      <motion.button
+        className="ml-2 px-4 py-1.5 text-[12px] font-semibold rounded-lg shadow-sm"
         style={{
-          background: '#EB9D2A',
+          background: 'linear-gradient(180deg, #F5A623 0%, #EB9D2A 100%)',
           color: 'white',
           fontFamily: '"IBM Plex Sans", sans-serif',
         }}
+        whileHover={{ scale: 1.03, boxShadow: '0 4px 12px rgba(235, 157, 42, 0.4)' }}
+        whileTap={{ scale: 0.97 }}
       >
         Get started - free
-      </button>
+      </motion.button>
     </div>
   );
 }
