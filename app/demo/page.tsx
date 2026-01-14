@@ -187,14 +187,8 @@ const DEMO_ANALYTICS_DATA = {
   ],
 };
 
-// Background images that rotate
-const BACKGROUND_IMAGES = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2560&h=1440&fit=crop&q=90',
-  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=2560&h=1440&fit=crop&q=90',
-  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=2560&h=1440&fit=crop&q=90',
-  'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=2560&h=1440&fit=crop&q=90',
-  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2560&h=1440&fit=crop&q=90',
-];
+// Default background image
+const DEFAULT_BACKGROUND = '/bg.jpg';
 
 // Desktop items with comprehensive block showcase
 const DEMO_ITEMS: DesktopItem[] = [
@@ -1397,7 +1391,7 @@ function MenuBar({
         {getPersonaLabel() && (
           <button
             onClick={() => onPersonaChange(persona === 'recruiter' ? 'visitor' : 'recruiter')}
-            className="flex items-center gap-1.5 transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10"
+            className="flex items-center gap-1.5 transition-all duration-200 hover:bg-[var(--hover-bg)]"
             style={{
               fontSize: '13px',
               color: 'var(--text-secondary, #666)',
@@ -1434,13 +1428,13 @@ function MenuBar({
         {context?.isOwner && (
           <button
             onClick={onShowQRCode}
-            className="flex items-center justify-center transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/10"
+            className="flex items-center justify-center transition-all duration-150 hover:bg-[var(--hover-bg)]"
             style={{
               width: '26px',
               height: '20px',
               borderRadius: '4px',
               background: 'transparent',
-              color: 'var(--text-secondary, #666)',
+              color: 'var(--text-secondary)',
             }}
             title="QR Code"
           >
@@ -1478,13 +1472,13 @@ function MenuBar({
         {/* Background button - icon only */}
         <button
           onClick={() => bgContext.setShowBackgroundPanel(true)}
-          className="flex items-center justify-center transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/10"
+          className="flex items-center justify-center transition-all duration-150 hover:bg-[var(--hover-bg)]"
           style={{
             width: '26px',
             height: '20px',
             borderRadius: '4px',
             background: 'transparent',
-            color: 'var(--text-secondary, #666)',
+            color: 'var(--text-secondary)',
           }}
           title="Background"
         >
@@ -1566,59 +1560,18 @@ function MenuBar({
   );
 }
 
-// Theme-aware Rotating Background
+// Theme-aware Background (static, no rotation)
 function RotatingBackground() {
   const { customBackground } = useBackgroundContext();
   const { themeInfo, theme } = useTheme();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [nextIndex, setNextIndex] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  useEffect(() => {
-    if (customBackground) return;
-
-    // If warm theme (Wallpaper component), don't rotate images
-    if (theme === 'warm') return;
-
-    const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setNextIndex((currentIndex + 1) % BACKGROUND_IMAGES.length);
-
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % BACKGROUND_IMAGES.length);
-        setIsTransitioning(false);
-      }, 1500);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [currentIndex, customBackground, theme]);
 
   // Theme-aware overlay gradient
   const overlayGradient = themeInfo.isDark
     ? 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.45) 100%)'
     : 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25) 100%)';
 
-  if (customBackground) {
-    return (
-      <>
-        <motion.div
-          className="fixed inset-0 z-0"
-          style={{
-            backgroundImage: `url(${customBackground})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        />
-        <div
-          className="fixed inset-0 z-[1] pointer-events-none"
-          style={{ background: overlayGradient }}
-        />
-      </>
-    );
-  }
+  // Use custom background if set, otherwise use default
+  const backgroundUrl = customBackground || DEFAULT_BACKGROUND;
 
   if (theme === 'warm') {
     return <Wallpaper />;
@@ -1629,22 +1582,13 @@ function RotatingBackground() {
       <motion.div
         className="fixed inset-0 z-0"
         style={{
-          backgroundImage: `url(${BACKGROUND_IMAGES[currentIndex]})`,
+          backgroundImage: `url(${backgroundUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
-        animate={{ opacity: isTransitioning ? 0 : 1 }}
-        transition={{ duration: 1.5, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: `url(${BACKGROUND_IMAGES[nextIndex]})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        animate={{ opacity: isTransitioning ? 1 : 0 }}
-        transition={{ duration: 1.5, ease: 'easeInOut' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
       />
       <div
         className="fixed inset-0 z-[1] pointer-events-none"
@@ -1964,12 +1908,13 @@ function AppWindow({
     >
       {/* Window chrome */}
       <div
-        className="rounded-xl overflow-hidden"
+        className="rounded-2xl overflow-hidden"
         style={{
-          background: 'rgba(30, 30, 30, 0.92)',
-          backdropFilter: 'blur(40px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+          background: 'var(--bg-glass-elevated)',
+          backdropFilter: 'blur(60px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+          border: '1px solid var(--border-glass-outer)',
+          boxShadow: 'var(--shadow-window)',
         }}
       >
         {/* Title bar */}
@@ -1977,21 +1922,22 @@ function AppWindow({
           className="flex items-center gap-3 px-4 py-3 cursor-move select-none"
           onMouseDown={handleMouseDown}
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+            background: 'var(--bg-elevated)',
+            borderBottom: '1px solid var(--border-light)',
           }}
         >
           {/* Traffic lights */}
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="w-3 h-3 rounded-full transition-all group relative"
-              style={{ background: '#ff5f57' }}
+              aria-label="Close panel"
+              className="w-3 h-3 rounded-full transition-all group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+              style={{ background: 'var(--traffic-red)' }}
             >
-              <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 text-[8px] text-black/70 font-bold">✕</span>
+              <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 text-[8px] font-bold" style={{ color: 'rgba(77, 0, 0, 0.7)' }}>✕</span>
             </button>
-            <div className="w-3 h-3 rounded-full" style={{ background: '#febd2e' }} />
-            <div className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+            <div className="w-3 h-3 rounded-full" style={{ background: 'var(--traffic-yellow)' }} />
+            <div className="w-3 h-3 rounded-full" style={{ background: 'var(--traffic-green)' }} />
           </div>
 
           {/* Title */}
@@ -2000,7 +1946,7 @@ function AppWindow({
             <span
               className="text-sm font-medium"
               style={{
-                color: 'rgba(255, 255, 255, 0.85)',
+                color: 'var(--text-primary)',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
               }}
             >
@@ -2014,7 +1960,7 @@ function AppWindow({
           className="p-5 max-h-[70vh] overflow-y-auto"
           style={{
             scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(255,255,255,0.2) transparent',
+            scrollbarColor: 'var(--text-tertiary) transparent',
           }}
         >
           {children}
@@ -2198,14 +2144,14 @@ function DemoPageInner() {
               >
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-sm font-semibold text-white/80 mb-3">Particles</h3>
+                    <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>Particles</h3>
                     <ParticleSettingsPanel
                       settings={particleSettings}
                       onChange={setParticleSettings}
                     />
                   </div>
-                  <div className="border-t border-white/10 pt-6">
-                    <h3 className="text-sm font-semibold text-white/80 mb-3">Custom Cursor</h3>
+                  <div className="pt-6" style={{ borderTop: '1px solid var(--border-light)' }}>
+                    <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>Custom Cursor</h3>
                     <CursorSettingsPanel
                       settings={cursorSettings}
                       onChange={setCursorSettings}
@@ -2255,7 +2201,7 @@ function MobileDemoPage() {
         profileTitle="Product Designer & Developer"
         profileBio="Creative developer passionate about building beautiful digital experiences. Currently at Figma, previously Stripe & Airbnb."
         username="alexchen"
-        backgroundUrl={BACKGROUND_IMAGES[0]}
+        backgroundUrl={DEFAULT_BACKGROUND}
         personas={[
           { id: 'recruiter', name: 'Recruiter', title: 'Looking to hire', color: 'rgba(59, 130, 246, 0.3)' },
           { id: 'visitor', name: 'Visitor', title: 'Just exploring', color: 'rgba(255, 255, 255, 0.15)' },
@@ -2295,7 +2241,7 @@ export default function DemoPage() {
       <div
         className="min-h-screen flex items-center justify-center"
         style={{
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)',
+          background: 'var(--bg-solid)',
         }}
       />
     );

@@ -258,7 +258,7 @@ export function QRCodeGenerator({ baseUrl, username, isOpen, onClose }: QRCodeGe
               <div className="flex flex-col items-center">
                 <div
                   className="p-4 rounded-xl"
-                  style={{ background: '#fafafa' }}
+                  style={{ background: 'var(--bg-elevated)' }}
                 >
                   <canvas ref={canvasRef} className="w-[200px] h-[200px]" />
                 </div>

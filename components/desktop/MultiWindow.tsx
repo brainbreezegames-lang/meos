@@ -5,10 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
 
-type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
-import { useThemeSafe } from '@/contexts/ThemeContext';
+import { useThemeSafe, type ThemeId } from '@/contexts/ThemeContext';
 import { EditableText, EditableImage } from '@/components/editing/Editable';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
 import { InlineBlockPicker, useInlineBlockPicker } from '@/components/editing/InlineBlockPicker';

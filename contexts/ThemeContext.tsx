@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 // Theme IDs
-export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay';
+export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay' | 'posthog';
 
 // Theme metadata
 export interface ThemeInfo {
@@ -54,6 +54,13 @@ export const THEMES: Record<ThemeId, ThemeInfo> = {
     description: 'Stop-motion studio',
     isDark: false,
     fontFamily: 'Fredoka',
+  },
+  posthog: {
+    id: 'posthog',
+    name: 'PostHog',
+    description: 'Retro desktop OS',
+    isDark: false,
+    fontFamily: 'IBMPlexSans',
   },
 };
 
@@ -140,6 +147,17 @@ export function ThemeProvider({
         link.href = 'https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap';
         link.rel = 'stylesheet';
         link.setAttribute('data-theme-font', 'fredoka');
+        document.head.appendChild(link);
+      }
+    }
+
+    if (themeInfo.fontFamily === 'IBMPlexSans') {
+      const existingLink = document.querySelector('link[data-theme-font="ibm-plex"]');
+      if (!existingLink) {
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap';
+        link.rel = 'stylesheet';
+        link.setAttribute('data-theme-font', 'ibm-plex');
         document.head.appendChild(link);
       }
     }

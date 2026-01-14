@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { IBM_Plex_Sans, Source_Code_Pro } from "next/font/google";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { CommentProvider } from "@/contexts/CommentContext";
 import "./globals.css";
@@ -21,12 +21,16 @@ export const metadata: Metadata = {
   },
 };
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const instrumentSerif = Instrument_Serif({
-  weight: "400",
+const ibmPlexSans = IBM_Plex_Sans({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-instrument",
-  style: ["normal", "italic"],
+  variable: "--font-ibm-plex-sans",
+});
+
+const sourceCodePro = Source_Code_Pro({
+  weight: ["400", "500"],
+  subsets: ["latin"],
+  variable: "--font-source-code-pro",
 });
 
 export default function RootLayout({
@@ -36,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${instrumentSerif.variable} antialiased font-sans bg-[#FAFAF9] text-stone-800 selection:bg-stone-200 overflow-hidden`}>
+      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} font-sans bg-[#EEEFE9] text-[#23251D] selection:bg-[#2F80FA] selection:text-white overflow-hidden`}>
         <div className="noise-overlay"></div>
         <SessionProvider>
           <CommentProvider>{children}</CommentProvider>

@@ -40,6 +40,11 @@ const themePreviewStyles: Record<ThemeId, { bg: string; window: string; dock: st
     window: 'linear-gradient(165deg, #FFFDFB 0%, #F5F1EB 50%, #EDE8E1 100%)',
     dock: 'rgba(237, 232, 225, 0.85)',
   },
+  posthog: {
+    bg: 'linear-gradient(180deg, #EEEFE9 0%, #E5E7E0 100%)',
+    window: '#FFFFFF',
+    dock: 'rgba(229, 231, 224, 0.9)',
+  },
 };
 
 function ThemePreview({ themeId, isActive, onClick }: { themeId: ThemeId; isActive: boolean; onClick: () => void }) {
