@@ -289,8 +289,8 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.15 }}
-      onMouseDown={onFocus}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      drag={!win.isMaximized}
     >
       {/* Title Bar */}
       <div
@@ -1463,25 +1463,15 @@ function DockItem({ mouseX, item, onClick }: { mouseX: any, item: typeof DOCK_IT
 }
 
 // ============================================
-// Noise & Texture Overlay
+// Noise & Texture Overlay (Optimized - Static)
 // ============================================
 function AmbientOverlay() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[0]">
-      {/* Moving Fog/Mesh Gradient Animation */}
-      <motion.div
-        className="absolute inset-0 opacity-100" // Increased opacity
-        animate={{
-          backgroundPosition: ['0% 0%', '100% 50%'],
-        }}
-        transition={{
-          repeat: Infinity,
-          repeatType: "mirror",
-          duration: 20,
-          ease: "linear"
-        }}
+    <div className="fixed inset-0 pointer-events-none z-[0]" style={{ backgroundColor: '#E8DCCC' }}>
+      {/* Static Gradient Mesh - GPU Optimized (No animation loop) */}
+      <div
+        className="absolute inset-0 opacity-100"
         style={{
-          backgroundColor: '#E8DCCC', // Moved base color here
           backgroundImage: `
             radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.05) 100%),
             radial-gradient(at 0% 0%, rgba(245, 166, 35, 0.08) 0px, transparent 50%),
@@ -1489,15 +1479,7 @@ function AmbientOverlay() {
             radial-gradient(at 100% 100%, rgba(245, 166, 35, 0.08) 0px, transparent 50%),
             radial-gradient(at 0% 100%, rgba(29, 31, 39, 0.08) 0px, transparent 50%)
           `,
-          backgroundSize: '150% 150%'
-        }}
-      />
-
-      {/* Static Noise Filter */}
-      <div
-        className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundSize: '100% 100%'
         }}
       />
     </div>
