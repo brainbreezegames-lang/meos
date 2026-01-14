@@ -217,11 +217,45 @@ interface WindowProps {
 }
 
 function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragEnd, containerRef }: WindowProps) {
-  const dragControls = useDragControls();
   const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const dragStartRef = useRef({ x: 0, y: 0, winX: 0, winY: 0 });
 
   if (win.isMinimized) return null;
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (win.isMaximized) return;
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setIsDragging(true);
+    dragStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      winX: win.x,
+      winY: win.y
+    };
+    setDragOffset({ x: 0, y: 0 });
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - dragStartRef.current.x;
+    const deltaY = e.clientY - dragStartRef.current.y;
+    setDragOffset({ x: deltaX, y: deltaY });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDragging) return;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    setIsDragging(false);
+    const newX = Math.max(0, dragStartRef.current.winX + dragOffset.x);
+    const newY = Math.max(48, dragStartRef.current.winY + dragOffset.y);
+    setDragOffset({ x: 0, y: 0 });
+    onDragEnd(newX, newY);
+  };
+
+  const currentX = win.x + dragOffset.x;
+  const currentY = win.y + dragOffset.y;
 
   const windowStyle = win.isMaximized ? {
     position: 'fixed' as const,
@@ -234,8 +268,8 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
     zIndex: win.zIndex,
   } : {
     position: 'absolute' as const,
-    left: win.x,
-    top: win.y,
+    left: currentX,
+    top: currentY,
     width: win.width,
     height: win.height,
     zIndex: win.zIndex,
@@ -250,47 +284,26 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
         boxShadow: isDragging
           ? '0 0 0 1px rgba(0,0,0,0.08), 0 40px 80px -20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0,0,0,0.05)'
           : '0 0 0 1px rgba(0,0,0,0.06), 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 30px rgba(0,0,0,0.03)',
+        cursor: isDragging ? 'grabbing' : 'default',
       }}
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 350, damping: 25 }}
-      drag={!win.isMaximized}
-      dragControls={dragControls}
-      dragListener={false}
-      dragMomentum={false}
-      dragElastic={0}
-      onDragStart={(_, info) => {
-        setIsDragging(true);
-        dragStartRef.current = {
-          x: info.point.x,
-          y: info.point.y,
-          winX: win.x,
-          winY: win.y
-        };
-      }}
-      onDragEnd={(_, info) => {
-        setIsDragging(false);
-        const deltaX = info.point.x - dragStartRef.current.x;
-        const deltaY = info.point.y - dragStartRef.current.y;
-        const newX = Math.max(0, dragStartRef.current.winX + deltaX);
-        const newY = Math.max(48, dragStartRef.current.winY + deltaY);
-        onDragEnd(newX, newY);
-      }}
+      transition={{ duration: 0.15 }}
       onMouseDown={onFocus}
     >
       {/* Title Bar */}
       <div
-        className="h-11 flex items-center justify-between px-4 cursor-default select-none"
+        className="h-11 flex items-center justify-between px-4 select-none"
         style={{
           background: 'linear-gradient(180deg, #F5F6F3 0%, #E8EAE5 100%)',
           borderBottom: '1px solid #D4D6CF',
+          cursor: isDragging ? 'grabbing' : 'grab',
         }}
-        onPointerDown={(e) => {
-          if (!win.isMaximized) {
-            dragControls.start(e);
-          }
-        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
         onDoubleClick={onMaximize}
       >
         {/* Left - File menu */}
