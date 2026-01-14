@@ -1375,6 +1375,9 @@ function Demo2PageInner() {
 // ============================================
 // Dock Component
 // ============================================
+// ============================================
+// Dock Component (Magnetic Physics)
+// ============================================
 const DOCK_ITEMS = [
   { id: 'finder', label: 'Finder', icon: 'folder' as const, color: '#2F80FA' },
   { id: 'terminal', label: 'Terminal', icon: 'code' as const, color: '#23251D' },
@@ -1385,39 +1388,54 @@ const DOCK_ITEMS = [
 ];
 
 function Dock({ onAppClick }: { onAppClick: (id: string) => void }) {
+  const mouseX = useMotionValue(Infinity);
+
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000] px-4 pb-2 pt-2.5 rounded-2xl flex items-end gap-3 glass-dock shadow-2xl border"
+    <motion.div
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000] px-4 pb-3 pt-3.5 rounded-2xl flex items-end gap-3 dock-container"
+      onMouseMove={(e) => mouseX.set(e.pageX)}
+      onMouseLeave={() => mouseX.set(Infinity)}
       style={{
         background: 'rgba(255, 255, 255, 0.4)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         border: '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.2)'
+        boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.2)',
+        height: 64, // Fixed height container
+        display: 'flex',
+        alignItems: 'center', // Center items vertically
       }}
     >
       {DOCK_ITEMS.map((item) => (
-        <DockItem key={item.id} item={item} onClick={() => onAppClick(item.id)} />
+        <DockItem key={item.id} mouseX={mouseX} item={item} onClick={() => onAppClick(item.id)} />
       ))}
-    </div>
+    </motion.div>
   );
 }
 
-function DockItem({ item, onClick }: { item: typeof DOCK_ITEMS[0], onClick: () => void }) {
+function DockItem({ mouseX, item, onClick }: { mouseX: any, item: typeof DOCK_ITEMS[0], onClick: () => void }) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  const distance = useTransform(mouseX, (val: number) => {
+    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
+    return val - bounds.x - bounds.width / 2;
+  });
+
+  const widthSync = useTransform(distance, [-150, 0, 150], [50, 90, 50]);
+  const width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 });
+
   return (
     <motion.button
+      ref={ref}
       onClick={onClick}
       className="relative flex flex-col items-center justify-center rounded-xl overflow-hidden shadow-lg group"
       style={{
-        width: 50,
-        height: 50,
+        width,
+        height: width, // Keep aspect ratio
         background: '#FFFFFF',
       }}
       whileHover={{
-        scale: 1.2,
-        y: -10,
-        marginBottom: 10,
         zIndex: 50,
-        transition: { type: "spring", stiffness: 400, damping: 20 }
       }}
       whileTap={{ scale: 0.9 }}
       initial={{ y: 100, opacity: 0 }}
@@ -1430,21 +1448,18 @@ function DockItem({ item, onClick }: { item: typeof DOCK_ITEMS[0], onClick: () =
           background: `linear-gradient(135deg, ${item.color}15, ${item.color}05)`,
         }}
       >
-        <FileIconSVG type={item.icon} size={32} />
+        <FileIconSVG type={item.icon} size={28} />
 
-        {/* Shine effect */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-      </div>
+        {/* Gloss overlay */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-white/40 pointer-events-none" />
 
-      {/* Label Tooltip */}
-      <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
-        style={{
-          background: 'rgba(35, 37, 29, 0.9)',
-          color: '#FDFDF8',
-          backdropFilter: 'blur(4px)'
-        }}
-      >
-        {item.label}
+        {/* Tooltip */}
+        <div
+          className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
+          style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+        >
+          {item.label}
+        </div>
       </div>
 
       {/* Active Dot indicator (mock) */}
@@ -1454,85 +1469,30 @@ function DockItem({ item, onClick }: { item: typeof DOCK_ITEMS[0], onClick: () =
 }
 
 // ============================================
-// Export
-// ============================================
-// ============================================
-// Magic Cursor
-// ============================================
-function MagicCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
-
-  // Smooth spring physics for the cursor
-  const springConfig = { damping: 25, stiffness: 400, mass: 0.5 };
-  const cursorX = useSpring(0, springConfig);
-  const cursorY = useSpring(0, springConfig);
-
-  useEffect(() => {
-    const updateMousePosition = (e: MouseEvent) => {
-      cursorX.set(e.clientX - 10); // Center the 20px cursor
-      cursorY.set(e.clientY - 10);
-
-      // Check if hovering over clickable element
-      const target = e.target as HTMLElement;
-      const isClickable =
-        target.tagName === 'BUTTON' ||
-        target.tagName === 'A' ||
-        target.closest('button') ||
-        target.closest('a') ||
-        target.classList.contains('cursor-pointer') ||
-        window.getComputedStyle(target).cursor === 'pointer';
-
-      setIsHovering(!!isClickable);
-    };
-
-    window.addEventListener('mousemove', updateMousePosition);
-    return () => window.removeEventListener('mousemove', updateMousePosition);
-  }, [cursorX, cursorY]);
-
-  return (
-    <motion.div
-      className="fixed top-0 left-0 w-5 h-5 rounded-full pointer-events-none z-[9999] mix-blend-difference"
-      style={{
-        x: cursorX,
-        y: cursorY,
-        backgroundColor: 'white',
-        boxShadow: '0 0 10px rgba(255,255,255,0.5)',
-      }}
-      animate={{
-        scale: isHovering ? 2.5 : 1,
-        opacity: isHovering ? 0.8 : 1,
-      }}
-      transition={{ duration: 0.15 }}
-    />
-  );
-}
-
-// ============================================
 // Noise & Texture Overlay
 // ============================================
 function AmbientOverlay() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[1]">
+    <div className="fixed inset-0 pointer-events-none z-[0]">
       {/* Moving Fog/Mesh Gradient Animation */}
       <motion.div
-        className="absolute inset-0 opacity-40"
+        className="absolute inset-0 opacity-60"
         animate={{
-          backgroundPosition: ['0% 0%', '100% 100%'],
+          backgroundPosition: ['0% 0%', '100% 50%'],
         }}
         transition={{
           repeat: Infinity,
-          repeatType: "reverse",
-          duration: 20,
+          repeatType: "mirror",
+          duration: 15,
           ease: "linear"
         }}
         style={{
           background: `
-            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.03) 100%),
-            radial-gradient(at 0% 0%, rgba(245, 166, 35, 0.05) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(29, 31, 39, 0.05) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(245, 166, 35, 0.05) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, rgba(29, 31, 39, 0.05) 0px, transparent 50%)
+            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.05) 100%),
+            radial-gradient(at 0% 0%, rgba(245, 166, 35, 0.08) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(29, 31, 39, 0.08) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(245, 166, 35, 0.08) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(29, 31, 39, 0.08) 0px, transparent 50%)
           `,
           backgroundSize: '150% 150%'
         }}
@@ -1540,7 +1500,7 @@ function AmbientOverlay() {
 
       {/* Static Noise Filter */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.04] mix-blend-overlay"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
@@ -1552,7 +1512,6 @@ function AmbientOverlay() {
 export default function Demo2Page() {
   return (
     <ThemeProvider initialTheme="posthog">
-      <MagicCursor />
       <AmbientOverlay />
       <Demo2PageInner />
     </ThemeProvider>
