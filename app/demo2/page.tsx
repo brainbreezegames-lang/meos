@@ -313,39 +313,36 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
           </svg>
         </div>
 
-        {/* Right - Traffic Light Controls */}
+        {/* Right - Window controls */}
         <div className="flex items-center gap-2 min-w-[80px] justify-end">
           <motion.button
-            onClick={(e) => { e.stopPropagation(); onClose(); }}
-            className="w-3 h-3 rounded-full flex items-center justify-center group"
-            style={{ background: '#FF5F57', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)' }}
-            whileHover={{ scale: 1.15 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <svg width="6" height="6" viewBox="0 0 6 6" className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <path d="M1 1l4 4M5 1l-4 4" stroke="#4a0002" strokeWidth="1.2" />
-            </svg>
-          </motion.button>
-          <motion.button
             onClick={(e) => { e.stopPropagation(); onMinimize(); }}
-            className="w-3 h-3 rounded-full flex items-center justify-center group"
-            style={{ background: '#FFBD2E', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)' }}
-            whileHover={{ scale: 1.15 }}
+            className="w-6 h-6 rounded flex items-center justify-center hover:bg-black/10 transition-colors"
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <svg width="6" height="6" viewBox="0 0 6 6" className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <path d="M1 3h4" stroke="#995700" strokeWidth="1.2" />
+            <svg width="10" height="2" viewBox="0 0 10 2" fill="none">
+              <rect width="10" height="2" rx="1" fill="#1D1F27" />
             </svg>
           </motion.button>
           <motion.button
             onClick={(e) => { e.stopPropagation(); onMaximize(); }}
-            className="w-3 h-3 rounded-full flex items-center justify-center group"
-            style={{ background: '#28CA41', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)' }}
-            whileHover={{ scale: 1.15 }}
+            className="w-6 h-6 rounded flex items-center justify-center hover:bg-black/10 transition-colors"
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <svg width="6" height="6" viewBox="0 0 6 6" className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <path d="M1 1l2 2m0 0l2-2m-2 2v2" stroke="#006500" strokeWidth="1" />
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <rect x="0.5" y="0.5" width="9" height="9" rx="1" stroke="#1D1F27" strokeWidth="1" />
+            </svg>
+          </motion.button>
+          <motion.button
+            onClick={(e) => { e.stopPropagation(); onClose(); }}
+            className="w-6 h-6 rounded flex items-center justify-center hover:bg-black/10 transition-colors"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path d="M1 1l8 8M9 1l-8 8" stroke="#1D1F27" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
           </motion.button>
         </div>
@@ -1068,10 +1065,8 @@ function TopNav({ minimizedWindows, onRestoreWindow }: {
     <nav
       className="fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-[1000]"
       style={{
-        background: 'rgba(229, 231, 224, 0.85)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid #BFC1B7',
+        background: '#1D1F27',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}
     >
       <div className="flex items-center gap-6">
@@ -1080,18 +1075,21 @@ function TopNav({ minimizedWindows, onRestoreWindow }: {
           {['Product OS', 'Pricing', 'Docs', 'Community', 'Company'].map((item) => (
             <button
               key={item}
-              className="px-2.5 py-1 text-[13px] font-medium rounded hover:bg-black/5"
-              style={{ color: '#23251D', fontFamily: '"IBM Plex Sans", sans-serif' }}
+              className="px-2.5 py-1 text-[13px] font-medium rounded hover:bg-white/10 transition-colors"
+              style={{ color: 'rgba(255,255,255,0.85)', fontFamily: '"IBM Plex Sans", sans-serif' }}
             >
               {item}
             </button>
           ))}
+          <button className="px-2.5 py-1 text-[13px] font-medium rounded hover:bg-white/10 transition-colors" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            More
+          </button>
         </div>
 
         {/* Minimized windows */}
         {minimizedWindows.length > 0 && (
           <>
-            <div className="w-px h-5 mx-2" style={{ background: '#BFC1B7' }} />
+            <div className="w-px h-5 mx-2" style={{ background: 'rgba(255,255,255,0.15)' }} />
             <div className="flex items-center gap-1">
               {minimizedWindows.map(win => (
                 <button
@@ -1109,19 +1107,28 @@ function TopNav({ minimizedWindows, onRestoreWindow }: {
         )}
       </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          className="px-4 py-1.5 text-[13px] font-semibold rounded"
-          style={{ background: '#EB9D2A', color: 'white', fontFamily: '"IBM Plex Sans", sans-serif' }}
+      <div className="flex items-center gap-3">
+        <motion.button
+          className="px-4 py-1.5 text-[13px] font-semibold rounded-md"
+          style={{
+            background: '#F5A623',
+            color: 'white',
+            fontFamily: '"IBM Plex Sans", sans-serif',
+          }}
+          whileHover={{ scale: 1.02, boxShadow: '0 4px 12px rgba(245, 166, 35, 0.35)' }}
+          whileTap={{ scale: 0.98 }}
         >
           Get started – free
-        </button>
-        <button className="w-8 h-8 rounded flex items-center justify-center hover:bg-black/5">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <circle cx="8" cy="8" r="5" stroke="#4D4F46" strokeWidth="1.5" />
-            <path d="M12 12l4 4" stroke="#4D4F46" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </button>
+        </motion.button>
+
+        <div className="hidden md:flex items-center gap-2 text-white/60">
+          <button className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1" fill="none" /><path d="M7 5h2v4H7zM7 10h2v2H7z" /></svg>
+          </button>
+          <button className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 14a6 6 0 110-12 6 6 0 010 12z" /></svg>
+          </button>
+        </div>
       </div>
     </nav>
   );
@@ -1239,11 +1246,11 @@ function Demo2PageInner() {
       ref={containerRef}
       className="min-h-screen relative overflow-hidden"
       style={{
-        backgroundColor: '#FBFBF9',
+        backgroundColor: '#E8DCCC',
         backgroundImage: `
-          radial-gradient(circle at 50% 0%, rgba(235, 157, 42, 0.03) 0%, transparent 60%),
-          radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.03) 0%, transparent 40%),
-          linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(0,0,0,0.01) 100%)
+          radial-gradient(circle at 30% 80%, rgba(139, 92, 50, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(180, 140, 100, 0.06) 0%, transparent 40%),
+          linear-gradient(180deg, rgba(232, 220, 204, 0) 0%, rgba(210, 195, 175, 0.3) 100%)
         `,
         paddingTop: '48px'
       }}
