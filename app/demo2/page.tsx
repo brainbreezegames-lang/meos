@@ -1215,9 +1215,7 @@ function Demo2PageInner() {
       ref={containerRef}
       className="min-h-screen relative overflow-hidden"
       style={{
-        backgroundImage: "url('/bg2.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        background: 'radial-gradient(circle at 50% 30%, #FDFDF8 0%, #EEEFE9 100%)',
         paddingTop: '48px'
       }}
       onClick={handleDesktopClick}
