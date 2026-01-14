@@ -1084,7 +1084,12 @@ function Demo2PageInner() {
     <div
       ref={containerRef}
       className="min-h-screen relative overflow-hidden"
-      style={{ background: '#EEEFE9', paddingTop: '48px' }}
+      style={{
+        backgroundImage: "url('/bg.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        paddingTop: '48px'
+      }}
       onClick={handleDesktopClick}
     >
       <TopNav minimizedWindows={minimizedWindows} onRestoreWindow={restoreWindow} />
