@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
-        <div className="desktop-bg fixed inset-0 z-[-1]" />
+
 
         <SessionProvider>
           <CommentProvider>{children}</CommentProvider>
