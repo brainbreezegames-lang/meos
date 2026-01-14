@@ -1463,23 +1463,81 @@ function DockItem({ mouseX, item, onClick }: { mouseX: any, item: typeof DOCK_IT
 }
 
 // ============================================
-// Noise & Texture Overlay (Optimized - Static)
+// Animated Background (Aurora/Orbs)
 // ============================================
 function AmbientOverlay() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[0]" style={{ backgroundColor: '#E8DCCC' }}>
-      {/* Static Gradient Mesh - GPU Optimized (No animation loop) */}
-      <div
-        className="absolute inset-0 opacity-100"
+    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none" style={{ background: '#E8DCCC' }}>
+      {/* Orb 1: Orange/Warm */}
+      <motion.div
+        className="absolute w-[60vw] h-[60vw] rounded-full blur-[100px] opacity-40 mix-blend-multiply"
         style={{
-          backgroundImage: `
-            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.05) 100%),
-            radial-gradient(at 0% 0%, rgba(245, 166, 35, 0.08) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(29, 31, 39, 0.08) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(245, 166, 35, 0.08) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, rgba(29, 31, 39, 0.08) 0px, transparent 50%)
-          `,
-          backgroundSize: '100% 100%'
+          background: 'radial-gradient(circle, #EB9D2A 0%, rgba(235, 157, 42, 0) 70%)',
+          top: '-10%',
+          left: '-10%',
+        }}
+        animate={{
+          x: [0, 100, 0],
+          y: [0, 50, 0],
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut"
+        }}
+      />
+
+      {/* Orb 2: Violet/Cool */}
+      <motion.div
+        className="absolute w-[50vw] h-[50vw] rounded-full blur-[90px] opacity-30 mix-blend-multiply"
+        style={{
+          background: 'radial-gradient(circle, #8B5CF6 0%, rgba(139, 92, 246, 0) 70%)',
+          top: '20%',
+          right: '-10%',
+        }}
+        animate={{
+          x: [0, -80, 0],
+          y: [0, 100, 0],
+          scale: [1, 1.2, 1],
+        }}
+        transition={{
+          duration: 18,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut",
+          delay: 1
+        }}
+      />
+
+      {/* Orb 3: Teal/Fresh (adds complexity) */}
+      <motion.div
+        className="absolute w-[45vw] h-[45vw] rounded-full blur-[80px] opacity-25 mix-blend-multiply"
+        style={{
+          background: 'radial-gradient(circle, #10B981 0%, rgba(16, 185, 129, 0) 70%)',
+          bottom: '-10%',
+          left: '20%',
+        }}
+        animate={{
+          x: [0, 50, 0],
+          y: [0, -80, 0],
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut",
+          delay: 2
+        }}
+      />
+
+      {/* Noise Texture Overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
       />
     </div>
