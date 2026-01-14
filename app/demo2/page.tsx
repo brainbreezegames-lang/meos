@@ -1456,9 +1456,104 @@ function DockItem({ item, onClick }: { item: typeof DOCK_ITEMS[0], onClick: () =
 // ============================================
 // Export
 // ============================================
+// ============================================
+// Magic Cursor
+// ============================================
+function MagicCursor() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  // Smooth spring physics for the cursor
+  const springConfig = { damping: 25, stiffness: 400, mass: 0.5 };
+  const cursorX = motion.useSpring(0, springConfig);
+  const cursorY = motion.useSpring(0, springConfig);
+
+  useEffect(() => {
+    const updateMousePosition = (e: MouseEvent) => {
+      cursorX.set(e.clientX - 10); // Center the 20px cursor
+      cursorY.set(e.clientY - 10);
+
+      // Check if hovering over clickable element
+      const target = e.target as HTMLElement;
+      const isClickable =
+        target.tagName === 'BUTTON' ||
+        target.tagName === 'A' ||
+        target.closest('button') ||
+        target.closest('a') ||
+        target.classList.contains('cursor-pointer') ||
+        window.getComputedStyle(target).cursor === 'pointer';
+
+      setIsHovering(!!isClickable);
+    };
+
+    window.addEventListener('mousemove', updateMousePosition);
+    return () => window.removeEventListener('mousemove', updateMousePosition);
+  }, [cursorX, cursorY]);
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 w-5 h-5 rounded-full pointer-events-none z-[9999] mix-blend-difference"
+      style={{
+        x: cursorX,
+        y: cursorY,
+        backgroundColor: 'white',
+        boxShadow: '0 0 10px rgba(255,255,255,0.5)',
+      }}
+      animate={{
+        scale: isHovering ? 2.5 : 1,
+        opacity: isHovering ? 0.8 : 1,
+      }}
+      transition={{ duration: 0.15 }}
+    />
+  );
+}
+
+// ============================================
+// Noise & Texture Overlay
+// ============================================
+function AmbientOverlay() {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[1]">
+      {/* Moving Fog/Mesh Gradient Animation */}
+      <motion.div
+        className="absolute inset-0 opacity-40"
+        animate={{
+          backgroundPosition: ['0% 0%', '100% 100%'],
+        }}
+        transition={{
+          repeat: Infinity,
+          repeatType: "reverse",
+          duration: 20,
+          ease: "linear"
+        }}
+        style={{
+          background: `
+            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.03) 100%),
+            radial-gradient(at 0% 0%, rgba(245, 166, 35, 0.05) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(29, 31, 39, 0.05) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(245, 166, 35, 0.05) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(29, 31, 39, 0.05) 0px, transparent 50%)
+          `,
+          backgroundSize: '150% 150%'
+        }}
+      />
+
+      {/* Static Noise Filter */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+    </div>
+  );
+}
+
 export default function Demo2Page() {
   return (
     <ThemeProvider initialTheme="posthog">
+      <MagicCursor />
+      <AmbientOverlay />
       <Demo2PageInner />
     </ThemeProvider>
   );
