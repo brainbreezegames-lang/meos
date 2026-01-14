@@ -10,7 +10,7 @@ interface WindowProps {
 
 export default function Window({ title, children, toolbar, className = '' }: WindowProps) {
     return (
-        <div className={`flex flex-col bg-white rounded-md shadow-2xl overflow-hidden min-h-0 flex-1 max-w-[1200px] mx-4 my-4 border border-[#BFC1B7] ${className}`}>
+        <div className={`flex flex-col bg-white rounded-md shadow-2xl overflow-hidden min-h-0 flex-1 max-w-[1200px] mx-4 my-4 border border-[#BFC1B7] ${className} animate-window-open`}>
             {/* Title Bar */}
             <div className="h-10 min-h-[40px] bg-[#E5E7E0] border-b border-[#BFC1B7] flex items-center justify-between px-3 select-none">
 
