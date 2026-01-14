@@ -1,3 +1,4 @@
+'use client';
 import { Minus, Square, X, ChevronDown, FileText } from 'lucide-react';
 import React from 'react';
 

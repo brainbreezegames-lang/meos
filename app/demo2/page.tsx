@@ -66,84 +66,84 @@ function FileIconSVG({ type, size = 48 }: { type: IconType; size?: number }) {
     case 'document':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <path d="M12 6h18l10 10v26a2 2 0 01-2 2H12a2 2 0 01-2-2V8a2 2 0 012-2z" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <path d="M30 6v10h10" stroke="#BFC1B7" strokeWidth="1.5" fill="#E5E7E0"/>
-          <path d="M16 22h16M16 28h16M16 34h10" stroke="#9EA096" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M12 6h18l10 10v26a2 2 0 01-2 2H12a2 2 0 01-2-2V8a2 2 0 012-2z" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5" />
+          <path d="M30 6v10h10" stroke="#BFC1B7" strokeWidth="1.5" fill="#E5E7E0" />
+          <path d="M16 22h16M16 28h16M16 34h10" stroke="#9EA096" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       );
     case 'folder':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <path d="M6 14a2 2 0 012-2h12l4 4h16a2 2 0 012 2v20a2 2 0 01-2 2H8a2 2 0 01-2-2V14z" fill="#E5E7E0" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <path d="M6 18h36v20a2 2 0 01-2 2H8a2 2 0 01-2-2V18z" fill="#EEEFE9"/>
+          <path d="M6 14a2 2 0 012-2h12l4 4h16a2 2 0 012 2v20a2 2 0 01-2 2H8a2 2 0 01-2-2V14z" fill="#E5E7E0" stroke="#BFC1B7" strokeWidth="1.5" />
+          <path d="M6 18h36v20a2 2 0 01-2 2H8a2 2 0 01-2-2V18z" fill="#EEEFE9" />
         </svg>
       );
     case 'spreadsheet':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <rect x="8" y="6" width="32" height="36" rx="2" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <path d="M8 14h32M20 14v28M32 14v28" stroke="#BFC1B7" strokeWidth="1"/>
-          <path d="M8 22h32M8 30h32" stroke="#E5E7E0" strokeWidth="1"/>
-          <rect x="10" y="8" width="6" height="4" fill="#6AA84F"/>
+          <rect x="8" y="6" width="32" height="36" rx="2" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5" />
+          <path d="M8 14h32M20 14v28M32 14v28" stroke="#BFC1B7" strokeWidth="1" />
+          <path d="M8 22h32M8 30h32" stroke="#E5E7E0" strokeWidth="1" />
+          <rect x="10" y="8" width="6" height="4" fill="#6AA84F" />
         </svg>
       );
     case 'video':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <rect x="6" y="10" width="36" height="28" rx="2" fill="#23251D" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <path d="M20 17l12 7-12 7V17z" fill="#EB9D2A"/>
-          <rect x="6" y="10" width="36" height="4" fill="#3D3D3D"/>
-          <circle cx="10" cy="12" r="1.5" fill="#F54E00"/>
-          <circle cx="15" cy="12" r="1.5" fill="#EB9D2A"/>
-          <circle cx="20" cy="12" r="1.5" fill="#6AA84F"/>
+          <rect x="6" y="10" width="36" height="28" rx="2" fill="#23251D" stroke="#BFC1B7" strokeWidth="1.5" />
+          <path d="M20 17l12 7-12 7V17z" fill="#EB9D2A" />
+          <rect x="6" y="10" width="36" height="4" fill="#3D3D3D" />
+          <circle cx="10" cy="12" r="1.5" fill="#F54E00" />
+          <circle cx="15" cy="12" r="1.5" fill="#EB9D2A" />
+          <circle cx="20" cy="12" r="1.5" fill="#6AA84F" />
         </svg>
       );
     case 'email':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <rect x="6" y="12" width="36" height="24" rx="2" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <path d="M6 14l18 10 18-10" stroke="#EB9D2A" strokeWidth="2" fill="none"/>
-          <path d="M6 36l12-10M42 36l-12-10" stroke="#BFC1B7" strokeWidth="1.5"/>
+          <rect x="6" y="12" width="36" height="24" rx="2" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5" />
+          <path d="M6 14l18 10 18-10" stroke="#EB9D2A" strokeWidth="2" fill="none" />
+          <path d="M6 36l12-10M42 36l-12-10" stroke="#BFC1B7" strokeWidth="1.5" />
         </svg>
       );
     case 'trash':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <path d="M14 16h20v24a2 2 0 01-2 2H16a2 2 0 01-2-2V16z" fill="#E5E7E0" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <path d="M10 16h28" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <path d="M18 12h12v4H18v-4z" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <path d="M20 22v12M24 22v12M28 22v12" stroke="#9EA096" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M14 16h20v24a2 2 0 01-2 2H16a2 2 0 01-2-2V16z" fill="#E5E7E0" stroke="#BFC1B7" strokeWidth="1.5" />
+          <path d="M10 16h28" stroke="#BFC1B7" strokeWidth="1.5" />
+          <path d="M18 12h12v4H18v-4z" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5" />
+          <path d="M20 22v12M24 22v12M28 22v12" stroke="#9EA096" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       );
     case 'calculator':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <rect x="10" y="6" width="28" height="36" rx="2" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <rect x="14" y="10" width="20" height="8" fill="#23251D" rx="1"/>
+          <rect x="10" y="6" width="28" height="36" rx="2" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5" />
+          <rect x="14" y="10" width="20" height="8" fill="#23251D" rx="1" />
           <text x="24" y="17" fill="#6AA84F" fontSize="8" fontFamily="monospace" textAnchor="middle">$0.00</text>
-          <rect x="14" y="22" width="4" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7"/>
-          <rect x="22" y="22" width="4" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7"/>
-          <rect x="30" y="22" width="4" height="4" rx="1" fill="#EB9D2A"/>
-          <rect x="14" y="30" width="4" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7"/>
-          <rect x="22" y="30" width="4" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7"/>
-          <rect x="30" y="30" width="4" height="4" rx="1" fill="#EB9D2A"/>
-          <rect x="14" y="38" width="12" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7"/>
-          <rect x="30" y="38" width="4" height="4" rx="1" fill="#6AA84F"/>
+          <rect x="14" y="22" width="4" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7" />
+          <rect x="22" y="22" width="4" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7" />
+          <rect x="30" y="22" width="4" height="4" rx="1" fill="#EB9D2A" />
+          <rect x="14" y="30" width="4" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7" />
+          <rect x="22" y="30" width="4" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7" />
+          <rect x="30" y="30" width="4" height="4" rx="1" fill="#EB9D2A" />
+          <rect x="14" y="38" width="12" height="4" rx="1" fill="#E5E7E0" stroke="#BFC1B7" />
+          <rect x="30" y="38" width="4" height="4" rx="1" fill="#6AA84F" />
         </svg>
       );
     case 'image':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <rect x="6" y="10" width="36" height="28" rx="2" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5"/>
-          <circle cx="16" cy="20" r="4" fill="#EB9D2A"/>
-          <path d="M6 32l10-8 6 4 14-10v20H6v-6z" fill="#6AA84F" fillOpacity="0.4"/>
-          <path d="M22 28l14-10v20H6v-6l10-8 6 4z" fill="#2F80FA" fillOpacity="0.3"/>
+          <rect x="6" y="10" width="36" height="28" rx="2" fill="#FDFDF8" stroke="#BFC1B7" strokeWidth="1.5" />
+          <circle cx="16" cy="20" r="4" fill="#EB9D2A" />
+          <path d="M6 32l10-8 6 4 14-10v20H6v-6z" fill="#6AA84F" fillOpacity="0.4" />
+          <path d="M22 28l14-10v20H6v-6l10-8 6 4z" fill="#2F80FA" fillOpacity="0.3" />
         </svg>
       );
     case 'code':
       return (
         <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-          <rect x="8" y="6" width="32" height="36" rx="2" fill="#23251D" stroke="#BFC1B7" strokeWidth="1.5"/>
+          <rect x="8" y="6" width="32" height="36" rx="2" fill="#23251D" stroke="#BFC1B7" strokeWidth="1.5" />
           <text x="12" y="18" fill="#6AA84F" fontSize="7" fontFamily="monospace">## v2.0</text>
           <text x="12" y="26" fill="#9EA096" fontSize="6" fontFamily="monospace">- New feature</text>
           <text x="12" y="33" fill="#9EA096" fontSize="6" fontFamily="monospace">- Bug fixes</text>
@@ -180,12 +180,13 @@ function DesktopIcon({ data, onDoubleClick, isSelected, onSelect, position }: De
         outline: isSelected ? '2px solid rgba(47, 128, 250, 0.4)' : 'none',
       }}
       whileHover={{
-        background: isSelected ? 'rgba(47, 128, 250, 0.15)' : 'rgba(229, 231, 224, 0.5)'
+        background: isSelected ? 'rgba(47, 128, 250, 0.15)' : 'rgba(229, 231, 224, 0.5)',
+        scale: 1.05
       }}
       whileTap={{ scale: 0.95 }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
       <div className="mb-1">
         <FileIconSVG type={data.icon} size={48} />
@@ -254,7 +255,7 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.15 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
       drag={!win.isMaximized}
       dragControls={dragControls}
       dragListener={false}
@@ -286,7 +287,7 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
           <button className="flex items-center gap-1 px-1.5 py-1 rounded hover:bg-black/5">
             <FileIconSVG type={win.icon} size={16} />
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <path d="M2 3l2 2 2-2" stroke="#73756B" strokeWidth="1.2"/>
+              <path d="M2 3l2 2 2-2" stroke="#73756B" strokeWidth="1.2" />
             </svg>
           </button>
         </div>
@@ -297,7 +298,7 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
             {win.title}
           </span>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M3 4l2 2 2-2" stroke="#73756B" strokeWidth="1.2"/>
+            <path d="M3 4l2 2 2-2" stroke="#73756B" strokeWidth="1.2" />
           </svg>
         </div>
 
@@ -308,7 +309,7 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
             className="w-7 h-7 rounded flex items-center justify-center hover:bg-black/10 transition-colors"
           >
             <svg width="10" height="10" viewBox="0 0 10 10">
-              <line x1="2" y1="5" x2="8" y2="5" stroke="#73756B" strokeWidth="1.5"/>
+              <line x1="2" y1="5" x2="8" y2="5" stroke="#73756B" strokeWidth="1.5" />
             </svg>
           </button>
           <button
@@ -316,7 +317,7 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
             className="w-7 h-7 rounded flex items-center justify-center hover:bg-black/10 transition-colors"
           >
             <svg width="10" height="10" viewBox="0 0 10 10">
-              <rect x="2" y="2" width="6" height="6" fill="none" stroke="#73756B" strokeWidth="1.5"/>
+              <rect x="2" y="2" width="6" height="6" fill="none" stroke="#73756B" strokeWidth="1.5" />
             </svg>
           </button>
           <button
@@ -324,8 +325,8 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
             className="w-7 h-7 rounded flex items-center justify-center hover:bg-[#F54E00] hover:text-white transition-colors group"
           >
             <svg width="10" height="10" viewBox="0 0 10 10">
-              <line x1="2" y1="2" x2="8" y2="8" stroke="currentColor" strokeWidth="1.5" className="text-[#73756B] group-hover:text-white"/>
-              <line x1="8" y1="2" x2="2" y2="8" stroke="currentColor" strokeWidth="1.5" className="text-[#73756B] group-hover:text-white"/>
+              <line x1="2" y1="2" x2="8" y2="8" stroke="currentColor" strokeWidth="1.5" className="text-[#73756B] group-hover:text-white" />
+              <line x1="8" y1="2" x2="2" y2="8" stroke="currentColor" strokeWidth="1.5" className="text-[#73756B] group-hover:text-white" />
             </svg>
           </button>
         </div>
@@ -452,40 +453,40 @@ function ToolbarIconSVG({ type }: { type: string }) {
     case 'undo':
       return (
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M2.5 4h5a2.5 2.5 0 110 5H6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-          <path d="M4 2.5L2.5 4 4 5.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M2.5 4h5a2.5 2.5 0 110 5H6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <path d="M4 2.5L2.5 4 4 5.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       );
     case 'redo':
       return (
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M9.5 4h-5a2.5 2.5 0 100 5H6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-          <path d="M8 2.5L9.5 4 8 5.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M9.5 4h-5a2.5 2.5 0 100 5H6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <path d="M8 2.5L9.5 4 8 5.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       );
     case 'align-left':
       return (
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M1 2.5h10M1 5h6M1 7.5h10M1 10h6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+          <path d="M1 2.5h10M1 5h6M1 7.5h10M1 10h6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
         </svg>
       );
     case 'align-center':
       return (
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M1 2.5h10M3 5h6M1 7.5h10M3 10h6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+          <path d="M1 2.5h10M3 5h6M1 7.5h10M3 10h6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
         </svg>
       );
     case 'align-right':
       return (
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M1 2.5h10M5 5h6M1 7.5h10M5 10h6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+          <path d="M1 2.5h10M5 5h6M1 7.5h10M5 10h6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
         </svg>
       );
     case 'search':
       return (
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <circle cx="5" cy="5" r="3.5" stroke="currentColor" strokeWidth="1.2"/>
-          <path d="M8 8l2.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+          <circle cx="5" cy="5" r="3.5" stroke="currentColor" strokeWidth="1.2" />
+          <path d="M8 8l2.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
         </svg>
       );
     default:
@@ -571,7 +572,7 @@ function HomeContent() {
           {/* Urgency Banner */}
           <div className="flex items-start gap-3 p-4 rounded mt-6" style={{ background: '#FDFDF8' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ color: '#73756B', flexShrink: 0 }}>
-              <path d="M2 12h4l3-9 6 18 3-9h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 12h4l3-9 6 18 3-9h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <p className="text-sm" style={{ color: '#4D4F46', lineHeight: 1.6 }}>
               <strong style={{ color: '#23251D' }}>Hurry:</strong>{' '}
@@ -734,7 +735,7 @@ function DemoContent() {
       <div className="text-center">
         <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(235, 157, 42, 0.2)' }}>
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <path d="M12 8l14 8-14 8V8z" fill="#EB9D2A"/>
+            <path d="M12 8l14 8-14 8V8z" fill="#EB9D2A" />
           </svg>
         </div>
         <p className="text-sm" style={{ color: '#9EA096' }}>Click to play demo video</p>
@@ -824,8 +825,8 @@ function TopNav({ minimizedWindows, onRestoreWindow }: {
         </button>
         <button className="w-8 h-8 rounded flex items-center justify-center hover:bg-black/5">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <circle cx="8" cy="8" r="5" stroke="#4D4F46" strokeWidth="1.5"/>
-            <path d="M12 12l4 4" stroke="#4D4F46" strokeWidth="1.5" strokeLinecap="round"/>
+            <circle cx="8" cy="8" r="5" stroke="#4D4F46" strokeWidth="1.5" />
+            <path d="M12 12l4 4" stroke="#4D4F46" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
       </div>

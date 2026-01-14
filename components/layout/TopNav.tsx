@@ -38,9 +38,17 @@ export default function TopNav() {
                     Get started
                 </Link>
 
+                <div className="hidden md:flex relative group">
+                    <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-secondary)] w-48 hover:border-[var(--border-medium)] transition-colors text-[13px]">
+                        <Search size={14} />
+                        <span>Search docs...</span>
+                        <span className="ml-auto text-[10px] opacity-60">⌘K</span>
+                    </button>
+                </div>
+
                 <div className="h-6 w-[1px] bg-[var(--border-light)] mx-1" />
 
-                <button className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-highlight)] hover:text-[var(--text-primary)] transition-colors">
+                <button className="md:hidden p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-highlight)] hover:text-[var(--text-primary)] transition-colors">
                     <Search size={18} />
                 </button>
                 <button className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-highlight)] hover:text-[var(--text-primary)] transition-colors">

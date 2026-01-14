@@ -1,3 +1,4 @@
+'use client';
 import TopNav from '@/components/layout/TopNav';
 import { DesktopIconsLeft, DesktopIconsRight } from '@/components/desktop/DesktopIcons';
 import Window from '@/components/window/Window';
@@ -7,6 +8,38 @@ import CTAButton from '@/components/ui/CTAButton';
 import WindowToolbar from '@/components/window/WindowToolbar';
 import ProductGrid from '@/components/features/ProductGrid';
 import { Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+const TypingEffect = ({ text, className, speed = 50, eraseSpeed = 30, typingDelay = 1000 }: { text: string[], className?: string, speed?: number, eraseSpeed?: number, typingDelay?: number }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const fullText = text[currentTextIndex];
+
+      if (isDeleting) {
+        setDisplayedText(fullText.substring(0, displayedText.length - 1));
+      } else {
+        setDisplayedText(fullText.substring(0, displayedText.length + 1));
+      }
+
+      if (!isDeleting && displayedText === fullText) {
+        if (currentTextIndex === text.length - 1) return; // Stop at the end
+        setTimeout(() => setIsDeleting(true), typingDelay);
+      } else if (isDeleting && displayedText === '') {
+        setIsDeleting(false);
+        setCurrentTextIndex((prev) => prev + 1);
+      }
+    };
+
+    const timer = setTimeout(handleTyping, isDeleting ? eraseSpeed : speed);
+    return () => clearTimeout(timer);
+  }, [displayedText, isDeleting, currentTextIndex, text, speed, eraseSpeed, typingDelay]);
+
+  return <h2 className={className}>{displayedText}<span className="animate-blink">|</span></h2>;
+};
 
 export default function Home() {
   return (
@@ -36,12 +69,16 @@ export default function Home() {
                     Digital download*
                   </span>
 
-                  <div>
-                    <h2 className="text-[32px] md:text-[48px] font-bold text-[#23251D] leading-[1.1] mb-2">
-                      Starts at: <span className="line-through text-[#73756B] text-[0.8em]">$1,000,000</span> <span className="text-[#6AA84F]">FREE</span>
-                    </h2>
-                    <p className="text-[#F54E00] font-mono text-sm font-medium">
-                      {'>'}1 left at this price!!
+                  <div className="h-[80px] flex flex-col justify-center">
+                    <TypingEffect
+                      text={["Starts at: $1,000,000", "Starts at: $0,000 (Free)"]}
+                      className="text-[32px] md:text-[48px] font-bold text-[#23251D] leading-[1.1] mb-2"
+                      speed={50}
+                      eraseSpeed={30}
+                      typingDelay={500}
+                    />
+                    <p className="text-[#F54E00] font-mono text-sm font-medium animate-pulse">
+                      {'>'} Limited time offer!
                     </p>
                   </div>
 
