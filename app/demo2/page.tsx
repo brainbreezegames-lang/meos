@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useDragControls, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls, useSpring, useMotionValue, useTransform } from 'framer-motion';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // ============================================
