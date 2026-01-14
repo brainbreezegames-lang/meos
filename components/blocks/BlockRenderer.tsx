@@ -1,6 +1,9 @@
 'use client';
 
+
 import { BlockData } from '@/types';
+import ProductGrid from '@/components/features/ProductGrid';
+import SpreadsheetTable from '@/components/features/SpreadsheetTable';
 import TextBlockRenderer from './renderers/TextBlock';
 import HeadingBlockRenderer from './renderers/HeadingBlock';
 import DividerBlockRenderer from './renderers/DividerBlock';
@@ -92,6 +95,10 @@ export default function BlockRenderer({ block }: BlockRendererProps) {
       return <AudioBlockRenderer data={block.data} />;
     case 'carousel':
       return <CarouselBlockRenderer data={block.data} />;
+    case 'product-grid':
+      return <ProductGrid />;
+    case 'spreadsheet':
+      return <SpreadsheetTable />;
     default:
       return (
         <div className="px-5 py-3 text-[13px] text-[var(--text-tertiary)]">

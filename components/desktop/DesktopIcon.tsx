@@ -49,16 +49,24 @@ export default function DesktopIcon({
             </div>
 
             {/* Label */}
+            {/* Label / Tooltip */}
             <span
-                className="text-[10px] font-medium tracking-wide px-2 py-0.5 rounded-full backdrop-blur-md transition-all duration-300"
+                className="text-[11px] font-medium tracking-wide px-2.5 py-1 rounded-md backdrop-blur-md transition-all duration-300 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 shadow-lg"
                 style={{
-                    color: 'var(--text-secondary)',
-                    background: 'var(--bg-dock)',
+                    color: 'var(--text-primary)',
+                    background: 'var(--bg-glass-elevated)',
                     border: '1px solid var(--border-glass-outer)',
+                    position: 'absolute',
+                    top: '100%',
+                    whiteSpace: 'nowrap',
+                    zIndex: 20
                 }}
             >
                 {label}
             </span>
+
+            {/* Selection Ring (Focus State) */}
+            <div className="absolute inset-0 rounded-[18px] border-2 border-[var(--accent-primary)] opacity-0 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none" style={{ margin: '-4px' }} />
 
             {/* Open indicator dot */}
             <AnimatePresence>

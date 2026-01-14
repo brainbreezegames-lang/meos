@@ -368,7 +368,9 @@ export type ContentBlock =
   | ProductBlock
   | BookBlock
   | AwardBlock
-  | PressBlock;
+  | PressBlock
+  | BaseBlock & { type: 'product-grid'; data: Record<string, unknown> }
+  | BaseBlock & { type: 'spreadsheet'; data: Record<string, unknown> };
 
 export type BlockType = ContentBlock['type'];
 
@@ -435,6 +437,8 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
   { type: 'book', label: 'Book', description: 'Book display', icon: '📚', category: 'specialized', defaultData: { books: [] } },
   { type: 'award', label: 'Award', description: 'Achievement display', icon: '🏆', category: 'specialized', defaultData: { awards: [] } },
   { type: 'press', label: 'Press', description: 'Press mentions', icon: '📰', category: 'specialized', defaultData: { mentions: [] } },
+  { type: 'product-grid' as BlockType, label: 'Product Grid', description: 'Interactive project grid', icon: '▦', category: 'specialized', defaultData: {} },
+  { type: 'spreadsheet' as BlockType, label: 'Spreadsheet', description: 'Article spreadsheet view', icon: '⊞', category: 'specialized', defaultData: {} },
 ];
 
 export const BLOCK_CATEGORIES = [

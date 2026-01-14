@@ -58,26 +58,24 @@ const ProductSection = ({ title, count, items }: ProductSectionProps) => {
 };
 
 export default function ProductGrid() {
-    const dataStack: ProductItem[] = [
-        { label: 'README: PostHog data stack.md', href: '#', icon: <FileTextIcon />, color: 'text-[#23251D]' },
-        { label: 'CDP integrations library (145+)', href: '#', icon: <Database size={24} />, color: 'text-[#30ABC6]' },
-        { label: 'Managed DuckDB warehouse', href: '#', icon: <HardDrive size={24} />, color: 'text-[#EB9D2A]' },
-        { label: 'SQL editor', href: '#', icon: <FileTextIcon />, color: 'text-[#6AA84F]' },
+    const mainProjects: ProductItem[] = [
+        { label: 'Design System 2.0', href: '#', icon: <Database size={24} />, color: 'text-[#23251D]' },
+        { label: 'E-commerce UI Kit', href: '#', icon: <BarChart2 size={24} />, color: 'text-[#30ABC6]' },
+        { label: 'SaaS Dashboard', href: '#', icon: <HardDrive size={24} />, color: 'text-[#EB9D2A]' },
+        { label: 'Mobile Banking App', href: '#', icon: <Activity size={24} />, color: 'text-[#6AA84F]' },
     ];
 
-    const analytics: ProductItem[] = [
-        { label: 'Product analytics', href: '#', icon: <BarChart2 size={24} />, color: 'text-[#2F80FA]' },
-        { label: 'Web analytics', href: '#', icon: <Activity size={24} />, color: 'text-[#2F80FA]' },
-        { label: 'Session replay', href: '#', icon: <MousePointer2 size={24} />, color: 'text-[#EB9D2A]' },
-        { label: 'Feature flags', href: '#', icon: <Flag size={24} />, color: 'text-[#B62AD9]' },
-        { label: 'A/B testing', href: '#', icon: <Split size={24} />, color: 'text-[#B62AD9]' },
-        { label: 'Surveys', href: '#', icon: <MessageSquare size={24} />, color: 'text-[#F54E00]' },
+    const experiments: ProductItem[] = [
+        { label: 'AI Image Gen', href: '#', icon: <Split size={24} />, color: 'text-[#2F80FA]' },
+        { label: 'WebGL Earth', href: '#', icon: <MousePointer2 size={24} />, color: 'text-[#B62AD9]' },
+        { label: 'Retro Game Engine', href: '#', icon: <Flag size={24} />, color: 'text-[#F54E00]' },
+        { label: 'Chat Interface', href: '#', icon: <MessageSquare size={24} />, color: 'text-[#2F80FA]' },
     ];
 
     return (
         <div className="w-full">
-            <ProductSection title="PostHog data stack" count={9} items={dataStack} />
-            <ProductSection title="Analytics & Engineering" count={6} items={analytics} />
+            <ProductSection title="Core Projects" count={4} items={mainProjects} />
+            <ProductSection title="Experiments & Prototypes" count={4} items={experiments} />
         </div>
     );
 }

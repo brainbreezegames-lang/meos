@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
-
+import { motion } from 'framer-motion';
 
 interface CTAButtonProps {
     href?: string;
@@ -20,10 +20,10 @@ export default function CTAButton({
     onClick
 }: CTAButtonProps) {
 
-    const baseStyles = "inline-flex items-center justify-center rounded font-semibold transition-all duration-150 active:scale-95";
+    const baseStyles = "inline-flex items-center justify-center rounded font-semibold transition-colors duration-150";
 
     const variants = {
-        primary: "bg-[#EB9D2A] text-white hover:bg-[#CD8407] active:bg-[#B17506]",
+        primary: "bg-[#EB9D2A] text-white hover:bg-[#CD8407]",
         secondary: "bg-transparent text-[#23251D] border border-[#BFC1B7] hover:bg-[#E5E7E0] hover:border-[#9EA096]"
     };
 
@@ -35,17 +35,34 @@ export default function CTAButton({
 
     const combinedClassName = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
 
+    const animationProps = {
+        whileHover: { scale: 1.02, y: -1 },
+        whileTap: { scale: 0.95, y: 0 },
+        transition: { type: "spring", stiffness: 400, damping: 17 } as const
+    };
+
     if (href) {
+        // For Link, we need to wrap it since motion.link doesn't exist directly in older framer-motion versions or acts weirdly with Next.js Link
+        // Better to use motion.create(Link) or just wrap a motion.div
+        const MotionLink = motion(Link);
         return (
-            <Link href={href} className={combinedClassName}>
+            <MotionLink
+                href={href}
+                className={combinedClassName}
+                {...animationProps}
+            >
                 {children}
-            </Link>
+            </MotionLink>
         );
     }
 
     return (
-        <button onClick={onClick} className={combinedClassName}>
+        <motion.button
+            onClick={onClick}
+            className={combinedClassName}
+            {...animationProps}
+        >
             {children}
-        </button>
+        </motion.button>
     );
 }

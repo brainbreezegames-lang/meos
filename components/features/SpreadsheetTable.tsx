@@ -8,35 +8,35 @@ export default function SpreadsheetTable() {
     const posts = [
         {
             date: 'Jan 8, 2026',
-            title: 'What the AI Wizard taught us about LLM code generation at scale',
-            category: 'Engineering',
-            author: 'Danilo Campos',
-            avatar: '/images/avatars/danilo.jpg',
-            tags: ['LLM', 'AI']
+            title: 'Building a Design System from Scratch',
+            category: 'Design',
+            author: 'Demo User',
+            avatar: '/images/avatars/user.jpg',
+            tags: ['UI/UX', 'System']
         },
         {
             date: 'Jan 5, 2026',
-            title: 'PostHog 3000: The story behind the design',
-            category: 'Design',
-            author: 'Lottie Coxon',
-            avatar: '/images/avatars/lottie.jpg',
-            tags: ['Design System', 'Art']
+            title: 'Optimizing React Rendering Performance',
+            category: 'Engineering',
+            author: 'Demo User',
+            avatar: '/images/avatars/user.jpg',
+            tags: ['React', 'Performance']
         },
         {
             date: 'Dec 28, 2025',
-            title: 'How we built a data warehouse in a weekend',
-            category: 'Engineering',
-            author: 'James Hawkins',
-            avatar: '/images/avatars/james.jpg',
-            tags: ['ClickHouse', 'Data']
+            title: 'The Future of Web Operating Systems',
+            category: 'Thoughts',
+            author: 'Demo User',
+            avatar: '/images/avatars/user.jpg',
+            tags: ['WebOS', 'Concept']
         },
         {
             date: 'Dec 15, 2025',
-            title: 'Why we are removing all our managers',
-            category: 'Culture',
-            author: 'Charles Cook',
-            avatar: '/images/avatars/charles.jpg',
-            tags: ['Culture', 'Hiring']
+            title: 'Why I Switched from VS Code to Zed',
+            category: 'Tools',
+            author: 'Demo User',
+            avatar: '/images/avatars/user.jpg',
+            tags: ['Editor', 'productivity']
         }
     ];
 
@@ -46,7 +46,7 @@ export default function SpreadsheetTable() {
             {/* Spreadsheet Title (File Name) */}
             <div className="px-6 py-4 border-b border-[#E5E7E0]">
                 <h1 className="font-mono text-xl md:text-2xl text-[#23251D]">
-                    <span className="font-bold">posts</span><span className="opacity-50">.psheet</span>
+                    <span className="font-bold">articles</span><span className="opacity-50">.csv</span>
                 </h1>
             </div>
 

@@ -40,8 +40,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} font-sans bg-[#EEEFE9] text-[#23251D] selection:bg-[#2F80FA] selection:text-white overflow-hidden`}>
-        <div className="noise-overlay"></div>
+      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
+        <div className="desktop-bg fixed inset-0 z-[-1]" />
+
         <SessionProvider>
           <CommentProvider>{children}</CommentProvider>
         </SessionProvider>
