@@ -748,18 +748,19 @@ const contentContainer = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
+      staggerChildren: 0.15,
+      delayChildren: 0.4
     }
   }
 };
 
 const contentItem = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 200, damping: 20 }
   }
 };
 
