@@ -1214,7 +1214,7 @@ function Demo2PageInner() {
       ref={containerRef}
       className="min-h-screen relative overflow-hidden"
       style={{
-        backgroundImage: "url('/bg.jpg')",
+        backgroundImage: "url('/bg2.png')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         paddingTop: '48px'
