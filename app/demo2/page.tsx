@@ -192,11 +192,11 @@ function DesktopIcon({ data, onDoubleClick, isSelected, onSelect, position }: De
         <FileIconSVG type={data.icon} size={48} />
       </div>
       <span
-        className="text-[11px] leading-tight text-center break-words w-full px-1"
+        className="text-[11px] leading-tight text-center break-words w-full px-1 font-medium drop-shadow-md"
         style={{
           fontFamily: '"Source Code Pro", monospace',
-          color: '#23251D',
-          textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+          color: 'var(--text-primary)',
+          textShadow: '0 1px 3px rgba(0,0,0,0.8)',
         }}
       >
         {displayLabel}
@@ -244,13 +244,14 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
 
   return (
     <motion.div
-      className="rounded-md overflow-hidden flex flex-col"
+      className="rounded-xl overflow-hidden flex flex-col backdrop-blur-2xl"
       style={{
         ...windowStyle,
-        background: '#FFFFFF',
+        background: 'var(--bg-glass-elevated)',
+        border: '1px solid var(--border-medium)',
         boxShadow: isDragging
-          ? '0 0 0 1px #BFC1B7, 0 35px 60px -15px rgba(0, 0, 0, 0.35)'
-          : '0 0 0 1px #BFC1B7, 0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          ? '0 0 0 1px var(--border-highlight), var(--shadow-lg)'
+          : '0 0 0 1px var(--border-subtle), var(--shadow-lg)',
       }}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -270,10 +271,10 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
     >
       {/* Title Bar */}
       <div
-        className="h-10 flex items-center justify-between px-3 cursor-default select-none"
+        className="h-10 flex items-center justify-between px-3 cursor-default select-none border-b"
         style={{
-          background: '#E5E7E0',
-          borderBottom: '1px solid #BFC1B7',
+          background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0))',
+          borderColor: 'var(--border-subtle)',
         }}
         onPointerDown={(e) => {
           if (!win.isMaximized) {
@@ -336,7 +337,7 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
       <WindowToolbar />
 
       {/* Content */}
-      <div className="flex-1 overflow-auto" style={{ background: '#FFFFFF' }}>
+      <div className="flex-1 overflow-auto" style={{ background: 'var(--bg-app)' }}>
         {win.content}
       </div>
     </motion.div>
@@ -773,12 +774,10 @@ function TopNav({ minimizedWindows, onRestoreWindow }: {
 }) {
   return (
     <nav
-      className="fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-4 z-[1000]"
+      className="fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-6 z-[1000] backdrop-blur-xl border-b transition-all duration-300"
       style={{
-        background: 'rgba(229, 231, 224, 0.85)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid #BFC1B7',
+        background: 'var(--bg-glass-heavy)',
+        borderColor: 'var(--border-subtle)',
       }}
     >
       <div className="flex items-center gap-6">
