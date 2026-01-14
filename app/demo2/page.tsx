@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls, useSpring } from 'framer-motion';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // ============================================
@@ -1465,8 +1465,8 @@ function MagicCursor() {
 
   // Smooth spring physics for the cursor
   const springConfig = { damping: 25, stiffness: 400, mass: 0.5 };
-  const cursorX = motion.useSpring(0, springConfig);
-  const cursorY = motion.useSpring(0, springConfig);
+  const cursorX = useSpring(0, springConfig);
+  const cursorY = useSpring(0, springConfig);
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
