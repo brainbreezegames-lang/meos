@@ -249,10 +249,10 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
           ? '0 0 0 1px #BFC1B7, 0 35px 60px -15px rgba(0, 0, 0, 0.35)'
           : '0 0 0 1px #BFC1B7, 0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       }}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+      transition={{ type: "spring", stiffness: 350, damping: 25 }}
       drag={!win.isMaximized}
       dragControls={dragControls}
       dragListener={false}
@@ -742,167 +742,296 @@ function DemoContent() {
 }
 
 
+// Animation variants for content
+const contentContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const contentItem = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
+  }
+};
+
 function DocsContent() {
   return (
-    <div className="p-8 max-w-2xl mx-auto" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
-      <h2 className="text-2xl font-bold mb-4" style={{ color: '#23251D' }}>Documentation</h2>
+    <motion.div
+      className="p-8 max-w-2xl mx-auto"
+      style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+      variants={contentContainer}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.h2 variants={contentItem} className="text-3xl font-bold mb-6" style={{ color: '#23251D' }}>Documentation</motion.h2>
       <div className="space-y-4">
-        <div className="p-4 rounded border border-[#E5E7E0] bg-[#FDFDF8]">
-          <h3 className="font-semibold mb-2" style={{ color: '#23251D' }}>Getting Started</h3>
-          <p className="text-sm" style={{ color: '#4D4F46' }}>Learn how to set up your portfolio in minutes using our quickstart guide.</p>
-        </div>
-        <div className="p-4 rounded border border-[#E5E7E0] bg-[#FDFDF8]">
-          <h3 className="font-semibold mb-2" style={{ color: '#23251D' }}>Components</h3>
-          <p className="text-sm" style={{ color: '#4D4F46' }}>Explore our library of pre-built components for your desktop environment.</p>
-        </div>
-        <div className="p-4 rounded border border-[#E5E7E0] bg-[#FDFDF8]">
-          <h3 className="font-semibold mb-2" style={{ color: '#23251D' }}>API Reference</h3>
-          <p className="text-sm" style={{ color: '#4D4F46' }}>Detailed documentation for the MeOS API and customization options.</p>
-        </div>
+        {[
+          { title: 'Getting Started', desc: 'Learn how to set up your portfolio in minutes.' },
+          { title: 'Components', desc: 'Explore our library of pre-built components.' },
+          { title: 'API Reference', desc: 'Detailed documentation for the MeOS API.' }
+        ].map((item, i) => (
+          <motion.div
+            key={i}
+            variants={contentItem}
+            className="p-5 rounded-xl border border-[#E5E7E0] bg-[#FDFDF8] hover:border-[#BFC1B7] hover:shadow-md cursor-pointer transition-all group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold text-lg group-hover:text-[#2F80FA] transition-colors" style={{ color: '#23251D' }}>{item.title}</h3>
+              <span className="text-[#BFC1B7] group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: '#4D4F46' }}>{item.desc}</p>
+          </motion.div>
+        ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function ContactContent() {
   return (
-    <div className="p-8 flex flex-col items-center justify-center h-full text-center" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
-      <div className="w-16 h-16 rounded-full bg-[#E5E7E0] flex items-center justify-center mb-4 text-2xl">👋</div>
-      <h2 className="text-2xl font-bold mb-2" style={{ color: '#23251D' }}>Let's Talk</h2>
-      <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: '#4D4F46' }}>We're here to help you build the perfect portfolio. Reach out for support or enterprise inquiries.</p>
-      <button className="px-6 py-2 rounded bg-[#23251D] text-white text-sm font-medium hover:opacity-90">
+    <motion.div
+      className="p-8 flex flex-col items-center justify-center h-full text-center"
+      style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+      variants={contentContainer}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={contentItem} className="w-20 h-20 rounded-full bg-[#E5E7E0] flex items-center justify-center mb-6 text-3xl shadow-sm">
+        👋
+      </motion.div>
+      <motion.h2 variants={contentItem} className="text-3xl font-bold mb-3" style={{ color: '#23251D' }}>Let's Talk</motion.h2>
+      <motion.p variants={contentItem} className="text-[15px] mb-8 max-w-xs mx-auto leading-relaxed" style={{ color: '#4D4F46' }}>
+        We're here to help you build the perfect portfolio. Reach out for support or enterprise inquiries.
+      </motion.p>
+      <motion.button
+        variants={contentItem}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="px-8 py-3 rounded-full bg-[#23251D] text-white text-sm font-semibold hover:opacity-90 shadow-lg hover:shadow-xl transition-all"
+      >
         Send us an email
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }
 
 function WhyContent() {
   return (
-    <div className="p-8" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
-      <h2 className="text-2xl font-bold mb-6" style={{ color: '#23251D' }}>Why MeOS?</h2>
-      <div className="grid gap-6">
-        <div>
-          <h3 className="font-semibold mb-1" style={{ color: '#23251D' }}>Stand Out</h3>
-          <p className="text-sm" style={{ color: '#4D4F46' }}>In a sea of identical static sites, give your visitors a memorable, interactive experience they'll actually remember.</p>
-        </div>
-        <div>
-          <h3 className="font-semibold mb-1" style={{ color: '#23251D' }}>Show, Don't Just Tell</h3>
-          <p className="text-sm" style={{ color: '#4D4F46' }}>Demonstrate your technical capability by presenting your work in a fully functional simulated OS environment.</p>
-        </div>
-        <div>
-          <h3 className="font-semibold mb-1" style={{ color: '#23251D' }}>Joy of Computing</h3>
-          <p className="text-sm" style={{ color: '#4D4F46' }}>Bring back the fun of personal computing with a retro-inspired yet modern interface.</p>
-        </div>
+    <motion.div
+      className="p-8"
+      style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+      variants={contentContainer}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.h2 variants={contentItem} className="text-3xl font-bold mb-8" style={{ color: '#23251D' }}>Why MeOS?</motion.h2>
+      <div className="grid gap-8">
+        {[
+          { title: 'Stand Out', desc: 'In a sea of identical static sites, give your visitors a memorable experience.', icon: '✨' },
+          { title: 'Show, Don\'t Tell', desc: 'Demonstrate your technical capability by presenting your work in a fully functional OS.', icon: '🛠️' },
+          { title: 'Joy of Computing', desc: 'Bring back the fun of personal computing with a retro-inspired interface.', icon: '💾' }
+        ].map((item, i) => (
+          <motion.div variants={contentItem} key={i} className="flex gap-4">
+            <div className="w-12 h-12 shrink-0 rounded-full bg-[#F5F5F3] flex items-center justify-center text-xl border border-[#E5E7E0]">{item.icon}</div>
+            <div>
+              <h3 className="font-bold text-lg mb-1" style={{ color: '#23251D' }}>{item.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#4D4F46' }}>{item.desc}</p>
+            </div>
+          </motion.div>
+        ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function ChangelogContent() {
   return (
-    <div className="p-6" style={{ fontFamily: '"Source Code Pro", monospace' }}>
-      <h2 className="text-xl font-bold mb-4" style={{ color: '#23251D' }}>CHANGELOG.md</h2>
-      <div className="space-y-6 border-l-2 border-[#E5E7E0] pl-4">
-        <div>
-          <div className="text-xs font-bold text-[#EB9D2A] mb-1">v2.1.0 (Current)</div>
-          <ul className="text-sm space-y-1" style={{ color: '#4D4F46' }}>
-            <li>- Added spring physics to window interactions</li>
-            <li>- Implemented dark/light mode toggle system</li>
-            <li>- Improved mobile responsiveness</li>
+    <motion.div
+      className="p-6 h-full overflow-auto"
+      style={{ fontFamily: '"Source Code Pro", monospace' }}
+      variants={contentContainer}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.h2 variants={contentItem} className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: '#23251D' }}>
+        <span>CHANGELOG.md</span>
+        <span className="text-xs px-2 py-0.5 rounded bg-[#E5E7E0] text-[#4D4F46] font-normal">v2.1.0</span>
+      </motion.h2>
+
+      <div className="relative border-l-2 border-[#E5E7E0] pl-6 space-y-8 ml-2">
+        <motion.div variants={contentItem} className="relative">
+          <div className="absolute -left-[31px] top-1.5 w-3 h-3 rounded-full bg-[#EB9D2A] border-2 border-[#fff]" />
+          <div className="text-sm font-bold text-[#EB9D2A] mb-2">v2.1.0 (Current)</div>
+          <ul className="text-sm space-y-2" style={{ color: '#4D4F46' }}>
+            <li>+ Added spring physics to window interactions</li>
+            <li>+ Implemented dark/light mode toggle system</li>
+            <li>+ Improved mobile responsiveness</li>
+            <li>* Fixed layout shift on window resize</li>
           </ul>
-        </div>
-        <div>
-          <div className="text-xs font-bold text-[#4D4F46] mb-1">v2.0.0</div>
-          <ul className="text-sm space-y-1" style={{ color: '#4D4F46' }}>
-            <li>- Complete rewrite of the window manager</li>
-            <li>- Added support for multiple workspaces</li>
-            <li>- New file system architecture</li>
+        </motion.div>
+
+        <motion.div variants={contentItem} className="relative">
+          <div className="absolute -left-[31px] top-1.5 w-3 h-3 rounded-full bg-[#BFC1B7] border-2 border-[#fff]" />
+          <div className="text-sm font-bold text-[#4D4F46] mb-2">v2.0.0</div>
+          <ul className="text-sm space-y-2" style={{ color: '#4D4F46' }}>
+            <li>+ Complete rewrite of the window manager</li>
+            <li>+ Added support for multiple workspaces</li>
+            <li>+ New file system architecture</li>
           </ul>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function GalleryContent() {
   return (
-    <div className="p-6 grid grid-cols-2 gap-4" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+    <motion.div
+      className="p-6 grid grid-cols-2 gap-4"
+      style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+      variants={contentContainer}
+      initial="hidden"
+      animate="show"
+    >
       {[1, 2, 3, 4].map(i => (
-        <div key={i} className="aspect-video bg-[#E5E7E0] rounded flex items-center justify-center relative overflow-hidden group cursor-pointer">
-          <span className="text-xs text-[#73756B]">Image {i}</span>
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-        </div>
+        <motion.div
+          key={i}
+          variants={contentItem}
+          className="aspect-video bg-[#F5F5F3] rounded-lg border border-[#E5E7E0] flex items-center justify-center relative overflow-hidden group cursor-pointer shadow-sm hover:shadow-md transition-all"
+        >
+          <div className="absolute inset-0 flex items-center justify-center opacity-30 text-4xl grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500">
+            {['🏔️', '🌊', '🏜️', '🌲'][i - 1]}
+          </div>
+          <span className="relative z-10 text-xs font-medium bg-white/80 backdrop-blur px-2 py-1 rounded shadow-sm opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 text-[#23251D]">View Image {i}</span>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }
 
 function StoreContent() {
   return (
-    <div className="p-6" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
-      <div className="flex items-center justify-between mb-6">
+    <motion.div
+      className="p-6 h-full flex flex-col"
+      style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+      variants={contentContainer}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={contentItem} className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold" style={{ color: '#23251D' }}>App Store</h2>
-        <span className="text-xs bg-[#E5E7E0] px-2 py-1 rounded">2 Updates</span>
-      </div>
-      <div className="space-y-3">
-        {['Terminal', 'Notes', 'Music Player', 'Browser'].map(app => (
-          <div key={app} className="flex items-center justify-between p-3 rounded border border-[#E5E7E0] bg-[#FDFDF8]">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded bg-[#E5E7E0]" />
+        <span className="text-xs bg-[#E5E7E0] px-2 py-1 rounded text-[#4D4F46] font-medium">2 Updates Available</span>
+      </motion.div>
+
+      <div className="space-y-4 overflow-auto pr-2">
+        {[
+          { name: 'Terminal', cat: 'Developer Tools', icon: 'Cmd' },
+          { name: 'Notes', cat: 'Productivity', icon: 'N' },
+          { name: 'Spotify', cat: 'Music & Audio', icon: 'S' },
+          { name: 'Browser', cat: 'Internet', icon: 'W' }
+        ].map((app, i) => (
+          <motion.div
+            key={i}
+            variants={contentItem}
+            className="flex items-center justify-between p-3 rounded-xl border border-[#E5E7E0] bg-[#FDFDF8] hover:border-[#BFC1B7] transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#E5E7E0] to-[#D1D3CC] flex items-center justify-center font-bold text-[#4D4F46] shadow-inner">
+                {app.icon}
+              </div>
               <div>
-                <div className="text-sm font-semibold" style={{ color: '#23251D' }}>{app}</div>
-                <div className="text-xs text-[#73756B]">Productivity</div>
+                <div className="text-sm font-bold" style={{ color: '#23251D' }}>{app.name}</div>
+                <div className="text-xs text-[#73756B]">{app.cat}</div>
               </div>
             </div>
-            <button className="px-3 py-1 rounded-full bg-[#E5E7E0] text-xs font-semibold text-[#4D4F46]">GET</button>
-          </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-4 py-1.5 rounded-full bg-[#E5E7E0] text-xs font-bold text-[#2052a3] hover:bg-[#2052a3] hover:text-white transition-colors"
+            >
+              GET
+            </motion.button>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function CareersContent() {
   return (
-    <div className="p-8 text-center" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
-      <h2 className="text-2xl font-bold mb-2" style={{ color: '#23251D' }}>Join the team</h2>
-      <p className="text-sm text-[#4D4F46] mb-8">We're building the future of personal websites. Help us make the web fun again.</p>
+    <motion.div
+      className="p-8 text-center h-full flex flex-col items-center justify-center"
+      style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+      variants={contentContainer}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.h2 variants={contentItem} className="text-2xl font-bold mb-2" style={{ color: '#23251D' }}>Join the team</motion.h2>
+      <motion.p variants={contentItem} className="text-sm text-[#4D4F46] mb-8 max-w-sm mx-auto">
+        We're building the future of personal websites. Help us make the web fun again.
+      </motion.p>
 
-      <div className="text-left space-y-4">
-        <div className="p-4 border border-[#E5E7E0] rounded hover:border-[#BFC1B7] cursor-pointer transition-colors bg-[#FDFDF8]">
-          <div className="font-semibold text-[#23251D]">Senior Frontend Engineer</div>
-          <div className="text-xs text-[#73756B]">Remote • React, WebGL, Next.js</div>
-        </div>
-        <div className="p-4 border border-[#E5E7E0] rounded hover:border-[#BFC1B7] cursor-pointer transition-colors bg-[#FDFDF8]">
-          <div className="font-semibold text-[#23251D]">Product Designer</div>
-          <div className="text-xs text-[#73756B]">Remote • UI/UX, Motion</div>
-        </div>
+      <div className="text-left space-y-3 w-full max-w-sm">
+        {[
+          { role: 'Senior Frontend Engineer', type: 'Remote • React, WebGL' },
+          { role: 'Product Designer', type: 'Remote • UI/UX, Motion' }
+        ].map((job, i) => (
+          <motion.div
+            key={i}
+            variants={contentItem}
+            whileHover={{ y: -2, borderColor: '#BFC1B7' }}
+            className="p-4 border border-[#E5E7E0] rounded-lg cursor-pointer transition-all bg-[#FDFDF8] hover:shadow-md group"
+          >
+            <div className="font-semibold text-[#23251D] group-hover:text-[#2F80FA] transition-colors">{job.role}</div>
+            <div className="text-xs text-[#73756B] mt-1">{job.type}</div>
+          </motion.div>
+        ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function GenericContent({ title }: { title: string }) {
   return (
-    <div className="p-8 flex flex-col items-center justify-center h-full" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+    <motion.div
+      className="p-8 flex flex-col items-center justify-center h-full"
+      style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+    >
       <div className="text-6xl mb-4">📄</div>
       <h2 className="text-xl font-bold mb-2" style={{ color: '#23251D' }}>{title}</h2>
       <p className="text-sm" style={{ color: '#4D4F46' }}>Double-click desktop icons to open more windows</p>
-    </div>
+    </motion.div>
   );
 }
 
 function TrashContent() {
   return (
-    <div className="p-8 flex flex-col items-center justify-center h-full" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
+    <motion.div
+      className="p-8 flex flex-col items-center justify-center h-full"
+      style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+    >
       <div className="text-6xl mb-4">🗑️</div>
       <h2 className="text-xl font-bold mb-2" style={{ color: '#23251D' }}>Trash is empty</h2>
       <p className="text-sm" style={{ color: '#73756B' }}>Nothing to see here...</p>
-    </div>
+    </motion.div>
   );
 }
-
 // ============================================
 // Top Navigation Bar
 // ============================================
