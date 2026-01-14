@@ -1265,12 +1265,6 @@ function Demo2PageInner() {
       ref={containerRef}
       className="min-h-screen relative overflow-hidden"
       style={{
-        backgroundColor: '#E8DCCC',
-        backgroundImage: `
-          radial-gradient(circle at 30% 80%, rgba(139, 92, 50, 0.08) 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, rgba(180, 140, 100, 0.06) 0%, transparent 40%),
-          linear-gradient(180deg, rgba(232, 220, 204, 0) 0%, rgba(210, 195, 175, 0.3) 100%)
-        `,
         paddingTop: '48px'
       }}
       onClick={handleDesktopClick}
@@ -1476,18 +1470,19 @@ function AmbientOverlay() {
     <div className="fixed inset-0 pointer-events-none z-[0]">
       {/* Moving Fog/Mesh Gradient Animation */}
       <motion.div
-        className="absolute inset-0 opacity-60"
+        className="absolute inset-0 opacity-100" // Increased opacity
         animate={{
           backgroundPosition: ['0% 0%', '100% 50%'],
         }}
         transition={{
           repeat: Infinity,
           repeatType: "mirror",
-          duration: 15,
+          duration: 20,
           ease: "linear"
         }}
         style={{
-          background: `
+          backgroundColor: '#E8DCCC', // Moved base color here
+          backgroundImage: `
             radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.05) 100%),
             radial-gradient(at 0% 0%, rgba(245, 166, 35, 0.08) 0px, transparent 50%),
             radial-gradient(at 100% 0%, rgba(29, 31, 39, 0.08) 0px, transparent 50%),
