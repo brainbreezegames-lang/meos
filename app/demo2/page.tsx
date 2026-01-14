@@ -251,9 +251,9 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
           ? '0 0 0 1px rgba(0,0,0,0.08), 0 40px 80px -20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0,0,0,0.05)'
           : '0 0 0 1px rgba(0,0,0,0.06), 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 30px rgba(0,0,0,0.03)',
       }}
-      initial={{ opacity: 0, scale: 0.9, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
       transition={{ type: "spring", stiffness: 350, damping: 25 }}
       drag={!win.isMaximized}
       dragControls={dragControls}
