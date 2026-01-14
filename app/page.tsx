@@ -5,6 +5,7 @@ import SoftwareBox from '@/components/features/SoftwareBox';
 import VisitorCounter from '@/components/features/VisitorCounter';
 import CTAButton from '@/components/ui/CTAButton';
 import WindowToolbar from '@/components/window/WindowToolbar';
+import ProductGrid from '@/components/features/ProductGrid';
 import { Zap } from 'lucide-react';
 
 export default function Home() {
@@ -66,18 +67,10 @@ export default function Home() {
 
               <div className="border-t border-[#E5E7E0] my-12"></div>
 
-              {/* Products Grid Placeholder - Will be expanded in next phase */}
+              {/* Products Grid */}
               <div className="text-center mb-12">
                 <h3 className="text-xl font-bold mb-6">Explore the Product OS</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
-                  {/* Just visual placeholders for now */}
-                  {['Product Analytics', 'Session Replay', 'Feature Flags', 'A/B Testing'].map((p) => (
-                    <div key={p} className="p-4 border border-[#BFC1B7] rounded bg-[#FDFDF8] hover:bg-[#EEEFE9] cursor-pointer transition-colors">
-                      <div className="w-10 h-10 bg-[#E5E7E0] rounded mx-auto mb-2"></div>
-                      <span className="text-sm font-medium">{p}</span>
-                    </div>
-                  ))}
-                </div>
+                <ProductGrid />
               </div>
 
               <VisitorCounter />

@@ -135,6 +135,7 @@ body {
 }
 
 /* Noise Overlay (Optional - keeping valid if user wants it, but making it subtle) */
+/* Noise Overlay */
 .noise-overlay {
     position: fixed;
     top: 0;
@@ -145,4 +146,55 @@ body {
     z-index: 9999;
     opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   POLISH & ANIMATIONS
+   ============================================ */
+
+/* Smooth interactions */
+a,
+button {
+    transition: all 0.15s ease;
+}
+
+/* Card hover lift */
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Text selections */
+::selection {
+    background: var(--accent-blue);
+    color: white;
+}
+
+/* Custom Scrollbar for Windows */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D0D1C9;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #B6B7AF;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .desktop-bg {
+        background-image: none;
+        /* Remove hedgehog scene on mobile to avoid clutter */
+    }
 }
