@@ -286,11 +286,11 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
           : '0 0 0 1px rgba(0,0,0,0.06), 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 30px rgba(0,0,0,0.03)',
         cursor: isDragging ? 'grabbing' : 'default',
       }}
-      initial={{ opacity: 0, scale: 0.95 }}
+      initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      drag={!win.isMaximized}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+      onMouseDown={onFocus}
     >
       {/* Title Bar */}
       <div
@@ -1463,84 +1463,26 @@ function DockItem({ mouseX, item, onClick }: { mouseX: any, item: typeof DOCK_IT
 }
 
 // ============================================
-// Animated Background (Aurora/Orbs)
+// Animated Background (Lightweight CSS)
 // ============================================
 function AmbientOverlay() {
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none" style={{ background: '#E8DCCC' }}>
-      {/* Orb 1: Orange/Warm */}
-      <motion.div
-        className="absolute w-[60vw] h-[60vw] rounded-full blur-[100px] opacity-40 mix-blend-multiply"
-        style={{
-          background: 'radial-gradient(circle, #EB9D2A 0%, rgba(235, 157, 42, 0) 70%)',
-          top: '-10%',
-          left: '-10%',
-        }}
-        animate={{
-          x: [0, 100, 0],
-          y: [0, 50, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "easeInOut"
-        }}
-      />
-
-      {/* Orb 2: Violet/Cool */}
-      <motion.div
-        className="absolute w-[50vw] h-[50vw] rounded-full blur-[90px] opacity-30 mix-blend-multiply"
-        style={{
-          background: 'radial-gradient(circle, #8B5CF6 0%, rgba(139, 92, 246, 0) 70%)',
-          top: '20%',
-          right: '-10%',
-        }}
-        animate={{
-          x: [0, -80, 0],
-          y: [0, 100, 0],
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "easeInOut",
-          delay: 1
-        }}
-      />
-
-      {/* Orb 3: Teal/Fresh (adds complexity) */}
-      <motion.div
-        className="absolute w-[45vw] h-[45vw] rounded-full blur-[80px] opacity-25 mix-blend-multiply"
-        style={{
-          background: 'radial-gradient(circle, #10B981 0%, rgba(16, 185, 129, 0) 70%)',
-          bottom: '-10%',
-          left: '20%',
-        }}
-        animate={{
-          x: [0, 50, 0],
-          y: [0, -80, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 22,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "easeInOut",
-          delay: 2
-        }}
-      />
-
-      {/* Noise Texture Overlay */}
+    <>
+      <style>{`
+        @keyframes gradientShift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+      `}</style>
       <div
-        className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+        className="fixed inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          background: 'linear-gradient(-45deg, #E8DCCC, #F5EDE0, #E0D4C4, #EBE3D8)',
+          backgroundSize: '400% 400%',
+          animation: 'gradientShift 15s ease infinite',
         }}
       />
-    </div>
+    </>
   );
 }
 
