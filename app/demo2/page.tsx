@@ -295,7 +295,7 @@ function Window({ window: win, onClose, onMinimize, onMaximize, onFocus, onDragE
 
         {/* Center - Title */}
         <div className="flex items-center gap-1">
-          <span className="text-[13px] font-medium" style={{ color: '#23251D', fontFamily: '"IBM Plex Sans", sans-serif' }}>
+          <span className="text-[13px] font-medium" style={{ color: 'var(--text-primary)', fontFamily: '"IBM Plex Sans", sans-serif' }}>
             {win.title}
           </span>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -555,7 +555,7 @@ function HomeContent() {
         {/* Pricing */}
         <div>
           <p className="text-xs font-medium mb-2" style={{ color: '#73756B' }}>Digital download*</p>
-          <h2 className="text-4xl font-bold mb-2" style={{ color: '#23251D' }}>
+          <h2 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
             Starts at: <span style={{ color: '#EB9D2A' }}>$0</span>
             <span className="ml-3 text-sm px-2 py-1 rounded" style={{ background: '#EB9D2A', color: 'white' }}>
               FREE
@@ -576,7 +576,7 @@ function HomeContent() {
               <path d="M2 12h4l3-9 6 18 3-9h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <p className="text-sm" style={{ color: '#4D4F46', lineHeight: 1.6 }}>
-              <strong style={{ color: '#23251D' }}>Hurry:</strong>{' '}
+              <strong style={{ color: 'var(--text-primary)' }}>Hurry:</strong>{' '}
               <span style={{ color: '#EB9D2A' }}>{signupCount.toLocaleString()}</span> companies signed up{' '}
               <strong style={{ color: '#EB9D2A' }}>today</strong>.
               Act now and get $0 off your first order.
@@ -624,7 +624,7 @@ function ProductsContent() {
 
   return (
     <div className="p-6" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
-      <h2 className="text-xl font-bold mb-2" style={{ color: '#23251D' }}>Product OS</h2>
+      <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Product OS</h2>
       <p className="text-sm mb-6" style={{ color: '#4D4F46' }}>Everything you need to build a stunning portfolio</p>
 
       <div className="grid grid-cols-3 gap-3">
@@ -651,7 +651,7 @@ function PricingContent() {
   return (
     <div className="p-6" style={{ fontFamily: '"Source Code Pro", monospace' }}>
       <div className="mb-4">
-        <span className="font-bold" style={{ color: '#23251D' }}>pricing</span>
+        <span className="font-bold" style={{ color: 'var(--text-primary)' }}>pricing</span>
         <span style={{ color: '#73756B' }}>.psheet</span>
       </div>
 
@@ -667,7 +667,7 @@ function PricingContent() {
           { plan: 'Team', price: '$29/mo', features: 'Everything' },
         ].map((row, i) => (
           <div key={i} className="flex" style={{ borderBottom: i < 2 ? '1px solid #E5E7E0' : 'none' }}>
-            <div className="flex-1 p-3 text-sm" style={{ color: '#23251D' }}>{row.plan}</div>
+            <div className="flex-1 p-3 text-sm" style={{ color: 'var(--text-primary)' }}>{row.plan}</div>
             <div className="w-24 p-3 text-sm text-center" style={{ color: '#EB9D2A', borderLeft: '1px solid #E5E7E0' }}>{row.price}</div>
             <div className="w-32 p-3 text-sm text-center" style={{ color: '#4D4F46', borderLeft: '1px solid #E5E7E0' }}>{row.features}</div>
           </div>
@@ -687,14 +687,14 @@ function CustomersContent() {
   return (
     <div className="p-6" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
       <div className="mb-4" style={{ fontFamily: '"Source Code Pro", monospace' }}>
-        <span className="font-bold text-lg" style={{ color: '#23251D' }}>posts</span>
+        <span className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>posts</span>
         <span style={{ color: '#73756B' }}>.psheet</span>
       </div>
 
       <div className="border rounded overflow-hidden" style={{ borderColor: '#BFC1B7' }}>
         <div className="flex items-center gap-2 px-3 py-2" style={{ background: '#FDFDF8', borderBottom: '1px solid #E5E7E0' }}>
           <span className="text-xs" style={{ color: '#73756B' }}>where</span>
-          <strong className="text-xs" style={{ color: '#23251D' }}>category</strong>
+          <strong className="text-xs" style={{ color: 'var(--text-primary)' }}>category</strong>
           <span className="text-xs" style={{ color: '#73756B' }}>eq</span>
           <select className="h-6 px-2 text-xs rounded" style={{ background: '#fff', border: '1px solid #BFC1B7' }}>
             <option>Blog</option>
@@ -714,7 +714,7 @@ function CustomersContent() {
             {posts.map((post, i) => (
               <tr key={i} style={{ borderBottom: '1px solid #E5E7E0' }}>
                 <td className="p-2" style={{ color: '#4D4F46' }}>{post.date}</td>
-                <td className="p-2 font-medium" style={{ color: '#23251D' }}>{post.title}</td>
+                <td className="p-2 font-medium" style={{ color: 'var(--text-primary)' }}>{post.title}</td>
                 <td className="p-2">
                   {post.tags.map(t => (
                     <span key={t} className="mr-1 text-xs" style={{ color: '#2F80FA' }}>{t}</span>
@@ -749,7 +749,7 @@ function GenericContent({ title }: { title: string }) {
   return (
     <div className="p-8 flex flex-col items-center justify-center h-full" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
       <div className="text-6xl mb-4">📄</div>
-      <h2 className="text-xl font-bold mb-2" style={{ color: '#23251D' }}>{title}</h2>
+      <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h2>
       <p className="text-sm" style={{ color: '#4D4F46' }}>Double-click desktop icons to open more windows</p>
     </div>
   );
@@ -759,7 +759,7 @@ function TrashContent() {
   return (
     <div className="p-8 flex flex-col items-center justify-center h-full" style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}>
       <div className="text-6xl mb-4">🗑️</div>
-      <h2 className="text-xl font-bold mb-2" style={{ color: '#23251D' }}>Trash is empty</h2>
+      <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Trash is empty</h2>
       <p className="text-sm" style={{ color: '#73756B' }}>Nothing to see here...</p>
     </div>
   );
@@ -787,7 +787,7 @@ function TopNav({ minimizedWindows, onRestoreWindow }: {
             <button
               key={item}
               className="px-2.5 py-1 text-[13px] font-medium rounded hover:bg-black/5"
-              style={{ color: '#23251D', fontFamily: '"IBM Plex Sans", sans-serif' }}
+              style={{ color: 'var(--text-primary)', fontFamily: '"IBM Plex Sans", sans-serif' }}
             >
               {item}
             </button>
