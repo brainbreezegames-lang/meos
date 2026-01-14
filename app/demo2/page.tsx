@@ -1386,28 +1386,33 @@ function Dock({ onAppClick }: { onAppClick: (id: string) => void }) {
 
   return (
     <motion.div
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000] px-4 pb-3 pt-3.5 rounded-2xl flex items-end gap-3 dock-container"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[2000] px-3 py-2 rounded-2xl flex items-end gap-2"
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.3, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
       style={{
-        background: 'rgba(255, 255, 255, 0.4)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.2)',
-        height: 64, // Fixed height container
-        display: 'flex',
-        alignItems: 'center', // Center items vertically
+        background: 'rgba(255, 255, 255, 0.72)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        border: '1px solid rgba(255, 255, 255, 0.4)',
+        boxShadow: `
+          0 0 0 0.5px rgba(0,0,0,0.04),
+          0 2px 8px rgba(0,0,0,0.04),
+          0 12px 32px rgba(0,0,0,0.08),
+          inset 0 1px 0 rgba(255,255,255,0.6)
+        `,
       }}
     >
-      {DOCK_ITEMS.map((item) => (
-        <DockItem key={item.id} mouseX={mouseX} item={item} onClick={() => onAppClick(item.id)} />
+      {DOCK_ITEMS.map((item, i) => (
+        <DockItem key={item.id} mouseX={mouseX} item={item} onClick={() => onAppClick(item.id)} index={i} />
       ))}
     </motion.div>
   );
 }
 
-function DockItem({ mouseX, item, onClick }: { mouseX: any, item: typeof DOCK_ITEMS[0], onClick: () => void }) {
+function DockItem({ mouseX, item, onClick, index }: { mouseX: any, item: typeof DOCK_ITEMS[0], onClick: () => void, index: number }) {
   const ref = useRef<HTMLButtonElement>(null);
 
   const distance = useTransform(mouseX, (val: number) => {
@@ -1415,71 +1420,79 @@ function DockItem({ mouseX, item, onClick }: { mouseX: any, item: typeof DOCK_IT
     return val - bounds.x - bounds.width / 2;
   });
 
-  const widthSync = useTransform(distance, [-150, 0, 150], [50, 90, 50]);
-  const width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 });
+  const widthSync = useTransform(distance, [-120, 0, 120], [48, 72, 48]);
+  const width = useSpring(widthSync, { mass: 0.1, stiffness: 200, damping: 15 });
 
   return (
     <motion.button
       ref={ref}
       onClick={onClick}
-      className="relative flex flex-col items-center justify-center rounded-xl overflow-hidden shadow-lg group"
+      className="relative flex items-center justify-center rounded-xl overflow-hidden group"
       style={{
         width,
-        height: width, // Keep aspect ratio
+        height: width,
         background: '#FFFFFF',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
       }}
-      whileHover={{
-        zIndex: 50,
-      }}
-      whileTap={{ scale: 0.9 }}
-      initial={{ y: 100, opacity: 0 }}
+      whileTap={{ scale: 0.92 }}
+      initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
+      transition={{ delay: 0.1 * index, duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
     >
       <div
         className="w-full h-full flex items-center justify-center relative"
         style={{
-          background: `linear-gradient(135deg, ${item.color}15, ${item.color}05)`,
+          background: `linear-gradient(145deg, ${item.color}12, ${item.color}04)`,
         }}
       >
-        <FileIconSVG type={item.icon} size={28} />
-
-        {/* Gloss overlay */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-white/40 pointer-events-none" />
-
-        {/* Tooltip */}
-        <div
-          className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
-          style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
-        >
-          {item.label}
-        </div>
+        <FileIconSVG type={item.icon} size={24} />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
       </div>
 
-      {/* Active Dot indicator (mock) */}
-      <div className="absolute -bottom-2 w-1 h-1 rounded-full bg-[#4D4F46] opacity-0 group-hover:opacity-100" />
+      {/* Tooltip */}
+      <motion.div
+        className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
+        style={{
+          background: 'rgba(30, 30, 30, 0.9)',
+          backdropFilter: 'blur(8px)',
+          color: 'white',
+          fontSize: '11px',
+          fontFamily: '"IBM Plex Sans", sans-serif',
+          fontWeight: 500,
+        }}
+      >
+        {item.label}
+      </motion.div>
     </motion.button>
   );
 }
 
 // ============================================
-// Animated Background (Lightweight CSS)
+// Animated Background (Premium Gradient)
 // ============================================
 function AmbientOverlay() {
   return (
     <>
       <style>{`
         @keyframes gradientShift {
-          0%, 100% { background-position: 0% 50%; }
+          0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
       `}</style>
       <div
         className="fixed inset-0 z-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(-45deg, #E8DCCC, #F5EDE0, #E0D4C4, #EBE3D8)',
+          background: 'linear-gradient(-45deg, #EDE6DC, #F7F2EA, #E5DED2, #F0EBE3, #E8E1D5)',
           backgroundSize: '400% 400%',
-          animation: 'gradientShift 15s ease infinite',
+          animation: 'gradientShift 20s ease-in-out infinite',
+        }}
+      />
+      {/* Subtle vignette for depth */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.03) 100%)',
         }}
       />
     </>
