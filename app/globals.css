@@ -2,8 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Typography: Averia Serif Libre (headings) + Instrument Sans (body) */
-@import url('https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@400;700&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+/* Typography loaded via next/font/google in layout.tsx:
+   - Averia Serif Libre (headings) → var(--font-averia)
+   - Instrument Sans (body) → var(--font-instrument)
+*/
 
 :root {
     /* ============================================
@@ -136,8 +138,8 @@
 
 .theme-sketch {
     /* ========== TYPOGRAPHY ========== */
-    --font-display: 'Averia Serif Libre', Georgia, serif;
-    --font-body: 'Instrument Sans', system-ui, sans-serif;
+    --font-display: var(--font-averia), Georgia, serif;
+    --font-body: var(--font-instrument), system-ui, sans-serif;
 
     /* Type Scale (1.25 ratio - warm & approachable) */
     --text-display: 2rem;        /* 32px - Hero text */

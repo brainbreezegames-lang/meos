@@ -95,7 +95,7 @@ const MemoizedDesktopIcon = React.memo(({ label, icon, onClick, badge, isActive 
         </motion.div>
         <span
             className="text-xs text-[#2a2a2a] text-center leading-tight select-none"
-            style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 500 }}
+            style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
         >
             {label}
         </span>
@@ -350,7 +350,7 @@ const HonkButton = React.memo(() => {
 
             <motion.span
                 className="text-xs text-[#2a2a2a]"
-                style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 600 }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: 600 }}
                 animate={isHonking ? { scale: [1, 1.2, 1] } : {}}
             >
                 Honk{honkCount > 0 ? ` ×${honkCount}` : ''} 🔥
@@ -481,7 +481,7 @@ const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
             <motion.span
                 animate={checked ? { opacity: 0.4 } : { opacity: 1 }}
                 className={`text-sm text-[#2a2a2a] ${checked ? 'line-through' : isHot ? 'text-[#D64C00]' : ''}`}
-                style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: isHot ? 600 : checked ? 400 : 500 }}
+                style={{ fontFamily: "var(--font-body)", fontWeight: isHot ? 600 : checked ? 400 : 500 }}
             >
                 {label}
             </motion.span>
@@ -572,7 +572,7 @@ function SketchWindow({
                     {win.icon && <span className="opacity-60">{win.icon}</span>}
                     <span
                         className="text-base text-[#1a1a1a]"
-                        style={{ fontFamily: "'Averia Serif Libre', Georgia, serif", fontWeight: 700 }}
+                        style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
                     >
                         {win.title}
                     </span>
@@ -714,7 +714,7 @@ export default function GoOSPage() {
                 <div className="flex items-center gap-8">
                     <span
                         className="text-xl tracking-tight text-[#1a1a1a]"
-                        style={{ fontFamily: "'Averia Serif Libre', Georgia, serif", fontWeight: 700 }}
+                        style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
                     >
                         goOS
                     </span>
@@ -723,14 +723,14 @@ export default function GoOSPage() {
                             <span
                                 key={item}
                                 className="cursor-pointer text-[#3a3a3a] hover:text-orange-600 transition-colors"
-                                style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 500 }}
+                                style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
                             >
                                 {item}
                             </span>
                         ))}
                     </nav>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-[#3a3a3a]" style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif" }}>
+                <div className="flex items-center gap-4 text-sm text-[#3a3a3a]" style={{ fontFamily: "var(--font-body)" }}>
                     <div className="flex items-center gap-1.5">
                         <Battery size={15} strokeWidth={2} />
                         <span className="font-medium">87%</span>
@@ -756,7 +756,7 @@ export default function GoOSPage() {
                         <MemoizedStickyNote color="#FFB347" rotation={-3}>
                             <span
                                 className="text-lg text-[#1a1a1a]"
-                                style={{ fontFamily: "'Averia Serif Libre', Georgia, serif", fontWeight: 700 }}
+                                style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
                             >
                                 Nest:
                             </span>
@@ -764,13 +764,13 @@ export default function GoOSPage() {
                         <MemoizedStickyNote color="#FFF9C4" rotation={4}>
                             <span
                                 className="text-xs text-[#555] uppercase tracking-wide"
-                                style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 500 }}
+                                style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
                             >
                                 todo
                             </span>
                             <div
                                 className="text-xl text-[#D64C00] leading-tight mt-0.5"
-                                style={{ fontFamily: "'Averia Serif Libre', Georgia, serif", fontWeight: 700 }}
+                                style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
                             >
                                 honk!
                             </div>
@@ -871,7 +871,7 @@ export default function GoOSPage() {
                                                 />
                                                 <div
                                                     className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-white/90 border border-[#2a2a2a]/20 shadow-sm text-[#3a3a3a]"
-                                                    style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 500 }}
+                                                    style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
                                                 >
                                                     Bookmark <span className="text-[#D64C00]">♦</span>
                                                 </div>
@@ -880,7 +880,7 @@ export default function GoOSPage() {
                                                 <div className="flex items-center gap-2">
                                                     <span
                                                         className="text-sm text-[#1a1a1a]"
-                                                        style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 600 }}
+                                                        style={{ fontFamily: "var(--font-body)", fontWeight: 600 }}
                                                     >
                                                         Migration In
                                                     </span>
@@ -889,13 +889,13 @@ export default function GoOSPage() {
                                                 <div className="flex gap-2">
                                                     <button
                                                         className="px-3 py-1 text-xs border-2 border-[#2a2a2a] bg-white text-[#2a2a2a] hover:bg-black/5 rounded transition-colors active:scale-95"
-                                                        style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 600 }}
+                                                        style={{ fontFamily: "var(--font-body)", fontWeight: 600 }}
                                                     >
                                                         ◀ Prev
                                                     </button>
                                                     <button
                                                         className="px-3 py-1 text-xs border-2 border-[#2a2a2a] bg-white text-[#2a2a2a] hover:bg-black/5 rounded transition-colors active:scale-95"
-                                                        style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 600 }}
+                                                        style={{ fontFamily: "var(--font-body)", fontWeight: 600 }}
                                                     >
                                                         Next ▶
                                                     </button>

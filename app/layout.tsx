@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, Source_Code_Pro } from "next/font/google";
+import { IBM_Plex_Sans, Source_Code_Pro, Averia_Serif_Libre, Instrument_Sans } from "next/font/google";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { CommentProvider } from "@/contexts/CommentContext";
 import "./globals.css";
@@ -33,6 +33,19 @@ const sourceCodePro = Source_Code_Pro({
   variable: "--font-source-code-pro",
 });
 
+// Sketch theme fonts
+const averiaSerifLibre = Averia_Serif_Libre({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-averia",
+});
+
+const instrumentSans = Instrument_Sans({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-instrument",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
+      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} ${averiaSerifLibre.variable} ${instrumentSans.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
 
 
         <SessionProvider>
