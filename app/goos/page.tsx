@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
     Folder,
     Terminal,
@@ -20,8 +20,18 @@ import {
     Minus,
     Square,
     Music,
-    Image as ImageIcon
+    Image as ImageIcon,
+    Settings,
+    Check,
+    Sparkles
 } from 'lucide-react';
+
+// ============================================
+// ANIMATION CONSTANTS
+// ============================================
+const springSnappy = { type: "spring", damping: 20, stiffness: 400 };
+const springGentle = { type: "spring", damping: 25, stiffness: 200 };
+const easeOutQuart = [0.25, 1, 0.5, 1];
 
 // ============================================
 // TYPES
@@ -41,7 +51,7 @@ interface WindowState {
 }
 
 // ============================================
-// MEMOIZED SUB-COMPONENTS
+// MEMOIZED SUB-COMPONENTS WITH DELIGHT
 // ============================================
 
 const MemoizedDesktopIcon = React.memo(({ label, icon, onClick, badge, isActive }: {
@@ -53,25 +63,36 @@ const MemoizedDesktopIcon = React.memo(({ label, icon, onClick, badge, isActive 
 }) => (
     <motion.button
         onClick={onClick}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.08, rotate: [-1, 1, 0] }}
+        whileTap={{ scale: 0.92 }}
+        transition={springSnappy}
         className={`
             flex flex-col items-center gap-1 p-2 rounded-lg cursor-pointer
             transition-colors duration-200 w-16 group
             ${isActive ? 'bg-orange-100/50 shadow-inner' : 'hover:bg-black/5'}
         `}
     >
-        <div className="relative w-10 h-10 flex items-center justify-center transition-transform group-active:scale-95">
+        <motion.div
+            className="relative w-10 h-10 flex items-center justify-center"
+            animate={isActive ? { y: [0, -2, 0] } : {}}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+        >
             {icon}
-            {badge !== undefined && badge > 0 && (
-                <span
-                    className="absolute -top-1 -right-1 min-w-[16px] h-4 flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
-                    style={{ background: '#E85D04', border: '1.5px solid #2a2a2a' }}
-                >
-                    {badge > 99 ? '99+' : badge}
-                </span>
-            )}
-        </div>
+            <AnimatePresence>
+                {badge !== undefined && badge > 0 && (
+                    <motion.span
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        exit={{ scale: 0 }}
+                        transition={springSnappy}
+                        className="absolute -top-1 -right-1 min-w-[16px] h-4 flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
+                        style={{ background: '#E85D04', border: '1.5px solid #2a2a2a' }}
+                    >
+                        {badge > 99 ? '99+' : badge}
+                    </motion.span>
+                )}
+            </AnimatePresence>
+        </motion.div>
         <span className="text-[13px] text-[#2a2a2a] text-center font-medium leading-tight select-none">
             {label}
         </span>
@@ -80,63 +101,96 @@ const MemoizedDesktopIcon = React.memo(({ label, icon, onClick, badge, isActive 
 
 MemoizedDesktopIcon.displayName = 'DesktopIcon';
 
-const MemoizedDockIcon = React.memo(({ icon, onClick, isActive, badge, label }: {
+// Dock icon with satisfying lift and subtle rotation
+const MemoizedDockIcon = React.memo(({ icon, onClick, isActive, badge, label, isSpecial }: {
     icon: React.ReactNode,
     onClick: () => void,
     isActive?: boolean,
     badge?: number,
-    label?: string
-}) => (
-    <motion.button
-        onClick={onClick}
-        whileHover={{ y: -6 }}
-        className="relative group flex flex-col items-center"
-        title={label}
-    >
-        <div
-            className={`
-                w-10 h-10 flex items-center justify-center rounded-lg
-                transition-all duration-200
-                ${isActive ? 'bg-orange-100 shadow-sm' : 'hover:bg-black/5'}
-            `}
-            style={{ border: isActive ? '1.5px solid #2a2a2a' : 'none' }}
+    label?: string,
+    isSpecial?: boolean
+}) => {
+    const [isPressed, setIsPressed] = useState(false);
+
+    return (
+        <motion.button
+            onClick={onClick}
+            onMouseDown={() => setIsPressed(true)}
+            onMouseUp={() => setIsPressed(false)}
+            onMouseLeave={() => setIsPressed(false)}
+            whileHover={{ y: -8, rotate: isSpecial ? [0, -5, 5, 0] : 0 }}
+            whileTap={{ y: -4, scale: 0.95 }}
+            transition={springGentle}
+            className="relative group flex flex-col items-center focus:outline-none"
+            title={label}
+            aria-label={badge ? `${label}, ${badge} notifications` : label}
         >
-            <div className="w-7 h-7 flex items-center justify-center">
-                {icon}
-            </div>
-            {badge !== undefined && badge > 0 && (
-                <span
-                    className="absolute -top-1 -right-1 min-w-[14px] h-3.5 flex items-center justify-center rounded-full text-white text-[9px] font-bold px-0.5 z-10 shadow-sm"
-                    style={{ background: '#E85D04' }}
-                >
-                    {badge}
-                </span>
-            )}
-        </div>
-        <AnimatePresence>
-            {isActive && (
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    className="w-1 h-1 rounded-full bg-[#2a2a2a] mt-0.5"
-                />
-            )}
-        </AnimatePresence>
-    </motion.button>
-));
+            <motion.div
+                animate={isPressed ? { scale: 0.9 } : { scale: 1 }}
+                transition={springSnappy}
+                className={`
+                    w-10 h-10 flex items-center justify-center rounded-lg
+                    transition-colors duration-200
+                    ${isActive ? 'bg-orange-100 shadow-sm' : 'group-hover:bg-black/5'}
+                `}
+                style={{ border: isActive ? '1.5px solid #2a2a2a' : 'none' }}
+            >
+                <div className="w-7 h-7 flex items-center justify-center">
+                    {icon}
+                </div>
+            </motion.div>
+
+            {/* Badge with pop animation */}
+            <AnimatePresence>
+                {badge !== undefined && badge > 0 && (
+                    <motion.span
+                        initial={{ scale: 0, y: 10 }}
+                        animate={{ scale: 1, y: 0 }}
+                        exit={{ scale: 0 }}
+                        transition={springSnappy}
+                        className="absolute -top-1 -right-1 min-w-[14px] h-3.5 flex items-center justify-center rounded-full text-white text-[9px] font-bold px-0.5 z-10 shadow-sm"
+                        style={{ background: '#E85D04' }}
+                    >
+                        {badge}
+                    </motion.span>
+                )}
+            </AnimatePresence>
+
+            {/* Active indicator with spring */}
+            <AnimatePresence>
+                {isActive && (
+                    <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={springSnappy}
+                        className="w-1.5 h-1.5 rounded-full bg-[#2a2a2a] mt-1"
+                    />
+                )}
+            </AnimatePresence>
+        </motion.button>
+    );
+});
 
 MemoizedDockIcon.displayName = 'DockIcon';
 
+// Sticky note with paper-like hover feel
 const MemoizedStickyNote = React.memo(({ children, color = '#FFB347', rotation = 0 }: {
     children: React.ReactNode;
     color?: string;
     rotation?: number;
 }) => (
     <motion.div
-        whileHover={{ scale: 1.05, rotate: rotation + 2 }}
+        initial={{ rotate: rotation, scale: 0.8, opacity: 0 }}
+        animate={{ rotate: rotation, scale: 1, opacity: 1 }}
+        whileHover={{
+            scale: 1.08,
+            rotate: rotation + 3,
+            boxShadow: "8px 8px 0 rgba(0,0,0,0.1)"
+        }}
+        whileTap={{ scale: 1.02 }}
+        transition={springGentle}
         className="relative cursor-pointer"
-        style={{ rotate: rotation }}
     >
         <div
             className="p-3 shadow-md"
@@ -148,10 +202,12 @@ const MemoizedStickyNote = React.memo(({ children, color = '#FFB347', rotation =
         >
             {children}
         </div>
-        <div
+        {/* Tape with subtle shine */}
+        <motion.div
             className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-2.5 opacity-60"
+            whileHover={{ opacity: 0.8 }}
             style={{
-                background: 'rgba(200,200,200,0.8)',
+                background: 'linear-gradient(135deg, rgba(220,220,220,0.9), rgba(200,200,200,0.7))',
                 border: '1px solid rgba(0,0,0,0.1)',
                 transform: 'rotate(1deg)'
             }}
@@ -160,6 +216,297 @@ const MemoizedStickyNote = React.memo(({ children, color = '#FFB347', rotation =
 ));
 
 MemoizedStickyNote.displayName = 'StickyNote';
+
+// Rubber Duck with wobble animation
+const RubberDuck = React.memo(({ onClick }: { onClick: () => void }) => {
+    const [isQuacking, setIsQuacking] = useState(false);
+
+    const handleClick = () => {
+        setIsQuacking(true);
+        onClick();
+        setTimeout(() => setIsQuacking(false), 600);
+    };
+
+    return (
+        <motion.button
+            onClick={handleClick}
+            className="relative group flex flex-col items-center focus:outline-none"
+            title="Quack!"
+            whileHover={{ y: -8 }}
+            transition={springGentle}
+        >
+            <motion.div
+                animate={isQuacking ? {
+                    rotate: [0, -15, 15, -10, 10, -5, 5, 0],
+                    y: [0, -5, 0, -3, 0]
+                } : {
+                    rotate: [0, 2, 0, -2, 0],
+                    y: [0, -2, 0]
+                }}
+                transition={isQuacking ? {
+                    duration: 0.5,
+                    ease: easeOutQuart
+                } : {
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }}
+                className="w-10 h-10 flex items-center justify-center rounded-lg group-hover:bg-black/5 transition-colors"
+            >
+                <Image
+                    src="/assets/sketch/rubber-duck.png"
+                    alt="Rubber Duck"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                />
+            </motion.div>
+
+            {/* Quack bubble */}
+            <AnimatePresence>
+                {isQuacking && (
+                    <motion.div
+                        initial={{ scale: 0, opacity: 0, y: 10 }}
+                        animate={{ scale: 1, opacity: 1, y: -35 }}
+                        exit={{ scale: 0, opacity: 0, y: -45 }}
+                        transition={springSnappy}
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white border-2 border-[#2a2a2a] rounded-full px-2 py-0.5 text-xs font-bold whitespace-nowrap shadow-md z-50"
+                    >
+                        Quack! 🦆
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.button>
+    );
+});
+
+RubberDuck.displayName = 'RubberDuck';
+
+// Honk Button with dramatic effect
+const HonkButton = React.memo(() => {
+    const [honkCount, setHonkCount] = useState(0);
+    const [isHonking, setIsHonking] = useState(false);
+
+    const handleHonk = () => {
+        setIsHonking(true);
+        setHonkCount(prev => prev + 1);
+        setTimeout(() => setIsHonking(false), 400);
+    };
+
+    return (
+        <motion.button
+            onClick={handleHonk}
+            className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 w-16 group relative"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+        >
+            <motion.div
+                className="w-12 h-12 relative flex items-center justify-center"
+                animate={isHonking ? {
+                    rotate: [0, -20, 20, -15, 15, -5, 5, 0],
+                    scale: [1, 1.2, 1.1, 1.15, 1]
+                } : {}}
+                transition={{ duration: 0.4 }}
+            >
+                <Image
+                    src="/assets/sketch/duck-detective.png"
+                    alt="Honk"
+                    width={48}
+                    height={48}
+                    className="object-contain"
+                    priority
+                />
+
+                {/* Honk sparkles */}
+                <AnimatePresence>
+                    {isHonking && (
+                        <>
+                            {[...Array(5)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ scale: 0, opacity: 1 }}
+                                    animate={{
+                                        scale: [0, 1.5],
+                                        opacity: [1, 0],
+                                        x: [0, (Math.random() - 0.5) * 50],
+                                        y: [0, (Math.random() - 0.5) * 50]
+                                    }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.5, delay: i * 0.05 }}
+                                    className="absolute text-[#E85D04] text-lg"
+                                    style={{ left: '50%', top: '50%' }}
+                                >
+                                    ✨
+                                </motion.div>
+                            ))}
+                        </>
+                    )}
+                </AnimatePresence>
+            </motion.div>
+
+            <motion.span
+                className="text-[13px] font-bold"
+                animate={isHonking ? { scale: [1, 1.2, 1] } : {}}
+            >
+                Honk{honkCount > 0 ? ` ×${honkCount}` : ''}🔥
+            </motion.span>
+
+            {/* Big honk bubble */}
+            <AnimatePresence>
+                {isHonking && (
+                    <motion.div
+                        initial={{ scale: 0, opacity: 0, y: 0 }}
+                        animate={{ scale: 1, opacity: 1, y: -60 }}
+                        exit={{ scale: 1.5, opacity: 0, y: -80 }}
+                        transition={springSnappy}
+                        className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#E85D04] text-white border-2 border-[#2a2a2a] rounded-lg px-3 py-1 text-sm font-bold whitespace-nowrap shadow-lg z-50"
+                    >
+                        HONK!!!
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.button>
+    );
+});
+
+HonkButton.displayName = 'HonkButton';
+
+// Coffee cup with steam animation
+const CoffeeCup = React.memo(() => (
+    <div className="relative">
+        <Image
+            src="/assets/sketch/coffee-cup.png"
+            alt=""
+            width={70}
+            height={70}
+            className="object-contain opacity-40 -rotate-12"
+        />
+        {/* Steam wisps */}
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1">
+            {[0, 1, 2].map(i => (
+                <motion.div
+                    key={i}
+                    className="w-1.5 h-6 bg-gradient-to-t from-transparent to-gray-400/30 rounded-full"
+                    animate={{
+                        y: [0, -8, 0],
+                        opacity: [0.3, 0.6, 0.3],
+                        scaleY: [1, 1.2, 1]
+                    }}
+                    transition={{
+                        duration: 2,
+                        delay: i * 0.3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+                />
+            ))}
+        </div>
+    </div>
+));
+
+CoffeeCup.displayName = 'CoffeeCup';
+
+// Plant with gentle sway
+const SwayingPlant = React.memo(() => (
+    <motion.div
+        animate={{ rotate: [-2, 2, -2] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: 'bottom center' }}
+    >
+        <Image
+            src="/assets/sketch/plant-pot.png"
+            alt=""
+            width={60}
+            height={80}
+            className="object-contain opacity-60"
+        />
+    </motion.div>
+));
+
+SwayingPlant.displayName = 'SwayingPlant';
+
+// Interactive checkbox with celebration
+const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
+    defaultChecked: boolean;
+    label: string;
+    isHot?: boolean;
+}) => {
+    const [checked, setChecked] = useState(defaultChecked);
+    const [justChecked, setJustChecked] = useState(false);
+
+    const handleChange = () => {
+        const newValue = !checked;
+        setChecked(newValue);
+        if (newValue) {
+            setJustChecked(true);
+            setTimeout(() => setJustChecked(false), 600);
+        }
+    };
+
+    return (
+        <motion.li
+            className="flex items-center gap-3 relative"
+            whileHover={{ x: 3 }}
+            transition={springGentle}
+        >
+            <motion.div
+                className="relative"
+                animate={justChecked ? { scale: [1, 1.3, 1] } : {}}
+                transition={springSnappy}
+            >
+                <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={handleChange}
+                    className="w-4 h-4 accent-[#E85D04] cursor-pointer"
+                />
+                <AnimatePresence>
+                    {justChecked && (
+                        <motion.div
+                            initial={{ scale: 0, opacity: 1 }}
+                            animate={{ scale: 2, opacity: 0 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 rounded-full bg-[#E85D04]/30"
+                        />
+                    )}
+                </AnimatePresence>
+            </motion.div>
+
+            <motion.span
+                animate={checked ? { opacity: 0.4 } : { opacity: 1 }}
+                className={`text-[17px] ${checked ? 'line-through' : isHot ? 'font-bold text-[#E85D04]' : 'font-medium'}`}
+            >
+                {label}
+            </motion.span>
+
+            {/* Celebration sparkles */}
+            <AnimatePresence>
+                {justChecked && (
+                    <>
+                        {[...Array(6)].map((_, i) => (
+                            <motion.span
+                                key={i}
+                                initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
+                                animate={{
+                                    scale: [0, 1],
+                                    opacity: [1, 0],
+                                    x: (Math.random() - 0.5) * 40,
+                                    y: (Math.random() - 0.5) * 40 - 10
+                                }}
+                                transition={{ duration: 0.5, delay: i * 0.03 }}
+                                className="absolute left-4 text-[#E85D04]"
+                            >
+                                ✓
+                            </motion.span>
+                        ))}
+                    </>
+                )}
+            </AnimatePresence>
+        </motion.li>
+    );
+});
+
+CelebratoryCheckbox.displayName = 'CelebratoryCheckbox';
 
 // ============================================
 // WINDOW COMPONENT (WITH DRAG & ANIMATION)
@@ -220,26 +567,29 @@ function SketchWindow({
                         {win.title}
                     </span>
                 </div>
-                <div className="flex items-center gap-1 z-10">
+                <div className="flex items-center gap-1.5 z-10">
                     <button
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); onMinimize(); }}
-                        className="w-5 h-5 flex items-center justify-center rounded-sm hover:bg-black/10 transition-colors"
+                        className="w-5 h-5 flex items-center justify-center rounded-full bg-yellow-400 border border-yellow-600 hover:bg-yellow-300 transition-colors"
+                        aria-label="Minimize"
                     >
-                        <Minus size={12} strokeWidth={2.5} />
+                        <Minus size={10} strokeWidth={3} className="text-yellow-800" />
                     </button>
                     <button
                         onMouseDown={(e) => e.stopPropagation()}
-                        className="w-5 h-5 flex items-center justify-center rounded-sm hover:bg-black/10 transition-colors"
+                        className="w-5 h-5 flex items-center justify-center rounded-full bg-green-400 border border-green-600 hover:bg-green-300 transition-colors"
+                        aria-label="Maximize"
                     >
-                        <Square size={10} strokeWidth={2.5} />
+                        <Square size={8} strokeWidth={3} className="text-green-800" />
                     </button>
                     <button
                         onMouseDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); onClose(); }}
-                        className="w-5 h-5 flex items-center justify-center rounded-sm hover:bg-red-200 transition-colors"
+                        className="w-5 h-5 flex items-center justify-center rounded-full bg-red-400 border border-red-600 hover:bg-red-300 transition-colors"
+                        aria-label="Close"
                     >
-                        <X size={12} strokeWidth={2.5} />
+                        <X size={10} strokeWidth={3} className="text-red-800" />
                     </button>
                 </div>
             </div>
@@ -376,7 +726,12 @@ export default function GoOSPage() {
             <main className="absolute inset-0 pt-9 pointer-events-none overflow-hidden">
 
                 {/* Icons - Left */}
-                <div className="absolute top-14 left-5 flex flex-col gap-2 pointer-events-auto">
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, ease: easeOutQuart }}
+                    className="absolute top-14 left-5 flex flex-col gap-2 pointer-events-auto"
+                >
                     <div className="mb-4 flex flex-col gap-3">
                         <MemoizedStickyNote color="#FFB347" rotation={-3}>
                             <span className="text-[19px] font-bold">Nest:</span>
@@ -406,23 +761,17 @@ export default function GoOSPage() {
                         onClick={() => { }}
                     />
 
-                    <button className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-black/5 active:scale-95 transition-all w-16 group">
-                        <div className="w-12 h-12 relative flex items-center justify-center">
-                            <Image
-                                src="/assets/sketch/duck-detective.png"
-                                alt="Honk"
-                                width={44}
-                                height={44}
-                                className="object-contain group-hover:scale-110 transition-transform"
-                                priority
-                            />
-                        </div>
-                        <span className="text-[13px] font-bold">Honk🔥</span>
-                    </button>
-                </div>
+                    {/* Delightful Honk Button */}
+                    <HonkButton />
+                </motion.div>
 
                 {/* Icons - Right */}
-                <div className="absolute top-14 right-5 flex flex-col gap-2 items-end pointer-events-auto">
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, ease: easeOutQuart, delay: 0.1 }}
+                    className="absolute top-14 right-5 flex flex-col gap-2 items-end pointer-events-auto"
+                >
                     <MemoizedDesktopIcon
                         label="Mail"
                         icon={<Mail size={30} stroke="#2a2a2a" strokeWidth={1.5} />}
@@ -443,9 +792,9 @@ export default function GoOSPage() {
                         isActive={winStates.notes.isOpen && !winStates.notes.isMinimized}
                     />
                     <div className="mt-8 select-none">
-                        <Image src="/assets/sketch/plant-pot.png" alt="" width={60} height={80} className="object-contain opacity-60" />
+                        <SwayingPlant />
                     </div>
-                </div>
+                </motion.div>
 
                 {/* WINDOWS LAYER */}
                 <div className="relative w-full h-full">
@@ -503,44 +852,43 @@ export default function GoOSPage() {
                                     )}
 
                                     {id === 'quackmail' && (
-                                        <div className="h-full flex flex-col p-4">
-                                            <header className="flex items-center justify-between border-b-2 border-dashed border-[#2a2a2a]/20 pb-2 mb-3">
+                                        <div className="h-full flex flex-col p-4 text-[#2a2a2a]">
+                                            <header className="flex items-center justify-between border-b-2 border-dashed border-[#2a2a2a]/30 pb-2 mb-3">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="opacity-60 text-sm">From</span>
-                                                    <span className="font-bold text-[17px]">David ▼</span>
-                                                    <span className="opacity-40 text-xs">12:05 PM</span>
+                                                    <span className="text-[#666] text-sm">From</span>
+                                                    <span className="font-bold text-[17px] text-[#2a2a2a]">David ▼</span>
+                                                    <span className="text-[#888] text-xs">12:05 PM</span>
                                                 </div>
-                                                <div className="text-[14px] font-bold">
-                                                    | Fienb <Heart size={14} className="inline-block translate-y-[-1px] text-[#E85D04] fill-[#E85D04]" />
-                                                </div>
+                                                <button className="flex items-center gap-1 text-[14px] font-bold hover:scale-110 transition-transform">
+                                                    <Heart size={16} className="text-[#E85D04] fill-[#E85D04]" />
+                                                </button>
                                             </header>
-                                            <article className="flex-1 text-[18px] leading-snug">
-                                                <p className="font-bold">How's good!!</p>
-                                                <p className="mt-3">How's the migration going?</p>
+                                            <article className="flex-1 text-[18px] leading-relaxed text-[#2a2a2a]">
+                                                <p className="font-bold text-[#2a2a2a]">Hey there! 👋</p>
+                                                <p className="mt-3 text-[#333]">How's the migration going?</p>
                                             </article>
-                                            <footer className="flex justify-end gap-2 pt-3 border-t-2 border-[#2a2a2a]/10">
-                                                <button className="px-4 py-1.5 text-[15px] font-bold border-2 border-[#2a2a2a] bg-white hover:bg-orange-50 rounded transition-all active:scale-95">↩ Reply</button>
+                                            <footer className="flex justify-end gap-2 pt-3 border-t-2 border-[#2a2a2a]/20">
+                                                <button className="px-4 py-1.5 text-[15px] font-bold border-2 border-[#2a2a2a] bg-white text-[#2a2a2a] hover:bg-orange-100 rounded transition-all active:scale-95">
+                                                    ↩ Reply
+                                                </button>
                                             </footer>
                                         </div>
                                     )}
 
                                     {id === 'notes' && (
                                         <div className="h-full p-4 bg-[#FFFACD]">
-                                            <h3 className="text-[20px] font-bold mb-4 border-b-2 border-[#2a2a2a]/10 pb-1">📝 Todo List</h3>
+                                            <motion.h3
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="text-[20px] font-bold mb-4 border-b-2 border-[#2a2a2a]/10 pb-1"
+                                            >
+                                                📝 Todo List
+                                            </motion.h3>
                                             <ul className="space-y-2.5">
-                                                {[
-                                                    { text: 'Finish the migration', done: false },
-                                                    { text: 'Reply to David', done: true },
-                                                    { text: 'HONK!!! 🦆', done: false, hot: true },
-                                                    { text: 'Optimise layout', done: true },
-                                                ].map((item, i) => (
-                                                    <li key={i} className="flex items-center gap-3">
-                                                        <input type="checkbox" defaultChecked={item.done} className="w-4 h-4 accent-[#E85D04]" />
-                                                        <span className={`text-[17px] ${item.done ? 'line-through opacity-40' : item.hot ? 'font-bold text-[#E85D04]' : 'font-medium'}`}>
-                                                            {item.text}
-                                                        </span>
-                                                    </li>
-                                                ))}
+                                                <CelebratoryCheckbox defaultChecked={false} label="Finish the migration" />
+                                                <CelebratoryCheckbox defaultChecked={true} label="Reply to David" />
+                                                <CelebratoryCheckbox defaultChecked={false} label="HONK!!! 🦆" isHot />
+                                                <CelebratoryCheckbox defaultChecked={true} label="Optimise layout" />
                                             </ul>
                                         </div>
                                     )}
@@ -572,21 +920,21 @@ export default function GoOSPage() {
 
                                     {id === 'chat' && (
                                         <div className="h-full flex flex-col">
-                                            <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-white/30">
+                                            <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-[#FFFDF5]">
                                                 <div className="flex gap-2">
-                                                    <div className="w-8 h-8 rounded-full bg-orange-200 border-2 border-[#2a2a2a] flex items-center justify-center text-sm shadow-sm">🦆</div>
-                                                    <div className="bg-[#FAF8F0] border-2 border-[#2a2a2a] rounded-xl rounded-tl-none p-3 max-w-[80%] text-[15px] font-bold shadow-sm">
-                                                        Quack! Is the migration done yet?
+                                                    <div className="w-8 h-8 rounded-full bg-orange-300 border-2 border-[#2a2a2a] flex items-center justify-center text-sm shadow-sm flex-shrink-0">🦆</div>
+                                                    <div className="bg-white border-2 border-[#2a2a2a] rounded-xl rounded-tl-none p-3 max-w-[80%] shadow-md">
+                                                        <span className="text-[15px] font-bold text-[#2a2a2a]">Quack! Is the migration done yet?</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-2 justify-end">
-                                                    <div className="bg-orange-100 border-2 border-[#2a2a2a] rounded-xl rounded-tr-none p-3 max-w-[80%] text-[15px] font-bold shadow-sm">
-                                                        80% complete! Just polishing the windows.
+                                                    <div className="bg-[#FFE4C4] border-2 border-[#2a2a2a] rounded-xl rounded-tr-none p-3 max-w-[80%] shadow-md">
+                                                        <span className="text-[15px] font-bold text-[#2a2a2a]">80% complete! Just polishing the windows.</span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="p-3 bg-[#F5F3E8] border-t-2 border-[#2a2a2a]">
-                                                <input type="text" placeholder="Type a message..." className="w-full px-4 py-2 bg-white border-2 border-[#2a2a2a] rounded-lg text-[15px] font-bold focus:outline-none focus:ring-2 focus:ring-orange-200" />
+                                                <input type="text" placeholder="Type a message..." className="w-full px-4 py-2 bg-white border-2 border-[#2a2a2a] rounded-lg text-[15px] font-bold text-[#2a2a2a] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300" />
                                             </div>
                                         </div>
                                     )}
@@ -620,14 +968,16 @@ export default function GoOSPage() {
                 <div className="absolute bottom-32 left-24 pointer-events-auto">
                     <motion.button
                         onClick={() => openWindow('nest')}
-                        whileHover={{ scale: 1.05, shadow: "6px 6px 0px #2a2a2a" }}
-                        whileTap={{ scale: 0.98, x: 2, y: 2, shadow: "1px 1px 0px #2a2a2a" }}
-                        className="px-6 py-3 bg-[#FFFDF5] border-2 border-[#2a2a2a] rounded-lg shadow-[4px_4px_0px_#2a2a2a] font-bold text-[22px]"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.98, x: 2, y: 2 }}
+                        transition={springSnappy}
+                        className="px-6 py-3 bg-[#FFFDF5] border-2 border-[#2a2a2a] rounded-lg font-bold text-[20px] text-[#2a2a2a]"
+                        style={{ boxShadow: '4px 4px 0 #2a2a2a' }}
                     >
-                        Open Nest
+                        🦆 Open Nest
                     </motion.button>
-                    <div className="absolute -left-16 -bottom-6 opacity-30 -rotate-12 pointer-events-none">
-                        <Image src="/assets/sketch/coffee-cup.png" alt="" width={70} height={70} className="object-contain" />
+                    <div className="absolute -left-16 -bottom-6 pointer-events-none">
+                        <CoffeeCup />
                     </div>
                 </div>
             </main>
@@ -640,11 +990,7 @@ export default function GoOSPage() {
                     className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#F0EDE0] shadow-xl"
                     style={{ border: '2px solid #2a2a2a', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}
                 >
-                    <MemoizedDockIcon
-                        icon={<Image src="/assets/sketch/rubber-duck.png" alt="" width={32} height={32} className="object-contain" />}
-                        onClick={() => { }}
-                        label="Duck"
-                    />
+                    <RubberDuck onClick={() => {}} />
                     <MemoizedDockIcon
                         icon={<Folder size={26} fill="#FFB347" stroke="#2a2a2a" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('nest')}
