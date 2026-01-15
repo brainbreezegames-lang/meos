@@ -700,8 +700,10 @@ export default function GoOSPage() {
             className="min-h-screen w-full relative overflow-hidden cursor-default antialiased theme-sketch"
             style={{
                 backgroundColor: '#FAF8F0',
-                backgroundImage: 'radial-gradient(#d8d8d8 1px, transparent 1px)',
-                backgroundSize: '28px 28px'
+                backgroundImage: 'url(/honk.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
             }}
         >
             {/* ====================
