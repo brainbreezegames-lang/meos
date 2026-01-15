@@ -128,16 +128,28 @@
 }
 
 .theme-sketch {
-    --bg-app: #FDFBF0;
-    --text-primary: #1a1a1a;
-    --text-secondary: #4a4a4a;
-    --border-subtle: #1a1a1a;
+    --bg-app: #FAF8F0;
+    --text-primary: #2a2a2a;
+    --text-secondary: #555;
+    --border-subtle: #2a2a2a;
     --font-sans: 'Patrick Hand', cursive;
     --font-inter: 'Patrick Hand', cursive;
-    background-color: var(--bg-app);
-    background-image:
-        radial-gradient(#d1d1d1 1px, transparent 0);
-    background-size: 20px 20px;
+    font-family: 'Patrick Hand', cursive !important;
+    background-color: #FAF8F0;
+    background-image: radial-gradient(#d8d8d8 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: #2a2a2a;
+    -webkit-font-smoothing: antialiased;
+}
+
+.theme-sketch * {
+    font-family: 'Patrick Hand', cursive;
+}
+
+.theme-sketch input,
+.theme-sketch button,
+.theme-sketch select {
+    font-family: 'Patrick Hand', cursive;
 }
 
 /* Light Mode Overrides (if needed later, but focusing on dark/premium first) */
