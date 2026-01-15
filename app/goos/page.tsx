@@ -93,7 +93,10 @@ const MemoizedDesktopIcon = React.memo(({ label, icon, onClick, badge, isActive 
                 )}
             </AnimatePresence>
         </motion.div>
-        <span className="text-[13px] text-[#2a2a2a] text-center font-medium leading-tight select-none">
+        <span
+            className="text-xs text-[#2a2a2a] text-center leading-tight select-none"
+            style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 500 }}
+        >
             {label}
         </span>
     </motion.button>
@@ -270,9 +273,10 @@ const RubberDuck = React.memo(({ onClick }: { onClick: () => void }) => {
                         animate={{ scale: 1, opacity: 1, y: -35 }}
                         exit={{ scale: 0, opacity: 0, y: -45 }}
                         transition={springSnappy}
-                        className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white border-2 border-[#2a2a2a] rounded-full px-2 py-0.5 text-xs font-bold whitespace-nowrap shadow-md z-50"
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white border-2 border-[var(--border-strong)] rounded-full px-3 py-1 text-xs whitespace-nowrap z-50"
+                        style={{ fontFamily: 'var(--font-body)', fontWeight: 600, boxShadow: 'var(--shadow-sm)' }}
                     >
-                        Quack! 🦆
+                        <span className="text-[var(--text-primary)]">Quack! 🦆</span>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -345,10 +349,11 @@ const HonkButton = React.memo(() => {
             </motion.div>
 
             <motion.span
-                className="text-[13px] font-bold"
+                className="text-xs text-[#2a2a2a]"
+                style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 600 }}
                 animate={isHonking ? { scale: [1, 1.2, 1] } : {}}
             >
-                Honk{honkCount > 0 ? ` ×${honkCount}` : ''}🔥
+                Honk{honkCount > 0 ? ` ×${honkCount}` : ''} 🔥
             </motion.span>
 
             {/* Big honk bubble */}
@@ -359,7 +364,8 @@ const HonkButton = React.memo(() => {
                         animate={{ scale: 1, opacity: 1, y: -60 }}
                         exit={{ scale: 1.5, opacity: 0, y: -80 }}
                         transition={springSnappy}
-                        className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#E85D04] text-white border-2 border-[#2a2a2a] rounded-lg px-3 py-1 text-sm font-bold whitespace-nowrap shadow-lg z-50"
+                        className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[var(--accent-primary)] text-white border-2 border-[var(--border-strong)] rounded-lg px-3 py-1.5 text-sm whitespace-nowrap z-50"
+                        style={{ fontFamily: 'var(--font-body)', fontWeight: 700, boxShadow: 'var(--shadow-md)' }}
                     >
                         HONK!!!
                     </motion.div>
@@ -474,7 +480,8 @@ const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
 
             <motion.span
                 animate={checked ? { opacity: 0.4 } : { opacity: 1 }}
-                className={`text-[17px] ${checked ? 'line-through' : isHot ? 'font-bold text-[#E85D04]' : 'font-medium'}`}
+                className={`text-sm text-[#2a2a2a] ${checked ? 'line-through' : isHot ? 'text-[#D64C00]' : ''}`}
+                style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: isHot ? 600 : checked ? 400 : 500 }}
             >
                 {label}
             </motion.span>
@@ -562,8 +569,11 @@ function SketchWindow({
                 }}
             >
                 <div className="flex items-center gap-2 pointer-events-none">
-                    {win.icon && <span className="opacity-70 scale-90">{win.icon}</span>}
-                    <span className="text-[16px] font-bold text-[#2a2a2a]">
+                    {win.icon && <span className="opacity-60">{win.icon}</span>}
+                    <span
+                        className="text-base text-[#1a1a1a]"
+                        style={{ fontFamily: "'Averia Serif Libre', Georgia, serif", fontWeight: 700 }}
+                    >
                         {win.title}
                     </span>
                 </div>
@@ -687,36 +697,46 @@ export default function GoOSPage() {
 
     return (
         <div
-            className="min-h-screen w-full relative overflow-hidden cursor-default antialiased"
+            className="min-h-screen w-full relative overflow-hidden cursor-default antialiased theme-sketch"
             style={{
-                fontFamily: "'Patrick Hand', cursive",
                 backgroundColor: '#FAF8F0',
-                backgroundImage: 'radial-gradient(#ddd 1px, transparent 1px)',
-                backgroundSize: '32px 32px'
+                backgroundImage: 'radial-gradient(#d8d8d8 1px, transparent 1px)',
+                backgroundSize: '28px 28px'
             }}
         >
             {/* ====================
                 MENU BAR 
                 ==================== */}
             <header
-                className="h-9 flex items-center justify-between px-5 relative z-[2000] shadow-sm select-none"
+                className="h-10 flex items-center justify-between px-5 relative z-[2000] shadow-sm select-none"
                 style={{ background: '#F0EDE0', borderBottom: '2px solid #2a2a2a' }}
             >
                 <div className="flex items-center gap-8">
-                    <span className="text-[19px] font-bold tracking-tighter">goOS</span>
-                    <nav className="flex gap-6 text-[16px]">
+                    <span
+                        className="text-xl tracking-tight text-[#1a1a1a]"
+                        style={{ fontFamily: "'Averia Serif Libre', Georgia, serif", fontWeight: 700 }}
+                    >
+                        goOS
+                    </span>
+                    <nav className="flex gap-5 text-sm">
                         {['File', 'Edit', 'View', 'Help'].map(item => (
-                            <span key={item} className="cursor-pointer hover:text-orange-600 transition-colors">{item}</span>
+                            <span
+                                key={item}
+                                className="cursor-pointer text-[#3a3a3a] hover:text-orange-600 transition-colors"
+                                style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 500 }}
+                            >
+                                {item}
+                            </span>
                         ))}
                     </nav>
                 </div>
-                <div className="flex items-center gap-5 text-[15px]">
-                    <div className="flex items-center gap-1.5 opacity-80">
-                        <Battery size={16} strokeWidth={2.5} />
+                <div className="flex items-center gap-4 text-sm text-[#3a3a3a]" style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif" }}>
+                    <div className="flex items-center gap-1.5">
+                        <Battery size={15} strokeWidth={2} />
                         <span className="font-medium">87%</span>
                     </div>
-                    <Wifi size={16} strokeWidth={2.5} className="opacity-80" />
-                    <span className="font-bold tabular-nums min-w-[45px] text-right">{time}</span>
+                    <Wifi size={15} strokeWidth={2} />
+                    <span className="font-semibold tabular-nums min-w-[44px] text-right text-[#1a1a1a]">{time}</span>
                 </div>
             </header>
 
@@ -734,11 +754,26 @@ export default function GoOSPage() {
                 >
                     <div className="mb-4 flex flex-col gap-3">
                         <MemoizedStickyNote color="#FFB347" rotation={-3}>
-                            <span className="text-[19px] font-bold">Nest:</span>
+                            <span
+                                className="text-lg text-[#1a1a1a]"
+                                style={{ fontFamily: "'Averia Serif Libre', Georgia, serif", fontWeight: 700 }}
+                            >
+                                Nest:
+                            </span>
                         </MemoizedStickyNote>
                         <MemoizedStickyNote color="#FFF9C4" rotation={4}>
-                            <span className="text-[14px] opacity-70">todo:</span>
-                            <div className="text-[20px] font-bold text-[#E85D04] leading-tight mt-1">honk!</div>
+                            <span
+                                className="text-xs text-[#555] uppercase tracking-wide"
+                                style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 500 }}
+                            >
+                                todo
+                            </span>
+                            <div
+                                className="text-xl text-[#D64C00] leading-tight mt-0.5"
+                                style={{ fontFamily: "'Averia Serif Libre', Georgia, serif", fontWeight: 700 }}
+                            >
+                                honk!
+                            </div>
                         </MemoizedStickyNote>
                     </div>
 
@@ -834,41 +869,62 @@ export default function GoOSPage() {
                                                     className="object-cover"
                                                     sizes="400px"
                                                 />
-                                                <div className="absolute top-2 right-2 px-2 py-1 rounded text-[13px] font-bold bg-white/90 border border-[#2a2a2a]/20 shadow-sm">
-                                                    Bookmark cut <span className="text-[#E85D04]">♦</span>
+                                                <div
+                                                    className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-white/90 border border-[#2a2a2a]/20 shadow-sm text-[#3a3a3a]"
+                                                    style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 500 }}
+                                                >
+                                                    Bookmark <span className="text-[#D64C00]">♦</span>
                                                 </div>
                                             </div>
-                                            <footer className="h-10 flex items-center justify-between px-4 bg-[#F5F3E8] border-t-2 border-[#2a2a2a]">
+                                            <footer className="h-11 flex items-center justify-between px-4 bg-[#F5F3E8] border-t-2 border-[#2a2a2a]">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-bold">Migration In</span>
-                                                    <span className="text-[#E85D04] animate-pulse">▶▶▶▶</span>
+                                                    <span
+                                                        className="text-sm text-[#1a1a1a]"
+                                                        style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 600 }}
+                                                    >
+                                                        Migration In
+                                                    </span>
+                                                    <span className="text-[#D64C00] animate-pulse text-xs">▶▶▶▶</span>
                                                 </div>
                                                 <div className="flex gap-2">
-                                                    <button className="px-3 py-1 text-[13px] font-bold border-2 border-[#2a2a2a] bg-white hover:bg-black/5 rounded transition-colors active:scale-95">◀ Prev</button>
-                                                    <button className="px-3 py-1 text-[13px] font-bold border-2 border-[#2a2a2a] bg-white hover:bg-black/5 rounded transition-colors active:scale-95">Next ▶</button>
+                                                    <button
+                                                        className="px-3 py-1 text-xs border-2 border-[#2a2a2a] bg-white text-[#2a2a2a] hover:bg-black/5 rounded transition-colors active:scale-95"
+                                                        style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 600 }}
+                                                    >
+                                                        ◀ Prev
+                                                    </button>
+                                                    <button
+                                                        className="px-3 py-1 text-xs border-2 border-[#2a2a2a] bg-white text-[#2a2a2a] hover:bg-black/5 rounded transition-colors active:scale-95"
+                                                        style={{ fontFamily: "'Instrument Sans', system-ui, sans-serif", fontWeight: 600 }}
+                                                    >
+                                                        Next ▶
+                                                    </button>
                                                 </div>
                                             </footer>
                                         </div>
                                     )}
 
                                     {id === 'quackmail' && (
-                                        <div className="h-full flex flex-col p-4 text-[#2a2a2a]">
-                                            <header className="flex items-center justify-between border-b-2 border-dashed border-[#2a2a2a]/30 pb-2 mb-3">
+                                        <div className="h-full flex flex-col p-4">
+                                            <header className="flex items-center justify-between border-b border-[var(--border-medium)] pb-3 mb-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-[#666] text-sm">From</span>
-                                                    <span className="font-bold text-[17px] text-[#2a2a2a]">David ▼</span>
-                                                    <span className="text-[#888] text-xs">12:05 PM</span>
+                                                    <span className="text-xs text-[var(--text-tertiary)] uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)' }}>From</span>
+                                                    <span className="text-sm text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>David</span>
+                                                    <span className="text-xs text-[var(--text-tertiary)]" style={{ fontFamily: 'var(--font-body)' }}>12:05 PM</span>
                                                 </div>
-                                                <button className="flex items-center gap-1 text-[14px] font-bold hover:scale-110 transition-transform">
-                                                    <Heart size={16} className="text-[#E85D04] fill-[#E85D04]" />
+                                                <button className="flex items-center hover:scale-110 transition-transform" aria-label="Favorite">
+                                                    <Heart size={18} className="text-[var(--accent-primary)]" fill="var(--accent-primary)" />
                                                 </button>
                                             </header>
-                                            <article className="flex-1 text-[18px] leading-relaxed text-[#2a2a2a]">
-                                                <p className="font-bold text-[#2a2a2a]">Hey there! 👋</p>
-                                                <p className="mt-3 text-[#333]">How's the migration going?</p>
+                                            <article className="flex-1">
+                                                <p className="text-lg text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>Hey there! 👋</p>
+                                                <p className="text-base text-[var(--text-secondary)] leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>How's the migration going?</p>
                                             </article>
-                                            <footer className="flex justify-end gap-2 pt-3 border-t-2 border-[#2a2a2a]/20">
-                                                <button className="px-4 py-1.5 text-[15px] font-bold border-2 border-[#2a2a2a] bg-white text-[#2a2a2a] hover:bg-orange-100 rounded transition-all active:scale-95">
+                                            <footer className="flex justify-end gap-2 pt-3 border-t border-[var(--border-subtle)]">
+                                                <button
+                                                    className="px-4 py-2 text-sm border-2 border-[var(--border-strong)] bg-white text-[var(--text-primary)] hover:bg-[var(--accent-pale)] rounded transition-all active:translate-y-px"
+                                                    style={{ fontFamily: 'var(--font-body)', fontWeight: 600, boxShadow: 'var(--shadow-button)' }}
+                                                >
                                                     ↩ Reply
                                                 </button>
                                             </footer>
@@ -876,15 +932,16 @@ export default function GoOSPage() {
                                     )}
 
                                     {id === 'notes' && (
-                                        <div className="h-full p-4 bg-[#FFFACD]">
+                                        <div className="h-full p-5 bg-[#FFFACD]">
                                             <motion.h3
                                                 initial={{ opacity: 0, y: -10 }}
                                                 animate={{ opacity: 1, y: 0 }}
-                                                className="text-[20px] font-bold mb-4 border-b-2 border-[#2a2a2a]/10 pb-1"
+                                                className="text-lg text-[var(--text-primary)] mb-4 pb-2 border-b border-[var(--border-medium)]"
+                                                style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                                             >
                                                 📝 Todo List
                                             </motion.h3>
-                                            <ul className="space-y-2.5">
+                                            <ul className="space-y-3">
                                                 <CelebratoryCheckbox defaultChecked={false} label="Finish the migration" />
                                                 <CelebratoryCheckbox defaultChecked={true} label="Reply to David" />
                                                 <CelebratoryCheckbox defaultChecked={false} label="HONK!!! 🦆" isHot />
@@ -894,25 +951,36 @@ export default function GoOSPage() {
                                     )}
 
                                     {id === 'shell' && (
-                                        <div className="h-full p-4 bg-[#1a1a1a] text-[#0f0] font-mono whitespace-pre text-[14px] shadow-inner">
-                                            <div className="opacity-50 mb-1">goOS Kernel v1.0.4-quack</div>
-                                            <div>$ duck --status-check</div>
-                                            <div className="text-white">    [OK] Quack levels nominal</div>
-                                            <div className="text-white">    [OK] Bread crumbs detected</div>
-                                            <div className="mt-2 text-yellow-500 underline">$ migration --start --force</div>
-                                            <div className="mt-1 text-orange-500">    MIGRATING... [████████░░] 80%</div>
-                                            <div className="animate-pulse mt-4">$ _</div>
+                                        <div
+                                            className="h-full p-4 bg-[#0d0d0d] whitespace-pre text-sm shadow-inner leading-relaxed"
+                                            style={{ fontFamily: "'SF Mono', 'Fira Code', 'Monaco', monospace" }}
+                                        >
+                                            <div className="text-[#666] text-xs mb-2">goOS Kernel v1.0.4-quack</div>
+                                            <div className="text-[#4ade80]">$ duck --status-check</div>
+                                            <div className="text-[#a3a3a3] pl-4">[OK] Quack levels nominal</div>
+                                            <div className="text-[#a3a3a3] pl-4">[OK] Bread crumbs detected</div>
+                                            <div className="mt-3 text-[#facc15]">$ migration --start --force</div>
+                                            <div className="mt-1 text-[var(--accent-primary)] pl-4">MIGRATING... [████████░░] 80%</div>
+                                            <div className="text-[#4ade80] animate-pulse mt-4">$ _</div>
                                         </div>
                                     )}
 
                                     {id === 'nest' && (
-                                        <div className="h-full p-5 overflow-auto">
-                                            <div className="grid grid-cols-3 gap-6">
+                                        <div className="h-full p-6 overflow-auto">
+                                            <div className="grid grid-cols-3 gap-5">
                                                 {['Docs', 'Photos', 'Cache', 'Music', 'Cloud', 'Trash'].map(name => (
-                                                    <div key={name} className="flex flex-col items-center gap-1 group cursor-pointer">
-                                                        <Folder size={40} fill="#FFB347" stroke="#2a2a2a" strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
-                                                        <span className="text-sm font-bold">{name}</span>
-                                                    </div>
+                                                    <button
+                                                        key={name}
+                                                        className="flex flex-col items-center gap-2 p-3 group cursor-pointer rounded-lg hover:bg-[var(--border-subtle)] transition-colors"
+                                                    >
+                                                        <Folder size={42} fill="var(--accent-light)" stroke="var(--border-strong)" strokeWidth={1.5} className="group-hover:scale-105 transition-transform" />
+                                                        <span
+                                                            className="text-sm text-[var(--text-primary)]"
+                                                            style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}
+                                                        >
+                                                            {name}
+                                                        </span>
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
@@ -920,39 +988,64 @@ export default function GoOSPage() {
 
                                     {id === 'chat' && (
                                         <div className="h-full flex flex-col">
-                                            <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-[#FFFDF5]">
-                                                <div className="flex gap-2">
-                                                    <div className="w-8 h-8 rounded-full bg-orange-300 border-2 border-[#2a2a2a] flex items-center justify-center text-sm shadow-sm flex-shrink-0">🦆</div>
-                                                    <div className="bg-white border-2 border-[#2a2a2a] rounded-xl rounded-tl-none p-3 max-w-[80%] shadow-md">
-                                                        <span className="text-[15px] font-bold text-[#2a2a2a]">Quack! Is the migration done yet?</span>
+                                            <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-[var(--bg-surface)]">
+                                                {/* Incoming message */}
+                                                <div className="flex gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-[var(--accent-light)] border-2 border-[var(--border-strong)] flex items-center justify-center text-sm shadow-sm flex-shrink-0">🦆</div>
+                                                    <div className="bg-white border-2 border-[var(--border-strong)] rounded-xl rounded-tl-none px-4 py-2.5 max-w-[80%]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                                                        <span className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}>Quack! Is the migration done yet?</span>
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-2 justify-end">
-                                                    <div className="bg-[#FFE4C4] border-2 border-[#2a2a2a] rounded-xl rounded-tr-none p-3 max-w-[80%] shadow-md">
-                                                        <span className="text-[15px] font-bold text-[#2a2a2a]">80% complete! Just polishing the windows.</span>
+                                                {/* Outgoing message */}
+                                                <div className="flex gap-3 justify-end">
+                                                    <div className="bg-[var(--accent-pale)] border-2 border-[var(--border-strong)] rounded-xl rounded-tr-none px-4 py-2.5 max-w-[80%]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                                                        <span className="text-sm text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}>80% complete! Just polishing the windows.</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="p-3 bg-[#F5F3E8] border-t-2 border-[#2a2a2a]">
-                                                <input type="text" placeholder="Type a message..." className="w-full px-4 py-2 bg-white border-2 border-[#2a2a2a] rounded-lg text-[15px] font-bold text-[#2a2a2a] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300" />
+                                            <div className="p-3 bg-[var(--bg-elevated)] border-t-2 border-[var(--border-strong)]">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Type a message..."
+                                                    className="w-full px-4 py-2.5 bg-white border-2 border-[var(--border-strong)] rounded-lg text-sm text-[var(--text-primary)] placeholder:text-[var(--text-disabled)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-light)]"
+                                                    style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}
+                                                />
                                             </div>
                                         </div>
                                     )}
 
                                     {id === 'settings' && (
-                                        <div className="h-full p-6 space-y-6 overflow-auto">
+                                        <div className="h-full p-5 space-y-5 overflow-auto">
                                             <section>
-                                                <h4 className="text-lg font-bold border-b-2 border-[#2a2a2a]/10 mb-3">Appearance</h4>
-                                                <div className="flex items-center justify-between p-3 bg-white/40 border-2 border-[#2a2a2a] rounded-lg">
-                                                    <span className="font-bold text-[16px]">Dark Mode</span>
-                                                    <div className="w-10 h-5 bg-[#2a2a2a] rounded-full relative">
-                                                        <div className="absolute right-1 top-1 w-3 h-3 bg-white rounded-full" />
+                                                <h4
+                                                    className="text-base text-[var(--text-primary)] mb-3 pb-2 border-b border-[var(--border-medium)]"
+                                                    style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
+                                                >
+                                                    Appearance
+                                                </h4>
+                                                <div className="flex items-center justify-between p-4 bg-white border-2 border-[var(--border-strong)] rounded-lg" style={{ boxShadow: 'var(--shadow-sm)' }}>
+                                                    <span
+                                                        className="text-sm text-[var(--text-primary)]"
+                                                        style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}
+                                                    >
+                                                        Dark Mode
+                                                    </span>
+                                                    <div className="w-11 h-6 bg-[var(--border-strong)] rounded-full relative cursor-pointer">
+                                                        <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all" />
                                                     </div>
                                                 </div>
                                             </section>
                                             <section>
-                                                <h4 className="text-lg font-bold border-b-2 border-[#2a2a2a]/10 mb-3">Migration</h4>
-                                                <button className="w-full p-3 bg-orange-500 text-white font-bold text-lg border-2 border-[#2a2a2a] rounded-lg shadow-[3px_3px_0px_#2a2a2a] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#2a2a2a] transition-all active:translate-y-[1px] active:shadow-none">
+                                                <h4
+                                                    className="text-base text-[var(--text-primary)] mb-3 pb-2 border-b border-[var(--border-medium)]"
+                                                    style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
+                                                >
+                                                    Migration
+                                                </h4>
+                                                <button
+                                                    className="w-full p-3 bg-[var(--accent-primary)] text-white text-base border-2 border-[var(--border-strong)] rounded-lg hover:brightness-110 transition-all active:translate-y-px"
+                                                    style={{ fontFamily: 'var(--font-body)', fontWeight: 600, boxShadow: 'var(--shadow-button)' }}
+                                                >
                                                     Force Sync (80%)
                                                 </button>
                                             </section>
@@ -968,11 +1061,11 @@ export default function GoOSPage() {
                 <div className="absolute bottom-32 left-24 pointer-events-auto">
                     <motion.button
                         onClick={() => openWindow('nest')}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.98, x: 2, y: 2 }}
+                        whileHover={{ scale: 1.03, y: -2 }}
+                        whileTap={{ scale: 0.98, y: 2 }}
                         transition={springSnappy}
-                        className="px-6 py-3 bg-[#FFFDF5] border-2 border-[#2a2a2a] rounded-lg font-bold text-[20px] text-[#2a2a2a]"
-                        style={{ boxShadow: '4px 4px 0 #2a2a2a' }}
+                        className="px-5 py-3 bg-[var(--bg-surface)] border-2 border-[var(--border-strong)] rounded-lg text-[var(--text-primary)]"
+                        style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.125rem', boxShadow: 'var(--shadow-solid)' }}
                     >
                         🦆 Open Nest
                     </motion.button>
@@ -987,8 +1080,8 @@ export default function GoOSPage() {
                 ==================== */}
             <footer className="absolute bottom-5 left-1/2 -translate-x-1/2 z-[3000]">
                 <div
-                    className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#F0EDE0] shadow-xl"
-                    style={{ border: '2px solid #2a2a2a', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}
+                    className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[var(--bg-muted)]"
+                    style={{ border: '2px solid var(--border-strong)', boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)' }}
                 >
                     <RubberDuck onClick={() => {}} />
                     <MemoizedDockIcon
@@ -998,7 +1091,14 @@ export default function GoOSPage() {
                         label="Nest"
                     />
                     <MemoizedDockIcon
-                        icon={<div className="w-7 h-7 flex items-center justify-center rounded bg-white text-sm font-bold border-2 border-[#2a2a2a]">23</div>}
+                        icon={
+                            <div
+                                className="w-7 h-7 flex items-center justify-center rounded bg-white border-2 border-[var(--border-strong)] text-[var(--text-primary)]"
+                                style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: '0.8125rem' }}
+                            >
+                                23
+                            </div>
+                        }
                         onClick={() => { }}
                         label="Calendar"
                     />
@@ -1046,10 +1146,16 @@ export default function GoOSPage() {
                         <motion.div
                             initial={{ scale: 0, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
-                            className="absolute -right-6 -top-12 bg-[#F2F0E4] border-2 border-[#2a2a2a] px-3 py-1.5 rounded-lg shadow-md pointer-events-none"
+                            className="absolute -right-6 -top-12 bg-[var(--bg-muted)] border-2 border-[var(--border-strong)] px-3 py-1.5 rounded-lg pointer-events-none"
+                            style={{ boxShadow: 'var(--shadow-md)' }}
                         >
-                            <span className="font-extrabold text-[#E85D04] animate-bounce inline-block">⚠ Honk!</span>
-                            <div className="absolute -bottom-[7px] right-6 w-3 h-3 bg-[#F2F0E4] border-b-2 border-r-2 border-[#2a2a2a] rotate-45" />
+                            <span
+                                className="text-[var(--accent-dark)] animate-bounce inline-block text-sm"
+                                style={{ fontFamily: 'var(--font-body)', fontWeight: 700 }}
+                            >
+                                ⚠ Honk!
+                            </span>
+                            <div className="absolute -bottom-[7px] right-6 w-3 h-3 bg-[var(--bg-muted)] border-b-2 border-r-2 border-[var(--border-strong)] rotate-45" />
                         </motion.div>
                     </AnimatePresence>
                 </div>

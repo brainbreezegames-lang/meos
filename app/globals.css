@@ -1,7 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+
+/* Typography: Averia Serif Libre (headings) + Instrument Sans (body) */
+@import url('https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@400;700&family=Instrument+Sans:wght@400;500;600;700&display=swap');
 
 :root {
     /* ============================================
@@ -127,30 +129,189 @@
     --accent-success: var(--accent-green);
 }
 
+/* ============================================
+   THEME: SKETCH - Comprehensive Design System
+   Typography: Averia Serif Libre (display) + Instrument Sans (body)
+   ============================================ */
+
 .theme-sketch {
-    --bg-app: #FAF8F0;
-    --text-primary: #2a2a2a;
-    --text-secondary: #555;
-    --border-subtle: #2a2a2a;
-    --font-sans: 'Patrick Hand', cursive;
-    --font-inter: 'Patrick Hand', cursive;
-    font-family: 'Patrick Hand', cursive !important;
-    background-color: #FAF8F0;
-    background-image: radial-gradient(#d8d8d8 1px, transparent 1px);
-    background-size: 24px 24px;
-    color: #2a2a2a;
+    /* ========== TYPOGRAPHY ========== */
+    --font-display: 'Averia Serif Libre', Georgia, serif;
+    --font-body: 'Instrument Sans', system-ui, sans-serif;
+
+    /* Type Scale (1.25 ratio - warm & approachable) */
+    --text-display: 2rem;        /* 32px - Hero text */
+    --text-title: 1.5rem;        /* 24px - Window titles */
+    --text-heading: 1.25rem;     /* 20px - Section headers */
+    --text-body-lg: 1.125rem;    /* 18px - Lead paragraphs */
+    --text-body: 1rem;           /* 16px - Body text */
+    --text-sm: 0.875rem;         /* 14px - Labels, secondary */
+    --text-xs: 0.75rem;          /* 12px - Captions, hints */
+
+    /* Font Weights */
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+
+    /* Line Heights */
+    --leading-tight: 1.2;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.65;
+
+    /* Letter Spacing */
+    --tracking-tight: -0.02em;
+    --tracking-normal: 0;
+    --tracking-wide: 0.02em;
+
+    /* ========== COLORS ========== */
+    /* Backgrounds */
+    --bg-canvas: #FAF8F0;        /* Main canvas/desktop */
+    --bg-surface: #FFFDF5;       /* Windows, cards */
+    --bg-elevated: #F5F3E8;      /* Toolbars, headers */
+    --bg-muted: #F0EDE0;         /* Dock, menu bar */
+    --bg-overlay: rgba(0, 0, 0, 0.3);
+
+    /* Text Colors */
+    --text-primary: #1a1a1a;     /* Headings, important */
+    --text-secondary: #3a3a3a;   /* Body text */
+    --text-tertiary: #666666;    /* Captions, metadata */
+    --text-disabled: #999999;    /* Disabled states */
+    --text-inverse: #FFFDF5;     /* On dark backgrounds */
+
+    /* Brand/Accent Colors */
+    --accent-primary: #E85D04;   /* Primary orange */
+    --accent-dark: #D64C00;      /* Dark orange (text) */
+    --accent-light: #FFB347;     /* Light orange (fills) */
+    --accent-pale: #FFE4C4;      /* Pale orange (subtle) */
+
+    /* Semantic Colors */
+    --color-success: #22C55E;
+    --color-warning: #F59E0B;
+    --color-error: #EF4444;
+    --color-info: #3B82F6;
+
+    /* Window Controls */
+    --traffic-red: #FF6B6B;
+    --traffic-yellow: #FFD93D;
+    --traffic-green: #6BCB77;
+
+    /* Border Colors */
+    --border-strong: #2a2a2a;
+    --border-medium: rgba(42, 42, 42, 0.3);
+    --border-subtle: rgba(42, 42, 42, 0.15);
+
+    /* ========== SPACING ========== */
+    --space-0: 0;
+    --space-1: 0.25rem;   /* 4px */
+    --space-2: 0.5rem;    /* 8px */
+    --space-3: 0.75rem;   /* 12px */
+    --space-4: 1rem;      /* 16px */
+    --space-5: 1.25rem;   /* 20px */
+    --space-6: 1.5rem;    /* 24px */
+    --space-8: 2rem;      /* 32px */
+    --space-10: 2.5rem;   /* 40px */
+    --space-12: 3rem;     /* 48px */
+
+    /* ========== BORDERS ========== */
+    --radius-none: 0;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+
+    --border-width: 2px;
+    --border-width-thin: 1.5px;
+
+    /* ========== SHADOWS (Sketch style: solid offsets) ========== */
+    --shadow-sm: 3px 3px 0 rgba(0, 0, 0, 0.08);
+    --shadow-md: 4px 4px 0 rgba(0, 0, 0, 0.1);
+    --shadow-lg: 6px 6px 0 rgba(0, 0, 0, 0.12);
+    --shadow-solid: 4px 4px 0 #2a2a2a;
+    --shadow-button: 3px 3px 0 #2a2a2a;
+    --shadow-button-active: 1px 1px 0 #2a2a2a;
+
+    /* ========== TRANSITIONS ========== */
+    --transition-fast: 150ms ease;
+    --transition-normal: 200ms ease;
+    --transition-slow: 300ms ease;
+
+    /* ========== APPLY DEFAULTS ========== */
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--leading-normal);
+    color: var(--text-secondary);
+    background-color: var(--bg-canvas);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
+/* ========== TYPOGRAPHY DEFAULTS ========== */
 .theme-sketch * {
-    font-family: 'Patrick Hand', cursive;
+    font-family: var(--font-body);
 }
 
+.theme-sketch h1,
+.theme-sketch h2,
+.theme-sketch h3,
+.theme-sketch h4,
+.theme-sketch h5,
+.theme-sketch h6,
+.theme-sketch .heading {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    color: var(--text-primary);
+}
+
+.theme-sketch h1 { font-size: var(--text-display); }
+.theme-sketch h2 { font-size: var(--text-title); }
+.theme-sketch h3 { font-size: var(--text-heading); }
+.theme-sketch h4 { font-size: var(--text-body-lg); }
+
+.theme-sketch p {
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+}
+
+.theme-sketch small,
+.theme-sketch .caption {
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+}
+
+/* ========== FORM ELEMENTS ========== */
 .theme-sketch input,
 .theme-sketch button,
-.theme-sketch select {
-    font-family: 'Patrick Hand', cursive;
+.theme-sketch select,
+.theme-sketch textarea {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
 }
+
+.theme-sketch input::placeholder,
+.theme-sketch textarea::placeholder {
+    color: var(--text-disabled);
+}
+
+/* ========== UTILITY CLASSES ========== */
+.theme-sketch .font-display { font-family: var(--font-display); }
+.theme-sketch .font-body { font-family: var(--font-body); }
+
+.theme-sketch .text-display { font-size: var(--text-display); }
+.theme-sketch .text-title { font-size: var(--text-title); }
+.theme-sketch .text-heading { font-size: var(--text-heading); }
+.theme-sketch .text-body-lg { font-size: var(--text-body-lg); }
+.theme-sketch .text-body { font-size: var(--text-body); }
+.theme-sketch .text-sm { font-size: var(--text-sm); }
+.theme-sketch .text-xs { font-size: var(--text-xs); }
+
+.theme-sketch .text-primary { color: var(--text-primary); }
+.theme-sketch .text-secondary { color: var(--text-secondary); }
+.theme-sketch .text-tertiary { color: var(--text-tertiary); }
+.theme-sketch .text-accent { color: var(--accent-dark); }
 
 /* Light Mode Overrides (if needed later, but focusing on dark/premium first) */
 .light-mode {
