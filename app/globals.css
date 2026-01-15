@@ -45,69 +45,102 @@
     --border-highlight: rgba(255, 255, 255, 0.2);
 
     /* ============================================
+     THEME: SKETCH (goOS)
+     ============================================ */
+    --sketch-bg: #F9F7E8;
+    /* Paper-like oatmeal */
+    --sketch-ink: #2b2b2b;
+    /* Pencil/Ink black */
+    --sketch-highlight: #FFFCF0;
+    --sketch-accent-orange: #FFB347;
+    --sketch-border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
+    /* Irregular */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+
+.theme-sketch {
+    --bg-app: #FDFBF0;
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --border-subtle: #1a1a1a;
+    --font-sans: 'Patrick Hand', cursive;
+    --font-inter: 'Patrick Hand', cursive;
+    /* Override for Tailwind */
+    background-color: var(--bg-app);
+    background-image:
+        radial-gradient(#d1d1d1 1px, transparent 0);
+    background-size: 20px 20px;
+}
+
+/* ============================================
      SPACING & LAYOUT
      ============================================ */
-    --header-height: 56px;
-    --dock-height: 80px;
-    --radius-xs: 4px;
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
-    --radius-full: 9999px;
+--header-height: 56px;
+--dock-height: 80px;
+--radius-xs: 4px;
+--radius-sm: 8px;
+--radius-md: 12px;
+--radius-lg: 16px;
+--radius-xl: 24px;
+--radius-full: 9999px;
 
-    /* ============================================
+/* ============================================
      TYPOGRAPHY & FONTS
      ============================================ */
-    --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
-    --font-mono: var(--font-jetbrains-mono), monospace;
-    --font-body: var(--font-sans);
+--font-sans: var(--font-inter),
+system-ui,
+-apple-system,
+sans-serif;
+--font-mono: var(--font-jetbrains-mono),
+monospace;
+--font-body: var(--font-sans);
 
-    /* Component Compatibility Maps */
-    --bg-item: var(--bg-card);
-    --shadow-item: 0 8px 16px rgba(0, 0, 0, 0.2);
-    --border-glass-inner: var(--border-highlight);
-    --border-glass-outer: var(--border-subtle);
+/* Component Compatibility Maps */
+--bg-item: var(--bg-card);
+--shadow-item: 0 8px 16px rgba(0, 0, 0, 0.2);
+--border-glass-inner: var(--border-highlight);
+--border-glass-outer: var(--border-subtle);
 
-    --bg-dock: var(--bg-glass-heavy);
-    --blur-dock: blur(24px);
-    --shadow-dock: 0 20px 50px rgba(0, 0, 0, 0.5);
+--bg-dock: var(--bg-glass-heavy);
+--blur-dock: blur(24px);
+--shadow-dock: 0 20px 50px rgba(0, 0, 0, 0.5);
 
-    --bg-button: rgba(255, 255, 255, 0.05);
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+--bg-button: rgba(255, 255, 255, 0.05);
+--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-    --accent-primary: var(--brand-primary);
+--accent-primary: var(--brand-primary);
 
-    --bg-highlight: rgba(255, 255, 255, 0.08);
-    /* Added for interactions */
+--bg-highlight: rgba(255, 255, 255, 0.08);
+/* Added for interactions */
 
-    /* BrowserWindow Compatibility */
-    --bg-glass-elevated: var(--bg-card);
-    --bg-elevated: var(--bg-subtle);
-    --bg-surface: var(--bg-app);
-    --radius-window: var(--radius-lg);
-    --blur-glass: blur(20px);
+/* BrowserWindow Compatibility */
+--bg-glass-elevated: var(--bg-card);
+--bg-elevated: var(--bg-subtle);
+--bg-surface: var(--bg-app);
+--radius-window: var(--radius-lg);
+--blur-glass: blur(20px);
 
-    --traffic-size: 12px;
-    --traffic-gap: 8px;
-    --traffic-red: #FF5F57;
-    --traffic-red-hover: #E0443E;
-    --traffic-yellow: #FFBD2E;
-    --traffic-yellow-hover: #DFA023;
-    --traffic-green: #28CA41;
-    --traffic-green-hover: #1AAD2E;
+--traffic-size: 12px;
+--traffic-gap: 8px;
+--traffic-red: #FF5F57;
+--traffic-red-hover: #E0443E;
+--traffic-yellow: #FFBD2E;
+--traffic-yellow-hover: #DFA023;
+--traffic-green: #28CA41;
+--traffic-green-hover: #1AAD2E;
 
-    --font-display: var(--font-sans);
-    --letter-spacing-tight: -0.02em;
-    --spacing-window-padding: 24px;
-    --radius-button: var(--radius-sm);
-    --border-width: 1px;
-    --border-medium: var(--border-light);
+--font-display: var(--font-sans);
+--letter-spacing-tight: -0.02em;
+--spacing-window-padding: 24px;
+--radius-button: var(--radius-sm);
+--border-width: 1px;
+--border-medium: var(--border-light);
 
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
+--shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
 
-    --accent-success: var(--accent-green);
+--accent-success: var(--accent-green);
 }
 
 /* Light Mode Overrides (if needed later, but focusing on dark/premium first) */
