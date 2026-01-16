@@ -1857,10 +1857,8 @@ function GoOSDemoContent() {
             style={{
                 backgroundColor: goOS.colors.paper,
                 backgroundImage: 'url(/geeseBg.jpg)',
-                backgroundSize: 'contain',
+                backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                imageRendering: 'crisp-edges',
             }}
             onContextMenu={handleDesktopContextMenu}
             onClick={(e) => {
