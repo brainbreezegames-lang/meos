@@ -1302,7 +1302,7 @@ function GoOSDemoContent() {
 // ============================================
 export default function GoOSDemoPage() {
     return (
-        <ThemeProvider initialTheme="sketch">
+        <ThemeProvider initialTheme="sketch" forceTheme={true}>
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
                     <GoOSDemoContent />

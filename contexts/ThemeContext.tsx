@@ -99,6 +99,7 @@ interface ThemeProviderProps {
   initialTheme?: ThemeId;
   desktopId?: string;
   isOwner?: boolean;
+  forceTheme?: boolean; // If true, ignore localStorage and always use initialTheme
 }
 
 export function ThemeProvider({
@@ -106,6 +107,7 @@ export function ThemeProvider({
   initialTheme = 'monterey',
   desktopId,
   isOwner = false,
+  forceTheme = false,
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<ThemeId>(initialTheme);
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -183,17 +185,22 @@ export function ThemeProvider({
 
   // Initialize theme
   useEffect(() => {
-    // Check localStorage first (for visitor preference)
-    const stored = localStorage.getItem('meos-theme-v2') as ThemeId | null;
+    let themeToApply: ThemeId;
 
-    // Use initial theme from desktop if provided, otherwise use stored or default
-    const themeToApply = stored && THEMES[stored] ? stored : initialTheme;
+    if (forceTheme) {
+      // For demo pages: always use the specified theme, ignore localStorage
+      themeToApply = initialTheme;
+    } else {
+      // Check localStorage first (for visitor preference)
+      const stored = localStorage.getItem('meos-theme-v2') as ThemeId | null;
+      themeToApply = stored && THEMES[stored] ? stored : initialTheme;
+    }
 
     setThemeState(themeToApply);
     applyTheme(themeToApply);
     loadThemeFonts(themeToApply);
     setFontsLoaded(true);
-  }, [initialTheme, applyTheme, loadThemeFonts]);
+  }, [initialTheme, applyTheme, loadThemeFonts, forceTheme]);
 
   // Set theme and persist
   const setTheme = useCallback(async (newTheme: ThemeId) => {
