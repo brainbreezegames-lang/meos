@@ -2004,53 +2004,57 @@ function GoOSDemoContent() {
 
                 {/* goOS File Icons */}
                 <AnimatePresence>
-                    {filesInCurrentFolder.map((file) => (
-                        <GoOSFileIcon
-                            key={file.id}
-                            id={file.id}
-                            type={file.type}
-                            title={file.title}
-                            status={file.status}
-                            isSelected={selectedFileId === file.id}
-                            isRenaming={renamingFileId === file.id}
-                            position={file.position}
-                            isDraggedOver={dragOverFolderId === file.id}
-                            onDragStart={() => setDraggingFileId(file.id)}
-                            onDrag={(dragPos) => {
-                                // Check if dragging over any folder
-                                const folders = filesInCurrentFolder.filter(f => f.type === 'folder' && f.id !== file.id);
-                                let foundFolder: string | null = null;
-                                for (const folder of folders) {
-                                    const folderX = folder.position.x;
-                                    const folderY = folder.position.y;
-                                    // Check if drag position overlaps with folder (80x80 icon size)
-                                    if (dragPos.x >= folderX && dragPos.x <= folderX + 80 &&
-                                        dragPos.y >= folderY && dragPos.y <= folderY + 80) {
-                                        foundFolder = folder.id;
-                                        break;
+                    {filesInCurrentFolder.map((file) => {
+                        // Ensure file has a valid position
+                        const filePosition = file.position || { x: 40, y: 320 };
+                        return (
+                            <GoOSFileIcon
+                                key={file.id}
+                                id={file.id}
+                                type={file.type}
+                                title={file.title}
+                                status={file.status}
+                                isSelected={selectedFileId === file.id}
+                                isRenaming={renamingFileId === file.id}
+                                position={filePosition}
+                                isDraggedOver={dragOverFolderId === file.id}
+                                onDragStart={() => setDraggingFileId(file.id)}
+                                onDrag={(dragPos) => {
+                                    // Check if dragging over any folder
+                                    const folders = filesInCurrentFolder.filter(f => f.type === 'folder' && f.id !== file.id && f.position);
+                                    let foundFolder: string | null = null;
+                                    for (const folder of folders) {
+                                        const folderX = folder.position.x;
+                                        const folderY = folder.position.y;
+                                        // Check if drag position overlaps with folder (80x80 icon size)
+                                        if (dragPos.x >= folderX && dragPos.x <= folderX + 80 &&
+                                            dragPos.y >= folderY && dragPos.y <= folderY + 80) {
+                                            foundFolder = folder.id;
+                                            break;
+                                        }
                                     }
-                                }
-                                setDragOverFolderId(foundFolder);
-                            }}
-                            onPositionChange={(pos) => {
-                                // Check if we're dropping on a folder
-                                if (draggingFileId && dragOverFolderId && dragOverFolderId !== draggingFileId) {
-                                    moveFileToFolder(draggingFileId, dragOverFolderId);
-                                } else {
-                                    updateFilePosition(file.id, pos);
-                                }
-                                setDraggingFileId(null);
-                                setDragOverFolderId(null);
-                            }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedFileId(file.id);
-                            }}
-                            onDoubleClick={() => openFile(file.id)}
-                            onContextMenu={(e) => handleFileContextMenu(e, file.id)}
-                            onRename={(newTitle) => renameFile(file.id, newTitle)}
-                        />
-                    ))}
+                                    setDragOverFolderId(foundFolder);
+                                }}
+                                onPositionChange={(pos) => {
+                                    // Check if we're dropping on a folder
+                                    if (draggingFileId && dragOverFolderId && dragOverFolderId !== draggingFileId) {
+                                        moveFileToFolder(draggingFileId, dragOverFolderId);
+                                    } else {
+                                        updateFilePosition(file.id, pos);
+                                    }
+                                    setDraggingFileId(null);
+                                    setDragOverFolderId(null);
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedFileId(file.id);
+                                }}
+                                onDoubleClick={() => openFile(file.id)}
+                                onContextMenu={(e) => handleFileContextMenu(e, file.id)}
+                                onRename={(newTitle) => renameFile(file.id, newTitle)}
+                            />
+                        );
+                    })}
                 </AnimatePresence>
 
                 {/* goOS Editor Windows */}
