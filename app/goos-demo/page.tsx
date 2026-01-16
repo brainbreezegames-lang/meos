@@ -38,6 +38,15 @@ import { WindowManager } from '@/components/desktop/MultiWindow';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { type GuestbookEntry } from '@/components/desktop/Guestbook';
 import type { DesktopItem, Desktop, StatusWidget as StatusWidgetType } from '@/types';
+import {
+    GoOSEditorWindow,
+    GoOSFileIcon,
+    GoOSDesktopContextMenu,
+    GoOSFileContextMenu,
+    type GoOSFile,
+    type FileType,
+} from '@/components/goos-editor';
+import { PenLine } from 'lucide-react';
 
 // ============================================
 // GOOS DESIGN TOKENS
@@ -187,6 +196,30 @@ const DEMO_STATUS_WIDGET: StatusWidgetType = {
     createdAt: new Date(),
     updatedAt: new Date(),
 };
+
+// ============================================
+// DEMO FILES (goOS Editor)
+// ============================================
+const DEMO_FILES: GoOSFile[] = [
+    {
+        id: 'file-1',
+        type: 'note',
+        title: 'Welcome to goOS',
+        content: '<h1>Welcome to goOS!</h1><p>This is your digital creative space. Use the editor to write notes, case studies, and more.</p><p>Try the formatting toolbar above to style your text.</p>',
+        status: 'published',
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    },
+    {
+        id: 'file-2',
+        type: 'case-study',
+        title: 'Design System Case Study',
+        content: '<h1>Building a Design System</h1><h2>The Challenge</h2><p>Our team needed a unified design language across 5 products...</p><h2>The Solution</h2><p>We built a comprehensive component library with...</p>',
+        status: 'draft',
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+    },
+];
 
 // ============================================
 // DEMO ITEMS
@@ -1502,6 +1535,209 @@ function GoOSDemoContent() {
     // Guestbook state
     const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>(DEMO_GUESTBOOK_ENTRIES);
 
+    // goOS Editor state
+    const [goosFiles, setGoosFiles] = useState<GoOSFile[]>(DEMO_FILES);
+    const [openEditors, setOpenEditors] = useState<string[]>([]);
+    const [activeEditorId, setActiveEditorId] = useState<string | null>(null);
+    const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+    const [renamingFileId, setRenamingFileId] = useState<string | null>(null);
+    const [clipboard, setClipboard] = useState<{ files: GoOSFile[]; operation: 'copy' | 'cut' } | null>(null);
+    const [desktopContextMenu, setDesktopContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({ isOpen: false, x: 0, y: 0 });
+    const [fileContextMenu, setFileContextMenu] = useState<{ isOpen: boolean; x: number; y: number; fileId: string | null }>({ isOpen: false, x: 0, y: 0, fileId: null });
+
+    // File management functions
+    const createFile = useCallback((type: FileType) => {
+        const newFile: GoOSFile = {
+            id: `file-${Date.now()}`,
+            type,
+            title: type === 'note' ? 'Untitled Note' : type === 'case-study' ? 'Untitled Case Study' : 'New Folder',
+            content: '',
+            status: 'draft',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+        setGoosFiles(prev => [...prev, newFile]);
+        if (type !== 'folder') {
+            setOpenEditors(prev => [...prev, newFile.id]);
+            setActiveEditorId(newFile.id);
+        }
+        setRenamingFileId(newFile.id);
+    }, []);
+
+    const openFile = useCallback((fileId: string) => {
+        const file = goosFiles.find(f => f.id === fileId);
+        if (!file || file.type === 'folder') return;
+        if (!openEditors.includes(fileId)) {
+            setOpenEditors(prev => [...prev, fileId]);
+        }
+        setActiveEditorId(fileId);
+        setWindowZ(prev => ({ ...prev, [`editor-${fileId}`]: topZIndex + 1 }));
+        setTopZIndex(prev => prev + 1);
+    }, [goosFiles, openEditors, topZIndex]);
+
+    const closeEditor = useCallback((fileId: string) => {
+        setOpenEditors(prev => prev.filter(id => id !== fileId));
+        if (activeEditorId === fileId) {
+            const remaining = openEditors.filter(id => id !== fileId);
+            setActiveEditorId(remaining.length > 0 ? remaining[remaining.length - 1] : null);
+        }
+    }, [activeEditorId, openEditors]);
+
+    const updateFile = useCallback((fileId: string, updates: Partial<GoOSFile>) => {
+        setGoosFiles(prev => prev.map(f => f.id === fileId ? { ...f, ...updates } : f));
+    }, []);
+
+    const deleteFile = useCallback((fileId: string) => {
+        setGoosFiles(prev => prev.filter(f => f.id !== fileId));
+        closeEditor(fileId);
+        setSelectedFileId(null);
+    }, [closeEditor]);
+
+    const duplicateFile = useCallback((fileId: string) => {
+        const file = goosFiles.find(f => f.id === fileId);
+        if (!file) return;
+        const newFile: GoOSFile = {
+            ...file,
+            id: `file-${Date.now()}`,
+            title: `${file.title} (Copy)`,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+        setGoosFiles(prev => [...prev, newFile]);
+    }, [goosFiles]);
+
+    const copyFile = useCallback((fileId: string) => {
+        const file = goosFiles.find(f => f.id === fileId);
+        if (file) setClipboard({ files: [file], operation: 'copy' });
+    }, [goosFiles]);
+
+    const cutFile = useCallback((fileId: string) => {
+        const file = goosFiles.find(f => f.id === fileId);
+        if (file) setClipboard({ files: [file], operation: 'cut' });
+    }, [goosFiles]);
+
+    const pasteFile = useCallback(() => {
+        if (!clipboard) return;
+        clipboard.files.forEach(file => {
+            const newFile: GoOSFile = {
+                ...file,
+                id: `file-${Date.now()}`,
+                title: clipboard.operation === 'copy' ? `${file.title} (Copy)` : file.title,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            setGoosFiles(prev => [...prev, newFile]);
+        });
+        if (clipboard.operation === 'cut') {
+            setGoosFiles(prev => prev.filter(f => !clipboard.files.some(cf => cf.id === f.id)));
+            setClipboard(null);
+        }
+    }, [clipboard]);
+
+    const renameFile = useCallback((fileId: string, newTitle: string) => {
+        updateFile(fileId, { title: newTitle });
+        setRenamingFileId(null);
+    }, [updateFile]);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ignore if focus is in an input/textarea
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+                return;
+            }
+
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+            // Cmd+N: New Note
+            if (modKey && e.key === 'n' && !e.shiftKey) {
+                e.preventDefault();
+                createFile('note');
+            }
+
+            // Cmd+Shift+N: New Case Study
+            if (modKey && e.key === 'n' && e.shiftKey) {
+                e.preventDefault();
+                createFile('case-study');
+            }
+
+            // Cmd+D: Duplicate selected file
+            if (modKey && e.key === 'd' && selectedFileId) {
+                e.preventDefault();
+                duplicateFile(selectedFileId);
+            }
+
+            // Cmd+C: Copy selected file
+            if (modKey && e.key === 'c' && selectedFileId) {
+                e.preventDefault();
+                copyFile(selectedFileId);
+            }
+
+            // Cmd+X: Cut selected file
+            if (modKey && e.key === 'x' && selectedFileId) {
+                e.preventDefault();
+                cutFile(selectedFileId);
+            }
+
+            // Cmd+V: Paste
+            if (modKey && e.key === 'v' && clipboard) {
+                e.preventDefault();
+                pasteFile();
+            }
+
+            // Delete/Backspace: Delete selected file
+            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedFileId) {
+                e.preventDefault();
+                if (window.confirm('Are you sure you want to delete this file?')) {
+                    deleteFile(selectedFileId);
+                }
+            }
+
+            // Enter: Rename selected file or open it
+            if (e.key === 'Enter' && selectedFileId && !renamingFileId) {
+                e.preventDefault();
+                const file = goosFiles.find(f => f.id === selectedFileId);
+                if (file && file.type !== 'folder') {
+                    openFile(selectedFileId);
+                } else {
+                    setRenamingFileId(selectedFileId);
+                }
+            }
+
+            // Escape: Deselect
+            if (e.key === 'Escape') {
+                setSelectedFileId(null);
+                setRenamingFileId(null);
+                setDesktopContextMenu(prev => ({ ...prev, isOpen: false }));
+                setFileContextMenu(prev => ({ ...prev, isOpen: false }));
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [createFile, selectedFileId, duplicateFile, copyFile, cutFile, clipboard, pasteFile, deleteFile, openFile, goosFiles, renamingFileId]);
+
+    // Desktop right-click handler
+    const handleDesktopContextMenu = useCallback((e: React.MouseEvent) => {
+        // Only show if clicked on the desktop background
+        const target = e.target as HTMLElement;
+        if (target.closest('[data-file-id]') || target.closest('[data-window]')) {
+            return;
+        }
+        e.preventDefault();
+        setDesktopContextMenu({ isOpen: true, x: e.clientX, y: e.clientY });
+        setSelectedFileId(null);
+    }, []);
+
+    // File right-click handler
+    const handleFileContextMenu = useCallback((e: React.MouseEvent, fileId: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setFileContextMenu({ isOpen: true, x: e.clientX, y: e.clientY, fileId });
+        setSelectedFileId(fileId);
+    }, []);
+
     useEffect(() => {
         const updateTime = () => {
             const now = new Date();
@@ -1560,6 +1796,11 @@ function GoOSDemoContent() {
                 backgroundColor: goOS.colors.paper,
                 backgroundImage: 'radial-gradient(#d4d4d4 1px, transparent 1px)',
                 backgroundSize: '24px 24px'
+            }}
+            onContextMenu={handleDesktopContextMenu}
+            onClick={() => {
+                setDesktopContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
+                setFileContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
             }}
         >
             {/* MENU BAR */}
@@ -1662,6 +1903,52 @@ function GoOSDemoContent() {
 
                 {/* Portfolio Windows */}
                 <WindowManager items={items} />
+
+                {/* goOS File Icons */}
+                <div className="absolute top-[280px] left-1/2 -translate-x-1/2 w-full max-w-4xl px-8">
+                    <div className="mb-3 px-2">
+                        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: goOS.colors.text.muted }}>
+                            My Files
+                        </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <AnimatePresence>
+                            {goosFiles.map((file) => (
+                                <GoOSFileIcon
+                                    key={file.id}
+                                    id={file.id}
+                                    type={file.type}
+                                    title={file.title}
+                                    status={file.status}
+                                    isSelected={selectedFileId === file.id}
+                                    isRenaming={renamingFileId === file.id}
+                                    onClick={() => setSelectedFileId(file.id)}
+                                    onDoubleClick={() => openFile(file.id)}
+                                    onContextMenu={(e) => handleFileContextMenu(e, file.id)}
+                                    onRename={(newTitle) => renameFile(file.id, newTitle)}
+                                />
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                {/* goOS Editor Windows */}
+                <AnimatePresence>
+                    {openEditors.map((fileId) => {
+                        const file = goosFiles.find(f => f.id === fileId);
+                        if (!file) return null;
+                        return (
+                            <GoOSEditorWindow
+                                key={file.id}
+                                file={file}
+                                onClose={() => closeEditor(file.id)}
+                                onUpdate={(updates) => updateFile(file.id, updates)}
+                                isActive={activeEditorId === file.id}
+                                zIndex={windowZ[`editor-${file.id}`] || topZIndex}
+                            />
+                        );
+                    })}
+                </AnimatePresence>
 
                 {/* goOS App Windows */}
                 <AnimatePresence>
@@ -1957,6 +2244,12 @@ function GoOSDemoContent() {
                         isActive={appWindows.analytics}
                         label="Analytics"
                     />
+                    <div className="w-px h-8 bg-black/10 mx-1" />
+                    <DockIcon
+                        icon={<PenLine size={24} stroke={goOS.colors.accent.orange} strokeWidth={1.5} />}
+                        onClick={() => createFile('note')}
+                        label="New Note"
+                    />
                 </div>
             </footer>
 
@@ -1980,6 +2273,49 @@ function GoOSDemoContent() {
             >
                 Made with goOS
             </motion.a>
+
+            {/* Desktop Context Menu */}
+            <GoOSDesktopContextMenu
+                isOpen={desktopContextMenu.isOpen}
+                position={{ x: desktopContextMenu.x, y: desktopContextMenu.y }}
+                onClose={() => setDesktopContextMenu(prev => ({ ...prev, isOpen: false }))}
+                onNewNote={() => createFile('note')}
+                onNewCaseStudy={() => createFile('case-study')}
+                onNewFolder={() => createFile('folder')}
+                onPaste={pasteFile}
+                canPaste={!!clipboard}
+            />
+
+            {/* File Context Menu */}
+            {fileContextMenu.fileId && (
+                <GoOSFileContextMenu
+                    isOpen={fileContextMenu.isOpen}
+                    position={{ x: fileContextMenu.x, y: fileContextMenu.y }}
+                    onClose={() => setFileContextMenu(prev => ({ ...prev, isOpen: false }))}
+                    fileType={goosFiles.find(f => f.id === fileContextMenu.fileId)?.type || 'note'}
+                    fileStatus={goosFiles.find(f => f.id === fileContextMenu.fileId)?.status}
+                    onOpen={() => openFile(fileContextMenu.fileId!)}
+                    onRename={() => setRenamingFileId(fileContextMenu.fileId)}
+                    onDuplicate={() => duplicateFile(fileContextMenu.fileId!)}
+                    onCopy={() => copyFile(fileContextMenu.fileId!)}
+                    onCut={() => cutFile(fileContextMenu.fileId!)}
+                    onPaste={pasteFile}
+                    onDelete={() => {
+                        if (window.confirm('Are you sure you want to delete this file?')) {
+                            deleteFile(fileContextMenu.fileId!);
+                        }
+                    }}
+                    onTogglePublish={() => {
+                        const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
+                        if (file) {
+                            updateFile(fileContextMenu.fileId!, {
+                                status: file.status === 'draft' ? 'published' : 'draft'
+                            });
+                        }
+                    }}
+                    canPaste={!!clipboard}
+                />
+            )}
 
             <SaveIndicator />
             <Toast />
