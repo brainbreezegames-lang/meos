@@ -36,9 +36,7 @@ import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { WindowManager } from '@/components/desktop/MultiWindow';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
-import { Guestbook, type GuestbookEntry } from '@/components/desktop/Guestbook';
-import { AnalyticsDashboard } from '@/components/desktop/AnalyticsDashboard';
-import { StatusWidget } from '@/components/desktop/StatusWidget';
+import { type GuestbookEntry } from '@/components/desktop/Guestbook';
 import type { DesktopItem, Desktop, StatusWidget as StatusWidgetType } from '@/types';
 
 // ============================================
@@ -919,6 +917,444 @@ const CelebratoryCheckbox = ({ defaultChecked, label, isHot }: { defaultChecked:
 };
 
 // ============================================
+// GOOS GUESTBOOK (Sketch style)
+// ============================================
+const GoOSGuestbook = React.memo(({
+    entries,
+    onSubmit,
+}: {
+    entries: GuestbookEntry[];
+    onSubmit?: (entry: Omit<GuestbookEntry, 'id' | 'createdAt' | 'isPublic' | 'ownerMarkedHelpful'>) => void;
+}) => {
+    const [message, setMessage] = useState('');
+    const [authorName, setAuthorName] = useState('');
+    const [isAnonymous, setIsAnonymous] = useState(true);
+
+    const handleSubmit = () => {
+        if (!message.trim()) return;
+        onSubmit?.({
+            message: message.trim(),
+            type: 'general',
+            authorType: isAnonymous ? 'anonymous' : 'named',
+            ...((!isAnonymous && authorName) && { authorName }),
+        });
+        setMessage('');
+        setAuthorName('');
+    };
+
+    const formatDate = (date: Date) => {
+        const now = new Date();
+        const diff = now.getTime() - new Date(date).getTime();
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return `${days}d ago`;
+        return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    const noteColors = ['#fef08a', '#bae6fd', '#fbcfe8', '#bbf7d0', '#fed7aa'];
+
+    return (
+        <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-instrument, system-ui)' }}>
+            {/* Header */}
+            <div
+                className="px-5 py-4"
+                style={{
+                    background: goOS.colors.windowBg,
+                    borderBottom: `2px solid ${goOS.colors.border}`,
+                }}
+            >
+                <h3
+                    className="text-lg font-bold mb-1"
+                    style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-averia, Georgia)' }}
+                >
+                    📝 Leave a Note
+                </h3>
+                <p className="text-xs" style={{ color: goOS.colors.text.muted }}>
+                    Say hi, share feedback, or just leave your mark!
+                </p>
+            </div>
+
+            {/* Form */}
+            <div className="px-5 py-4 space-y-3" style={{ borderBottom: `2px solid ${goOS.colors.border}` }}>
+                <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value.slice(0, 280))}
+                    placeholder="Write something nice..."
+                    className="w-full h-20 px-3 py-2.5 resize-none focus:outline-none"
+                    style={{
+                        background: '#fef9c3',
+                        border: `2px solid ${goOS.colors.border}`,
+                        borderRadius: '4px',
+                        color: goOS.colors.text.primary,
+                        fontSize: '14px',
+                        fontFamily: 'var(--font-gochi, cursive)',
+                        boxShadow: goOS.shadows.sm,
+                    }}
+                    maxLength={280}
+                />
+
+                <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={!isAnonymous}
+                            onChange={(e) => setIsAnonymous(!e.target.checked)}
+                            className="w-4 h-4"
+                            style={{ accentColor: goOS.colors.accent.orange }}
+                        />
+                        <span className="text-sm" style={{ color: goOS.colors.text.secondary }}>Sign my name</span>
+                    </label>
+                </div>
+
+                {!isAnonymous && (
+                    <input
+                        type="text"
+                        value={authorName}
+                        onChange={(e) => setAuthorName(e.target.value.slice(0, 30))}
+                        placeholder="Your name"
+                        className="w-full px-3 py-2 focus:outline-none"
+                        style={{
+                            background: goOS.colors.cream,
+                            border: `2px solid ${goOS.colors.border}`,
+                            borderRadius: '4px',
+                            color: goOS.colors.text.primary,
+                            fontSize: '14px',
+                        }}
+                    />
+                )}
+
+                <motion.button
+                    onClick={handleSubmit}
+                    disabled={!message.trim()}
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full py-2.5 font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                        background: goOS.colors.accent.orange,
+                        color: 'white',
+                        border: `2px solid ${goOS.colors.border}`,
+                        borderRadius: '4px',
+                        boxShadow: goOS.shadows.button,
+                    }}
+                >
+                    Drop Note 🦆
+                </motion.button>
+            </div>
+
+            {/* Entries */}
+            <div className="flex-1 overflow-y-auto p-4">
+                <div className="flex flex-wrap gap-3">
+                    <AnimatePresence mode="popLayout">
+                        {entries.length === 0 ? (
+                            <div className="w-full text-center py-8">
+                                <span className="text-4xl">🦆</span>
+                                <p className="text-sm mt-2" style={{ color: goOS.colors.text.muted }}>
+                                    Be the first to leave a note!
+                                </p>
+                            </div>
+                        ) : (
+                            entries.map((entry, i) => (
+                                <motion.div
+                                    key={entry.id}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                                    animate={{ opacity: 1, scale: 1, rotate: (i % 3 - 1) * 3 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    className="relative p-3 w-[calc(50%-6px)]"
+                                    style={{
+                                        background: noteColors[i % noteColors.length],
+                                        minHeight: '100px',
+                                        boxShadow: '3px 3px 6px rgba(0,0,0,0.1)',
+                                    }}
+                                >
+                                    {/* Tape effect */}
+                                    <div
+                                        className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-2.5"
+                                        style={{
+                                            background: 'linear-gradient(135deg, rgba(240,240,230,0.9) 0%, rgba(200,200,190,0.8) 100%)',
+                                            borderRadius: '1px',
+                                        }}
+                                    />
+
+                                    <p
+                                        className="text-sm leading-relaxed mb-2"
+                                        style={{
+                                            color: goOS.colors.text.primary,
+                                            fontFamily: 'var(--font-gochi, cursive)',
+                                        }}
+                                    >
+                                        &ldquo;{entry.message}&rdquo;
+                                    </p>
+
+                                    <div className="flex items-center justify-between text-[10px]" style={{ color: goOS.colors.text.muted }}>
+                                        <span>
+                                            — {entry.authorType === 'anonymous' ? 'Anonymous' : entry.authorName || 'Friend'}
+                                        </span>
+                                        <span>{formatDate(entry.createdAt)}</span>
+                                    </div>
+
+                                    {entry.ownerMarkedHelpful && (
+                                        <span className="absolute -top-1 -right-1 text-sm">⭐</span>
+                                    )}
+                                </motion.div>
+                            ))
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+GoOSGuestbook.displayName = 'GoOSGuestbook';
+
+// ============================================
+// GOOS ANALYTICS (Sketch style)
+// ============================================
+const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }) => {
+    const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('7d');
+
+    const SketchBar = ({ value, max, color }: { value: number; max: number; color: string }) => (
+        <div
+            className="h-3 rounded-sm overflow-hidden"
+            style={{ background: `${goOS.colors.border}20`, border: `1px solid ${goOS.colors.border}40` }}
+        >
+            <motion.div
+                className="h-full rounded-sm"
+                style={{ background: color }}
+                initial={{ width: 0 }}
+                animate={{ width: `${(value / max) * 100}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+            />
+        </div>
+    );
+
+    const StatBox = ({ value, label, change, icon }: { value: string | number; label: string; change?: number; icon: string }) => (
+        <div
+            className="p-3 text-center"
+            style={{
+                background: goOS.colors.cream,
+                border: `2px solid ${goOS.colors.border}`,
+                borderRadius: '4px',
+                boxShadow: goOS.shadows.sm,
+            }}
+        >
+            <span className="text-lg block mb-1">{icon}</span>
+            <div
+                className="text-2xl font-bold"
+                style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-averia, Georgia)' }}
+            >
+                {value}
+            </div>
+            <div className="text-xs mt-0.5" style={{ color: goOS.colors.text.muted }}>{label}</div>
+            {change !== undefined && (
+                <div
+                    className="text-xs mt-1 font-medium"
+                    style={{ color: change >= 0 ? '#16a34a' : '#dc2626' }}
+                >
+                    {change >= 0 ? '↑' : '↓'} {Math.abs(change)}%
+                </div>
+            )}
+        </div>
+    );
+
+    return (
+        <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-instrument, system-ui)' }}>
+            {/* Header */}
+            <div
+                className="px-5 py-3 flex items-center justify-between"
+                style={{
+                    background: goOS.colors.windowBg,
+                    borderBottom: `2px solid ${goOS.colors.border}`,
+                }}
+            >
+                <div className="flex items-center gap-2">
+                    <span className="text-lg">📊</span>
+                    <h3 className="font-bold" style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-averia, Georgia)' }}>
+                        Portfolio Analytics
+                    </h3>
+                </div>
+                <div className="flex items-center gap-1">
+                    {(['7d', '30d', 'all'] as const).map((range) => (
+                        <button
+                            key={range}
+                            onClick={() => setTimeRange(range)}
+                            className="px-2 py-1 text-xs font-medium"
+                            style={{
+                                background: timeRange === range ? goOS.colors.accent.orangePale : 'transparent',
+                                border: `1.5px solid ${timeRange === range ? goOS.colors.border : 'transparent'}`,
+                                borderRadius: '4px',
+                                color: timeRange === range ? goOS.colors.text.primary : goOS.colors.text.muted,
+                            }}
+                        >
+                            {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : 'All Time'}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-5" style={{ background: goOS.colors.paper }}>
+                {/* Overview Stats */}
+                <div className="grid grid-cols-3 gap-3">
+                    <StatBox value={data.overview.visitors} label="Visitors" change={data.overview.visitorsChange} icon="👀" />
+                    <StatBox value={data.overview.pageViews} label="Page Views" change={data.overview.pageViewsChange} icon="📄" />
+                    <StatBox value={data.overview.avgTime} label="Avg. Time" change={data.overview.avgTimeChange} icon="⏱️" />
+                </div>
+
+                {/* Live indicator */}
+                <div
+                    className="flex items-center justify-between px-3 py-2"
+                    style={{
+                        background: '#dcfce7',
+                        border: `2px solid ${goOS.colors.border}`,
+                        borderRadius: '4px',
+                    }}
+                >
+                    <div className="flex items-center gap-2">
+                        <motion.span
+                            className="w-2 h-2 rounded-full bg-green-500"
+                            animate={{ scale: [1, 1.3, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                        />
+                        <span className="text-sm font-medium" style={{ color: goOS.colors.text.primary }}>
+                            {data.liveVisitors.length} live visitor{data.liveVisitors.length !== 1 ? 's' : ''}
+                        </span>
+                    </div>
+                    <span className="text-xs" style={{ color: goOS.colors.text.muted }}>
+                        {data.liveVisitors[0]?.viewing && `Viewing: ${data.liveVisitors[0].viewing}`}
+                    </span>
+                </div>
+
+                {/* Traffic Sources */}
+                <div
+                    className="p-4"
+                    style={{
+                        background: goOS.colors.cream,
+                        border: `2px solid ${goOS.colors.border}`,
+                        borderRadius: '4px',
+                        boxShadow: goOS.shadows.sm,
+                    }}
+                >
+                    <h4 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: goOS.colors.text.primary }}>
+                        <span>🌐</span> Where visitors come from
+                    </h4>
+                    <div className="space-y-2.5">
+                        {data.sources.map((source, i) => {
+                            const colors = ['#E85D04', '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'];
+                            return (
+                                <div key={source.name}>
+                                    <div className="flex items-center justify-between text-sm mb-1">
+                                        <span style={{ color: goOS.colors.text.primary }}>{source.name}</span>
+                                        <span className="font-medium" style={{ color: goOS.colors.text.secondary }}>
+                                            {source.count} ({source.percentage}%)
+                                        </span>
+                                    </div>
+                                    <SketchBar value={source.percentage} max={100} color={colors[i % colors.length]} />
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Top Content */}
+                <div
+                    className="p-4"
+                    style={{
+                        background: goOS.colors.cream,
+                        border: `2px solid ${goOS.colors.border}`,
+                        borderRadius: '4px',
+                        boxShadow: goOS.shadows.sm,
+                    }}
+                >
+                    <h4 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: goOS.colors.text.primary }}>
+                        <span>🔥</span> Most viewed
+                    </h4>
+                    <div className="space-y-2">
+                        {data.topContent.slice(0, 4).map((item, i) => (
+                            <div
+                                key={item.name}
+                                className="flex items-center gap-3 p-2"
+                                style={{
+                                    background: i === 0 ? goOS.colors.accent.orangePale : 'transparent',
+                                    borderRadius: '4px',
+                                }}
+                            >
+                                <span
+                                    className="w-5 h-5 flex items-center justify-center text-xs font-bold rounded"
+                                    style={{
+                                        background: goOS.colors.border,
+                                        color: 'white',
+                                    }}
+                                >
+                                    {i + 1}
+                                </span>
+                                <span className="flex-1 text-sm" style={{ color: goOS.colors.text.primary }}>{item.name}</span>
+                                <span className="text-xs" style={{ color: goOS.colors.text.muted }}>{item.opens} opens</span>
+                                <span
+                                    className="text-xs font-medium"
+                                    style={{ color: item.change >= 0 ? '#16a34a' : '#dc2626' }}
+                                >
+                                    {item.change >= 0 ? '+' : ''}{item.change}%
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Recruiter Funnel */}
+                <div
+                    className="p-4"
+                    style={{
+                        background: '#fef3c7',
+                        border: `2px solid ${goOS.colors.border}`,
+                        borderRadius: '4px',
+                        boxShadow: goOS.shadows.sm,
+                    }}
+                >
+                    <h4 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: goOS.colors.text.primary }}>
+                        <span>👔</span> Recruiter journey
+                    </h4>
+                    <div className="flex items-end justify-between gap-2">
+                        {[
+                            { label: 'Visited', value: data.recruiterFunnel.visited },
+                            { label: 'Viewed', value: data.recruiterFunnel.viewedWork },
+                            { label: 'CV', value: data.recruiterFunnel.downloadedCV },
+                            { label: 'Contact', value: data.recruiterFunnel.contacted },
+                        ].map((step, i) => {
+                            const maxVal = data.recruiterFunnel.visited;
+                            const height = Math.max(20, (step.value / maxVal) * 80);
+                            return (
+                                <div key={step.label} className="flex-1 text-center">
+                                    <motion.div
+                                        className="mx-auto mb-2"
+                                        style={{
+                                            width: '100%',
+                                            height: `${height}px`,
+                                            background: goOS.colors.accent.orange,
+                                            border: `2px solid ${goOS.colors.border}`,
+                                            borderRadius: '4px 4px 0 0',
+                                        }}
+                                        initial={{ height: 0 }}
+                                        animate={{ height: `${height}px` }}
+                                        transition={{ delay: i * 0.1 }}
+                                    />
+                                    <div className="text-lg font-bold" style={{ color: goOS.colors.text.primary }}>{step.value}</div>
+                                    <div className="text-[10px]" style={{ color: goOS.colors.text.muted }}>{step.label}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+GoOSAnalytics.displayName = 'GoOSAnalytics';
+
+// ============================================
 // TYPING INDICATOR
 // ============================================
 const TypingIndicator = () => (
@@ -1407,26 +1843,23 @@ function GoOSDemoContent() {
                         zIndex={windowZ.guestbook}
                         defaultX={getWindowX(450)}
                         defaultY={100}
-                        width={420}
-                        height={480}
+                        width={380}
+                        height={520}
                         onClose={() => closeApp('guestbook')}
                         onFocus={() => focusApp('guestbook')}
                     >
-                        <div className="h-full overflow-auto" style={{ background: goOS.colors.cream }}>
-                            <Guestbook
-                                entries={guestbookEntries}
-                                onSubmit={(entry) => {
-                                    const newEntry: GuestbookEntry = {
-                                        ...entry,
-                                        id: `gb-${Date.now()}`,
-                                        createdAt: new Date(),
-                                        isPublic: true,
-                                    };
-                                    setGuestbookEntries(prev => [newEntry, ...prev]);
-                                }}
-                                isOwnerView={false}
-                            />
-                        </div>
+                        <GoOSGuestbook
+                            entries={guestbookEntries}
+                            onSubmit={(entry) => {
+                                const newEntry: GuestbookEntry = {
+                                    ...entry,
+                                    id: `gb-${Date.now()}`,
+                                    createdAt: new Date(),
+                                    isPublic: true,
+                                };
+                                setGuestbookEntries(prev => [newEntry, ...prev]);
+                            }}
+                        />
                     </SketchWindow>
 
                     {/* Analytics Window */}
@@ -1436,16 +1869,14 @@ function GoOSDemoContent() {
                         icon={<BarChart3 size={14} />}
                         isOpen={appWindows.analytics}
                         zIndex={windowZ.analytics}
-                        defaultX={getWindowX(100)}
-                        defaultY={80}
-                        width={520}
-                        height={540}
+                        defaultX={getWindowX(80)}
+                        defaultY={60}
+                        width={440}
+                        height={580}
                         onClose={() => closeApp('analytics')}
                         onFocus={() => focusApp('analytics')}
                     >
-                        <div className="h-full overflow-auto" style={{ background: '#1a1a2e' }}>
-                            <AnalyticsDashboard data={DEMO_ANALYTICS_DATA} />
-                        </div>
+                        <GoOSAnalytics data={DEMO_ANALYTICS_DATA} />
                     </SketchWindow>
                 </AnimatePresence>
             </main>
