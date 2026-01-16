@@ -1,10 +1,25 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Presentation, Folder } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { PublishStatus } from './GoOSPublishToggle';
+
+// Throttle function for performance
+function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
+  func: T,
+  limit: number
+): T {
+  let inThrottle = false;
+  return ((...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  }) as T;
+}
 
 export type FileType = 'note' | 'case-study' | 'folder';
 
@@ -26,7 +41,7 @@ interface GoOSFileIconProps {
   onDrag?: (info: { x: number; y: number }) => void;
 }
 
-export function GoOSFileIcon({
+export const GoOSFileIcon = memo(function GoOSFileIcon({
   id,
   type,
   title,
@@ -52,6 +67,12 @@ export function GoOSFileIcon({
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const cleanupRef = useRef<(() => void) | null>(null);
   const isMountedRef = useRef(true);
+
+  // Throttle onDrag callback for performance (16ms = ~60fps)
+  const throttledOnDrag = useMemo(
+    () => onDrag ? throttle(onDrag, 16) : undefined,
+    [onDrag]
+  );
 
   // Cleanup event listeners on unmount
   useEffect(() => {
@@ -121,7 +142,8 @@ export function GoOSFileIcon({
       dragOffsetRef.current = { x: dx, y: dy };
       setDragOffset({ x: dx, y: dy });
 
-      onDrag?.({
+      // Use throttled callback for folder hit-testing
+      throttledOnDrag?.({
         x: position.x + dx + 40,
         y: position.y + dy + 40,
       });
@@ -155,7 +177,7 @@ export function GoOSFileIcon({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [isRenaming, position, onDragStartProp, onDrag, onPositionChange]);
+  }, [isRenaming, position, onDragStartProp, throttledOnDrag, onPositionChange]);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     if (hasDragged.current) {
@@ -295,6 +317,6 @@ export function GoOSFileIcon({
       )}
     </motion.div>
   );
-}
+});
 
 export default GoOSFileIcon;

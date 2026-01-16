@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -30,6 +31,7 @@ import {
     Star,
     BarChart3,
     BookOpen,
+    PenLine,
 } from 'lucide-react';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
@@ -39,14 +41,27 @@ import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { type GuestbookEntry } from '@/components/desktop/Guestbook';
 import type { DesktopItem, Desktop, StatusWidget as StatusWidgetType } from '@/types';
 import {
-    GoOSEditorWindow,
     GoOSFileIcon,
     GoOSDesktopContextMenu,
     GoOSFileContextMenu,
     type GoOSFile,
     type FileType,
 } from '@/components/goos-editor';
-import { PenLine } from 'lucide-react';
+
+// Lazy load heavy editor component (includes TipTap + all extensions)
+const GoOSEditorWindow = dynamic(
+    () => import('@/components/goos-editor/GoOSEditorWindow').then(mod => ({ default: mod.GoOSEditorWindow })),
+    {
+        loading: () => (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
+                <div className="bg-[#FAF8F0] p-6 rounded-lg border-2 border-[#2a2a2a] shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
+                    <div className="animate-pulse text-sm font-medium text-[#1a1a1a]">Loading editor...</div>
+                </div>
+            </div>
+        ),
+        ssr: false
+    }
+);
 
 // ============================================
 // GOOS DESIGN TOKENS
