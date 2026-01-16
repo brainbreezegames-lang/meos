@@ -1566,11 +1566,36 @@ function GoOSDemoContent() {
     const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
     // Get files in current folder (null/undefined both mean root level)
-    const filesInCurrentFolder = goosFiles.filter(f =>
+    const filesInCurrentFolder = useMemo(() => goosFiles.filter(f =>
         currentFolderId === null
             ? !f.parentFolderId  // Root: show files with no parent (undefined or null)
             : f.parentFolderId === currentFolderId  // Inside folder: match exact ID
-    );
+    ), [goosFiles, currentFolderId]);
+
+    // Ref for folder hit-testing (avoids re-creating callbacks)
+    const filesRef = React.useRef(filesInCurrentFolder);
+    filesRef.current = filesInCurrentFolder;
+    const dragOverRef = React.useRef<string | null>(null);
+
+    // Memoized folder hit-test function
+    const checkFolderHit = useCallback((dragPos: { x: number; y: number }, excludeFileId: string) => {
+        const folders = filesRef.current.filter(f => f.type === 'folder' && f.id !== excludeFileId && f.position);
+        let foundFolder: string | null = null;
+        for (const folder of folders) {
+            const folderX = folder.position.x;
+            const folderY = folder.position.y;
+            if (dragPos.x >= folderX && dragPos.x <= folderX + 80 &&
+                dragPos.y >= folderY && dragPos.y <= folderY + 80) {
+                foundFolder = folder.id;
+                break;
+            }
+        }
+        // Only update state if the value changed
+        if (dragOverRef.current !== foundFolder) {
+            dragOverRef.current = foundFolder;
+            setDragOverFolderId(foundFolder);
+        }
+    }, []);
 
     // File management functions
     const createFile = useCallback((type: FileType) => {
@@ -2031,22 +2056,7 @@ function GoOSDemoContent() {
                                 position={filePosition}
                                 isDraggedOver={dragOverFolderId === file.id}
                                 onDragStart={() => setDraggingFileId(file.id)}
-                                onDrag={(dragPos) => {
-                                    // Check if dragging over any folder
-                                    const folders = filesInCurrentFolder.filter(f => f.type === 'folder' && f.id !== file.id && f.position);
-                                    let foundFolder: string | null = null;
-                                    for (const folder of folders) {
-                                        const folderX = folder.position.x;
-                                        const folderY = folder.position.y;
-                                        // Check if drag position overlaps with folder (80x80 icon size)
-                                        if (dragPos.x >= folderX && dragPos.x <= folderX + 80 &&
-                                            dragPos.y >= folderY && dragPos.y <= folderY + 80) {
-                                            foundFolder = folder.id;
-                                            break;
-                                        }
-                                    }
-                                    setDragOverFolderId(foundFolder);
-                                }}
+                                onDrag={(dragPos) => checkFolderHit(dragPos, file.id)}
                                 onPositionChange={(pos) => {
                                     // Check if we're dropping on a folder
                                     if (draggingFileId && dragOverFolderId && dragOverFolderId !== draggingFileId) {
