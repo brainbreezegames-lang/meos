@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, Source_Code_Pro, Averia_Serif_Libre, Instrument_Sans } from "next/font/google";
+import { IBM_Plex_Sans, Source_Code_Pro, Averia_Serif_Libre, Instrument_Sans, Gochi_Hand } from "next/font/google";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { CommentProvider } from "@/contexts/CommentContext";
 import "./globals.css";
@@ -46,6 +46,13 @@ const instrumentSans = Instrument_Sans({
   variable: "--font-instrument",
 });
 
+// Handwritten font for sticky notes
+const gochiHand = Gochi_Hand({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-gochi",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -53,7 +60,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} ${averiaSerifLibre.variable} ${instrumentSans.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
+      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} ${averiaSerifLibre.variable} ${instrumentSans.variable} ${gochiHand.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
 
 
         <SessionProvider>

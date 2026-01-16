@@ -177,46 +177,106 @@ const MemoizedDockIcon = React.memo(({ icon, onClick, isActive, badge, label, is
 
 MemoizedDockIcon.displayName = 'DockIcon';
 
-// Sticky note with paper-like hover feel
-const MemoizedStickyNote = React.memo(({ children, color = '#FFB347', rotation = 0 }: {
+// Tactile Sticky Note with spring physics, drag momentum, and paper texture
+const springNote = { type: "spring", stiffness: 300, damping: 15 };
+
+type StickyNoteColor = 'yellow' | 'blue' | 'pink' | 'green' | 'orange' | 'purple';
+
+const stickyNoteColors: Record<StickyNoteColor, string> = {
+    yellow: '#fef08a',
+    blue: '#bae6fd',
+    pink: '#fbcfe8',
+    green: '#bbf7d0',
+    orange: '#fed7aa',
+    purple: '#e9d5ff'
+};
+
+const MemoizedStickyNote = React.memo(({
+    children,
+    color = 'yellow',
+    rotation = 0,
+    defaultPosition = { x: 0, y: 0 }
+}: {
     children: React.ReactNode;
-    color?: string;
+    color?: StickyNoteColor;
     rotation?: number;
-}) => (
-    <motion.div
-        initial={{ rotate: rotation, scale: 0.8, opacity: 0 }}
-        animate={{ rotate: rotation, scale: 1, opacity: 1 }}
-        whileHover={{
-            scale: 1.08,
-            rotate: rotation + 3,
-            boxShadow: "8px 8px 0 rgba(0,0,0,0.1)"
-        }}
-        whileTap={{ scale: 1.02 }}
-        transition={springGentle}
-        className="relative cursor-pointer"
-    >
-        <div
-            className="p-3 shadow-md"
+    defaultPosition?: { x: number; y: number };
+}) => {
+    const [isDragging, setIsDragging] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
+        <motion.div
+            drag
+            dragMomentum={true}
+            dragElastic={0.1}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setIsDragging(false)}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
+            initial={{
+                rotate: rotation,
+                scale: 0.8,
+                opacity: 0,
+                x: defaultPosition.x,
+                y: defaultPosition.y
+            }}
+            animate={{
+                // Straighten on hover (rotate to 0), otherwise keep initial rotation
+                rotate: isHovered ? 0 : rotation,
+                scale: isDragging ? 1.05 : isHovered ? 1.05 : 1,
+                opacity: 1,
+                // Dynamic shadow based on state
+                boxShadow: isDragging
+                    ? '12px 12px 20px rgba(0,0,0,0.25)'
+                    : isHovered
+                        ? '8px 8px 12px rgba(0,0,0,0.15)'
+                        : '4px 4px 8px rgba(0,0,0,0.1)'
+            }}
+            whileTap={{ scale: 1.02 }}
+            transition={springNote}
+            className="sticky-note relative cursor-grab active:cursor-grabbing select-none"
             style={{
-                backgroundColor: color,
-                border: '1.5px solid rgba(0,0,0,0.15)',
-                minWidth: '100px'
+                backgroundColor: stickyNoteColors[color],
+                minWidth: '110px',
+                padding: '14px 12px 18px 12px',
+                // Z-index boost when dragging
+                zIndex: isDragging ? 100 : isHovered ? 50 : 1
             }}
         >
-            {children}
-        </div>
-        {/* Tape with subtle shine */}
-        <motion.div
-            className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-2.5 opacity-60"
-            whileHover={{ opacity: 0.8 }}
-            style={{
-                background: 'linear-gradient(135deg, rgba(220,220,220,0.9), rgba(200,200,200,0.7))',
-                border: '1px solid rgba(0,0,0,0.1)',
-                transform: 'rotate(1deg)'
-            }}
-        />
-    </motion.div>
-));
+            {/* Paper grain texture (applied via CSS ::before) */}
+
+            {/* Content */}
+            <div className="relative z-10" style={{ fontFamily: 'var(--font-handwritten)' }}>
+                {children}
+            </div>
+
+            {/* Tape strip */}
+            <motion.div
+                className="absolute -top-2 left-1/2 -translate-x-1/2 w-10 h-3"
+                animate={{
+                    opacity: isDragging ? 0.9 : isHovered ? 0.8 : 0.6,
+                    scaleX: isDragging ? 1.1 : 1
+                }}
+                transition={springNote}
+                style={{
+                    background: 'linear-gradient(135deg, rgba(240,240,230,0.95) 0%, rgba(210,210,200,0.85) 100%)',
+                    border: '1px solid rgba(0,0,0,0.08)',
+                    borderRadius: '1px',
+                    transform: 'rotate(1deg)'
+                }}
+            />
+
+            {/* Fold corner shadow hint */}
+            <div
+                className="absolute bottom-0 right-0 w-4 h-4 pointer-events-none"
+                style={{
+                    background: 'linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.06) 50%)'
+                }}
+            />
+        </motion.div>
+    );
+});
 
 MemoizedStickyNote.displayName = 'StickyNote';
 
@@ -965,27 +1025,18 @@ export default function GoOSPage() {
                     className="absolute top-14 left-5 flex flex-col gap-2 pointer-events-auto"
                 >
                     <div className="mb-4 flex flex-col gap-3">
-                        <MemoizedStickyNote color="#FFB347" rotation={-3}>
-                            <span
-                                className="text-lg text-[#1a1a1a]"
-                                style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
-                            >
+                        <MemoizedStickyNote color="orange" rotation={-3}>
+                            <span className="text-xl text-[#2a2a2a]">
                                 Nest:
                             </span>
                         </MemoizedStickyNote>
-                        <MemoizedStickyNote color="#FFF9C4" rotation={4}>
-                            <span
-                                className="text-xs text-[#555] uppercase tracking-wide"
-                                style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
-                            >
+                        <MemoizedStickyNote color="yellow" rotation={4}>
+                            <span className="text-[10px] text-[#666] uppercase tracking-wider block mb-1">
                                 todo
                             </span>
-                            <div
-                                className="text-xl text-[#D64C00] leading-tight mt-0.5"
-                                style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
-                            >
+                            <span className="text-xl text-[#c53d00] leading-tight">
                                 honk!
-                            </div>
+                            </span>
                         </MemoizedStickyNote>
                     </div>
 

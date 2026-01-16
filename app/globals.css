@@ -140,6 +140,7 @@
     /* ========== TYPOGRAPHY ========== */
     --font-display: var(--font-averia), Georgia, serif;
     --font-body: var(--font-instrument), system-ui, sans-serif;
+    --font-handwritten: var(--font-gochi), 'Comic Sans MS', cursive;
 
     /* Type Scale (1.25 ratio - warm & approachable) */
     --text-display: 2rem;        /* 32px - Hero text */
@@ -314,6 +315,36 @@
 .theme-sketch .text-secondary { color: var(--text-secondary); }
 .theme-sketch .text-tertiary { color: var(--text-tertiary); }
 .theme-sketch .text-accent { color: var(--accent-dark); }
+
+/* ========== STICKY NOTE STYLES ========== */
+.sticky-note {
+    /* Dog-ear fold effect */
+    clip-path: polygon(0% 0%, 100% 0%, 100% 88%, 92% 100%, 0% 100%);
+    position: relative;
+    font-family: var(--font-handwritten);
+}
+
+/* Paper grain texture overlay */
+.sticky-note::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+}
+
+/* Muted pastel colors */
+.sticky-note-yellow { background-color: #fef08a; }
+.sticky-note-blue { background-color: #bae6fd; }
+.sticky-note-pink { background-color: #fbcfe8; }
+.sticky-note-green { background-color: #bbf7d0; }
+.sticky-note-orange { background-color: #fed7aa; }
+.sticky-note-purple { background-color: #e9d5ff; }
+
+/* Handwritten font utility */
+.theme-sketch .font-handwritten { font-family: var(--font-handwritten); }
 
 /* Light Mode Overrides (if needed later, but focusing on dark/premium first) */
 .light-mode {
