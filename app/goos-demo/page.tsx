@@ -28,13 +28,18 @@ import {
     Code,
     Palette,
     Star,
+    BarChart3,
+    BookOpen,
 } from 'lucide-react';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { WindowManager } from '@/components/desktop/MultiWindow';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
-import type { DesktopItem, Desktop } from '@/types';
+import { Guestbook, type GuestbookEntry } from '@/components/desktop/Guestbook';
+import { AnalyticsDashboard } from '@/components/desktop/AnalyticsDashboard';
+import { StatusWidget } from '@/components/desktop/StatusWidget';
+import type { DesktopItem, Desktop, StatusWidget as StatusWidgetType } from '@/types';
 
 // ============================================
 // GOOS DESIGN TOKENS
@@ -91,6 +96,98 @@ const PORTFOLIO_ICON_MAP: Record<string, React.ReactNode> = {
     'Skills': <Code size={28} stroke={goOS.colors.border} strokeWidth={1.5} />,
     'Portfolio': <Palette size={28} stroke={goOS.colors.border} strokeWidth={1.5} />,
     'Resume': <FileText size={28} stroke={goOS.colors.border} strokeWidth={1.5} />,
+};
+
+// ============================================
+// DEMO GUESTBOOK ENTRIES
+// ============================================
+const DEMO_GUESTBOOK_ENTRIES: GuestbookEntry[] = [
+    {
+        id: 'gb-1',
+        message: 'Love the playful design! The sticky notes are such a nice touch 🦆',
+        type: 'general',
+        authorType: 'named',
+        authorName: 'Sarah',
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+        isPublic: true,
+    },
+    {
+        id: 'gb-2',
+        message: 'Would love to collaborate on a project! Your work is inspiring.',
+        type: 'opportunity',
+        authorType: 'named',
+        authorName: 'Mike T.',
+        createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+        isPublic: true,
+        ownerMarkedHelpful: true,
+    },
+    {
+        id: 'gb-3',
+        message: 'This is the most creative portfolio I\'ve seen. Bookmarked!',
+        type: 'feedback',
+        authorType: 'anonymous',
+        createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
+        isPublic: true,
+    },
+];
+
+// ============================================
+// DEMO ANALYTICS DATA
+// ============================================
+const DEMO_ANALYTICS_DATA = {
+    overview: {
+        visitors: 847,
+        visitorsChange: 18,
+        pageViews: 2341,
+        pageViewsChange: 12,
+        avgTime: '3m 12s',
+        avgTimeChange: 5,
+    },
+    sources: [
+        { name: 'Direct', count: 312, percentage: 37 },
+        { name: 'Twitter', count: 245, percentage: 29 },
+        { name: 'LinkedIn', count: 156, percentage: 18 },
+        { name: 'Dribbble', count: 89, percentage: 11 },
+        { name: 'Other', count: 45, percentage: 5 },
+    ],
+    visitorTypes: {
+        recruiters: { count: 67, percentage: 8 },
+        visitors: { count: 712, percentage: 84 },
+        skipped: { count: 68, percentage: 8 },
+    },
+    topContent: [
+        { name: 'About Me', opens: 623, change: 8 },
+        { name: 'Projects', opens: 489, change: 15 },
+        { name: 'Photography', opens: 234, change: -3 },
+        { name: 'Contact', opens: 156, change: 22 },
+        { name: 'Skills', opens: 98, change: 5 },
+    ],
+    recruiterFunnel: {
+        visited: 67,
+        viewedWork: 52,
+        downloadedCV: 28,
+        contacted: 9,
+    },
+    liveVisitors: [
+        { location: 'San Francisco, US', viewing: 'Projects', duration: '2m 45s' },
+        { location: 'Berlin, DE', viewing: 'About Me', duration: '1m 12s' },
+    ],
+};
+
+// ============================================
+// DEMO STATUS WIDGET
+// ============================================
+const DEMO_STATUS_WIDGET: StatusWidgetType = {
+    id: 'status-demo',
+    desktopId: 'goos-demo',
+    statusType: 'available',
+    title: 'Open for work',
+    description: 'Looking for exciting projects',
+    ctaUrl: '#contact',
+    ctaLabel: 'Get in touch',
+    isVisible: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
 };
 
 // ============================================
@@ -844,6 +941,94 @@ const TypingIndicator = () => (
 );
 
 // ============================================
+// GOOS STATUS WIDGET (Sketch style)
+// ============================================
+const GoOSStatusWidget = React.memo(({ statusWidget }: { statusWidget: StatusWidgetType | null }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    if (!statusWidget || !statusWidget.isVisible) return null;
+
+    const statusColors: Record<string, { bg: string; dot: string; text: string }> = {
+        available: { bg: '#d1fae5', dot: '#10b981', text: '#065f46' },
+        looking: { bg: '#dbeafe', dot: '#3b82f6', text: '#1e40af' },
+        taking: { bg: '#fef3c7', dot: '#f59e0b', text: '#92400e' },
+        open: { bg: '#ede9fe', dot: '#8b5cf6', text: '#5b21b6' },
+        consulting: { bg: '#cffafe', dot: '#06b6d4', text: '#155e75' },
+    };
+
+    const colors = statusColors[statusWidget.statusType] || statusColors.available;
+
+    return (
+        <motion.div
+            className="fixed z-[2500] cursor-pointer"
+            style={{ bottom: '80px', right: '20px' }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
+        >
+            <motion.div
+                className="flex items-center gap-3 px-4 py-3 rounded-lg"
+                style={{
+                    background: goOS.colors.cream,
+                    border: `2px solid ${goOS.colors.border}`,
+                    boxShadow: isHovered ? goOS.shadows.hover : goOS.shadows.solid,
+                }}
+                animate={{ y: isHovered ? -2 : 0 }}
+                transition={goOS.springs.gentle}
+            >
+                {/* Status dot */}
+                <motion.div
+                    className="w-3 h-3 rounded-full"
+                    style={{ background: colors.dot }}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                />
+
+                {/* Content */}
+                <div className="flex flex-col">
+                    <span
+                        className="text-sm font-bold"
+                        style={{ color: goOS.colors.text.primary }}
+                    >
+                        {statusWidget.title}
+                    </span>
+                    {statusWidget.description && (
+                        <span
+                            className="text-xs"
+                            style={{ color: goOS.colors.text.muted }}
+                        >
+                            {statusWidget.description}
+                        </span>
+                    )}
+                </div>
+
+                {/* CTA Arrow */}
+                {statusWidget.ctaUrl && (
+                    <motion.a
+                        href={statusWidget.ctaUrl}
+                        className="ml-2 w-6 h-6 flex items-center justify-center rounded-full"
+                        style={{
+                            background: goOS.colors.accent.orange,
+                            color: 'white',
+                        }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                            <path d="M3.5 3a.5.5 0 0 0 0 1h3.793L3.146 8.146a.5.5 0 1 0 .708.708L8 4.707V8.5a.5.5 0 0 0 1 0v-5a.5.5 0 0 0-.5-.5h-5Z"/>
+                        </svg>
+                    </motion.a>
+                )}
+            </motion.div>
+        </motion.div>
+    );
+});
+
+GoOSStatusWidget.displayName = 'GoOSStatusWidget';
+
+// ============================================
 // MAIN CONTENT
 // ============================================
 function GoOSDemoContent() {
@@ -863,6 +1048,8 @@ function GoOSDemoContent() {
         settings: false,
         nest: false,
         shell: false,
+        guestbook: false,
+        analytics: false,
     });
 
     const [windowZ, setWindowZ] = useState<Record<string, number>>({
@@ -872,7 +1059,12 @@ function GoOSDemoContent() {
         settings: 53,
         nest: 54,
         shell: 55,
+        guestbook: 56,
+        analytics: 57,
     });
+
+    // Guestbook state
+    const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>(DEMO_GUESTBOOK_ENTRIES);
 
     useEffect(() => {
         const updateTime = () => {
@@ -1205,6 +1397,56 @@ function GoOSDemoContent() {
                             </div>
                         </div>
                     </SketchWindow>
+
+                    {/* Guestbook Window */}
+                    <SketchWindow
+                        id="guestbook"
+                        title="Guestbook"
+                        icon={<BookOpen size={14} />}
+                        isOpen={appWindows.guestbook}
+                        zIndex={windowZ.guestbook}
+                        defaultX={getWindowX(450)}
+                        defaultY={100}
+                        width={420}
+                        height={480}
+                        onClose={() => closeApp('guestbook')}
+                        onFocus={() => focusApp('guestbook')}
+                    >
+                        <div className="h-full overflow-auto" style={{ background: goOS.colors.cream }}>
+                            <Guestbook
+                                entries={guestbookEntries}
+                                onSubmit={(entry) => {
+                                    const newEntry: GuestbookEntry = {
+                                        ...entry,
+                                        id: `gb-${Date.now()}`,
+                                        createdAt: new Date(),
+                                        isPublic: true,
+                                    };
+                                    setGuestbookEntries(prev => [newEntry, ...prev]);
+                                }}
+                                isOwnerView={false}
+                            />
+                        </div>
+                    </SketchWindow>
+
+                    {/* Analytics Window */}
+                    <SketchWindow
+                        id="analytics"
+                        title="Analytics"
+                        icon={<BarChart3 size={14} />}
+                        isOpen={appWindows.analytics}
+                        zIndex={windowZ.analytics}
+                        defaultX={getWindowX(100)}
+                        defaultY={80}
+                        width={520}
+                        height={540}
+                        onClose={() => closeApp('analytics')}
+                        onFocus={() => focusApp('analytics')}
+                    >
+                        <div className="h-full overflow-auto" style={{ background: '#1a1a2e' }}>
+                            <AnalyticsDashboard data={DEMO_ANALYTICS_DATA} />
+                        </div>
+                    </SketchWindow>
                 </AnimatePresence>
             </main>
 
@@ -1270,8 +1512,25 @@ function GoOSDemoContent() {
                         isActive={appWindows.settings}
                         label="Settings"
                     />
+                    <div className="w-px h-8 bg-black/10 mx-1" />
+                    <DockIcon
+                        icon={<BookOpen size={24} stroke={goOS.colors.border} strokeWidth={1.5} />}
+                        onClick={() => toggleApp('guestbook')}
+                        isActive={appWindows.guestbook}
+                        badge={guestbookEntries.length}
+                        label="Guestbook"
+                    />
+                    <DockIcon
+                        icon={<BarChart3 size={24} stroke={goOS.colors.border} strokeWidth={1.5} />}
+                        onClick={() => toggleApp('analytics')}
+                        isActive={appWindows.analytics}
+                        label="Analytics"
+                    />
                 </div>
             </footer>
+
+            {/* Status Widget */}
+            <GoOSStatusWidget statusWidget={DEMO_STATUS_WIDGET} />
 
             {/* Made with badge */}
             <motion.a
