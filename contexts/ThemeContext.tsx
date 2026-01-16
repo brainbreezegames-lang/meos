@@ -119,6 +119,14 @@ export function ThemeProvider({
     // Set data-theme attribute for CSS variable switching
     document.documentElement.setAttribute('data-theme', themeId);
 
+    // Also add theme class to document for CSS selectors
+    // Remove all existing theme classes first
+    document.documentElement.classList.remove(
+      'theme-monterey', 'theme-dark', 'theme-bluren', 'theme-refined',
+      'theme-warm', 'theme-clay', 'theme-posthog', 'theme-sketch'
+    );
+    document.documentElement.classList.add(`theme-${themeId}`);
+
     // Set color-scheme for browser UI elements
     document.documentElement.style.colorScheme = themeInfo.isDark ? 'dark' : 'light';
   }, []);

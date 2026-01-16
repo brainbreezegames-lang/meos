@@ -120,10 +120,27 @@
 
     --font-display: var(--font-sans);
     --letter-spacing-tight: -0.02em;
+    --letter-spacing-normal: 0;
     --spacing-window-padding: 24px;
     --radius-button: var(--radius-sm);
     --border-width: 1px;
     --border-medium: var(--border-light);
+
+    /* Typography sizes for blocks */
+    --font-size-body: 14px;
+    --line-height-body: 1.6;
+    --font-size-heading: 18px;
+    --font-size-small: 12px;
+
+    /* Button styling */
+    --spacing-button-gap: 8px;
+    --spacing-inline-gap: 6px;
+    --spacing-button-padding: 8px 14px;
+    --font-size-button: 13px;
+    --font-size-button-icon: 14px;
+    --font-weight-medium: 500;
+    --letter-spacing-button: -0.01em;
+    --text-transform-button: none;
 
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.2);
     --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
@@ -136,7 +153,9 @@
    Typography: Averia Serif Libre (display) + Instrument Sans (body)
    ============================================ */
 
-.theme-sketch {
+.theme-sketch,
+[data-theme="sketch"],
+html.theme-sketch {
     /* ========== TYPOGRAPHY ========== */
     --font-display: var(--font-averia), Georgia, serif;
     --font-body: var(--font-instrument), system-ui, sans-serif;
@@ -239,6 +258,70 @@
     --transition-fast: 150ms ease;
     --transition-normal: 200ms ease;
     --transition-slow: 300ms ease;
+
+    /* ========== WINDOW COMPATIBILITY ========== */
+    /* Override default window styling for sketch theme */
+    --bg-glass-elevated: var(--bg-surface);
+    --bg-glass: var(--bg-surface);
+    --bg-glass-heavy: var(--bg-muted);
+    --blur-glass: none;
+    --radius-window: var(--radius-sm);
+    --border-glass-outer: var(--border-strong);
+    --border-glass-inner: var(--border-medium);
+    --border-light: var(--border-subtle);
+    --border-highlight: var(--border-medium);
+
+    /* Window dimensions */
+    --window-header-height: 52px;
+    --line-height-normal: var(--leading-normal);
+
+    /* Typography sizes for blocks */
+    --font-size-body: var(--text-body);
+    --line-height-body: var(--leading-relaxed);
+    --font-size-heading: var(--text-heading);
+    --font-size-small: var(--text-sm);
+    --letter-spacing-normal: var(--tracking-normal);
+
+    /* Traffic lights - solid colors with borders */
+    --traffic-size: 14px;
+    --traffic-gap: 8px;
+    --traffic-red: #FF6B6B;
+    --traffic-red-hover: #FF5252;
+    --traffic-yellow: #FFD93D;
+    --traffic-yellow-hover: #FFC107;
+    --traffic-green: #6BCB77;
+    --traffic-green-hover: #4CAF50;
+
+    /* Window shadows - solid offset style */
+    --shadow-window: 6px 6px 0 rgba(0, 0, 0, 0.1);
+    --shadow-dock: 4px 4px 0 rgba(0, 0, 0, 0.1);
+
+    /* Dock styling */
+    --bg-dock: var(--bg-muted);
+    --blur-dock: none;
+
+    /* Additional compatibility */
+    --bg-card: var(--bg-surface);
+    --bg-item: var(--bg-surface);
+    --bg-app: var(--bg-canvas);
+    --bg-subtle: var(--bg-elevated);
+    --shadow-item: var(--shadow-md);
+    --shadow-item-hover: var(--shadow-lg);
+    --accent-success: var(--color-success);
+    --spacing-window-padding: var(--space-5);
+    --radius-xs: var(--radius-sm);
+    --radius-xl: var(--radius-lg);
+    --shadow-button: var(--shadow-sm);
+
+    /* Button styling - goOS sketch style */
+    --spacing-button-gap: var(--space-3);
+    --spacing-inline-gap: var(--space-2);
+    --spacing-button-padding: var(--space-2) var(--space-4);
+    --font-size-button: var(--text-sm);
+    --font-size-button-icon: var(--text-body);
+    --font-weight-medium: var(--weight-medium);
+    --letter-spacing-button: var(--tracking-normal);
+    --text-transform-button: none;
 
     /* ========== APPLY DEFAULTS ========== */
     font-family: var(--font-body);

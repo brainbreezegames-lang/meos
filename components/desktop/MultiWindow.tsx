@@ -396,10 +396,10 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isMaximized ? 12 : 14,
+            borderRadius: themeContext?.theme === 'sketch' ? 4 : (isMaximized ? 12 : 14),
             background: colors.windowBg,
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            backdropFilter: themeContext?.theme === 'sketch' ? 'none' : 'blur(20px)',
+            WebkitBackdropFilter: themeContext?.theme === 'sketch' ? 'none' : 'blur(20px)',
             boxShadow: colors.windowShadow,
             border: colors.windowBorder,
             opacity: isActive ? 1 : 0.95,
@@ -429,7 +429,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleClose}
                 aria-label="Close window"
                 className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1"
-                style={{
+                style={themeContext?.theme === 'sketch' ? {
+                  width: 14,
+                  height: 14,
+                  background: '#FF6B6B',
+                  border: '1.5px solid #2a2a2a',
+                } : {
                   width: 12,
                   height: 12,
                   background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
@@ -437,7 +442,7 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 }}
               >
                 <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                  <path d="M1 1L7 7M7 1L1 7" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(77, 0, 0, 0.7)'} strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
 
@@ -446,7 +451,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleMinimize}
                 aria-label="Minimize window"
                 className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-1"
-                style={{
+                style={themeContext?.theme === 'sketch' ? {
+                  width: 14,
+                  height: 14,
+                  background: '#FFD93D',
+                  border: '1.5px solid #2a2a2a',
+                } : {
                   width: 12,
                   height: 12,
                   background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
@@ -454,7 +464,7 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 }}
               >
                 <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                  <path d="M1 4H7" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(100, 65, 0, 0.7)'} strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
 
@@ -463,7 +473,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleMaximize}
                 aria-label={isMaximized ? "Restore window" : "Maximize window"}
                 className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-1"
-                style={{
+                style={themeContext?.theme === 'sketch' ? {
+                  width: 14,
+                  height: 14,
+                  background: '#6BCB77',
+                  border: '1.5px solid #2a2a2a',
+                } : {
                   width: 12,
                   height: 12,
                   background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
@@ -474,12 +489,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   {isMaximized ? (
                     // Restore icon (two overlapping rectangles)
                     <>
-                      <rect x="1" y="2.5" width="4" height="4" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1" fill="none" />
-                      <rect x="3" y="0.5" width="4" height="4" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1" fill="none" />
+                      <rect x="1" y="2.5" width="4" height="4" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(0, 70, 0, 0.7)'} strokeWidth="1" fill="none" />
+                      <rect x="3" y="0.5" width="4" height="4" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(0, 70, 0, 0.7)'} strokeWidth="1" fill="none" />
                     </>
                   ) : (
                     // Maximize icon (expand arrows)
-                    <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                    <path d="M1 2.5L4 5.5L7 2.5" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(0, 70, 0, 0.7)'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                   )}
                 </svg>
               </button>
@@ -522,8 +537,9 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   <div
                     className="relative w-16 h-16 overflow-hidden shrink-0"
                     style={{
-                      borderRadius: 12,
+                      borderRadius: themeContext?.theme === 'sketch' ? 4 : 12,
                       boxShadow: colors.imageShadow,
+                      border: themeContext?.theme === 'sketch' ? '2px solid #2a2a2a' : 'none',
                     }}
                   >
                     <Image
@@ -539,8 +555,9 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 <div
                   className="relative w-16 h-16 overflow-hidden shrink-0"
                   style={{
-                    borderRadius: 12,
+                    borderRadius: themeContext?.theme === 'sketch' ? 4 : 12,
                     boxShadow: colors.imageShadow,
+                    border: themeContext?.theme === 'sketch' ? '2px solid #2a2a2a' : 'none',
                   }}
                 >
                   <Image
