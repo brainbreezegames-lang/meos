@@ -1550,13 +1550,19 @@ function GoOSDemoContent() {
     const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
     const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
-    // Get files in current folder
-    const filesInCurrentFolder = goosFiles.filter(f => f.parentFolderId === currentFolderId);
+    // Get files in current folder (null/undefined both mean root level)
+    const filesInCurrentFolder = goosFiles.filter(f =>
+        currentFolderId === null
+            ? !f.parentFolderId  // Root: show files with no parent (undefined or null)
+            : f.parentFolderId === currentFolderId  // Inside folder: match exact ID
+    );
 
     // File management functions
     const createFile = useCallback((type: FileType) => {
         // Find a free position for the new file
-        const filesInFolder = goosFiles.filter(f => f.parentFolderId === currentFolderId);
+        const filesInFolder = goosFiles.filter(f =>
+            currentFolderId === null ? !f.parentFolderId : f.parentFolderId === currentFolderId
+        );
         const baseX = 40 + (filesInFolder.length % 8) * 100;
         const baseY = 320 + Math.floor(filesInFolder.length / 8) * 100;
         const newFile: GoOSFile = {
