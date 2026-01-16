@@ -67,6 +67,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const cleanupRef = useRef<(() => void) | null>(null);
   const isMountedRef = useRef(true);
+  const lastMouseDownTime = useRef(0);
 
   // Throttle onDrag callback for performance (16ms = ~60fps)
   const throttledOnDrag = useMemo(
@@ -119,6 +120,16 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (isRenaming) return;
     if (e.button !== 0) return;
+
+    // Detect potential double-click - don't start drag if clicking rapidly
+    const now = Date.now();
+    const timeSinceLastClick = now - lastMouseDownTime.current;
+    lastMouseDownTime.current = now;
+
+    if (timeSinceLastClick < 300) {
+      // This is likely a double-click, let native dblclick event fire
+      return;
+    }
 
     e.preventDefault();
     e.stopPropagation();
