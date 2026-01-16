@@ -1856,8 +1856,11 @@ function GoOSDemoContent() {
             className="min-h-screen w-full relative overflow-hidden theme-sketch"
             style={{
                 backgroundColor: goOS.colors.paper,
-                backgroundImage: 'radial-gradient(#d4d4d4 1px, transparent 1px)',
-                backgroundSize: '24px 24px'
+                backgroundImage: 'url(/geeseBg.jpg)',
+                backgroundSize: 'contain',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                imageRendering: 'crisp-edges',
             }}
             onContextMenu={handleDesktopContextMenu}
             onClick={(e) => {
