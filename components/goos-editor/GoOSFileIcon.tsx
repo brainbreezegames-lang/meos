@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Presentation, Folder } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
@@ -44,10 +44,12 @@ export function GoOSFileIcon({
   onDrag,
 }: GoOSFileIconProps) {
   const [renameValue, setRenameValue] = useState(title);
-  const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
   const dragStartPos = useRef({ x: 0, y: 0 });
   const hasDragged = useRef(false);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
 
   const getIcon = () => {
     switch (type) {
@@ -79,32 +81,30 @@ export function GoOSFileIcon({
     }
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (isRenaming) return;
-    if (e.button !== 0) return; // Only left click
+    if (e.button !== 0) return;
 
     e.preventDefault();
-    setIsDragging(true);
-    hasDragged.current = false;
+    e.stopPropagation();
+
     dragStartPos.current = { x: e.clientX, y: e.clientY };
+    hasDragged.current = false;
+    dragOffsetRef.current = { x: 0, y: 0 };
+    setIsDragging(true);
     onDragStartProp?.();
-  };
 
-  useEffect(() => {
-    if (!isDragging) return;
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const dx = moveEvent.clientX - dragStartPos.current.x;
+      const dy = moveEvent.clientY - dragStartPos.current.y;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const dx = e.clientX - dragStartPos.current.x;
-      const dy = e.clientY - dragStartPos.current.y;
-
-      // Only count as drag if moved more than 3px
       if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
         hasDragged.current = true;
       }
 
+      dragOffsetRef.current = { x: dx, y: dy };
       setDragOffset({ x: dx, y: dy });
 
-      // Notify parent of current drag position (for folder detection)
       onDrag?.({
         x: position.x + dx + 40,
         y: position.y + dy + 40,
@@ -112,13 +112,15 @@ export function GoOSFileIcon({
     };
 
     const handleMouseUp = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+
       setIsDragging(false);
 
       if (hasDragged.current) {
-        // Update final position
         onPositionChange?.({
-          x: position.x + dragOffset.x,
-          y: position.y + dragOffset.y,
+          x: position.x + dragOffsetRef.current.x,
+          y: position.y + dragOffsetRef.current.y,
         });
       }
 
@@ -127,21 +129,15 @@ export function GoOSFileIcon({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+  }, [isRenaming, position, onDragStartProp, onDrag, onPositionChange]);
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, position, dragOffset, onPositionChange, onDrag]);
-
-  const handleClick = (e: React.MouseEvent) => {
-    // Don't trigger click if we just finished dragging
+  const handleClick = useCallback((e: React.MouseEvent) => {
     if (hasDragged.current) {
       hasDragged.current = false;
       return;
     }
     onClick?.(e);
-  };
+  }, [onClick]);
 
   const currentX = position.x + dragOffset.x;
   const currentY = position.y + dragOffset.y;
@@ -233,7 +229,7 @@ export function GoOSFileIcon({
             if (e.key === 'Enter') handleRenameSubmit();
             if (e.key === 'Escape') {
               setRenameValue(title);
-              onRename?.(title); // Signal cancel
+              onRename?.(title);
             }
           }}
           style={{
