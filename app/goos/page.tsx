@@ -515,6 +515,154 @@ const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
 
 CelebratoryCheckbox.displayName = 'CelebratoryCheckbox';
 
+// Animated toggle switch with satisfying physics
+const AnimatedToggle = React.memo(({ defaultOn = false, onChange }: {
+    defaultOn?: boolean;
+    onChange?: (isOn: boolean) => void;
+}) => {
+    const [isOn, setIsOn] = useState(defaultOn);
+    const [justToggled, setJustToggled] = useState(false);
+
+    const handleToggle = () => {
+        const newValue = !isOn;
+        setIsOn(newValue);
+        setJustToggled(true);
+        onChange?.(newValue);
+        setTimeout(() => setJustToggled(false), 300);
+    };
+
+    return (
+        <motion.button
+            onClick={handleToggle}
+            className="relative w-11 h-6 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--accent-light)] focus:ring-offset-2"
+            animate={{
+                backgroundColor: isOn ? '#E85D04' : '#2a2a2a'
+            }}
+            transition={{ duration: 0.2 }}
+            whileTap={{ scale: 0.95 }}
+            aria-pressed={isOn}
+            role="switch"
+        >
+            <motion.div
+                className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
+                animate={{
+                    left: isOn ? 'calc(100% - 20px)' : '4px',
+                    scale: justToggled ? [1, 1.2, 1] : 1
+                }}
+                transition={springSnappy}
+            />
+            {/* Glow effect when toggled on */}
+            <AnimatePresence>
+                {justToggled && isOn && (
+                    <motion.div
+                        initial={{ scale: 0.8, opacity: 0.8 }}
+                        animate={{ scale: 1.5, opacity: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 rounded-full bg-[#E85D04]"
+                    />
+                )}
+            </AnimatePresence>
+        </motion.button>
+    );
+});
+
+AnimatedToggle.displayName = 'AnimatedToggle';
+
+// Playful menu item with wobble
+const MenuBarItem = React.memo(({ label }: { label: string }) => (
+    <motion.span
+        whileHover={{ scale: 1.05, y: -1 }}
+        whileTap={{ scale: 0.95 }}
+        transition={springSnappy}
+        className="cursor-pointer text-[#3a3a3a] hover:text-orange-600 transition-colors select-none"
+        style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
+    >
+        {label}
+    </motion.span>
+));
+
+MenuBarItem.displayName = 'MenuBarItem';
+
+// Typing indicator with bouncing dots
+const TypingIndicator = React.memo(() => (
+    <div className="flex gap-3">
+        <div className="w-8 h-8 rounded-full bg-[var(--accent-light)] border-2 border-[var(--border-strong)] flex items-center justify-center text-sm shadow-sm flex-shrink-0">🦆</div>
+        <div className="bg-white/80 border-2 border-[var(--border-strong)] rounded-xl rounded-tl-none px-4 py-2.5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+            <div className="flex gap-1 items-center h-5">
+                {[0, 1, 2].map(i => (
+                    <motion.div
+                        key={i}
+                        className="w-2 h-2 rounded-full bg-[var(--text-tertiary)]"
+                        animate={{ y: [0, -4, 0] }}
+                        transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: i * 0.15,
+                            ease: "easeInOut"
+                        }}
+                    />
+                ))}
+            </div>
+        </div>
+    </div>
+));
+
+TypingIndicator.displayName = 'TypingIndicator';
+
+// Celebration button with confetti burst
+const CelebrationButton = React.memo(({ children, onClick }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+}) => {
+    const [isCelebrating, setIsCelebrating] = useState(false);
+
+    const handleClick = () => {
+        setIsCelebrating(true);
+        onClick?.();
+        setTimeout(() => setIsCelebrating(false), 800);
+    };
+
+    return (
+        <motion.button
+            onClick={handleClick}
+            className="relative px-4 py-2 text-sm border-2 border-[var(--border-strong)] bg-white text-[var(--text-primary)] hover:bg-[var(--accent-pale)] rounded transition-all overflow-visible"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 600, boxShadow: 'var(--shadow-button)' }}
+            whileHover={{ scale: 1.02, y: -1 }}
+            whileTap={{ scale: 0.98, y: 1 }}
+            transition={springSnappy}
+        >
+            {children}
+
+            {/* Confetti burst */}
+            <AnimatePresence>
+                {isCelebrating && (
+                    <>
+                        {['🎉', '✨', '💌', '🦆', '⭐'].map((emoji, i) => (
+                            <motion.span
+                                key={i}
+                                initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
+                                animate={{
+                                    scale: [0, 1.2, 1],
+                                    opacity: [1, 1, 0],
+                                    x: (Math.random() - 0.5) * 80,
+                                    y: -30 - Math.random() * 40
+                                }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.6, delay: i * 0.05 }}
+                                className="absolute left-1/2 top-0 text-base pointer-events-none"
+                            >
+                                {emoji}
+                            </motion.span>
+                        ))}
+                    </>
+                )}
+            </AnimatePresence>
+        </motion.button>
+    );
+});
+
+CelebrationButton.displayName = 'CelebrationButton';
+
 // ============================================
 // WINDOW COMPONENT (WITH DRAG & ANIMATION)
 // ============================================
@@ -615,9 +763,21 @@ function SketchWindow({
 // ============================================
 // MAIN PAGE COMPONENT
 // ============================================
+// Get time-based greeting
+const getGreeting = (hour: number): string => {
+    if (hour < 5) return "Night owl? 🦉";
+    if (hour < 12) return "Good morning! ☀️";
+    if (hour < 17) return "Good afternoon! 🌤";
+    if (hour < 21) return "Good evening! 🌅";
+    return "Night owl? 🦉";
+};
+
 export default function GoOSPage() {
     const [time, setTime] = useState('00:00');
+    const [greeting, setGreeting] = useState('');
     const [topZIndex, setTopZIndex] = useState(100);
+    const [logoClickCount, setLogoClickCount] = useState(0);
+    const [showEasterEgg, setShowEasterEgg] = useState(false);
 
     // Window initialization with ids and default data
     const [winStates, setWinStates] = useState<Record<string, { isOpen: boolean, isMinimized: boolean, zIndex: number }>>({
@@ -641,16 +801,28 @@ export default function GoOSPage() {
         settings: { title: 'Settings', icon: <Settings size={14} />, width: 380, height: 320, x: 380, y: 150 },
     }), []);
 
-    // Update time optimized
+    // Update time and greeting
     useEffect(() => {
         const updateTime = () => {
             const now = new Date();
             setTime(now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
+            setGreeting(getGreeting(now.getHours()));
         };
         updateTime();
         const interval = setInterval(updateTime, 30000); // Only update every 30s
         return () => clearInterval(interval);
     }, []);
+
+    // Easter egg: click logo 5 times
+    const handleLogoClick = useCallback(() => {
+        const newCount = logoClickCount + 1;
+        setLogoClickCount(newCount);
+        if (newCount >= 5) {
+            setShowEasterEgg(true);
+            setLogoClickCount(0);
+            setTimeout(() => setShowEasterEgg(false), 3000);
+        }
+    }, [logoClickCount]);
 
     // Optimized Window operations
     const focusWindow = useCallback((id: string) => {
@@ -705,32 +877,72 @@ export default function GoOSPage() {
             }}
         >
             {/* ====================
-                MENU BAR 
+                MENU BAR
                 ==================== */}
             <header
                 className="h-10 flex items-center justify-between px-5 relative z-[2000] shadow-sm select-none"
                 style={{ background: '#F0EDE0', borderBottom: '2px solid #2a2a2a' }}
             >
                 <div className="flex items-center gap-8">
-                    <span
-                        className="text-xl tracking-tight text-[#1a1a1a]"
+                    <motion.button
+                        onClick={handleLogoClick}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95, rotate: [-5, 5, 0] }}
+                        transition={springSnappy}
+                        className="text-xl tracking-tight text-[#1a1a1a] cursor-pointer focus:outline-none relative"
                         style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
                     >
                         goOS
-                    </span>
+                        {/* Easter egg burst */}
+                        <AnimatePresence>
+                            {showEasterEgg && (
+                                <>
+                                    {['🦆', '🥚', '✨', '🎉', '🦆', '💫'].map((emoji, i) => (
+                                        <motion.span
+                                            key={i}
+                                            initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
+                                            animate={{
+                                                scale: [0, 1.5, 1],
+                                                opacity: [1, 1, 0],
+                                                x: (Math.random() - 0.5) * 120,
+                                                y: -20 - Math.random() * 60
+                                            }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.8, delay: i * 0.08 }}
+                                            className="absolute left-1/2 top-0 text-xl pointer-events-none"
+                                        >
+                                            {emoji}
+                                        </motion.span>
+                                    ))}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 20 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute left-1/2 -translate-x-1/2 top-full whitespace-nowrap bg-[var(--accent-primary)] text-white px-2 py-1 rounded text-xs"
+                                        style={{ fontFamily: 'var(--font-body)', fontWeight: 600 }}
+                                    >
+                                        You found the duck! 🦆
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
+                    </motion.button>
                     <nav className="flex gap-5 text-sm">
                         {['File', 'Edit', 'View', 'Help'].map(item => (
-                            <span
-                                key={item}
-                                className="cursor-pointer text-[#3a3a3a] hover:text-orange-600 transition-colors"
-                                style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
-                            >
-                                {item}
-                            </span>
+                            <MenuBarItem key={item} label={item} />
                         ))}
                     </nav>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-[#3a3a3a]" style={{ fontFamily: "var(--font-body)" }}>
+                    {/* Time-based greeting */}
+                    <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-xs text-[var(--text-tertiary)] hidden sm:block"
+                        style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}
+                    >
+                        {greeting}
+                    </motion.span>
                     <div className="flex items-center gap-1.5">
                         <Battery size={15} strokeWidth={2} />
                         <span className="font-medium">87%</span>
@@ -921,12 +1133,7 @@ export default function GoOSPage() {
                                                 <p className="text-base text-[var(--text-secondary)] leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>How's the migration going?</p>
                                             </article>
                                             <footer className="flex justify-end gap-2 pt-3 border-t border-[var(--border-subtle)]">
-                                                <button
-                                                    className="px-4 py-2 text-sm border-2 border-[var(--border-strong)] bg-white text-[var(--text-primary)] hover:bg-[var(--accent-pale)] rounded transition-all active:translate-y-px"
-                                                    style={{ fontFamily: 'var(--font-body)', fontWeight: 600, boxShadow: 'var(--shadow-button)' }}
-                                                >
-                                                    ↩ Reply
-                                                </button>
+                                                <CelebrationButton>↩ Reply</CelebrationButton>
                                             </footer>
                                         </div>
                                     )}
@@ -1002,6 +1209,8 @@ export default function GoOSPage() {
                                                         <span className="text-sm text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}>80% complete! Just polishing the windows.</span>
                                                     </div>
                                                 </div>
+                                                {/* Typing indicator */}
+                                                <TypingIndicator />
                                             </div>
                                             <div className="p-3 bg-[var(--bg-elevated)] border-t-2 border-[var(--border-strong)]">
                                                 <input
@@ -1030,9 +1239,7 @@ export default function GoOSPage() {
                                                     >
                                                         Dark Mode
                                                     </span>
-                                                    <div className="w-11 h-6 bg-[var(--border-strong)] rounded-full relative cursor-pointer">
-                                                        <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all" />
-                                                    </div>
+                                                    <AnimatedToggle defaultOn={false} />
                                                 </div>
                                             </section>
                                             <section>
