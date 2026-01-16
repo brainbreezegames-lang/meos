@@ -2000,7 +2000,7 @@ function GoOSDemoContent() {
                 )}
 
                 {/* goOS File Icons */}
-                <AnimatePresence>
+                <AnimatePresence mode="sync" initial={false}>
                     {filesInCurrentFolder.map((file) => {
                         // Ensure file has a valid position
                         const filePosition = file.position || { x: 40, y: 320 };

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Presentation, Folder } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
@@ -50,6 +50,20 @@ export function GoOSFileIcon({
   const dragStartPos = useRef({ x: 0, y: 0 });
   const hasDragged = useRef(false);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const cleanupRef = useRef<(() => void) | null>(null);
+  const isMountedRef = useRef(true);
+
+  // Cleanup event listeners on unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (cleanupRef.current) {
+        cleanupRef.current();
+        cleanupRef.current = null;
+      }
+    };
+  }, []);
 
   const getIcon = () => {
     switch (type) {
@@ -95,6 +109,8 @@ export function GoOSFileIcon({
     onDragStartProp?.();
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!isMountedRef.current) return;
+
       const dx = moveEvent.clientX - dragStartPos.current.x;
       const dy = moveEvent.clientY - dragStartPos.current.y;
 
@@ -112,8 +128,9 @@ export function GoOSFileIcon({
     };
 
     const handleMouseUp = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      cleanup();
+
+      if (!isMountedRef.current) return;
 
       setIsDragging(false);
 
@@ -126,6 +143,15 @@ export function GoOSFileIcon({
 
       setDragOffset({ x: 0, y: 0 });
     };
+
+    const cleanup = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      cleanupRef.current = null;
+    };
+
+    // Store cleanup function for unmount
+    cleanupRef.current = cleanup;
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
