@@ -358,6 +358,72 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         accentLight: 'rgba(234,88,12,0.1)',
       };
 
+    case 'sketch':
+      // Sketch/goOS: Hand-drawn, playful, paper-like
+      return {
+        windowBg: '#FFFDF5',
+        windowShadow: '6px 6px 0 rgba(0,0,0,0.1)',
+        windowShadowInactive: '4px 4px 0 rgba(0,0,0,0.08)',
+        windowBorder: '#2a2a2a',
+
+        titleBarBg: '#F5F3E8',
+        titleBarBorder: '#2a2a2a',
+        titleText: '#1a1a1a',
+        iconColor: '#E85D04',
+
+        sidebarBg: '#F0EDE0',
+        sidebarBorder: 'rgba(42,42,42,0.2)',
+        searchBg: 'rgba(42,42,42,0.06)',
+        searchBgFocused: '#FFFDF5',
+        searchBorder: 'transparent',
+        searchBorderFocused: '#E85D04',
+        searchShadowFocused: '3px 3px 0 rgba(232,93,4,0.2)',
+        searchIcon: '#666666',
+        searchIconFocused: '#E85D04',
+        searchText: '#1a1a1a',
+
+        folderText: '#1a1a1a',
+        folderCount: '#666666',
+        folderHoverBg: 'rgba(42,42,42,0.08)',
+
+        noteCardBg: '#FFFDF5',
+        noteCardShadow: '3px 3px 0 rgba(0,0,0,0.08)',
+        noteCardHoverShadow: '4px 4px 0 rgba(0,0,0,0.12)',
+        noteCardSelectedBg: '#E85D04',
+        noteCardSelectedShadow: '4px 4px 0 rgba(0,0,0,0.15)',
+        noteTitle: '#1a1a1a',
+        noteTitleSelected: '#FFFDF5',
+        noteDate: '#E85D04',
+        noteDateSelected: 'rgba(255,253,245,0.85)',
+        notePreview: '#666666',
+        notePreviewSelected: 'rgba(255,253,245,0.8)',
+        noteDot: 'rgba(42,42,42,0.2)',
+        noteDotSelected: 'rgba(255,253,245,0.5)',
+
+        contentBg: '#FFFDF5',
+        contentHeaderBg: 'transparent',
+        contentBorder: 'rgba(42,42,42,0.15)',
+        contentTitle: '#1a1a1a',
+        contentMeta: '#666666',
+        contentText: '#3a3a3a',
+
+        emptyBg: 'rgba(232,93,4,0.08)',
+        emptyShadow: '4px 4px 0 rgba(0,0,0,0.08)',
+        emptyIconColor: '#E85D04',
+        emptyTitle: '#1a1a1a',
+        emptyText: '#666666',
+
+        buttonText: '#666666',
+        buttonHoverBg: 'rgba(42,42,42,0.08)',
+        buttonHoverText: '#1a1a1a',
+        primaryButtonBg: '#E85D04',
+        primaryButtonText: '#FFFDF5',
+        primaryButtonShadow: '3px 3px 0 rgba(0,0,0,0.15)',
+
+        accent: '#E85D04',
+        accentLight: 'rgba(232,93,4,0.12)',
+      };
+
     case 'monterey':
     default:
       // Monterey: Classic macOS, warm orange Notes accent

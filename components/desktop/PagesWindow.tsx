@@ -213,6 +213,53 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         accent: '#cae8bd',
       };
 
+    case 'sketch':
+      // Sketch/goOS: Hand-drawn, playful, paper-like
+      return {
+        windowBg: '#FFFDF5',
+        windowShadow: '6px 6px 0 rgba(0,0,0,0.1)',
+        windowShadowInactive: '4px 4px 0 rgba(0,0,0,0.08)',
+        windowBorder: '#2a2a2a',
+
+        titleBarBg: '#F5F3E8',
+        titleBarBorder: '#2a2a2a',
+        titleText: '#1a1a1a',
+        iconBg: '#E85D04',
+        iconColor: '#FFFDF5',
+
+        sidebarBg: '#F0EDE0',
+        sidebarBorder: 'rgba(42,42,42,0.2)',
+        sectionHeader: '#666666',
+        sectionItemBg: 'transparent',
+        sectionItemSelectedBg: '#E85D04',
+        sectionItemText: '#1a1a1a',
+        sectionItemSelectedText: '#FFFDF5',
+        sectionNumber: '#666666',
+        sectionNumberBg: 'rgba(42,42,42,0.08)',
+        sectionNumberSelectedBg: 'rgba(255,253,245,0.3)',
+
+        contentBg: '#FFFDF5',
+        contentText: '#3a3a3a',
+        contentTitle: '#1a1a1a',
+        contentSubtitle: '#666666',
+        contentBorder: 'rgba(42,42,42,0.15)',
+
+        progressBg: 'rgba(42,42,42,0.1)',
+        progressFill: '#E85D04',
+        progressText: '#666666',
+
+        buttonText: '#666666',
+        buttonHoverBg: 'rgba(42,42,42,0.08)',
+        buttonDisabledText: '#999999',
+
+        emptyBg: 'rgba(42,42,42,0.04)',
+        emptyIcon: '#999999',
+        emptyTitle: '#1a1a1a',
+        emptyText: '#666666',
+
+        accent: '#E85D04',
+      };
+
     case 'monterey':
     default:
       return {

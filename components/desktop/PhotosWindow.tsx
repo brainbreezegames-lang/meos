@@ -189,6 +189,46 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         favoriteColor: '#FF6B6B',
       };
 
+    case 'sketch':
+      // Sketch/goOS: Hand-drawn, playful, paper-like
+      return {
+        windowBg: '#FFFDF5',
+        windowShadow: '6px 6px 0 rgba(0,0,0,0.1)',
+        windowShadowInactive: '4px 4px 0 rgba(0,0,0,0.08)',
+
+        titleBarBg: '#F5F3E8',
+        titleBarBorder: '#2a2a2a',
+        titleText: '#1a1a1a',
+        badgeBg: 'rgba(232,93,4,0.12)',
+        badgeText: '#E85D04',
+
+        toolbarBg: '#F0EDE0',
+        toolbarBorder: 'rgba(42,42,42,0.2)',
+        toolbarText: '#666666',
+        toolbarHoverBg: 'rgba(42,42,42,0.08)',
+        toolbarActiveBg: '#E85D04',
+        toolbarActiveText: '#FFFDF5',
+
+        contentBg: '#FAF8F0',
+        photoCardBg: '#FFFDF5',
+        photoCardShadow: '3px 3px 0 rgba(0,0,0,0.08)',
+        photoCardHoverShadow: '5px 5px 0 rgba(0,0,0,0.12)',
+        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.6) 100%)',
+
+        emptyBg: 'rgba(42,42,42,0.04)',
+        emptyIcon: '#999999',
+        emptyTitle: '#1a1a1a',
+        emptyText: '#666666',
+
+        lightboxBg: 'rgba(26,26,26,0.95)',
+        lightboxText: '#FFFDF5',
+        lightboxButtonBg: 'rgba(255,253,245,0.12)',
+        lightboxButtonHoverBg: 'rgba(255,253,245,0.2)',
+
+        accent: '#E85D04',
+        favoriteColor: '#FF6B6B',
+      };
+
     case 'monterey':
     default:
       return {

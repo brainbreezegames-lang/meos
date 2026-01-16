@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 // Theme IDs
-export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay' | 'posthog';
+export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay' | 'posthog' | 'sketch';
 
 // Theme metadata
 export interface ThemeInfo {
@@ -61,6 +61,13 @@ export const THEMES: Record<ThemeId, ThemeInfo> = {
     description: 'Retro desktop OS',
     isDark: false,
     fontFamily: 'IBMPlexSans',
+  },
+  sketch: {
+    id: 'sketch',
+    name: 'goOS',
+    description: 'Playful sketch style',
+    isDark: false,
+    fontFamily: 'Gochi',
   },
 };
 
@@ -158,6 +165,17 @@ export function ThemeProvider({
         link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap';
         link.rel = 'stylesheet';
         link.setAttribute('data-theme-font', 'ibm-plex');
+        document.head.appendChild(link);
+      }
+    }
+
+    if (themeInfo.fontFamily === 'Gochi') {
+      const existingLink = document.querySelector('link[data-theme-font="gochi"]');
+      if (!existingLink) {
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Averia+Serif+Libre:wght@400;700&display=swap';
+        link.rel = 'stylesheet';
+        link.setAttribute('data-theme-font', 'gochi');
         document.head.appendChild(link);
       }
     }

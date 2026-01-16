@@ -151,6 +151,27 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         buttonBg: 'linear-gradient(145deg, #FFFDFB 0%, #EDE8E1 100%)',
         imageShadow: '0 0 0 1px rgba(255,255,255,0.4) inset, 0 8px 24px -4px rgba(107,114,128,0.15)',
       };
+    case 'sketch':
+      return {
+        windowBg: '#FFFDF5',
+        windowShadow: '6px 6px 0 rgba(0,0,0,0.1)',
+        windowBorder: '2px solid #2a2a2a',
+        headerBg: '#F5F3E8',
+        headerBorder: '2px solid #2a2a2a',
+        titleColor: '#1a1a1a',
+        subtitleColor: '#3a3a3a',
+        textPrimary: '#1a1a1a',
+        textSecondary: '#3a3a3a',
+        textTertiary: '#666666',
+        borderLight: 'rgba(42,42,42,0.15)',
+        borderMedium: 'rgba(42,42,42,0.3)',
+        tabActiveBg: 'rgba(232,93,4,0.12)',
+        tabActiveColor: '#E85D04',
+        tabInactiveColor: '#666666',
+        accentColor: '#E85D04',
+        buttonBg: 'rgba(42,42,42,0.06)',
+        imageShadow: '4px 4px 0 rgba(0,0,0,0.1)',
+      };
     case 'monterey':
     default:
       return {

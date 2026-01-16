@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { WindowManager } from '@/components/desktop/MultiWindow';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import type { DesktopItem, Desktop } from '@/types';
@@ -1301,10 +1302,12 @@ function GoOSDemoContent() {
 // ============================================
 export default function GoOSDemoPage() {
     return (
-        <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
-            <WindowProvider>
-                <GoOSDemoContent />
-            </WindowProvider>
-        </EditProvider>
+        <ThemeProvider initialTheme="sketch">
+            <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
+                <WindowProvider>
+                    <GoOSDemoContent />
+                </WindowProvider>
+            </EditProvider>
+        </ThemeProvider>
     );
 }

@@ -256,6 +256,61 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         accent: '#CAE8BD',
       };
 
+    case 'sketch':
+      // Sketch/goOS: Hand-drawn, playful, paper-like
+      return {
+        windowBg: '#FFFDF5',
+        windowShadow: '6px 6px 0 rgba(0,0,0,0.1)',
+        windowShadowInactive: '4px 4px 0 rgba(0,0,0,0.08)',
+
+        titleBarBg: '#F5F3E8',
+        titleBarBorder: '#2a2a2a',
+        titleText: '#1a1a1a',
+
+        toolbarIconColor: '#3a3a3a',
+        toolbarIconHoverBg: 'rgba(42,42,42,0.08)',
+        toolbarIconDisabled: '#999999',
+        toolbarDivider: 'rgba(42,42,42,0.2)',
+        viewToggleBorder: '#2a2a2a',
+        viewToggleActiveBg: '#E85D04',
+        viewToggleActiveText: '#FFFDF5',
+
+        sidebarBg: '#F0EDE0',
+        sidebarBorder: 'rgba(42,42,42,0.2)',
+        sidebarHeader: '#666666',
+        sidebarItemText: '#1a1a1a',
+        sidebarItemHover: 'rgba(42,42,42,0.08)',
+        tagRed: '#FF6B6B',
+        tagOrange: '#FFB347',
+        tagGreen: '#6BCB77',
+        tagBlue: '#5BA0FF',
+
+        contentBg: '#FFFDF5',
+        fileText: '#1a1a1a',
+        fileSelectedBg: '#E85D04',
+        fileSelectedText: '#FFFDF5',
+        fileHoverBg: 'rgba(42,42,42,0.06)',
+        listHeaderText: '#666666',
+        listRowBorder: 'rgba(42,42,42,0.1)',
+
+        previewBg: '#F5F3E8',
+        previewBorder: 'rgba(42,42,42,0.2)',
+        previewText: '#1a1a1a',
+        previewLabelText: '#666666',
+        previewValueText: '#3a3a3a',
+        previewBlockBg: '#FFFDF5',
+
+        statusBarBg: '#F0EDE0',
+        statusBarBorder: 'rgba(42,42,42,0.2)',
+        statusBarText: '#666666',
+
+        emptyIcon: '#999999',
+        emptyTitle: '#1a1a1a',
+        emptyText: '#666666',
+
+        accent: '#E85D04',
+      };
+
     case 'monterey':
     default:
       return {
