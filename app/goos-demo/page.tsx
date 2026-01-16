@@ -1572,12 +1572,54 @@ function GoOSDemoContent() {
             : f.parentFolderId === currentFolderId  // Inside folder: match exact ID
     ), [goosFiles, currentFolderId]);
 
-    // Ref for folder hit-testing (avoids re-creating callbacks)
+    // Refs for drag state (avoids re-creating callbacks)
     const filesRef = React.useRef(filesInCurrentFolder);
     filesRef.current = filesInCurrentFolder;
     const dragOverRef = React.useRef<string | null>(null);
+    const draggingFileRef = React.useRef<string | null>(null);
 
-    // Memoized folder hit-test function
+    // Memoized drag start handler (stable reference)
+    const handleDragStart = useCallback((fileId: string) => {
+        draggingFileRef.current = fileId;
+        setDraggingFileId(fileId);
+    }, []);
+
+    // Memoized click handler (stable reference)
+    const handleFileClick = useCallback((e: React.MouseEvent, fileId: string) => {
+        e.stopPropagation();
+        setSelectedFileId(fileId);
+    }, []);
+
+    // Memoized position change handler (stable reference)
+    const handlePositionChange = useCallback((pos: { x: number; y: number }, fileId: string) => {
+        const currentDraggingId = draggingFileRef.current;
+        const currentDragOverId = dragOverRef.current;
+
+        // Check if we're dropping on a folder
+        if (currentDraggingId && currentDragOverId && currentDragOverId !== currentDraggingId) {
+            // Move to folder
+            setGoosFiles(prev => prev.map(f => {
+                if (f.id === currentDraggingId) {
+                    const filesInTarget = prev.filter(file => file.parentFolderId === currentDragOverId && file.id !== currentDraggingId);
+                    const newX = 40 + (filesInTarget.length % 8) * 100;
+                    const newY = 320 + Math.floor(filesInTarget.length / 8) * 100;
+                    return { ...f, parentFolderId: currentDragOverId, position: { x: newX, y: newY } };
+                }
+                return f;
+            }));
+        } else {
+            // Just update position
+            setGoosFiles(prev => prev.map(f => f.id === fileId ? { ...f, position: pos } : f));
+        }
+
+        // Reset drag state
+        draggingFileRef.current = null;
+        dragOverRef.current = null;
+        setDraggingFileId(null);
+        setDragOverFolderId(null);
+    }, []);
+
+    // Memoized folder hit-test function (stable reference)
     const checkFolderHit = useCallback((dragPos: { x: number; y: number }, excludeFileId: string) => {
         const folders = filesRef.current.filter(f => f.type === 'folder' && f.id !== excludeFileId && f.position);
         let foundFolder: string | null = null;
@@ -2055,22 +2097,10 @@ function GoOSDemoContent() {
                                 isRenaming={renamingFileId === file.id}
                                 position={filePosition}
                                 isDraggedOver={dragOverFolderId === file.id}
-                                onDragStart={() => setDraggingFileId(file.id)}
-                                onDrag={(dragPos) => checkFolderHit(dragPos, file.id)}
-                                onPositionChange={(pos) => {
-                                    // Check if we're dropping on a folder
-                                    if (draggingFileId && dragOverFolderId && dragOverFolderId !== draggingFileId) {
-                                        moveFileToFolder(draggingFileId, dragOverFolderId);
-                                    } else {
-                                        updateFilePosition(file.id, pos);
-                                    }
-                                    setDraggingFileId(null);
-                                    setDragOverFolderId(null);
-                                }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedFileId(file.id);
-                                }}
+                                onDragStart={handleDragStart}
+                                onDrag={checkFolderHit}
+                                onPositionChange={handlePositionChange}
+                                onClick={handleFileClick}
                                 onDoubleClick={() => openFile(file.id)}
                                 onContextMenu={(e) => handleFileContextMenu(e, file.id)}
                                 onRename={(newTitle) => renameFile(file.id, newTitle)}

@@ -30,15 +30,15 @@ interface GoOSFileIconProps {
   status?: PublishStatus;
   isSelected?: boolean;
   isRenaming?: boolean;
-  onClick?: (e: React.MouseEvent) => void;
+  onClick?: (e: React.MouseEvent, fileId: string) => void;
   onDoubleClick?: () => void;
   onContextMenu?: (e: React.MouseEvent) => void;
   onRename?: (newTitle: string) => void;
   position: { x: number; y: number };
-  onPositionChange?: (position: { x: number; y: number }) => void;
+  onPositionChange?: (position: { x: number; y: number }, fileId: string) => void;
   isDraggedOver?: boolean;
-  onDragStart?: () => void;
-  onDrag?: (info: { x: number; y: number }) => void;
+  onDragStart?: (fileId: string) => void;
+  onDrag?: (info: { x: number; y: number }, fileId: string) => void;
 }
 
 export const GoOSFileIcon = memo(function GoOSFileIcon({
@@ -127,7 +127,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     hasDragged.current = false;
     dragOffsetRef.current = { x: 0, y: 0 };
     setIsDragging(true);
-    onDragStartProp?.();
+    onDragStartProp?.(id);
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!isMountedRef.current) return;
@@ -143,10 +143,10 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       setDragOffset({ x: dx, y: dy });
 
       // Use throttled callback for folder hit-testing
-      throttledOnDrag?.({
-        x: position.x + dx + 40,
-        y: position.y + dy + 40,
-      });
+      throttledOnDrag?.(
+        { x: position.x + dx + 40, y: position.y + dy + 40 },
+        id
+      );
     };
 
     const handleMouseUp = () => {
@@ -157,10 +157,13 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       setIsDragging(false);
 
       if (hasDragged.current) {
-        onPositionChange?.({
-          x: position.x + dragOffsetRef.current.x,
-          y: position.y + dragOffsetRef.current.y,
-        });
+        onPositionChange?.(
+          {
+            x: position.x + dragOffsetRef.current.x,
+            y: position.y + dragOffsetRef.current.y,
+          },
+          id
+        );
       }
 
       setDragOffset({ x: 0, y: 0 });
@@ -184,8 +187,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       hasDragged.current = false;
       return;
     }
-    onClick?.(e);
-  }, [onClick]);
+    onClick?.(e, id);
+  }, [onClick, id]);
 
   const currentX = position.x + dragOffset.x;
   const currentY = position.y + dragOffset.y;
