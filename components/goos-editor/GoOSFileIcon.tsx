@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef } from 'react';
+import { motion, PanInfo } from 'framer-motion';
 import { FileText, Presentation, Folder } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
-import { GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
+import { PublishStatus } from './GoOSPublishToggle';
 
 export type FileType = 'note' | 'case-study' | 'folder';
 
@@ -15,16 +15,16 @@ interface GoOSFileIconProps {
   status?: PublishStatus;
   isSelected?: boolean;
   isRenaming?: boolean;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   onDoubleClick?: () => void;
   onContextMenu?: (e: React.MouseEvent) => void;
   onRename?: (newTitle: string) => void;
-  position?: { x: number; y: number };
-  draggable?: boolean;
-  onDragStart?: (e: React.DragEvent) => void;
-  onDragEnd?: (e: React.DragEvent) => void;
-  onDragOver?: (e: React.DragEvent) => void;
-  onDrop?: (e: React.DragEvent) => void;
+  position: { x: number; y: number };
+  onPositionChange?: (position: { x: number; y: number }) => void;
+  onFileDrop?: (droppedFileId: string) => void;
+  isDraggedOver?: boolean;
+  onDragStart?: () => void;
+  onDrag?: (info: { x: number; y: number }) => void;
 }
 
 export function GoOSFileIcon({
@@ -39,14 +39,14 @@ export function GoOSFileIcon({
   onContextMenu,
   onRename,
   position,
-  draggable = true,
-  onDragStart,
-  onDragEnd,
-  onDragOver,
-  onDrop,
+  onPositionChange,
+  onFileDrop,
+  isDraggedOver = false,
+  onDragStart: onDragStartProp,
+  onDrag,
 }: GoOSFileIconProps) {
   const [renameValue, setRenameValue] = useState(title);
-  const [isDragOver, setIsDragOver] = useState(false);
+  const isDraggingRef = useRef(false);
 
   const getIcon = () => {
     switch (type) {
@@ -78,61 +78,73 @@ export function GoOSFileIcon({
     }
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    if (type === 'folder') {
-      e.preventDefault();
-      setIsDragOver(true);
+  const handleDragStart = () => {
+    isDraggingRef.current = true;
+    onDragStartProp?.();
+  };
+
+  const handleDrag = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    onDrag?.({
+      x: position.x + info.offset.x + 40, // Center of icon
+      y: position.y + info.offset.y + 40,
+    });
+  };
+
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    isDraggingRef.current = false;
+    onPositionChange?.({
+      x: position.x + info.offset.x,
+      y: position.y + info.offset.y,
+    });
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Don't trigger click if we just finished dragging
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      return;
     }
-    onDragOver?.(e);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    setIsDragOver(false);
-    onDrop?.(e);
+    onClick?.(e);
   };
 
   return (
     <motion.div
       data-file-id={id}
+      data-file-type={type}
       initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
+      animate={{ opacity: 1, scale: 1, x: position.x, y: position.y }}
       exit={{ opacity: 0, scale: 0.9 }}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onClick}
+      drag={!isRenaming}
+      dragMomentum={false}
+      dragElastic={0}
+      onDragStart={handleDragStart}
+      onDrag={handleDrag}
+      onDragEnd={handleDragEnd}
+      whileDrag={{ scale: 1.05, zIndex: 1000 }}
+      onClick={handleClick}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
-      draggable={draggable && !isRenaming}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
       style={{
-        position: position ? 'absolute' : 'relative',
-        left: position?.x,
-        top: position?.y,
+        position: 'absolute',
+        top: 0,
+        left: 0,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: 6,
         padding: 8,
         borderRadius: 8,
-        cursor: 'pointer',
+        cursor: 'grab',
         userSelect: 'none',
         width: 80,
         background: isSelected
           ? `${goOSTokens.colors.accent.orange}20`
-          : isDragOver
-          ? `${goOSTokens.colors.accent.orange}10`
+          : isDraggedOver && type === 'folder'
+          ? `${goOSTokens.colors.accent.orange}15`
           : 'transparent',
         border: isSelected
           ? `2px solid ${goOSTokens.colors.accent.orange}`
-          : isDragOver
+          : isDraggedOver && type === 'folder'
           ? `2px dashed ${goOSTokens.colors.accent.orange}`
           : '2px solid transparent',
         transition: 'background 0.15s, border 0.15s',

@@ -209,6 +209,7 @@ const DEMO_FILES: GoOSFile[] = [
         status: 'published',
         createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        position: { x: 40, y: 320 },
     },
     {
         id: 'file-2',
@@ -218,6 +219,7 @@ const DEMO_FILES: GoOSFile[] = [
         status: 'draft',
         createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        position: { x: 140, y: 320 },
     },
 ];
 
@@ -1544,9 +1546,19 @@ function GoOSDemoContent() {
     const [clipboard, setClipboard] = useState<{ files: GoOSFile[]; operation: 'copy' | 'cut' } | null>(null);
     const [desktopContextMenu, setDesktopContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({ isOpen: false, x: 0, y: 0 });
     const [fileContextMenu, setFileContextMenu] = useState<{ isOpen: boolean; x: number; y: number; fileId: string | null }>({ isOpen: false, x: 0, y: 0, fileId: null });
+    const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+    const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
+    const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
+
+    // Get files in current folder
+    const filesInCurrentFolder = goosFiles.filter(f => f.parentFolderId === currentFolderId);
 
     // File management functions
     const createFile = useCallback((type: FileType) => {
+        // Find a free position for the new file
+        const filesInFolder = goosFiles.filter(f => f.parentFolderId === currentFolderId);
+        const baseX = 40 + (filesInFolder.length % 8) * 100;
+        const baseY = 320 + Math.floor(filesInFolder.length / 8) * 100;
         const newFile: GoOSFile = {
             id: `file-${Date.now()}`,
             type,
@@ -1555,6 +1567,8 @@ function GoOSDemoContent() {
             status: 'draft',
             createdAt: new Date(),
             updatedAt: new Date(),
+            position: { x: baseX, y: baseY },
+            parentFolderId: currentFolderId || undefined,
         };
         setGoosFiles(prev => [...prev, newFile]);
         if (type !== 'folder') {
@@ -1562,11 +1576,19 @@ function GoOSDemoContent() {
             setActiveEditorId(newFile.id);
         }
         setRenamingFileId(newFile.id);
-    }, []);
+    }, [goosFiles, currentFolderId]);
 
     const openFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
-        if (!file || file.type === 'folder') return;
+        if (!file) return;
+
+        // If it's a folder, navigate into it
+        if (file.type === 'folder') {
+            setCurrentFolderId(fileId);
+            setSelectedFileId(null);
+            return;
+        }
+
         if (!openEditors.includes(fileId)) {
             setOpenEditors(prev => [...prev, fileId]);
         }
@@ -1574,6 +1596,33 @@ function GoOSDemoContent() {
         setWindowZ(prev => ({ ...prev, [`editor-${fileId}`]: topZIndex + 1 }));
         setTopZIndex(prev => prev + 1);
     }, [goosFiles, openEditors, topZIndex]);
+
+    const moveFileToFolder = useCallback((fileId: string, targetFolderId: string | null) => {
+        // Don't move a folder into itself
+        if (fileId === targetFolderId) return;
+
+        setGoosFiles(prev => prev.map(f => {
+            if (f.id === fileId) {
+                // Calculate new position in the target folder
+                const filesInTarget = prev.filter(file => file.parentFolderId === targetFolderId && file.id !== fileId);
+                const newX = 40 + (filesInTarget.length % 8) * 100;
+                const newY = 320 + Math.floor(filesInTarget.length / 8) * 100;
+                return {
+                    ...f,
+                    parentFolderId: targetFolderId || undefined,
+                    position: { x: newX, y: newY }
+                };
+            }
+            return f;
+        }));
+    }, []);
+
+    const navigateToParentFolder = useCallback(() => {
+        if (!currentFolderId) return;
+        const currentFolder = goosFiles.find(f => f.id === currentFolderId);
+        setCurrentFolderId(currentFolder?.parentFolderId || null);
+        setSelectedFileId(null);
+    }, [currentFolderId, goosFiles]);
 
     const closeEditor = useCallback((fileId: string) => {
         setOpenEditors(prev => prev.filter(id => id !== fileId));
@@ -1602,9 +1651,16 @@ function GoOSDemoContent() {
             title: `${file.title} (Copy)`,
             createdAt: new Date(),
             updatedAt: new Date(),
+            position: { x: file.position.x + 30, y: file.position.y + 30 },
         };
         setGoosFiles(prev => [...prev, newFile]);
     }, [goosFiles]);
+
+    const updateFilePosition = useCallback((fileId: string, position: { x: number; y: number }) => {
+        setGoosFiles(prev => prev.map(f =>
+            f.id === fileId ? { ...f, position } : f
+        ));
+    }, []);
 
     const copyFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
@@ -1798,9 +1854,15 @@ function GoOSDemoContent() {
                 backgroundSize: '24px 24px'
             }}
             onContextMenu={handleDesktopContextMenu}
-            onClick={() => {
+            onClick={(e) => {
+                // Close context menus
                 setDesktopContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
                 setFileContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
+                // Deselect files when clicking on desktop background (not on files or windows)
+                const target = e.target as HTMLElement;
+                if (!target.closest('[data-file-id]') && !target.closest('[data-window]')) {
+                    setSelectedFileId(null);
+                }
             }}
         >
             {/* MENU BAR */}
@@ -1904,33 +1966,83 @@ function GoOSDemoContent() {
                 {/* Portfolio Windows */}
                 <WindowManager items={items} />
 
-                {/* goOS File Icons */}
-                <div className="absolute top-[280px] left-1/2 -translate-x-1/2 w-full max-w-4xl px-8">
-                    <div className="mb-3 px-2">
-                        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: goOS.colors.text.muted }}>
-                            My Files
+                {/* Folder navigation breadcrumb */}
+                {currentFolderId && (
+                    <div
+                        className="absolute top-[280px] left-8 flex items-center gap-2 z-10"
+                        style={{ fontFamily: goOS.fonts.body }}
+                    >
+                        <button
+                            onClick={navigateToParentFolder}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all"
+                            style={{
+                                background: goOS.colors.paper,
+                                border: `2px solid ${goOS.colors.border}`,
+                                color: goOS.colors.text.primary,
+                                boxShadow: goOS.shadows.sm,
+                            }}
+                        >
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M10 12L6 8l4-4" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            Back
+                        </button>
+                        <span className="text-sm" style={{ color: goOS.colors.text.muted }}>
+                            / {goosFiles.find(f => f.id === currentFolderId)?.title}
                         </span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                        <AnimatePresence>
-                            {goosFiles.map((file) => (
-                                <GoOSFileIcon
-                                    key={file.id}
-                                    id={file.id}
-                                    type={file.type}
-                                    title={file.title}
-                                    status={file.status}
-                                    isSelected={selectedFileId === file.id}
-                                    isRenaming={renamingFileId === file.id}
-                                    onClick={() => setSelectedFileId(file.id)}
-                                    onDoubleClick={() => openFile(file.id)}
-                                    onContextMenu={(e) => handleFileContextMenu(e, file.id)}
-                                    onRename={(newTitle) => renameFile(file.id, newTitle)}
-                                />
-                            ))}
-                        </AnimatePresence>
-                    </div>
-                </div>
+                )}
+
+                {/* goOS File Icons */}
+                <AnimatePresence>
+                    {filesInCurrentFolder.map((file) => (
+                        <GoOSFileIcon
+                            key={file.id}
+                            id={file.id}
+                            type={file.type}
+                            title={file.title}
+                            status={file.status}
+                            isSelected={selectedFileId === file.id}
+                            isRenaming={renamingFileId === file.id}
+                            position={file.position}
+                            isDraggedOver={dragOverFolderId === file.id}
+                            onDragStart={() => setDraggingFileId(file.id)}
+                            onDrag={(dragPos) => {
+                                // Check if dragging over any folder
+                                const folders = filesInCurrentFolder.filter(f => f.type === 'folder' && f.id !== file.id);
+                                let foundFolder: string | null = null;
+                                for (const folder of folders) {
+                                    const folderX = folder.position.x;
+                                    const folderY = folder.position.y;
+                                    // Check if drag position overlaps with folder (80x80 icon size)
+                                    if (dragPos.x >= folderX && dragPos.x <= folderX + 80 &&
+                                        dragPos.y >= folderY && dragPos.y <= folderY + 80) {
+                                        foundFolder = folder.id;
+                                        break;
+                                    }
+                                }
+                                setDragOverFolderId(foundFolder);
+                            }}
+                            onPositionChange={(pos) => {
+                                // Check if we're dropping on a folder
+                                if (draggingFileId && dragOverFolderId && dragOverFolderId !== draggingFileId) {
+                                    moveFileToFolder(draggingFileId, dragOverFolderId);
+                                } else {
+                                    updateFilePosition(file.id, pos);
+                                }
+                                setDraggingFileId(null);
+                                setDragOverFolderId(null);
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedFileId(file.id);
+                            }}
+                            onDoubleClick={() => openFile(file.id)}
+                            onContextMenu={(e) => handleFileContextMenu(e, file.id)}
+                            onRename={(newTitle) => renameFile(file.id, newTitle)}
+                        />
+                    ))}
+                </AnimatePresence>
 
                 {/* goOS Editor Windows */}
                 <AnimatePresence>

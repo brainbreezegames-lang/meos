@@ -16,6 +16,7 @@ export interface GoOSFile {
   createdAt: Date;
   updatedAt: Date;
   parentFolderId?: string;
+  position: { x: number; y: number };
 }
 
 interface GoOSEditorWindowProps {
