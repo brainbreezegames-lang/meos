@@ -44,6 +44,7 @@ import {
     GoOSFileIcon,
     GoOSDesktopContextMenu,
     GoOSFileContextMenu,
+    GoOSFolderWindow,
     type GoOSFile,
     type FileType,
 } from '@/components/goos-editor';
@@ -1561,20 +1562,17 @@ function GoOSDemoContent() {
     const [clipboard, setClipboard] = useState<{ files: GoOSFile[]; operation: 'copy' | 'cut' } | null>(null);
     const [desktopContextMenu, setDesktopContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({ isOpen: false, x: 0, y: 0 });
     const [fileContextMenu, setFileContextMenu] = useState<{ isOpen: boolean; x: number; y: number; fileId: string | null }>({ isOpen: false, x: 0, y: 0, fileId: null });
-    const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+    const [openFolders, setOpenFolders] = useState<string[]>([]); // Folder windows
+    const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
     const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
     const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
-    // Get files in current folder (null/undefined both mean root level)
-    const filesInCurrentFolder = useMemo(() => goosFiles.filter(f =>
-        currentFolderId === null
-            ? !f.parentFolderId  // Root: show files with no parent (undefined or null)
-            : f.parentFolderId === currentFolderId  // Inside folder: match exact ID
-    ), [goosFiles, currentFolderId]);
+    // Desktop always shows root-level files (no parentFolderId)
+    const filesOnDesktop = useMemo(() => goosFiles.filter(f => !f.parentFolderId), [goosFiles]);
 
     // Refs for drag state (avoids re-creating callbacks)
-    const filesRef = React.useRef(filesInCurrentFolder);
-    filesRef.current = filesInCurrentFolder;
+    const filesRef = React.useRef(filesOnDesktop);
+    filesRef.current = filesOnDesktop;
     const dragOverRef = React.useRef<string | null>(null);
     const draggingFileRef = React.useRef<string | null>(null);
 
@@ -1641,12 +1639,10 @@ function GoOSDemoContent() {
 
     // File management functions
     const createFile = useCallback((type: FileType) => {
-        // Find a free position for the new file
-        const filesInFolder = goosFiles.filter(f =>
-            currentFolderId === null ? !f.parentFolderId : f.parentFolderId === currentFolderId
-        );
-        const baseX = 40 + (filesInFolder.length % 8) * 100;
-        const baseY = 320 + Math.floor(filesInFolder.length / 8) * 100;
+        // Find a free position for the new file on desktop
+        const rootFiles = goosFiles.filter(f => !f.parentFolderId);
+        const baseX = 40 + (rootFiles.length % 8) * 100;
+        const baseY = 320 + Math.floor(rootFiles.length / 8) * 100;
         const newFile: GoOSFile = {
             id: `file-${Date.now()}`,
             type,
@@ -1656,7 +1652,7 @@ function GoOSDemoContent() {
             createdAt: new Date(),
             updatedAt: new Date(),
             position: { x: baseX, y: baseY },
-            parentFolderId: currentFolderId || undefined,
+            // Always create at root level (on desktop)
         };
         setGoosFiles(prev => [...prev, newFile]);
         if (type !== 'folder') {
@@ -1664,26 +1660,38 @@ function GoOSDemoContent() {
             setActiveEditorId(newFile.id);
         }
         setRenamingFileId(newFile.id);
-    }, [goosFiles, currentFolderId]);
+    }, [goosFiles]);
 
     const openFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
         if (!file) return;
 
-        // If it's a folder, navigate into it
+        // If it's a folder, open a folder window
         if (file.type === 'folder') {
-            setCurrentFolderId(fileId);
-            setSelectedFileId(null);
+            if (!openFolders.includes(fileId)) {
+                setOpenFolders(prev => [...prev, fileId]);
+            }
+            setActiveFolderId(fileId);
+            setWindowZ(prev => ({ ...prev, [`folder-${fileId}`]: topZIndex + 1 }));
+            setTopZIndex(prev => prev + 1);
             return;
         }
 
+        // It's a file, open the editor
         if (!openEditors.includes(fileId)) {
             setOpenEditors(prev => [...prev, fileId]);
         }
         setActiveEditorId(fileId);
         setWindowZ(prev => ({ ...prev, [`editor-${fileId}`]: topZIndex + 1 }));
         setTopZIndex(prev => prev + 1);
-    }, [goosFiles, openEditors, topZIndex]);
+    }, [goosFiles, openEditors, openFolders, topZIndex]);
+
+    const closeFolder = useCallback((folderId: string) => {
+        setOpenFolders(prev => prev.filter(id => id !== folderId));
+        if (activeFolderId === folderId) {
+            setActiveFolderId(null);
+        }
+    }, [activeFolderId]);
 
     const moveFileToFolder = useCallback((fileId: string, targetFolderId: string | null) => {
         // Don't move a folder into itself
@@ -1704,13 +1712,6 @@ function GoOSDemoContent() {
             return f;
         }));
     }, []);
-
-    const navigateToParentFolder = useCallback(() => {
-        if (!currentFolderId) return;
-        const currentFolder = goosFiles.find(f => f.id === currentFolderId);
-        setCurrentFolderId(currentFolder?.parentFolderId || null);
-        setSelectedFileId(null);
-    }, [currentFolderId, goosFiles]);
 
     const closeEditor = useCallback((fileId: string) => {
         setOpenEditors(prev => prev.filter(id => id !== fileId));
@@ -2054,36 +2055,9 @@ function GoOSDemoContent() {
                 {/* Portfolio Windows */}
                 <WindowManager items={items} />
 
-                {/* Folder navigation breadcrumb */}
-                {currentFolderId && (
-                    <div
-                        className="absolute top-[280px] left-8 flex items-center gap-2 z-10"
-                        style={{ fontFamily: goOS.fonts.body }}
-                    >
-                        <button
-                            onClick={navigateToParentFolder}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all"
-                            style={{
-                                background: goOS.colors.paper,
-                                border: `2px solid ${goOS.colors.border}`,
-                                color: goOS.colors.text.primary,
-                                boxShadow: goOS.shadows.sm,
-                            }}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M10 12L6 8l4-4" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            Back
-                        </button>
-                        <span className="text-sm" style={{ color: goOS.colors.text.muted }}>
-                            / {goosFiles.find(f => f.id === currentFolderId)?.title}
-                        </span>
-                    </div>
-                )}
-
-                {/* goOS File Icons */}
+                {/* goOS File Icons (desktop - root level only) */}
                 <AnimatePresence mode="sync" initial={false}>
-                    {filesInCurrentFolder.map((file) => {
+                    {filesOnDesktop.map((file) => {
                         // Ensure file has a valid position
                         const filePosition = file.position || { x: 40, y: 320 };
                         return (
@@ -2122,6 +2096,32 @@ function GoOSDemoContent() {
                                 onUpdate={(updates) => updateFile(file.id, updates)}
                                 isActive={activeEditorId === file.id}
                                 zIndex={windowZ[`editor-${file.id}`] || topZIndex}
+                            />
+                        );
+                    })}
+                </AnimatePresence>
+
+                {/* goOS Folder Windows */}
+                <AnimatePresence>
+                    {openFolders.map((folderId) => {
+                        const folder = goosFiles.find(f => f.id === folderId);
+                        if (!folder || folder.type !== 'folder') return null;
+                        return (
+                            <GoOSFolderWindow
+                                key={folder.id}
+                                folder={folder}
+                                files={goosFiles}
+                                onClose={() => closeFolder(folder.id)}
+                                onFileDoubleClick={openFile}
+                                onFileClick={handleFileClick}
+                                selectedFileId={selectedFileId}
+                                isActive={activeFolderId === folder.id}
+                                zIndex={windowZ[`folder-${folder.id}`] || topZIndex}
+                                onFocus={() => {
+                                    setActiveFolderId(folder.id);
+                                    setWindowZ(prev => ({ ...prev, [`folder-${folder.id}`]: topZIndex + 1 }));
+                                    setTopZIndex(prev => prev + 1);
+                                }}
                             />
                         );
                     })}
