@@ -14,16 +14,42 @@ export async function generateMetadata({ params }: PageProps) {
 
   const user = await prisma.user.findUnique({
     where: { username },
-    select: { name: true, username: true },
+    select: { name: true, username: true, image: true },
   });
 
   if (!user) {
     return { title: 'Not Found' };
   }
 
+  const displayName = user.name || user.username;
+  const title = `${displayName}'s goOS`;
+  const description = `Explore ${displayName}'s digital workspace on goOS`;
+  const url = `https://goos.io/${username}`;
+
   return {
-    title: `${user.name || user.username}'s goOS`,
-    description: `Explore ${user.name || user.username}'s digital workspace`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'goOS',
+      type: 'website',
+      images: [
+        {
+          url: `/api/og/${username}`,
+          width: 1200,
+          height: 630,
+          alt: `${displayName}'s goOS desktop`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`/api/og/${username}`],
+    },
   };
 }
 
@@ -75,8 +101,10 @@ export default async function PublicGoOSPage({ params }: PageProps) {
     id: item.id,
     type: item.goosFileType as 'note' | 'case-study' | 'folder',
     title: item.label,
-    content: item.goosContent || '',
+    // For locked files, don't send content to visitors (they need to unlock)
+    content: (item.accessLevel === 'locked' && !viewContext.canViewDrafts) ? '' : (item.goosContent || ''),
     status: item.publishStatus as 'draft' | 'published',
+    accessLevel: item.accessLevel as 'public' | 'locked',
     publishedAt: item.publishedAt,
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,

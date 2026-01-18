@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
@@ -11,6 +11,7 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Highlight from '@tiptap/extension-highlight';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Youtube from '@tiptap/extension-youtube';
 import { common, createLowlight } from 'lowlight';
 import { GoOSEditorToolbar } from './GoOSEditorToolbar';
 
@@ -58,6 +59,30 @@ interface GoOSTipTapEditorProps {
   autoFocus?: boolean;
 }
 
+// Upload image to API
+async function uploadImage(file: File): Promise<string | null> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'image');
+
+    const response = await fetch('/api/goos/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      return result.data.url;
+    }
+    console.error('Upload failed:', result.error);
+    return null;
+  } catch (error) {
+    console.error('Upload error:', error);
+    return null;
+  }
+}
+
 export function GoOSTipTapEditor({
   content,
   onChange,
@@ -66,6 +91,9 @@ export function GoOSTipTapEditor({
   editable = true,
   autoFocus = false,
 }: GoOSTipTapEditorProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -81,6 +109,9 @@ export function GoOSTipTapEditor({
       Image.configure({
         inline: false,
         allowBase64: true,
+        HTMLAttributes: {
+          class: 'goos-image',
+        },
       }),
       Link.configure({
         openOnClick: false,
@@ -101,6 +132,13 @@ export function GoOSTipTapEditor({
           class: 'goos-code-block',
         },
       }),
+      Youtube.configure({
+        controls: true,
+        nocookie: true,
+        HTMLAttributes: {
+          class: 'goos-youtube',
+        },
+      }),
     ],
     content,
     editable,
@@ -111,6 +149,55 @@ export function GoOSTipTapEditor({
     editorProps: {
       attributes: {
         class: 'goos-editor-content',
+      },
+      // Handle paste events for images
+      handlePaste: (view, event) => {
+        const items = event.clipboardData?.items;
+        if (!items) return false;
+
+        for (const item of items) {
+          if (item.type.startsWith('image/')) {
+            event.preventDefault();
+            const file = item.getAsFile();
+            if (file) {
+              setIsUploading(true);
+              uploadImage(file).then(url => {
+                setIsUploading(false);
+                if (url) {
+                  view.dispatch(view.state.tr.replaceSelectionWith(
+                    view.state.schema.nodes.image.create({ src: url })
+                  ));
+                }
+              });
+            }
+            return true;
+          }
+        }
+        return false;
+      },
+      // Handle drop events for images
+      handleDrop: (view, event) => {
+        const files = event.dataTransfer?.files;
+        if (!files || files.length === 0) return false;
+
+        const file = files[0];
+        if (!file.type.startsWith('image/')) return false;
+
+        event.preventDefault();
+        setIsUploading(true);
+
+        const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+
+        uploadImage(file).then(url => {
+          setIsUploading(false);
+          if (url && coordinates) {
+            const node = view.state.schema.nodes.image.create({ src: url });
+            const transaction = view.state.tr.insert(coordinates.pos, node);
+            view.dispatch(transaction);
+          }
+        });
+
+        return true;
       },
     },
   });
@@ -135,10 +222,54 @@ export function GoOSTipTapEditor({
     }
   }, [content, editor]);
 
+  // Handle file input change for image upload
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editor) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    setIsUploading(true);
+    const url = await uploadImage(file);
+    setIsUploading(false);
+
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    } else {
+      alert('Failed to upload image. Please try again.');
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [editor]);
+
   const addImage = useCallback(() => {
+    // Show file picker
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, []);
+
+  const addImageFromUrl = useCallback(() => {
     const url = window.prompt('Enter image URL');
     if (url && editor) {
       editor.chain().focus().setImage({ src: url }).run();
+    }
+  }, [editor]);
+
+  const addVideo = useCallback(() => {
+    const url = window.prompt('Enter YouTube URL');
+    if (url && editor) {
+      editor.commands.setYoutubeVideo({
+        src: url,
+        width: 640,
+        height: 360,
+      });
     }
   }, [editor]);
 
@@ -162,10 +293,55 @@ export function GoOSTipTapEditor({
 
   return (
     <div className="goos-editor-wrapper">
+      {/* Hidden file input for image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+        style={{ display: 'none' }}
+        aria-hidden="true"
+      />
+
+      {/* Upload indicator */}
+      {isUploading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(250, 248, 240, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+          }}
+        >
+          <div
+            style={{
+              padding: '16px 24px',
+              background: goOSTokens.colors.paper,
+              border: `2px solid ${goOSTokens.colors.border}`,
+              borderRadius: 6,
+              boxShadow: goOSTokens.shadows.solid,
+              fontFamily: goOSTokens.fonts.body,
+              fontSize: 14,
+              color: goOSTokens.colors.text.primary,
+            }}
+          >
+            Uploading image...
+          </div>
+        </div>
+      )}
+
       {/* Toolbar */}
       <GoOSEditorToolbar
         editor={editor}
         onAddImage={addImage}
+        onAddImageFromUrl={addImageFromUrl}
+        onAddVideo={addVideo}
         onSetLink={setLink}
       />
 
@@ -408,6 +584,21 @@ export function GoOSTipTapEditor({
           border: 2px solid ${goOSTokens.colors.border};
           box-shadow: ${goOSTokens.shadows.sm};
           margin: 1em 0;
+        }
+
+        /* YouTube Embed Styling */
+        .goos-editor-content .goos-youtube {
+          border-radius: 6px;
+          overflow: hidden;
+          border: 2px solid ${goOSTokens.colors.border};
+          box-shadow: ${goOSTokens.shadows.sm};
+          margin: 1em 0;
+          aspect-ratio: 16/9;
+        }
+
+        .goos-editor-content .goos-youtube iframe {
+          width: 100%;
+          height: 100%;
         }
 
         .goos-editor-content hr {

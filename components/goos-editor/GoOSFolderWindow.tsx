@@ -215,6 +215,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
                 type={file.type}
                 title={file.title}
                 status={file.status}
+                accessLevel={file.accessLevel}
                 isSelected={selectedFileId === file.id}
                 position={{ x: (index % 4) * 100 + 20, y: Math.floor(index / 4) * 100 + 20 }}
                 onClick={onFileClick}

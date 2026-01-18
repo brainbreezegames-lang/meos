@@ -8,6 +8,7 @@ import {
   GoOSDesktopContextMenu,
   GoOSFileContextMenu,
   GoOSFolderWindow,
+  GoOSLockedContentModal,
 } from '@/components/goos-editor';
 import type { GoOSViewMode } from '@/lib/goos/viewContext';
 
@@ -66,7 +67,7 @@ const goOS = {
 };
 
 function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwner: boolean }) {
-  const { files, viewMode, createFile, updateFile, deleteFile, duplicateFile, publishFile, unpublishFile, toast } = useGoOS();
+  const { files, viewMode, createFile, updateFile, deleteFile, duplicateFile, publishFile, unpublishFile, toast, showToast } = useGoOS();
 
   // UI state
   const [openEditors, setOpenEditors] = useState<string[]>([]);
@@ -79,6 +80,12 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
   const [topZIndex, setTopZIndex] = useState(100);
   const [windowZ, setWindowZ] = useState<Record<string, number>>({});
 
+  // Locked content modal state
+  const [lockedModal, setLockedModal] = useState<{
+    isOpen: boolean;
+    file: GoOSFileData | null;
+  }>({ isOpen: false, file: null });
+
   // Context menus
   const [desktopContextMenu, setDesktopContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({ isOpen: false, x: 0, y: 0 });
   const [fileContextMenu, setFileContextMenu] = useState<{ isOpen: boolean; x: number; y: number; fileId: string | null }>({ isOpen: false, x: 0, y: 0, fileId: null });
@@ -86,9 +93,57 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
   // Desktop shows root-level files only
   const filesOnDesktop = useMemo(() => files.filter(f => !f.parentId), [files]);
 
+  // Handle email unlock
+  const handleEmailUnlock = useCallback(async (email: string): Promise<boolean> => {
+    if (!lockedModal.file) return false;
+
+    try {
+      const response = await fetch('/api/goos/unlock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileId: lockedModal.file.id,
+          email,
+          username: desktop.username,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Store unlock in localStorage
+        const unlocks = JSON.parse(localStorage.getItem('goosUnlocks') || '{}');
+        unlocks[lockedModal.file.id] = { email, unlockedAt: new Date().toISOString() };
+        localStorage.setItem('goosUnlocks', JSON.stringify(unlocks));
+
+        // Open the file
+        setLockedModal({ isOpen: false, file: null });
+        if (lockedModal.file) {
+          setOpenEditors(prev => [...prev, lockedModal.file!.id]);
+          setActiveEditorId(lockedModal.file.id);
+        }
+        return true;
+      }
+
+      return false;
+    } catch {
+      return false;
+    }
+  }, [lockedModal.file, desktop.username]);
+
   const openFile = useCallback((fileId: string) => {
     const file = files.find(f => f.id === fileId);
     if (!file) return;
+
+    // Check if file is locked and user is visitor
+    if (file.accessLevel === 'locked' && viewMode === 'visitor') {
+      // Check if already unlocked via localStorage
+      const unlocks = JSON.parse(localStorage.getItem('goosUnlocks') || '{}');
+      if (!unlocks[fileId]) {
+        setLockedModal({ isOpen: true, file });
+        return;
+      }
+    }
 
     if (file.type === 'folder') {
       if (!openFolders.includes(fileId)) {
@@ -105,7 +160,7 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
       setWindowZ(prev => ({ ...prev, [`editor-${fileId}`]: topZIndex + 1 }));
       setTopZIndex(prev => prev + 1);
     }
-  }, [files, openFolders, openEditors, topZIndex]);
+  }, [files, openFolders, openEditors, topZIndex, viewMode]);
 
   const closeEditor = useCallback((fileId: string) => {
     setOpenEditors(prev => prev.filter(id => id !== fileId));
@@ -139,8 +194,22 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
     setSelectedFileId(fileId);
   }, [isOwner]);
 
-  const handleCreateFile = useCallback(async (type: 'note' | 'case-study' | 'folder') => {
-    const newFile = await createFile(type);
+  const handleCreateFile = useCallback(async (type: 'note' | 'case-study' | 'folder', pixelPosition?: { x: number; y: number }) => {
+    // Convert pixel position to percentage if provided
+    let position: { x: number; y: number } | undefined;
+    if (pixelPosition) {
+      const desktopArea = document.querySelector('[data-goos-desktop]');
+      if (desktopArea) {
+        const rect = desktopArea.getBoundingClientRect();
+        const relativeX = pixelPosition.x - rect.left;
+        const relativeY = pixelPosition.y - rect.top;
+        position = {
+          x: Math.max(2, Math.min(90, (relativeX / rect.width) * 100)),
+          y: Math.max(2, Math.min(85, (relativeY / rect.height) * 100)),
+        };
+      }
+    }
+    const newFile = await createFile(type, null, position);
     if (newFile && type !== 'folder') {
       setOpenEditors(prev => [...prev, newFile.id]);
       setActiveEditorId(newFile.id);
@@ -176,6 +245,7 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
 
   return (
     <div
+      data-goos-desktop
       className="relative w-full h-screen overflow-hidden"
       style={{
         background: desktop.backgroundUrl
@@ -218,6 +288,7 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
             type={file.type}
             title={file.title}
             status={file.status}
+            accessLevel={file.accessLevel}
             position={file.position}
             isSelected={selectedFileId === file.id}
             isRenaming={renamingFileId === file.id}
@@ -227,7 +298,7 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
             }}
             onDoubleClick={() => openFile(file.id)}
             onContextMenu={(e) => handleFileContextMenu(e, file.id)}
-            onPositionChange={(pos) => updateFile(file.id, { position: pos })}
+            onPositionChange={isOwner ? (pos) => updateFile(file.id, { position: pos }) : undefined}
             onRename={(title) => handleRename(file.id, title)}
             onDragStart={() => {}}
             isDraggedOver={false}
@@ -332,9 +403,9 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
             isOpen={desktopContextMenu.isOpen}
             position={{ x: desktopContextMenu.x, y: desktopContextMenu.y }}
             onClose={() => setDesktopContextMenu(prev => ({ ...prev, isOpen: false }))}
-            onNewNote={() => handleCreateFile('note')}
-            onNewCaseStudy={() => handleCreateFile('case-study')}
-            onNewFolder={() => handleCreateFile('folder')}
+            onNewNote={() => handleCreateFile('note', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+            onNewCaseStudy={() => handleCreateFile('case-study', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+            onNewFolder={() => handleCreateFile('folder', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
             onPaste={clipboard ? () => {} : undefined}
             canPaste={!!clipboard}
           />
@@ -376,6 +447,37 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
         >
           {toast.message}
         </div>
+      )}
+
+      {/* Made with goOS badge */}
+      <a
+        href="https://goos.io"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-4 right-4 z-[100] px-3 py-1.5 rounded-full text-[11px] font-medium transition-all hover:scale-105 hover:shadow-md"
+        style={{
+          background: goOS.colors.headerBg,
+          border: `1.5px solid ${goOS.colors.border}`,
+          color: goOS.colors.text.primary,
+          boxShadow: '2px 2px 0 rgba(0,0,0,0.08)',
+        }}
+      >
+        Made with goOS
+      </a>
+
+      {/* Locked Content Modal */}
+      {lockedModal.file && (
+        <GoOSLockedContentModal
+          isOpen={lockedModal.isOpen}
+          onClose={() => setLockedModal({ isOpen: false, file: null })}
+          file={{
+            id: lockedModal.file.id,
+            type: lockedModal.file.type,
+            title: lockedModal.file.title,
+          }}
+          unlockType="email"
+          onUnlockWithEmail={handleEmailUnlock}
+        />
       )}
     </div>
   );

@@ -73,10 +73,12 @@ function ToolbarDivider() {
 interface GoOSEditorToolbarProps {
   editor: Editor;
   onAddImage?: () => void;
+  onAddImageFromUrl?: () => void;
+  onAddVideo?: () => void;
   onSetLink?: () => void;
 }
 
-export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorToolbarProps) {
+export function GoOSEditorToolbar({ editor, onAddImage, onAddImageFromUrl, onAddVideo, onSetLink }: GoOSEditorToolbarProps) {
   const [showHeadingDropdown, setShowHeadingDropdown] = useState(false);
 
   const getActiveHeading = () => {
@@ -357,12 +359,22 @@ export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorT
 
       <ToolbarButton
         onClick={() => onAddImage?.()}
-        title="Add image"
+        title="Upload image"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="1.5" y="2.5" width="11" height="9" rx="1"/>
           <circle cx="4.5" cy="5.5" r="1"/>
           <path d="M1.5 9.5l3-3 2 2 3-3 3 3" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={() => onAddVideo?.()}
+        title="Add YouTube video"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="1" y="3" width="12" height="8" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+          <path d="M5.5 5.5l3.5 1.5-3.5 1.5v-3z" fill="currentColor"/>
         </svg>
       </ToolbarButton>
 

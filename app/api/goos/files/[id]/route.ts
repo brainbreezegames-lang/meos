@@ -22,15 +22,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const desktop = await prisma.desktop.findUnique({
+    let desktop = await prisma.desktop.findUnique({
       where: { userId: session.user.id },
     });
 
+    // Create desktop if doesn't exist
     if (!desktop) {
-      return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Desktop not found' } },
-        { status: 404 }
-      );
+      desktop = await prisma.desktop.create({
+        data: { userId: session.user.id },
+      });
     }
 
     const item = await prisma.desktopItem.findFirst({
@@ -59,6 +59,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       title: item.label,
       content: item.goosContent || '',
       status: item.publishStatus as 'draft' | 'published',
+      accessLevel: item.accessLevel as 'public' | 'locked',
       publishedAt: item.publishedAt,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
@@ -90,15 +91,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const desktop = await prisma.desktop.findUnique({
+    let desktop = await prisma.desktop.findUnique({
       where: { userId: session.user.id },
     });
 
+    // Create desktop if doesn't exist
     if (!desktop) {
-      return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Desktop not found' } },
-        { status: 404 }
-      );
+      desktop = await prisma.desktop.create({
+        data: { userId: session.user.id },
+      });
     }
 
     // Verify file exists and belongs to user
@@ -197,6 +198,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       title: item.label,
       content: item.goosContent || '',
       status: item.publishStatus as 'draft' | 'published',
+      accessLevel: item.accessLevel as 'public' | 'locked',
       publishedAt: item.publishedAt,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
@@ -235,15 +237,15 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const desktop = await prisma.desktop.findUnique({
+    let desktop = await prisma.desktop.findUnique({
       where: { userId: session.user.id },
     });
 
+    // Create desktop if doesn't exist
     if (!desktop) {
-      return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Desktop not found' } },
-        { status: 404 }
-      );
+      desktop = await prisma.desktop.create({
+        data: { userId: session.user.id },
+      });
     }
 
     // Verify file exists and belongs to user

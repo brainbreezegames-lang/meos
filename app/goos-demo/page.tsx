@@ -1566,8 +1566,11 @@ function GoOSDemoContent() {
         autoSave: goosAutoSave,
         publishFile: publishGoOSFile,
         unpublishFile: unpublishGoOSFile,
+        lockFile: lockGoOSFile,
+        unlockFile: unlockGoOSFile,
         refreshFiles,
         isLoading: goosLoading,
+        toast: goosToast,
     } = goosContext;
 
     // Transform context files to component format
@@ -1577,6 +1580,7 @@ function GoOSDemoContent() {
         title: f.title,
         content: f.content,
         status: f.status,
+        accessLevel: f.accessLevel,
         createdAt: new Date(f.createdAt),
         updatedAt: new Date(f.updatedAt),
         parentFolderId: f.parentId || undefined,
@@ -1596,10 +1600,11 @@ function GoOSDemoContent() {
     const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
     const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
-    // Load files from API on mount
+    // Load files from API on mount (only once)
     useEffect(() => {
         refreshFiles();
-    }, [refreshFiles]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Desktop always shows root-level files (no parentFolderId)
     const filesOnDesktop = useMemo(() => goosFiles.filter(f => !f.parentFolderId), [goosFiles]);
@@ -1664,8 +1669,25 @@ function GoOSDemoContent() {
     }, []);
 
     // File management functions - now use API persistence
-    const createFile = useCallback(async (type: FileType) => {
-        const newFile = await createGoOSFile(type, null);
+    const createFile = useCallback(async (type: FileType, pixelPosition?: { x: number; y: number }) => {
+        // Convert pixel position to percentage if provided
+        let position: { x: number; y: number } | undefined;
+        if (pixelPosition) {
+            // Get desktop area dimensions and position
+            const desktopArea = document.getElementById('goos-desktop-area');
+            if (desktopArea) {
+                const rect = desktopArea.getBoundingClientRect();
+                // Convert viewport coordinates to element-relative coordinates, then to percentage
+                const relativeX = pixelPosition.x - rect.left;
+                const relativeY = pixelPosition.y - rect.top;
+                position = {
+                    x: Math.max(2, Math.min(90, (relativeX / rect.width) * 100)),
+                    y: Math.max(2, Math.min(85, (relativeY / rect.height) * 100)),
+                };
+            }
+        }
+
+        const newFile = await createGoOSFile(type, null, position);
         if (newFile) {
             if (type !== 'folder') {
                 setOpenEditors(prev => [...prev, newFile.id]);
@@ -1928,6 +1950,8 @@ function GoOSDemoContent() {
 
     return (
         <div
+            id="goos-desktop-area"
+            data-goos-desktop
             className="min-h-screen w-full relative overflow-hidden theme-sketch"
             style={{
                 backgroundColor: goOS.colors.paper,
@@ -2059,6 +2083,7 @@ function GoOSDemoContent() {
                                 type={file.type}
                                 title={file.title}
                                 status={file.status}
+                                accessLevel={file.accessLevel}
                                 isSelected={selectedFileId === file.id}
                                 isRenaming={renamingFileId === file.id}
                                 position={filePosition}
@@ -2461,9 +2486,9 @@ function GoOSDemoContent() {
                 isOpen={desktopContextMenu.isOpen}
                 position={{ x: desktopContextMenu.x, y: desktopContextMenu.y }}
                 onClose={() => setDesktopContextMenu(prev => ({ ...prev, isOpen: false }))}
-                onNewNote={() => createFile('note')}
-                onNewCaseStudy={() => createFile('case-study')}
-                onNewFolder={() => createFile('folder')}
+                onNewNote={() => createFile('note', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+                onNewCaseStudy={() => createFile('case-study', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+                onNewFolder={() => createFile('folder', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onPaste={pasteFile}
                 canPaste={!!clipboard}
             />
@@ -2476,6 +2501,7 @@ function GoOSDemoContent() {
                     onClose={() => setFileContextMenu(prev => ({ ...prev, isOpen: false }))}
                     fileType={goosFiles.find(f => f.id === fileContextMenu.fileId)?.type || 'note'}
                     fileStatus={goosFiles.find(f => f.id === fileContextMenu.fileId)?.status}
+                    accessLevel={goosFiles.find(f => f.id === fileContextMenu.fileId)?.accessLevel}
                     onOpen={() => openFile(fileContextMenu.fileId!)}
                     onRename={() => setRenamingFileId(fileContextMenu.fileId)}
                     onDuplicate={() => duplicateFile(fileContextMenu.fileId!)}
@@ -2497,12 +2523,49 @@ function GoOSDemoContent() {
                             }
                         }
                     }}
+                    onToggleLock={() => {
+                        const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
+                        if (file) {
+                            if (file.accessLevel === 'locked') {
+                                unlockGoOSFile(fileContextMenu.fileId!);
+                            } else {
+                                lockGoOSFile(fileContextMenu.fileId!);
+                            }
+                        }
+                    }}
                     canPaste={!!clipboard}
                 />
             )}
 
             <SaveIndicator />
             <Toast />
+
+            {/* goOS Toast */}
+            <AnimatePresence>
+                {goosToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 50 }}
+                        style={{
+                            position: 'fixed',
+                            bottom: 20,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            padding: '12px 24px',
+                            borderRadius: '8px',
+                            background: goosToast.type === 'error' ? '#ef4444' : goosToast.type === 'success' ? '#22c55e' : '#3b82f6',
+                            color: 'white',
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            zIndex: 9999,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        }}
+                    >
+                        {goosToast.message}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -2515,7 +2578,7 @@ export default function GoOSDemoPage() {
         <ThemeProvider initialTheme="sketch" forceTheme={true}>
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
-                    <GoOSProvider viewMode="owner">
+                    <GoOSProvider viewMode="owner" localOnly={true}>
                         <GoOSDemoContent />
                     </GoOSProvider>
                 </WindowProvider>

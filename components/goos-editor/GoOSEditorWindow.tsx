@@ -6,6 +6,7 @@ import { X, Minus, Square, FileText, Presentation } from 'lucide-react';
 import { GoOSTipTapEditor, goOSTokens } from './GoOSTipTapEditor';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
+import { AccessLevel } from '@/contexts/GoOSContext';
 
 export interface GoOSFile {
   id: string;
@@ -13,6 +14,7 @@ export interface GoOSFile {
   title: string;
   content: string;
   status: PublishStatus;
+  accessLevel?: AccessLevel;
   createdAt: Date;
   updatedAt: Date;
   parentFolderId?: string;

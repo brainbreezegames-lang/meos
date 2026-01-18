@@ -2,9 +2,10 @@
 
 import React, { useState, useRef, useCallback, useEffect, memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Presentation, Folder } from 'lucide-react';
+import { FileText, Presentation, Folder, Lock } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { PublishStatus } from './GoOSPublishToggle';
+import { AccessLevel } from '@/contexts/GoOSContext';
 
 // Throttle function for performance
 function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
@@ -28,6 +29,7 @@ interface GoOSFileIconProps {
   type: FileType;
   title: string;
   status?: PublishStatus;
+  accessLevel?: AccessLevel;
   isSelected?: boolean;
   isRenaming?: boolean;
   onClick?: (e: React.MouseEvent, fileId: string) => void;
@@ -46,6 +48,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   type,
   title,
   status,
+  accessLevel,
   isSelected = false,
   isRenaming = false,
   onClick,
@@ -58,6 +61,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   onDragStart: onDragStartProp,
   onDrag,
 }: GoOSFileIconProps) {
+  const isLocked = accessLevel === 'locked';
   const [renameValue, setRenameValue] = useState(title);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -127,17 +131,21 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     hasDragged.current = false;
     dragOffsetRef.current = { x: 0, y: 0 };
 
+    // Get parent container dimensions for converting pixels to percentages
+    const parent = (e.target as HTMLElement).closest('[data-goos-desktop]') || document.body;
+    const parentRect = parent.getBoundingClientRect();
+
     // Track if we've committed to dragging (moved beyond threshold)
     let isDragCommitted = false;
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!isMountedRef.current) return;
 
-      const dx = moveEvent.clientX - dragStartPos.current.x;
-      const dy = moveEvent.clientY - dragStartPos.current.y;
+      const dxPx = moveEvent.clientX - dragStartPos.current.x;
+      const dyPx = moveEvent.clientY - dragStartPos.current.y;
 
-      // Only commit to dragging once we've moved beyond threshold
-      if (!isDragCommitted && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+      // Only commit to dragging once we've moved beyond threshold (5px)
+      if (!isDragCommitted && (Math.abs(dxPx) > 5 || Math.abs(dyPx) > 5)) {
         isDragCommitted = true;
         hasDragged.current = true;
         setIsDragging(true);
@@ -146,12 +154,16 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
       if (!isDragCommitted) return;
 
-      dragOffsetRef.current = { x: dx, y: dy };
-      setDragOffset({ x: dx, y: dy });
+      // Convert pixel offset to percentage of parent container
+      const dxPercent = (dxPx / parentRect.width) * 100;
+      const dyPercent = (dyPx / parentRect.height) * 100;
 
-      // Use throttled callback for folder hit-testing
+      dragOffsetRef.current = { x: dxPercent, y: dyPercent };
+      setDragOffset({ x: dxPercent, y: dyPercent });
+
+      // Use throttled callback for folder hit-testing (pass pixel position for hit detection)
       throttledOnDrag?.(
-        { x: position.x + dx + 40, y: position.y + dy + 40 },
+        { x: moveEvent.clientX, y: moveEvent.clientY },
         id
       );
     };
@@ -164,11 +176,11 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       setIsDragging(false);
 
       if (hasDragged.current) {
+        // Calculate new position in percentages, clamped to valid range
+        const newX = Math.max(0, Math.min(95, position.x + dragOffsetRef.current.x));
+        const newY = Math.max(0, Math.min(90, position.y + dragOffsetRef.current.y));
         onPositionChange?.(
-          {
-            x: position.x + dragOffsetRef.current.x,
-            y: position.y + dragOffsetRef.current.y,
-          },
+          { x: newX, y: newY },
           id
         );
       }
@@ -197,6 +209,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     onClick?.(e, id);
   }, [onClick, id]);
 
+  // Position is in percentages (0-100), dragOffset is also in percentages now
   const currentX = position.x + dragOffset.x;
   const currentY = position.y + dragOffset.y;
 
@@ -226,8 +239,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       }}
       style={{
         position: 'absolute',
-        top: currentY,
-        left: currentX,
+        top: `${currentY}%`,
+        left: `${currentX}%`,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -284,6 +297,28 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             }}
             title="Draft"
           />
+        )}
+
+        {/* Lock indicator */}
+        {type !== 'folder' && isLocked && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: -4,
+              right: -4,
+              width: 16,
+              height: 16,
+              borderRadius: '50%',
+              background: '#6b7280',
+              border: `1.5px solid ${goOSTokens.colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            title="Locked - requires purchase"
+          >
+            <Lock size={9} color="white" strokeWidth={2.5} />
+          </div>
         )}
       </div>
 

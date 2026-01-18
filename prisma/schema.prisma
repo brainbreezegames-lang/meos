@@ -75,6 +75,21 @@ model Desktop {
   dockItems          DockItem[]
   statusWidget       StatusWidget?
   workbenchEntries   WorkbenchEntry[]
+  emailCaptures      EmailCapture[]
+}
+
+// Email captures for gated content
+model EmailCapture {
+  id           String   @id @default(cuid())
+  email        String
+  desktopId    String
+  desktop      Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  sourceFileId String?  // The file that triggered the capture
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([email, desktopId])
+  @@index([desktopId])
 }
 
 model DesktopItem {

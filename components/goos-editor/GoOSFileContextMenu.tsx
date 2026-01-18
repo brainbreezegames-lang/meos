@@ -14,10 +14,13 @@ import {
   Download,
   Eye,
   EyeOff,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { FileType } from './GoOSFileIcon';
 import { PublishStatus } from './GoOSPublishToggle';
+import { AccessLevel } from '@/contexts/GoOSContext';
 
 interface ContextMenuItem {
   id: string;
@@ -36,6 +39,7 @@ interface GoOSFileContextMenuProps {
   onClose: () => void;
   fileType: FileType;
   fileStatus?: PublishStatus;
+  accessLevel?: AccessLevel;
   onOpen: () => void;
   onRename: () => void;
   onDuplicate: () => void;
@@ -44,6 +48,7 @@ interface GoOSFileContextMenuProps {
   onPaste?: () => void;
   onDelete: () => void;
   onTogglePublish?: () => void;
+  onToggleLock?: () => void;
   onExport?: () => void;
   onShare?: () => void;
   canPaste?: boolean;
@@ -55,6 +60,7 @@ export function GoOSFileContextMenu({
   onClose,
   fileType,
   fileStatus,
+  accessLevel,
   onOpen,
   onRename,
   onDuplicate,
@@ -63,6 +69,7 @@ export function GoOSFileContextMenu({
   onPaste,
   onDelete,
   onTogglePublish,
+  onToggleLock,
   onExport,
   onShare,
   canPaste = false,
@@ -71,6 +78,7 @@ export function GoOSFileContextMenu({
   const [focusedIndex, setFocusedIndex] = useState(0);
   const isFolder = fileType === 'folder';
   const isDraft = fileStatus === 'draft';
+  const isLocked = accessLevel === 'locked';
 
   const items: ContextMenuItem[] = [
     {
@@ -141,6 +149,12 @@ export function GoOSFileContextMenu({
         label: 'Share Link',
         icon: <Share size={14} />,
         onClick: () => onShare?.(),
+      },
+      {
+        id: 'toggle-lock',
+        label: isLocked ? 'Unlock' : 'Lock',
+        icon: isLocked ? <Unlock size={14} /> : <Lock size={14} />,
+        onClick: () => onToggleLock?.(),
         dividerAfter: true,
       }
     );

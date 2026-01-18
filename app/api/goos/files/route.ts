@@ -17,15 +17,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const desktop = await prisma.desktop.findUnique({
+    let desktop = await prisma.desktop.findUnique({
       where: { userId: session.user.id },
     });
 
+    // Create desktop if doesn't exist
     if (!desktop) {
-      return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Desktop not found' } },
-        { status: 404 }
-      );
+      desktop = await prisma.desktop.create({
+        data: { userId: session.user.id },
+      });
     }
 
     // Parse query params
@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
       title: item.label,
       content: item.goosContent || '',
       status: item.publishStatus as 'draft' | 'published',
+      accessLevel: item.accessLevel as 'public' | 'locked',
       publishedAt: item.publishedAt,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const desktop = await prisma.desktop.findUnique({
+    let desktop = await prisma.desktop.findUnique({
       where: { userId: session.user.id },
       include: {
         items: {
@@ -100,11 +101,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Create desktop if doesn't exist
     if (!desktop) {
-      return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Desktop not found' } },
-        { status: 404 }
-      );
+      desktop = await prisma.desktop.create({
+        data: { userId: session.user.id },
+        include: {
+          items: {
+            where: { itemVariant: 'goos-file' },
+          },
+        },
+      });
     }
 
     // Check file limit (100 for now)
@@ -161,6 +167,7 @@ export async function POST(request: NextRequest) {
       title: item.label,
       content: item.goosContent || '',
       status: item.publishStatus as 'draft' | 'published',
+      accessLevel: item.accessLevel as 'public' | 'locked',
       publishedAt: item.publishedAt,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
