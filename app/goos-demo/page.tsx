@@ -1571,6 +1571,7 @@ function GoOSDemoContent() {
         refreshFiles,
         isLoading: goosLoading,
         toast: goosToast,
+        showToast: showGoOSToast,
     } = goosContext;
 
     // Transform context files to component format
@@ -2536,10 +2537,23 @@ function GoOSDemoContent() {
                             }
                         }
                     }}
-                    onShare={() => {
-                        const url = window.location.href;
-                        navigator.clipboard.writeText(url);
-                        showGoOSToast('Link copied to clipboard!', 'success');
+                    onShare={async () => {
+                        try {
+                            const url = window.location.href;
+                            await navigator.clipboard.writeText(url);
+                            showGoOSToast('Link copied to clipboard!', 'success');
+                        } catch (err) {
+                            // Fallback for older browsers
+                            const textArea = document.createElement('textarea');
+                            textArea.value = window.location.href;
+                            textArea.style.position = 'fixed';
+                            textArea.style.left = '-9999px';
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            showGoOSToast('Link copied to clipboard!', 'success');
+                        }
                     }}
                     canPaste={!!clipboard}
                 />

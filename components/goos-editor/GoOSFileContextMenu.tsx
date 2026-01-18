@@ -76,6 +76,7 @@ export function GoOSFileContextMenu({
 }: GoOSFileContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [focusedIndex, setFocusedIndex] = useState(0);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const isFolder = fileType === 'folder';
   const isDraft = fileStatus === 'draft';
   const isLocked = accessLevel === 'locked';
@@ -266,8 +267,11 @@ export function GoOSFileContextMenu({
                   aria-disabled={item.disabled}
                   onClick={() => {
                     if (!item.disabled) {
+                      setActiveId(item.id);
                       item.onClick();
-                      onClose();
+                      setTimeout(() => {
+                        onClose();
+                      }, 100);
                     }
                   }}
                   onMouseEnter={() => {
@@ -275,6 +279,13 @@ export function GoOSFileContextMenu({
                       setFocusedIndex(enabledIndex);
                     }
                   }}
+                  onMouseDown={() => {
+                    if (!item.disabled) {
+                      setActiveId(item.id);
+                    }
+                  }}
+                  onMouseUp={() => setActiveId(null)}
+                  onMouseLeave={() => setActiveId(null)}
                   disabled={item.disabled}
                   style={{
                     width: '100%',
@@ -282,7 +293,9 @@ export function GoOSFileContextMenu({
                     alignItems: 'center',
                     gap: 10,
                     padding: '8px 12px',
-                    background: isFocused
+                    background: activeId === item.id
+                      ? item.danger ? '#fecaca' : goOSTokens.colors.accent.orangePale
+                      : isFocused
                       ? item.danger ? '#fef2f2' : goOSTokens.colors.headerBg
                       : 'transparent',
                     border: 'none',
@@ -296,7 +309,8 @@ export function GoOSFileContextMenu({
                       : goOSTokens.colors.text.primary,
                     opacity: item.disabled ? 0.5 : 1,
                     textAlign: 'left',
-                    transition: 'background 0.1s',
+                    transition: 'background 0.08s ease-out, transform 0.08s ease-out',
+                    transform: activeId === item.id ? 'scale(0.98)' : 'scale(1)',
                     outline: 'none',
                   }}
                 >
