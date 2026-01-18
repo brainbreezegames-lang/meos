@@ -12,3 +12,4 @@ export type { FileType } from './GoOSFileIcon';
 export { GoOSDesktopContextMenu } from './GoOSDesktopContextMenu';
 export { GoOSFileContextMenu } from './GoOSFileContextMenu';
 export { GoOSFolderWindow } from './GoOSFolderWindow';
+export { GoOSReadOnlyViewer } from './GoOSReadOnlyViewer';

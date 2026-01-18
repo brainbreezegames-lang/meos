@@ -34,6 +34,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
 
   return (
     <motion.div
+      role="dialog"
+      aria-label={`${folder.title} folder`}
+      aria-modal="false"
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -43,8 +46,10 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         position: 'fixed',
         top: '15%',
         left: '20%',
-        width: 500,
-        height: 400,
+        width: 'min(500px, 90vw)',
+        height: 'min(400px, 70vh)',
+        minWidth: 320,
+        minHeight: 280,
         background: goOSTokens.colors.cream,
         border: `2px solid ${goOSTokens.colors.border}`,
         borderRadius: 8,
@@ -69,8 +74,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         }}
       >
         {/* Traffic Lights */}
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 6 }} role="group" aria-label="Window controls">
           <button
+            type="button"
             onClick={onClose}
             style={{
               width: 14,
@@ -85,10 +91,12 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               justifyContent: 'center',
             }}
             title="Close"
+            aria-label="Close window"
           >
-            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" />
+            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
           </button>
           <button
+            type="button"
             style={{
               width: 14,
               height: 14,
@@ -102,10 +110,12 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               justifyContent: 'center',
             }}
             title="Minimize"
+            aria-label="Minimize window"
           >
-            <Minus size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" />
+            <Minus size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
           </button>
           <button
+            type="button"
             style={{
               width: 14,
               height: 14,
@@ -119,8 +129,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               justifyContent: 'center',
             }}
             title="Maximize"
+            aria-label="Maximize window"
           >
-            <Square size={7} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" />
+            <Square size={7} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
           </button>
         </div>
 

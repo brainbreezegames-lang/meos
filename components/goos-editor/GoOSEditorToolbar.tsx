@@ -15,9 +15,12 @@ interface ToolbarButtonProps {
 function ToolbarButton({ onClick, isActive, disabled, title, children }: ToolbarButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={disabled}
       title={title}
+      aria-label={title}
+      aria-pressed={isActive}
       style={{
         padding: '6px 8px',
         fontSize: 13,
@@ -85,6 +88,8 @@ export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorT
 
   return (
     <div
+      role="toolbar"
+      aria-label="Text formatting"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -98,7 +103,11 @@ export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorT
       {/* Heading Dropdown */}
       <div style={{ position: 'relative' }}>
         <button
+          type="button"
           onClick={() => setShowHeadingDropdown(!showHeadingDropdown)}
+          aria-label="Text style"
+          aria-haspopup="listbox"
+          aria-expanded={showHeadingDropdown}
           style={{
             padding: '6px 10px',
             fontSize: 13,
@@ -123,6 +132,8 @@ export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorT
 
         {showHeadingDropdown && (
           <div
+            role="listbox"
+            aria-label="Text styles"
             style={{
               position: 'absolute',
               top: '100%',
@@ -139,6 +150,9 @@ export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorT
             onClick={() => setShowHeadingDropdown(false)}
           >
             <button
+              type="button"
+              role="option"
+              aria-selected={!editor.isActive('heading')}
               onClick={() => editor.chain().focus().setParagraph().run()}
               style={{
                 width: '100%',
@@ -155,6 +169,9 @@ export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorT
               Paragraph
             </button>
             <button
+              type="button"
+              role="option"
+              aria-selected={editor.isActive('heading', { level: 1 })}
               onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
               style={{
                 width: '100%',
@@ -172,6 +189,9 @@ export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorT
               Heading 1
             </button>
             <button
+              type="button"
+              role="option"
+              aria-selected={editor.isActive('heading', { level: 2 })}
               onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
               style={{
                 width: '100%',
@@ -189,6 +209,9 @@ export function GoOSEditorToolbar({ editor, onAddImage, onSetLink }: GoOSEditorT
               Heading 2
             </button>
             <button
+              type="button"
+              role="option"
+              aria-selected={editor.isActive('heading', { level: 3 })}
               onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
               style={{
                 width: '100%',

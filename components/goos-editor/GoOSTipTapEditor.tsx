@@ -176,35 +176,56 @@ export function GoOSTipTapEditor({
         className="goos-bubble-menu"
       >
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive('bold') ? 'is-active' : ''}
+          aria-label="Bold"
+          aria-pressed={editor.isActive('bold')}
         >
           B
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={editor.isActive('italic') ? 'is-active' : ''}
+          aria-label="Italic"
+          aria-pressed={editor.isActive('italic')}
         >
           I
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           className={editor.isActive('underline') ? 'is-active' : ''}
+          aria-label="Underline"
+          aria-pressed={editor.isActive('underline')}
         >
           U
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleStrike().run()}
           className={editor.isActive('strike') ? 'is-active' : ''}
+          aria-label="Strikethrough"
+          aria-pressed={editor.isActive('strike')}
         >
           S
         </button>
-        <button onClick={setLink} className={editor.isActive('link') ? 'is-active' : ''}>
+        <button
+          type="button"
+          onClick={setLink}
+          className={editor.isActive('link') ? 'is-active' : ''}
+          aria-label="Add link"
+          aria-pressed={editor.isActive('link')}
+        >
           Link
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHighlight().run()}
           className={editor.isActive('highlight') ? 'is-active' : ''}
+          aria-label="Highlight"
+          aria-pressed={editor.isActive('highlight')}
         >
           Highlight
         </button>
@@ -217,31 +238,41 @@ export function GoOSTipTapEditor({
         className="goos-floating-menu"
       >
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          aria-label="Heading 1"
         >
           H1
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          aria-label="Heading 2"
         >
           H2
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
+          aria-label="Bullet list"
         >
           List
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          aria-label="Code block"
         >
           Code
         </button>
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          aria-label="Block quote"
         >
           Quote
         </button>
-        <button onClick={addImage}>
+        <button type="button" onClick={addImage} aria-label="Add image">
           Image
         </button>
       </FloatingMenu>

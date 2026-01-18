@@ -106,6 +106,27 @@ model DesktopItem {
   commentsEnabled    Boolean  @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  // === goOS-specific fields ===
+  // Item variant distinguishes meOS windows from goOS files
+  itemVariant        String   @default("window")  // "window" | "goos-file"
+  // goOS file type (only for goos-file variant)
+  goosFileType       String?  // "note" | "case-study" | "folder"
+  // Rich text content for goOS editor (TipTap HTML)
+  goosContent        String?  @db.Text
+  // Publication status for visibility control
+  publishStatus      String   @default("draft")   // "draft" | "published"
+  publishedAt        DateTime?
+  // Hierarchical folder structure (self-referential)
+  parentItemId       String?
+  parentItem         DesktopItem?  @relation("FolderHierarchy", fields: [parentItemId], references: [id], onDelete: SetNull)
+  children           DesktopItem[] @relation("FolderHierarchy")
+  // Future: access control (Phase 3)
+  accessLevel        String   @default("public")  // "public" | "locked"
+
+  @@index([parentItemId])
+  @@index([desktopId, publishStatus])
+  @@index([desktopId, itemVariant])
 }
 
 model Tab {

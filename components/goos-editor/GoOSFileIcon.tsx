@@ -67,7 +67,6 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const cleanupRef = useRef<(() => void) | null>(null);
   const isMountedRef = useRef(true);
-  const lastMouseDownTime = useRef(0);
 
   // Throttle onDrag callback for performance (16ms = ~60fps)
   const throttledOnDrag = useMemo(
@@ -121,24 +120,15 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     if (isRenaming) return;
     if (e.button !== 0) return;
 
-    // Detect potential double-click - don't start drag if clicking rapidly
-    const now = Date.now();
-    const timeSinceLastClick = now - lastMouseDownTime.current;
-    lastMouseDownTime.current = now;
-
-    if (timeSinceLastClick < 300) {
-      // This is likely a double-click, let native dblclick event fire
-      return;
-    }
-
-    e.preventDefault();
-    e.stopPropagation();
+    // Don't prevent default immediately - let the browser handle potential double-clicks
+    // We'll only prevent default once we detect actual dragging (movement > threshold)
 
     dragStartPos.current = { x: e.clientX, y: e.clientY };
     hasDragged.current = false;
     dragOffsetRef.current = { x: 0, y: 0 };
-    setIsDragging(true);
-    onDragStartProp?.(id);
+
+    // Track if we've committed to dragging (moved beyond threshold)
+    let isDragCommitted = false;
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!isMountedRef.current) return;
@@ -146,9 +136,15 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       const dx = moveEvent.clientX - dragStartPos.current.x;
       const dy = moveEvent.clientY - dragStartPos.current.y;
 
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      // Only commit to dragging once we've moved beyond threshold
+      if (!isDragCommitted && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+        isDragCommitted = true;
         hasDragged.current = true;
+        setIsDragging(true);
+        onDragStartProp?.(id);
       }
+
+      if (!isDragCommitted) return;
 
       dragOffsetRef.current = { x: dx, y: dy };
       setDragOffset({ x: dx, y: dy });
@@ -191,7 +187,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [isRenaming, position, onDragStartProp, throttledOnDrag, onPositionChange]);
+  }, [id, isRenaming, position, onDragStartProp, throttledOnDrag, onPositionChange]);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     if (hasDragged.current) {
@@ -206,6 +202,10 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
   return (
     <motion.div
+      role="button"
+      tabIndex={0}
+      aria-label={`${title} ${type === 'folder' ? 'folder' : type === 'case-study' ? 'case study' : 'note'}${isSelected ? ', selected' : ''}`}
+      aria-selected={isSelected}
       data-file-id={id}
       data-file-type={type}
       initial={{ opacity: 0, scale: 0.9 }}
@@ -218,6 +218,12 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       onClick={handleClick}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onDoubleClick?.();
+        }
+      }}
       style={{
         position: 'absolute',
         top: currentY,
@@ -243,6 +249,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
           ? `2px dashed ${goOSTokens.colors.accent.orange}`
           : '2px solid transparent',
         transition: isDragging ? 'none' : 'background 0.15s, border 0.15s',
+        outline: 'none',
       }}
     >
       {/* Icon */}

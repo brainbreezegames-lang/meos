@@ -145,8 +145,9 @@ export function GoOSEditorWindow({
         }}
       >
         {/* Traffic Lights */}
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 6 }} role="group" aria-label="Window controls">
           <button
+            type="button"
             onClick={onClose}
             style={{
               width: 14,
@@ -161,10 +162,12 @@ export function GoOSEditorWindow({
               justifyContent: 'center',
             }}
             title="Close"
+            aria-label="Close window"
           >
-            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" />
+            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
           </button>
           <button
+            type="button"
             onClick={onMinimize}
             style={{
               width: 14,
@@ -179,10 +182,12 @@ export function GoOSEditorWindow({
               justifyContent: 'center',
             }}
             title="Minimize"
+            aria-label="Minimize window"
           >
-            <Minus size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" />
+            <Minus size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
           </button>
           <button
+            type="button"
             onClick={onMaximize}
             style={{
               width: 14,
@@ -197,8 +202,9 @@ export function GoOSEditorWindow({
               justifyContent: 'center',
             }}
             title={isMaximized ? 'Restore' : 'Maximize'}
+            aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
           >
-            <Square size={7} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" />
+            <Square size={7} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
           </button>
         </div>
 

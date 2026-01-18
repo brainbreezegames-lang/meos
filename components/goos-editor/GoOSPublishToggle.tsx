@@ -42,6 +42,8 @@ export function GoOSPublishToggle({ status, onChange, disabled }: GoOSPublishTog
 
       {/* Toggle Switch */}
       <button
+        type="button"
+        role="switch"
         onClick={() => !disabled && onChange(isDraft ? 'published' : 'draft')}
         disabled={disabled}
         style={{
@@ -56,10 +58,12 @@ export function GoOSPublishToggle({ status, onChange, disabled }: GoOSPublishTog
           transition: 'background 0.2s ease',
           padding: 0,
         }}
-        aria-label={isDraft ? 'Publish' : 'Unpublish'}
+        aria-label={isDraft ? 'Publish document' : 'Unpublish document'}
+        aria-checked={!isDraft}
       >
         {/* Track indicators */}
         <span
+          aria-hidden="true"
           style={{
             position: 'absolute',
             left: 6,
@@ -73,6 +77,7 @@ export function GoOSPublishToggle({ status, onChange, disabled }: GoOSPublishTog
           D
         </span>
         <span
+          aria-hidden="true"
           style={{
             position: 'absolute',
             right: 6,
