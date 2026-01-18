@@ -246,7 +246,6 @@ export function GoOSProvider({
     setFiles(prev => [...prev, newFile]);
 
     try {
-      console.log('[goOS] Creating file:', { type, title, parentId, position });
       const response = await fetch('/api/goos/files', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -259,7 +258,6 @@ export function GoOSProvider({
       });
 
       const result = await response.json();
-      console.log('[goOS] API response:', result);
 
       if (!result.success) {
         throw new Error(result.error?.message || 'Failed to create file');
@@ -284,30 +282,22 @@ export function GoOSProvider({
   // Update file
   // Use functional updates to always get current state (avoids stale closure for newly created files)
   const updateFile = useCallback(async (id: string, updates: Partial<GoOSFileData>) => {
-    console.log('[goOS] updateFile called:', { id, updates, viewMode, localOnly });
     if (viewMode === 'visitor') return;
 
     // Store previous file for potential rollback (captured via functional update)
     let previousFile: GoOSFileData | undefined;
-    let fileFound = false;
 
     // Optimistic update using functional pattern to get current state
     setFiles(prev => {
-      console.log('[goOS] updateFile setFiles callback, files count:', prev.length, 'looking for:', id);
-      console.log('[goOS] existing IDs:', prev.map(f => f.id));
       previousFile = prev.find(f => f.id === id);
       if (!previousFile) {
-        console.warn('[goOS] updateFile: file not found', id);
         return prev; // No change
       }
-      fileFound = true;
-      console.log('[goOS] updateFile: found file, updating position');
       return prev.map(f => f.id === id ? { ...f, ...updates, updatedAt: new Date() } : f);
     });
 
     // In local-only mode, just update state
     if (localOnly) {
-      console.log('[goOS] updateFile: local-only mode, done');
       return;
     }
 

@@ -71,6 +71,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const cleanupRef = useRef<(() => void) | null>(null);
   const isMountedRef = useRef(true);
+  const pendingPositionRef = useRef<{ x: number; y: number } | null>(null);
 
   // Store callbacks in refs to avoid stale closures during drag
   const onPositionChangeRef = useRef(onPositionChange);
@@ -81,6 +82,21 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   onPositionChangeRef.current = onPositionChange;
   onDragStartRef.current = onDragStartProp;
   positionRef.current = position;
+
+  // Reset dragOffset only after position prop has been updated
+  useEffect(() => {
+    if (pendingPositionRef.current) {
+      const pending = pendingPositionRef.current;
+      // Check if position is close enough to pending (within 0.5%)
+      if (
+        Math.abs(position.x - pending.x) < 0.5 &&
+        Math.abs(position.y - pending.y) < 0.5
+      ) {
+        pendingPositionRef.current = null;
+        setDragOffset({ x: 0, y: 0 });
+      }
+    }
+  }, [position.x, position.y]);
 
   // Throttle onDrag callback for performance (16ms = ~60fps)
   const throttledOnDrag = useMemo(
@@ -131,7 +147,6 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   };
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    console.log('[GoOSFileIcon] mouseDown:', { id, position: positionRef.current, hasOnPositionChange: !!onPositionChangeRef.current });
     if (isRenaming) return;
     if (e.button !== 0) return;
 
@@ -192,16 +207,15 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         // Calculate new position in percentages, clamped to valid range
         const newX = Math.max(0, Math.min(95, startPosition.x + dragOffsetRef.current.x));
         const newY = Math.max(0, Math.min(90, startPosition.y + dragOffsetRef.current.y));
-        console.log('[GoOSFileIcon] mouseUp - calling onPositionChange:', { id, newX, newY, hasCallback: !!onPositionChangeRef.current });
+        // Store pending position - dragOffset will be reset when position prop updates
+        pendingPositionRef.current = { x: newX, y: newY };
         onPositionChangeRef.current?.(
           { x: newX, y: newY },
           id
         );
       } else {
-        console.log('[GoOSFileIcon] mouseUp - no drag detected');
+        setDragOffset({ x: 0, y: 0 });
       }
-
-      setDragOffset({ x: 0, y: 0 });
     };
 
     const cleanup = () => {
