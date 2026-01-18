@@ -72,6 +72,16 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   const cleanupRef = useRef<(() => void) | null>(null);
   const isMountedRef = useRef(true);
 
+  // Store callbacks in refs to avoid stale closures during drag
+  const onPositionChangeRef = useRef(onPositionChange);
+  const onDragStartRef = useRef(onDragStartProp);
+  const positionRef = useRef(position);
+
+  // Keep refs updated
+  onPositionChangeRef.current = onPositionChange;
+  onDragStartRef.current = onDragStartProp;
+  positionRef.current = position;
+
   // Throttle onDrag callback for performance (16ms = ~60fps)
   const throttledOnDrag = useMemo(
     () => onDrag ? throttle(onDrag, 16) : undefined,
@@ -121,12 +131,12 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   };
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    console.log('[GoOSFileIcon] mouseDown on', id, 'position:', position, 'isRenaming:', isRenaming);
+    console.log('[GoOSFileIcon] mouseDown on', id, 'position:', positionRef.current, 'isRenaming:', isRenaming);
     if (isRenaming) return;
     if (e.button !== 0) return;
 
-    // Don't prevent default immediately - let the browser handle potential double-clicks
-    // We'll only prevent default once we detect actual dragging (movement > threshold)
+    // Capture position at drag start
+    const startPosition = { ...positionRef.current };
 
     dragStartPos.current = { x: e.clientX, y: e.clientY };
     hasDragged.current = false;
@@ -150,7 +160,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         isDragCommitted = true;
         hasDragged.current = true;
         setIsDragging(true);
-        onDragStartProp?.(id);
+        onDragStartRef.current?.(id);
       }
 
       if (!isDragCommitted) return;
@@ -165,8 +175,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       // Use throttled callback for folder hit-testing
       // Pass the current position in percentages (same units as folder positions)
       const currentPosPercent = {
-        x: position.x + dxPercent,
-        y: position.y + dyPercent,
+        x: startPosition.x + dxPercent,
+        y: startPosition.y + dyPercent,
       };
       throttledOnDrag?.(currentPosPercent, id);
     };
@@ -182,10 +192,10 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
       if (hasDragged.current) {
         // Calculate new position in percentages, clamped to valid range
-        const newX = Math.max(0, Math.min(95, position.x + dragOffsetRef.current.x));
-        const newY = Math.max(0, Math.min(90, position.y + dragOffsetRef.current.y));
-        console.log('[GoOSFileIcon] calling onPositionChange:', { newX, newY }, 'hasCallback:', !!onPositionChange);
-        onPositionChange?.(
+        const newX = Math.max(0, Math.min(95, startPosition.x + dragOffsetRef.current.x));
+        const newY = Math.max(0, Math.min(90, startPosition.y + dragOffsetRef.current.y));
+        console.log('[GoOSFileIcon] calling onPositionChange:', { newX, newY }, 'hasCallback:', !!onPositionChangeRef.current);
+        onPositionChangeRef.current?.(
           { x: newX, y: newY },
           id
         );
@@ -205,7 +215,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [id, isRenaming, position, onDragStartProp, throttledOnDrag, onPositionChange]);
+  }, [id, isRenaming, throttledOnDrag]);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     if (hasDragged.current) {
