@@ -2536,6 +2536,11 @@ function GoOSDemoContent() {
                             }
                         }
                     }}
+                    onShare={() => {
+                        const url = window.location.href;
+                        navigator.clipboard.writeText(url);
+                        showGoOSToast('Link copied to clipboard!', 'success');
+                    }}
                     canPaste={!!clipboard}
                 />
             )}
