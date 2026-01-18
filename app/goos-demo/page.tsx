@@ -1630,15 +1630,18 @@ function GoOSDemoContent() {
 
     // Memoized position change handler (stable reference)
     const handlePositionChange = useCallback((pos: { x: number; y: number }, fileId: string) => {
+        console.log('[goos-demo] handlePositionChange called:', { pos, fileId });
         const currentDraggingId = draggingFileRef.current;
         const currentDragOverId = dragOverRef.current;
 
         // Check if we're dropping on a folder
         if (currentDraggingId && currentDragOverId && currentDragOverId !== currentDraggingId) {
             // Move to folder via API
+            console.log('[goos-demo] Moving to folder:', currentDragOverId);
             moveGoOSFile(currentDraggingId, currentDragOverId);
         } else {
             // Just update position via API
+            console.log('[goos-demo] Updating position for:', fileId);
             updateGoOSFile(fileId, { position: pos });
         }
 
