@@ -48,6 +48,7 @@ import {
     type GoOSFile,
     type FileType,
 } from '@/components/goos-editor';
+import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext';
 
 // Lazy load heavy editor component (includes TipTap + all extensions)
 const GoOSEditorWindow = dynamic(
@@ -1553,8 +1554,36 @@ function GoOSDemoContent() {
     // Guestbook state
     const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>(DEMO_GUESTBOOK_ENTRIES);
 
-    // goOS Editor state
-    const [goosFiles, setGoosFiles] = useState<GoOSFile[]>(DEMO_FILES);
+    // goOS Context - use API persistence
+    const goosContext = useGoOS();
+    const {
+        files: goosFilesRaw,
+        createFile: createGoOSFile,
+        updateFile: updateGoOSFile,
+        deleteFile: deleteGoOSFile,
+        duplicateFile: duplicateGoOSFile,
+        moveFile: moveGoOSFile,
+        autoSave: goosAutoSave,
+        publishFile: publishGoOSFile,
+        unpublishFile: unpublishGoOSFile,
+        refreshFiles,
+        isLoading: goosLoading,
+    } = goosContext;
+
+    // Transform context files to component format
+    const goosFiles: GoOSFile[] = useMemo(() => goosFilesRaw.map(f => ({
+        id: f.id,
+        type: f.type as FileType,
+        title: f.title,
+        content: f.content,
+        status: f.status,
+        createdAt: new Date(f.createdAt),
+        updatedAt: new Date(f.updatedAt),
+        parentFolderId: f.parentId || undefined,
+        position: f.position,
+    })), [goosFilesRaw]);
+
+    // goOS Editor UI state (local only)
     const [openEditors, setOpenEditors] = useState<string[]>([]);
     const [activeEditorId, setActiveEditorId] = useState<string | null>(null);
     const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
@@ -1566,6 +1595,11 @@ function GoOSDemoContent() {
     const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
     const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
     const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
+
+    // Load files from API on mount
+    useEffect(() => {
+        refreshFiles();
+    }, [refreshFiles]);
 
     // Desktop always shows root-level files (no parentFolderId)
     const filesOnDesktop = useMemo(() => goosFiles.filter(f => !f.parentFolderId), [goosFiles]);
@@ -1595,19 +1629,11 @@ function GoOSDemoContent() {
 
         // Check if we're dropping on a folder
         if (currentDraggingId && currentDragOverId && currentDragOverId !== currentDraggingId) {
-            // Move to folder
-            setGoosFiles(prev => prev.map(f => {
-                if (f.id === currentDraggingId) {
-                    const filesInTarget = prev.filter(file => file.parentFolderId === currentDragOverId && file.id !== currentDraggingId);
-                    const newX = 40 + (filesInTarget.length % 8) * 100;
-                    const newY = 320 + Math.floor(filesInTarget.length / 8) * 100;
-                    return { ...f, parentFolderId: currentDragOverId, position: { x: newX, y: newY } };
-                }
-                return f;
-            }));
+            // Move to folder via API
+            moveGoOSFile(currentDraggingId, currentDragOverId);
         } else {
-            // Just update position
-            setGoosFiles(prev => prev.map(f => f.id === fileId ? { ...f, position: pos } : f));
+            // Just update position via API
+            updateGoOSFile(fileId, { position: pos });
         }
 
         // Reset drag state
@@ -1615,7 +1641,7 @@ function GoOSDemoContent() {
         dragOverRef.current = null;
         setDraggingFileId(null);
         setDragOverFolderId(null);
-    }, []);
+    }, [moveGoOSFile, updateGoOSFile]);
 
     // Memoized folder hit-test function (stable reference)
     const checkFolderHit = useCallback((dragPos: { x: number; y: number }, excludeFileId: string) => {
@@ -1637,30 +1663,17 @@ function GoOSDemoContent() {
         }
     }, []);
 
-    // File management functions
-    const createFile = useCallback((type: FileType) => {
-        // Find a free position for the new file on desktop
-        const rootFiles = goosFiles.filter(f => !f.parentFolderId);
-        const baseX = 40 + (rootFiles.length % 8) * 100;
-        const baseY = 320 + Math.floor(rootFiles.length / 8) * 100;
-        const newFile: GoOSFile = {
-            id: `file-${Date.now()}`,
-            type,
-            title: type === 'note' ? 'Untitled Note' : type === 'case-study' ? 'Untitled Case Study' : 'New Folder',
-            content: '',
-            status: 'draft',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            position: { x: baseX, y: baseY },
-            // Always create at root level (on desktop)
-        };
-        setGoosFiles(prev => [...prev, newFile]);
-        if (type !== 'folder') {
-            setOpenEditors(prev => [...prev, newFile.id]);
-            setActiveEditorId(newFile.id);
+    // File management functions - now use API persistence
+    const createFile = useCallback(async (type: FileType) => {
+        const newFile = await createGoOSFile(type, null);
+        if (newFile) {
+            if (type !== 'folder') {
+                setOpenEditors(prev => [...prev, newFile.id]);
+                setActiveEditorId(newFile.id);
+            }
+            setRenamingFileId(newFile.id);
         }
-        setRenamingFileId(newFile.id);
-    }, [goosFiles]);
+    }, [createGoOSFile]);
 
     const openFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
@@ -1696,22 +1709,9 @@ function GoOSDemoContent() {
     const moveFileToFolder = useCallback((fileId: string, targetFolderId: string | null) => {
         // Don't move a folder into itself
         if (fileId === targetFolderId) return;
-
-        setGoosFiles(prev => prev.map(f => {
-            if (f.id === fileId) {
-                // Calculate new position in the target folder
-                const filesInTarget = prev.filter(file => file.parentFolderId === targetFolderId && file.id !== fileId);
-                const newX = 40 + (filesInTarget.length % 8) * 100;
-                const newY = 320 + Math.floor(filesInTarget.length / 8) * 100;
-                return {
-                    ...f,
-                    parentFolderId: targetFolderId || undefined,
-                    position: { x: newX, y: newY }
-                };
-            }
-            return f;
-        }));
-    }, []);
+        // Use API persistence
+        moveGoOSFile(fileId, targetFolderId);
+    }, [moveGoOSFile]);
 
     const closeEditor = useCallback((fileId: string) => {
         setOpenEditors(prev => prev.filter(id => id !== fileId));
@@ -1722,34 +1722,28 @@ function GoOSDemoContent() {
     }, [activeEditorId, openEditors]);
 
     const updateFile = useCallback((fileId: string, updates: Partial<GoOSFile>) => {
-        setGoosFiles(prev => prev.map(f => f.id === fileId ? { ...f, ...updates } : f));
-    }, []);
+        // Use API persistence
+        updateGoOSFile(fileId, {
+            ...updates,
+            parentId: updates.parentFolderId,
+        } as Partial<GoOSFileData>);
+    }, [updateGoOSFile]);
 
-    const deleteFile = useCallback((fileId: string) => {
-        setGoosFiles(prev => prev.filter(f => f.id !== fileId));
-        closeEditor(fileId);
-        setSelectedFileId(null);
-    }, [closeEditor]);
+    const deleteFile = useCallback(async (fileId: string) => {
+        const success = await deleteGoOSFile(fileId);
+        if (success) {
+            closeEditor(fileId);
+            setSelectedFileId(null);
+        }
+    }, [deleteGoOSFile, closeEditor]);
 
-    const duplicateFile = useCallback((fileId: string) => {
-        const file = goosFiles.find(f => f.id === fileId);
-        if (!file) return;
-        const newFile: GoOSFile = {
-            ...file,
-            id: `file-${Date.now()}`,
-            title: `${file.title} (Copy)`,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            position: { x: file.position.x + 30, y: file.position.y + 30 },
-        };
-        setGoosFiles(prev => [...prev, newFile]);
-    }, [goosFiles]);
+    const duplicateFile = useCallback(async (fileId: string) => {
+        await duplicateGoOSFile(fileId);
+    }, [duplicateGoOSFile]);
 
     const updateFilePosition = useCallback((fileId: string, position: { x: number; y: number }) => {
-        setGoosFiles(prev => prev.map(f =>
-            f.id === fileId ? { ...f, position } : f
-        ));
-    }, []);
+        updateGoOSFile(fileId, { position });
+    }, [updateGoOSFile]);
 
     const copyFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
@@ -1761,28 +1755,26 @@ function GoOSDemoContent() {
         if (file) setClipboard({ files: [file], operation: 'cut' });
     }, [goosFiles]);
 
-    const pasteFile = useCallback(() => {
+    const pasteFile = useCallback(async () => {
         if (!clipboard) return;
-        clipboard.files.forEach(file => {
-            const newFile: GoOSFile = {
-                ...file,
-                id: `file-${Date.now()}`,
-                title: clipboard.operation === 'copy' ? `${file.title} (Copy)` : file.title,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
-            setGoosFiles(prev => [...prev, newFile]);
-        });
+        for (const file of clipboard.files) {
+            if (clipboard.operation === 'copy') {
+                // Duplicate via API
+                await duplicateGoOSFile(file.id);
+            } else {
+                // Cut = move to root (null parent)
+                await moveGoOSFile(file.id, null);
+            }
+        }
         if (clipboard.operation === 'cut') {
-            setGoosFiles(prev => prev.filter(f => !clipboard.files.some(cf => cf.id === f.id)));
             setClipboard(null);
         }
-    }, [clipboard]);
+    }, [clipboard, duplicateGoOSFile, moveGoOSFile]);
 
     const renameFile = useCallback((fileId: string, newTitle: string) => {
-        updateFile(fileId, { title: newTitle });
+        updateGoOSFile(fileId, { title: newTitle });
         setRenamingFileId(null);
-    }, [updateFile]);
+    }, [updateGoOSFile]);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -2093,7 +2085,20 @@ function GoOSDemoContent() {
                                 key={file.id}
                                 file={file}
                                 onClose={() => closeEditor(file.id)}
-                                onUpdate={(updates) => updateFile(file.id, updates)}
+                                onUpdate={(updates) => {
+                                    // Use auto-save for content/title changes (debounced)
+                                    if (updates.content !== undefined || updates.title !== undefined) {
+                                        goosAutoSave(file.id, updates.content ?? file.content, updates.title);
+                                    }
+                                    // Use immediate update for status changes
+                                    if (updates.status !== undefined) {
+                                        if (updates.status === 'published') {
+                                            publishGoOSFile(file.id);
+                                        } else {
+                                            unpublishGoOSFile(file.id);
+                                        }
+                                    }
+                                }}
                                 isActive={activeEditorId === file.id}
                                 zIndex={windowZ[`editor-${file.id}`] || topZIndex}
                             />
@@ -2485,9 +2490,11 @@ function GoOSDemoContent() {
                     onTogglePublish={() => {
                         const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
                         if (file) {
-                            updateFile(fileContextMenu.fileId!, {
-                                status: file.status === 'draft' ? 'published' : 'draft'
-                            });
+                            if (file.status === 'draft') {
+                                publishGoOSFile(fileContextMenu.fileId!);
+                            } else {
+                                unpublishGoOSFile(fileContextMenu.fileId!);
+                            }
                         }
                     }}
                     canPaste={!!clipboard}
@@ -2508,7 +2515,9 @@ export default function GoOSDemoPage() {
         <ThemeProvider initialTheme="sketch" forceTheme={true}>
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
-                    <GoOSDemoContent />
+                    <GoOSProvider viewMode="owner">
+                        <GoOSDemoContent />
+                    </GoOSProvider>
                 </WindowProvider>
             </EditProvider>
         </ThemeProvider>
