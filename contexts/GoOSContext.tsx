@@ -282,22 +282,28 @@ export function GoOSProvider({
   }, [localOnly, viewMode, getNextPosition, findNonOverlappingPosition, showToast]);
 
   // Update file
-  // Using a ref to avoid stale closure issues with files dependency
-  const filesRef = useRef(files);
-  filesRef.current = files;
-
+  // Use functional updates to always get current state (avoids stale closure for newly created files)
   const updateFile = useCallback(async (id: string, updates: Partial<GoOSFileData>) => {
     if (viewMode === 'visitor') return;
 
-    // Get current file from ref to avoid stale closure
-    const previousFile = filesRef.current.find(f => f.id === id);
-    if (!previousFile) return;
+    // Store previous file for potential rollback (captured via functional update)
+    let previousFile: GoOSFileData | undefined;
 
-    // Optimistic update
-    setFiles(prev => prev.map(f => f.id === id ? { ...f, ...updates, updatedAt: new Date() } : f));
+    // Optimistic update using functional pattern to get current state
+    setFiles(prev => {
+      previousFile = prev.find(f => f.id === id);
+      if (!previousFile) {
+        console.warn('[goOS] updateFile: file not found', id);
+        return prev; // No change
+      }
+      return prev.map(f => f.id === id ? { ...f, ...updates, updatedAt: new Date() } : f);
+    });
 
     // In local-only mode, just update state
     if (localOnly) return;
+
+    // Wait for next tick to ensure previousFile is captured
+    if (!previousFile) return;
 
     try {
       const apiUpdates: Record<string, unknown> = {};
@@ -322,7 +328,9 @@ export function GoOSProvider({
       setFiles(prev => prev.map(f => f.id === id ? result.data : f));
     } catch (err) {
       // Rollback using the captured previousFile
-      setFiles(prev => prev.map(f => f.id === id ? previousFile : f));
+      if (previousFile) {
+        setFiles(prev => prev.map(f => f.id === id ? previousFile! : f));
+      }
       const message = err instanceof Error ? err.message : 'Failed to update file';
       showToast(message, 'error');
     }
