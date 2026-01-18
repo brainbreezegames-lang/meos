@@ -131,7 +131,6 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   };
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    console.log('[GoOSFileIcon] mouseDown on', id, 'position:', positionRef.current, 'isRenaming:', isRenaming);
     if (isRenaming) return;
     if (e.button !== 0) return;
 
@@ -188,13 +187,10 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
       setIsDragging(false);
 
-      console.log('[GoOSFileIcon] mouseUp on', id, 'hasDragged:', hasDragged.current, 'offset:', dragOffsetRef.current);
-
       if (hasDragged.current) {
         // Calculate new position in percentages, clamped to valid range
         const newX = Math.max(0, Math.min(95, startPosition.x + dragOffsetRef.current.x));
         const newY = Math.max(0, Math.min(90, startPosition.y + dragOffsetRef.current.y));
-        console.log('[GoOSFileIcon] calling onPositionChange:', { newX, newY }, 'hasCallback:', !!onPositionChangeRef.current);
         onPositionChangeRef.current?.(
           { x: newX, y: newY },
           id
