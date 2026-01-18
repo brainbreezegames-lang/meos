@@ -282,13 +282,18 @@ export function GoOSProvider({
   }, [localOnly, viewMode, getNextPosition, findNonOverlappingPosition, showToast]);
 
   // Update file
+  // Using a ref to avoid stale closure issues with files dependency
+  const filesRef = useRef(files);
+  filesRef.current = files;
+
   const updateFile = useCallback(async (id: string, updates: Partial<GoOSFileData>) => {
     if (viewMode === 'visitor') return;
 
-    // Optimistic update
-    const previousFile = files.find(f => f.id === id);
+    // Get current file from ref to avoid stale closure
+    const previousFile = filesRef.current.find(f => f.id === id);
     if (!previousFile) return;
 
+    // Optimistic update
     setFiles(prev => prev.map(f => f.id === id ? { ...f, ...updates, updatedAt: new Date() } : f));
 
     // In local-only mode, just update state
@@ -316,12 +321,12 @@ export function GoOSProvider({
       // Update with server response
       setFiles(prev => prev.map(f => f.id === id ? result.data : f));
     } catch (err) {
-      // Rollback
+      // Rollback using the captured previousFile
       setFiles(prev => prev.map(f => f.id === id ? previousFile : f));
       const message = err instanceof Error ? err.message : 'Failed to update file';
       showToast(message, 'error');
     }
-  }, [localOnly, viewMode, files, showToast]);
+  }, [localOnly, viewMode, showToast]);
 
   // Auto-save with debounce
   const autoSave = useCallback((id: string, content: string, title?: string) => {

@@ -1649,14 +1649,17 @@ function GoOSDemoContent() {
     }, [moveGoOSFile, updateGoOSFile]);
 
     // Memoized folder hit-test function (stable reference)
+    // dragPos is in percentages (0-100), same as folder positions
     const checkFolderHit = useCallback((dragPos: { x: number; y: number }, excludeFileId: string) => {
         const folders = filesRef.current.filter(f => f.type === 'folder' && f.id !== excludeFileId && f.position);
         let foundFolder: string | null = null;
+        // Icon is roughly 80px wide, which is about 5% of a 1600px screen
+        const hitBoxSize = 6; // percentage
         for (const folder of folders) {
             const folderX = folder.position.x;
             const folderY = folder.position.y;
-            if (dragPos.x >= folderX && dragPos.x <= folderX + 80 &&
-                dragPos.y >= folderY && dragPos.y <= folderY + 80) {
+            if (dragPos.x >= folderX - 2 && dragPos.x <= folderX + hitBoxSize &&
+                dragPos.y >= folderY - 2 && dragPos.y <= folderY + hitBoxSize) {
                 foundFolder = folder.id;
                 break;
             }

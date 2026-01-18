@@ -161,11 +161,13 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       dragOffsetRef.current = { x: dxPercent, y: dyPercent };
       setDragOffset({ x: dxPercent, y: dyPercent });
 
-      // Use throttled callback for folder hit-testing (pass pixel position for hit detection)
-      throttledOnDrag?.(
-        { x: moveEvent.clientX, y: moveEvent.clientY },
-        id
-      );
+      // Use throttled callback for folder hit-testing
+      // Pass the current position in percentages (same units as folder positions)
+      const currentPosPercent = {
+        x: position.x + dxPercent,
+        y: position.y + dyPercent,
+      };
+      throttledOnDrag?.(currentPosPercent, id);
     };
 
     const handleMouseUp = () => {
