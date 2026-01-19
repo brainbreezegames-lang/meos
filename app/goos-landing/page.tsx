@@ -159,10 +159,10 @@ const DuckMascot = ({ size = 120 }: { size?: number }) => {
                         animate={{ scale: 1, opacity: 1, y: -20 }}
                         exit={{ scale: 0, opacity: 0, y: -40 }}
                         transition={springBouncy}
-                        className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white border-2 border-[#2a2a2a] rounded-full px-4 py-2 whitespace-nowrap z-50"
+                        className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white border-2 border-[#2B4AE2] rounded-full px-4 py-2 whitespace-nowrap z-50"
                         style={{ fontFamily: 'var(--font-handwritten)', boxShadow: '4px 4px 0 rgba(0,0,0,0.1)' }}
                     >
-                        <span className="text-lg text-[#2a2a2a]">
+                        <span className="text-lg text-[#2B4AE2]">
                             {quackMessages[quackCount % quackMessages.length]}
                         </span>
                     </motion.div>
@@ -217,13 +217,13 @@ const FeatureCard = ({
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay, ease: easeOutQuart }}
         whileHover={{ y: -4, boxShadow: '6px 6px 0 rgba(0,0,0,0.12)' }}
-        className="p-6 bg-[#FFFDF5] border-2 border-[#2a2a2a] relative"
+        className="p-6 bg-[#FFFDF5] border-2 border-[#2B4AE2] relative"
         style={{ boxShadow: '4px 4px 0 rgba(0,0,0,0.08)' }}
     >
-        <div className="w-12 h-12 rounded-lg bg-[#E8ECFB] border-2 border-[#2a2a2a] flex items-center justify-center mb-4">
+        <div className="w-12 h-12 rounded-lg bg-[#E8ECFB] border-2 border-[#2B4AE2] flex items-center justify-center mb-4">
             {icon}
         </div>
-        <h3 className="text-xl mb-2 text-[#1a1a1a]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+        <h3 className="text-xl mb-2 text-[#1E3494]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
             {title}
         </h3>
         <p className="text-[#4a4a4a] leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
@@ -253,18 +253,18 @@ const GoOSButton = ({
     };
 
     const variantClasses = {
-        primary: 'bg-[#2B4AE2] text-white border-[#2a2a2a] hover:brightness-110',
-        secondary: 'bg-white text-[#2a2a2a] border-[#2a2a2a] hover:bg-[#f5f5f0]'
+        primary: 'bg-[#2B4AE2] text-white border-[#2B4AE2] hover:brightness-110',
+        secondary: 'bg-white text-[#2B4AE2] border-[#2B4AE2] hover:bg-[#f5f5f0]'
     };
 
     return (
         <Link href={href}>
             <motion.span
-                whileHover={{ y: -2, boxShadow: '5px 5px 0 #2a2a2a' }}
-                whileTap={{ y: 1, boxShadow: '2px 2px 0 #2a2a2a' }}
+                whileHover={{ y: -2, boxShadow: '5px 5px 0 #2B4AE2' }}
+                whileTap={{ y: 1, boxShadow: '2px 2px 0 #2B4AE2' }}
                 transition={springBouncy}
                 className={`inline-flex items-center gap-2 border-2 font-semibold cursor-pointer ${sizeClasses[size]} ${variantClasses[variant]}`}
-                style={{ fontFamily: 'var(--font-body)', boxShadow: '4px 4px 0 #2a2a2a' }}
+                style={{ fontFamily: 'var(--font-body)', boxShadow: '4px 4px 0 #2B4AE2' }}
             >
                 {children}
             </motion.span>
@@ -289,9 +289,9 @@ const Testimonial = ({
     rotation?: number;
 }) => (
     <DraggableStickyNote color={color} rotation={rotation} size="lg">
-        <p className="text-lg text-[#2a2a2a] mb-3 leading-snug">"{quote}"</p>
-        <div className="border-t border-[#2a2a2a]/20 pt-2 mt-2">
-            <p className="text-sm font-bold text-[#2a2a2a]">{author}</p>
+        <p className="text-lg text-[#2B4AE2] mb-3 leading-snug">"{quote}"</p>
+        <div className="border-t border-[#2B4AE2]/20 pt-2 mt-2">
+            <p className="text-sm font-bold text-[#2B4AE2]">{author}</p>
             <p className="text-xs text-[#666]">{role}</p>
         </div>
     </DraggableStickyNote>
@@ -325,7 +325,7 @@ export default function GoOSLanding() {
                 style={{
                     background: 'rgba(250, 248, 240, 0.9)',
                     backdropFilter: 'blur(8px)',
-                    borderBottom: '2px solid #2a2a2a'
+                    borderBottom: '2px solid #2B4AE2'
                 }}
             >
                 <div className="flex items-center gap-3">
@@ -337,7 +337,7 @@ export default function GoOSLanding() {
                         className="object-contain"
                     />
                     <span
-                        className="text-2xl text-[#1a1a1a]"
+                        className="text-2xl text-[#1E3494]"
                         style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                     >
                         goOS
@@ -399,18 +399,18 @@ export default function GoOSLanding() {
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: 0.2, type: "spring" }}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-[#E8ECFB] border-2 border-[#2a2a2a] mb-6"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-[#E8ECFB] border-2 border-[#2B4AE2] mb-6"
                                 style={{ boxShadow: '3px 3px 0 rgba(0,0,0,0.1)' }}
                             >
                                 <Sparkles size={16} className="text-[#2B4AE2]" />
-                                <span style={{ fontFamily: 'var(--font-handwritten)' }} className="text-[#2a2a2a]">
+                                <span style={{ fontFamily: 'var(--font-handwritten)' }} className="text-[#2B4AE2]">
                                     Your Personal Web Desktop
                                 </span>
                             </motion.div>
 
                             {/* Headline */}
                             <h1
-                                className="text-4xl md:text-5xl lg:text-6xl text-[#1a1a1a] mb-6 leading-[1.1]"
+                                className="text-4xl md:text-5xl lg:text-6xl text-[#1E3494] mb-6 leading-[1.1]"
                                 style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                             >
                                 A portfolio that
@@ -469,7 +469,7 @@ export default function GoOSLanding() {
                                     ))}
                                 </div>
                                 <p className="text-sm text-[#666]" style={{ fontFamily: 'var(--font-body)' }}>
-                                    <span className="font-semibold text-[#2a2a2a]">2,847+</span> creatives building
+                                    <span className="font-semibold text-[#2B4AE2]">2,847+</span> creatives building
                                 </p>
                             </motion.div>
                         </motion.div>
@@ -484,11 +484,11 @@ export default function GoOSLanding() {
                             <div className="relative">
                                 {/* Desktop preview mockup */}
                                 <div
-                                    className="relative bg-[#FFFDF5] border-2 border-[#2a2a2a] p-4 overflow-hidden"
+                                    className="relative bg-[#FFFDF5] border-2 border-[#2B4AE2] p-4 overflow-hidden"
                                     style={{ boxShadow: '8px 8px 0 rgba(0,0,0,0.1)' }}
                                 >
                                     {/* Title bar */}
-                                    <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-[#2a2a2a]/20">
+                                    <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-[#2B4AE2]/20">
                                         <div className="flex gap-1.5">
                                             <div className="w-3 h-3 rounded-full bg-[#FF6B6B]" />
                                             <div className="w-3 h-3 rounded-full bg-[#FFD93D]" />
@@ -503,15 +503,15 @@ export default function GoOSLanding() {
                                         style={{ backgroundImage: 'radial-gradient(#e0e0e0 1px, transparent 1px)', backgroundSize: '16px 16px' }}
                                     >
                                         {/* Mini windows */}
-                                        <div className="absolute top-4 left-4 w-24 h-16 bg-white border border-[#2a2a2a]/30 rounded-sm p-1">
+                                        <div className="absolute top-4 left-4 w-24 h-16 bg-white border border-[#2B4AE2]/30 rounded-sm p-1">
                                             <div className="w-full h-2 bg-[#f0ede0] rounded-sm mb-1" />
                                             <div className="w-full h-full bg-[#bae6fd]/30 rounded-sm" />
                                         </div>
-                                        <div className="absolute top-8 right-4 w-20 h-20 bg-white border border-[#2a2a2a]/30 rounded-sm p-1">
+                                        <div className="absolute top-8 right-4 w-20 h-20 bg-white border border-[#2B4AE2]/30 rounded-sm p-1">
                                             <div className="w-full h-2 bg-[#f0ede0] rounded-sm mb-1" />
                                             <div className="w-full h-full bg-[#fbcfe8]/30 rounded-sm" />
                                         </div>
-                                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 px-3 py-2 bg-white/80 border border-[#2a2a2a]/20 rounded-lg">
+                                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 px-3 py-2 bg-white/80 border border-[#2B4AE2]/20 rounded-lg">
                                             {[...Array(5)].map((_, i) => (
                                                 <div key={i} className="w-6 h-6 bg-[#E8ECFB]/50 rounded-md" />
                                             ))}
@@ -538,7 +538,7 @@ export default function GoOSLanding() {
             </section>
 
             {/* ==================== FEATURES SECTION ==================== */}
-            <section id="features" className="px-6 py-20 md:py-28 bg-[#F5F3E8]" style={{ borderTop: '2px solid #2a2a2a' }}>
+            <section id="features" className="px-6 py-20 md:py-28 bg-[#F5F3E8]" style={{ borderTop: '2px solid #2B4AE2' }}>
                 <div className="max-w-6xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -547,7 +547,7 @@ export default function GoOSLanding() {
                         className="text-center mb-16"
                     >
                         <h2
-                            className="text-3xl md:text-4xl text-[#1a1a1a] mb-4"
+                            className="text-3xl md:text-4xl text-[#1E3494] mb-4"
                             style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                         >
                             Everything you need to
@@ -609,7 +609,7 @@ export default function GoOSLanding() {
                         className="text-center mb-16"
                     >
                         <h2
-                            className="text-3xl md:text-4xl text-[#1a1a1a] mb-4"
+                            className="text-3xl md:text-4xl text-[#1E3494] mb-4"
                             style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                         >
                             Creatives
@@ -644,7 +644,7 @@ export default function GoOSLanding() {
             </section>
 
             {/* ==================== CTA SECTION ==================== */}
-            <section className="px-6 py-20 md:py-28 bg-[#2a2a2a] relative">
+            <section className="px-6 py-20 md:py-28 bg-[#2B4AE2] relative">
                 <div className="max-w-4xl mx-auto text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -692,7 +692,7 @@ export default function GoOSLanding() {
             </section>
 
             {/* ==================== FOOTER ==================== */}
-            <footer className="px-6 py-8 border-t-2 border-[#2a2a2a] bg-[#FAF8F0]">
+            <footer className="px-6 py-8 border-t-2 border-[#2B4AE2] bg-[#FAF8F0]">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
                         <Image
@@ -703,7 +703,7 @@ export default function GoOSLanding() {
                             className="object-contain"
                         />
                         <span
-                            className="text-lg text-[#1a1a1a]"
+                            className="text-lg text-[#1E3494]"
                             style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                         >
                             goOS

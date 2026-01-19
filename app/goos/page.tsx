@@ -86,7 +86,7 @@ const MemoizedDesktopIcon = React.memo(({ label, icon, onClick, badge, isActive 
                         exit={{ scale: 0 }}
                         transition={springSnappy}
                         className="absolute -top-1 -right-1 min-w-[16px] h-4 flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
-                        style={{ background: '#2B4AE2', border: '1.5px solid #2a2a2a' }}
+                        style={{ background: '#2B4AE2', border: '1.5px solid #2B4AE2' }}
                     >
                         {badge > 99 ? '99+' : badge}
                     </motion.span>
@@ -94,7 +94,7 @@ const MemoizedDesktopIcon = React.memo(({ label, icon, onClick, badge, isActive 
             </AnimatePresence>
         </motion.div>
         <span
-            className="text-xs text-[#2a2a2a] text-center leading-tight select-none"
+            className="text-xs text-[#2B4AE2] text-center leading-tight select-none"
             style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
         >
             {label}
@@ -136,7 +136,7 @@ const MemoizedDockIcon = React.memo(({ icon, onClick, isActive, badge, label, is
                     transition-colors duration-200
                     ${isActive ? 'bg-orange-100 shadow-sm' : 'group-hover:bg-black/5'}
                 `}
-                style={{ border: isActive ? '1.5px solid #2a2a2a' : 'none' }}
+                style={{ border: isActive ? '1.5px solid #2B4AE2' : 'none' }}
             >
                 <div className="w-7 h-7 flex items-center justify-center">
                     {icon}
@@ -167,7 +167,7 @@ const MemoizedDockIcon = React.memo(({ icon, onClick, isActive, badge, label, is
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
                         transition={springSnappy}
-                        className="w-1.5 h-1.5 rounded-full bg-[#2a2a2a] mt-1"
+                        className="w-1.5 h-1.5 rounded-full bg-[#2B4AE2] mt-1"
                     />
                 )}
             </AnimatePresence>
@@ -409,7 +409,7 @@ const HonkButton = React.memo(() => {
             </motion.div>
 
             <motion.span
-                className="text-xs text-[#2a2a2a]"
+                className="text-xs text-[#2B4AE2]"
                 style={{ fontFamily: "var(--font-body)", fontWeight: 600 }}
                 animate={isHonking ? { scale: [1, 1.2, 1] } : {}}
             >
@@ -540,7 +540,7 @@ const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
 
             <motion.span
                 animate={checked ? { opacity: 0.4 } : { opacity: 1 }}
-                className={`text-sm text-[#2a2a2a] ${checked ? 'line-through' : isHot ? 'text-[#1E3494]' : ''}`}
+                className={`text-sm text-[#2B4AE2] ${checked ? 'line-through' : isHot ? 'text-[#1E3494]' : ''}`}
                 style={{ fontFamily: "var(--font-body)", fontWeight: isHot ? 600 : checked ? 400 : 500 }}
             >
                 {label}
@@ -596,7 +596,7 @@ const AnimatedToggle = React.memo(({ defaultOn = false, onChange }: {
             onClick={handleToggle}
             className="relative w-11 h-6 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--accent-light)] focus:ring-offset-2"
             animate={{
-                backgroundColor: isOn ? '#2B4AE2' : '#2a2a2a'
+                backgroundColor: isOn ? '#2B4AE2' : '#2B4AE2'
             }}
             transition={{ duration: 0.2 }}
             whileTap={{ scale: 0.95 }}
@@ -764,7 +764,7 @@ function SketchWindow({
                 width: win.width,
                 height: win.height,
                 zIndex: win.zIndex,
-                border: '2px solid #2a2a2a',
+                border: '2px solid #2B4AE2',
                 boxShadow: '6px 6px 0 rgba(0,0,0,0.1)'
             }}
         >
@@ -773,13 +773,13 @@ function SketchWindow({
                 className="h-8 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0"
                 style={{
                     background: '#F5F3E8',
-                    borderBottom: '2px solid #2a2a2a'
+                    borderBottom: '2px solid #2B4AE2'
                 }}
             >
                 <div className="flex items-center gap-2 pointer-events-none">
                     {win.icon && <span className="opacity-60">{win.icon}</span>}
                     <span
-                        className="text-base text-[#1a1a1a]"
+                        className="text-base text-[#1E3494]"
                         style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
                     >
                         {win.title}
@@ -941,7 +941,7 @@ export default function GoOSPage() {
                 ==================== */}
             <header
                 className="h-10 flex items-center justify-between px-5 relative z-[2000] shadow-sm select-none"
-                style={{ background: '#F0EDE0', borderBottom: '2px solid #2a2a2a' }}
+                style={{ background: '#F0EDE0', borderBottom: '2px solid #2B4AE2' }}
             >
                 <div className="flex items-center gap-8">
                     <motion.button
@@ -949,7 +949,7 @@ export default function GoOSPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95, rotate: [-5, 5, 0] }}
                         transition={springSnappy}
-                        className="text-xl tracking-tight text-[#1a1a1a] cursor-pointer focus:outline-none relative"
+                        className="text-xl tracking-tight text-[#1E3494] cursor-pointer focus:outline-none relative"
                         style={{ fontFamily: "var(--font-display)", fontWeight: 700 }}
                     >
                         goOS
@@ -1008,7 +1008,7 @@ export default function GoOSPage() {
                         <span className="font-medium">87%</span>
                     </div>
                     <Wifi size={15} strokeWidth={2} />
-                    <span className="font-semibold tabular-nums min-w-[44px] text-right text-[#1a1a1a]">{time}</span>
+                    <span className="font-semibold tabular-nums min-w-[44px] text-right text-[#1E3494]">{time}</span>
                 </div>
             </header>
 
@@ -1026,7 +1026,7 @@ export default function GoOSPage() {
                 >
                     <div className="mb-4 flex flex-col gap-3">
                         <MemoizedStickyNote color="orange" rotation={-3}>
-                            <span className="text-xl text-[#2a2a2a]">
+                            <span className="text-xl text-[#2B4AE2]">
                                 Nest:
                             </span>
                         </MemoizedStickyNote>
@@ -1042,20 +1042,20 @@ export default function GoOSPage() {
 
                     <MemoizedDesktopIcon
                         label="Nest"
-                        icon={<Folder size={30} fill="#5B73E8" stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Folder size={30} fill="#5B73E8" stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('nest')}
                         isActive={winStates.nest.isOpen && !winStates.nest.isMinimized}
                     />
                     <MemoizedDesktopIcon
                         label="Shell"
-                        icon={<Terminal size={30} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Terminal size={30} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('shell')}
                         badge={250}
                         isActive={winStates.shell.isOpen && !winStates.shell.isMinimized}
                     />
                     <MemoizedDesktopIcon
                         label="Migration"
-                        icon={<HardDrive size={30} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<HardDrive size={30} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => { }}
                     />
 
@@ -1072,20 +1072,20 @@ export default function GoOSPage() {
                 >
                     <MemoizedDesktopIcon
                         label="Mail"
-                        icon={<Mail size={30} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Mail size={30} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('quackmail')}
                         badge={3}
                         isActive={winStates.quackmail.isOpen && !winStates.quackmail.isMinimized}
                     />
                     <MemoizedDesktopIcon
                         label="Chat"
-                        icon={<MessageCircle size={30} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<MessageCircle size={30} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('chat')}
                         isActive={winStates.chat.isOpen && !winStates.chat.isMinimized}
                     />
                     <MemoizedDesktopIcon
                         label="Notes"
-                        icon={<StickyNoteIcon size={30} fill="#FFF9C4" stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<StickyNoteIcon size={30} fill="#FFF9C4" stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('notes')}
                         isActive={winStates.notes.isOpen && !winStates.notes.isMinimized}
                     />
@@ -1124,7 +1124,7 @@ export default function GoOSPage() {
                                     {/* Window Contents Integrated for performance */}
                                     {id === 'goOS' && (
                                         <div className="h-full flex flex-col">
-                                            <div className="flex-1 m-3 relative border-2 border-[#2a2a2a]/10 overflow-hidden bg-white/50">
+                                            <div className="flex-1 m-3 relative border-2 border-[#2B4AE2]/10 overflow-hidden bg-white/50">
                                                 <Image
                                                     src="/assets/sketch/duck-water.png"
                                                     alt="Duck"
@@ -1133,16 +1133,16 @@ export default function GoOSPage() {
                                                     sizes="400px"
                                                 />
                                                 <div
-                                                    className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-white/90 border border-[#2a2a2a]/20 shadow-sm text-[#3a3a3a]"
+                                                    className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-white/90 border border-[#2B4AE2]/20 shadow-sm text-[#3a3a3a]"
                                                     style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
                                                 >
                                                     Bookmark <span className="text-[#1E3494]">♦</span>
                                                 </div>
                                             </div>
-                                            <footer className="h-11 flex items-center justify-between px-4 bg-[#F5F3E8] border-t-2 border-[#2a2a2a]">
+                                            <footer className="h-11 flex items-center justify-between px-4 bg-[#F5F3E8] border-t-2 border-[#2B4AE2]">
                                                 <div className="flex items-center gap-2">
                                                     <span
-                                                        className="text-sm text-[#1a1a1a]"
+                                                        className="text-sm text-[#1E3494]"
                                                         style={{ fontFamily: "var(--font-body)", fontWeight: 600 }}
                                                     >
                                                         Migration In
@@ -1151,13 +1151,13 @@ export default function GoOSPage() {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
-                                                        className="px-3 py-1 text-xs border-2 border-[#2a2a2a] bg-white text-[#2a2a2a] hover:bg-black/5 rounded transition-colors active:scale-95"
+                                                        className="px-3 py-1 text-xs border-2 border-[#2B4AE2] bg-white text-[#2B4AE2] hover:bg-black/5 rounded transition-colors active:scale-95"
                                                         style={{ fontFamily: "var(--font-body)", fontWeight: 600 }}
                                                     >
                                                         ◀ Prev
                                                     </button>
                                                     <button
-                                                        className="px-3 py-1 text-xs border-2 border-[#2a2a2a] bg-white text-[#2a2a2a] hover:bg-black/5 rounded transition-colors active:scale-95"
+                                                        className="px-3 py-1 text-xs border-2 border-[#2B4AE2] bg-white text-[#2B4AE2] hover:bg-black/5 rounded transition-colors active:scale-95"
                                                         style={{ fontFamily: "var(--font-body)", fontWeight: 600 }}
                                                     >
                                                         Next ▶
@@ -1343,7 +1343,7 @@ export default function GoOSPage() {
                 >
                     <RubberDuck onClick={() => {}} />
                     <MemoizedDockIcon
-                        icon={<Folder size={26} fill="#5B73E8" stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Folder size={26} fill="#5B73E8" stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('nest')}
                         isActive={winStates.nest.isOpen}
                         label="Nest"
@@ -1361,20 +1361,20 @@ export default function GoOSPage() {
                         label="Calendar"
                     />
                     <MemoizedDockIcon
-                        icon={<Mail size={26} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Mail size={26} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('quackmail')}
                         isActive={winStates.quackmail.isOpen}
                         badge={3}
                         label="Mail"
                     />
                     <MemoizedDockIcon
-                        icon={<Camera size={26} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Camera size={26} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('goOS')}
                         isActive={winStates.goOS.isOpen}
                         label="Photos"
                     />
                     <MemoizedDockIcon
-                        icon={<FileText size={26} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<FileText size={26} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('notes')}
                         isActive={winStates.notes.isOpen}
                         label="Notes"
@@ -1383,17 +1383,17 @@ export default function GoOSPage() {
                     <div className="w-[1.5px] h-9 mx-1 bg-black/10 rounded-full" />
 
                     <MemoizedDockIcon
-                        icon={<Gamepad2 size={26} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Gamepad2 size={26} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => { }}
                         label="Games"
                     />
                     <MemoizedDockIcon
-                        icon={<Music size={26} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Music size={26} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => { }}
                         label="Music"
                     />
                     <MemoizedDockIcon
-                        icon={<Settings size={26} stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Settings size={26} stroke="#2B4AE2" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('settings')}
                         isActive={winStates.settings.isOpen}
                         label="Settings"

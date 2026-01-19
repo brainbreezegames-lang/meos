@@ -4,17 +4,17 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Mail, X, FileText, Folder, BarChart3 } from 'lucide-react';
 
-// Design tokens - Mediterranean Blue
+// Design tokens - Mediterranean Blue (Blue is the new black)
 const goOS = {
   colors: {
     paper: '#FAF7F2',
     cream: '#FEFEFE',
-    headerBg: '#F0EDE0',
-    border: '#2a2a2a',
+    headerBg: '#E8ECFB',
+    border: '#2B4AE2',
     text: {
-      primary: '#1a1a1a',
-      secondary: '#3a3a3a',
-      muted: '#666666',
+      primary: '#1E3494',
+      secondary: '#2B4AE2',
+      muted: '#5B73E8',
     },
     accent: {
       primary: '#2B4AE2',
@@ -22,7 +22,7 @@ const goOS = {
     },
   },
   shadows: {
-    solid: '4px 4px 16px rgba(0,0,0,0.08)',
+    solid: '4px 4px 16px rgba(43, 74, 226, 0.15)',
   },
 };
 

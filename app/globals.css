@@ -190,15 +190,15 @@ html.theme-sketch {
     /* Backgrounds */
     --bg-canvas: #FAF7F2;        /* Main canvas/desktop - warm cream */
     --bg-surface: #FFFDF5;       /* Windows, cards */
-    --bg-elevated: #F5F3E8;      /* Toolbars, headers */
-    --bg-muted: #F0EDE0;         /* Dock, menu bar */
-    --bg-overlay: rgba(0, 0, 0, 0.3);
+    --bg-elevated: #E8ECFB;      /* Toolbars, headers - light blue */
+    --bg-muted: #E8ECFB;         /* Dock, menu bar - light blue */
+    --bg-overlay: rgba(43, 74, 226, 0.2);
 
-    /* Text Colors */
-    --text-primary: #1a1a1a;     /* Headings, important */
-    --text-secondary: #3a3a3a;   /* Body text */
-    --text-tertiary: #666666;    /* Captions, metadata */
-    --text-disabled: #999999;    /* Disabled states */
+    /* Text Colors - Mediterranean Blue */
+    --text-primary: #1E3494;     /* Headings, important */
+    --text-secondary: #2B4AE2;   /* Body text */
+    --text-tertiary: #5B73E8;    /* Captions, metadata */
+    --text-disabled: #A3B1F0;    /* Disabled states */
     --text-inverse: #FFFDF5;     /* On dark backgrounds */
 
     /* Brand/Accent Colors - Mediterranean Blue */
@@ -207,21 +207,21 @@ html.theme-sketch {
     --accent-light: #5B73E8;     /* Light blue (fills) */
     --accent-pale: #E8ECFB;      /* Pale blue (subtle) */
 
-    /* Semantic Colors */
-    --color-success: #22C55E;
-    --color-warning: #F59E0B;
-    --color-error: #EF4444;
-    --color-info: #3B82F6;
+    /* Semantic Colors - Blue palette */
+    --color-success: #5B73E8;
+    --color-warning: #2B4AE2;
+    --color-error: #1E3494;
+    --color-info: #2B4AE2;
 
-    /* Window Controls */
-    --traffic-red: #FF6B6B;
-    --traffic-yellow: #FFD93D;
-    --traffic-green: #6BCB77;
+    /* Window Controls - Subtle blue tinted */
+    --traffic-red: #E85B6B;
+    --traffic-yellow: #5B73E8;
+    --traffic-green: #5B73E8;
 
-    /* Border Colors */
-    --border-strong: #2a2a2a;
-    --border-medium: rgba(42, 42, 42, 0.3);
-    --border-subtle: rgba(42, 42, 42, 0.15);
+    /* Border Colors - Mediterranean Blue */
+    --border-strong: #2B4AE2;
+    --border-medium: rgba(43, 74, 226, 0.4);
+    --border-subtle: rgba(43, 74, 226, 0.2);
 
     /* ========== SPACING ========== */
     --space-0: 0;

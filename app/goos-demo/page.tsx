@@ -56,8 +56,8 @@ const GoOSEditorWindow = dynamic(
     {
         loading: () => (
             <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-                <div className="bg-[#FAF8F0] p-6 rounded-lg border-2 border-[#2a2a2a] shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
-                    <div className="animate-pulse text-sm font-medium text-[#1a1a1a]">Loading editor...</div>
+                <div className="bg-[#FAF8F0] p-6 rounded-lg border-2 border-[#2B4AE2] shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
+                    <div className="animate-pulse text-sm font-medium text-[#1E3494]">Loading editor...</div>
                 </div>
             </div>
         ),
@@ -66,19 +66,19 @@ const GoOSEditorWindow = dynamic(
 );
 
 // ============================================
-// GOOS DESIGN TOKENS - Mediterranean Blue
+// GOOS DESIGN TOKENS - Mediterranean Blue (Blue is the new black)
 // ============================================
 const goOS = {
     colors: {
         paper: '#FAF7F2',
         cream: '#FEFEFE',
-        headerBg: '#F0EDE0',
-        windowBg: '#F5F3E8',
-        border: '#2a2a2a',
+        headerBg: '#E8ECFB',
+        windowBg: '#F8FAFF',
+        border: '#2B4AE2',
         text: {
-            primary: '#1a1a1a',
-            secondary: '#3a3a3a',
-            muted: '#666666',
+            primary: '#1E3494',
+            secondary: '#2B4AE2',
+            muted: '#5B73E8',
         },
         accent: {
             primary: '#2B4AE2',
@@ -87,19 +87,19 @@ const goOS = {
             pale: '#E8ECFB',
         },
         sticky: {
-            yellow: '#fef08a',
-            blue: '#bae6fd',
-            pink: '#fbcfe8',
-            green: '#bbf7d0',
-            orange: '#fed7aa',
-            purple: '#e9d5ff',
+            yellow: '#E8ECFB',
+            blue: '#E8ECFB',
+            pink: '#E8ECFB',
+            green: '#E8ECFB',
+            orange: '#E8ECFB',
+            purple: '#E8ECFB',
         }
     },
     shadows: {
-        solid: '4px 4px 16px rgba(0,0,0,0.08)',
-        hover: '6px 6px 20px rgba(0,0,0,0.10)',
-        sm: '2px 2px 8px rgba(0,0,0,0.06)',
-        button: '2px 2px 8px rgba(0,0,0,0.08)',
+        solid: '4px 4px 16px rgba(43, 74, 226, 0.15)',
+        hover: '6px 6px 20px rgba(43, 74, 226, 0.20)',
+        sm: '2px 2px 8px rgba(43, 74, 226, 0.10)',
+        button: '2px 2px 8px rgba(43, 74, 226, 0.12)',
     },
     springs: {
         snappy: { type: "spring" as const, damping: 20, stiffness: 400 },

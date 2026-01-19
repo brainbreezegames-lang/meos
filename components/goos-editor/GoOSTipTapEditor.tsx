@@ -22,13 +22,13 @@ export const goOSTokens = {
   colors: {
     paper: '#FAF7F2',
     cream: '#FEFEFE',
-    headerBg: '#F0EDE0',
-    windowBg: '#F5F3E8',
-    border: '#2a2a2a',
+    headerBg: '#E8ECFB',
+    windowBg: '#F8FAFF',
+    border: '#2B4AE2',
     text: {
-      primary: '#1a1a1a',
-      secondary: '#3a3a3a',
-      muted: '#666666',
+      primary: '#1E3494',
+      secondary: '#2B4AE2',
+      muted: '#5B73E8',
     },
     accent: {
       primary: '#2B4AE2',
@@ -38,10 +38,10 @@ export const goOSTokens = {
     },
   },
   shadows: {
-    solid: '4px 4px 16px rgba(0,0,0,0.08)',
-    hover: '6px 6px 20px rgba(0,0,0,0.10)',
-    sm: '2px 2px 8px rgba(0,0,0,0.06)',
-    button: '2px 2px 8px rgba(0,0,0,0.08)',
+    solid: '4px 4px 16px rgba(43, 74, 226, 0.15)',
+    hover: '6px 6px 20px rgba(43, 74, 226, 0.20)',
+    sm: '2px 2px 8px rgba(43, 74, 226, 0.10)',
+    button: '2px 2px 8px rgba(43, 74, 226, 0.12)',
   },
   fonts: {
     display: "'Averia Serif Libre', Georgia, serif",
