@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Mail, X, FileText, Folder, BarChart3 } from 'lucide-react';
 
-// Design tokens
+// Design tokens - Mediterranean Blue
 const goOS = {
   colors: {
-    paper: '#FAF8F0',
-    cream: '#FFFDF5',
+    paper: '#FAF7F2',
+    cream: '#FEFEFE',
     headerBg: '#F0EDE0',
     border: '#2a2a2a',
     text: {
@@ -17,12 +17,12 @@ const goOS = {
       muted: '#666666',
     },
     accent: {
-      orange: '#E85D04',
-      orangeLight: '#FFB347',
+      primary: '#2B4AE2',
+      light: '#5B73E8',
     },
   },
   shadows: {
-    solid: '6px 6px 0 rgba(0,0,0,0.1)',
+    solid: '4px 4px 16px rgba(0,0,0,0.08)',
   },
 };
 
@@ -126,7 +126,7 @@ export function GoOSLockedContentModal({
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <Lock size={16} stroke={goOS.colors.accent.orange} />
+                  <Lock size={16} stroke={goOS.colors.accent.primary} />
                   <span className="font-medium text-sm" style={{ color: goOS.colors.text.primary }}>
                     Locked Content
                   </span>
@@ -175,7 +175,7 @@ export function GoOSLockedContentModal({
                     className="text-center py-4"
                   >
                     <div className="text-2xl mb-2">✓</div>
-                    <p className="font-medium" style={{ color: goOS.colors.accent.orange }}>
+                    <p className="font-medium" style={{ color: goOS.colors.accent.primary }}>
                       Unlocked! Opening now...
                     </p>
                   </motion.div>
@@ -212,7 +212,7 @@ export function GoOSLockedContentModal({
                       whileTap={{ scale: 0.98 }}
                       className="w-full py-3 rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{
-                        background: goOS.colors.accent.orange,
+                        background: goOS.colors.accent.primary,
                         color: 'white',
                         border: `2px solid ${goOS.colors.border}`,
                         boxShadow: '4px 4px 0 rgba(0,0,0,0.1)',
@@ -247,7 +247,7 @@ export function GoOSLockedContentModal({
                       whileTap={{ scale: 0.98 }}
                       className="w-full py-3 rounded-lg font-medium text-sm"
                       style={{
-                        background: goOS.colors.accent.orange,
+                        background: goOS.colors.accent.primary,
                         color: 'white',
                         border: `2px solid ${goOS.colors.border}`,
                         boxShadow: '4px 4px 0 rgba(0,0,0,0.1)',

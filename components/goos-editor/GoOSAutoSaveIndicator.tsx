@@ -29,7 +29,7 @@ export function GoOSAutoSaveIndicator({ status, lastSaved }: GoOSAutoSaveIndicat
                 cx="6"
                 cy="6"
                 r="5"
-                stroke={goOSTokens.colors.accent.orange}
+                stroke={goOSTokens.colors.accent.primary}
                 strokeWidth="1.5"
                 strokeDasharray="20"
                 strokeDashoffset="5"
@@ -37,7 +37,7 @@ export function GoOSAutoSaveIndicator({ status, lastSaved }: GoOSAutoSaveIndicat
             </motion.svg>
           ),
           text: 'Saving...',
-          color: goOSTokens.colors.accent.orange,
+          color: goOSTokens.colors.accent.primary,
         };
       case 'saved':
         return {

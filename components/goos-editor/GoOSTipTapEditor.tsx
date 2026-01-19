@@ -17,11 +17,11 @@ import { GoOSEditorToolbar } from './GoOSEditorToolbar';
 
 const lowlight = createLowlight(common);
 
-// goOS Design Tokens (shared)
+// goOS Design Tokens (shared) - Mediterranean Blue
 export const goOSTokens = {
   colors: {
-    paper: '#FAF8F0',
-    cream: '#FFFDF5',
+    paper: '#FAF7F2',
+    cream: '#FEFEFE',
     headerBg: '#F0EDE0',
     windowBg: '#F5F3E8',
     border: '#2a2a2a',
@@ -31,17 +31,17 @@ export const goOSTokens = {
       muted: '#666666',
     },
     accent: {
-      orange: '#E85D04',
-      orangeDark: '#D64C00',
-      orangeLight: '#FFB347',
-      orangePale: '#FFE4C4',
+      primary: '#2B4AE2',
+      dark: '#1E3494',
+      light: '#5B73E8',
+      pale: '#E8ECFB',
     },
   },
   shadows: {
-    solid: '6px 6px 0 rgba(0,0,0,0.1)',
-    hover: '8px 8px 0 rgba(0,0,0,0.12)',
-    sm: '3px 3px 0 rgba(0,0,0,0.08)',
-    button: '4px 4px 0 rgba(0,0,0,0.1)',
+    solid: '4px 4px 16px rgba(0,0,0,0.08)',
+    hover: '6px 6px 20px rgba(0,0,0,0.10)',
+    sm: '2px 2px 8px rgba(0,0,0,0.06)',
+    button: '2px 2px 8px rgba(0,0,0,0.08)',
   },
   fonts: {
     display: "'Averia Serif Libre', Georgia, serif",
@@ -549,18 +549,18 @@ export function GoOSTipTapEditor({
         }
 
         .goos-editor-content blockquote {
-          border-left: 3px solid ${goOSTokens.colors.accent.orange};
+          border-left: 3px solid ${goOSTokens.colors.accent.primary};
           padding-left: 1em;
           margin: 1em 0;
           font-style: italic;
           color: ${goOSTokens.colors.text.secondary};
-          background: ${goOSTokens.colors.accent.orangePale}20;
+          background: ${goOSTokens.colors.accent.pale}20;
           padding: 12px 16px;
           border-radius: 0 4px 4px 0;
         }
 
         .goos-editor-content .goos-link {
-          color: ${goOSTokens.colors.accent.orange};
+          color: ${goOSTokens.colors.accent.primary};
           text-decoration: underline;
           text-decoration-style: wavy;
           text-underline-offset: 3px;
@@ -568,11 +568,11 @@ export function GoOSTipTapEditor({
         }
 
         .goos-editor-content .goos-link:hover {
-          color: ${goOSTokens.colors.accent.orangeDark};
+          color: ${goOSTokens.colors.accent.dark};
         }
 
         .goos-editor-content mark {
-          background: ${goOSTokens.colors.accent.orangePale};
+          background: ${goOSTokens.colors.accent.pale};
           padding: 0 2px;
           border-radius: 2px;
         }
@@ -628,12 +628,12 @@ export function GoOSTipTapEditor({
         }
 
         .goos-editor-content code {
-          background: ${goOSTokens.colors.accent.orangePale}40;
+          background: ${goOSTokens.colors.accent.pale}40;
           padding: 2px 6px;
           border-radius: 3px;
           font-family: 'SF Mono', 'Fira Code', monospace;
           font-size: 0.9em;
-          color: ${goOSTokens.colors.accent.orangeDark};
+          color: ${goOSTokens.colors.accent.dark};
         }
 
         /* Syntax Highlighting */
@@ -683,7 +683,7 @@ export function GoOSTipTapEditor({
         .hljs-selector-attr,
         .hljs-selector-pseudo,
         .hljs-link {
-          color: ${goOSTokens.colors.accent.orange};
+          color: ${goOSTokens.colors.accent.primary};
         }
 
         .hljs-built_in,
@@ -721,7 +721,7 @@ export function GoOSTipTapEditor({
         }
 
         .goos-bubble-menu button.is-active {
-          background: ${goOSTokens.colors.accent.orange};
+          background: ${goOSTokens.colors.accent.primary};
           color: white;
         }
 
@@ -750,9 +750,9 @@ export function GoOSTipTapEditor({
         }
 
         .goos-floating-menu button:hover {
-          background: ${goOSTokens.colors.accent.orangePale};
-          border-color: ${goOSTokens.colors.accent.orange};
-          color: ${goOSTokens.colors.accent.orangeDark};
+          background: ${goOSTokens.colors.accent.pale};
+          border-color: ${goOSTokens.colors.accent.primary};
+          color: ${goOSTokens.colors.accent.dark};
         }
       `}</style>
     </div>

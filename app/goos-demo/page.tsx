@@ -66,12 +66,12 @@ const GoOSEditorWindow = dynamic(
 );
 
 // ============================================
-// GOOS DESIGN TOKENS
+// GOOS DESIGN TOKENS - Mediterranean Blue
 // ============================================
 const goOS = {
     colors: {
-        paper: '#FAF8F0',
-        cream: '#FFFDF5',
+        paper: '#FAF7F2',
+        cream: '#FEFEFE',
         headerBg: '#F0EDE0',
         windowBg: '#F5F3E8',
         border: '#2a2a2a',
@@ -81,10 +81,10 @@ const goOS = {
             muted: '#666666',
         },
         accent: {
-            orange: '#E85D04',
-            orangeDark: '#D64C00',
-            orangeLight: '#FFB347',
-            orangePale: '#FFE4C4',
+            primary: '#2B4AE2',
+            dark: '#1E3494',
+            light: '#5B73E8',
+            pale: '#E8ECFB',
         },
         sticky: {
             yellow: '#fef08a',
@@ -96,10 +96,10 @@ const goOS = {
         }
     },
     shadows: {
-        solid: '6px 6px 0 rgba(0,0,0,0.1)',
-        hover: '8px 8px 0 rgba(0,0,0,0.12)',
-        sm: '3px 3px 0 rgba(0,0,0,0.08)',
-        button: '4px 4px 0 rgba(0,0,0,0.1)',
+        solid: '4px 4px 16px rgba(0,0,0,0.08)',
+        hover: '6px 6px 20px rgba(0,0,0,0.10)',
+        sm: '2px 2px 8px rgba(0,0,0,0.06)',
+        button: '2px 2px 8px rgba(0,0,0,0.08)',
     },
     springs: {
         snappy: { type: "spring" as const, damping: 20, stiffness: 400 },
@@ -612,7 +612,7 @@ const GoOSDesktopIcon = React.memo(({
     isActive?: boolean;
     badge?: number;
 }) => {
-    const displayIcon = icon || PORTFOLIO_ICON_MAP[label] || <Folder size={28} fill={goOS.colors.accent.orangeLight} stroke={goOS.colors.border} strokeWidth={1.5} />;
+    const displayIcon = icon || PORTFOLIO_ICON_MAP[label] || <Folder size={28} fill={goOS.colors.accent.light} stroke={goOS.colors.border} strokeWidth={1.5} />;
 
     return (
         <motion.button
@@ -653,7 +653,7 @@ const GoOSDesktopIcon = React.memo(({
                         animate={{ scale: 1 }}
                         className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1"
                         style={{
-                            background: goOS.colors.accent.orange,
+                            background: goOS.colors.accent.primary,
                             border: `1.5px solid ${goOS.colors.border}`,
                         }}
                     >
@@ -836,7 +836,7 @@ const DockIcon = React.memo(({
         {badge !== undefined && badge > 0 && (
             <span
                 className="absolute -top-1 -right-1 min-w-[14px] h-3.5 flex items-center justify-center rounded-full text-white text-[9px] font-bold px-0.5 z-10"
-                style={{ background: goOS.colors.accent.orange }}
+                style={{ background: goOS.colors.accent.primary }}
             >
                 {badge}
             </span>
@@ -948,7 +948,7 @@ const CelebratoryCheckbox = ({ defaultChecked, label, isHot }: { defaultChecked:
                     checked={checked}
                     onChange={handleChange}
                     className="w-4 h-4 cursor-pointer"
-                    style={{ accentColor: goOS.colors.accent.orange }}
+                    style={{ accentColor: goOS.colors.accent.primary }}
                 />
                 <AnimatePresence>
                     {justChecked && (
@@ -956,12 +956,12 @@ const CelebratoryCheckbox = ({ defaultChecked, label, isHot }: { defaultChecked:
                             initial={{ scale: 0, opacity: 1 }}
                             animate={{ scale: 2, opacity: 0 }}
                             className="absolute inset-0 rounded-full"
-                            style={{ background: `${goOS.colors.accent.orange}30` }}
+                            style={{ background: `${goOS.colors.accent.primary}30` }}
                         />
                     )}
                 </AnimatePresence>
             </div>
-            <span className={`text-sm ${checked ? 'line-through opacity-50' : isHot ? 'font-semibold' : ''}`} style={{ color: isHot ? goOS.colors.accent.orangeDark : undefined }}>
+            <span className={`text-sm ${checked ? 'line-through opacity-50' : isHot ? 'font-semibold' : ''}`} style={{ color: isHot ? goOS.colors.accent.dark : undefined }}>
                 {label}
             </span>
         </motion.li>
@@ -1053,7 +1053,7 @@ const GoOSGuestbook = React.memo(({
                             checked={!isAnonymous}
                             onChange={(e) => setIsAnonymous(!e.target.checked)}
                             className="w-4 h-4"
-                            style={{ accentColor: goOS.colors.accent.orange }}
+                            style={{ accentColor: goOS.colors.accent.primary }}
                         />
                         <span className="text-sm" style={{ color: goOS.colors.text.secondary }}>Sign my name</span>
                     </label>
@@ -1083,7 +1083,7 @@ const GoOSGuestbook = React.memo(({
                     whileTap={{ scale: 0.98 }}
                     className="w-full py-2.5 font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                        background: goOS.colors.accent.orange,
+                        background: goOS.colors.accent.primary,
                         color: 'white',
                         border: `2px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
@@ -1234,7 +1234,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                             onClick={() => setTimeRange(range)}
                             className="px-2 py-1 text-xs font-medium"
                             style={{
-                                background: timeRange === range ? goOS.colors.accent.orangePale : 'transparent',
+                                background: timeRange === range ? goOS.colors.accent.pale : 'transparent',
                                 border: `1.5px solid ${timeRange === range ? goOS.colors.border : 'transparent'}`,
                                 borderRadius: '4px',
                                 color: timeRange === range ? goOS.colors.text.primary : goOS.colors.text.muted,
@@ -1329,7 +1329,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                                 key={item.name}
                                 className="flex items-center gap-3 p-2"
                                 style={{
-                                    background: i === 0 ? goOS.colors.accent.orangePale : 'transparent',
+                                    background: i === 0 ? goOS.colors.accent.pale : 'transparent',
                                     borderRadius: '4px',
                                 }}
                             >
@@ -1384,7 +1384,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                                         style={{
                                             width: '100%',
                                             height: `${height}px`,
-                                            background: goOS.colors.accent.orange,
+                                            background: goOS.colors.accent.primary,
                                             border: `2px solid ${goOS.colors.border}`,
                                             borderRadius: '4px 4px 0 0',
                                         }}
@@ -1411,7 +1411,7 @@ GoOSAnalytics.displayName = 'GoOSAnalytics';
 // ============================================
 const TypingIndicator = () => (
     <div className="flex gap-3">
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.orangeLight, border: `2px solid ${goOS.colors.border}` }}>🦆</div>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.light, border: `2px solid ${goOS.colors.border}` }}>🦆</div>
         <div className="bg-white border-2 rounded-xl rounded-tl-none px-4 py-2.5" style={{ borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
             <div className="flex gap-1 items-center h-5">
                 {[0, 1, 2].map(i => (
@@ -1498,7 +1498,7 @@ const GoOSStatusWidget = React.memo(({ statusWidget }: { statusWidget: StatusWid
                         href={statusWidget.ctaUrl}
                         className="ml-2 w-6 h-6 flex items-center justify-center rounded-full"
                         style={{
-                            background: goOS.colors.accent.orange,
+                            background: goOS.colors.accent.primary,
                             color: 'white',
                         }}
                         whileHover={{ scale: 1.1 }}
@@ -2007,7 +2007,7 @@ function GoOSDemoContent() {
                                         animate={{ opacity: 1, y: 24 }}
                                         exit={{ opacity: 0 }}
                                         className="absolute left-1/2 -translate-x-1/2 top-full text-white px-2 py-1 rounded text-xs whitespace-nowrap"
-                                        style={{ background: goOS.colors.accent.orange }}
+                                        style={{ background: goOS.colors.accent.primary }}
                                     >
                                         You found the duck! 🦆
                                     </motion.div>
@@ -2017,7 +2017,7 @@ function GoOSDemoContent() {
                     </motion.button>
                     <nav className="flex gap-4 text-sm" style={{ color: goOS.colors.text.secondary }}>
                         {['File', 'Edit', 'View', 'Help'].map(item => (
-                            <motion.span key={item} whileHover={{ scale: 1.05 }} className="cursor-pointer" style={{ ['--hover-color' as string]: goOS.colors.accent.orange }}>
+                            <motion.span key={item} whileHover={{ scale: 1.05 }} className="cursor-pointer" style={{ ['--hover-color' as string]: goOS.colors.accent.primary }}>
                                 {item}
                             </motion.span>
                         ))}
@@ -2038,12 +2038,8 @@ function GoOSDemoContent() {
             <main className="pt-10 pb-20 min-h-screen relative">
                 {/* Sticky Notes (Left side) */}
                 <div className="fixed top-16 left-4 z-[30] flex flex-col gap-3">
-                    <StickyNote color="orange" rotation={-3}>
+                    <StickyNote color="blue" rotation={-3}>
                         <span className="text-lg" style={{ color: goOS.colors.text.primary }}>goOS Demo</span>
-                    </StickyNote>
-                    <StickyNote color="yellow" rotation={4}>
-                        <span className="text-[10px] uppercase tracking-wider block mb-0.5" style={{ color: goOS.colors.text.muted }}>tip</span>
-                        <span className="text-base" style={{ color: goOS.colors.accent.orangeDark }}>Click the icons!</span>
                     </StickyNote>
                 </div>
 
@@ -2183,7 +2179,7 @@ function GoOSDemoContent() {
                                     <span className="text-sm font-bold" style={{ color: goOS.colors.text.primary }}>David</span>
                                     <span className="text-xs" style={{ color: goOS.colors.text.muted }}>12:05 PM</span>
                                 </div>
-                                <Heart size={18} style={{ color: goOS.colors.accent.orange }} fill={goOS.colors.accent.orange} />
+                                <Heart size={18} style={{ color: goOS.colors.accent.primary }} fill={goOS.colors.accent.primary} />
                             </div>
                             <p className="text-lg font-bold mb-2" style={{ color: goOS.colors.text.primary }}>Hey there! 👋</p>
                             <p className="text-sm" style={{ color: goOS.colors.text.secondary }}>Welcome to goOS Demo! Click the portfolio items to explore.</p>
@@ -2230,13 +2226,13 @@ function GoOSDemoContent() {
                         <div className="flex flex-col h-full">
                             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
                                 <div className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.orangeLight, border: `2px solid ${goOS.colors.border}` }}>🦆</div>
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.light, border: `2px solid ${goOS.colors.border}` }}>🦆</div>
                                     <div className="bg-white border-2 rounded-xl rounded-tl-none px-4 py-2.5" style={{ borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
                                         <span className="text-sm" style={{ color: goOS.colors.text.secondary }}>Welcome to goOS Demo! 🦆</span>
                                     </div>
                                 </div>
                                 <div className="flex gap-3 justify-end">
-                                    <div className="border-2 rounded-xl rounded-tr-none px-4 py-2.5" style={{ background: goOS.colors.accent.orangePale, borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
+                                    <div className="border-2 rounded-xl rounded-tr-none px-4 py-2.5" style={{ background: goOS.colors.accent.pale, borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
                                         <span className="text-sm" style={{ color: goOS.colors.text.primary }}>This looks amazing!</span>
                                     </div>
                                 </div>
@@ -2272,7 +2268,7 @@ function GoOSDemoContent() {
                             <div className="text-[#a3a3a3] pl-4">[OK] Quack levels nominal</div>
                             <div className="text-[#a3a3a3] pl-4">[OK] Portfolio loaded</div>
                             <div className="mt-3 text-[#facc15]">$ portfolio --show</div>
-                            <div className="pl-4 mt-1" style={{ color: goOS.colors.accent.orange }}>READY... [████████████] 100%</div>
+                            <div className="pl-4 mt-1" style={{ color: goOS.colors.accent.primary }}>READY... [████████████] 100%</div>
                             <div className="text-[#4ade80] animate-pulse mt-4">$ _</div>
                         </div>
                     </SketchWindow>
@@ -2294,7 +2290,7 @@ function GoOSDemoContent() {
                             <div className="grid grid-cols-3 gap-4">
                                 {['Docs', 'Photos', 'Projects', 'Music', 'About', 'Contact'].map(name => (
                                     <button key={name} className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-black/5 transition-colors">
-                                        <Folder size={36} fill={goOS.colors.accent.orangeLight} stroke={goOS.colors.border} strokeWidth={1.5} />
+                                        <Folder size={36} fill={goOS.colors.accent.light} stroke={goOS.colors.border} strokeWidth={1.5} />
                                         <span className="text-sm" style={{ color: goOS.colors.text.primary }}>{name}</span>
                                     </button>
                                 ))}
@@ -2391,7 +2387,7 @@ function GoOSDemoContent() {
                 >
                     <RubberDuck />
                     <DockIcon
-                        icon={<Folder size={24} fill={goOS.colors.accent.orangeLight} stroke={goOS.colors.border} strokeWidth={1.5} />}
+                        icon={<Folder size={24} fill={goOS.colors.accent.light} stroke={goOS.colors.border} strokeWidth={1.5} />}
                         onClick={() => toggleApp('nest')}
                         isActive={appWindows.nest}
                         label="Nest"
@@ -2457,7 +2453,7 @@ function GoOSDemoContent() {
                     />
                     <div className="w-px h-8 bg-black/10 mx-1" />
                     <DockIcon
-                        icon={<PenLine size={24} stroke={goOS.colors.accent.orange} strokeWidth={1.5} />}
+                        icon={<PenLine size={24} stroke={goOS.colors.accent.primary} strokeWidth={1.5} />}
                         onClick={() => createFile('note')}
                         label="New Note"
                     />

@@ -237,7 +237,7 @@ export function GoOSEditorWindow({
                 fontFamily: goOSTokens.fonts.body,
                 color: goOSTokens.colors.text.primary,
                 background: goOSTokens.colors.paper,
-                border: `1.5px solid ${goOSTokens.colors.accent.orange}`,
+                border: `1.5px solid ${goOSTokens.colors.accent.primary}`,
                 borderRadius: 4,
                 outline: 'none',
               }}

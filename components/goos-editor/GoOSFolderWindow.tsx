@@ -141,7 +141,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             size={18}
             stroke={goOSTokens.colors.border}
             strokeWidth={1.5}
-            fill={goOSTokens.colors.accent.orangePale}
+            fill={goOSTokens.colors.accent.pale}
           />
           <span
             style={{

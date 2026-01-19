@@ -26,7 +26,7 @@ function ToolbarButton({ onClick, isActive, disabled, title, children }: Toolbar
         fontSize: 13,
         fontWeight: 600,
         fontFamily: goOSTokens.fonts.body,
-        background: isActive ? goOSTokens.colors.accent.orange : 'transparent',
+        background: isActive ? goOSTokens.colors.accent.primary : 'transparent',
         color: isActive ? 'white' : goOSTokens.colors.text.secondary,
         border: 'none',
         borderRadius: 3,
@@ -283,7 +283,7 @@ export function GoOSEditorToolbar({ editor, onAddImage, onAddImageFromUrl, onAdd
         title="Highlight"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <rect x="2" y="9" width="10" height="3" rx="1" fill={goOSTokens.colors.accent.orangePale}/>
+          <rect x="2" y="9" width="10" height="3" rx="1" fill={goOSTokens.colors.accent.pale}/>
           <path d="M4 8V4c0-.55.45-1 1-1h4c.55 0 1 .45 1 1v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
         </svg>
       </ToolbarButton>

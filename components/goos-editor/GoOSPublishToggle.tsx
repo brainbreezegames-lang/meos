@@ -27,7 +27,7 @@ export function GoOSPublishToggle({ status, onChange, disabled }: GoOSPublishTog
       <motion.span
         initial={false}
         animate={{
-          color: isDraft ? goOSTokens.colors.accent.orange : '#22c55e',
+          color: isDraft ? goOSTokens.colors.accent.primary : '#22c55e',
         }}
         style={{
           fontSize: 12,
@@ -52,7 +52,7 @@ export function GoOSPublishToggle({ status, onChange, disabled }: GoOSPublishTog
           height: 24,
           borderRadius: 12,
           border: `2px solid ${goOSTokens.colors.border}`,
-          background: isDraft ? goOSTokens.colors.accent.orangePale : '#bbf7d0',
+          background: isDraft ? goOSTokens.colors.accent.pale : '#bbf7d0',
           cursor: disabled ? 'not-allowed' : 'pointer',
           opacity: disabled ? 0.5 : 1,
           transition: 'background 0.2s ease',
@@ -96,7 +96,7 @@ export function GoOSPublishToggle({ status, onChange, disabled }: GoOSPublishTog
           initial={false}
           animate={{
             x: isDraft ? 0 : 20,
-            background: isDraft ? goOSTokens.colors.accent.orange : '#22c55e',
+            background: isDraft ? goOSTokens.colors.accent.primary : '#22c55e',
           }}
           transition={{ type: 'spring', damping: 20, stiffness: 400 }}
           style={{
@@ -127,14 +127,14 @@ export function GoOSPublishBadge({ status }: { status: PublishStatus }) {
         gap: 4,
         padding: '3px 8px',
         borderRadius: 4,
-        border: `1.5px solid ${isDraft ? goOSTokens.colors.accent.orange : '#22c55e'}`,
-        background: isDraft ? goOSTokens.colors.accent.orangePale + '60' : '#bbf7d060',
+        border: `1.5px solid ${isDraft ? goOSTokens.colors.accent.primary : '#22c55e'}`,
+        background: isDraft ? goOSTokens.colors.accent.pale + '60' : '#bbf7d060',
         fontSize: 10,
         fontWeight: 600,
         fontFamily: goOSTokens.fonts.body,
         textTransform: 'uppercase',
         letterSpacing: '0.05em',
-        color: isDraft ? goOSTokens.colors.accent.orangeDark : '#15803d',
+        color: isDraft ? goOSTokens.colors.accent.primaryDark : '#15803d',
       }}
     >
       <span
@@ -142,7 +142,7 @@ export function GoOSPublishBadge({ status }: { status: PublishStatus }) {
           width: 6,
           height: 6,
           borderRadius: '50%',
-          background: isDraft ? goOSTokens.colors.accent.orange : '#22c55e',
+          background: isDraft ? goOSTokens.colors.accent.primary : '#22c55e',
         }}
       />
       {isDraft ? 'Draft' : 'Live'}

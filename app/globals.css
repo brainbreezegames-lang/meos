@@ -188,7 +188,7 @@ html.theme-sketch {
 
     /* ========== COLORS ========== */
     /* Backgrounds */
-    --bg-canvas: #FAF8F0;        /* Main canvas/desktop */
+    --bg-canvas: #FAF7F2;        /* Main canvas/desktop - warm cream */
     --bg-surface: #FFFDF5;       /* Windows, cards */
     --bg-elevated: #F5F3E8;      /* Toolbars, headers */
     --bg-muted: #F0EDE0;         /* Dock, menu bar */
@@ -201,11 +201,11 @@ html.theme-sketch {
     --text-disabled: #999999;    /* Disabled states */
     --text-inverse: #FFFDF5;     /* On dark backgrounds */
 
-    /* Brand/Accent Colors */
-    --accent-primary: #E85D04;   /* Primary orange */
-    --accent-dark: #D64C00;      /* Dark orange (text) */
-    --accent-light: #FFB347;     /* Light orange (fills) */
-    --accent-pale: #FFE4C4;      /* Pale orange (subtle) */
+    /* Brand/Accent Colors - Mediterranean Blue */
+    --accent-primary: #2B4AE2;   /* Primary blue */
+    --accent-dark: #1E3494;      /* Dark blue (text) */
+    --accent-light: #5B73E8;     /* Light blue (fills) */
+    --accent-pale: #E8ECFB;      /* Pale blue (subtle) */
 
     /* Semantic Colors */
     --color-success: #22C55E;
@@ -246,13 +246,13 @@ html.theme-sketch {
     --border-width: 2px;
     --border-width-thin: 1.5px;
 
-    /* ========== SHADOWS (Sketch style: solid offsets) ========== */
-    --shadow-sm: 3px 3px 0 rgba(0, 0, 0, 0.08);
-    --shadow-md: 4px 4px 0 rgba(0, 0, 0, 0.1);
-    --shadow-lg: 6px 6px 0 rgba(0, 0, 0, 0.12);
-    --shadow-solid: 4px 4px 0 #2a2a2a;
-    --shadow-button: 3px 3px 0 #2a2a2a;
-    --shadow-button-active: 1px 1px 0 #2a2a2a;
+    /* ========== SHADOWS (Soft style with blur) ========== */
+    --shadow-sm: 2px 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 3px 3px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 4px 4px 20px rgba(0, 0, 0, 0.10);
+    --shadow-solid: 3px 3px 16px rgba(0, 0, 0, 0.08);
+    --shadow-button: 2px 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-button-active: 1px 1px 4px rgba(0, 0, 0, 0.06);
 
     /* ========== TRANSITIONS ========== */
     --transition-fast: 150ms ease;

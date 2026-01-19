@@ -24,8 +24,8 @@ export default function CTAButton({
     const baseStyles = "inline-flex items-center justify-center rounded font-semibold transition-colors duration-150";
 
     const variants = {
-        primary: "bg-[#EB9D2A] text-white hover:bg-[#CD8407]",
-        secondary: "bg-transparent text-[#23251D] border border-[#BFC1B7] hover:bg-[#E5E7E0] hover:border-[#9EA096]"
+        primary: "bg-[#2B4AE2] text-white hover:bg-[#1E3494]",
+        secondary: "bg-transparent text-[#23251D] border border-[#BFC1B7] hover:bg-[#E8ECFB] hover:border-[#5B73E8]"
     };
 
     const sizes = {

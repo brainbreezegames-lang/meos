@@ -86,7 +86,7 @@ const MemoizedDesktopIcon = React.memo(({ label, icon, onClick, badge, isActive 
                         exit={{ scale: 0 }}
                         transition={springSnappy}
                         className="absolute -top-1 -right-1 min-w-[16px] h-4 flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
-                        style={{ background: '#E85D04', border: '1.5px solid #2a2a2a' }}
+                        style={{ background: '#2B4AE2', border: '1.5px solid #2a2a2a' }}
                     >
                         {badge > 99 ? '99+' : badge}
                     </motion.span>
@@ -152,7 +152,7 @@ const MemoizedDockIcon = React.memo(({ icon, onClick, isActive, badge, label, is
                         exit={{ scale: 0 }}
                         transition={springSnappy}
                         className="absolute -top-1 -right-1 min-w-[14px] h-3.5 flex items-center justify-center rounded-full text-white text-[9px] font-bold px-0.5 z-10 shadow-sm"
-                        style={{ background: '#E85D04' }}
+                        style={{ background: '#2B4AE2' }}
                     >
                         {badge}
                     </motion.span>
@@ -397,7 +397,7 @@ const HonkButton = React.memo(() => {
                                     }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.5, delay: i * 0.05 }}
-                                    className="absolute text-[#E85D04] text-lg"
+                                    className="absolute text-[#2B4AE2] text-lg"
                                     style={{ left: '50%', top: '50%' }}
                                 >
                                     ✨
@@ -524,7 +524,7 @@ const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
                     type="checkbox"
                     checked={checked}
                     onChange={handleChange}
-                    className="w-4 h-4 accent-[#E85D04] cursor-pointer"
+                    className="w-4 h-4 accent-[#2B4AE2] cursor-pointer"
                 />
                 <AnimatePresence>
                     {justChecked && (
@@ -532,7 +532,7 @@ const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
                             initial={{ scale: 0, opacity: 1 }}
                             animate={{ scale: 2, opacity: 0 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 rounded-full bg-[#E85D04]/30"
+                            className="absolute inset-0 rounded-full bg-[#2B4AE2]/30"
                         />
                     )}
                 </AnimatePresence>
@@ -540,7 +540,7 @@ const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
 
             <motion.span
                 animate={checked ? { opacity: 0.4 } : { opacity: 1 }}
-                className={`text-sm text-[#2a2a2a] ${checked ? 'line-through' : isHot ? 'text-[#D64C00]' : ''}`}
+                className={`text-sm text-[#2a2a2a] ${checked ? 'line-through' : isHot ? 'text-[#1E3494]' : ''}`}
                 style={{ fontFamily: "var(--font-body)", fontWeight: isHot ? 600 : checked ? 400 : 500 }}
             >
                 {label}
@@ -561,7 +561,7 @@ const CelebratoryCheckbox = React.memo(({ defaultChecked, label, isHot }: {
                                     y: (Math.random() - 0.5) * 40 - 10
                                 }}
                                 transition={{ duration: 0.5, delay: i * 0.03 }}
-                                className="absolute left-4 text-[#E85D04]"
+                                className="absolute left-4 text-[#2B4AE2]"
                             >
                                 ✓
                             </motion.span>
@@ -596,7 +596,7 @@ const AnimatedToggle = React.memo(({ defaultOn = false, onChange }: {
             onClick={handleToggle}
             className="relative w-11 h-6 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--accent-light)] focus:ring-offset-2"
             animate={{
-                backgroundColor: isOn ? '#E85D04' : '#2a2a2a'
+                backgroundColor: isOn ? '#2B4AE2' : '#2a2a2a'
             }}
             transition={{ duration: 0.2 }}
             whileTap={{ scale: 0.95 }}
@@ -618,7 +618,7 @@ const AnimatedToggle = React.memo(({ defaultOn = false, onChange }: {
                         initial={{ scale: 0.8, opacity: 0.8 }}
                         animate={{ scale: 1.5, opacity: 0 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 rounded-full bg-[#E85D04]"
+                        className="absolute inset-0 rounded-full bg-[#2B4AE2]"
                     />
                 )}
             </AnimatePresence>
@@ -1042,7 +1042,7 @@ export default function GoOSPage() {
 
                     <MemoizedDesktopIcon
                         label="Nest"
-                        icon={<Folder size={30} fill="#FFB347" stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Folder size={30} fill="#5B73E8" stroke="#2a2a2a" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('nest')}
                         isActive={winStates.nest.isOpen && !winStates.nest.isMinimized}
                     />
@@ -1136,7 +1136,7 @@ export default function GoOSPage() {
                                                     className="absolute top-2 right-2 px-2 py-1 rounded text-xs bg-white/90 border border-[#2a2a2a]/20 shadow-sm text-[#3a3a3a]"
                                                     style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}
                                                 >
-                                                    Bookmark <span className="text-[#D64C00]">♦</span>
+                                                    Bookmark <span className="text-[#1E3494]">♦</span>
                                                 </div>
                                             </div>
                                             <footer className="h-11 flex items-center justify-between px-4 bg-[#F5F3E8] border-t-2 border-[#2a2a2a]">
@@ -1147,7 +1147,7 @@ export default function GoOSPage() {
                                                     >
                                                         Migration In
                                                     </span>
-                                                    <span className="text-[#D64C00] animate-pulse text-xs">▶▶▶▶</span>
+                                                    <span className="text-[#1E3494] animate-pulse text-xs">▶▶▶▶</span>
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
@@ -1343,7 +1343,7 @@ export default function GoOSPage() {
                 >
                     <RubberDuck onClick={() => {}} />
                     <MemoizedDockIcon
-                        icon={<Folder size={26} fill="#FFB347" stroke="#2a2a2a" strokeWidth={1.5} />}
+                        icon={<Folder size={26} fill="#5B73E8" stroke="#2a2a2a" strokeWidth={1.5} />}
                         onClick={() => toggleWindow('nest')}
                         isActive={winStates.nest.isOpen}
                         label="Nest"

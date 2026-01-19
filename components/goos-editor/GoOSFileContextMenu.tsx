@@ -294,9 +294,9 @@ export function GoOSFileContextMenu({
                     gap: 10,
                     padding: '8px 12px',
                     background: activeId === item.id
-                      ? item.danger ? '#fecaca' : `${goOSTokens.colors.accent.orange}30`
+                      ? item.danger ? '#fecaca' : `${goOSTokens.colors.accent.primary}30`
                       : isFocused
-                      ? item.danger ? '#fef2f2' : goOSTokens.colors.accent.orangePale
+                      ? item.danger ? '#fef2f2' : goOSTokens.colors.accent.pale
                       : 'transparent',
                     border: 'none',
                     cursor: item.disabled ? 'not-allowed' : 'pointer',

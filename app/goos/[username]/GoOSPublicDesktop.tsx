@@ -18,7 +18,7 @@ const GoOSEditorWindow = dynamic(
   {
     loading: () => (
       <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-        <div className="bg-[#FAF8F0] p-6 rounded-lg border-2 border-[#2a2a2a] shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
+        <div className="bg-[#FAF7F2] p-6 rounded-lg border-2 border-[#2a2a2a] shadow-[4px_4px_16px_rgba(0,0,0,0.08)]">
           <div className="animate-pulse text-sm font-medium text-[#1a1a1a]">Loading editor...</div>
         </div>
       </div>
@@ -48,11 +48,11 @@ interface GoOSPublicDesktopProps {
   isOwner: boolean;
 }
 
-// Design tokens
+// Design tokens - Mediterranean Blue
 const goOS = {
   colors: {
-    paper: '#FAF8F0',
-    cream: '#FFFDF5',
+    paper: '#FAF7F2',
+    cream: '#FEFEFE',
     headerBg: '#F0EDE0',
     border: '#2a2a2a',
     text: {
@@ -61,7 +61,7 @@ const goOS = {
       muted: '#666666',
     },
     accent: {
-      orange: '#E85D04',
+      primary: '#2B4AE2',
     },
   },
 };
@@ -273,7 +273,7 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
           </span>
         </div>
         {!desktop.isPublic && isOwner && (
-          <span className="text-xs px-2 py-0.5 rounded" style={{ background: goOS.colors.accent.orange + '20', color: goOS.colors.accent.orange }}>
+          <span className="text-xs px-2 py-0.5 rounded" style={{ background: goOS.colors.accent.primary + '20', color: goOS.colors.accent.primary }}>
             Private
           </span>
         )}

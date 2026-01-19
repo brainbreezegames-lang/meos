@@ -121,7 +121,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       case 'case-study':
         return <Presentation size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} />;
       case 'folder':
-        return <Folder size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} fill={goOSTokens.colors.accent.orangePale} />;
+        return <Folder size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} fill={goOSTokens.colors.accent.pale} />;
       default:
         return <FileText size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} />;
     }
@@ -282,14 +282,14 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         width: 80,
         zIndex: isDragging ? 1000 : 1,
         background: isSelected
-          ? `${goOSTokens.colors.accent.orange}20`
+          ? `${goOSTokens.colors.accent.primary}20`
           : isDraggedOver && type === 'folder'
-          ? `${goOSTokens.colors.accent.orange}15`
+          ? `${goOSTokens.colors.accent.primary}15`
           : 'transparent',
         border: isSelected
-          ? `2px solid ${goOSTokens.colors.accent.orange}`
+          ? `2px solid ${goOSTokens.colors.accent.primary}`
           : isDraggedOver && type === 'folder'
-          ? `2px dashed ${goOSTokens.colors.accent.orange}`
+          ? `2px dashed ${goOSTokens.colors.accent.primary}`
           : '2px solid transparent',
         transition: isDragging ? 'none' : 'background 0.15s, border 0.15s',
         outline: 'none',
@@ -322,7 +322,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
               width: 12,
               height: 12,
               borderRadius: '50%',
-              background: goOSTokens.colors.accent.orange,
+              background: goOSTokens.colors.accent.primary,
               border: `1.5px solid ${goOSTokens.colors.border}`,
             }}
             title="Draft"
@@ -373,7 +373,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             fontFamily: goOSTokens.fonts.body,
             textAlign: 'center',
             background: goOSTokens.colors.paper,
-            border: `1.5px solid ${goOSTokens.colors.accent.orange}`,
+            border: `1.5px solid ${goOSTokens.colors.accent.primary}`,
             borderRadius: 3,
             outline: 'none',
           }}
@@ -394,7 +394,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             whiteSpace: 'nowrap',
             padding: '2px 4px',
             borderRadius: 3,
-            background: isSelected ? goOSTokens.colors.accent.orangePale : 'transparent',
+            background: isSelected ? goOSTokens.colors.accent.pale : 'transparent',
           }}
           title={title}
         >

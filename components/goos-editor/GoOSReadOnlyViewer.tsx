@@ -235,11 +235,11 @@ export function GoOSReadOnlyViewer({
           margin-bottom: 4px;
         }
         .goos-content a {
-          color: ${goOSTokens.colors.accent.orange};
+          color: ${goOSTokens.colors.accent.primary};
           text-decoration: underline;
         }
         .goos-content blockquote {
-          border-left: 3px solid ${goOSTokens.colors.accent.orange};
+          border-left: 3px solid ${goOSTokens.colors.accent.primary};
           padding-left: 16px;
           margin: 16px 0;
           font-style: italic;

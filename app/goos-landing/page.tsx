@@ -22,7 +22,7 @@ const stickyColors: Record<StickyColor, string> = {
     blue: '#bae6fd',
     pink: '#fbcfe8',
     green: '#bbf7d0',
-    orange: '#fed7aa',
+    orange: '#E8ECFB',
     purple: '#e9d5ff'
 };
 
@@ -220,7 +220,7 @@ const FeatureCard = ({
         className="p-6 bg-[#FFFDF5] border-2 border-[#2a2a2a] relative"
         style={{ boxShadow: '4px 4px 0 rgba(0,0,0,0.08)' }}
     >
-        <div className="w-12 h-12 rounded-lg bg-[#fed7aa] border-2 border-[#2a2a2a] flex items-center justify-center mb-4">
+        <div className="w-12 h-12 rounded-lg bg-[#E8ECFB] border-2 border-[#2a2a2a] flex items-center justify-center mb-4">
             {icon}
         </div>
         <h3 className="text-xl mb-2 text-[#1a1a1a]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
@@ -253,7 +253,7 @@ const GoOSButton = ({
     };
 
     const variantClasses = {
-        primary: 'bg-[#E85D04] text-white border-[#2a2a2a] hover:brightness-110',
+        primary: 'bg-[#2B4AE2] text-white border-[#2a2a2a] hover:brightness-110',
         secondary: 'bg-white text-[#2a2a2a] border-[#2a2a2a] hover:bg-[#f5f5f0]'
     };
 
@@ -349,7 +349,7 @@ export default function GoOSLanding() {
                             key={item}
                             href={`#${item.toLowerCase()}`}
                             whileHover={{ y: -2 }}
-                            className="text-[#3a3a3a] hover:text-[#E85D04] transition-colors cursor-pointer"
+                            className="text-[#3a3a3a] hover:text-[#2B4AE2] transition-colors cursor-pointer"
                             style={{ fontFamily: 'var(--font-body)', fontWeight: 500 }}
                         >
                             {item}
@@ -399,10 +399,10 @@ export default function GoOSLanding() {
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: 0.2, type: "spring" }}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-[#fed7aa] border-2 border-[#2a2a2a] mb-6"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-[#E8ECFB] border-2 border-[#2a2a2a] mb-6"
                                 style={{ boxShadow: '3px 3px 0 rgba(0,0,0,0.1)' }}
                             >
-                                <Sparkles size={16} className="text-[#E85D04]" />
+                                <Sparkles size={16} className="text-[#2B4AE2]" />
                                 <span style={{ fontFamily: 'var(--font-handwritten)' }} className="text-[#2a2a2a]">
                                     Your Personal Web Desktop
                                 </span>
@@ -426,7 +426,7 @@ export default function GoOSLanding() {
                                 </span>
                                 {' '}feels like
                                 <span
-                                    className="text-[#E85D04] block mt-2"
+                                    className="text-[#2B4AE2] block mt-2"
                                     style={{ fontFamily: 'var(--font-handwritten)' }}
                                 >
                                     you
@@ -463,7 +463,7 @@ export default function GoOSLanding() {
                                     {[...Array(4)].map((_, i) => (
                                         <div
                                             key={i}
-                                            className="w-10 h-10 rounded-full border-2 border-white bg-gradient-to-br from-[#fed7aa] to-[#fbcfe8]"
+                                            className="w-10 h-10 rounded-full border-2 border-white bg-gradient-to-br from-[#E8ECFB] to-[#fbcfe8]"
                                             style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
                                         />
                                     ))}
@@ -513,7 +513,7 @@ export default function GoOSLanding() {
                                         </div>
                                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 px-3 py-2 bg-white/80 border border-[#2a2a2a]/20 rounded-lg">
                                             {[...Array(5)].map((_, i) => (
-                                                <div key={i} className="w-6 h-6 bg-[#fed7aa]/50 rounded-md" />
+                                                <div key={i} className="w-6 h-6 bg-[#E8ECFB]/50 rounded-md" />
                                             ))}
                                         </div>
                                     </div>
@@ -551,7 +551,7 @@ export default function GoOSLanding() {
                             style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                         >
                             Everything you need to
-                            <span className="text-[#E85D04]" style={{ fontFamily: 'var(--font-handwritten)' }}> stand out</span>
+                            <span className="text-[#2B4AE2]" style={{ fontFamily: 'var(--font-handwritten)' }}> stand out</span>
                         </h2>
                         <p className="text-lg text-[#4a4a4a] max-w-2xl mx-auto" style={{ fontFamily: 'var(--font-body)' }}>
                             Create something memorable. Not another boring website.
@@ -613,7 +613,7 @@ export default function GoOSLanding() {
                             style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                         >
                             Creatives
-                            <span className="text-[#E85D04]" style={{ fontFamily: 'var(--font-handwritten)' }}> love</span> it
+                            <span className="text-[#2B4AE2]" style={{ fontFamily: 'var(--font-handwritten)' }}> love</span> it
                         </h2>
                     </motion.div>
 
@@ -656,7 +656,7 @@ export default function GoOSLanding() {
                             style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
                         >
                             Ready to be
-                            <span className="text-[#E85D04]" style={{ fontFamily: 'var(--font-handwritten)' }}> unforgettable</span>?
+                            <span className="text-[#2B4AE2]" style={{ fontFamily: 'var(--font-handwritten)' }}> unforgettable</span>?
                         </h2>
                         <p
                             className="text-lg text-[#a0a0a0] mb-10 max-w-xl mx-auto"
@@ -667,10 +667,10 @@ export default function GoOSLanding() {
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/signup">
                                 <motion.span
-                                    whileHover={{ y: -3, boxShadow: '6px 6px 0 #E85D04' }}
+                                    whileHover={{ y: -3, boxShadow: '6px 6px 0 #2B4AE2' }}
                                     whileTap={{ y: 1 }}
-                                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#E85D04] text-white text-lg font-semibold border-2 border-white cursor-pointer"
-                                    style={{ fontFamily: 'var(--font-body)', boxShadow: '4px 4px 0 #E85D04' }}
+                                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#2B4AE2] text-white text-lg font-semibold border-2 border-white cursor-pointer"
+                                    style={{ fontFamily: 'var(--font-body)', boxShadow: '4px 4px 0 #2B4AE2' }}
                                 >
                                     Start Free <ArrowRight size={20} />
                                 </motion.span>
@@ -717,7 +717,7 @@ export default function GoOSLanding() {
                             <a
                                 key={link}
                                 href="#"
-                                className="text-sm text-[#666] hover:text-[#E85D04] transition-colors"
+                                className="text-sm text-[#666] hover:text-[#2B4AE2] transition-colors"
                                 style={{ fontFamily: 'var(--font-body)' }}
                             >
                                 {link}
