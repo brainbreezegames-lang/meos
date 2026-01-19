@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X, Minus, Square } from 'lucide-react';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
 
@@ -153,24 +154,24 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
       };
     case 'sketch':
       return {
-        windowBg: '#FFFDF5',
-        windowShadow: '6px 6px 0 rgba(0,0,0,0.1)',
-        windowBorder: '2px solid #2a2a2a',
-        headerBg: '#F5F3E8',
-        headerBorder: '2px solid #2a2a2a',
-        titleColor: '#1a1a1a',
-        subtitleColor: '#3a3a3a',
-        textPrimary: '#1a1a1a',
-        textSecondary: '#3a3a3a',
-        textTertiary: '#666666',
-        borderLight: 'rgba(42,42,42,0.15)',
-        borderMedium: 'rgba(42,42,42,0.3)',
-        tabActiveBg: 'rgba(232,93,4,0.12)',
-        tabActiveColor: '#E85D04',
-        tabInactiveColor: '#666666',
-        accentColor: '#E85D04',
-        buttonBg: 'rgba(42,42,42,0.06)',
-        imageShadow: '4px 4px 0 rgba(0,0,0,0.1)',
+        windowBg: '#FFFFFF',
+        windowShadow: '6px 6px 0 #2B4AE2',
+        windowBorder: '2px solid #2B4AE2',
+        headerBg: '#FFFFFF',
+        headerBorder: '2px solid #2B4AE2',
+        titleColor: '#2B4AE2',
+        subtitleColor: '#2B4AE2',
+        textPrimary: '#2B4AE2',
+        textSecondary: '#2B4AE2',
+        textTertiary: '#2B4AE2',
+        borderLight: 'rgba(43, 74, 226, 0.2)',
+        borderMedium: '#2B4AE2',
+        tabActiveBg: '#FFFFFF',
+        tabActiveColor: '#2B4AE2',
+        tabInactiveColor: 'rgba(43, 74, 226, 0.6)',
+        accentColor: '#2B4AE2',
+        buttonBg: '#FFFFFF',
+        imageShadow: '4px 4px 0 #2B4AE2',
       };
     case 'monterey':
     default:
@@ -428,12 +429,15 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
               <button
                 onClick={handleClose}
                 aria-label="Close window"
-                className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1"
+                className="rounded-full flex items-center justify-center transition-all duration-150 group hover:bg-[#2B4AE2]"
                 style={themeContext?.theme === 'sketch' ? {
                   width: 14,
                   height: 14,
-                  background: '#FF6B6B',
-                  border: '1.5px solid #2a2a2a',
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 } : {
                   width: 12,
                   height: 12,
@@ -441,21 +445,22 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 1L7 7M7 1L1 7" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(77, 0, 0, 0.7)'} strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
+                <X size={8} strokeWidth={3} className="text-[#2B4AE2] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
               </button>
 
               {/* Minimize */}
               <button
                 onClick={handleMinimize}
                 aria-label="Minimize window"
-                className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-1"
+                className="rounded-full flex items-center justify-center transition-all duration-150 group hover:bg-[#2B4AE2]"
                 style={themeContext?.theme === 'sketch' ? {
                   width: 14,
                   height: 14,
-                  background: '#FFD93D',
-                  border: '1.5px solid #2a2a2a',
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 } : {
                   width: 12,
                   height: 12,
@@ -463,21 +468,22 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4H7" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(100, 65, 0, 0.7)'} strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
+                <Minus size={8} strokeWidth={3} className="text-[#2B4AE2] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
               </button>
 
               {/* Maximize */}
               <button
                 onClick={handleMaximize}
                 aria-label={isMaximized ? "Restore window" : "Maximize window"}
-                className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75 focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-1"
+                className="rounded-full flex items-center justify-center transition-all duration-150 group hover:bg-[#2B4AE2]"
                 style={themeContext?.theme === 'sketch' ? {
                   width: 14,
                   height: 14,
-                  background: '#6BCB77',
-                  border: '1.5px solid #2a2a2a',
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 } : {
                   width: 12,
                   height: 12,
@@ -485,18 +491,7 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                  {isMaximized ? (
-                    // Restore icon (two overlapping rectangles)
-                    <>
-                      <rect x="1" y="2.5" width="4" height="4" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(0, 70, 0, 0.7)'} strokeWidth="1" fill="none" />
-                      <rect x="3" y="0.5" width="4" height="4" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(0, 70, 0, 0.7)'} strokeWidth="1" fill="none" />
-                    </>
-                  ) : (
-                    // Maximize icon (expand arrows)
-                    <path d="M1 2.5L4 5.5L7 2.5" stroke={themeContext?.theme === 'sketch' ? '#2a2a2a' : 'rgba(0, 70, 0, 0.7)'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                  )}
-                </svg>
+                <Square size={6} strokeWidth={3} className="text-[#2B4AE2] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
               </button>
             </div>
 
@@ -539,7 +534,7 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                     style={{
                       borderRadius: themeContext?.theme === 'sketch' ? 4 : 12,
                       boxShadow: colors.imageShadow,
-                      border: themeContext?.theme === 'sketch' ? '2px solid #2a2a2a' : 'none',
+                      border: themeContext?.theme === 'sketch' ? '2px solid #2B4AE2' : 'none',
                     }}
                   >
                     <Image
@@ -557,7 +552,7 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   style={{
                     borderRadius: themeContext?.theme === 'sketch' ? 4 : 12,
                     boxShadow: colors.imageShadow,
-                    border: themeContext?.theme === 'sketch' ? '2px solid #2a2a2a' : 'none',
+                    border: themeContext?.theme === 'sketch' ? '2px solid #2B4AE2' : 'none',
                   }}
                 >
                   <Image

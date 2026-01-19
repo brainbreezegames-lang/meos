@@ -123,10 +123,10 @@ export function GoOSEditorWindow({
         maxWidth: isMaximized ? '100%' : 900,
         height: isMaximized ? 'auto' : 'auto',
         maxHeight: isMaximized ? '100%' : '80vh',
-        background: goOSTokens.colors.cream,
-        border: `2px solid ${goOSTokens.colors.border}`,
+        background: '#FFFFFF',
+        border: '2px solid #2B4AE2',
         borderRadius: isMaximized ? 0 : 8,
-        boxShadow: isMaximized ? 'none' : goOSTokens.shadows.solid,
+        boxShadow: isMaximized ? 'none' : '6px 6px 0 #2B4AE2',
         zIndex,
         display: 'flex',
         flexDirection: 'column',
@@ -140,8 +140,8 @@ export function GoOSEditorWindow({
           display: 'flex',
           alignItems: 'center',
           padding: '10px 12px',
-          background: goOSTokens.colors.headerBg,
-          borderBottom: `2px solid ${goOSTokens.colors.border}`,
+          background: '#FFFFFF',
+          borderBottom: '2px solid #2B4AE2',
           gap: 12,
           cursor: isMaximized ? 'default' : 'grab',
         }}
@@ -155,8 +155,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#FF6B6B',
-              border: `1.5px solid ${goOSTokens.colors.border}`,
+              background: '#FFFFFF',
+              border: '1.5px solid #2B4AE2',
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -165,8 +165,9 @@ export function GoOSEditorWindow({
             }}
             title="Close"
             aria-label="Close window"
+            className="group hover:bg-[#2B4AE2] transition-colors"
           >
-            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
+            <X size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
           </button>
           <button
             type="button"
@@ -175,8 +176,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#FFD93D',
-              border: `1.5px solid ${goOSTokens.colors.border}`,
+              background: '#FFFFFF',
+              border: '1.5px solid #2B4AE2',
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -185,8 +186,9 @@ export function GoOSEditorWindow({
             }}
             title="Minimize"
             aria-label="Minimize window"
+            className="group hover:bg-[#2B4AE2] transition-colors"
           >
-            <Minus size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
+            <Minus size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
           </button>
           <button
             type="button"
@@ -195,8 +197,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#6BCB77',
-              border: `1.5px solid ${goOSTokens.colors.border}`,
+              background: '#FFFFFF',
+              border: '1.5px solid #2B4AE2',
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -205,8 +207,9 @@ export function GoOSEditorWindow({
             }}
             title={isMaximized ? 'Restore' : 'Maximize'}
             aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
+            className="group hover:bg-[#2B4AE2] transition-colors"
           >
-            <Square size={7} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
+            <Square size={6} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
           </button>
         </div>
 
@@ -214,7 +217,7 @@ export function GoOSEditorWindow({
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <FileIcon
             size={16}
-            stroke={goOSTokens.colors.border}
+            className="text-[#2B4AE2]"
             strokeWidth={1.5}
           />
 
@@ -235,9 +238,9 @@ export function GoOSEditorWindow({
                 fontSize: 14,
                 fontWeight: 600,
                 fontFamily: goOSTokens.fonts.body,
-                color: goOSTokens.colors.text.primary,
-                background: goOSTokens.colors.paper,
-                border: `1.5px solid ${goOSTokens.colors.accent.primary}`,
+                color: '#2B4AE2',
+                background: '#FFFFFF',
+                border: '1.5px solid #2B4AE2',
                 borderRadius: 4,
                 outline: 'none',
               }}
@@ -249,7 +252,7 @@ export function GoOSEditorWindow({
                 fontSize: 14,
                 fontWeight: 600,
                 fontFamily: goOSTokens.fonts.body,
-                color: goOSTokens.colors.text.primary,
+                color: '#2B4AE2',
                 cursor: 'text',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -294,11 +297,11 @@ export function GoOSEditorWindow({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          borderTop: `2px solid ${goOSTokens.colors.border}`,
-          background: goOSTokens.colors.headerBg,
+          borderTop: '2px solid #2B4AE2',
+          background: '#FFFFFF',
           fontSize: 11,
           fontFamily: goOSTokens.fonts.body,
-          color: goOSTokens.colors.text.muted,
+          color: '#2B4AE2',
         }}
       >
         <div style={{ display: 'flex', gap: 16 }}>

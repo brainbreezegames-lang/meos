@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
+import { useThemeSafe } from '@/contexts/ThemeContext';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { EditableText, EditableImage } from '@/components/editing/Editable';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
@@ -19,6 +20,8 @@ interface EditableInfoWindowProps {
 
 export function EditableInfoWindow({ item, onClose, position }: EditableInfoWindowProps) {
   const context = useEditContextSafe();
+  const themeContext = useThemeSafe();
+  const isSketch = themeContext?.theme === 'sketch';
   const windowRef = useRef<HTMLDivElement>(null);
   const constraintsRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
@@ -218,12 +221,12 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
               style={{
                 width: item.windowWidth || 440,
                 maxHeight: 'calc(100vh - 120px)',
-                borderRadius: 'var(--radius-window)',
-                background: 'var(--bg-glass-elevated)',
-                backdropFilter: 'var(--blur-glass)',
-                WebkitBackdropFilter: 'var(--blur-glass)',
-                boxShadow: 'var(--shadow-window)',
-                border: 'var(--border-width) solid var(--border-glass-outer)',
+                borderRadius: isSketch ? '0px' : 'var(--radius-window)',
+                background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated)',
+                backdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
+                WebkitBackdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
+                boxShadow: isSketch ? '6px 6px 0 #2B4AE2' : 'var(--shadow-window)',
+                border: isSketch ? '2px solid #2B4AE2' : 'var(--border-width) solid var(--border-glass-outer)',
               }}
               initial={{ opacity: 0, scale: 0.88, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -235,95 +238,125 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 mass: 0.8
               }}
             >
-            {/* Title Bar - Uses CSS variable for height */}
-            <div
-              className="flex items-center px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
-              style={{
-                height: 'var(--window-header-height)',
-                borderBottom: 'var(--border-width) solid var(--border-light)',
-                background: 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
-              }}
-              onPointerDown={startDrag}
-            >
-              {/* Traffic Lights - Uses CSS variables for size and gap */}
-              <div className="flex items-center group/traffic" style={{ gap: 'var(--traffic-gap)' }} onPointerDown={(e) => e.stopPropagation()}>
-                <button
-                  onClick={onClose}
-                  className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"
-                  style={{
-                    width: 'var(--traffic-size)',
-                    height: 'var(--traffic-size)',
-                    background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
-                    boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  }}
-                >
-                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                  </svg>
-                </button>
-                <div
-                  className="rounded-full flex items-center justify-center"
-                  style={{
-                    width: 'var(--traffic-size)',
-                    height: 'var(--traffic-size)',
-                    background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
-                    boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  }}
-                >
-                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                  </svg>
+              {/* Title Bar - Uses CSS variable for height */}
+              <div
+                className="flex items-center px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
+                style={{
+                  height: 'var(--window-header-height)',
+                  borderBottom: isSketch ? '2px solid #2B4AE2' : 'var(--border-width) solid var(--border-light)',
+                  background: isSketch ? '#FFFFFF' : 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
+                }}
+                onPointerDown={startDrag}
+              >
+                {/* Traffic Lights - Uses CSS variables for size and gap */}
+                <div className="flex items-center group/traffic" style={{ gap: isSketch ? '12px' : 'var(--traffic-gap)' }} onPointerDown={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={onClose}
+                    className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"}
+                    style={isSketch ? {
+                      background: '#FFFFFF',
+                      border: '1.5px solid #2B4AE2',
+                    } : {
+                      width: 'var(--traffic-size)',
+                      height: 'var(--traffic-size)',
+                      background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
+                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    }}
+                  >
+                    {isSketch ? (
+                      <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                        <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
+                      </svg>
+                    ) : (
+                      <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
+                        <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                      </svg>
+                    )}
+                  </button>
+                  <div
+                    className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white opacity-50" : "rounded-full flex items-center justify-center"}
+                    style={isSketch ? {} : {
+                      width: 'var(--traffic-size)',
+                      height: 'var(--traffic-size)',
+                      background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
+                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    }}
+                  >
+                    {!isSketch && (
+                      <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
+                        <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <div
+                    className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white opacity-50" : "rounded-full flex items-center justify-center"}
+                    style={isSketch ? {} : {
+                      width: 'var(--traffic-size)',
+                      height: 'var(--traffic-size)',
+                      background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
+                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    }}
+                  >
+                    {!isSketch && (
+                      <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
+                        <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                      </svg>
+                    )}
+                  </div>
                 </div>
-                <div
-                  className="rounded-full flex items-center justify-center"
+
+                {/* Title */}
+                <span
+                  className="absolute left-1/2 -translate-x-1/2 font-medium truncate max-w-[55%] select-none"
                   style={{
-                    width: 'var(--traffic-size)',
-                    height: 'var(--traffic-size)',
-                    background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
-                    boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    fontSize: '13px',
+                    color: isSketch ? '#2B4AE2' : 'var(--text-primary)',
+                    opacity: 0.85,
+                    fontFamily: isSketch ? '"Comic Sans MS", "Chalkboard SE", sans-serif' : 'var(--font-display)',
+                    letterSpacing: 'var(--letter-spacing-tight)',
                   }}
                 >
-                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                  </svg>
-                </div>
+                  {item.windowTitle}
+                </span>
               </div>
 
-              {/* Title */}
-              <span
-                className="absolute left-1/2 -translate-x-1/2 font-medium truncate max-w-[55%] select-none"
+              {/* Content */}
+              <div
+                className="flex-1 overflow-y-auto"
                 style={{
-                  fontSize: '13px',
-                  color: 'var(--text-primary)',
-                  opacity: 0.85,
-                  fontFamily: 'var(--font-display)',
-                  letterSpacing: 'var(--letter-spacing-tight)',
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehavior: 'contain',
                 }}
               >
-                {item.windowTitle}
-              </span>
-            </div>
-
-            {/* Content */}
-            <div
-              className="flex-1 overflow-y-auto"
-              style={{
-                WebkitOverflowScrolling: 'touch',
-                overscrollBehavior: 'contain',
-              }}
-            >
-              {/* Header Section - Uses CSS variables for padding and radii */}
-              <div
-                className="flex items-start gap-4"
-                style={{ padding: `calc(var(--spacing-window-padding) * 0.75) var(--spacing-window-padding)` }}
-              >
-                {/* Header Image */}
-                {isOwner ? (
-                  <EditableImage
-                    id={`${item.id}-header-image`}
-                    value={item.windowHeaderImage || item.thumbnailUrl}
-                    onChange={handleHeaderImageChange}
-                  >
+                {/* Header Section - Uses CSS variables for padding and radii */}
+                <div
+                  className="flex items-start gap-4"
+                  style={{ padding: `calc(var(--spacing-window-padding) * 0.75) var(--spacing-window-padding)` }}
+                >
+                  {/* Header Image */}
+                  {isOwner ? (
+                    <EditableImage
+                      id={`${item.id}-header-image`}
+                      value={item.windowHeaderImage || item.thumbnailUrl}
+                      onChange={handleHeaderImageChange}
+                    >
+                      <div
+                        className="relative w-16 h-16 overflow-hidden shrink-0"
+                        style={{
+                          borderRadius: 'var(--radius-md)',
+                          boxShadow: 'var(--shadow-sm)',
+                        }}
+                      >
+                        <Image
+                          src={item.windowHeaderImage || item.thumbnailUrl}
+                          alt={item.windowTitle}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+                    </EditableImage>
+                  ) : (
                     <div
                       className="relative w-16 h-16 overflow-hidden shrink-0"
                       style={{
@@ -339,35 +372,50 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                         sizes="64px"
                       />
                     </div>
-                  </EditableImage>
-                ) : (
-                  <div
-                    className="relative w-16 h-16 overflow-hidden shrink-0"
-                    style={{
-                      borderRadius: 'var(--radius-md)',
-                      boxShadow: 'var(--shadow-sm)',
-                    }}
-                  >
-                    <Image
-                      src={item.windowHeaderImage || item.thumbnailUrl}
-                      alt={item.windowTitle}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
-                  </div>
-                )}
+                  )}
 
-                {/* Title + Subtitle */}
-                <div className="flex flex-col min-w-0 pt-1.5 flex-1">
-                  {isOwner ? (
-                    <>
-                      <EditableText
-                        id={`${item.id}-title`}
-                        value={item.windowTitle}
-                        onChange={handleTitleChange}
-                        placeholder="Window title..."
-                      >
+                  {/* Title + Subtitle */}
+                  <div className="flex flex-col min-w-0 pt-1.5 flex-1">
+                    {isOwner ? (
+                      <>
+                        <EditableText
+                          id={`${item.id}-title`}
+                          value={item.windowTitle}
+                          onChange={handleTitleChange}
+                          placeholder="Window title..."
+                        >
+                          <h2
+                            className="font-semibold truncate leading-tight info-window-title"
+                            style={{
+                              fontSize: '17px',
+                              color: 'var(--text-primary)',
+                              fontFamily: 'var(--font-display)',
+                              letterSpacing: 'var(--letter-spacing-tight)',
+                            }}
+                          >
+                            {item.windowTitle}
+                          </h2>
+                        </EditableText>
+                        <EditableText
+                          id={`${item.id}-subtitle`}
+                          value={item.windowSubtitle || ''}
+                          onChange={handleSubtitleChange}
+                          placeholder="Add subtitle..."
+                        >
+                          <p
+                            className="mt-0.5 truncate"
+                            style={{
+                              fontSize: '13px',
+                              color: 'var(--text-secondary)',
+                              fontFamily: 'var(--font-body)',
+                            }}
+                          >
+                            {item.windowSubtitle || (isOwner && <span className="opacity-40">Add subtitle...</span>)}
+                          </p>
+                        </EditableText>
+                      </>
+                    ) : (
+                      <>
                         <h2
                           className="font-semibold truncate leading-tight info-window-title"
                           style={{
@@ -379,160 +427,128 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                         >
                           {item.windowTitle}
                         </h2>
-                      </EditableText>
-                      <EditableText
-                        id={`${item.id}-subtitle`}
-                        value={item.windowSubtitle || ''}
-                        onChange={handleSubtitleChange}
-                        placeholder="Add subtitle..."
-                      >
-                        <p
-                          className="mt-0.5 truncate"
-                          style={{
-                            fontSize: '13px',
-                            color: 'var(--text-secondary)',
-                            fontFamily: 'var(--font-body)',
-                          }}
-                        >
-                          {item.windowSubtitle || (isOwner && <span className="opacity-40">Add subtitle...</span>)}
-                        </p>
-                      </EditableText>
-                    </>
-                  ) : (
-                    <>
-                      <h2
-                        className="font-semibold truncate leading-tight info-window-title"
-                        style={{
-                          fontSize: '17px',
-                          color: 'var(--text-primary)',
-                          fontFamily: 'var(--font-display)',
-                          letterSpacing: 'var(--letter-spacing-tight)',
-                        }}
-                      >
-                        {item.windowTitle}
-                      </h2>
-                      {item.windowSubtitle && (
-                        <p
-                          className="mt-0.5 truncate"
-                          style={{
-                            fontSize: '13px',
-                            color: 'var(--text-secondary)',
-                            fontFamily: 'var(--font-body)',
-                          }}
-                        >
-                          {item.windowSubtitle}
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Tabs - Uses CSS variables for styling */}
-              {item.useTabs && sortedTabs.length > 0 && (
-                <div
-                  className="flex gap-1"
-                  style={{
-                    padding: `0 var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)`,
-                    borderBottom: 'var(--border-width) solid var(--border-light)',
-                  }}
-                >
-                  {sortedTabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTabId(tab.id)}
-                      className="px-3 py-1.5 font-medium transition-all"
-                      style={{
-                        fontSize: '12px',
-                        borderRadius: 'var(--radius-sm)',
-                        background: activeTabId === tab.id ? 'color-mix(in srgb, var(--accent-primary) 10%, transparent)' : 'transparent',
-                        color: activeTabId === tab.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                        fontFamily: 'var(--font-body)',
-                      }}
-                    >
-                      {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Blocks */}
-              <div className="pb-5">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeTabId || 'main'}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    {sortedBlocks.map((block, index) => (
-                      <div
-                        key={block.id}
-                        style={{
-                          borderTop: index > 0 ? '1px solid var(--border-light)' : undefined,
-                        }}
-                      >
-                        {isOwner ? (
-                          <EditableBlockRenderer
-                            block={block}
-                            itemId={item.id}
-                            onUpdate={handleBlockUpdate}
-                            onDelete={handleBlockDelete}
-                          />
-                        ) : (
-                          <BlockRenderer block={block} />
-                        )}
-                      </div>
-                    ))}
-
-                    {/* Add block button (owner only) */}
-                    {isOwner && (
-                      <div style={{ padding: `var(--spacing-window-padding) var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)` }}>
-                        <button
-                          ref={addBlockButtonRef}
-                          onClick={openBlockPicker}
-                          className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
-                          style={{
-                            fontSize: '13px',
-                            borderRadius: 'var(--radius-button)',
-                            borderColor: 'var(--border-medium)',
-                            color: 'var(--text-tertiary)',
-                            background: 'transparent',
-                            fontFamily: 'var(--font-body)',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'var(--border-light)';
-                            e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                            e.currentTarget.style.color = 'var(--accent-primary)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.borderColor = 'var(--border-medium)';
-                            e.currentTarget.style.color = 'var(--text-tertiary)';
-                          }}
-                        >
-                          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <path d="M8 3v10M3 8h10" strokeLinecap="round" />
-                          </svg>
-                          Add block
-                          <span
-                            className="text-[10px] px-1 py-0.5 rounded ml-1"
+                        {item.windowSubtitle && (
+                          <p
+                            className="mt-0.5 truncate"
                             style={{
-                              background: 'var(--border-light)',
-                              color: 'var(--text-tertiary)',
+                              fontSize: '13px',
+                              color: 'var(--text-secondary)',
+                              fontFamily: 'var(--font-body)',
                             }}
                           >
-                            /
-                          </span>
-                        </button>
-                      </div>
+                            {item.windowSubtitle}
+                          </p>
+                        )}
+                      </>
                     )}
-                  </motion.div>
-                </AnimatePresence>
+                  </div>
+                </div>
+
+                {/* Tabs - Uses CSS variables for styling */}
+                {item.useTabs && sortedTabs.length > 0 && (
+                  <div
+                    className="flex gap-1"
+                    style={{
+                      padding: `0 var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)`,
+                      borderBottom: 'var(--border-width) solid var(--border-light)',
+                    }}
+                  >
+                    {sortedTabs.map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTabId(tab.id)}
+                        className="px-3 py-1.5 font-medium transition-all"
+                        style={{
+                          fontSize: '12px',
+                          borderRadius: 'var(--radius-sm)',
+                          background: activeTabId === tab.id ? 'color-mix(in srgb, var(--accent-primary) 10%, transparent)' : 'transparent',
+                          color: activeTabId === tab.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                          fontFamily: 'var(--font-body)',
+                        }}
+                      >
+                        {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Blocks */}
+                <div className="pb-5">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeTabId || 'main'}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {sortedBlocks.map((block, index) => (
+                        <div
+                          key={block.id}
+                          style={{
+                            borderTop: index > 0 ? '1px solid var(--border-light)' : undefined,
+                          }}
+                        >
+                          {isOwner ? (
+                            <EditableBlockRenderer
+                              block={block}
+                              itemId={item.id}
+                              onUpdate={handleBlockUpdate}
+                              onDelete={handleBlockDelete}
+                            />
+                          ) : (
+                            <BlockRenderer block={block} />
+                          )}
+                        </div>
+                      ))}
+
+                      {/* Add block button (owner only) */}
+                      {isOwner && (
+                        <div style={{ padding: `var(--spacing-window-padding) var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)` }}>
+                          <button
+                            ref={addBlockButtonRef}
+                            onClick={openBlockPicker}
+                            className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
+                            style={{
+                              fontSize: '13px',
+                              borderRadius: 'var(--radius-button)',
+                              borderColor: 'var(--border-medium)',
+                              color: 'var(--text-tertiary)',
+                              background: 'transparent',
+                              fontFamily: 'var(--font-body)',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'var(--border-light)';
+                              e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                              e.currentTarget.style.color = 'var(--accent-primary)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                              e.currentTarget.style.borderColor = 'var(--border-medium)';
+                              e.currentTarget.style.color = 'var(--text-tertiary)';
+                            }}
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <path d="M8 3v10M3 8h10" strokeLinecap="round" />
+                            </svg>
+                            Add block
+                            <span
+                              className="text-[10px] px-1 py-0.5 rounded ml-1"
+                              style={{
+                                background: 'var(--border-light)',
+                                color: 'var(--text-tertiary)',
+                              }}
+                            >
+                              /
+                            </span>
+                          </button>
+                        </div>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
-            </div>
             </motion.div>
           </div>
 
@@ -545,7 +561,8 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
             onClose={blockPicker.close}
           />
         </>
-      )}
-    </AnimatePresence>
+      )
+      }
+    </AnimatePresence >
   );
 }

@@ -50,10 +50,10 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         height: 'min(400px, 70vh)',
         minWidth: 320,
         minHeight: 280,
-        background: goOSTokens.colors.cream,
-        border: `2px solid ${goOSTokens.colors.border}`,
+        background: '#FFFFFF',
+        border: '2px solid #2B4AE2',
         borderRadius: 8,
-        boxShadow: goOSTokens.shadows.solid,
+        boxShadow: '6px 6px 0 #2B4AE2',
         zIndex,
         display: 'flex',
         flexDirection: 'column',
@@ -67,8 +67,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           display: 'flex',
           alignItems: 'center',
           padding: '10px 12px',
-          background: goOSTokens.colors.headerBg,
-          borderBottom: `2px solid ${goOSTokens.colors.border}`,
+          background: '#FFFFFF',
+          borderBottom: '2px solid #2B4AE2',
           gap: 12,
           cursor: 'grab',
         }}
@@ -82,8 +82,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#FF6B6B',
-              border: `1.5px solid ${goOSTokens.colors.border}`,
+              background: '#FFFFFF',
+              border: '1.5px solid #2B4AE2',
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -92,8 +92,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             }}
             title="Close"
             aria-label="Close window"
+            className="group hover:bg-[#2B4AE2] transition-colors"
           >
-            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
+            <X size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
           </button>
           <button
             type="button"
@@ -101,8 +102,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#FFD93D',
-              border: `1.5px solid ${goOSTokens.colors.border}`,
+              background: '#FFFFFF',
+              border: '1.5px solid #2B4AE2',
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -111,8 +112,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             }}
             title="Minimize"
             aria-label="Minimize window"
+            className="group hover:bg-[#2B4AE2] transition-colors"
           >
-            <Minus size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
+            <Minus size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
           </button>
           <button
             type="button"
@@ -120,8 +122,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#6BCB77',
-              border: `1.5px solid ${goOSTokens.colors.border}`,
+              background: '#FFFFFF',
+              border: '1.5px solid #2B4AE2',
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -130,8 +132,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             }}
             title="Maximize"
             aria-label="Maximize window"
+            className="group hover:bg-[#2B4AE2] transition-colors"
           >
-            <Square size={7} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" aria-hidden="true" />
+            <Square size={6} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
           </button>
         </div>
 
@@ -139,16 +142,16 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <FolderOpen
             size={18}
-            stroke={goOSTokens.colors.border}
+            fill="#FFFFFF"
+            className="text-[#2B4AE2]"
             strokeWidth={1.5}
-            fill={goOSTokens.colors.accent.pale}
           />
           <span
             style={{
               fontSize: 14,
               fontWeight: 600,
               fontFamily: goOSTokens.fonts.body,
-              color: goOSTokens.colors.text.primary,
+              color: '#2B4AE2',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -174,7 +177,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           flex: 1,
           padding: 16,
           overflow: 'auto',
-          background: goOSTokens.colors.paper,
+          background: '#FFFFFF',
           position: 'relative',
           minHeight: 200,
         }}
@@ -193,7 +196,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               gap: 12,
             }}
           >
-            <Folder size={48} strokeWidth={1} stroke={goOSTokens.colors.text.muted} />
+            <Folder size={48} strokeWidth={1} stroke="#2B4AE2" />
             <div>
               <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 4 }}>This folder is empty</p>
               <p style={{ fontSize: 12 }}>Drag files here to add them</p>
@@ -233,11 +236,11 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          borderTop: `2px solid ${goOSTokens.colors.border}`,
-          background: goOSTokens.colors.headerBg,
+          borderTop: '2px solid #2B4AE2',
+          background: '#FFFFFF',
           fontSize: 11,
           fontFamily: goOSTokens.fonts.body,
-          color: goOSTokens.colors.text.muted,
+          color: '#2B4AE2',
         }}
       >
         <span>{filesInFolder.length} {filesInFolder.length === 1 ? 'item' : 'items'}</span>

@@ -70,36 +70,36 @@ const GoOSEditorWindow = dynamic(
 // ============================================
 const goOS = {
     colors: {
-        paper: '#FAF7F2',
-        cream: '#FEFEFE',
-        headerBg: '#E8ECFB',
-        windowBg: '#F8FAFF',
+        paper: '#FFFFFF',
+        cream: '#FFFFFF',
+        headerBg: '#FFFFFF',
+        windowBg: '#FFFFFF',
         border: '#2B4AE2',
         text: {
-            primary: '#1E3494',
+            primary: '#2B4AE2',
             secondary: '#2B4AE2',
-            muted: '#5B73E8',
+            muted: '#2B4AE2',
         },
         accent: {
             primary: '#2B4AE2',
-            dark: '#1E3494',
-            light: '#5B73E8',
-            pale: '#E8ECFB',
+            dark: '#2B4AE2',
+            light: '#2B4AE2',
+            pale: '#FFFFFF',
         },
         sticky: {
-            yellow: '#E8ECFB',
-            blue: '#E8ECFB',
-            pink: '#E8ECFB',
-            green: '#E8ECFB',
-            orange: '#E8ECFB',
-            purple: '#E8ECFB',
+            yellow: '#FFFFFF',
+            blue: '#FFFFFF',
+            pink: '#FFFFFF',
+            green: '#FFFFFF',
+            orange: '#FFFFFF',
+            purple: '#FFFFFF',
         }
     },
     shadows: {
-        solid: '4px 4px 16px rgba(43, 74, 226, 0.15)',
-        hover: '6px 6px 20px rgba(43, 74, 226, 0.20)',
-        sm: '2px 2px 8px rgba(43, 74, 226, 0.10)',
-        button: '2px 2px 8px rgba(43, 74, 226, 0.12)',
+        solid: '6px 6px 0 #2B4AE2',
+        hover: '8px 8px 0 #2B4AE2',
+        sm: '2px 2px 0 #2B4AE2',
+        button: '2px 2px 0 #2B4AE2',
     },
     springs: {
         snappy: { type: "spring" as const, damping: 20, stiffness: 400 },
@@ -237,6 +237,16 @@ const DEMO_FILES: GoOSFile[] = [
         createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         position: { x: 140, y: 320 },
+    },
+    {
+        id: 'file-prompts',
+        type: 'note',
+        title: 'AI Image Prompts',
+        content: `<h1>goOS — AI Image Generation Prompts</h1><p>Copy and paste each prompt directly into Midjourney, DALL-E, or your preferred AI image tool.</p><hr><h2>HERO ILLUSTRATIONS</h2><h3>Prompt 1: Goose at the Desk (Main Hero)</h3><p>Line illustration of a goose sitting at a desk working on a laptop, surrounded by floating papers, folders, and sticky notes in organized chaos. Other human coworkers in the background look impressed and confused. Mediterranean blue line art on cream white background. Hand-drawn imperfect lines, minimal halftone dot patterns for shading. Whimsical, absurd, professional yet funny. Style of editorial illustration, simple and clean.</p><h3>Prompt 2: Goose Running a Business</h3><p>Line illustration of a confident goose in a cozy home office, multiple browser windows floating around, coffee mug, plants, files neatly scattered on desk. The goose looks pleased with itself. Mediterranean blue monochrome line art on warm cream background. Hand-drawn editorial illustration style with subtle halftone textures. Charming, slightly absurd, warm and inviting.</p><h3>Prompt 3: Goose Welcoming Visitors</h3><p>Line illustration of a friendly goose standing at the entrance of a cozy digital workspace, gesturing welcomingly with one wing. Floating icons and windows in the background suggesting a desktop environment. Mediterranean blue line drawing on off-white cream background. Simple, warm, hand-drawn feel with minimal halftone shading. Inviting and slightly humorous.</p><hr><h2>FEATURE ILLUSTRATIONS</h2><h3>Prompt 4: Goose Selling Digital Products</h3><p>Line illustration of a goose handing a glowing file folder through a window to a happy customer. Coins and sparkles floating between them. Simple transaction moment. Mediterranean blue line art on cream background. Hand-drawn editorial style, imperfect charming lines, subtle halftone dots. Whimsical and friendly, like a neighborhood shop.</p><h3>Prompt 5: Goose Teaching a Course</h3><p>Line illustration of a goose standing at a small chalkboard or whiteboard, pointing at diagrams, with attentive students (mix of humans and other birds) sitting with laptops. Floating video icons and folder icons around. Mediterranean blue monochrome line drawing on warm cream background. Hand-drawn style with halftone textures. Educational but absurd and charming.</p><h3>Prompt 6: Goose Organizing Files</h3><p>Line illustration of a goose surrounded by a tornado of papers, folders, images, and documents, but the goose looks calm and in control, casually sorting them with its wings. Organized chaos energy. Mediterranean blue line art on cream white background. Editorial illustration style, hand-drawn imperfect lines, minimal halftone shading. Funny and relatable.</p><h3>Prompt 7: Goose Sharing Work</h3><p>Line illustration of a goose proudly showing off a framed piece of work to a small audience of impressed viewers. Social media hearts and share icons floating above. Mediterranean blue line drawing on off-white background. Simple hand-drawn editorial style with subtle halftone patterns. Warm, celebratory, slightly absurd.</p><hr><h2>EMPTY STATE ILLUSTRATIONS</h2><h3>Prompt 8: Goose on Empty Desktop</h3><p>Line illustration of a single goose sitting in the middle of an empty minimalist desktop space, looking at the viewer expectantly, head slightly tilted. One small file icon next to it. Lots of white space. Mediterranean blue line art on cream background. Simple, minimal, hand-drawn style. Cute, patient, slightly lonely but hopeful.</p><h3>Prompt 9: Goose Waiting to Start</h3><p>Line illustration of a goose sitting on an empty desk, wings folded, looking up with anticipation. A single cursor arrow hovering nearby. Very minimal composition with lots of breathing room. Mediterranean blue line drawing on warm cream background. Hand-drawn editorial style, charming and inviting. Caption energy: "Let's make something."</p><h3>Prompt 10: Goose with Empty Folder</h3><p>Line illustration of a goose holding an open empty folder, peering inside it curiously, then looking at the viewer with a shrug. Minimal background. Mediterranean blue monochrome line art on off-white background. Hand-drawn imperfect lines, simple and charming. Funny empty state energy.</p><hr><h2>ERROR STATE ILLUSTRATIONS</h2><h3>Prompt 11: Goose Looking Guilty</h3><p>Line illustration of a goose looking guilty and sheepish, standing next to a knocked-over stack of papers and a spilled coffee mug. Oops energy. Mediterranean blue line art on cream background. Hand-drawn editorial illustration style with subtle halftone shading. Sympathetic and funny, not frustrating.</p><h3>Prompt 12: Goose Lost</h3><p>Line illustration of a confused goose holding a map upside down, surrounded by floating question marks and tangled paths. Lost but not panicked. Mediterranean blue line drawing on warm cream background. Simple hand-drawn style, imperfect charming lines. Humorous 404 error energy.</p><h3>Prompt 13: Goose Fixing Things</h3><p>Line illustration of a determined goose wearing tiny safety goggles, holding a wrench, working on fixing a floating broken window icon. Sparks and tools scattered around. Mediterranean blue line art on off-white background. Hand-drawn editorial style with halftone textures. Reassuring and funny, "we're on it" energy.</p><hr><h2>SUCCESS / CELEBRATION ILLUSTRATIONS</h2><h3>Prompt 14: Goose Celebrating</h3><p>Line illustration of an excited goose throwing confetti, wings spread wide in celebration. Floating checkmarks, stars, and sparkles around. Joyful energy. Mediterranean blue line art on cream background. Hand-drawn editorial illustration style, imperfect expressive lines. Pure happiness and accomplishment.</p><h3>Prompt 15: Goose High-Five</h3><p>Line illustration of a goose giving a wing high-five to a human hand reaching into frame. Sparkle effect at the point of contact. Celebratory moment. Mediterranean blue line drawing on warm cream background. Simple hand-drawn style with minimal halftone shading. Friendly, triumphant, team energy.</p><hr><h2>ICON PACK PROMPTS</h2><h3>Prompt 16: Desktop Icon Set - Line Style</h3><p>Icon set of 12 minimal desktop icons: folder, file, image, video, note, settings gear, mail envelope, calendar, camera, music note, download arrow, and lock. Mediterranean blue line art on transparent or cream background. Consistent 2px stroke weight, rounded corners, simple geometric shapes. Clean, modern, hand-drawn feel but precise. Cohesive icon family.</p><h3>Prompt 17: Goose Emoji Set</h3><p>Set of 9 goose face expressions as simple icons: happy, thinking, surprised, winking, sleeping, confused, excited, focused, and mischievous. Mediterranean blue line art, minimal strokes, consistent style. Simple circular or square frames. Cute and expressive, emoji energy. Clean lines on cream or transparent background.</p><h3>Prompt 18: File Type Icons with Goose</h3><p>Icon set of 6 file type icons with tiny goose incorporated: PDF with goose reading, ZIP with goose packing, image file with goose posing, video with goose directing, audio with goose singing, code file with goose typing. Mediterranean blue line art, consistent style, minimal and charming. Small icons, clean strokes.</p><h3>Prompt 19: Action Icons - Rounded Style</h3><p>Set of 16 UI action icons: plus, minus, close X, checkmark, arrow up, arrow down, arrow left, arrow right, refresh, search magnifier, edit pencil, trash bin, share, link chain, eye view, and heart. Mediterranean blue, 2px rounded stroke, soft corners, consistent 24px grid. Modern, friendly, cohesive set on transparent background.</p><h3>Prompt 20: Navigation Icons</h3><p>Icon set of 8 navigation icons for dock: home house, folder, mail, chat bubble, camera, calendar, settings cog, and analytics chart. Mediterranean blue line art, filled style with rounded corners, consistent weight and padding. Friendly and modern, suitable for bottom dock navigation bar. Clean on light background.</p><hr><h2>BACKGROUND PROMPTS</h2><h3>Prompt 21: Minimal Gradient Desktop Background</h3><p>Minimal desktop wallpaper with soft gradient from warm cream white at top to very pale Mediterranean blue at bottom. Subtle grain texture overlay. No objects, no patterns, just calm color transition. 16:9 aspect ratio, high resolution. Clean, serene, perfect for desktop with icons on top.</p><h3>Prompt 22: Abstract Geometric Background</h3><p>Abstract desktop wallpaper with scattered soft geometric shapes - circles, rounded rectangles, organic blobs - in very pale Mediterranean blue and cream tones. Subtle, minimal, barely there pattern. Soft shadows. Modern and calm. 16:9 aspect ratio. Background that doesn't compete with desktop icons.</p><h3>Prompt 23: Mediterranean Inspired Pattern Background</h3><p>Subtle desktop wallpaper inspired by Mediterranean tile patterns, very faded and minimal, in pale blue and cream white. Geometric repeating pattern at low opacity. Elegant and warm. 16:9 aspect ratio, high resolution. Sophisticated but not busy, perfect as desktop background.</p><h3>Prompt 24: Soft Clouds Background</h3><p>Desktop wallpaper of soft abstract cloud shapes in pale Mediterranean blue on warm cream background. Dreamy, minimal, organic shapes. Very subtle and calming. No sharp edges, everything soft and blurred. 16:9 aspect ratio. Peaceful desktop background that lets icons stand out.</p><h3>Prompt 25: Grain Texture Solid Background</h3><p>Solid desktop wallpaper in warm cream off-white color with subtle film grain texture overlay. Minimal, clean, tactile feel. No patterns, no gradients, just warm neutral with gentle noise. 16:9 aspect ratio, high resolution. Timeless and sophisticated desktop background.</p><h3>Prompt 26: Goose Silhouette Background</h3><p>Minimal desktop wallpaper with a single very subtle goose silhouette in the bottom right corner, barely visible in slightly darker cream tone. Rest of background is warm cream white with soft grain texture. Understated brand presence. 16:9 aspect ratio. Elegant and playful.</p><hr><h2>LANDING PAGE ILLUSTRATIONS</h2><h3>Prompt 27: "Your Space" Hero Scene</h3><p>Wide editorial illustration showing a cozy digital workspace from above - desk with laptop, floating windows, scattered files, plants, coffee - with a goose comfortably working in the center. Warm and inviting atmosphere. Mediterranean blue line art on cream background. Hand-drawn style with halftone textures. Panoramic composition, 16:9 aspect ratio. Feels like home.</p><h3>Prompt 28: Features Overview Scene</h3><p>Line illustration showing multiple small vignettes in one image: goose writing at desk, goose selling to customer, goose organizing folders, goose celebrating. Connected by flowing lines. Mediterranean blue on cream background. Editorial hand-drawn style. Shows variety of use cases in one charming scene.</p><h3>Prompt 29: Community of Creators</h3><p>Line illustration of multiple different geese (and maybe other birds) each with their own small desk/workspace, all connected by dotted lines suggesting a network. Each workspace is slightly different showing personality. Mediterranean blue line art on cream background. Hand-drawn editorial style. Community and connection energy.</p><hr><h2>TIPS FOR BEST RESULTS</h2><ol><li><strong>For Midjourney:</strong> Add <code>--ar 16:9</code> for backgrounds, <code>--ar 1:1</code> for icons</li><li><strong>For consistency:</strong> Save your best result and use it as a style reference for future prompts</li><li><strong>Color accuracy:</strong> If the blue isn't right, add "color hex #2B4AE2" or "Santorini blue" or "Greek blue"</li><li><strong>For line art:</strong> Add "no fill, outline only" if you're getting filled shapes</li><li><strong>For icons:</strong> Add "flat design, no shadows, no gradients" for cleaner results</li></ol>`,
+        status: 'published',
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now()),
+        position: { x: 240, y: 320 },
     },
 ];
 
@@ -676,8 +686,8 @@ const GoOSDesktopIcon = React.memo(({
                 className="text-xs font-medium text-center leading-tight max-w-[80px] truncate px-1.5 py-0.5 rounded"
                 style={{
                     color: goOS.colors.text.primary,
-                    background: 'rgba(255,253,245,0.9)',
-                    border: `1px solid ${goOS.colors.border}20`,
+                    background: 'rgba(255,255,255,0.95)',
+                    border: `1px solid ${goOS.colors.border}`,
                 }}
             >
                 {label}
@@ -723,15 +733,17 @@ const StickyNote = React.memo(({
             transition={goOS.springs.bouncy}
             className="sticky-note relative cursor-grab active:cursor-grabbing select-none"
             style={{
-                backgroundColor: goOS.colors.sticky[color],
+                backgroundColor: '#FFFFFF',
+                border: `2px solid ${goOS.colors.border}`,
+                color: goOS.colors.text.primary,
                 minWidth: '100px',
                 padding: '12px 10px 16px 10px',
                 zIndex: isDragging ? 100 : isHovered ? 50 : 1,
                 boxShadow: isDragging
-                    ? '8px 8px 16px rgba(0,0,0,0.2)'
+                    ? '8px 8px 0 rgba(43, 74, 226, 0.2)'
                     : isHovered
-                        ? '6px 6px 10px rgba(0,0,0,0.12)'
-                        : '4px 4px 6px rgba(0,0,0,0.08)',
+                        ? '6px 6px 0 rgba(43, 74, 226, 0.12)'
+                        : '4px 4px 0 rgba(43, 74, 226, 0.08)',
             }}
         >
             <div className="relative z-10" style={{ fontFamily: 'var(--font-gochi, "Comic Sans MS", cursive)' }}>
@@ -827,7 +839,7 @@ const DockIcon = React.memo(({
         title={label}
     >
         <div
-            className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${isActive ? 'bg-orange-100' : 'hover:bg-black/5'
+            className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${isActive ? 'bg-white' : 'hover:bg-black/5'
                 }`}
             style={{ border: isActive ? `1.5px solid ${goOS.colors.border}` : 'none' }}
         >
@@ -898,25 +910,25 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
         >
             <div
                 className="h-8 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0"
-                style={{ background: goOS.colors.windowBg, borderBottom: `2px solid ${goOS.colors.border}` }}
+                style={{ background: '#FFFFFF', borderBottom: `2px solid ${goOS.colors.border}` }}
             >
+                <div className="flex items-center gap-1.5">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onClose(); }}
+                        className="w-4 h-4 flex items-center justify-center rounded-full bg-white border border-[#2B4AE2] hover:bg-[#2B4AE2] group transition-colors"
+                    >
+                        <X size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
+                    </button>
+                    <button className="w-4 h-4 flex items-center justify-center rounded-full bg-white border border-[#2B4AE2] hover:bg-[#2B4AE2] group transition-colors">
+                        <Minus size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
+                    </button>
+                    <button className="w-4 h-4 flex items-center justify-center rounded-full bg-white border border-[#2B4AE2] hover:bg-[#2B4AE2] group transition-colors">
+                        <Square size={6} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
+                    </button>
+                </div>
                 <div className="flex items-center gap-2 pointer-events-none">
                     {icon && <span className="opacity-60">{icon}</span>}
                     <span className="text-sm font-bold" style={{ color: goOS.colors.text.primary }}>{title}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <button className="w-4 h-4 flex items-center justify-center rounded-full bg-yellow-400 border border-yellow-600 hover:bg-yellow-300">
-                        <Minus size={8} strokeWidth={3} className="text-yellow-800" />
-                    </button>
-                    <button className="w-4 h-4 flex items-center justify-center rounded-full bg-green-400 border border-green-600 hover:bg-green-300">
-                        <Square size={6} strokeWidth={3} className="text-green-800" />
-                    </button>
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onClose(); }}
-                        className="w-4 h-4 flex items-center justify-center rounded-full bg-red-400 border border-red-600 hover:bg-red-300"
-                    >
-                        <X size={8} strokeWidth={3} className="text-red-800" />
-                    </button>
                 </div>
             </div>
             <div className="flex-1 overflow-auto">{children}</div>
@@ -1004,7 +1016,7 @@ const GoOSGuestbook = React.memo(({
         return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
 
-    const noteColors = ['#fef08a', '#bae6fd', '#fbcfe8', '#bbf7d0', '#fed7aa'];
+    const noteColors = ['#FFFFFF'];
 
     return (
         <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-instrument, system-ui)' }}>
@@ -1035,7 +1047,7 @@ const GoOSGuestbook = React.memo(({
                     placeholder="Write something nice..."
                     className="w-full h-20 px-3 py-2.5 resize-none focus:outline-none"
                     style={{
-                        background: '#fef9c3',
+                        background: '#FFFFFF',
                         border: `2px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         color: goOS.colors.text.primary,
@@ -1117,15 +1129,16 @@ const GoOSGuestbook = React.memo(({
                                     style={{
                                         background: noteColors[i % noteColors.length],
                                         minHeight: '100px',
-                                        boxShadow: '3px 3px 6px rgba(0,0,0,0.1)',
+                                        boxShadow: '3px 3px 0 #2B4AE2',
                                     }}
                                 >
                                     {/* Tape effect */}
                                     <div
                                         className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-2.5"
                                         style={{
-                                            background: 'linear-gradient(135deg, rgba(240,240,230,0.9) 0%, rgba(200,200,190,0.8) 100%)',
-                                            borderRadius: '1px',
+                                            background: '#FFFFFF',
+                                            border: `1px dashed ${goOS.colors.border}`,
+                                            borderRadius: '2px',
                                         }}
                                     />
 
@@ -1203,7 +1216,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
             {change !== undefined && (
                 <div
                     className="text-xs mt-1 font-medium"
-                    style={{ color: change >= 0 ? '#16a34a' : '#dc2626' }}
+                    style={{ color: goOS.colors.text.primary }}
                 >
                     {change >= 0 ? '↑' : '↓'} {Math.abs(change)}%
                 </div>
@@ -1259,14 +1272,15 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                 <div
                     className="flex items-center justify-between px-3 py-2"
                     style={{
-                        background: '#dcfce7',
+                        background: '#FFFFFF',
                         border: `2px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                     }}
                 >
                     <div className="flex items-center gap-2">
                         <motion.span
-                            className="w-2 h-2 rounded-full bg-green-500"
+                            className="w-2 h-2 rounded-full"
+                            style={{ background: goOS.colors.accent.primary }}
                             animate={{ scale: [1, 1.3, 1] }}
                             transition={{ duration: 1.5, repeat: Infinity }}
                         />
@@ -1294,7 +1308,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                     </h4>
                     <div className="space-y-2.5">
                         {data.sources.map((source, i) => {
-                            const colors = ['#E85D04', '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'];
+                            const colors = ['#2B4AE2', '#2B4AE2', '#2B4AE2', '#2B4AE2', '#2B4AE2'];
                             return (
                                 <div key={source.name}>
                                     <div className="flex items-center justify-between text-sm mb-1">
@@ -1346,7 +1360,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                                 <span className="text-xs" style={{ color: goOS.colors.text.muted }}>{item.opens} opens</span>
                                 <span
                                     className="text-xs font-medium"
-                                    style={{ color: item.change >= 0 ? '#16a34a' : '#dc2626' }}
+                                    style={{ color: goOS.colors.text.primary }}
                                 >
                                     {item.change >= 0 ? '+' : ''}{item.change}%
                                 </span>
@@ -1359,7 +1373,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                 <div
                     className="p-4"
                     style={{
-                        background: '#fef3c7',
+                        background: '#FFFFFF',
                         border: `2px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         boxShadow: goOS.shadows.sm,
@@ -1437,11 +1451,11 @@ const GoOSStatusWidget = React.memo(({ statusWidget }: { statusWidget: StatusWid
     if (!statusWidget || !statusWidget.isVisible) return null;
 
     const statusColors: Record<string, { bg: string; dot: string; text: string }> = {
-        available: { bg: '#d1fae5', dot: '#10b981', text: '#065f46' },
-        looking: { bg: '#dbeafe', dot: '#3b82f6', text: '#1e40af' },
-        taking: { bg: '#fef3c7', dot: '#f59e0b', text: '#92400e' },
-        open: { bg: '#ede9fe', dot: '#8b5cf6', text: '#5b21b6' },
-        consulting: { bg: '#cffafe', dot: '#06b6d4', text: '#155e75' },
+        available: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
+        looking: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
+        taking: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
+        open: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
+        consulting: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
     };
 
     const colors = statusColors[statusWidget.statusType] || statusColors.available;
@@ -1505,7 +1519,7 @@ const GoOSStatusWidget = React.memo(({ statusWidget }: { statusWidget: StatusWid
                         whileTap={{ scale: 0.95 }}
                     >
                         <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                            <path d="M3.5 3a.5.5 0 0 0 0 1h3.793L3.146 8.146a.5.5 0 1 0 .708.708L8 4.707V8.5a.5.5 0 0 0 1 0v-5a.5.5 0 0 0-.5-.5h-5Z"/>
+                            <path d="M3.5 3a.5.5 0 0 0 0 1h3.793L3.146 8.146a.5.5 0 1 0 .708.708L8 4.707V8.5a.5.5 0 0 0 1 0v-5a.5.5 0 0 0-.5-.5h-5Z" />
                         </svg>
                     </motion.a>
                 )}
@@ -2382,7 +2396,7 @@ function GoOSDemoContent() {
                     style={{
                         background: goOS.colors.headerBg,
                         border: `2px solid ${goOS.colors.border}`,
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+                        boxShadow: '6px 6px 0 #2B4AE2'
                     }}
                 >
                     <RubberDuck />
@@ -2572,12 +2586,13 @@ function GoOSDemoContent() {
                             transform: 'translateX(-50%)',
                             padding: '12px 24px',
                             borderRadius: '8px',
-                            background: goosToast.type === 'error' ? '#ef4444' : goosToast.type === 'success' ? '#22c55e' : '#3b82f6',
-                            color: 'white',
+                            background: '#FFFFFF',
+                            border: `2px solid ${goOS.colors.border}`,
+                            color: goOS.colors.text.primary,
                             fontWeight: 500,
                             fontSize: '14px',
                             zIndex: 9999,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                            boxShadow: '4px 4px 0 #2B4AE2',
                         }}
                     >
                         {goosToast.message}

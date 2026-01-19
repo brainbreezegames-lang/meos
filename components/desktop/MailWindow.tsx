@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem } from '@/types';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
+import { useThemeSafe } from '@/contexts/ThemeContext';
 
 interface MailWindowProps {
   window: WindowInstance;
@@ -13,6 +14,8 @@ interface MailWindowProps {
 
 export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
   const windowContext = useWindowContext();
+  const { theme } = useThemeSafe() || {};
+  const isSketch = theme === 'sketch';
   const windowRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
@@ -119,302 +122,335 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
         >
-        {/* Mail Header */}
-        <div
-          className="flex items-center justify-between px-4 shrink-0 select-none"
-          style={{
-            height: 'var(--window-header-height)',
-            borderBottom: 'var(--border-width) solid var(--border-light)',
-            background: 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
-            cursor: isMaximized ? 'default' : 'grab',
-          }}
-        >
-          {/* Traffic Lights */}
+          {/* Mail Header */}
           <div
-            className="flex items-center group/traffic"
-            style={{ gap: 'var(--traffic-gap)' }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => windowContext.closeWindow(windowInstance.id)}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"
-              style={{
-                width: 'var(--traffic-size)',
-                height: 'var(--traffic-size)',
-                background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
-                boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-              }}
-            >
-              <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-            </button>
-            <button
-              onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"
-              style={{
-                width: 'var(--traffic-size)',
-                height: 'var(--traffic-size)',
-                background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
-                boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-              }}
-            >
-              <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-            </button>
-            <button
-              onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-              className="rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"
-              style={{
-                width: 'var(--traffic-size)',
-                height: 'var(--traffic-size)',
-                background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
-                boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-              }}
-            >
-              <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Title */}
-          <span
-            className="absolute left-1/2 -translate-x-1/2 font-medium"
+            className="flex items-center justify-between px-4 shrink-0 select-none"
             style={{
-              fontSize: '13px',
-              color: 'var(--text-primary)',
-              opacity: isActive ? 0.85 : 0.6,
-              fontFamily: 'var(--font-display)',
-              letterSpacing: 'var(--letter-spacing-tight)',
+              height: 'var(--window-header-height)',
+              borderBottom: 'var(--border-width) solid var(--border-light)',
+              background: 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
+              cursor: isMaximized ? 'default' : 'grab',
             }}
           >
-            New Message
-          </span>
-
-          {/* Send Button */}
-          <motion.button
-            onClick={handleSend}
-            disabled={isSending || !formData.message.trim()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all"
-            style={{
-              fontSize: '12px',
-              background: formData.message.trim() ? 'var(--accent-primary)' : 'var(--border-light)',
-              color: formData.message.trim() ? 'white' : 'var(--text-tertiary)',
-              boxShadow: formData.message.trim() ? 'var(--shadow-button)' : 'none',
-            }}
-            whileHover={formData.message.trim() ? { scale: 1.02 } : {}}
-            whileTap={formData.message.trim() ? { scale: 0.98 } : {}}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            {isSending ? (
-              <motion.div
-                className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              />
-            ) : (
-              <>
-                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M1.5 2.5l13 5.5-13 5.5v-4.5l8-1-8-1v-4.5z" />
-                </svg>
-                Send
-              </>
-            )}
-          </motion.button>
-        </div>
-
-        {/* Compose Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Success Message */}
-          <AnimatePresence>
-            {showSuccess && (
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center z-10"
-                style={{ background: 'var(--bg-glass)' }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div
-                  className="flex flex-col items-center gap-3"
-                  initial={{ scale: 0.8, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.8, y: -20 }}
-                >
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center"
-                    style={{
-                      background: 'var(--accent-success)',
-                      boxShadow: '0 4px 20px var(--accent-success)',
-                    }}
-                  >
-                    <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <path d="M5 12l5 5L19 7" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <p
-                    className="font-semibold"
-                    style={{
-                      fontSize: '16px',
-                      color: 'var(--text-primary)',
-                      fontFamily: 'var(--font-display)',
-                    }}
-                  >
-                    Opening mail client...
-                  </p>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Recipient Info */}
-          <div
-            className="flex items-center gap-3 px-4 py-3"
-            style={{ borderBottom: 'var(--border-width) solid var(--border-light)' }}
-          >
+            {/* Traffic Lights */}
             <div
-              className="relative w-10 h-10 rounded-full overflow-hidden shrink-0"
-              style={{ boxShadow: 'var(--shadow-sm)' }}
+              className="flex items-center group/traffic"
+              style={{ gap: 'var(--traffic-gap)' }}
+              onPointerDown={(e) => e.stopPropagation()}
             >
-              <Image
-                src={item.windowHeaderImage || item.thumbnailUrl}
-                alt={item.windowTitle}
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p
-                className="font-medium truncate"
-                style={{
-                  fontSize: '14px',
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-display)',
+              <button
+                onClick={() => windowContext.closeWindow(windowInstance.id)}
+                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"}
+                style={isSketch ? {
+                  width: '14px',
+                  height: '14px',
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                } : {
+                  width: 'var(--traffic-size)',
+                  height: 'var(--traffic-size)',
+                  background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                {item.windowTitle}
-              </p>
-              <p
-                className="truncate"
-                style={{
-                  fontSize: '12px',
-                  color: 'var(--text-secondary)',
-                  fontFamily: 'var(--font-body)',
+                {isSketch ? (
+                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                    <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => windowContext.minimizeWindow(windowInstance.id)}
+                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"}
+                style={isSketch ? {
+                  width: '14px',
+                  height: '14px',
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                } : {
+                  width: 'var(--traffic-size)',
+                  height: 'var(--traffic-size)',
+                  background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                {contactEmail}
-              </p>
-            </div>
-          </div>
-
-          {/* To Field */}
-          <div
-            className="flex items-center gap-2 px-4 py-2"
-            style={{ borderBottom: 'var(--border-width) solid var(--border-light)' }}
-          >
-            <span
-              className="font-medium w-16 shrink-0"
-              style={{ fontSize: '13px', color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}
-            >
-              To:
-            </span>
-            <div
-              className="flex items-center gap-2 px-2 py-1 rounded-md"
-              style={{ background: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)' }}
-            >
-              <span
-                className="text-[12px] font-medium"
-                style={{ color: 'var(--accent-primary)' }}
+                {isSketch ? (
+                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                    <path d="M1 4H7" stroke="currentColor" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => windowContext.maximizeWindow(windowInstance.id)}
+                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"}
+                style={isSketch ? {
+                  width: '14px',
+                  height: '14px',
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                } : {
+                  width: 'var(--traffic-size)',
+                  height: 'var(--traffic-size)',
+                  background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                }}
               >
-                {contactEmail}
-              </span>
+                {isSketch ? (
+                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                    <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" />
+                  </svg>
+                ) : (
+                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                  </svg>
+                )}
+              </button>
             </div>
-          </div>
 
-          {/* Subject Field */}
-          <div
-            className="flex items-center gap-2 px-4 py-2"
-            style={{ borderBottom: 'var(--border-width) solid var(--border-light)' }}
-          >
+            {/* Title */}
             <span
-              className="font-medium w-16 shrink-0"
-              style={{ fontSize: '13px', color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}
-            >
-              Subject:
-            </span>
-            <input
-              type="text"
-              value={formData.subject}
-              onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-              placeholder="What's this about?"
-              className="flex-1 bg-transparent outline-none"
+              className="absolute left-1/2 -translate-x-1/2 font-medium"
               style={{
                 fontSize: '13px',
                 color: 'var(--text-primary)',
-                fontFamily: 'var(--font-body)',
-              }}
-            />
-          </div>
-
-          {/* Message Body */}
-          <div className="flex-1 p-4 overflow-y-auto">
-            <textarea
-              value={formData.message}
-              onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-              placeholder="Write your message here..."
-              className="w-full h-full resize-none bg-transparent outline-none"
-              style={{
-                fontSize: '14px',
-                color: 'var(--text-primary)',
-                fontFamily: 'var(--font-body)',
-                lineHeight: 'var(--line-height-normal)',
-              }}
-            />
-          </div>
-
-          {/* Footer with tips */}
-          <div
-            className="flex items-center gap-4 px-4 py-3 shrink-0"
-            style={{
-              borderTop: 'var(--border-width) solid var(--border-light)',
-              background: 'var(--bg-elevated)',
-            }}
-          >
-            <p
-              className="flex-1"
-              style={{
-                fontSize: '11px',
-                color: 'var(--text-tertiary)',
-                fontFamily: 'var(--font-body)',
+                opacity: isActive ? 0.85 : 0.6,
+                fontFamily: 'var(--font-display)',
+                letterSpacing: 'var(--letter-spacing-tight)',
               }}
             >
-              {item.windowSubtitle || "I'd love to hear from you!"}
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-[var(--border-light)]"
-                style={{ color: 'var(--text-tertiary)' }}
+              New Message
+            </span>
+
+            {/* Send Button */}
+            <motion.button
+              onClick={handleSend}
+              disabled={isSending || !formData.message.trim()}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all"
+              style={{
+                fontSize: '12px',
+                background: formData.message.trim() ? 'var(--accent-primary)' : 'var(--border-light)',
+                color: formData.message.trim() ? 'white' : 'var(--text-tertiary)',
+                boxShadow: formData.message.trim() ? 'var(--shadow-button)' : 'none',
+              }}
+              whileHover={formData.message.trim() ? { scale: 1.02 } : {}}
+              whileTap={formData.message.trim() ? { scale: 0.98 } : {}}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              {isSending ? (
+                <motion.div
+                  className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                />
+              ) : (
+                <>
+                  <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M1.5 2.5l13 5.5-13 5.5v-4.5l8-1-8-1v-4.5z" />
+                  </svg>
+                  Send
+                </>
+              )}
+            </motion.button>
+          </div>
+
+          {/* Compose Area */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Success Message */}
+            <AnimatePresence>
+              {showSuccess && (
+                <motion.div
+                  className="absolute inset-0 flex items-center justify-center z-10"
+                  style={{ background: 'var(--bg-glass)' }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <motion.div
+                    className="flex flex-col items-center gap-3"
+                    initial={{ scale: 0.8, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.8, y: -20 }}
+                  >
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center"
+                      style={{
+                        background: 'var(--accent-success)',
+                        boxShadow: '0 4px 20px var(--accent-success)',
+                      }}
+                    >
+                      <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M5 12l5 5L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <p
+                      className="font-semibold"
+                      style={{
+                        fontSize: '16px',
+                        color: 'var(--text-primary)',
+                        fontFamily: 'var(--font-display)',
+                      }}
+                    >
+                      Opening mail client...
+                    </p>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Recipient Info */}
+            <div
+              className="flex items-center gap-3 px-4 py-3"
+              style={{ borderBottom: 'var(--border-width) solid var(--border-light)' }}
+            >
+              <div
+                className="relative w-10 h-10 rounded-full overflow-hidden shrink-0"
+                style={{ boxShadow: 'var(--shadow-sm)' }}
               >
-                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M14 9v4a1 1 0 01-1 1H3a1 1 0 01-1-1V9M8 2v8M5 5l3-3 3 3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <button
-                className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-[var(--border-light)]"
-                style={{ color: 'var(--text-tertiary)' }}
+                <Image
+                  src={item.windowHeaderImage || item.thumbnailUrl}
+                  alt={item.windowTitle}
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="font-medium truncate"
+                  style={{
+                    fontSize: '14px',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'var(--font-display)',
+                  }}
+                >
+                  {item.windowTitle}
+                </p>
+                <p
+                  className="truncate"
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--text-secondary)',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  {contactEmail}
+                </p>
+              </div>
+            </div>
+
+            {/* To Field */}
+            <div
+              className="flex items-center gap-2 px-4 py-2"
+              style={{ borderBottom: 'var(--border-width) solid var(--border-light)' }}
+            >
+              <span
+                className="font-medium w-16 shrink-0"
+                style={{ fontSize: '13px', color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}
               >
-                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <rect x="2" y="2" width="12" height="12" rx="1" />
-                  <circle cx="5.5" cy="5.5" r="1" fill="currentColor" />
-                  <path d="M14 10l-4-4L2 14" />
-                </svg>
-              </button>
+                To:
+              </span>
+              <div
+                className="flex items-center gap-2 px-2 py-1 rounded-md"
+                style={{ background: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)' }}
+              >
+                <span
+                  className="text-[12px] font-medium"
+                  style={{ color: 'var(--accent-primary)' }}
+                >
+                  {contactEmail}
+                </span>
+              </div>
+            </div>
+
+            {/* Subject Field */}
+            <div
+              className="flex items-center gap-2 px-4 py-2"
+              style={{ borderBottom: 'var(--border-width) solid var(--border-light)' }}
+            >
+              <span
+                className="font-medium w-16 shrink-0"
+                style={{ fontSize: '13px', color: 'var(--text-tertiary)', fontFamily: 'var(--font-body)' }}
+              >
+                Subject:
+              </span>
+              <input
+                type="text"
+                value={formData.subject}
+                onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                placeholder="What's this about?"
+                className="flex-1 bg-transparent outline-none"
+                style={{
+                  fontSize: '13px',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-body)',
+                }}
+              />
+            </div>
+
+            {/* Message Body */}
+            <div className="flex-1 p-4 overflow-y-auto">
+              <textarea
+                value={formData.message}
+                onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                placeholder="Write your message here..."
+                className="w-full h-full resize-none bg-transparent outline-none"
+                style={{
+                  fontSize: '14px',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-body)',
+                  lineHeight: 'var(--line-height-normal)',
+                }}
+              />
+            </div>
+
+            {/* Footer with tips */}
+            <div
+              className="flex items-center gap-4 px-4 py-3 shrink-0"
+              style={{
+                borderTop: 'var(--border-width) solid var(--border-light)',
+                background: 'var(--bg-elevated)',
+              }}
+            >
+              <p
+                className="flex-1"
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--text-tertiary)',
+                  fontFamily: 'var(--font-body)',
+                }}
+              >
+                {item.windowSubtitle || "I'd love to hear from you!"}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-[var(--border-light)]"
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M14 9v4a1 1 0 01-1 1H3a1 1 0 01-1-1V9M8 2v8M5 5l3-3 3 3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-[var(--border-light)]"
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <rect x="2" y="2" width="12" height="12" rx="1" />
+                    <circle cx="5.5" cy="5.5" r="1" fill="currentColor" />
+                    <path d="M14 10l-4-4L2 14" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
         </motion.div>
       </div>
     </>

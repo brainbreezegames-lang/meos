@@ -22,30 +22,30 @@ export default function SketchWindow({
 }: SketchWindowProps) {
     return (
         <div
-            className="absolute flex flex-col bg-[#FFFCF0] border-2 border-[#1a1a1a] shadow-[5px_5px_0px_0px_rgba(26,26,26,0.3)] font-sans"
+            className="absolute flex flex-col bg-[#FFFFFF] border-2 border-[#2B4AE2] shadow-[6px_6px_0px_0px_#2B4AE2] font-sans"
             style={{ width, height, top, left }}
         >
             {/* Title Bar */}
-            <div className="flex items-center justify-between px-3 py-2 border-b-2 border-[#1a1a1a] bg-[#F2F0E4] select-none">
-                <div className="font-bold text-xl text-[#1a1a1a] tracking-wide">{title}</div>
+            <div className="flex items-center justify-between px-3 py-2 border-b-2 border-[#2B4AE2] bg-[#FFFFFF] select-none">
+                <div className="font-bold text-xl text-[#2B4AE2] tracking-wide">{title}</div>
                 <div className="flex gap-2">
-                    <button className="p-0.5 hover:bg-black/10 rounded transition-colors border border-transparent hover:border-[#1a1a1a]">
-                        <Minus size={18} color="#1a1a1a" strokeWidth={2.5} />
+                    <button className="w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white group hover:bg-[#2B4AE2] transition-colors">
+                        <Minus size={8} className="text-[#2B4AE2] group-hover:text-white" strokeWidth={3} />
                     </button>
-                    <button className="p-0.5 hover:bg-black/10 rounded transition-colors border border-transparent hover:border-[#1a1a1a]">
-                        <Square size={14} color="#1a1a1a" strokeWidth={2.5} />
+                    <button className="w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white opacity-50">
+                        <Square size={8} className="text-[#2B4AE2]" strokeWidth={3} />
                     </button>
                     <button
                         onClick={onClose}
-                        className="p-0.5 hover:bg-red-100 rounded transition-colors border border-transparent hover:border-[#1a1a1a]"
+                        className="w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white group hover:bg-[#2B4AE2] transition-colors"
                     >
-                        <X size={18} color="#1a1a1a" strokeWidth={2.5} />
+                        <X size={8} className="text-[#2B4AE2] group-hover:text-white" strokeWidth={3} />
                     </button>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-auto p-4 text-[#1a1a1a] bg-[#FFFCF0]">
+            <div className="flex-1 overflow-auto p-4 text-[#2B4AE2] bg-[#FFFFFF]">
                 {children}
             </div>
         </div>

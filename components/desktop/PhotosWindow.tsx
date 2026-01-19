@@ -190,43 +190,82 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
       };
 
     case 'sketch':
-      // Sketch/goOS: Hand-drawn, playful, paper-like
+      // Sketch/goOS: Hand-drawn, playful, paper-like (Blueprint style)
       return {
-        windowBg: '#FFFDF5',
-        windowShadow: '6px 6px 0 rgba(0,0,0,0.1)',
-        windowShadowInactive: '4px 4px 0 rgba(0,0,0,0.08)',
+        windowBg: '#FFFFFF',
+        windowShadow: '6px 6px 0 #2B4AE2',
+        windowShadowInactive: '4px 4px 0 #2B4AE2',
 
-        titleBarBg: '#F5F3E8',
-        titleBarBorder: '#2a2a2a',
-        titleText: '#1a1a1a',
-        badgeBg: 'rgba(232,93,4,0.12)',
-        badgeText: '#E85D04',
+        titleBarBg: '#FFFFFF',
+        titleBarBorder: '#2B4AE2',
+        titleText: '#2B4AE2',
+        badgeBg: 'rgba(43, 74, 226, 0.12)',
+        badgeText: '#2B4AE2',
 
-        toolbarBg: '#F0EDE0',
-        toolbarBorder: 'rgba(42,42,42,0.2)',
-        toolbarText: '#666666',
-        toolbarHoverBg: 'rgba(42,42,42,0.08)',
-        toolbarActiveBg: '#E85D04',
-        toolbarActiveText: '#FFFDF5',
+        toolbarBg: '#FFFFFF',
+        toolbarBorder: '#2B4AE2',
+        toolbarText: '#2B4AE2',
+        toolbarHoverBg: 'rgba(43, 74, 226, 0.08)',
+        toolbarActiveBg: '#2B4AE2',
+        toolbarActiveText: '#FFFFFF',
 
-        contentBg: '#FAF8F0',
-        photoCardBg: '#FFFDF5',
-        photoCardShadow: '3px 3px 0 rgba(0,0,0,0.08)',
-        photoCardHoverShadow: '5px 5px 0 rgba(0,0,0,0.12)',
-        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.6) 100%)',
+        contentBg: '#FFFFFF',
+        photoCardBg: '#FFFFFF',
+        photoCardShadow: '3px 3px 0 #2B4AE2',
+        photoCardHoverShadow: '5px 5px 0 #2B4AE2',
+        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(43, 74, 226, 0.6) 100%)',
 
-        emptyBg: 'rgba(42,42,42,0.04)',
-        emptyIcon: '#999999',
-        emptyTitle: '#1a1a1a',
-        emptyText: '#666666',
+        emptyBg: 'rgba(43, 74, 226, 0.04)',
+        emptyIcon: '#2B4AE2',
+        emptyTitle: '#2B4AE2',
+        emptyText: '#2B4AE2',
 
-        lightboxBg: 'rgba(26,26,26,0.95)',
-        lightboxText: '#FFFDF5',
-        lightboxButtonBg: 'rgba(255,253,245,0.12)',
-        lightboxButtonHoverBg: 'rgba(255,253,245,0.2)',
+        lightboxBg: 'rgba(255, 255, 255, 0.95)',
+        lightboxText: '#2B4AE2',
+        lightboxButtonBg: 'rgba(43, 74, 226, 0.12)',
+        lightboxButtonHoverBg: 'rgba(43, 74, 226, 0.2)',
 
-        accent: '#E85D04',
-        favoriteColor: '#FF6B6B',
+        accent: '#2B4AE2',
+        favoriteColor: '#2B4AE2',
+      };
+
+    case 'warm':
+      return {
+        windowBg: '#FAFAF9',
+        windowShadow: '0 24px 60px -12px rgba(28,25,23,0.15), 0 0 0 1px rgba(28,25,23,0.05)',
+        windowShadowInactive: '0 12px 32px -8px rgba(28,25,23,0.1), 0 0 0 1px rgba(28,25,23,0.04)',
+
+        titleBarBg: '#F5F5F4',
+        titleBarBorder: 'rgba(28,25,23,0.06)',
+        titleText: '#1C1917',
+        badgeBg: 'rgba(28,25,23,0.06)',
+        badgeText: '#57534E',
+
+        toolbarBg: '#F5F5F4',
+        toolbarBorder: 'rgba(28,25,23,0.06)',
+        toolbarText: '#57534E',
+        toolbarHoverBg: 'rgba(28,25,23,0.05)',
+        toolbarActiveBg: '#EA580C',
+        toolbarActiveText: '#FFFFFF',
+
+        contentBg: '#FAFAF9',
+        photoCardBg: '#FFFFFF',
+        photoCardShadow: '0 1px 2px rgba(28,25,23,0.06), 0 0 0 1px rgba(28,25,23,0.04)',
+        photoCardHoverShadow: '0 4px 12px rgba(28,25,23,0.08), 0 0 0 1px rgba(28,25,23,0.06)',
+        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(28,25,23,0.6) 100%)',
+
+        emptyBg: 'rgba(28,25,23,0.04)',
+        emptyIcon: '#A8A29E',
+        emptyTitle: '#1C1917',
+        emptyText: '#57534E',
+
+        lightboxBg: 'rgba(250, 250, 249, 0.98)',
+        lightboxText: '#1C1917',
+        lightboxButtonBg: 'rgba(28,25,23,0.06)',
+        lightboxButtonHoverBg: 'rgba(28,25,23,0.1)',
+
+        accent: '#EA580C',
+        favoriteColor: '#EA580C',
       };
 
     case 'monterey':
@@ -284,6 +323,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
 
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
+  const isSketch = themeContext?.theme === 'sketch';
 
   const colors = useMemo(() => getThemeColors(themeContext?.theme), [themeContext?.theme]);
 
@@ -434,42 +474,69 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
               >
                 <button
                   onClick={() => windowContext.closeWindow(windowInstance.id)}
-                  className="w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"
-                  style={{
+                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  style={isSketch ? {
+                    background: '#FFFFFF',
+                    border: '1.5px solid #2B4AE2',
+                  } : {
                     background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
                     boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
                   }}
                   aria-label="Close"
                 >
-                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
-                  </svg>
+                  {isSketch ? (
+                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                      <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                      <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                    </svg>
+                  )}
                 </button>
                 <button
                   onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                  className="w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"
-                  style={{
+                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  style={isSketch ? {
+                    background: '#FFFFFF',
+                    border: '1.5px solid #2B4AE2',
+                  } : {
                     background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
                     boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
                   }}
                   aria-label="Minimize"
                 >
-                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
-                  </svg>
+                  {isSketch ? (
+                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                      <path d="M1 4H7" stroke="currentColor" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                      <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                    </svg>
+                  )}
                 </button>
                 <button
                   onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                  className="w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"
-                  style={{
+                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  style={isSketch ? {
+                    background: '#FFFFFF',
+                    border: '1.5px solid #2B4AE2',
+                  } : {
                     background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
                     boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
                   }}
                   aria-label="Maximize"
                 >
-                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                  </svg>
+                  {isSketch ? (
+                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                      <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" />
+                    </svg>
+                  ) : (
+                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                      <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
@@ -477,9 +544,9 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
             {/* Title */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2.5">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" style={{ color: colors.accent }}>
-                <rect x="3" y="3" width="18" height="18" rx="3" fill="currentColor" fillOpacity="0.15"/>
-                <path d="M3 15L8 10L12 14L16 9L21 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="16" cy="7" r="2" fill="currentColor" fillOpacity="0.4"/>
+                <rect x="3" y="3" width="18" height="18" rx="3" fill="currentColor" fillOpacity="0.15" />
+                <path d="M3 15L8 10L12 14L16 9L21 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="16" cy="7" r="2" fill="currentColor" fillOpacity="0.4" />
               </svg>
               <span className="text-[13px] font-semibold" style={{ color: colors.titleText }}>
                 {item.windowTitle}
@@ -536,9 +603,8 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                 {photos.map((photo, index) => (
                   <motion.div
                     key={photo.id}
-                    className={`relative group cursor-pointer overflow-hidden ${
-                      viewMode === 'grid' ? 'aspect-square rounded-lg' : 'flex items-center gap-4 p-3 rounded-xl'
-                    }`}
+                    className={`relative group cursor-pointer overflow-hidden ${viewMode === 'grid' ? 'aspect-square rounded-lg' : 'flex items-center gap-4 p-3 rounded-xl'
+                      }`}
                     style={{
                       background: colors.photoCardBg,
                       boxShadow: colors.photoCardShadow,

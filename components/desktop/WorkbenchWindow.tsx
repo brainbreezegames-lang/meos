@@ -6,6 +6,7 @@ import { Plus, Archive, ArchiveRestore, Trash2, X, Sparkles } from 'lucide-react
 import type { DesktopItem } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
+import { useThemeSafe } from '@/contexts/ThemeContext';
 
 interface WorkbenchWindowProps {
   window: WindowInstance;
@@ -15,6 +16,7 @@ interface WorkbenchWindowProps {
 export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindowProps) {
   const context = useEditContextSafe();
   const windowContext = useWindowContext();
+  const themeContext = useThemeSafe();
   const windowRef = useRef<HTMLDivElement>(null);
   const constraintsRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -27,6 +29,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
   const isOwner = context?.isOwner ?? false;
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
+  const isSketch = themeContext?.theme === 'sketch';
 
   // Get workbench entries from desktop context
   const allEntries = context?.desktop?.workbenchEntries || [];
@@ -116,13 +119,13 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 120px)',
             minHeight: 400,
             borderRadius: isMaximized ? '0' : 'var(--radius-window, 12px)',
-            background: 'var(--bg-glass-elevated, rgba(255,255,255,0.95))',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: isActive
-              ? 'var(--shadow-window, 0 24px 80px -12px rgba(0,0,0,0.25))'
-              : 'var(--shadow-window-inactive, 0 12px 40px -8px rgba(0,0,0,0.15))',
-            border: '1px solid var(--border-glass-outer, rgba(255,255,255,0.2))',
+            background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated, rgba(255,255,255,0.95))',
+            backdropFilter: isSketch ? 'none' : 'blur(40px) saturate(180%)',
+            WebkitBackdropFilter: isSketch ? 'none' : 'blur(40px) saturate(180%)',
+            boxShadow: isSketch
+              ? (isActive ? '6px 6px 0 #2B4AE2' : '4px 4px 0 #2B4AE2')
+              : (isActive ? 'var(--shadow-window, 0 24px 80px -12px rgba(0,0,0,0.25))' : 'var(--shadow-window-inactive, 0 12px 40px -8px rgba(0,0,0,0.15))'),
+            border: isSketch ? '1px solid #2B4AE2' : '1px solid var(--border-glass-outer, rgba(255,255,255,0.2))',
             opacity: isActive ? 1 : 0.96,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 16 }}
@@ -138,8 +141,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
           <div
             className="flex items-center h-[52px] px-4 shrink-0 relative select-none"
             style={{
-              background: 'var(--bg-titlebar, linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(250,250,252,0.85) 100%))',
-              borderBottom: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+              background: isSketch ? '#FFFFFF' : 'var(--bg-titlebar, linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(250,250,252,0.85) 100%))',
+              borderBottom: isSketch ? '1px solid #2B4AE2' : '1px solid var(--border-light, rgba(0,0,0,0.06))',
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
@@ -150,48 +153,75 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
             >
               <button
                 onClick={() => windowContext.closeWindow(windowInstance.id)}
-                className="w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"
-                style={{
+                className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                style={isSketch ? {
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                } : {
                   background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <X className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" strokeWidth={2.5} style={{ color: 'rgba(77,0,0,0.7)' }} />
+                {isSketch ? (
+                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                    <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <X className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" strokeWidth={2.5} style={{ color: 'rgba(77,0,0,0.7)' }} />
+                )}
               </button>
               <button
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                className="w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"
-                style={{
+                className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                style={isSketch ? {
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                } : {
                   background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 2" fill="none">
-                  <path d="M1 1H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
-                </svg>
+                {isSketch ? (
+                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                    <path d="M1 4H7" stroke="currentColor" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 2" fill="none">
+                    <path d="M1 1H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
+                )}
               </button>
               <button
                 onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                className="w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"
-                style={{
+                className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                style={isSketch ? {
+                  background: '#FFFFFF',
+                  border: '1.5px solid #2B4AE2',
+                } : {
                   background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 3L4 6L7 3" stroke="rgba(0,70,0,0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                {isSketch ? (
+                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
+                    <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" />
+                  </svg>
+                ) : (
+                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 3L4 6L7 3" stroke="rgba(0,70,0,0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
               </button>
             </div>
 
             {/* Title */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-              <Sparkles size={14} style={{ color: 'var(--accent-primary, #8b5cf6)' }} />
+              <Sparkles size={14} style={{ color: isSketch ? '#2B4AE2' : 'var(--accent-primary, #8b5cf6)' }} />
               <span
                 style={{
                   fontSize: '13px',
                   fontWeight: 500,
-                  color: 'var(--text-primary, #1a1a1a)',
+                  color: isSketch ? '#2B4AE2' : 'var(--text-primary, #1a1a1a)',
                   fontFamily: 'var(--font-body, system-ui)',
                 }}
               >
@@ -230,7 +260,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
           {/* Content */}
           <div
             className="flex-1 overflow-y-auto"
-            style={{ background: 'var(--bg-secondary, #fafafa)' }}
+            style={{ background: isSketch ? '#FFFFFF' : 'var(--bg-secondary, #fafafa)' }}
           >
             {/* Add Entry Form */}
             <AnimatePresence>

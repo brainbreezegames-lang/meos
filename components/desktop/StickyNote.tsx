@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEditContextSafe } from '@/contexts/EditContext';
+import { useThemeSafe } from '@/contexts/ThemeContext';
 
 // Sticky note colors matching macOS Stickies
 const STICKY_COLORS = {
@@ -35,7 +36,9 @@ interface StickyNoteProps {
 
 export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyNoteProps) {
   const context = useEditContextSafe();
+  const themeContext = useThemeSafe();
   const isOwner = context?.isOwner ?? false;
+  const isSketch = themeContext?.theme === 'sketch';
 
   const [isEditing, setIsEditing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -52,7 +55,9 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
     startItemY: 0,
   });
 
-  const colors = STICKY_COLORS[note.color];
+  const colors = isSketch
+    ? { bg: '#FFFFFF', text: '#2B4AE2' }
+    : STICKY_COLORS[note.color];
 
   // Sync position from props
   useEffect(() => {
@@ -151,6 +156,17 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
     setShowColorPicker(false);
   }, [note.id, onUpdate]);
 
+  const getShadow = () => {
+    if (isSketch) {
+      return isDragging
+        ? '8px 8px 0 #2B4AE2'
+        : '6px 6px 0 #2B4AE2';
+    }
+    return isDragging
+      ? '0 12px 40px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.15)'
+      : '0 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1)';
+  };
+
   return (
     <>
       <motion.div
@@ -178,9 +194,12 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
         {/* Pin */}
         <div
           className="absolute -top-2 left-3 text-base z-10"
-          style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+          style={{
+            filter: isSketch ? 'none' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))',
+            opacity: isSketch ? 0 : 1 // Hide pin in sketch mode if desired, or keep it. Let's keep it but maybe no shadow.
+          }}
         >
-          📌
+          {isSketch ? '📌' : '📌'}
         </div>
 
         {/* Note body */}
@@ -191,11 +210,10 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
             minHeight: '120px',
             padding: '28px 12px 12px 12px',
             background: colors.bg,
-            borderRadius: '2px',
-            boxShadow: isDragging
-              ? '0 12px 40px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.15)'
-              : '0 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1)',
-            fontFamily: '"Marker Felt", "Comic Sans MS", cursive',
+            borderRadius: isSketch ? '4px' : '2px', // Slightly more rounded for sketch? Or square. Let's match window radius.
+            border: isSketch ? '2px solid #2B4AE2' : 'none',
+            boxShadow: getShadow(),
+            fontFamily: isSketch ? 'var(--font-gochi, "Comic Sans MS", cursive)' : '"Marker Felt", "Comic Sans MS", cursive',
             fontSize: '14px',
             lineHeight: '1.4',
             color: colors.text,
