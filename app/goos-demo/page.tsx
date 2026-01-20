@@ -631,7 +631,7 @@ const GoOSDesktopIcon = React.memo(({
 
     return (
         <motion.button
-            onClick={onClick}
+            onDoubleClick={onClick}
             whileHover={{ scale: 1.08, y: -2 }}
             whileTap={{ scale: 0.95 }}
             transition={goOS.springs.snappy}
@@ -1817,16 +1817,28 @@ function GoOSDemoContent() {
         }
     }, [createFilePosition, convertToPercentPosition, goosContext]);
 
-    // Widget creation handler
-    const handleAddWidget = useCallback(async (widgetType: string) => {
-        console.log('[handleAddWidget] Creating widget:', widgetType);
-        const result = await createWidget(widgetType as WidgetType, {
-            x: 70 + Math.random() * 10,
-            y: 20 + Math.random() * 10,
-        });
+    // Widget creation handler - accepts pixel position, converts to percentage
+    const handleAddWidget = useCallback(async (widgetType: string, pixelPosition?: { x: number; y: number }) => {
+        console.log('[handleAddWidget] Creating widget:', widgetType, 'at pixel:', pixelPosition);
+
+        // Convert pixel position to percentage
+        let x = 50; // Default to center
+        let y = 30;
+
+        if (pixelPosition) {
+            const desktopArea = document.getElementById('goos-desktop-area');
+            if (desktopArea) {
+                const rect = desktopArea.getBoundingClientRect();
+                const relativeX = pixelPosition.x - rect.left;
+                const relativeY = pixelPosition.y - rect.top;
+                x = Math.max(5, Math.min(95, (relativeX / rect.width) * 100));
+                y = Math.max(5, Math.min(90, (relativeY / rect.height) * 100));
+            }
+        }
+
+        const result = await createWidget(widgetType as WidgetType, { x, y });
         console.log('[handleAddWidget] Result:', result);
-        console.log('[handleAddWidget] Widgets after create:', widgets);
-    }, [createWidget, widgets]);
+    }, [createWidget]);
 
     const openFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
@@ -2665,7 +2677,7 @@ function GoOSDemoContent() {
                 onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewEmbed={() => handleOpenCreateFileDialog('embed', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewDownload={() => handleOpenCreateFileDialog('download', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
-                onAddWidget={handleAddWidget}
+                onAddWidget={(type) => handleAddWidget(type, { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onPaste={pasteFile}
                 canPaste={!!clipboard}
             />

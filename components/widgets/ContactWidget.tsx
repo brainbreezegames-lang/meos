@@ -102,7 +102,7 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
     >
       {!isExpanded ? (
         <button
-          onClick={() => setIsExpanded(true)}
+          onDoubleClick={() => setIsExpanded(true)}
           style={{
             background: goOS.colors.paper,
             border: `2px solid ${goOS.colors.border}`,

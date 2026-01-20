@@ -38,8 +38,12 @@ export function WidgetWrapper({
     if (!isOwner) return;
     if (e.button !== 0) return; // Only left click
 
+    // Don't start drag if clicking on interactive elements (inputs, buttons, textareas, links)
+    const target = e.target as HTMLElement;
+    const isInteractive = target.closest('input, textarea, button, a, select, [contenteditable="true"]');
+    if (isInteractive) return; // Let the interactive element handle the event
+
     e.preventDefault();
-    e.stopPropagation();
 
     dragStartRef.current = {
       mouseX: e.clientX,
