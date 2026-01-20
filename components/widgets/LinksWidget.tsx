@@ -1,10 +1,29 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link2, ExternalLink, ChevronDown, Twitter, Github, Linkedin, Instagram, Youtube, Globe } from 'lucide-react';
+import { Link2, ExternalLink, ChevronDown, Twitter, Github, Linkedin, Instagram, Youtube, Globe, X } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
+
+// goOS Design Tokens - Mediterranean Blue
+const goOS = {
+  colors: {
+    paper: '#FFFFFF',
+    border: '#2B4AE2',
+    text: {
+      primary: '#2B4AE2',
+      secondary: '#2B4AE2',
+      muted: '#6B7FE8',
+    },
+  },
+  shadows: {
+    solid: '4px 4px 0 #2B4AE2',
+  },
+  fonts: {
+    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
+  },
+};
 
 interface LinkItem {
   name: string;
@@ -20,6 +39,7 @@ interface LinksWidgetProps {
   widget: Widget;
   isOwner?: boolean;
   onEdit?: () => void;
+  onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
 }
 
@@ -28,7 +48,7 @@ const DEFAULT_CONFIG: LinksWidgetConfig = {
 };
 
 // Map icon names to Lucide icons
-const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+const ICON_MAP: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>> = {
   twitter: Twitter,
   github: Github,
   linkedin: Linkedin,
@@ -36,6 +56,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: 
   youtube: Youtube,
   globe: Globe,
   link: Link2,
+  x: X,
 };
 
 function getIcon(iconName?: string) {
@@ -44,7 +65,7 @@ function getIcon(iconName?: string) {
   return ICON_MAP[lowerName] || ExternalLink;
 }
 
-export function LinksWidget({ widget, isOwner, onEdit, onPositionChange }: LinksWidgetProps) {
+export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChange }: LinksWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const config: LinksWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<LinksWidgetConfig>) };
 
@@ -55,200 +76,174 @@ export function LinksWidget({ widget, isOwner, onEdit, onPositionChange }: Links
       widget={widget}
       isOwner={isOwner}
       onEdit={onEdit}
+      onDelete={onDelete}
       onPositionChange={onPositionChange}
     >
-      <AnimatePresence mode="wait">
-        {!isExpanded ? (
-          <motion.button
-            key="collapsed"
-            onClick={() => setIsExpanded(true)}
-            className="relative"
+      {!isExpanded ? (
+        <button
+          onClick={() => setIsExpanded(true)}
+          style={{
+            background: goOS.colors.paper,
+            border: `2px solid ${goOS.colors.border}`,
+            borderRadius: '8px',
+            boxShadow: goOS.shadows.solid,
+            padding: '10px 16px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translate(-2px, -2px)';
+            e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translate(0, 0)';
+            e.currentTarget.style.boxShadow = goOS.shadows.solid;
+          }}
+        >
+          <Link2
+            size={18}
+            strokeWidth={2}
+            style={{ color: goOS.colors.text.primary }}
+          />
+          <span
             style={{
-              borderRadius: '20px',
-              overflow: 'hidden',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: goOS.colors.text.primary,
+              fontFamily: goOS.fonts.heading,
+              letterSpacing: '0.01em',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {widget.title || 'Links'}
+          </span>
+          <ChevronDown
+            size={14}
+            strokeWidth={2.5}
+            style={{ color: goOS.colors.text.primary, opacity: 0.7 }}
+          />
+        </button>
+      ) : (
+        <div
+          style={{
+            background: goOS.colors.paper,
+            border: `2px solid ${goOS.colors.border}`,
+            borderRadius: '8px',
+            boxShadow: goOS.shadows.solid,
+            minWidth: '180px',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Header */}
+          <button
+            onClick={() => setIsExpanded(false)}
+            style={{
+              width: '100%',
+              padding: '12px 14px',
+              borderBottom: `2px solid ${goOS.colors.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'transparent',
+              border: 'none',
               cursor: 'pointer',
             }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            whileHover={{
-              scale: 1.02,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-            }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.2 }}
           >
-            {/* Glass background */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'var(--bg-glass-elevated, rgba(255,255,255,0.92))',
-                backdropFilter: 'blur(40px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-              }}
-            />
-
-            {/* Content */}
-            <div
-              className="relative flex items-center gap-2"
-              style={{
-                padding: '10px 14px',
-              }}
-            >
-              <Link2
-                size={16}
-                style={{ color: 'var(--text-secondary, #666)' }}
-              />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Link2 size={16} strokeWidth={2} style={{ color: goOS.colors.text.primary }} />
               <span
                 style={{
                   fontSize: '13px',
-                  fontWeight: 500,
-                  color: 'var(--text-primary, #1a1a1a)',
-                  fontFamily: 'var(--font-body, system-ui)',
-                  whiteSpace: 'nowrap',
+                  fontWeight: 700,
+                  color: goOS.colors.text.primary,
+                  fontFamily: goOS.fonts.heading,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
                 }}
               >
                 {widget.title || 'Links'}
               </span>
-              <motion.div
-                animate={{ rotate: isExpanded ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronDown
-                  size={14}
-                  style={{ color: 'var(--text-tertiary, #888)' }}
-                />
-              </motion.div>
             </div>
-          </motion.button>
-        ) : (
-          <motion.div
-            key="expanded"
-            className="relative"
-            style={{
-              borderRadius: '16px',
-              overflow: 'hidden',
-              minWidth: '160px',
-            }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-          >
-            {/* Glass background */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'var(--bg-glass-elevated, rgba(255,255,255,0.95))',
-                backdropFilter: 'blur(40px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-              }}
+            <ChevronDown
+              size={14}
+              strokeWidth={2.5}
+              style={{ color: goOS.colors.text.primary, transform: 'rotate(180deg)' }}
             />
+          </button>
 
-            {/* Content */}
-            <div className="relative">
-              {/* Header */}
-              <button
-                onClick={() => setIsExpanded(false)}
-                className="w-full flex items-center justify-between"
+          {/* Links list */}
+          <div style={{ padding: '8px' }}>
+            {!hasLinks ? (
+              <div
                 style={{
-                  padding: '10px 14px',
-                  borderBottom: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+                  padding: '16px 12px',
+                  textAlign: 'center',
+                  color: goOS.colors.text.muted,
+                  fontSize: '13px',
+                  fontFamily: goOS.fonts.heading,
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <Link2
-                    size={14}
-                    style={{ color: 'var(--text-secondary, #666)' }}
-                  />
-                  <span
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      color: 'var(--text-primary, #1a1a1a)',
-                      fontFamily: 'var(--font-body, system-ui)',
-                    }}
-                  >
-                    {widget.title || 'Links'}
-                  </span>
-                </div>
-                <motion.div
-                  animate={{ rotate: 180 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <ChevronDown
-                    size={14}
-                    style={{ color: 'var(--text-tertiary, #888)' }}
-                  />
-                </motion.div>
-              </button>
-
-              {/* Links list */}
-              <div style={{ padding: '6px' }}>
-                {!hasLinks ? (
-                  <div
-                    style={{
-                      padding: '12px',
-                      textAlign: 'center',
-                      color: 'var(--text-tertiary, #888)',
-                      fontSize: '12px',
-                      fontFamily: 'var(--font-body, system-ui)',
-                    }}
-                  >
-                    No links added yet
-                  </div>
-                ) : (
-                  config.links.map((link, index) => {
-                    const IconComponent = getIcon(link.icon);
-                    return (
-                      <motion.a
-                        key={index}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3"
-                        style={{
-                          padding: '8px 10px',
-                          borderRadius: '8px',
-                          textDecoration: 'none',
-                        }}
-                        whileHover={{
-                          backgroundColor: 'var(--bg-hover, rgba(0,0,0,0.04))',
-                        }}
-                      >
-                        <IconComponent
-                          size={16}
-                          className="flex-shrink-0"
-                        />
-                        <span
-                          style={{
-                            fontSize: '13px',
-                            fontWeight: 500,
-                            color: 'var(--text-primary, #1a1a1a)',
-                            fontFamily: 'var(--font-body, system-ui)',
-                            flex: 1,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {link.name}
-                        </span>
-                        <ExternalLink
-                          size={12}
-                          style={{ color: 'var(--text-tertiary, #888)', flexShrink: 0 }}
-                        />
-                      </motion.a>
-                    );
-                  })
-                )}
+                No links added yet
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ) : (
+              config.links.map((link, index) => {
+                const IconComponent = getIcon(link.icon);
+                return (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '10px 12px',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      transition: 'background 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(43, 74, 226, 0.08)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    <IconComponent
+                      size={16}
+                      strokeWidth={2}
+                      style={{ color: goOS.colors.text.primary, flexShrink: 0 }}
+                    />
+                    <span
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        color: goOS.colors.text.primary,
+                        fontFamily: goOS.fonts.heading,
+                        flex: 1,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {link.name}
+                    </span>
+                    <ExternalLink
+                      size={12}
+                      strokeWidth={2}
+                      style={{ color: goOS.colors.text.muted, flexShrink: 0 }}
+                    />
+                  </a>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
     </WidgetWrapper>
   );
 }

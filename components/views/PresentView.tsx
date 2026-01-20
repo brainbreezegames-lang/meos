@@ -1,10 +1,31 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X, Play, Pause, Maximize2, Minimize2 } from 'lucide-react';
 import type { DesktopItem, GoOSFileType } from '@/types';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS } from '@/lib/goos/fileTypeMapping';
+
+// goOS Design Tokens - Mediterranean Blue
+const goOS = {
+  colors: {
+    paper: '#FFFFFF',
+    border: '#2B4AE2',
+    background: '#0B0F1A',
+    text: {
+      primary: '#FFFFFF',
+      secondary: 'rgba(255, 255, 255, 0.7)',
+      muted: 'rgba(255, 255, 255, 0.5)',
+    },
+    accent: '#2B4AE2',
+  },
+  shadows: {
+    solid: '4px 4px 0 #2B4AE2',
+  },
+  fonts: {
+    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+    body: '"SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif',
+  },
+};
 
 interface PresentViewProps {
   items: DesktopItem[];
@@ -135,25 +156,61 @@ export function PresentView({
   if (!currentItem) {
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center"
         style={{
-          background: 'var(--bg-primary, #0a0a0a)',
-          color: 'var(--text-primary, white)',
+          position: 'fixed',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: goOS.colors.background,
+          zIndex: 99999,
         }}
       >
-        <div className="text-center">
-          <span style={{ fontSize: '48px' }}>📭</span>
-          <h3 style={{ fontSize: '18px', marginTop: '16px' }}>No slides to present</h3>
+        <div
+          style={{
+            textAlign: 'center',
+            background: goOS.colors.paper,
+            border: `2px solid ${goOS.colors.border}`,
+            borderRadius: '8px',
+            boxShadow: goOS.shadows.solid,
+            padding: '48px',
+          }}
+        >
+          <span style={{ fontSize: '48px', display: 'block', marginBottom: '16px' }}>📭</span>
+          <h3
+            style={{
+              fontSize: '18px',
+              fontWeight: 700,
+              color: goOS.colors.accent,
+              fontFamily: goOS.fonts.heading,
+              marginBottom: '8px',
+            }}
+          >
+            No slides to present
+          </h3>
+          <p
+            style={{
+              fontSize: '14px',
+              color: goOS.colors.accent,
+              fontFamily: goOS.fonts.body,
+              marginBottom: '24px',
+              opacity: 0.7,
+            }}
+          >
+            Create some content to start presenting
+          </p>
           <button
             onClick={onClose}
             style={{
-              marginTop: '24px',
-              padding: '10px 20px',
-              borderRadius: '8px',
-              background: 'var(--bg-card, rgba(255,255,255,0.1))',
-              color: 'var(--text-primary, white)',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              background: goOS.colors.accent,
+              color: goOS.colors.paper,
               border: 'none',
               cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 600,
+              fontFamily: goOS.fonts.heading,
             }}
           >
             Close
@@ -165,171 +222,224 @@ export function PresentView({
 
   return (
     <div
-      className="fixed inset-0"
       style={{
-        background: 'var(--bg-primary, #0a0a0a)',
+        position: 'fixed',
+        inset: 0,
+        background: goOS.colors.background,
         zIndex: 99999,
       }}
     >
       {/* Slide content */}
-      <AnimatePresence mode="wait">
-        <PresentSlide key={currentItem.id} item={currentItem} />
-      </AnimatePresence>
+      <PresentSlide key={currentItem.id} item={currentItem} />
 
       {/* Controls overlay */}
-      <motion.div
-        className="fixed inset-0 pointer-events-none"
-        animate={{ opacity: showControls ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          pointerEvents: 'none',
+          opacity: showControls ? 1 : 0,
+          transition: 'opacity 0.3s ease',
+        }}
       >
         {/* Top bar */}
         <div
-          className="absolute top-0 left-0 right-0 flex items-center justify-between pointer-events-auto"
           style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             padding: '16px 24px',
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.5), transparent)',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)',
+            pointerEvents: 'auto',
           }}
         >
           {/* Slide counter */}
           <div
             style={{
               fontSize: '13px',
-              fontWeight: 500,
-              color: 'rgba(255,255,255,0.7)',
-              fontFamily: 'var(--font-body, system-ui)',
+              fontWeight: 600,
+              color: goOS.colors.paper,
+              fontFamily: goOS.fonts.heading,
+              background: goOS.colors.accent,
+              padding: '6px 12px',
+              borderRadius: '4px',
             }}
           >
             {currentIndex + 1} / {totalSlides}
           </div>
 
           {/* Right controls */}
-          <div className="flex items-center gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Play/Pause */}
-            <motion.button
+            <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className="flex items-center justify-center"
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                background: 'rgba(255,255,255,0.1)',
-                color: 'white',
-                border: 'none',
+                width: '40px',
+                height: '40px',
+                borderRadius: '6px',
+                background: goOS.colors.paper,
+                border: `2px solid ${goOS.colors.accent}`,
+                color: goOS.colors.accent,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-              whileHover={{ background: 'rgba(255,255,255,0.2)' }}
-              whileTap={{ scale: 0.95 }}
             >
-              {isPlaying ? <Pause size={18} /> : <Play size={18} />}
-            </motion.button>
+              {isPlaying ? <Pause size={18} strokeWidth={2} /> : <Play size={18} strokeWidth={2} />}
+            </button>
 
             {/* Fullscreen */}
-            <motion.button
+            <button
               onClick={toggleFullscreen}
-              className="flex items-center justify-center"
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                background: 'rgba(255,255,255,0.1)',
-                color: 'white',
-                border: 'none',
+                width: '40px',
+                height: '40px',
+                borderRadius: '6px',
+                background: goOS.colors.paper,
+                border: `2px solid ${goOS.colors.accent}`,
+                color: goOS.colors.accent,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-              whileHover={{ background: 'rgba(255,255,255,0.2)' }}
-              whileTap={{ scale: 0.95 }}
             >
-              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-            </motion.button>
+              {isFullscreen ? <Minimize2 size={18} strokeWidth={2} /> : <Maximize2 size={18} strokeWidth={2} />}
+            </button>
 
             {/* Close */}
-            <motion.button
+            <button
               onClick={onClose}
-              className="flex items-center justify-center"
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                background: 'rgba(255,255,255,0.1)',
-                color: 'white',
+                width: '40px',
+                height: '40px',
+                borderRadius: '6px',
+                background: goOS.colors.accent,
                 border: 'none',
+                color: goOS.colors.paper,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-              whileHover={{ background: 'rgba(255,255,255,0.2)' }}
-              whileTap={{ scale: 0.95 }}
             >
-              <X size={18} />
-            </motion.button>
+              <X size={18} strokeWidth={2} />
+            </button>
           </div>
         </div>
 
         {/* Navigation arrows */}
         {totalSlides > 1 && (
           <>
-            <motion.button
+            <button
               onClick={goPrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto"
               style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'rgba(255,255,255,0.1)',
-                color: 'white',
-                border: 'none',
+                position: 'absolute',
+                left: '24px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '56px',
+                height: '56px',
+                borderRadius: '8px',
+                background: goOS.colors.paper,
+                border: `2px solid ${goOS.colors.accent}`,
+                boxShadow: '3px 3px 0 ' + goOS.colors.accent,
+                color: goOS.colors.accent,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'auto',
+                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
               }}
-              whileHover={{ background: 'rgba(255,255,255,0.2)', scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-50%) translate(-2px, -2px)';
+                e.currentTarget.style.boxShadow = '5px 5px 0 ' + goOS.colors.accent;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(-50%)';
+                e.currentTarget.style.boxShadow = '3px 3px 0 ' + goOS.colors.accent;
+              }}
             >
-              <ChevronLeft size={24} />
-            </motion.button>
+              <ChevronLeft size={28} strokeWidth={2} />
+            </button>
 
-            <motion.button
+            <button
               onClick={goNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto"
               style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'rgba(255,255,255,0.1)',
-                color: 'white',
-                border: 'none',
+                position: 'absolute',
+                right: '24px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '56px',
+                height: '56px',
+                borderRadius: '8px',
+                background: goOS.colors.paper,
+                border: `2px solid ${goOS.colors.accent}`,
+                boxShadow: '3px 3px 0 ' + goOS.colors.accent,
+                color: goOS.colors.accent,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'auto',
+                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
               }}
-              whileHover={{ background: 'rgba(255,255,255,0.2)', scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-50%) translate(-2px, -2px)';
+                e.currentTarget.style.boxShadow = '5px 5px 0 ' + goOS.colors.accent;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(-50%)';
+                e.currentTarget.style.boxShadow = '3px 3px 0 ' + goOS.colors.accent;
+              }}
             >
-              <ChevronRight size={24} />
-            </motion.button>
+              <ChevronRight size={28} strokeWidth={2} />
+            </button>
           </>
         )}
 
         {/* Progress dots */}
         {totalSlides > 1 && totalSlides <= 20 && (
           <div
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-auto"
+            style={{
+              position: 'absolute',
+              bottom: '24px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              pointerEvents: 'auto',
+              background: goOS.colors.paper,
+              padding: '8px 16px',
+              borderRadius: '24px',
+              border: `2px solid ${goOS.colors.accent}`,
+            }}
           >
             {sortedItems.map((_, index) => (
-              <motion.button
+              <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 style={{
-                  width: index === currentIndex ? '24px' : '8px',
-                  height: '8px',
-                  borderRadius: '4px',
-                  background: index === currentIndex
-                    ? 'white'
-                    : 'rgba(255,255,255,0.3)',
+                  width: index === currentIndex ? '24px' : '10px',
+                  height: '10px',
+                  borderRadius: '5px',
+                  background: index === currentIndex ? goOS.colors.accent : 'rgba(43, 74, 226, 0.3)',
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'width 0.2s ease, background 0.2s ease',
                 }}
-                whileHover={{ background: 'rgba(255,255,255,0.6)' }}
               />
             ))}
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -359,62 +469,80 @@ function PresentSlide({ item }: PresentSlideProps) {
   }, [isGoosFile, item.goosContent, item.windowDescription]);
 
   return (
-    <motion.div
-      className="absolute inset-0 flex items-center justify-center"
-      style={{ padding: '80px 120px' }}
-      initial={{ opacity: 0, x: 100 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -100 }}
-      transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '80px 120px',
+      }}
     >
       <div
-        className="w-full h-full flex flex-col items-center justify-center"
-        style={{ maxWidth: '1200px' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          maxWidth: '1200px',
+        }}
       >
         {/* Image */}
         {imageUrl && fileType === 'image' && (
-          <motion.img
+          <img
             src={imageUrl}
             alt={item.windowTitle || item.label}
-            className="max-w-full max-h-[60vh] object-contain rounded-lg"
             style={{
-              boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+              maxWidth: '100%',
+              maxHeight: '60vh',
+              objectFit: 'contain',
+              borderRadius: '8px',
+              border: `2px solid ${goOS.colors.accent}`,
+              boxShadow: '8px 8px 0 ' + goOS.colors.accent,
             }}
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.1, duration: 0.4 }}
           />
         )}
 
         {/* Header image for non-image types */}
         {imageUrl && fileType !== 'image' && (
-          <motion.div
-            className="w-full mb-8"
+          <div
             style={{
+              width: '100%',
+              marginBottom: '32px',
               maxHeight: '40vh',
-              borderRadius: '12px',
+              borderRadius: '8px',
               overflow: 'hidden',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+              border: `2px solid ${goOS.colors.accent}`,
+              boxShadow: '8px 8px 0 ' + goOS.colors.accent,
             }}
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.4 }}
           >
             <img
               src={imageUrl}
               alt=""
-              className="w-full h-full object-cover"
-              style={{ maxHeight: '40vh' }}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                maxHeight: '40vh',
+              }}
             />
-          </motion.div>
+          </div>
         )}
 
         {/* Type badge */}
-        <motion.div
-          className="flex items-center gap-2 mb-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.3 }}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '16px',
+            background: goOS.colors.accent,
+            padding: '6px 12px',
+            borderRadius: '4px',
+          }}
         >
           <span style={{ fontSize: '20px' }}>
             {FILE_TYPE_ICONS[fileType] || '📄'}
@@ -422,72 +550,64 @@ function PresentSlide({ item }: PresentSlideProps) {
           <span
             style={{
               fontSize: '12px',
-              fontWeight: 600,
+              fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
-              color: 'rgba(255,255,255,0.5)',
-              fontFamily: 'var(--font-body, system-ui)',
+              color: goOS.colors.paper,
+              fontFamily: goOS.fonts.heading,
             }}
           >
             {FILE_TYPE_LABELS[fileType] || 'File'}
           </span>
-        </motion.div>
+        </div>
 
         {/* Title */}
-        <motion.h1
-          className="text-center"
+        <h1
           style={{
+            textAlign: 'center',
             fontSize: 'clamp(32px, 5vw, 64px)',
             fontWeight: 700,
-            color: 'white',
-            fontFamily: 'var(--font-heading, system-ui)',
+            color: goOS.colors.text.primary,
+            fontFamily: goOS.fonts.heading,
             lineHeight: 1.2,
             marginBottom: '16px',
           }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
         >
           {item.windowTitle || item.label}
-        </motion.h1>
+        </h1>
 
         {/* Subtitle */}
         {item.windowSubtitle && (
-          <motion.p
-            className="text-center"
+          <p
             style={{
+              textAlign: 'center',
               fontSize: 'clamp(16px, 2vw, 24px)',
-              color: 'rgba(255,255,255,0.7)',
-              fontFamily: 'var(--font-body, system-ui)',
+              color: goOS.colors.text.secondary,
+              fontFamily: goOS.fonts.body,
               maxWidth: '800px',
             }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.4 }}
           >
             {item.windowSubtitle}
-          </motion.p>
+          </p>
         )}
 
         {/* Content preview */}
         {content && fileType !== 'image' && (
-          <motion.p
-            className="text-center mt-6"
+          <p
             style={{
+              textAlign: 'center',
+              marginTop: '24px',
               fontSize: '16px',
-              color: 'rgba(255,255,255,0.5)',
-              fontFamily: 'var(--font-body, system-ui)',
+              color: goOS.colors.text.muted,
+              fontFamily: goOS.fonts.body,
               maxWidth: '600px',
               lineHeight: 1.6,
             }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.4 }}
           >
             {content.length > 300 ? content.slice(0, 300) + '...' : content}
-          </motion.p>
+          </p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

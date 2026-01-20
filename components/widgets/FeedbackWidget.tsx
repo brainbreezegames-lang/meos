@@ -1,10 +1,30 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Send, X, Check } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
+
+// goOS Design Tokens - Mediterranean Blue
+const goOS = {
+  colors: {
+    paper: '#FFFFFF',
+    border: '#2B4AE2',
+    text: {
+      primary: '#2B4AE2',
+      secondary: '#2B4AE2',
+      muted: '#6B7FE8',
+    },
+    success: '#22C55E',
+  },
+  shadows: {
+    solid: '4px 4px 0 #2B4AE2',
+  },
+  fonts: {
+    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
+  },
+};
 
 interface FeedbackWidgetConfig {
   prompt: string;
@@ -15,6 +35,7 @@ interface FeedbackWidgetProps {
   widget: Widget;
   isOwner?: boolean;
   onEdit?: () => void;
+  onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
   onSubmit?: (feedback: string) => Promise<void>;
 }
@@ -24,7 +45,7 @@ const DEFAULT_CONFIG: FeedbackWidgetConfig = {
   anonymous: true,
 };
 
-export function FeedbackWidget({ widget, isOwner, onEdit, onPositionChange, onSubmit }: FeedbackWidgetProps) {
+export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onSubmit }: FeedbackWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -57,232 +78,221 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onPositionChange, onSu
       widget={widget}
       isOwner={isOwner}
       onEdit={onEdit}
+      onDelete={onDelete}
       onPositionChange={onPositionChange}
     >
-      <AnimatePresence mode="wait">
-        {!isExpanded ? (
-          <motion.button
-            key="collapsed"
-            onClick={() => setIsExpanded(true)}
-            className="relative"
+      {!isExpanded ? (
+        <button
+          onClick={() => setIsExpanded(true)}
+          style={{
+            background: goOS.colors.paper,
+            border: `2px solid ${goOS.colors.border}`,
+            borderRadius: '8px',
+            boxShadow: goOS.shadows.solid,
+            padding: '10px 16px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translate(-2px, -2px)';
+            e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translate(0, 0)';
+            e.currentTarget.style.boxShadow = goOS.shadows.solid;
+          }}
+        >
+          <MessageSquare
+            size={18}
+            strokeWidth={2}
+            style={{ color: goOS.colors.text.primary }}
+          />
+          <span
             style={{
-              borderRadius: '20px',
-              overflow: 'hidden',
-              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: goOS.colors.text.primary,
+              fontFamily: goOS.fonts.heading,
+              letterSpacing: '0.01em',
+              whiteSpace: 'nowrap',
             }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            whileHover={{
-              scale: 1.02,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 0 20px rgba(16, 185, 129, 0.2)',
-            }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.2 }}
           >
-            {/* Gradient background */}
+            {widget.title || 'Feedback'}
+          </span>
+        </button>
+      ) : (
+        <div
+          style={{
+            background: goOS.colors.paper,
+            border: `2px solid ${goOS.colors.border}`,
+            borderRadius: '8px',
+            boxShadow: goOS.shadows.solid,
+            width: '260px',
+            overflow: 'hidden',
+          }}
+        >
+          {isSuccess ? (
             <div
               style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              }}
-            />
-
-            {/* Content */}
-            <div
-              className="relative flex items-center gap-2"
-              style={{
-                padding: '10px 16px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px',
               }}
             >
-              <MessageSquare
-                size={16}
-                style={{ color: 'rgba(255,255,255,0.9)' }}
-              />
-              <span
+              <div
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  color: 'white',
-                  fontFamily: 'var(--font-body, system-ui)',
-                  whiteSpace: 'nowrap',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  background: goOS.colors.success,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                {widget.title || 'Feedback'}
+                <Check size={20} color="white" strokeWidth={3} />
+              </div>
+              <span
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: goOS.colors.text.primary,
+                  fontFamily: goOS.fonts.heading,
+                  textAlign: 'center',
+                }}
+              >
+                Thanks for your feedback!
               </span>
             </div>
-          </motion.button>
-        ) : (
-          <motion.div
-            key="expanded"
-            className="relative"
-            style={{
-              borderRadius: '16px',
-              overflow: 'hidden',
-              width: '240px',
-            }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-          >
-            {/* Glass background */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'var(--bg-glass-elevated, rgba(255,255,255,0.95))',
-                backdropFilter: 'blur(40px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-              }}
-            />
-
-            {/* Content */}
-            <div className="relative p-3">
-              {isSuccess ? (
-                <motion.div
-                  className="flex flex-col items-center justify-center py-4"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                >
-                  <div
-                    className="flex items-center justify-center mb-2"
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    }}
-                  >
-                    <Check size={20} color="white" />
-                  </div>
+          ) : (
+            <>
+              {/* Header */}
+              <div
+                style={{
+                  padding: '12px 14px',
+                  borderBottom: `2px solid ${goOS.colors.border}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <MessageSquare size={16} strokeWidth={2} style={{ color: goOS.colors.text.primary }} />
                   <span
                     style={{
                       fontSize: '13px',
-                      fontWeight: 500,
-                      color: 'var(--text-primary, #1a1a1a)',
-                      fontFamily: 'var(--font-body, system-ui)',
-                      textAlign: 'center',
+                      fontWeight: 700,
+                      color: goOS.colors.text.primary,
+                      fontFamily: goOS.fonts.heading,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
                     }}
                   >
-                    Thanks for your feedback!
+                    Feedback
                   </span>
-                </motion.div>
-              ) : (
-                <>
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <MessageSquare
-                        size={14}
-                        style={{ color: '#059669' }}
-                      />
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          color: 'var(--text-primary, #1a1a1a)',
-                          fontFamily: 'var(--font-body, system-ui)',
-                        }}
-                      >
-                        {widget.title || 'Feedback'}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => setIsExpanded(false)}
-                      style={{
-                        padding: '4px',
-                        borderRadius: '6px',
-                        color: 'var(--text-tertiary, #888)',
-                      }}
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
+                </div>
+                <button
+                  onClick={() => setIsExpanded(false)}
+                  style={{
+                    padding: '4px',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: goOS.colors.text.primary,
+                  }}
+                >
+                  <X size={16} strokeWidth={2} />
+                </button>
+              </div>
 
-                  {/* Prompt */}
+              {/* Content */}
+              <form onSubmit={handleSubmit} style={{ padding: '14px' }}>
+                {/* Prompt */}
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: goOS.colors.text.primary,
+                    fontFamily: goOS.fonts.heading,
+                    marginBottom: '12px',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {config.prompt}
+                </p>
+
+                <textarea
+                  placeholder="Share your thoughts..."
+                  rows={3}
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    marginBottom: '8px',
+                    borderRadius: '6px',
+                    border: `2px solid ${goOS.colors.border}`,
+                    background: goOS.colors.paper,
+                    color: goOS.colors.text.primary,
+                    fontSize: '13px',
+                    fontFamily: goOS.fonts.heading,
+                    outline: 'none',
+                    resize: 'none',
+                  }}
+                />
+
+                {/* Anonymous notice */}
+                {config.anonymous && (
                   <p
                     style={{
-                      fontSize: '12px',
-                      color: 'var(--text-secondary, #666)',
-                      fontFamily: 'var(--font-body, system-ui)',
+                      fontSize: '11px',
+                      color: goOS.colors.text.muted,
+                      fontFamily: goOS.fonts.heading,
                       marginBottom: '12px',
-                      lineHeight: 1.4,
+                      textAlign: 'center',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
                     }}
                   >
-                    {config.prompt}
+                    Your feedback is anonymous
                   </p>
+                )}
 
-                  {/* Form */}
-                  <form onSubmit={handleSubmit}>
-                    <textarea
-                      placeholder="Share your thoughts..."
-                      rows={3}
-                      value={feedback}
-                      onChange={(e) => setFeedback(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        marginBottom: '12px',
-                        borderRadius: '8px',
-                        border: '1px solid var(--border-medium, rgba(0,0,0,0.1))',
-                        background: 'transparent',
-                        color: 'var(--text-primary, #1a1a1a)',
-                        fontSize: '13px',
-                        fontFamily: 'var(--font-body, system-ui)',
-                        outline: 'none',
-                        resize: 'none',
-                      }}
-                    />
-
-                    {/* Anonymous notice */}
-                    {config.anonymous && (
-                      <p
-                        style={{
-                          fontSize: '10px',
-                          color: 'var(--text-tertiary, #888)',
-                          fontFamily: 'var(--font-body, system-ui)',
-                          marginBottom: '8px',
-                          textAlign: 'center',
-                        }}
-                      >
-                        Your feedback is anonymous
-                      </p>
-                    )}
-
-                    {/* Submit button */}
-                    <motion.button
-                      type="submit"
-                      disabled={isLoading || !feedback.trim()}
-                      className="w-full flex items-center justify-center gap-2"
-                      style={{
-                        padding: '10px 16px',
-                        borderRadius: '10px',
-                        background: feedback.trim()
-                          ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                          : 'var(--bg-tertiary, #f0f0f0)',
-                        color: feedback.trim() ? 'white' : 'var(--text-tertiary, #888)',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        fontFamily: 'var(--font-body, system-ui)',
-                        cursor: feedback.trim() ? 'pointer' : 'not-allowed',
-                        opacity: isLoading ? 0.7 : 1,
-                        border: 'none',
-                      }}
-                      whileHover={feedback.trim() ? { scale: 1.02 } : {}}
-                      whileTap={feedback.trim() ? { scale: 0.98 } : {}}
-                    >
-                      <Send size={14} />
-                      <span>{isLoading ? 'Sending...' : 'Send Feedback'}</span>
-                    </motion.button>
-                  </form>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {/* Submit button */}
+                <button
+                  type="submit"
+                  disabled={isLoading || !feedback.trim()}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    borderRadius: '6px',
+                    border: `2px solid ${goOS.colors.border}`,
+                    background: feedback.trim() ? goOS.colors.border : goOS.colors.paper,
+                    color: feedback.trim() ? goOS.colors.paper : goOS.colors.text.muted,
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    fontFamily: goOS.fonts.heading,
+                    cursor: feedback.trim() ? 'pointer' : 'not-allowed',
+                    opacity: isLoading ? 0.7 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <Send size={14} strokeWidth={2.5} />
+                  <span>{isLoading ? 'Sending...' : 'Send Feedback'}</span>
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      )}
     </WidgetWrapper>
   );
 }

@@ -1,10 +1,28 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
+
+// goOS Design Tokens - Mediterranean Blue
+const goOS = {
+  colors: {
+    paper: '#FFFFFF',
+    border: '#2B4AE2',
+    text: {
+      primary: '#2B4AE2',
+      secondary: '#2B4AE2',
+    },
+  },
+  shadows: {
+    solid: '4px 4px 0 #2B4AE2',
+  },
+  fonts: {
+    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
+  },
+};
 
 interface ClockWidgetConfig {
   timezone: string;
@@ -16,6 +34,7 @@ interface ClockWidgetProps {
   widget: Widget;
   isOwner?: boolean;
   onEdit?: () => void;
+  onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
 }
 
@@ -40,7 +59,7 @@ function getTimezoneAbbreviation(timezone: string): string {
   }
 }
 
-export function ClockWidget({ widget, isOwner, onEdit, onPositionChange }: ClockWidgetProps) {
+export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChange }: ClockWidgetProps) {
   const [time, setTime] = useState<Date>(new Date());
   const config: ClockWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ClockWidgetConfig>) };
 
@@ -75,49 +94,34 @@ export function ClockWidget({ widget, isOwner, onEdit, onPositionChange }: Clock
       widget={widget}
       isOwner={isOwner}
       onEdit={onEdit}
+      onDelete={onDelete}
       onPositionChange={onPositionChange}
     >
-      <motion.div
-        className="relative"
+      <div
         style={{
-          borderRadius: '16px',
-          overflow: 'hidden',
+          background: goOS.colors.paper,
+          border: `2px solid ${goOS.colors.border}`,
+          borderRadius: '8px',
+          boxShadow: goOS.shadows.solid,
+          padding: '12px 16px',
+          minWidth: '120px',
         }}
-        whileHover={{
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-        }}
-        transition={{ duration: 0.2 }}
       >
-        {/* Glass background */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'var(--bg-glass-elevated, rgba(255,255,255,0.92))',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-          }}
-        />
-
-        {/* Content */}
-        <div
-          className="relative flex items-center gap-2"
-          style={{
-            padding: '10px 14px',
-          }}
-        >
+        <div className="flex items-center gap-3">
           <Clock
-            size={16}
-            style={{ color: 'var(--text-tertiary, #888)' }}
+            size={18}
+            strokeWidth={2}
+            style={{ color: goOS.colors.text.primary }}
           />
           <div className="flex flex-col">
             <span
               style={{
-                fontSize: '14px',
-                fontWeight: 600,
-                color: 'var(--text-primary, #1a1a1a)',
-                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: '18px',
+                fontWeight: 700,
+                color: goOS.colors.text.primary,
+                fontFamily: goOS.fonts.mono,
                 letterSpacing: '0.02em',
+                lineHeight: 1,
               }}
             >
               {formatTime(time)}
@@ -126,11 +130,12 @@ export function ClockWidget({ widget, isOwner, onEdit, onPositionChange }: Clock
               <span
                 style={{
                   fontSize: '10px',
-                  fontWeight: 500,
-                  color: 'var(--text-tertiary, #888)',
-                  fontFamily: 'var(--font-body, system-ui)',
+                  fontWeight: 600,
+                  color: goOS.colors.text.secondary,
+                  fontFamily: goOS.fonts.heading,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
+                  letterSpacing: '0.08em',
+                  marginTop: '2px',
                 }}
               >
                 {timezoneAbbr}
@@ -138,7 +143,7 @@ export function ClockWidget({ widget, isOwner, onEdit, onPositionChange }: Clock
             )}
           </div>
         </div>
-      </motion.div>
+      </div>
     </WidgetWrapper>
   );
 }

@@ -1,9 +1,30 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
 import type { DesktopItem, GoOSFileType } from '@/types';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS } from '@/lib/goos/fileTypeMapping';
+
+// goOS Design Tokens - Mediterranean Blue
+const goOS = {
+  colors: {
+    paper: '#FFFFFF',
+    border: '#2B4AE2',
+    background: '#F8F9FE',
+    text: {
+      primary: '#2B4AE2',
+      secondary: '#6B7FE8',
+      muted: '#9BA5E8',
+    },
+    warning: '#F59E0B',
+  },
+  shadows: {
+    solid: '4px 4px 0 #2B4AE2',
+  },
+  fonts: {
+    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+    body: '"SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif',
+  },
+};
 
 interface PageViewProps {
   items: DesktopItem[];
@@ -48,20 +69,50 @@ export function PageView({
 
   return (
     <div
-      className="min-h-screen"
       style={{
-        background: 'var(--bg-primary, #fafafa)',
+        minHeight: '100vh',
+        background: goOS.colors.background,
         paddingTop: '80px',
         paddingBottom: '80px',
       }}
     >
       <div
-        className="mx-auto"
         style={{
           maxWidth: '800px',
+          margin: '0 auto',
           padding: '0 24px',
         }}
       >
+        {/* Page header */}
+        <div
+          style={{
+            marginBottom: '48px',
+            paddingBottom: '24px',
+            borderBottom: `2px solid ${goOS.colors.border}`,
+          }}
+        >
+          <h1
+            style={{
+              fontSize: '32px',
+              fontWeight: 700,
+              color: goOS.colors.text.primary,
+              fontFamily: goOS.fonts.heading,
+              marginBottom: '8px',
+            }}
+          >
+            All Content
+          </h1>
+          <p
+            style={{
+              fontSize: '14px',
+              color: goOS.colors.text.secondary,
+              fontFamily: goOS.fonts.body,
+            }}
+          >
+            {sortedItems.length} {sortedItems.length === 1 ? 'item' : 'items'}
+          </p>
+        </div>
+
         {sortedItems.map((item, index) => (
           <PageViewItem
             key={item.id}
@@ -76,15 +127,19 @@ export function PageView({
 
         {sortedItems.length === 0 && (
           <div
-            className="flex flex-col items-center justify-center"
             style={{
               padding: '80px 24px',
               textAlign: 'center',
+              background: goOS.colors.paper,
+              border: `2px solid ${goOS.colors.border}`,
+              borderRadius: '8px',
+              boxShadow: goOS.shadows.solid,
             }}
           >
             <span
               style={{
                 fontSize: '48px',
+                display: 'block',
                 marginBottom: '16px',
               }}
             >
@@ -93,9 +148,9 @@ export function PageView({
             <h3
               style={{
                 fontSize: '18px',
-                fontWeight: 600,
-                color: 'var(--text-primary, #1a1a1a)',
-                fontFamily: 'var(--font-heading, system-ui)',
+                fontWeight: 700,
+                color: goOS.colors.text.primary,
+                fontFamily: goOS.fonts.heading,
                 marginBottom: '8px',
               }}
             >
@@ -104,8 +159,8 @@ export function PageView({
             <p
               style={{
                 fontSize: '14px',
-                color: 'var(--text-secondary, #666)',
-                fontFamily: 'var(--font-body, system-ui)',
+                color: goOS.colors.text.secondary,
+                fontFamily: goOS.fonts.body,
               }}
             >
               {isOwner
@@ -152,33 +207,33 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
   }, [isGoosFile, fileType, item]);
 
   return (
-    <motion.article
+    <article
       onClick={onClick}
-      className="relative cursor-pointer"
       style={{
+        position: 'relative',
         marginTop: isFirst ? 0 : gap,
         marginBottom: isLast ? 0 : gap,
-        opacity: isDraft && isOwner ? 0.6 : 1,
+        opacity: isDraft && isOwner ? 0.7 : 1,
+        cursor: 'pointer',
       }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: isDraft && isOwner ? 0.6 : 1, y: 0 }}
-      whileHover={{ scale: 1.01 }}
-      transition={{ duration: 0.3 }}
     >
       {/* Draft indicator */}
       {isDraft && isOwner && (
         <div
-          className="absolute -left-4 top-4"
           style={{
-            padding: '2px 8px',
+            position: 'absolute',
+            left: '-12px',
+            top: '16px',
+            padding: '4px 8px',
             borderRadius: '4px',
-            background: 'var(--bg-warning, rgba(245, 158, 11, 0.1))',
-            color: 'var(--text-warning, #d97706)',
+            background: goOS.colors.warning,
+            color: goOS.colors.paper,
             fontSize: '10px',
-            fontWeight: 600,
+            fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
-            fontFamily: 'var(--font-body, system-ui)',
+            fontFamily: goOS.fonts.heading,
+            transform: 'rotate(-3deg)',
           }}
         >
           Draft
@@ -187,11 +242,20 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
 
       <div
         style={{
-          background: 'var(--bg-card, white)',
-          borderRadius: '16px',
+          background: goOS.colors.paper,
+          border: `2px solid ${goOS.colors.border}`,
+          borderRadius: '8px',
+          boxShadow: goOS.shadows.solid,
           overflow: 'hidden',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-          border: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translate(-2px, -2px)';
+          e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translate(0, 0)';
+          e.currentTarget.style.boxShadow = goOS.shadows.solid;
         }}
       >
         {/* Image header */}
@@ -200,7 +264,7 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
             style={{
               aspectRatio: '16/9',
               background: `url(${imageUrl}) center/cover no-repeat`,
-              borderBottom: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+              borderBottom: `2px solid ${goOS.colors.border}`,
             }}
           />
         )}
@@ -208,18 +272,25 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
         {/* Content */}
         <div style={{ padding: '24px' }}>
           {/* Type badge */}
-          <div className="flex items-center gap-2 mb-3">
-            <span style={{ fontSize: '14px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '12px',
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>
               {FILE_TYPE_ICONS[fileType] || '📄'}
             </span>
             <span
               style={{
                 fontSize: '11px',
-                fontWeight: 600,
+                fontWeight: 700,
                 textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                color: 'var(--text-tertiary, #888)',
-                fontFamily: 'var(--font-body, system-ui)',
+                letterSpacing: '0.08em',
+                color: goOS.colors.text.secondary,
+                fontFamily: goOS.fonts.heading,
               }}
             >
               {FILE_TYPE_LABELS[fileType] || 'File'}
@@ -230,9 +301,9 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
           <h2
             style={{
               fontSize: '20px',
-              fontWeight: 600,
-              color: 'var(--text-primary, #1a1a1a)',
-              fontFamily: 'var(--font-heading, system-ui)',
+              fontWeight: 700,
+              color: goOS.colors.text.primary,
+              fontFamily: goOS.fonts.heading,
               marginBottom: '8px',
               lineHeight: 1.3,
             }}
@@ -245,8 +316,8 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
             <p
               style={{
                 fontSize: '14px',
-                color: 'var(--text-secondary, #666)',
-                fontFamily: 'var(--font-body, system-ui)',
+                color: goOS.colors.text.secondary,
+                fontFamily: goOS.fonts.body,
                 marginBottom: '12px',
               }}
             >
@@ -259,8 +330,8 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
             <p
               style={{
                 fontSize: '14px',
-                color: 'var(--text-secondary, #666)',
-                fontFamily: 'var(--font-body, system-ui)',
+                color: goOS.colors.text.secondary,
+                fontFamily: goOS.fonts.body,
                 lineHeight: 1.6,
               }}
             >
@@ -271,11 +342,14 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
           {/* Folder children count */}
           {fileType === 'folder' && item.children && (
             <div
-              className="flex items-center gap-2 mt-3"
               style={{
-                color: 'var(--text-tertiary, #888)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '12px',
+                color: goOS.colors.text.muted,
                 fontSize: '13px',
-                fontFamily: 'var(--font-body, system-ui)',
+                fontFamily: goOS.fonts.body,
               }}
             >
               <span>📁</span>
@@ -286,20 +360,24 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
           {/* Access indicator */}
           {item.accessLevel && item.accessLevel !== 'free' && (
             <div
-              className="flex items-center gap-2 mt-4 pt-4"
               style={{
-                borderTop: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '16px',
+                paddingTop: '16px',
+                borderTop: `2px solid ${goOS.colors.border}`,
               }}
             >
-              <span style={{ fontSize: '12px' }}>
+              <span style={{ fontSize: '14px' }}>
                 {item.accessLevel === 'paid' ? '💰' : '✉️'}
               </span>
               <span
                 style={{
-                  fontSize: '12px',
-                  fontWeight: 500,
-                  color: 'var(--text-secondary, #666)',
-                  fontFamily: 'var(--font-body, system-ui)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: goOS.colors.text.primary,
+                  fontFamily: goOS.fonts.heading,
                 }}
               >
                 {item.accessLevel === 'paid'
@@ -310,6 +388,6 @@ function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageView
           )}
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }

@@ -1,10 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import { Calendar, ArrowUpRight } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
+
+// goOS Design Tokens - Mediterranean Blue
+const goOS = {
+  colors: {
+    paper: '#FFFFFF',
+    border: '#2B4AE2',
+    text: {
+      primary: '#2B4AE2',
+      secondary: '#2B4AE2',
+    },
+  },
+  shadows: {
+    solid: '4px 4px 0 #2B4AE2',
+  },
+  fonts: {
+    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
+  },
+};
 
 interface BookWidgetConfig {
   url: string;
@@ -15,6 +33,7 @@ interface BookWidgetProps {
   widget: Widget;
   isOwner?: boolean;
   onEdit?: () => void;
+  onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
 }
 
@@ -23,8 +42,7 @@ const DEFAULT_CONFIG: BookWidgetConfig = {
   buttonText: 'Book a Call',
 };
 
-export function BookWidget({ widget, isOwner, onEdit, onPositionChange }: BookWidgetProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange }: BookWidgetProps) {
   const config: BookWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<BookWidgetConfig>) };
 
   const handleClick = () => {
@@ -38,70 +56,57 @@ export function BookWidget({ widget, isOwner, onEdit, onPositionChange }: BookWi
       widget={widget}
       isOwner={isOwner}
       onEdit={onEdit}
+      onDelete={onDelete}
       onPositionChange={onPositionChange}
     >
-      <motion.button
+      <button
         onClick={handleClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="relative"
         style={{
-          borderRadius: '20px',
-          overflow: 'hidden',
+          background: goOS.colors.paper,
+          border: `2px solid ${goOS.colors.border}`,
+          borderRadius: '8px',
+          boxShadow: goOS.shadows.solid,
+          padding: '10px 16px',
           cursor: config.url ? 'pointer' : 'default',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
         }}
-        whileHover={{
-          scale: config.url ? 1.02 : 1,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 0 20px rgba(139, 92, 246, 0.2)',
+        onMouseEnter={(e) => {
+          if (config.url) {
+            e.currentTarget.style.transform = 'translate(-2px, -2px)';
+            e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
+          }
         }}
-        whileTap={{ scale: config.url ? 0.98 : 1 }}
-        transition={{ duration: 0.2 }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translate(0, 0)';
+          e.currentTarget.style.boxShadow = goOS.shadows.solid;
+        }}
       >
-        {/* Gradient background */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-          }}
+        <Calendar
+          size={18}
+          strokeWidth={2}
+          style={{ color: goOS.colors.text.primary }}
         />
-
-        {/* Content */}
-        <div
-          className="relative flex items-center gap-2"
+        <span
           style={{
-            padding: '10px 16px',
+            fontSize: '14px',
+            fontWeight: 600,
+            color: goOS.colors.text.primary,
+            fontFamily: goOS.fonts.heading,
+            letterSpacing: '0.01em',
+            whiteSpace: 'nowrap',
           }}
         >
-          <Calendar
-            size={16}
-            style={{ color: 'rgba(255,255,255,0.9)' }}
-          />
-          <span
-            style={{
-              fontSize: '13px',
-              fontWeight: 600,
-              color: 'white',
-              fontFamily: 'var(--font-body, system-ui)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {widget.title || config.buttonText}
-          </span>
-          <motion.div
-            animate={{
-              x: isHovered ? 2 : 0,
-              opacity: isHovered ? 1 : 0.7,
-            }}
-            transition={{ duration: 0.15 }}
-          >
-            <ArrowUpRight
-              size={14}
-              style={{ color: 'rgba(255,255,255,0.8)' }}
-            />
-          </motion.div>
-        </div>
-      </motion.button>
+          {widget.title || config.buttonText}
+        </span>
+        <ArrowUpRight
+          size={14}
+          strokeWidth={2.5}
+          style={{ color: goOS.colors.text.primary, opacity: 0.7 }}
+        />
+      </button>
     </WidgetWrapper>
   );
 }

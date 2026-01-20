@@ -1,9 +1,26 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Monitor, FileText, Presentation } from 'lucide-react';
 import type { ViewMode } from '@/types';
+
+// goOS Design Tokens - Mediterranean Blue
+const goOS = {
+  colors: {
+    paper: '#FFFFFF',
+    border: '#2B4AE2',
+    text: {
+      primary: '#2B4AE2',
+      secondary: '#6B7FE8',
+    },
+  },
+  shadows: {
+    solid: '3px 3px 0 #2B4AE2',
+  },
+  fonts: {
+    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+  },
+};
 
 interface ViewSwitcherProps {
   currentView: ViewMode;
@@ -13,7 +30,7 @@ interface ViewSwitcherProps {
 
 const VIEW_OPTIONS: {
   mode: ViewMode;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>;
   label: string;
   description: string;
 }[] = [
@@ -40,58 +57,56 @@ const VIEW_OPTIONS: {
 export function ViewSwitcher({ currentView, onViewChange, className = '' }: ViewSwitcherProps) {
   return (
     <div
-      className={`flex items-center gap-1 ${className}`}
+      className={`flex items-center ${className}`}
       style={{
-        padding: '4px',
-        borderRadius: '12px',
-        background: 'var(--bg-glass, rgba(255,255,255,0.8))',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-        border: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+        padding: '3px',
+        borderRadius: '8px',
+        background: goOS.colors.paper,
+        border: `2px solid ${goOS.colors.border}`,
+        boxShadow: goOS.shadows.solid,
+        gap: '2px',
       }}
     >
       {VIEW_OPTIONS.map(({ mode, icon: Icon, label }) => {
         const isActive = currentView === mode;
         return (
-          <motion.button
+          <button
             key={mode}
-            onClick={() => onViewChange(mode)}
-            className="relative flex items-center gap-1.5"
+            onClick={() => {
+              console.log('[ViewSwitcher] Switching to:', mode);
+              onViewChange(mode);
+            }}
+            title={label}
             style={{
-              padding: '6px 12px',
-              borderRadius: '8px',
-              background: 'transparent',
-              color: isActive
-                ? 'var(--text-primary, #1a1a1a)'
-                : 'var(--text-tertiary, #888)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 10px',
+              borderRadius: '5px',
+              background: isActive ? goOS.colors.border : 'transparent',
+              color: isActive ? goOS.colors.paper : goOS.colors.text.primary,
               fontSize: '12px',
-              fontWeight: isActive ? 600 : 500,
-              fontFamily: 'var(--font-body, system-ui)',
+              fontWeight: 600,
+              fontFamily: goOS.fonts.heading,
               cursor: 'pointer',
               border: 'none',
               outline: 'none',
+              transition: 'all 0.15s ease',
             }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.background = 'rgba(43, 74, 226, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.background = 'transparent';
+              }
+            }}
           >
-            {isActive && (
-              <motion.div
-                layoutId="viewSwitcherActive"
-                className="absolute inset-0"
-                style={{
-                  borderRadius: '8px',
-                  background: 'var(--bg-solid, white)',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                }}
-                transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
-              />
-            )}
-            <span className="relative z-10 flex items-center gap-1.5">
-              <Icon size={14} />
-              <span>{label}</span>
-            </span>
-          </motion.button>
+            <Icon size={14} strokeWidth={2} />
+            <span>{label}</span>
+          </button>
         );
       })}
     </div>
@@ -101,36 +116,51 @@ export function ViewSwitcher({ currentView, onViewChange, className = '' }: View
 // Compact version for menu bar
 export function ViewSwitcherCompact({ currentView, onViewChange }: ViewSwitcherProps) {
   return (
-    <div className="flex items-center gap-0.5">
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '2px',
+        padding: '2px',
+        borderRadius: '6px',
+        background: goOS.colors.paper,
+        border: `2px solid ${goOS.colors.border}`,
+      }}
+    >
       {VIEW_OPTIONS.map(({ mode, icon: Icon, label }) => {
         const isActive = currentView === mode;
         return (
-          <motion.button
+          <button
             key={mode}
             onClick={() => onViewChange(mode)}
             title={label}
-            className="flex items-center justify-center"
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               width: '28px',
               height: '28px',
-              borderRadius: '6px',
-              background: isActive
-                ? 'var(--bg-active, rgba(0,0,0,0.08))'
-                : 'transparent',
-              color: isActive
-                ? 'var(--text-primary, #1a1a1a)'
-                : 'var(--text-tertiary, #888)',
+              borderRadius: '4px',
+              background: isActive ? goOS.colors.border : 'transparent',
+              color: isActive ? goOS.colors.paper : goOS.colors.text.primary,
               cursor: 'pointer',
               border: 'none',
               outline: 'none',
+              transition: 'all 0.15s ease',
             }}
-            whileHover={{
-              background: 'var(--bg-hover, rgba(0,0,0,0.04))',
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.background = 'rgba(43, 74, 226, 0.1)';
+              }
             }}
-            whileTap={{ scale: 0.95 }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.background = 'transparent';
+              }
+            }}
           >
-            <Icon size={16} />
-          </motion.button>
+            <Icon size={16} strokeWidth={2} />
+          </button>
         );
       })}
     </div>
