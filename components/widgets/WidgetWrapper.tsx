@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, PanInfo } from 'framer-motion';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import type { Widget } from '@/types';
 
 interface WidgetWrapperProps {
@@ -24,95 +23,120 @@ export function WidgetWrapper({
   className = '',
 }: WidgetWrapperProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState({ x: widget.positionX, y: widget.positionY });
   const elementRef = useRef<HTMLDivElement>(null);
-  const startPosRef = useRef({ x: widget.positionX, y: widget.positionY });
+  const dragStartRef = useRef<{ mouseX: number; mouseY: number; elemX: number; elemY: number } | null>(null);
 
-  // Update start position when widget position changes externally
+  // Sync position with widget prop changes (only when not dragging)
   useEffect(() => {
-    startPosRef.current = { x: widget.positionX, y: widget.positionY };
-  }, [widget.positionX, widget.positionY]);
+    if (!isDragging) {
+      setPosition({ x: widget.positionX, y: widget.positionY });
+    }
+  }, [widget.positionX, widget.positionY, isDragging]);
 
-  const handleDragStart = () => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!isOwner) return;
+    if (e.button !== 0) return; // Only left click
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    dragStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      elemX: position.x,
+      elemY: position.y,
+    };
+
     setIsDragging(true);
-    startPosRef.current = { x: widget.positionX, y: widget.positionY };
-  };
+  }, [isOwner, position]);
 
-  const handleDragEnd = (
-    _event: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo
-  ) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging || !dragStartRef.current) return;
+
+    const deltaX = e.clientX - dragStartRef.current.mouseX;
+    const deltaY = e.clientY - dragStartRef.current.mouseY;
+
+    // Convert pixel delta to percentage
+    const deltaXPercent = (deltaX / window.innerWidth) * 100;
+    const deltaYPercent = (deltaY / window.innerHeight) * 100;
+
+    // Calculate new position - NO SNAPPING, exact position
+    const newX = dragStartRef.current.elemX + deltaXPercent;
+    const newY = dragStartRef.current.elemY + deltaYPercent;
+
+    // Clamp to keep on screen (0-100%)
+    const clampedX = Math.max(0, Math.min(100, newX));
+    const clampedY = Math.max(0, Math.min(100, newY));
+
+    setPosition({ x: clampedX, y: clampedY });
+  }, [isDragging]);
+
+  const handleMouseUp = useCallback(() => {
+    if (!isDragging) return;
+
     setIsDragging(false);
 
-    if (!onPositionChange) return;
+    // Save the final position
+    if (onPositionChange && dragStartRef.current) {
+      onPositionChange(position.x, position.y);
+    }
 
-    // Get viewport dimensions
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    dragStartRef.current = null;
+  }, [isDragging, position, onPositionChange]);
 
-    // Convert drag offset (pixels) to percentage
-    const deltaXPercent = (info.offset.x / viewportWidth) * 100;
-    const deltaYPercent = (info.offset.y / viewportHeight) * 100;
+  // Global mouse event listeners for drag
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
 
-    // Calculate new position
-    const newX = startPosRef.current.x + deltaXPercent;
-    const newY = startPosRef.current.y + deltaYPercent;
-
-    // Clamp to viewport bounds (2% to 98%)
-    const clampedX = Math.max(2, Math.min(98, newX));
-    const clampedY = Math.max(2, Math.min(98, newY));
-
-    // Update position - no snapping, stays exactly where released
-    onPositionChange(clampedX, clampedY);
-  };
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   if (!widget.isVisible && !isOwner) {
     return null;
   }
 
   return (
-    <motion.div
+    <div
       ref={elementRef}
-      className={`fixed ${className}`}
+      className={className}
       style={{
-        left: `${widget.positionX}%`,
-        top: `${widget.positionY}%`,
+        position: 'fixed',
+        left: `${position.x}%`,
+        top: `${position.y}%`,
         transform: 'translate(-50%, -50%)',
         zIndex: isDragging ? 9999 : 100,
         cursor: isOwner ? (isDragging ? 'grabbing' : 'grab') : 'default',
-      }}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{
         opacity: widget.isVisible ? 1 : 0.5,
-        scale: 1,
-        x: 0,
-        y: 0,
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
       }}
-      transition={{ duration: 0.2 }}
-      drag={isOwner}
-      dragMomentum={false}
-      dragElastic={0}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      whileDrag={{ scale: 1.02 }}
+      onMouseDown={handleMouseDown}
     >
       {children}
 
       {/* Owner controls - show on hover */}
-      {isOwner && (
+      {isOwner && !isDragging && (
         <div
-          className="absolute -top-2 -right-2 flex gap-1 opacity-0 hover:opacity-100 transition-opacity"
-          style={{
-            opacity: isDragging ? 0 : undefined,
-          }}
+          className="absolute -top-2 -right-2 flex gap-1"
+          style={{ opacity: 0, transition: 'opacity 0.15s' }}
+          onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.opacity = '0'; }}
         >
           {onEdit && (
-            <motion.button
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 onEdit();
               }}
-              className="flex items-center justify-center"
+              onMouseDown={(e) => e.stopPropagation()}
               style={{
                 width: '20px',
                 height: '20px',
@@ -121,24 +145,26 @@ export function WidgetWrapper({
                 border: '2px solid #2B4AE2',
                 color: 'white',
                 boxShadow: '2px 2px 0 rgba(0,0,0,0.1)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
-            </motion.button>
+            </button>
           )}
           {onDelete && (
-            <motion.button
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 onDelete();
               }}
-              className="flex items-center justify-center"
+              onMouseDown={(e) => e.stopPropagation()}
               style={{
                 width: '20px',
                 height: '20px',
@@ -147,17 +173,19 @@ export function WidgetWrapper({
                 border: '2px solid #2B4AE2',
                 color: '#2B4AE2',
                 boxShadow: '2px 2px 0 rgba(0,0,0,0.1)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-              whileHover={{ scale: 1.1, background: '#fee2e2' }}
-              whileTap={{ scale: 0.95 }}
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
-            </motion.button>
+            </button>
           )}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

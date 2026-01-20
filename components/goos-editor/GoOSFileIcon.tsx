@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect, memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { FileText, Presentation, Folder, Lock } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { PublishStatus } from './GoOSPublishToggle';
@@ -63,58 +62,42 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 }: GoOSFileIconProps) {
   const isLocked = accessLevel === 'locked';
   const [renameValue, setRenameValue] = useState(title);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  // Local state for position - this is the single source of truth during drag
+  const [localPosition, setLocalPosition] = useState({ x: position.x, y: position.y });
   const [isDragging, setIsDragging] = useState(false);
+  const [isAppearing, setIsAppearing] = useState(true);
 
-  const dragStartPos = useRef({ x: 0, y: 0 });
+  const dragStartRef = useRef<{ mouseX: number; mouseY: number; elemX: number; elemY: number } | null>(null);
   const hasDragged = useRef(false);
-  const dragOffsetRef = useRef({ x: 0, y: 0 });
-  const cleanupRef = useRef<(() => void) | null>(null);
-  const isMountedRef = useRef(true);
-  const pendingPositionRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Store callbacks in refs to avoid stale closures during drag
+  // Refs for callbacks to avoid stale closures
   const onPositionChangeRef = useRef(onPositionChange);
   const onDragStartRef = useRef(onDragStartProp);
-  const positionRef = useRef(position);
+  const onDragRef = useRef(onDrag);
 
   // Keep refs updated
   onPositionChangeRef.current = onPositionChange;
   onDragStartRef.current = onDragStartProp;
-  positionRef.current = position;
+  onDragRef.current = onDrag;
 
-  // Reset dragOffset only after position prop has been updated
+  // Sync local position with prop changes (only when NOT dragging)
   useEffect(() => {
-    if (pendingPositionRef.current) {
-      const pending = pendingPositionRef.current;
-      // Check if position is close enough to pending (within 0.5%)
-      if (
-        Math.abs(position.x - pending.x) < 0.5 &&
-        Math.abs(position.y - pending.y) < 0.5
-      ) {
-        pendingPositionRef.current = null;
-        setDragOffset({ x: 0, y: 0 });
-      }
+    if (!isDragging) {
+      setLocalPosition({ x: position.x, y: position.y });
     }
-  }, [position.x, position.y]);
+  }, [position.x, position.y, isDragging]);
+
+  // Fade in on mount
+  useEffect(() => {
+    const timer = setTimeout(() => setIsAppearing(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Throttle onDrag callback for performance (16ms = ~60fps)
   const throttledOnDrag = useMemo(
     () => onDrag ? throttle(onDrag, 16) : undefined,
     [onDrag]
   );
-
-  // Cleanup event listeners on unmount
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-      if (cleanupRef.current) {
-        cleanupRef.current();
-        cleanupRef.current = null;
-      }
-    };
-  }, []);
 
   const getIcon = () => {
     switch (type) {
@@ -148,90 +131,77 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (isRenaming) return;
-    if (e.button !== 0) return;
+    if (e.button !== 0) return; // Only left click
 
-    // Capture position at drag start
-    const startPosition = { ...positionRef.current };
+    e.preventDefault();
+    e.stopPropagation();
 
-    dragStartPos.current = { x: e.clientX, y: e.clientY };
-    hasDragged.current = false;
-    dragOffsetRef.current = { x: 0, y: 0 };
-
-    // Get parent container dimensions for converting pixels to percentages
+    // Get parent container for percentage calculations
     const parent = (e.target as HTMLElement).closest('[data-goos-desktop]') || document.body;
     const parentRect = parent.getBoundingClientRect();
 
-    // Track if we've committed to dragging (moved beyond threshold)
-    let isDragCommitted = false;
+    dragStartRef.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      elemX: localPosition.x,
+      elemY: localPosition.y,
+    };
+    hasDragged.current = false;
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (!isMountedRef.current) return;
+      if (!dragStartRef.current) return;
 
-      const dxPx = moveEvent.clientX - dragStartPos.current.x;
-      const dyPx = moveEvent.clientY - dragStartPos.current.y;
+      const deltaX = moveEvent.clientX - dragStartRef.current.mouseX;
+      const deltaY = moveEvent.clientY - dragStartRef.current.mouseY;
 
-      // Only commit to dragging once we've moved beyond threshold (5px)
-      if (!isDragCommitted && (Math.abs(dxPx) > 5 || Math.abs(dyPx) > 5)) {
-        isDragCommitted = true;
+      // Only commit to drag after moving beyond threshold (5px)
+      if (!hasDragged.current && (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5)) {
         hasDragged.current = true;
         setIsDragging(true);
         onDragStartRef.current?.(id);
       }
 
-      if (!isDragCommitted) return;
+      if (!hasDragged.current) return;
 
-      // Convert pixel offset to percentage of parent container
-      const dxPercent = (dxPx / parentRect.width) * 100;
-      const dyPercent = (dyPx / parentRect.height) * 100;
+      // Convert pixel delta to percentage
+      const deltaXPercent = (deltaX / parentRect.width) * 100;
+      const deltaYPercent = (deltaY / parentRect.height) * 100;
 
-      dragOffsetRef.current = { x: dxPercent, y: dyPercent };
-      setDragOffset({ x: dxPercent, y: dyPercent });
+      // Calculate new position - NO SNAPPING, exact position
+      const newX = dragStartRef.current.elemX + deltaXPercent;
+      const newY = dragStartRef.current.elemY + deltaYPercent;
 
-      // Use throttled callback for folder hit-testing
-      // Pass the current position in percentages (same units as folder positions)
-      const currentPosPercent = {
-        x: startPosition.x + dxPercent,
-        y: startPosition.y + dyPercent,
-      };
-      throttledOnDrag?.(currentPosPercent, id);
+      // Clamp to keep on screen (0-95% for x, 0-90% for y to account for icon size)
+      const clampedX = Math.max(0, Math.min(95, newX));
+      const clampedY = Math.max(0, Math.min(90, newY));
+
+      setLocalPosition({ x: clampedX, y: clampedY });
+
+      // Notify for folder hit-testing
+      throttledOnDrag?.({ x: clampedX, y: clampedY }, id);
     };
 
     const handleMouseUp = () => {
-      cleanup();
-
-      if (!isMountedRef.current) return;
-
-      setIsDragging(false);
-
-      if (hasDragged.current) {
-        // Calculate new position in percentages, clamped to valid range
-        const newX = Math.max(0, Math.min(95, startPosition.x + dragOffsetRef.current.x));
-        const newY = Math.max(0, Math.min(90, startPosition.y + dragOffsetRef.current.y));
-        // Store pending position - dragOffset will be reset when position prop updates
-        pendingPositionRef.current = { x: newX, y: newY };
-        onPositionChangeRef.current?.(
-          { x: newX, y: newY },
-          id
-        );
-      } else {
-        setDragOffset({ x: 0, y: 0 });
-      }
-    };
-
-    const cleanup = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
-      cleanupRef.current = null;
-    };
 
-    // Store cleanup function for unmount
-    cleanupRef.current = cleanup;
+      const wasActualDrag = hasDragged.current;
+      setIsDragging(false);
+
+      // Save the final position if we actually dragged
+      if (wasActualDrag && dragStartRef.current) {
+        onPositionChangeRef.current?.(localPosition, id);
+      }
+
+      dragStartRef.current = null;
+    };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [id, isRenaming, throttledOnDrag]);
+  }, [id, isRenaming, localPosition, throttledOnDrag]);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
+    // If we dragged, don't trigger click
     if (hasDragged.current) {
       hasDragged.current = false;
       return;
@@ -239,24 +209,14 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     onClick?.(e, id);
   }, [onClick, id]);
 
-  // Position is in percentages (0-100), dragOffset is also in percentages now
-  const currentX = position.x + dragOffset.x;
-  const currentY = position.y + dragOffset.y;
-
   return (
-    <motion.div
+    <div
       role="button"
       tabIndex={0}
       aria-label={`${title} ${type === 'folder' ? 'folder' : type === 'case-study' ? 'case study' : 'note'}${isSelected ? ', selected' : ''}`}
       aria-selected={isSelected}
       data-file-id={id}
       data-file-type={type}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{
-        opacity: 1,
-        scale: isDragging ? 1.05 : 1,
-      }}
-      exit={{ opacity: 0, scale: 0.9 }}
       onMouseDown={handleMouseDown}
       onClick={handleClick}
       onDoubleClick={onDoubleClick}
@@ -269,8 +229,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       }}
       style={{
         position: 'absolute',
-        top: `${currentY}%`,
-        left: `${currentX}%`,
+        top: `${localPosition.y}%`,
+        left: `${localPosition.x}%`,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -279,8 +239,11 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         borderRadius: 8,
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
+        WebkitUserSelect: 'none',
         width: 80,
         zIndex: isDragging ? 1000 : 1,
+        opacity: isAppearing ? 0 : 1,
+        transform: isDragging ? 'scale(1.05)' : 'scale(1)',
         background: isSelected
           ? `${goOSTokens.colors.accent.primary}20`
           : isDraggedOver && type === 'folder'
@@ -291,7 +254,9 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
           : isDraggedOver && type === 'folder'
           ? `2px dashed ${goOSTokens.colors.accent.primary}`
           : '2px solid transparent',
-        transition: isDragging ? 'none' : 'background 0.15s, border 0.15s',
+        transition: isDragging
+          ? 'transform 0.1s ease'
+          : 'opacity 0.3s ease, transform 0.15s ease, background 0.15s, border 0.15s',
         outline: 'none',
       }}
     >
@@ -401,7 +366,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
           {title}
         </span>
       )}
-    </motion.div>
+    </div>
   );
 });
 

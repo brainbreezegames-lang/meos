@@ -2269,25 +2269,6 @@ function GoOSDemoContent() {
                         updateWidget(id, { positionX: x, positionY: y });
                     }}
                 />
-                {/* Debug: Show widget count */}
-                {widgets.length > 0 && (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            bottom: '80px',
-                            right: '20px',
-                            padding: '8px 12px',
-                            background: '#2B4AE2',
-                            color: 'white',
-                            borderRadius: '8px',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            zIndex: 9999,
-                        }}
-                    >
-                        Widgets: {widgets.length}
-                    </div>
-                )}
 
                 {/* goOS Editor Windows */}
                 <AnimatePresence>
