@@ -126,26 +126,42 @@ export function GoOSDesktopContextMenu({
       onClick: () => onNewDownload?.(),
       dividerAfter: true,
     },
+    // Widget items - direct menu items (no submenu)
     {
-      id: 'add-widget',
-      label: 'Add Widget',
-      icon: <Plus size={14} />,
-      onClick: () => {
-        console.log('[Add Widget] Clicked - showing inline options');
-        // Fallback: show alert with widget options
-        const type = window.prompt('Enter widget type (clock, book, tipjar, contact, links, feedback):');
-        if (type && ['clock', 'book', 'tipjar', 'contact', 'links', 'feedback'].includes(type)) {
-          onAddWidget?.(type);
-        }
-      },
-      submenu: [
-        { id: 'widget-clock', label: 'Clock', icon: <span>🕐</span>, onClick: () => { console.log('[Widget] Clock clicked'); onAddWidget?.('clock'); } },
-        { id: 'widget-book', label: 'Book a Call', icon: <span>📅</span>, onClick: () => { console.log('[Widget] Book clicked'); onAddWidget?.('book'); } },
-        { id: 'widget-tipjar', label: 'Tip Jar', icon: <span>☕</span>, onClick: () => { console.log('[Widget] TipJar clicked'); onAddWidget?.('tipjar'); } },
-        { id: 'widget-contact', label: 'Contact', icon: <span>✉️</span>, onClick: () => { console.log('[Widget] Contact clicked'); onAddWidget?.('contact'); } },
-        { id: 'widget-links', label: 'Links', icon: <span>🔗</span>, onClick: () => { console.log('[Widget] Links clicked'); onAddWidget?.('links'); } },
-        { id: 'widget-feedback', label: 'Feedback', icon: <span>💬</span>, onClick: () => { console.log('[Widget] Feedback clicked'); onAddWidget?.('feedback'); } },
-      ],
+      id: 'widget-clock',
+      label: 'Add Clock Widget',
+      icon: <span style={{ fontSize: 14 }}>🕐</span>,
+      onClick: () => { console.log('[Widget] Clock clicked'); onAddWidget?.('clock'); },
+    },
+    {
+      id: 'widget-book',
+      label: 'Add Book Widget',
+      icon: <span style={{ fontSize: 14 }}>📅</span>,
+      onClick: () => { console.log('[Widget] Book clicked'); onAddWidget?.('book'); },
+    },
+    {
+      id: 'widget-tipjar',
+      label: 'Add Tip Jar Widget',
+      icon: <span style={{ fontSize: 14 }}>☕</span>,
+      onClick: () => { console.log('[Widget] TipJar clicked'); onAddWidget?.('tipjar'); },
+    },
+    {
+      id: 'widget-contact',
+      label: 'Add Contact Widget',
+      icon: <span style={{ fontSize: 14 }}>✉️</span>,
+      onClick: () => { console.log('[Widget] Contact clicked'); onAddWidget?.('contact'); },
+    },
+    {
+      id: 'widget-links',
+      label: 'Add Links Widget',
+      icon: <span style={{ fontSize: 14 }}>🔗</span>,
+      onClick: () => { console.log('[Widget] Links clicked'); onAddWidget?.('links'); },
+    },
+    {
+      id: 'widget-feedback',
+      label: 'Add Feedback Widget',
+      icon: <span style={{ fontSize: 14 }}>💬</span>,
+      onClick: () => { console.log('[Widget] Feedback clicked'); onAddWidget?.('feedback'); },
       dividerAfter: true,
     },
     {
