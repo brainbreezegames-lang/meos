@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Monitor, FileText, Presentation } from 'lucide-react';
+import { Monitor, FileText } from 'lucide-react';
 import type { ViewMode } from '@/types';
 
 // goOS Design Tokens - Mediterranean Blue
@@ -28,6 +28,8 @@ interface ViewSwitcherProps {
   className?: string;
 }
 
+// Global view toggle: Desktop (OS experience) | Page (linear portfolio)
+// Note: Present mode is only for individual Notes, not the whole desktop
 const VIEW_OPTIONS: {
   mode: ViewMode;
   icon: React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>;
@@ -44,13 +46,7 @@ const VIEW_OPTIONS: {
     mode: 'page',
     icon: FileText,
     label: 'Page',
-    description: 'Scrollable linear layout',
-  },
-  {
-    mode: 'present',
-    icon: Presentation,
-    label: 'Present',
-    description: 'Fullscreen slideshow',
+    description: 'Linear portfolio view',
   },
 ];
 

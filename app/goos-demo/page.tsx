@@ -2743,6 +2743,20 @@ function GoOSDemoContent() {
                     fileStatus={goosFiles.find(f => f.id === fileContextMenu.fileId)?.status}
                     accessLevel={goosFiles.find(f => f.id === fileContextMenu.fileId)?.accessLevel}
                     onOpen={() => openFile(fileContextMenu.fileId!)}
+                    onOpenAsPage={() => {
+                        const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
+                        if (file && (file.type === 'note' || file.type === 'case-study')) {
+                            // Open in new tab for demo - in production this would use the actual username
+                            window.open(`/demo-user/${fileContextMenu.fileId}`, '_blank');
+                        }
+                    }}
+                    onOpenAsPresent={() => {
+                        const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
+                        if (file && (file.type === 'note' || file.type === 'case-study')) {
+                            // Open in new tab for demo - in production this would use the actual username
+                            window.open(`/demo-user/${fileContextMenu.fileId}/present`, '_blank');
+                        }
+                    }}
                     onRename={() => setRenamingFileId(fileContextMenu.fileId)}
                     onDuplicate={() => duplicateFile(fileContextMenu.fileId!)}
                     onCopy={() => copyFile(fileContextMenu.fileId!)}

@@ -418,6 +418,18 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
               fileType={files.find(f => f.id === fileContextMenu.fileId)?.type || 'note'}
               fileStatus={files.find(f => f.id === fileContextMenu.fileId)?.status}
               onOpen={() => openFile(fileContextMenu.fileId!)}
+              onOpenAsPage={() => {
+                const file = files.find(f => f.id === fileContextMenu.fileId);
+                if (file && (file.type === 'note' || file.type === 'case-study')) {
+                  window.open(`/${desktop.username}/${fileContextMenu.fileId}`, '_blank');
+                }
+              }}
+              onOpenAsPresent={() => {
+                const file = files.find(f => f.id === fileContextMenu.fileId);
+                if (file && (file.type === 'note' || file.type === 'case-study')) {
+                  window.open(`/${desktop.username}/${fileContextMenu.fileId}/present`, '_blank');
+                }
+              }}
               onRename={() => setRenamingFileId(fileContextMenu.fileId)}
               onDuplicate={() => duplicateFile(fileContextMenu.fileId!)}
               onCopy={() => {

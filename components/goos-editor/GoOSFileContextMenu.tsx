@@ -16,6 +16,8 @@ import {
   EyeOff,
   Lock,
   Unlock,
+  FileText,
+  Presentation,
 } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { FileType } from './GoOSFileIcon';
@@ -41,6 +43,8 @@ interface GoOSFileContextMenuProps {
   fileStatus?: PublishStatus;
   accessLevel?: AccessLevel;
   onOpen: () => void;
+  onOpenAsPage?: () => void;
+  onOpenAsPresent?: () => void;
   onRename: () => void;
   onDuplicate: () => void;
   onCopy: () => void;
@@ -62,6 +66,8 @@ export function GoOSFileContextMenu({
   fileStatus,
   accessLevel,
   onOpen,
+  onOpenAsPage,
+  onOpenAsPresent,
   onRename,
   onDuplicate,
   onCopy,
@@ -89,13 +95,27 @@ export function GoOSFileContextMenu({
       shortcut: '↵',
       onClick: onOpen,
     },
+    // Open as Page/Present for notes and case studies
+    ...((!isFolder && onOpenAsPage) ? [{
+      id: 'open-page',
+      label: 'Open as Page',
+      icon: <FileText size={14} />,
+      onClick: onOpenAsPage,
+    } as ContextMenuItem] : []),
+    ...((!isFolder && onOpenAsPresent) ? [{
+      id: 'open-present',
+      label: 'Open as Present',
+      icon: <Presentation size={14} />,
+      onClick: onOpenAsPresent,
+      dividerAfter: true,
+    } as ContextMenuItem] : []),
     {
       id: 'rename',
       label: 'Rename',
       icon: <Edit3 size={14} />,
       shortcut: '↵',
       onClick: onRename,
-      dividerAfter: true,
+      dividerAfter: !onOpenAsPage && !onOpenAsPresent,
     },
     {
       id: 'copy',
