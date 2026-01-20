@@ -6,6 +6,8 @@ A personal "web desktop" builder that lets users create an explorable macOS-styl
 
 **Always commit and push**: After completing any code changes, immediately commit and push to git. Never ask "would you like me to commit?" - just do it automatically.
 
+**Demo URL**: https://meos-delta.vercel.app/goos-demo (auto-deploys from git push)
+
 ## Design Context
 
 ### Users
