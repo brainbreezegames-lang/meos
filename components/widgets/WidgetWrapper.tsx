@@ -26,6 +26,7 @@ export function WidgetWrapper({
   const [position, setPosition] = useState({ x: widget.positionX, y: widget.positionY });
   const elementRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef<{ mouseX: number; mouseY: number; elemX: number; elemY: number } | null>(null);
+  const hasDragged = useRef(false);
 
   // Sync position with widget prop changes (only when not dragging)
   useEffect(() => {
@@ -38,69 +39,67 @@ export function WidgetWrapper({
     if (!isOwner) return;
     if (e.button !== 0) return; // Only left click
 
-    // Don't start drag if clicking on interactive elements (inputs, buttons, textareas, links)
+    // Don't interfere with form inputs at all
     const target = e.target as HTMLElement;
-    const isInteractive = target.closest('input, textarea, button, a, select, [contenteditable="true"]');
-    if (isInteractive) return; // Let the interactive element handle the event
+    const isFormInput = target.closest('input, textarea, select, [contenteditable="true"]');
+    if (isFormInput) return;
 
-    e.preventDefault();
-
+    // Track start position (don't preventDefault yet - let clicks work)
     dragStartRef.current = {
       mouseX: e.clientX,
       mouseY: e.clientY,
       elemX: position.x,
       elemY: position.y,
     };
+    hasDragged.current = false;
 
-    setIsDragging(true);
-  }, [isOwner, position]);
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!dragStartRef.current) return;
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !dragStartRef.current) return;
+      const deltaX = moveEvent.clientX - dragStartRef.current.mouseX;
+      const deltaY = moveEvent.clientY - dragStartRef.current.mouseY;
 
-    const deltaX = e.clientX - dragStartRef.current.mouseX;
-    const deltaY = e.clientY - dragStartRef.current.mouseY;
+      // Only commit to drag after moving beyond threshold (5px)
+      if (!hasDragged.current && (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5)) {
+        hasDragged.current = true;
+        setIsDragging(true);
+      }
 
-    // Convert pixel delta to percentage
-    const deltaXPercent = (deltaX / window.innerWidth) * 100;
-    const deltaYPercent = (deltaY / window.innerHeight) * 100;
+      if (!hasDragged.current) return;
 
-    // Calculate new position - NO SNAPPING, exact position
-    const newX = dragStartRef.current.elemX + deltaXPercent;
-    const newY = dragStartRef.current.elemY + deltaYPercent;
+      // Convert pixel delta to percentage
+      const deltaXPercent = (deltaX / window.innerWidth) * 100;
+      const deltaYPercent = (deltaY / window.innerHeight) * 100;
 
-    // Clamp to keep on screen (0-100%)
-    const clampedX = Math.max(0, Math.min(100, newX));
-    const clampedY = Math.max(0, Math.min(100, newY));
+      // Calculate new position - NO SNAPPING, exact position
+      const newX = dragStartRef.current.elemX + deltaXPercent;
+      const newY = dragStartRef.current.elemY + deltaYPercent;
 
-    setPosition({ x: clampedX, y: clampedY });
-  }, [isDragging]);
+      // Clamp to keep on screen (0-100%)
+      const clampedX = Math.max(0, Math.min(100, newX));
+      const clampedY = Math.max(0, Math.min(100, newY));
 
-  const handleMouseUp = useCallback(() => {
-    if (!isDragging) return;
+      setPosition({ x: clampedX, y: clampedY });
+    };
 
-    setIsDragging(false);
+    const handleMouseUp = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
 
-    // Save the final position
-    if (onPositionChange && dragStartRef.current) {
-      onPositionChange(position.x, position.y);
-    }
+      const wasActualDrag = hasDragged.current;
+      setIsDragging(false);
 
-    dragStartRef.current = null;
-  }, [isDragging, position, onPositionChange]);
+      // Save the final position if we actually dragged
+      if (wasActualDrag && onPositionChange && dragStartRef.current) {
+        onPositionChange(position.x, position.y);
+      }
 
-  // Global mouse event listeners for drag
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      dragStartRef.current = null;
+    };
 
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  }, [isOwner, position, onPositionChange]);
 
   if (!widget.isVisible && !isOwner) {
     return null;
