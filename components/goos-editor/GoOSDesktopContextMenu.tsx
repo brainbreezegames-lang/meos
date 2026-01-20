@@ -54,6 +54,30 @@ export function GoOSDesktopContextMenu({
   const menuRef = useRef<HTMLDivElement>(null);
   const [focusedIndex, setFocusedIndex] = React.useState(0);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const submenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Delayed submenu close to allow moving between parent and submenu
+  const closeSubmenuDelayed = useCallback(() => {
+    submenuTimeoutRef.current = setTimeout(() => {
+      setActiveSubmenu(null);
+    }, 150);
+  }, []);
+
+  const cancelSubmenuClose = useCallback(() => {
+    if (submenuTimeoutRef.current) {
+      clearTimeout(submenuTimeoutRef.current);
+      submenuTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (submenuTimeoutRef.current) {
+        clearTimeout(submenuTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const items: ContextMenuItem[] = [
     {
@@ -255,12 +279,18 @@ export function GoOSDesktopContextMenu({
                     }}
                     onMouseEnter={() => {
                       if (!item.disabled) {
+                        cancelSubmenuClose();
                         setFocusedIndex(enabledIndex);
                         if (hasSubmenu) {
                           setActiveSubmenu(item.id);
                         } else {
                           setActiveSubmenu(null);
                         }
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (hasSubmenu) {
+                        closeSubmenuDelayed();
                       }
                     }}
                     disabled={item.disabled}
@@ -303,58 +333,66 @@ export function GoOSDesktopContextMenu({
                     )}
                   </button>
 
-                  {/* Submenu */}
+                  {/* Submenu with bridge for smooth hover */}
                   {hasSubmenu && activeSubmenu === item.id && (
                     <div
                       style={{
                         position: 'absolute',
                         left: '100%',
-                        top: 0,
-                        marginLeft: 4,
-                        minWidth: 160,
-                        background: goOSTokens.colors.paper,
-                        border: `2px solid ${goOSTokens.colors.border}`,
-                        borderRadius: 6,
-                        boxShadow: goOSTokens.shadows.solid,
-                        padding: '4px 0',
-                        zIndex: 10000,
+                        top: -4,
+                        paddingLeft: 8, // Bridge area to prevent gap issues
                       }}
-                      onMouseLeave={() => setActiveSubmenu(null)}
+                      onMouseEnter={cancelSubmenuClose}
+                      onMouseLeave={closeSubmenuDelayed}
                     >
-                      {item.submenu?.map((subitem) => (
-                        <button
-                          key={subitem.id}
-                          role="menuitem"
-                          onClick={() => {
-                            subitem.onClick();
-                            onClose();
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 10,
-                            padding: '8px 12px',
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontFamily: goOSTokens.fonts.body,
-                            fontSize: 13,
-                            color: goOSTokens.colors.text.primary,
-                            textAlign: 'left',
-                            transition: 'background 0.1s',
-                          }}
-                          onMouseEnter={(e) => {
-                            (e.target as HTMLElement).style.background = goOSTokens.colors.headerBg;
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.target as HTMLElement).style.background = 'transparent';
-                          }}
-                        >
-                          <span style={{ display: 'flex', width: 16 }}>{subitem.icon}</span>
-                          <span>{subitem.label}</span>
-                        </button>
-                      ))}
+                      <div
+                        style={{
+                          minWidth: 160,
+                          background: goOSTokens.colors.paper,
+                          border: `2px solid ${goOSTokens.colors.border}`,
+                          borderRadius: 6,
+                          boxShadow: goOSTokens.shadows.solid,
+                          padding: '4px 0',
+                          zIndex: 10000,
+                        }}
+                      >
+                        {item.submenu?.map((subitem) => (
+                          <button
+                            key={subitem.id}
+                            role="menuitem"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('[Submenu] Clicked:', subitem.id);
+                              subitem.onClick();
+                              onClose();
+                            }}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10,
+                              padding: '8px 12px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              fontFamily: goOSTokens.fonts.body,
+                              fontSize: 13,
+                              color: goOSTokens.colors.text.primary,
+                              textAlign: 'left',
+                              transition: 'background 0.1s',
+                            }}
+                            onMouseEnter={(e) => {
+                              (e.target as HTMLElement).style.background = goOSTokens.colors.headerBg;
+                            }}
+                            onMouseLeave={(e) => {
+                              (e.target as HTMLElement).style.background = 'transparent';
+                            }}
+                          >
+                            <span style={{ display: 'flex', width: 16 }}>{subitem.icon}</span>
+                            <span>{subitem.label}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
