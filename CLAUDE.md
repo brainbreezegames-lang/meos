@@ -2,6 +2,10 @@
 
 A personal "web desktop" builder that lets users create an explorable macOS-style portfolio and link-in-bio experience.
 
+## Workflow Rules
+
+**Always commit and deploy**: After completing any code changes, immediately commit and push without asking. Never ask "would you like me to commit?" - just do it.
+
 ## Design Context
 
 ### Users
