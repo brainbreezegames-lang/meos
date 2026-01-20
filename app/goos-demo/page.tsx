@@ -2201,22 +2201,43 @@ function GoOSDemoContent() {
                 </div>
             </header>
 
-            {/* DESKTOP AREA */}
-            <main className="pt-10 pb-20 min-h-screen relative">
-                {/* Page View Mode */}
-                {viewMode === 'page' && (
+            {/* PAGE VIEW MODE - Full screen, clean reading experience */}
+            {viewMode === 'page' && (
+                <div className="fixed inset-0 z-[9000] bg-white overflow-auto">
+                    {/* Back to Desktop button */}
+                    <button
+                        onClick={() => setViewMode('desktop')}
+                        style={{
+                            position: 'fixed',
+                            top: '24px',
+                            right: '24px',
+                            zIndex: 9001,
+                            padding: '8px 16px',
+                            background: '#2B4AE2',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            fontFamily: '"SF Pro Text", -apple-system, sans-serif',
+                        }}
+                    >
+                        ← Back to Desktop
+                    </button>
                     <PageView
                         items={goosFilesAsDesktopItems}
                         isOwner={true}
-                        onItemClick={(item) => {
-                            const file = goosFiles.find(f => f.id === item.id);
-                            if (file) {
-                                openFile(file.id);
-                            }
+                        author={{
+                            name: 'Demo User',
+                            username: 'demo',
                         }}
                     />
-                )}
+                </div>
+            )}
 
+            {/* DESKTOP AREA */}
+            <main className="pt-10 pb-20 min-h-screen relative">
                 {/* Present View Mode */}
                 {viewMode === 'present' && (
                     <PresentView

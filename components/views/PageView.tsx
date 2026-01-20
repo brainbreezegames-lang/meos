@@ -4,25 +4,24 @@ import React, { useMemo } from 'react';
 import type { DesktopItem, GoOSFileType } from '@/types';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS } from '@/lib/goos/fileTypeMapping';
 
-// goOS Design Tokens - Mediterranean Blue
-const goOS = {
+// Clean, distraction-free design tokens
+const pageStyles = {
   colors: {
+    background: '#FAFAFA',
     paper: '#FFFFFF',
-    border: '#2B4AE2',
-    background: '#F8F9FE',
     text: {
-      primary: '#2B4AE2',
-      secondary: '#6B7FE8',
-      muted: '#9BA5E8',
+      primary: '#1a1a1a',
+      secondary: '#666666',
+      muted: '#999999',
     },
-    warning: '#F59E0B',
-  },
-  shadows: {
-    solid: '4px 4px 0 #2B4AE2',
+    accent: '#2B4AE2',
+    border: '#E5E5E5',
+    divider: '#EEEEEE',
   },
   fonts: {
     heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-    body: '"SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif',
+    body: '"SF Pro Text", Georgia, "Times New Roman", serif',
+    mono: '"SF Mono", Menlo, Monaco, monospace',
   },
 };
 
@@ -31,28 +30,30 @@ interface PageViewProps {
   pageOrder?: string[];
   onItemClick?: (item: DesktopItem) => void;
   isOwner?: boolean;
-  spacing?: 'tight' | 'comfortable' | 'spacious';
+  author?: {
+    name: string;
+    username: string;
+    image?: string | null;
+  };
 }
-
-const SPACING_VALUES = {
-  tight: '24px',
-  comfortable: '48px',
-  spacious: '72px',
-};
 
 export function PageView({
   items,
   pageOrder,
   onItemClick,
   isOwner = false,
-  spacing = 'comfortable',
+  author,
 }: PageViewProps) {
-  // Sort items by pageOrder if provided, otherwise by order field
+  // Filter to notes and case studies only, sort by pageOrder or date
   const sortedItems = useMemo(() => {
-    // Filter to only published items for visitors
-    const filteredItems = isOwner
-      ? items
-      : items.filter(item => item.publishStatus === 'published');
+    const filteredItems = items.filter(item => {
+      // Only show notes and case-studies
+      if (item.itemVariant !== 'goos-file') return false;
+      if (item.goosFileType === 'folder') return false;
+      // For visitors, only show published
+      if (!isOwner && item.publishStatus !== 'published') return false;
+      return true;
+    });
 
     if (pageOrder && pageOrder.length > 0) {
       const orderMap = new Map(pageOrder.map((id, index) => [id, index]));
@@ -62,332 +63,437 @@ export function PageView({
         return orderA - orderB;
       });
     }
-    return [...filteredItems].sort((a, b) => a.order - b.order);
+    // Default: sort by publishedAt or updatedAt, newest first
+    return [...filteredItems].sort((a, b) => {
+      const dateA = a.publishedAt || a.updatedAt || a.createdAt;
+      const dateB = b.publishedAt || b.updatedAt || b.createdAt;
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
+    });
   }, [items, pageOrder, isOwner]);
-
-  const gapValue = SPACING_VALUES[spacing];
 
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: goOS.colors.background,
-        paddingTop: '80px',
-        paddingBottom: '80px',
+        background: pageStyles.colors.background,
       }}
     >
-      <div
+      {/* Clean header */}
+      <header
         style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '0 24px',
+          background: pageStyles.colors.paper,
+          borderBottom: `1px solid ${pageStyles.colors.border}`,
+          padding: '24px 0',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
         }}
       >
-        {/* Page header */}
         <div
           style={{
-            marginBottom: '48px',
-            paddingBottom: '24px',
-            borderBottom: `2px solid ${goOS.colors.border}`,
+            maxWidth: '720px',
+            margin: '0 auto',
+            padding: '0 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
-          <h1
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {author?.image && (
+              <img
+                src={author.image}
+                alt={author.name}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                }}
+              />
+            )}
+            <div>
+              <h1
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  color: pageStyles.colors.text.primary,
+                  fontFamily: pageStyles.fonts.heading,
+                  margin: 0,
+                }}
+              >
+                {author?.name || 'Portfolio'}
+              </h1>
+              {author?.username && (
+                <span
+                  style={{
+                    fontSize: '13px',
+                    color: pageStyles.colors.text.muted,
+                    fontFamily: pageStyles.fonts.heading,
+                  }}
+                >
+                  @{author.username}
+                </span>
+              )}
+            </div>
+          </div>
+          <span
             style={{
-              fontSize: '32px',
-              fontWeight: 700,
-              color: goOS.colors.text.primary,
-              fontFamily: goOS.fonts.heading,
-              marginBottom: '8px',
+              fontSize: '12px',
+              color: pageStyles.colors.text.muted,
+              fontFamily: pageStyles.fonts.heading,
             }}
           >
-            All Content
-          </h1>
-          <p
-            style={{
-              fontSize: '14px',
-              color: goOS.colors.text.secondary,
-              fontFamily: goOS.fonts.body,
-            }}
-          >
-            {sortedItems.length} {sortedItems.length === 1 ? 'item' : 'items'}
-          </p>
+            {sortedItems.length} {sortedItems.length === 1 ? 'article' : 'articles'}
+          </span>
         </div>
+      </header>
 
+      {/* Articles */}
+      <main
+        style={{
+          maxWidth: '720px',
+          margin: '0 auto',
+          padding: '48px 24px 120px',
+        }}
+      >
         {sortedItems.map((item, index) => (
-          <PageViewItem
+          <Article
             key={item.id}
             item={item}
-            onClick={() => onItemClick?.(item)}
             isFirst={index === 0}
             isLast={index === sortedItems.length - 1}
-            gap={gapValue}
             isOwner={isOwner}
+            onClick={() => onItemClick?.(item)}
           />
         ))}
 
         {sortedItems.length === 0 && (
           <div
             style={{
-              padding: '80px 24px',
               textAlign: 'center',
-              background: goOS.colors.paper,
-              border: `2px solid ${goOS.colors.border}`,
-              borderRadius: '8px',
-              boxShadow: goOS.shadows.solid,
+              padding: '80px 24px',
             }}
           >
-            <span
-              style={{
-                fontSize: '48px',
-                display: 'block',
-                marginBottom: '16px',
-              }}
-            >
-              📭
-            </span>
-            <h3
-              style={{
-                fontSize: '18px',
-                fontWeight: 700,
-                color: goOS.colors.text.primary,
-                fontFamily: goOS.fonts.heading,
-                marginBottom: '8px',
-              }}
-            >
-              No content yet
-            </h3>
             <p
               style={{
-                fontSize: '14px',
-                color: goOS.colors.text.secondary,
-                fontFamily: goOS.fonts.body,
+                fontSize: '18px',
+                color: pageStyles.colors.text.secondary,
+                fontFamily: pageStyles.fonts.body,
+                fontStyle: 'italic',
               }}
             >
-              {isOwner
-                ? 'Create some files to see them in page view'
-                : 'Nothing published yet'}
+              {isOwner ? 'No published content yet' : 'Nothing here yet'}
             </p>
           </div>
         )}
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer
+        style={{
+          borderTop: `1px solid ${pageStyles.colors.border}`,
+          padding: '24px',
+          textAlign: 'center',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '12px',
+            color: pageStyles.colors.text.muted,
+            fontFamily: pageStyles.fonts.heading,
+          }}
+        >
+          Built with goOS
+        </span>
+      </footer>
     </div>
   );
 }
 
-interface PageViewItemProps {
+interface ArticleProps {
   item: DesktopItem;
+  isFirst: boolean;
+  isLast: boolean;
+  isOwner: boolean;
   onClick?: () => void;
-  isFirst?: boolean;
-  isLast?: boolean;
-  gap: string;
-  isOwner?: boolean;
 }
 
-function PageViewItem({ item, onClick, isFirst, isLast, gap, isOwner }: PageViewItemProps) {
-  const isGoosFile = item.itemVariant === 'goos-file';
-  const fileType = (item.goosFileType || 'note') as GoOSFileType;
+function Article({ item, isFirst, isLast, isOwner, onClick }: ArticleProps) {
   const isDraft = item.publishStatus === 'draft';
+  const fileType = (item.goosFileType || 'note') as GoOSFileType;
+  const title = item.windowTitle || item.label;
+  const subtitle = item.windowSubtitle;
+  const content = item.goosContent || '';
+  const headerImage = item.windowHeaderImage;
+  const publishedAt = item.publishedAt || item.updatedAt || item.createdAt;
 
-  // Get content preview
-  const contentPreview = useMemo(() => {
-    if (isGoosFile && item.goosContent) {
-      // Strip HTML and truncate
-      const text = item.goosContent.replace(/<[^>]*>/g, '').trim();
-      return text.length > 200 ? text.slice(0, 200) + '...' : text;
-    }
-    return item.windowDescription?.slice(0, 200) || '';
-  }, [isGoosFile, item.goosContent, item.windowDescription]);
-
-  // Get image for the item
-  const imageUrl = useMemo(() => {
-    if (isGoosFile) {
-      if (fileType === 'image' && item.goosImageUrl) return item.goosImageUrl;
-    }
-    return item.windowHeaderImage || item.thumbnailUrl;
-  }, [isGoosFile, fileType, item]);
+  // Format date
+  const formattedDate = useMemo(() => {
+    if (!publishedAt) return null;
+    const date = new Date(publishedAt);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }, [publishedAt]);
 
   return (
     <article
-      onClick={onClick}
       style={{
+        marginBottom: isLast ? 0 : '80px',
+        opacity: isDraft ? 0.6 : 1,
         position: 'relative',
-        marginTop: isFirst ? 0 : gap,
-        marginBottom: isLast ? 0 : gap,
-        opacity: isDraft && isOwner ? 0.7 : 1,
-        cursor: 'pointer',
       }}
     >
-      {/* Draft indicator */}
+      {/* Draft badge for owners */}
       {isDraft && isOwner && (
         <div
           style={{
-            position: 'absolute',
-            left: '-12px',
-            top: '16px',
-            padding: '4px 8px',
+            display: 'inline-block',
+            padding: '4px 10px',
             borderRadius: '4px',
-            background: goOS.colors.warning,
-            color: goOS.colors.paper,
-            fontSize: '10px',
-            fontWeight: 700,
+            background: '#FEF3C7',
+            color: '#92400E',
+            fontSize: '11px',
+            fontWeight: 600,
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
-            fontFamily: goOS.fonts.heading,
-            transform: 'rotate(-3deg)',
+            fontFamily: pageStyles.fonts.heading,
+            marginBottom: '16px',
           }}
         >
           Draft
         </div>
       )}
 
-      <div
-        style={{
-          background: goOS.colors.paper,
-          border: `2px solid ${goOS.colors.border}`,
-          borderRadius: '8px',
-          boxShadow: goOS.shadows.solid,
-          overflow: 'hidden',
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translate(-2px, -2px)';
-          e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translate(0, 0)';
-          e.currentTarget.style.boxShadow = goOS.shadows.solid;
-        }}
-      >
-        {/* Image header */}
-        {imageUrl && fileType !== 'folder' && (
-          <div
+      {/* Header image */}
+      {headerImage && (
+        <div
+          style={{
+            marginBottom: '32px',
+            borderRadius: '8px',
+            overflow: 'hidden',
+          }}
+        >
+          <img
+            src={headerImage}
+            alt=""
             style={{
-              aspectRatio: '16/9',
-              background: `url(${imageUrl}) center/cover no-repeat`,
-              borderBottom: `2px solid ${goOS.colors.border}`,
+              width: '100%',
+              height: 'auto',
+              display: 'block',
             }}
           />
-        )}
+        </div>
+      )}
 
-        {/* Content */}
-        <div style={{ padding: '24px' }}>
-          {/* Type badge */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              marginBottom: '12px',
-            }}
-          >
-            <span style={{ fontSize: '16px' }}>
-              {FILE_TYPE_ICONS[fileType] || '📄'}
-            </span>
+      {/* Type + Date */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginBottom: '16px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: pageStyles.colors.accent,
+            fontFamily: pageStyles.fonts.heading,
+          }}
+        >
+          {FILE_TYPE_LABELS[fileType] || 'Article'}
+        </span>
+        {formattedDate && (
+          <>
+            <span style={{ color: pageStyles.colors.text.muted }}>·</span>
             <span
               style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                color: goOS.colors.text.secondary,
-                fontFamily: goOS.fonts.heading,
-              }}
-            >
-              {FILE_TYPE_LABELS[fileType] || 'File'}
-            </span>
-          </div>
-
-          {/* Title */}
-          <h2
-            style={{
-              fontSize: '20px',
-              fontWeight: 700,
-              color: goOS.colors.text.primary,
-              fontFamily: goOS.fonts.heading,
-              marginBottom: '8px',
-              lineHeight: 1.3,
-            }}
-          >
-            {item.windowTitle || item.label}
-          </h2>
-
-          {/* Subtitle */}
-          {item.windowSubtitle && (
-            <p
-              style={{
-                fontSize: '14px',
-                color: goOS.colors.text.secondary,
-                fontFamily: goOS.fonts.body,
-                marginBottom: '12px',
-              }}
-            >
-              {item.windowSubtitle}
-            </p>
-          )}
-
-          {/* Content preview */}
-          {contentPreview && (
-            <p
-              style={{
-                fontSize: '14px',
-                color: goOS.colors.text.secondary,
-                fontFamily: goOS.fonts.body,
-                lineHeight: 1.6,
-              }}
-            >
-              {contentPreview}
-            </p>
-          )}
-
-          {/* Folder children count */}
-          {fileType === 'folder' && item.children && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginTop: '12px',
-                color: goOS.colors.text.muted,
                 fontSize: '13px',
-                fontFamily: goOS.fonts.body,
+                color: pageStyles.colors.text.muted,
+                fontFamily: pageStyles.fonts.heading,
               }}
             >
-              <span>📁</span>
-              <span>{item.children.length} items</span>
-            </div>
-          )}
-
-          {/* Access indicator */}
-          {item.accessLevel && item.accessLevel !== 'free' && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginTop: '16px',
-                paddingTop: '16px',
-                borderTop: `2px solid ${goOS.colors.border}`,
-              }}
-            >
-              <span style={{ fontSize: '14px' }}>
-                {item.accessLevel === 'paid' ? '💰' : '✉️'}
-              </span>
-              <span
-                style={{
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  color: goOS.colors.text.primary,
-                  fontFamily: goOS.fonts.heading,
-                }}
-              >
-                {item.accessLevel === 'paid'
-                  ? `$${item.goosPriceAmount || '0'}`
-                  : 'Email required'}
-              </span>
-            </div>
-          )}
-        </div>
+              {formattedDate}
+            </span>
+          </>
+        )}
       </div>
+
+      {/* Title */}
+      <h2
+        style={{
+          fontSize: '32px',
+          fontWeight: 700,
+          color: pageStyles.colors.text.primary,
+          fontFamily: pageStyles.fonts.heading,
+          lineHeight: 1.25,
+          marginBottom: subtitle ? '12px' : '24px',
+          letterSpacing: '-0.02em',
+        }}
+      >
+        {title}
+      </h2>
+
+      {/* Subtitle */}
+      {subtitle && (
+        <p
+          style={{
+            fontSize: '20px',
+            color: pageStyles.colors.text.secondary,
+            fontFamily: pageStyles.fonts.body,
+            lineHeight: 1.5,
+            marginBottom: '24px',
+          }}
+        >
+          {subtitle}
+        </p>
+      )}
+
+      {/* Full content */}
+      <div
+        className="prose-content"
+        style={{
+          fontSize: '18px',
+          lineHeight: 1.75,
+          color: pageStyles.colors.text.primary,
+          fontFamily: pageStyles.fonts.body,
+        }}
+        dangerouslySetInnerHTML={{ __html: content }}
+      />
+
+      {/* Divider between articles */}
+      {!isLast && (
+        <div
+          style={{
+            marginTop: '80px',
+            height: '1px',
+            background: pageStyles.colors.divider,
+          }}
+        />
+      )}
+
+      {/* Global styles for prose content */}
+      <style jsx global>{`
+        .prose-content h1 {
+          font-size: 28px;
+          font-weight: 700;
+          font-family: ${pageStyles.fonts.heading};
+          color: ${pageStyles.colors.text.primary};
+          margin: 40px 0 20px;
+          line-height: 1.3;
+          letter-spacing: -0.02em;
+        }
+        .prose-content h2 {
+          font-size: 24px;
+          font-weight: 700;
+          font-family: ${pageStyles.fonts.heading};
+          color: ${pageStyles.colors.text.primary};
+          margin: 36px 0 16px;
+          line-height: 1.3;
+          letter-spacing: -0.01em;
+        }
+        .prose-content h3 {
+          font-size: 20px;
+          font-weight: 600;
+          font-family: ${pageStyles.fonts.heading};
+          color: ${pageStyles.colors.text.primary};
+          margin: 32px 0 12px;
+          line-height: 1.4;
+        }
+        .prose-content p {
+          margin: 0 0 20px;
+        }
+        .prose-content p:last-child {
+          margin-bottom: 0;
+        }
+        .prose-content a {
+          color: ${pageStyles.colors.accent};
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+        .prose-content a:hover {
+          text-decoration-thickness: 2px;
+        }
+        .prose-content strong {
+          font-weight: 600;
+          color: ${pageStyles.colors.text.primary};
+        }
+        .prose-content em {
+          font-style: italic;
+        }
+        .prose-content ul, .prose-content ol {
+          margin: 20px 0;
+          padding-left: 24px;
+        }
+        .prose-content li {
+          margin: 8px 0;
+        }
+        .prose-content blockquote {
+          border-left: 3px solid ${pageStyles.colors.accent};
+          margin: 24px 0;
+          padding: 4px 0 4px 20px;
+          color: ${pageStyles.colors.text.secondary};
+          font-style: italic;
+        }
+        .prose-content code {
+          font-family: ${pageStyles.fonts.mono};
+          font-size: 0.9em;
+          background: #F5F5F5;
+          padding: 2px 6px;
+          border-radius: 4px;
+        }
+        .prose-content pre {
+          background: #1a1a1a;
+          color: #f5f5f5;
+          padding: 20px;
+          border-radius: 8px;
+          overflow-x: auto;
+          margin: 24px 0;
+          font-family: ${pageStyles.fonts.mono};
+          font-size: 14px;
+          line-height: 1.6;
+        }
+        .prose-content pre code {
+          background: none;
+          padding: 0;
+          font-size: inherit;
+        }
+        .prose-content img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 8px;
+          margin: 24px 0;
+        }
+        .prose-content hr {
+          border: none;
+          height: 1px;
+          background: ${pageStyles.colors.divider};
+          margin: 40px 0;
+        }
+        .prose-content table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 24px 0;
+          font-size: 16px;
+        }
+        .prose-content th, .prose-content td {
+          border: 1px solid ${pageStyles.colors.border};
+          padding: 12px;
+          text-align: left;
+        }
+        .prose-content th {
+          background: #F9F9F9;
+          font-weight: 600;
+          font-family: ${pageStyles.fonts.heading};
+        }
+      `}</style>
     </article>
   );
 }
