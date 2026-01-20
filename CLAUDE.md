@@ -4,7 +4,12 @@ A personal "web desktop" builder that lets users create an explorable macOS-styl
 
 ## Workflow Rules
 
-**Always commit and deploy**: After completing any code changes, immediately commit and push without asking. Never ask "would you like me to commit?" - just do it.
+**Always commit and deploy**: After completing any code changes:
+1. Commit and push to git
+2. Deploy to Vercel with `vercel --prod`
+3. Share the demo URL
+
+Never ask "would you like me to commit?" or "should I deploy?" - just do it automatically.
 
 ## Design Context
 
