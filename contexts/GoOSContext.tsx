@@ -7,7 +7,7 @@ import type { GoOSFile, GoOSFileType, PublishStatus } from '@/lib/validations/go
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 export type GoOSViewMode = 'owner' | 'visitor';
 
-export type AccessLevel = 'public' | 'locked';
+export type AccessLevel = 'free' | 'paid' | 'email';
 
 export interface GoOSFileData {
   id: string;
@@ -22,6 +22,26 @@ export interface GoOSFileData {
   parentId: string | null;
   position: { x: number; y: number };
   childCount?: number;
+  // Pricing for paid access
+  priceAmount?: number | null;
+  priceCurrency?: string | null;
+  // Image file fields
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  imageCaption?: string | null;
+  // Link file fields
+  linkUrl?: string | null;
+  linkTitle?: string | null;
+  linkDescription?: string | null;
+  linkFavicon?: string | null;
+  // Embed file fields
+  embedUrl?: string | null;
+  embedType?: string | null;
+  // Download file fields
+  downloadUrl?: string | null;
+  downloadName?: string | null;
+  downloadSize?: number | null;
+  downloadType?: string | null;
 }
 
 interface GoOSContextType {
@@ -39,6 +59,12 @@ interface GoOSContextType {
   duplicateFile: (id: string) => Promise<GoOSFileData | null>;
   moveFile: (id: string, newParentId: string | null) => Promise<void>;
 
+  // New file type creators
+  createImageFile: (url: string, options?: { caption?: string; alt?: string; parentId?: string | null; position?: { x: number; y: number } }) => Promise<GoOSFileData | null>;
+  createLinkFile: (url: string, options?: { title?: string; description?: string; parentId?: string | null; position?: { x: number; y: number } }) => Promise<GoOSFileData | null>;
+  createEmbedFile: (url: string, embedType: string, options?: { parentId?: string | null; position?: { x: number; y: number } }) => Promise<GoOSFileData | null>;
+  createDownloadFile: (url: string, fileName: string, options?: { fileSize?: number; fileType?: string; parentId?: string | null; position?: { x: number; y: number } }) => Promise<GoOSFileData | null>;
+
   // Auto-save
   autoSave: (id: string, content: string, title?: string) => void;
 
@@ -47,6 +73,7 @@ interface GoOSContextType {
   unpublishFile: (id: string) => Promise<void>;
 
   // Access control
+  setAccessLevel: (id: string, level: AccessLevel, price?: number) => Promise<void>;
   lockFile: (id: string) => Promise<void>;
   unlockFile: (id: string) => Promise<void>;
 
@@ -722,6 +749,313 @@ export function GoOSProvider({
     }
   }, [localOnly, viewMode, files, showToast]);
 
+  // Create image file
+  const createImageFile = useCallback(async (
+    url: string,
+    options?: { caption?: string; alt?: string; parentId?: string | null; position?: { x: number; y: number } }
+  ): Promise<GoOSFileData | null> => {
+    if (viewMode === 'visitor') return null;
+
+    const position = options?.position || getNextPosition();
+    const title = options?.caption || 'New Image';
+
+    const newId = localOnly ? `local-${Date.now()}` : `temp-${Date.now()}`;
+    const newFile: GoOSFileData = {
+      id: newId,
+      type: 'image',
+      title,
+      content: '',
+      status: 'draft',
+      accessLevel: 'free',
+      publishedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      parentId: options?.parentId || null,
+      position,
+      imageUrl: url,
+      imageAlt: options?.alt || '',
+      imageCaption: options?.caption || '',
+    };
+
+    if (localOnly) {
+      setFiles(prev => [...prev, newFile]);
+      showToast('Image added', 'success');
+      return newFile;
+    }
+
+    pendingCreatesRef.current.add(newId);
+    setFiles(prev => [...prev, newFile]);
+
+    try {
+      const response = await fetch('/api/goos/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'image',
+          title,
+          parentId: options?.parentId || null,
+          position,
+          imageUrl: url,
+          imageAlt: options?.alt || '',
+          imageCaption: options?.caption || '',
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error?.message || 'Failed to create image');
+
+      pendingCreatesRef.current.delete(newId);
+      setFiles(prev => prev.map(f => f.id === newId ? result.data : f));
+      showToast('Image added', 'success');
+      return result.data;
+    } catch (err) {
+      pendingCreatesRef.current.delete(newId);
+      setFiles(prev => prev.filter(f => f.id !== newId));
+      showToast(err instanceof Error ? err.message : 'Failed to create image', 'error');
+      return null;
+    }
+  }, [localOnly, viewMode, getNextPosition, showToast]);
+
+  // Create link file
+  const createLinkFile = useCallback(async (
+    url: string,
+    options?: { title?: string; description?: string; parentId?: string | null; position?: { x: number; y: number } }
+  ): Promise<GoOSFileData | null> => {
+    if (viewMode === 'visitor') return null;
+
+    const position = options?.position || getNextPosition();
+    const title = options?.title || new URL(url).hostname;
+
+    const newId = localOnly ? `local-${Date.now()}` : `temp-${Date.now()}`;
+    const newFile: GoOSFileData = {
+      id: newId,
+      type: 'link',
+      title,
+      content: '',
+      status: 'draft',
+      accessLevel: 'free',
+      publishedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      parentId: options?.parentId || null,
+      position,
+      linkUrl: url,
+      linkTitle: options?.title || '',
+      linkDescription: options?.description || '',
+    };
+
+    if (localOnly) {
+      setFiles(prev => [...prev, newFile]);
+      showToast('Link added', 'success');
+      return newFile;
+    }
+
+    pendingCreatesRef.current.add(newId);
+    setFiles(prev => [...prev, newFile]);
+
+    try {
+      const response = await fetch('/api/goos/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'link',
+          title,
+          parentId: options?.parentId || null,
+          position,
+          linkUrl: url,
+          linkTitle: options?.title || '',
+          linkDescription: options?.description || '',
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error?.message || 'Failed to create link');
+
+      pendingCreatesRef.current.delete(newId);
+      setFiles(prev => prev.map(f => f.id === newId ? result.data : f));
+      showToast('Link added', 'success');
+      return result.data;
+    } catch (err) {
+      pendingCreatesRef.current.delete(newId);
+      setFiles(prev => prev.filter(f => f.id !== newId));
+      showToast(err instanceof Error ? err.message : 'Failed to create link', 'error');
+      return null;
+    }
+  }, [localOnly, viewMode, getNextPosition, showToast]);
+
+  // Create embed file
+  const createEmbedFile = useCallback(async (
+    url: string,
+    embedType: string,
+    options?: { parentId?: string | null; position?: { x: number; y: number } }
+  ): Promise<GoOSFileData | null> => {
+    if (viewMode === 'visitor') return null;
+
+    const position = options?.position || getNextPosition();
+    const title = `${embedType.charAt(0).toUpperCase() + embedType.slice(1)} Embed`;
+
+    const newId = localOnly ? `local-${Date.now()}` : `temp-${Date.now()}`;
+    const newFile: GoOSFileData = {
+      id: newId,
+      type: 'embed',
+      title,
+      content: '',
+      status: 'draft',
+      accessLevel: 'free',
+      publishedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      parentId: options?.parentId || null,
+      position,
+      embedUrl: url,
+      embedType,
+    };
+
+    if (localOnly) {
+      setFiles(prev => [...prev, newFile]);
+      showToast('Embed added', 'success');
+      return newFile;
+    }
+
+    pendingCreatesRef.current.add(newId);
+    setFiles(prev => [...prev, newFile]);
+
+    try {
+      const response = await fetch('/api/goos/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'embed',
+          title,
+          parentId: options?.parentId || null,
+          position,
+          embedUrl: url,
+          embedType,
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error?.message || 'Failed to create embed');
+
+      pendingCreatesRef.current.delete(newId);
+      setFiles(prev => prev.map(f => f.id === newId ? result.data : f));
+      showToast('Embed added', 'success');
+      return result.data;
+    } catch (err) {
+      pendingCreatesRef.current.delete(newId);
+      setFiles(prev => prev.filter(f => f.id !== newId));
+      showToast(err instanceof Error ? err.message : 'Failed to create embed', 'error');
+      return null;
+    }
+  }, [localOnly, viewMode, getNextPosition, showToast]);
+
+  // Create download file
+  const createDownloadFile = useCallback(async (
+    url: string,
+    fileName: string,
+    options?: { fileSize?: number; fileType?: string; parentId?: string | null; position?: { x: number; y: number } }
+  ): Promise<GoOSFileData | null> => {
+    if (viewMode === 'visitor') return null;
+
+    const position = options?.position || getNextPosition();
+    const title = fileName;
+
+    const newId = localOnly ? `local-${Date.now()}` : `temp-${Date.now()}`;
+    const newFile: GoOSFileData = {
+      id: newId,
+      type: 'download',
+      title,
+      content: '',
+      status: 'draft',
+      accessLevel: 'free',
+      publishedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      parentId: options?.parentId || null,
+      position,
+      downloadUrl: url,
+      downloadName: fileName,
+      downloadSize: options?.fileSize || null,
+      downloadType: options?.fileType || null,
+    };
+
+    if (localOnly) {
+      setFiles(prev => [...prev, newFile]);
+      showToast('Download added', 'success');
+      return newFile;
+    }
+
+    pendingCreatesRef.current.add(newId);
+    setFiles(prev => [...prev, newFile]);
+
+    try {
+      const response = await fetch('/api/goos/files', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'download',
+          title,
+          parentId: options?.parentId || null,
+          position,
+          downloadUrl: url,
+          downloadName: fileName,
+          downloadSize: options?.fileSize,
+          downloadType: options?.fileType,
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error?.message || 'Failed to create download');
+
+      pendingCreatesRef.current.delete(newId);
+      setFiles(prev => prev.map(f => f.id === newId ? result.data : f));
+      showToast('Download added', 'success');
+      return result.data;
+    } catch (err) {
+      pendingCreatesRef.current.delete(newId);
+      setFiles(prev => prev.filter(f => f.id !== newId));
+      showToast(err instanceof Error ? err.message : 'Failed to create download', 'error');
+      return null;
+    }
+  }, [localOnly, viewMode, getNextPosition, showToast]);
+
+  // Set access level
+  const setAccessLevel = useCallback(async (id: string, level: AccessLevel, price?: number) => {
+    if (viewMode === 'visitor') return;
+
+    const fileToUpdate = files.find(f => f.id === id);
+    if (!fileToUpdate) return;
+
+    // Optimistic update
+    setFiles(prev => prev.map(f =>
+      f.id === id ? { ...f, accessLevel: level, priceAmount: price || null } : f
+    ));
+
+    if (localOnly) {
+      showToast(`Access set to ${level}`, 'success');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/goos/files/${id}/access`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessLevel: level, priceAmount: price }),
+      });
+
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error?.message || 'Failed to set access level');
+
+      showToast(`Access set to ${level}`, 'success');
+    } catch (err) {
+      // Rollback
+      setFiles(prev => prev.map(f =>
+        f.id === id ? { ...f, accessLevel: fileToUpdate.accessLevel, priceAmount: fileToUpdate.priceAmount } : f
+      ));
+      showToast(err instanceof Error ? err.message : 'Failed to set access level', 'error');
+    }
+  }, [localOnly, viewMode, files, showToast]);
+
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
@@ -740,9 +1074,14 @@ export function GoOSProvider({
     deleteFile,
     duplicateFile,
     moveFile,
+    createImageFile,
+    createLinkFile,
+    createEmbedFile,
+    createDownloadFile,
     autoSave,
     publishFile,
     unpublishFile,
+    setAccessLevel,
     lockFile,
     unlockFile,
     refreshFiles,

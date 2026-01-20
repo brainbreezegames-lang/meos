@@ -22,30 +22,22 @@ export default function SketchWindow({
 }: SketchWindowProps) {
     return (
         <div
-            className="absolute flex flex-col bg-[#FFFFFF] border-2 border-[#2B4AE2] shadow-[6px_6px_0px_0px_#2B4AE2] font-sans"
+            className="absolute flex flex-col bg-[#FFFFFF] border-[1.5px] border-[#4A6CF7] shadow-[6px_6px_0px_0px_#4A6CF7] font-sans rounded-xl"
             style={{ width, height, top, left }}
         >
             {/* Title Bar */}
-            <div className="flex items-center justify-between px-3 py-2 border-b-2 border-[#2B4AE2] bg-[#FFFFFF] select-none">
-                <div className="font-bold text-xl text-[#2B4AE2] tracking-wide">{title}</div>
-                <div className="flex gap-2">
-                    <button className="w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white group hover:bg-[#2B4AE2] transition-colors">
-                        <Minus size={8} className="text-[#2B4AE2] group-hover:text-white" strokeWidth={3} />
-                    </button>
-                    <button className="w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white opacity-50">
-                        <Square size={8} className="text-[#2B4AE2]" strokeWidth={3} />
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className="w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white group hover:bg-[#2B4AE2] transition-colors"
-                    >
-                        <X size={8} className="text-[#2B4AE2] group-hover:text-white" strokeWidth={3} />
-                    </button>
+            <div className="flex items-center px-4 py-3 border-b-[1.5px] border-[#4A6CF7] bg-[#FFFFFF] select-none rounded-t-xl gap-4">
+                <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#4A6CF7]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#4A6CF7]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#4A6CF7]" />
                 </div>
+                <div className="font-medium text-[13px] text-[#4A6CF7] flex-1 text-center">{title}</div>
+                <div className="w-12" /> {/* Spacer for balance */}
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-auto p-4 text-[#2B4AE2] bg-[#FFFFFF]">
+            <div className="flex-1 overflow-auto p-4 text-[#4A6CF7] bg-[#FFFFFF] rounded-b-xl">
                 {children}
             </div>
         </div>

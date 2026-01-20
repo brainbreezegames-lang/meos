@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { DesktopItem } from './DesktopItem';
 import { InfoWindow } from './InfoWindow';
-import type { DesktopItem as DesktopItemType, Desktop } from '@/types';
+import type { DesktopItem as DesktopItemType, Desktop, Widget } from '@/types';
+import { useThemeSafe } from '@/contexts/ThemeContext';
+import { WidgetRenderer } from '@/components/widgets';
 
 export type ViewMode = 'recruiter' | 'visitor';
 
@@ -13,11 +15,26 @@ interface DesktopCanvasProps {
   isEditing?: boolean;
   onItemMove?: (id: string, x: number, y: number) => void;
   viewMode?: ViewMode;
+  widgets?: Widget[];
+  isOwner?: boolean;
+  onWidgetEdit?: (widget: Widget) => void;
+  onWidgetPositionChange?: (id: string, x: number, y: number) => void;
 }
 
-export function DesktopCanvas({ desktop, isEditing = false, onItemMove: _onItemMove, viewMode = 'visitor' }: DesktopCanvasProps) {
+export function DesktopCanvas({
+  desktop,
+  isEditing = false,
+  onItemMove: _onItemMove,
+  viewMode = 'visitor',
+  widgets = [],
+  isOwner = false,
+  onWidgetEdit,
+  onWidgetPositionChange,
+}: DesktopCanvasProps) {
   const [selectedItem, setSelectedItem] = useState<DesktopItemType | null>(null);
   const [windowPosition, setWindowPosition] = useState<{ x: number; y: number } | undefined>();
+  const themeContext = useThemeSafe();
+  const isSketch = themeContext?.theme === 'sketch';
 
   const handleItemClick = (item: DesktopItemType, event: React.MouseEvent) => {
     if (isEditing) return;
@@ -57,23 +74,23 @@ export function DesktopCanvas({ desktop, isEditing = false, onItemMove: _onItemM
   const hasBackground = desktop.backgroundUrl;
   const backgroundStyle = hasBackground
     ? {
-        backgroundImage: `url(${desktop.backgroundUrl})`,
-        backgroundSize: desktop.backgroundPosition || 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }
+      backgroundImage: `url(${desktop.backgroundUrl})`,
+      backgroundSize: desktop.backgroundPosition || 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+    }
     : {};
 
   return (
     <motion.div
-      className="fixed inset-0 pt-[28px]"
-      style={backgroundStyle}
+      className={`fixed inset-0 pt-[28px] ${isSketch ? 'goos-bg' : ''}`}
+      style={isSketch ? {} : backgroundStyle}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Default gradient background if no image */}
-      {!hasBackground && (
+      {/* Default gradient background if no image - Hidden in Sketch theme */}
+      {!hasBackground && !isSketch && (
         <div
           className="absolute inset-0 -z-10"
           style={{
@@ -91,29 +108,31 @@ export function DesktopCanvas({ desktop, isEditing = false, onItemMove: _onItemM
         />
       )}
 
-      {/* Ambient lighting overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none -z-5"
-        style={{
-          background: `
-            radial-gradient(
-              ellipse 100% 60% at 50% 0%,
-              rgba(255, 255, 255, 0.08) 0%,
-              transparent 50%
-            ),
-            radial-gradient(
-              ellipse 80% 40% at 0% 100%,
-              rgba(255, 200, 150, 0.05) 0%,
-              transparent 50%
-            ),
-            radial-gradient(
-              ellipse 80% 40% at 100% 100%,
-              rgba(150, 200, 255, 0.05) 0%,
-              transparent 50%
-            )
-          `,
-        }}
-      />
+      {/* Ambient lighting overlay - Hidden in Sketch theme */}
+      {!isSketch && (
+        <div
+          className="absolute inset-0 pointer-events-none -z-5"
+          style={{
+            background: `
+              radial-gradient(
+                ellipse 100% 60% at 50% 0%,
+                rgba(255, 255, 255, 0.08) 0%,
+                transparent 50%
+              ),
+              radial-gradient(
+                ellipse 80% 40% at 0% 100%,
+                rgba(255, 200, 150, 0.05) 0%,
+                transparent 50%
+              ),
+              radial-gradient(
+                ellipse 80% 40% at 100% 100%,
+                rgba(150, 200, 255, 0.05) 0%,
+                transparent 50%
+              )
+            `,
+          }}
+        />
+      )}
 
       {/* Custom overlay if set */}
       {desktop.backgroundOverlay && (
@@ -123,13 +142,15 @@ export function DesktopCanvas({ desktop, isEditing = false, onItemMove: _onItemM
         />
       )}
 
-      {/* Vignette effect */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.15) 100%)',
-        }}
-      />
+      {/* Vignette effect - Hidden in Sketch theme */}
+      {!isSketch && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.15) 100%)',
+          }}
+        />
+      )}
 
       {/* Desktop Items Container */}
       <div className="relative w-full h-full">
@@ -152,6 +173,16 @@ export function DesktopCanvas({ desktop, isEditing = false, onItemMove: _onItemM
             />
           </motion.div>
         ))}
+
+        {/* Widgets */}
+        {widgets.length > 0 && (
+          <WidgetRenderer
+            widgets={widgets}
+            isOwner={isOwner}
+            onWidgetEdit={onWidgetEdit}
+            onWidgetPositionChange={onWidgetPositionChange}
+          />
+        )}
       </div>
 
       {/* Info Window */}

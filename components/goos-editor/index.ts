@@ -14,3 +14,4 @@ export { GoOSFileContextMenu } from './GoOSFileContextMenu';
 export { GoOSFolderWindow } from './GoOSFolderWindow';
 export { GoOSReadOnlyViewer } from './GoOSReadOnlyViewer';
 export { GoOSLockedContentModal } from './GoOSLockedContentModal';
+export { GoOSCreateFileDialog } from './GoOSCreateFileDialog';

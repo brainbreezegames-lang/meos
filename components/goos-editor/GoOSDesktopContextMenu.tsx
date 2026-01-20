@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Presentation, FolderPlus, Clipboard, RefreshCw, LayoutGrid } from 'lucide-react';
+import { FileText, Presentation, FolderPlus, Clipboard, RefreshCw, LayoutGrid, Image, Link, Video, Download, ChevronRight, Plus } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 
 interface ContextMenuItem {
@@ -13,6 +13,7 @@ interface ContextMenuItem {
   onClick: () => void;
   dividerAfter?: boolean;
   disabled?: boolean;
+  submenu?: ContextMenuItem[];
 }
 
 interface GoOSDesktopContextMenuProps {
@@ -22,6 +23,11 @@ interface GoOSDesktopContextMenuProps {
   onNewNote: () => void;
   onNewCaseStudy: () => void;
   onNewFolder: () => void;
+  onNewImage?: () => void;
+  onNewLink?: () => void;
+  onNewEmbed?: () => void;
+  onNewDownload?: () => void;
+  onAddWidget?: (type: string) => void;
   onPaste?: () => void;
   onRefresh?: () => void;
   onArrangeIcons?: () => void;
@@ -35,6 +41,11 @@ export function GoOSDesktopContextMenu({
   onNewNote,
   onNewCaseStudy,
   onNewFolder,
+  onNewImage,
+  onNewLink,
+  onNewEmbed,
+  onNewDownload,
+  onAddWidget,
   onPaste,
   onRefresh,
   onArrangeIcons,
@@ -42,6 +53,7 @@ export function GoOSDesktopContextMenu({
 }: GoOSDesktopContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [focusedIndex, setFocusedIndex] = React.useState(0);
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
 
   const items: ContextMenuItem[] = [
     {
@@ -64,6 +76,45 @@ export function GoOSDesktopContextMenu({
       icon: <FolderPlus size={14} />,
       shortcut: '⌘⇧F',
       onClick: onNewFolder,
+    },
+    {
+      id: 'new-image',
+      label: 'New Image',
+      icon: <Image size={14} />,
+      onClick: () => onNewImage?.(),
+    },
+    {
+      id: 'new-link',
+      label: 'New Link',
+      icon: <Link size={14} />,
+      onClick: () => onNewLink?.(),
+    },
+    {
+      id: 'new-embed',
+      label: 'New Embed',
+      icon: <Video size={14} />,
+      onClick: () => onNewEmbed?.(),
+    },
+    {
+      id: 'new-download',
+      label: 'New Download',
+      icon: <Download size={14} />,
+      onClick: () => onNewDownload?.(),
+      dividerAfter: true,
+    },
+    {
+      id: 'add-widget',
+      label: 'Add Widget',
+      icon: <Plus size={14} />,
+      onClick: () => {},
+      submenu: [
+        { id: 'widget-clock', label: 'Clock', icon: <span>🕐</span>, onClick: () => onAddWidget?.('clock') },
+        { id: 'widget-book', label: 'Book a Call', icon: <span>📅</span>, onClick: () => onAddWidget?.('book') },
+        { id: 'widget-tipjar', label: 'Tip Jar', icon: <span>☕</span>, onClick: () => onAddWidget?.('tipjar') },
+        { id: 'widget-contact', label: 'Contact', icon: <span>✉️</span>, onClick: () => onAddWidget?.('contact') },
+        { id: 'widget-links', label: 'Links', icon: <span>🔗</span>, onClick: () => onAddWidget?.('links') },
+        { id: 'widget-feedback', label: 'Feedback', icon: <span>💬</span>, onClick: () => onAddWidget?.('feedback') },
+      ],
       dividerAfter: true,
     },
     {
@@ -186,59 +237,127 @@ export function GoOSDesktopContextMenu({
           {items.map((item) => {
             const enabledIndex = getEnabledIndex(item);
             const isFocused = enabledIndex === focusedIndex && !item.disabled;
+            const hasSubmenu = item.submenu && item.submenu.length > 0;
 
             return (
               <React.Fragment key={item.id}>
-                <button
-                  role="menuitem"
-                  aria-disabled={item.disabled}
-                  onClick={() => {
-                    if (!item.disabled) {
-                      item.onClick();
-                      onClose();
-                    }
-                  }}
-                  onMouseEnter={() => {
-                    if (!item.disabled) {
-                      setFocusedIndex(enabledIndex);
-                    }
-                  }}
-                  disabled={item.disabled}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: '8px 12px',
-                    background: isFocused ? goOSTokens.colors.headerBg : 'transparent',
-                    border: 'none',
-                    cursor: item.disabled ? 'not-allowed' : 'pointer',
-                    fontFamily: goOSTokens.fonts.body,
-                    fontSize: 13,
-                    color: item.disabled ? goOSTokens.colors.text.muted : goOSTokens.colors.text.primary,
-                    opacity: item.disabled ? 0.5 : 1,
-                    textAlign: 'left',
-                    transition: 'background 0.1s',
-                    outline: 'none',
-                  }}
-                >
-                  <span style={{ color: goOSTokens.colors.text.secondary, display: 'flex' }} aria-hidden="true">
-                    {item.icon}
-                  </span>
-                  <span style={{ flex: 1 }}>{item.label}</span>
-                  {item.shortcut && (
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: goOSTokens.colors.text.muted,
-                        fontFamily: 'SF Mono, monospace',
-                      }}
-                      aria-label={`Keyboard shortcut: ${item.shortcut}`}
-                    >
-                      {item.shortcut}
+                <div style={{ position: 'relative' }}>
+                  <button
+                    role="menuitem"
+                    aria-disabled={item.disabled}
+                    aria-haspopup={hasSubmenu ? 'menu' : undefined}
+                    aria-expanded={hasSubmenu ? activeSubmenu === item.id : undefined}
+                    onClick={() => {
+                      if (!item.disabled && !hasSubmenu) {
+                        item.onClick();
+                        onClose();
+                      }
+                    }}
+                    onMouseEnter={() => {
+                      if (!item.disabled) {
+                        setFocusedIndex(enabledIndex);
+                        if (hasSubmenu) {
+                          setActiveSubmenu(item.id);
+                        } else {
+                          setActiveSubmenu(null);
+                        }
+                      }
+                    }}
+                    disabled={item.disabled}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '8px 12px',
+                      background: isFocused || activeSubmenu === item.id ? goOSTokens.colors.headerBg : 'transparent',
+                      border: 'none',
+                      cursor: item.disabled ? 'not-allowed' : 'pointer',
+                      fontFamily: goOSTokens.fonts.body,
+                      fontSize: 13,
+                      color: item.disabled ? goOSTokens.colors.text.muted : goOSTokens.colors.text.primary,
+                      opacity: item.disabled ? 0.5 : 1,
+                      textAlign: 'left',
+                      transition: 'background 0.1s',
+                      outline: 'none',
+                    }}
+                  >
+                    <span style={{ color: goOSTokens.colors.text.secondary, display: 'flex' }} aria-hidden="true">
+                      {item.icon}
                     </span>
+                    <span style={{ flex: 1 }}>{item.label}</span>
+                    {item.shortcut && (
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: goOSTokens.colors.text.muted,
+                          fontFamily: 'SF Mono, monospace',
+                        }}
+                        aria-label={`Keyboard shortcut: ${item.shortcut}`}
+                      >
+                        {item.shortcut}
+                      </span>
+                    )}
+                    {hasSubmenu && (
+                      <ChevronRight size={12} style={{ color: goOSTokens.colors.text.muted }} />
+                    )}
+                  </button>
+
+                  {/* Submenu */}
+                  {hasSubmenu && activeSubmenu === item.id && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: '100%',
+                        top: 0,
+                        marginLeft: 4,
+                        minWidth: 160,
+                        background: goOSTokens.colors.paper,
+                        border: `2px solid ${goOSTokens.colors.border}`,
+                        borderRadius: 6,
+                        boxShadow: goOSTokens.shadows.solid,
+                        padding: '4px 0',
+                        zIndex: 10000,
+                      }}
+                      onMouseLeave={() => setActiveSubmenu(null)}
+                    >
+                      {item.submenu?.map((subitem) => (
+                        <button
+                          key={subitem.id}
+                          role="menuitem"
+                          onClick={() => {
+                            subitem.onClick();
+                            onClose();
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            padding: '8px 12px',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontFamily: goOSTokens.fonts.body,
+                            fontSize: 13,
+                            color: goOSTokens.colors.text.primary,
+                            textAlign: 'left',
+                            transition: 'background 0.1s',
+                          }}
+                          onMouseEnter={(e) => {
+                            (e.target as HTMLElement).style.background = goOSTokens.colors.headerBg;
+                          }}
+                          onMouseLeave={(e) => {
+                            (e.target as HTMLElement).style.background = 'transparent';
+                          }}
+                        >
+                          <span style={{ display: 'flex', width: 16 }}>{subitem.icon}</span>
+                          <span>{subitem.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   )}
-                </button>
+                </div>
                 {item.dividerAfter && (
                   <div
                     role="separator"

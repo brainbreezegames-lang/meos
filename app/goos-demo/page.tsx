@@ -45,10 +45,15 @@ import {
     GoOSDesktopContextMenu,
     GoOSFileContextMenu,
     GoOSFolderWindow,
+    GoOSCreateFileDialog,
     type GoOSFile,
     type FileType,
 } from '@/components/goos-editor';
 import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext';
+import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
+import { WidgetRenderer, WIDGET_METADATA } from '@/components/widgets';
+import { ViewSwitcher, PageView, PresentView } from '@/components/views';
+import type { ViewMode, WidgetType } from '@/types';
 
 // Lazy load heavy editor component (includes TipTap + all extensions)
 const GoOSEditorWindow = dynamic(
@@ -1602,6 +1607,39 @@ function GoOSDemoContent() {
         position: f.position,
     })), [goosFilesRaw]);
 
+    // Convert goosFiles to DesktopItem format for PageView/PresentView
+    const goosFilesAsDesktopItems: DesktopItem[] = useMemo(() => goosFilesRaw.map((f, index) => ({
+        id: f.id,
+        desktopId: '',
+        label: f.title,
+        windowTitle: f.title,
+        windowSubtitle: null,
+        windowHeaderImage: null,
+        windowDescription: f.content || '',
+        windowType: 'default' as const,
+        windowDetails: null,
+        windowGallery: null,
+        windowLinks: null,
+        thumbnailUrl: '',
+        positionX: f.position?.x ?? 50,
+        positionY: f.position?.y ?? 50,
+        zIndex: 1,
+        order: index,
+        useTabs: false,
+        tabs: [],
+        blocks: [],
+        commentsEnabled: false,
+        isVisible: true,
+        itemVariant: 'goos-file' as const,
+        goosFileType: f.type as 'note' | 'case-study' | 'folder' | 'image' | 'link' | 'embed' | 'download',
+        goosContent: f.content || '',
+        publishStatus: f.status as 'draft' | 'published',
+        accessLevel: f.accessLevel as 'free' | 'paid' | 'email',
+        parentItemId: f.parentId || null,
+        createdAt: new Date(f.createdAt),
+        updatedAt: new Date(f.updatedAt),
+    })), [goosFilesRaw]);
+
     // goOS Editor UI state (local only)
     const [openEditors, setOpenEditors] = useState<string[]>([]);
     const [activeEditorId, setActiveEditorId] = useState<string | null>(null);
@@ -1612,6 +1650,17 @@ function GoOSDemoContent() {
     const [fileContextMenu, setFileContextMenu] = useState<{ isOpen: boolean; x: number; y: number; fileId: string | null }>({ isOpen: false, x: 0, y: 0, fileId: null });
     const [openFolders, setOpenFolders] = useState<string[]>([]); // Folder windows
     const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+
+    // New file type creation dialog state
+    const [createFileDialog, setCreateFileDialog] = useState<{ isOpen: boolean; fileType: 'image' | 'link' | 'embed' | 'download' | null }>({ isOpen: false, fileType: null });
+    const [createFilePosition, setCreateFilePosition] = useState<{ x: number; y: number } | null>(null);
+
+    // View mode state
+    const [viewMode, setViewMode] = useState<ViewMode>('desktop');
+
+    // Widget context
+    const widgetContext = useWidgets();
+    const { widgets, createWidget, updateWidget, deleteWidget } = widgetContext;
     const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
     const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
@@ -1714,6 +1763,67 @@ function GoOSDemoContent() {
             setRenamingFileId(newFile.id);
         }
     }, [createGoOSFile]);
+
+    // Convert pixel to percentage position helper
+    const convertToPercentPosition = useCallback((pixelX: number, pixelY: number) => {
+        const desktopArea = document.getElementById('goos-desktop-area');
+        if (desktopArea) {
+            const rect = desktopArea.getBoundingClientRect();
+            const relativeX = pixelX - rect.left;
+            const relativeY = pixelY - rect.top;
+            return {
+                x: Math.max(2, Math.min(90, (relativeX / rect.width) * 100)),
+                y: Math.max(2, Math.min(85, (relativeY / rect.height) * 100)),
+            };
+        }
+        return { x: 20, y: 20 };
+    }, []);
+
+    // New file type creation handlers
+    const handleOpenCreateFileDialog = useCallback((fileType: 'image' | 'link' | 'embed' | 'download', position?: { x: number; y: number }) => {
+        setCreateFilePosition(position || null);
+        setCreateFileDialog({ isOpen: true, fileType });
+    }, []);
+
+    const handleCreateImage = useCallback(async (url: string, caption?: string, alt?: string) => {
+        const position = createFilePosition ? convertToPercentPosition(createFilePosition.x, createFilePosition.y) : undefined;
+        const { createImageFile } = goosContext;
+        if (createImageFile) {
+            await createImageFile(url, { caption, alt, position });
+        }
+    }, [createFilePosition, convertToPercentPosition, goosContext]);
+
+    const handleCreateLink = useCallback(async (url: string, title?: string, description?: string) => {
+        const position = createFilePosition ? convertToPercentPosition(createFilePosition.x, createFilePosition.y) : undefined;
+        const { createLinkFile } = goosContext;
+        if (createLinkFile) {
+            await createLinkFile(url, { title, description, position });
+        }
+    }, [createFilePosition, convertToPercentPosition, goosContext]);
+
+    const handleCreateEmbed = useCallback(async (url: string, embedType: string) => {
+        const position = createFilePosition ? convertToPercentPosition(createFilePosition.x, createFilePosition.y) : undefined;
+        const { createEmbedFile } = goosContext;
+        if (createEmbedFile) {
+            await createEmbedFile(url, embedType, { position });
+        }
+    }, [createFilePosition, convertToPercentPosition, goosContext]);
+
+    const handleCreateDownload = useCallback(async (url: string, fileName: string, fileType?: string) => {
+        const position = createFilePosition ? convertToPercentPosition(createFilePosition.x, createFilePosition.y) : undefined;
+        const { createDownloadFile } = goosContext;
+        if (createDownloadFile) {
+            await createDownloadFile(url, fileName, { fileType, position });
+        }
+    }, [createFilePosition, convertToPercentPosition, goosContext]);
+
+    // Widget creation handler
+    const handleAddWidget = useCallback(async (widgetType: string) => {
+        await createWidget(widgetType as WidgetType, {
+            x: 70 + Math.random() * 10,
+            y: 20 + Math.random() * 10,
+        });
+    }, [createWidget]);
 
     const openFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
@@ -2038,6 +2148,11 @@ function GoOSDemoContent() {
                     </nav>
                 </div>
                 <div className="flex items-center gap-4 text-sm" style={{ color: goOS.colors.text.secondary }}>
+                    {/* View Switcher */}
+                    <ViewSwitcher
+                        currentView={viewMode}
+                        onViewChange={setViewMode}
+                    />
                     <span className="text-xs hidden sm:block">{greeting}</span>
                     <div className="flex items-center gap-1.5">
                         <Battery size={14} strokeWidth={2} />
@@ -2050,6 +2165,32 @@ function GoOSDemoContent() {
 
             {/* DESKTOP AREA */}
             <main className="pt-10 pb-20 min-h-screen relative">
+                {/* Page View Mode */}
+                {viewMode === 'page' && (
+                    <PageView
+                        items={goosFilesAsDesktopItems}
+                        isOwner={true}
+                        onItemClick={(item) => {
+                            const file = goosFiles.find(f => f.id === item.id);
+                            if (file) {
+                                openFile(file.id);
+                            }
+                        }}
+                    />
+                )}
+
+                {/* Present View Mode */}
+                {viewMode === 'present' && (
+                    <PresentView
+                        items={goosFilesAsDesktopItems}
+                        isOwner={true}
+                        onClose={() => setViewMode('desktop')}
+                    />
+                )}
+
+                {/* Desktop View Mode - only show when viewMode is 'desktop' */}
+                {viewMode === 'desktop' && (
+                    <>
                 {/* Sticky Notes (Left side) */}
                 <div className="fixed top-16 left-4 z-[30] flex flex-col gap-3">
                     <StickyNote color="blue" rotation={-3}>
@@ -2113,6 +2254,20 @@ function GoOSDemoContent() {
                         );
                     })}
                 </AnimatePresence>
+
+                {/* goOS Widgets */}
+                {widgets.length > 0 && (
+                    <WidgetRenderer
+                        widgets={widgets}
+                        isOwner={true}
+                        onWidgetEdit={(widget) => {
+                            console.log('Edit widget:', widget);
+                        }}
+                        onWidgetPositionChange={(id, x, y) => {
+                            updateWidget(id, { positionX: x, positionY: y });
+                        }}
+                    />
+                )}
 
                 {/* goOS Editor Windows */}
                 <AnimatePresence>
@@ -2387,6 +2542,8 @@ function GoOSDemoContent() {
                         <GoOSAnalytics data={DEMO_ANALYTICS_DATA} />
                     </SketchWindow>
                 </AnimatePresence>
+                    </>
+                )}
             </main>
 
             {/* DOCK */}
@@ -2503,8 +2660,24 @@ function GoOSDemoContent() {
                 onNewNote={() => createFile('note', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewCaseStudy={() => createFile('case-study', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewFolder={() => createFile('folder', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+                onNewImage={() => handleOpenCreateFileDialog('image', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+                onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+                onNewEmbed={() => handleOpenCreateFileDialog('embed', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+                onNewDownload={() => handleOpenCreateFileDialog('download', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+                onAddWidget={handleAddWidget}
                 onPaste={pasteFile}
                 canPaste={!!clipboard}
+            />
+
+            {/* File Creation Dialog */}
+            <GoOSCreateFileDialog
+                isOpen={createFileDialog.isOpen}
+                fileType={createFileDialog.fileType}
+                onClose={() => setCreateFileDialog({ isOpen: false, fileType: null })}
+                onCreateImage={handleCreateImage}
+                onCreateLink={handleCreateLink}
+                onCreateEmbed={handleCreateEmbed}
+                onCreateDownload={handleCreateDownload}
             />
 
             {/* File Context Menu */}
@@ -2540,7 +2713,7 @@ function GoOSDemoContent() {
                     onToggleLock={() => {
                         const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
                         if (file) {
-                            if (file.accessLevel === 'locked') {
+                            if (file.accessLevel === 'email' || file.accessLevel === 'paid') {
                                 unlockGoOSFile(fileContextMenu.fileId!);
                             } else {
                                 lockGoOSFile(fileContextMenu.fileId!);
@@ -2612,7 +2785,9 @@ export default function GoOSDemoPage() {
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
                     <GoOSProvider viewMode="owner" localOnly={true}>
-                        <GoOSDemoContent />
+                        <WidgetProvider localOnly={true} isOwner={true}>
+                            <GoOSDemoContent />
+                        </WidgetProvider>
                     </GoOSProvider>
                 </WindowProvider>
             </EditProvider>

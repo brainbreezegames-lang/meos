@@ -52,14 +52,27 @@
     /* ============================================
      THEME: SKETCH (goOS)
      ============================================ */
-    --sketch-bg: #F9F7E8;
-    /* Paper-like oatmeal */
-    --sketch-ink: #2b2b2b;
-    /* Pencil/Ink black */
-    --sketch-highlight: #FFFCF0;
-    --sketch-accent-orange: #FFB347;
+    --sketch-bg: #F8F6F1;
+    /* oatmeal/cream */
+    --sketch-ink: #4A6CF7;
+    /* Main blue ink */
+    --sketch-highlight: #FFFFFF;
+    --sketch-accent-orange: #4A6CF7;
+    /* All accents are blue now */
     --sketch-border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
-    /* Irregular */
+
+    /* goOS Strict Theme Specs */
+    --goos-blue: #4A6CF7;
+    --goos-cream: #F8F6F1;
+    --goos-white: #FFFFFF;
+    --goos-blue-10: rgba(74, 108, 247, 0.1);
+    --goos-blue-20: rgba(74, 108, 247, 0.2);
+    --goos-blue-50: rgba(74, 108, 247, 0.5);
+
+    /* goOS Halftone Pattern */
+    --goos-halftone: radial-gradient(var(--goos-blue) 1px, transparent 1px);
+    --goos-halftone-size: 8px 8px;
+    /* Increased spacing for better visibility */
 
     /* ============================================
      SPACING & LAYOUT
@@ -649,4 +662,28 @@ h6 {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+}
+
+/* goOS Halftone Utility Classes */
+.bg-goos-halftone {
+    background-image: var(--goos-halftone);
+    background-size: var(--goos-halftone-size);
+    opacity: 0.15;
+    /* Subtle texture */
+}
+
+.goos-bg {
+    background-color: var(--goos-cream);
+    position: relative;
+}
+
+.goos-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--goos-halftone);
+    background-size: var(--goos-halftone-size);
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
 }

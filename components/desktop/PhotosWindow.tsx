@@ -474,21 +474,26 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
               >
                 <button
                   onClick={() => windowContext.closeWindow(windowInstance.id)}
-                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  className="rounded-full flex items-center justify-center transition-all duration-150"
                   style={isSketch ? {
-                    background: '#FFFFFF',
-                    border: '1.5px solid #2B4AE2',
+                    width: 10,
+                    height: 10,
+                    background: '#4A6CF7',
+                    border: 'none',
+                    borderRadius: '50%',
+                    marginRight: 4,
                   } : {
+                    width: 12,
+                    height: 12,
                     background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
-                    boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
+                    boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                   aria-label="Close"
                 >
-                  {isSketch ? (
-                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                      <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
-                    </svg>
-                  ) : (
+                  {isSketch ? null : (
                     <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                       <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
                     </svg>
@@ -496,21 +501,26 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                 </button>
                 <button
                   onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  className="rounded-full flex items-center justify-center transition-all duration-150"
                   style={isSketch ? {
-                    background: '#FFFFFF',
-                    border: '1.5px solid #2B4AE2',
+                    width: 10,
+                    height: 10,
+                    background: '#4A6CF7',
+                    border: 'none',
+                    borderRadius: '50%',
+                    marginRight: 4,
                   } : {
+                    width: 12,
+                    height: 12,
                     background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
-                    boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
+                    boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                   aria-label="Minimize"
                 >
-                  {isSketch ? (
-                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                      <path d="M1 4H7" stroke="currentColor" strokeLinecap="round" />
-                    </svg>
-                  ) : (
+                  {isSketch ? null : (
                     <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                       <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
                     </svg>
@@ -518,27 +528,32 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                 </button>
                 <button
                   onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  className="rounded-full flex items-center justify-center transition-all duration-150"
                   style={isSketch ? {
-                    background: '#FFFFFF',
-                    border: '1.5px solid #2B4AE2',
+                    width: 10,
+                    height: 10,
+                    background: '#4A6CF7',
+                    border: 'none',
+                    borderRadius: '50%',
                   } : {
+                    width: 12,
+                    height: 12,
                     background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
-                    boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
+                    boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                   aria-label="Maximize"
                 >
-                  {isSketch ? (
-                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                      <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" />
-                    </svg>
-                  ) : (
+                  {isSketch ? null : (
                     <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                       <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                     </svg>
                   )}
                 </button>
               </div>
+
             </div>
 
             {/* Title */}
@@ -591,210 +606,215 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                 </button>
               </div>
             </div>
-          </div>
+          </div >
 
           {/* Photo Grid */}
-          <div
+          < div
             className="flex-1 overflow-y-auto p-4"
-            style={{ background: colors.contentBg }}
+            style={{ background: colors.contentBg }
+            }
           >
-            {photos.length > 0 ? (
-              <div className={viewMode === 'grid' ? 'grid grid-cols-3 md:grid-cols-4 gap-3' : 'space-y-2'}>
-                {photos.map((photo, index) => (
-                  <motion.div
-                    key={photo.id}
-                    className={`relative group cursor-pointer overflow-hidden ${viewMode === 'grid' ? 'aspect-square rounded-lg' : 'flex items-center gap-4 p-3 rounded-xl'
-                      }`}
-                    style={{
-                      background: colors.photoCardBg,
-                      boxShadow: colors.photoCardShadow,
-                    }}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.03, duration: 0.2 }}
-                    onClick={() => handlePhotoClick(photo)}
-                    whileHover={{
-                      scale: viewMode === 'grid' ? 1.02 : 1,
-                      boxShadow: colors.photoCardHoverShadow,
-                    }}
-                  >
-                    {viewMode === 'grid' ? (
-                      <>
-                        <Image
-                          src={photo.url}
-                          alt={photo.alt}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          sizes="(max-width: 768px) 33vw, 25vw"
-                        />
-                        {/* Gradient overlay on hover */}
-                        <div
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          style={{ background: colors.photoOverlay }}
-                        />
-                        {/* Favorite button */}
-                        <button
-                          onClick={(e) => handleFavorite(photo.id, e)}
-                          className="absolute top-2 right-2 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
-                          style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill={favorites.has(photo.id) ? colors.favoriteColor : 'none'}
-                            viewBox="0 0 24 24"
-                            stroke={favorites.has(photo.id) ? colors.favoriteColor : 'white'}
-                            strokeWidth={2}
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                          </svg>
-                        </button>
-                        {/* Caption on hover */}
-                        <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <p className="text-white text-xs font-medium truncate">{photo.alt}</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-14 h-14 relative rounded-lg overflow-hidden shrink-0">
+            {
+              photos.length > 0 ? (
+                <div className={viewMode === 'grid' ? 'grid grid-cols-3 md:grid-cols-4 gap-3' : 'space-y-2'}>
+                  {photos.map((photo, index) => (
+                    <motion.div
+                      key={photo.id}
+                      className={`relative group cursor-pointer overflow-hidden ${viewMode === 'grid' ? 'aspect-square rounded-lg' : 'flex items-center gap-4 p-3 rounded-xl'
+                        }`}
+                      style={{
+                        background: colors.photoCardBg,
+                        boxShadow: colors.photoCardShadow,
+                      }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.03, duration: 0.2 }}
+                      onClick={() => handlePhotoClick(photo)}
+                      whileHover={{
+                        scale: viewMode === 'grid' ? 1.02 : 1,
+                        boxShadow: colors.photoCardHoverShadow,
+                      }}
+                    >
+                      {viewMode === 'grid' ? (
+                        <>
                           <Image
                             src={photo.url}
                             alt={photo.alt}
                             fill
-                            className="object-cover"
-                            sizes="56px"
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 768px) 33vw, 25vw"
                           />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[13px] font-medium truncate" style={{ color: colors.titleText }}>
-                            {photo.alt}
-                          </p>
-                          <p className="text-[11px]" style={{ color: colors.toolbarText }}>
-                            Photo
-                          </p>
-                        </div>
-                        <button
-                          onClick={(e) => handleFavorite(photo.id, e)}
-                          className="p-2 transition-transform hover:scale-110"
-                        >
-                          <svg
-                            className="w-5 h-5"
-                            fill={favorites.has(photo.id) ? colors.favoriteColor : 'none'}
-                            viewBox="0 0 24 24"
-                            stroke={favorites.has(photo.id) ? colors.favoriteColor : colors.toolbarText}
-                            strokeWidth={2}
+                          {/* Gradient overlay on hover */}
+                          <div
+                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            style={{ background: colors.photoOverlay }}
+                          />
+                          {/* Favorite button */}
+                          <button
+                            onClick={(e) => handleFavorite(photo.id, e)}
+                            className="absolute top-2 right-2 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+                            style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                          </svg>
-                        </button>
-                      </>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <motion.div
-                className="flex flex-col items-center justify-center h-full py-16"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <div
-                  className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5"
-                  style={{ background: colors.emptyBg }}
-                >
-                  <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke={colors.emptyIcon} strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                  </svg>
+                            <svg
+                              className="w-4 h-4"
+                              fill={favorites.has(photo.id) ? colors.favoriteColor : 'none'}
+                              viewBox="0 0 24 24"
+                              stroke={favorites.has(photo.id) ? colors.favoriteColor : 'white'}
+                              strokeWidth={2}
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                          </button>
+                          {/* Caption on hover */}
+                          <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <p className="text-white text-xs font-medium truncate">{photo.alt}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-14 h-14 relative rounded-lg overflow-hidden shrink-0">
+                            <Image
+                              src={photo.url}
+                              alt={photo.alt}
+                              fill
+                              className="object-cover"
+                              sizes="56px"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-medium truncate" style={{ color: colors.titleText }}>
+                              {photo.alt}
+                            </p>
+                            <p className="text-[11px]" style={{ color: colors.toolbarText }}>
+                              Photo
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => handleFavorite(photo.id, e)}
+                            className="p-2 transition-transform hover:scale-110"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill={favorites.has(photo.id) ? colors.favoriteColor : 'none'}
+                              viewBox="0 0 24 24"
+                              stroke={favorites.has(photo.id) ? colors.favoriteColor : colors.toolbarText}
+                              strokeWidth={2}
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                          </button>
+                        </>
+                      )}
+                    </motion.div>
+                  ))}
                 </div>
-                <p className="text-[16px] font-semibold mb-1" style={{ color: colors.emptyTitle }}>
-                  No Photos
-                </p>
-                <p className="text-[13px] text-center max-w-[240px]" style={{ color: colors.emptyText }}>
-                  Add gallery or image blocks to see photos here
-                </p>
-              </motion.div>
-            )}
-          </div>
+              ) : (
+                <motion.div
+                  className="flex flex-col items-center justify-center h-full py-16"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div
+                    className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5"
+                    style={{ background: colors.emptyBg }}
+                  >
+                    <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke={colors.emptyIcon} strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-[16px] font-semibold mb-1" style={{ color: colors.emptyTitle }}>
+                    No Photos
+                  </p>
+                  <p className="text-[13px] text-center max-w-[240px]" style={{ color: colors.emptyText }}>
+                    Add gallery or image blocks to see photos here
+                  </p>
+                </motion.div>
+              )
+            }
+          </div >
 
           {/* Lightbox */}
           <AnimatePresence>
-            {selectedPhoto && (
-              <motion.div
-                className="absolute inset-0 z-50 flex items-center justify-center"
-                style={{ background: colors.lightboxBg }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedPhoto(null)}
-              >
-                {/* Close button */}
-                <button
-                  className="absolute top-4 right-4 p-2.5 rounded-full transition-all duration-200 hover:scale-105"
-                  style={{ background: colors.lightboxButtonBg, color: colors.lightboxText }}
+            {
+              selectedPhoto && (
+                <motion.div
+                  className="absolute inset-0 z-50 flex items-center justify-center"
+                  style={{ background: colors.lightboxBg }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   onClick={() => setSelectedPhoto(null)}
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-
-                {/* Navigation */}
-                {photos.findIndex(p => p.id === selectedPhoto.id) > 0 && (
+                  {/* Close button */}
                   <button
-                    className="absolute left-4 p-3 rounded-full transition-all duration-200 hover:scale-105"
+                    className="absolute top-4 right-4 p-2.5 rounded-full transition-all duration-200 hover:scale-105"
                     style={{ background: colors.lightboxButtonBg, color: colors.lightboxText }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const idx = photos.findIndex(p => p.id === selectedPhoto.id);
-                      if (idx > 0) setSelectedPhoto(photos[idx - 1]);
-                    }}
+                    onClick={() => setSelectedPhoto(null)}
                   >
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
-                )}
-                {photos.findIndex(p => p.id === selectedPhoto.id) < photos.length - 1 && (
-                  <button
-                    className="absolute right-4 p-3 rounded-full transition-all duration-200 hover:scale-105"
-                    style={{ background: colors.lightboxButtonBg, color: colors.lightboxText }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const idx = photos.findIndex(p => p.id === selectedPhoto.id);
-                      if (idx < photos.length - 1) setSelectedPhoto(photos[idx + 1]);
-                    }}
-                  >
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                )}
 
-                {/* Image */}
-                <motion.div
-                  className="relative max-w-[90%] max-h-[85%]"
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Image
-                    src={selectedPhoto.url}
-                    alt={selectedPhoto.alt}
-                    width={1200}
-                    height={800}
-                    className="max-h-[80vh] w-auto object-contain rounded-lg"
-                    style={{ maxWidth: '100%' }}
-                  />
-                  <p className="text-center mt-4 text-[14px]" style={{ color: colors.lightboxText }}>
-                    {selectedPhoto.alt}
-                  </p>
+                  {/* Navigation */}
+                  {photos.findIndex(p => p.id === selectedPhoto.id) > 0 && (
+                    <button
+                      className="absolute left-4 p-3 rounded-full transition-all duration-200 hover:scale-105"
+                      style={{ background: colors.lightboxButtonBg, color: colors.lightboxText }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const idx = photos.findIndex(p => p.id === selectedPhoto.id);
+                        if (idx > 0) setSelectedPhoto(photos[idx - 1]);
+                      }}
+                    >
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                  )}
+                  {photos.findIndex(p => p.id === selectedPhoto.id) < photos.length - 1 && (
+                    <button
+                      className="absolute right-4 p-3 rounded-full transition-all duration-200 hover:scale-105"
+                      style={{ background: colors.lightboxButtonBg, color: colors.lightboxText }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const idx = photos.findIndex(p => p.id === selectedPhoto.id);
+                        if (idx < photos.length - 1) setSelectedPhoto(photos[idx + 1]);
+                      }}
+                    >
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Image */}
+                  <motion.div
+                    className="relative max-w-[90%] max-h-[85%]"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Image
+                      src={selectedPhoto.url}
+                      alt={selectedPhoto.alt}
+                      width={1200}
+                      height={800}
+                      className="max-h-[80vh] w-auto object-contain rounded-lg"
+                      style={{ maxWidth: '100%' }}
+                    />
+                    <p className="text-center mt-4 text-[14px]" style={{ color: colors.lightboxText }}>
+                      {selectedPhoto.alt}
+                    </p>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+              )
+            }
+          </AnimatePresence >
+        </motion.div >
+      </div >
     </>
   );
 }

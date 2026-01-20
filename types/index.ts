@@ -23,9 +23,48 @@ export interface Desktop {
   dockItems: DockItem[];
   statusWidget: StatusWidget | null;
   workbenchEntries: WorkbenchEntry[];
+  // goOS additions
+  widgets?: Widget[];
+  view?: DesktopView | null;
 }
 
 export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document' | 'pages' | 'notes' | 'photos' | 'finder' | 'preview' | 'workbench';
+
+// === goOS Primitive Types ===
+export type GoOSFileType = 'note' | 'case-study' | 'folder' | 'image' | 'link' | 'embed' | 'download';
+export type PublishStatus = 'draft' | 'published';
+export type AccessLevel = 'free' | 'paid' | 'email';
+export type EmbedType = 'youtube' | 'vimeo' | 'spotify' | 'figma' | 'loom' | 'codepen' | 'other';
+export type WidgetType = 'clock' | 'book' | 'tipjar' | 'contact' | 'links' | 'feedback';
+export type ViewMode = 'desktop' | 'page' | 'present';
+
+// goOS Widget
+export interface Widget {
+  id: string;
+  desktopId: string;
+  widgetType: WidgetType;
+  positionX: number;
+  positionY: number;
+  title: string | null;
+  isVisible: boolean;
+  config: Record<string, unknown>;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// goOS Desktop View settings
+export interface DesktopView {
+  id: string;
+  desktopId: string;
+  activeMode: ViewMode;
+  pageOrder: string[];
+  presentOrder: string[];
+  presentAuto: boolean;
+  presentDelay: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 // Status Widget types
 export type StatusType = 'available' | 'looking' | 'taking' | 'open' | 'consulting';
@@ -111,6 +150,41 @@ export interface DesktopItem {
   // Comments
   comments?: Comment[];
   commentsEnabled: boolean;
+
+  // === goOS-specific fields ===
+  itemVariant?: 'window' | 'goos-file';
+  goosFileType?: GoOSFileType;
+  goosContent?: string | null;
+  publishStatus?: PublishStatus;
+  publishedAt?: Date | null;
+  parentItemId?: string | null;
+  children?: DesktopItem[];
+
+  // Access control
+  accessLevel?: AccessLevel;
+  goosPriceAmount?: number | null;
+  goosPriceCurrency?: string | null;
+
+  // Image file fields
+  goosImageUrl?: string | null;
+  goosImageAlt?: string | null;
+  goosImageCaption?: string | null;
+
+  // Link file fields
+  goosLinkUrl?: string | null;
+  goosLinkTitle?: string | null;
+  goosLinkDescription?: string | null;
+  goosLinkFavicon?: string | null;
+
+  // Embed file fields
+  goosEmbedUrl?: string | null;
+  goosEmbedType?: EmbedType | null;
+
+  // Download file fields
+  goosDownloadUrl?: string | null;
+  goosDownloadName?: string | null;
+  goosDownloadSize?: number | null;
+  goosDownloadType?: string | null;
 }
 
 export interface TabData {

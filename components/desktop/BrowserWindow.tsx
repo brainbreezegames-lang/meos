@@ -153,12 +153,14 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
               <button
                 onClick={() => windowContext.closeWindow(windowInstance.id)}
                 aria-label="Close window"
-                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
+                className={isSketch ? "rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
                 style={isSketch ? {
-                  width: '14px',
-                  height: '14px',
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
+                  marginRight: 4,
                 } : {
                   width: 'var(--traffic-size)',
                   height: 'var(--traffic-size)',
@@ -166,11 +168,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
-                  </svg>
-                ) : (
+                {isSketch ? null : (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                   </svg>
@@ -179,12 +177,14 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
               <button
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
                 aria-label="Minimize window"
-                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
+                className={isSketch ? "rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
                 style={isSketch ? {
-                  width: '14px',
-                  height: '14px',
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
+                  marginRight: 4,
                 } : {
                   width: 'var(--traffic-size)',
                   height: 'var(--traffic-size)',
@@ -192,25 +192,22 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <path d="M1 4H7" stroke="currentColor" strokeLinecap="round" />
-                  </svg>
-                ) : (
+                {isSketch ? null : (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                    <path d="M1 4H7" stroke="rgba(77, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                   </svg>
                 )}
               </button>
               <button
                 onClick={() => windowContext.maximizeWindow(windowInstance.id)}
                 aria-label="Maximize window"
-                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
+                className={isSketch ? "rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
                 style={isSketch ? {
-                  width: '14px',
-                  height: '14px',
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
                 } : {
                   width: 'var(--traffic-size)',
                   height: 'var(--traffic-size)',
@@ -218,11 +215,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" />
-                  </svg>
-                ) : (
+                {isSketch ? null : (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                   </svg>

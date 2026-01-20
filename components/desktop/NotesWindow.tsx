@@ -685,21 +685,27 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
             >
               <button
                 onClick={() => windowContext.closeWindow(windowInstance.id)}
-                className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={isSketch ? {
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
+                  marginRight: 4,
+                  display: 'block'
                 } : {
+                  width: 12,
+                  height: 12,
                   background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
                 aria-label="Close window"
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
-                  </svg>
-                ) : (
+                {isSketch ? null : (
                   <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
                   </svg>
@@ -707,21 +713,27 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
               </button>
               <button
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={isSketch ? {
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
+                  marginRight: 4,
+                  display: 'block'
                 } : {
+                  width: 12,
+                  height: 12,
                   background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
                 aria-label="Minimize window"
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <path d="M1 4H7" stroke="currentColor" strokeLinecap="round" />
-                  </svg>
-                ) : (
+                {isSketch ? null : (
                   <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
                   </svg>
@@ -729,21 +741,26 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
               </button>
               <button
                 onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={isSketch ? {
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
+                  display: 'block'
                 } : {
+                  width: 12,
+                  height: 12,
                   background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
                 aria-label="Maximize window"
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" />
-                  </svg>
-                ) : (
+                {isSketch ? null : (
                   <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                   </svg>

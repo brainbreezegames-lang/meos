@@ -107,14 +107,16 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isMaximized ? 'var(--radius-lg)' : 'var(--radius-window)',
-            background: 'var(--bg-glass-elevated)',
-            backdropFilter: 'var(--blur-glass)',
-            WebkitBackdropFilter: 'var(--blur-glass)',
-            boxShadow: isActive
-              ? '0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 12px 40px -8px rgba(0, 0, 0, 0.35)'
-              : 'var(--shadow-lg)',
-            border: 'var(--border-width) solid var(--border-glass-outer)',
+            borderRadius: isSketch ? (isMaximized ? '0' : '12px') : (isMaximized ? 'var(--radius-lg)' : 'var(--radius-window)'),
+            background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated)',
+            backdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
+            WebkitBackdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
+            boxShadow: isSketch
+              ? '6px 6px 0 #4A6CF7'
+              : (isActive
+                ? '0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 12px 40px -8px rgba(0, 0, 0, 0.35)'
+                : 'var(--shadow-lg)'),
+            border: isSketch ? '1.5px solid #4A6CF7' : 'var(--border-width) solid var(--border-glass-outer)',
             opacity: isActive ? 1 : 0.95,
           }}
           initial={{ opacity: 0, scale: 0.9 }}
@@ -127,25 +129,26 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
             className="flex items-center justify-between px-4 shrink-0 select-none"
             style={{
               height: 'var(--window-header-height)',
-              borderBottom: 'var(--border-width) solid var(--border-light)',
-              background: 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
+              borderBottom: isSketch ? '1.5px solid #4A6CF7' : 'var(--border-width) solid var(--border-light)',
+              background: isSketch ? '#FFFFFF' : 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
             {/* Traffic Lights */}
             <div
               className="flex items-center group/traffic"
-              style={{ gap: 'var(--traffic-gap)' }}
+              style={{ gap: isSketch ? '8px' : 'var(--traffic-gap)' }}
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => windowContext.closeWindow(windowInstance.id)}
-                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"}
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={isSketch ? {
-                  width: '14px',
-                  height: '14px',
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
                 } : {
                   width: 'var(--traffic-size)',
                   height: 'var(--traffic-size)',
@@ -153,11 +156,7 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
-                  </svg>
-                ) : (
+                {!isSketch && (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                   </svg>
@@ -165,12 +164,13 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
               </button>
               <button
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"}
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={isSketch ? {
-                  width: '14px',
-                  height: '14px',
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
                 } : {
                   width: 'var(--traffic-size)',
                   height: 'var(--traffic-size)',
@@ -178,11 +178,7 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <path d="M1 4H7" stroke="currentColor" strokeLinecap="round" />
-                  </svg>
-                ) : (
+                {!isSketch && (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                   </svg>
@@ -190,12 +186,13 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
               </button>
               <button
                 onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                className={isSketch ? "rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90"}
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={isSketch ? {
-                  width: '14px',
-                  height: '14px',
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
                 } : {
                   width: 'var(--traffic-size)',
                   height: 'var(--traffic-size)',
@@ -203,11 +200,7 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                 }}
               >
-                {isSketch ? (
-                  <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                    <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" />
-                  </svg>
-                ) : (
+                {!isSketch && (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                   </svg>

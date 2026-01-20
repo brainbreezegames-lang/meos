@@ -261,55 +261,55 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
       // Sketch/goOS: Hand-drawn, playful, paper-like (Blueprint style)
       return {
         windowBg: '#FFFFFF',
-        windowShadow: '6px 6px 0 #2B4AE2',
-        windowShadowInactive: '4px 4px 0 #2B4AE2',
+        windowShadow: '6px 6px 0 #4A6CF7',
+        windowShadowInactive: '4px 4px 0 #4A6CF7',
 
         titleBarBg: '#FFFFFF',
-        titleBarBorder: '#2B4AE2',
-        titleText: '#2B4AE2',
+        titleBarBorder: '#4A6CF7',
+        titleText: '#4A6CF7',
 
-        toolbarIconColor: '#2B4AE2',
-        toolbarIconHoverBg: 'rgba(43, 74, 226, 0.08)',
+        toolbarIconColor: '#4A6CF7',
+        toolbarIconHoverBg: 'rgba(74, 108, 247, 0.08)',
         toolbarIconDisabled: '#999999',
-        toolbarDivider: 'rgba(43, 74, 226, 0.2)',
-        viewToggleBorder: '#2B4AE2',
-        viewToggleActiveBg: '#2B4AE2',
+        toolbarDivider: 'rgba(74, 108, 247, 0.2)',
+        viewToggleBorder: '#4A6CF7',
+        viewToggleActiveBg: '#4A6CF7',
         viewToggleActiveText: '#FFFFFF',
 
         sidebarBg: '#FFFFFF',
-        sidebarBorder: '#2B4AE2',
-        sidebarHeader: '#2B4AE2',
-        sidebarItemText: '#2B4AE2',
-        sidebarItemHover: 'rgba(43, 74, 226, 0.08)',
-        tagRed: '#2B4AE2',
-        tagOrange: '#2B4AE2',
-        tagGreen: '#2B4AE2',
-        tagBlue: '#2B4AE2',
+        sidebarBorder: '#4A6CF7',
+        sidebarHeader: '#4A6CF7',
+        sidebarItemText: '#4A6CF7',
+        sidebarItemHover: 'rgba(74, 108, 247, 0.08)',
+        tagRed: '#4A6CF7',
+        tagOrange: '#4A6CF7',
+        tagGreen: '#4A6CF7',
+        tagBlue: '#4A6CF7',
 
         contentBg: '#FFFFFF',
-        fileText: '#2B4AE2',
-        fileSelectedBg: '#2B4AE2',
+        fileText: '#4A6CF7',
+        fileSelectedBg: '#4A6CF7',
         fileSelectedText: '#FFFFFF',
-        fileHoverBg: 'rgba(43, 74, 226, 0.06)',
-        listHeaderText: '#2B4AE2',
-        listRowBorder: 'rgba(43, 74, 226, 0.1)',
+        fileHoverBg: 'rgba(74, 108, 247, 0.06)',
+        listHeaderText: '#4A6CF7',
+        listRowBorder: 'rgba(74, 108, 247, 0.1)',
 
         previewBg: '#FFFFFF',
-        previewBorder: '#2B4AE2',
-        previewText: '#2B4AE2',
-        previewLabelText: '#2B4AE2',
-        previewValueText: '#2B4AE2',
+        previewBorder: '#4A6CF7',
+        previewText: '#4A6CF7',
+        previewLabelText: '#4A6CF7',
+        previewValueText: '#4A6CF7',
         previewBlockBg: '#FFFFFF',
 
         statusBarBg: '#FFFFFF',
-        statusBarBorder: '#2B4AE2',
-        statusBarText: '#2B4AE2',
+        statusBarBorder: '#4A6CF7',
+        statusBarText: '#4A6CF7',
 
-        emptyIcon: '#2B4AE2',
-        emptyTitle: '#2B4AE2',
-        emptyText: '#2B4AE2',
+        emptyIcon: '#4A6CF7',
+        emptyTitle: '#4A6CF7',
+        emptyText: '#4A6CF7',
 
-        accent: '#2B4AE2',
+        accent: '#4A6CF7',
       };
 
     case 'monterey':
@@ -577,21 +577,26 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
               >
                 <button
                   onClick={() => windowContext.closeWindow(windowInstance.id)}
-                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  className="rounded-full flex items-center justify-center transition-all duration-150"
                   style={isSketch ? {
-                    background: '#FFFFFF',
-                    border: '1.5px solid #2B4AE2',
+                    width: 10,
+                    height: 10,
+                    background: '#4A6CF7',
+                    border: 'none',
+                    borderRadius: '50%',
+                    marginRight: 4,
                   } : {
+                    width: 12,
+                    height: 12,
                     background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
                     boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                   aria-label="Close"
                 >
-                  {isSketch ? (
-                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                      <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
-                    </svg>
-                  ) : (
+                  {isSketch ? null : (
                     <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                       <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
                     </svg>
@@ -599,21 +604,26 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
                 </button>
                 <button
                   onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  className="rounded-full flex items-center justify-center transition-all duration-150"
                   style={isSketch ? {
-                    background: '#FFFFFF',
-                    border: '1.5px solid #2B4AE2',
+                    width: 10,
+                    height: 10,
+                    background: '#4A6CF7',
+                    border: 'none',
+                    borderRadius: '50%',
+                    marginRight: 4,
                   } : {
+                    width: 12,
+                    height: 12,
                     background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
                     boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                   aria-label="Minimize"
                 >
-                  {isSketch ? (
-                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                      <path d="M1 4H7" stroke="currentColor" strokeLinecap="round" />
-                    </svg>
-                  ) : (
+                  {isSketch ? null : (
                     <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                       <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
                     </svg>
@@ -621,27 +631,33 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
                 </button>
                 <button
                   onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                  className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "w-3 h-3 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:scale-90"}
+                  className="rounded-full flex items-center justify-center transition-all duration-150"
                   style={isSketch ? {
-                    background: '#FFFFFF',
-                    border: '1.5px solid #2B4AE2',
+                    width: 10,
+                    height: 10,
+                    background: '#4A6CF7',
+                    border: 'none',
+                    borderRadius: '50%',
                   } : {
+                    width: 12,
+                    height: 12,
                     background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
                     boxShadow: '0 0.5px 1px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(0,0,0,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                   aria-label="Maximize"
                 >
-                  {isSketch ? (
-                    <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                      <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" />
-                    </svg>
-                  ) : (
+                  {isSketch ? null : (
                     <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                       <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                     </svg>
                   )}
+
                 </button>
               </div>
+
 
               {/* Navigation Arrows */}
               <div className="flex items-center">
@@ -744,17 +760,18 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
                 </svg>
               </button>
             </div>
-          </div>
+          </div >
 
           {/* Sidebar + Content */}
-          <div className="flex flex-1 min-h-0">
+          < div className="flex flex-1 min-h-0" >
             {/* Sidebar */}
-            <div
+            < div
               className="w-44 shrink-0 py-3 overflow-y-auto"
               style={{
                 background: colors.sidebarBg,
                 borderRight: `1px solid ${colors.sidebarBorder}`,
-              }}
+              }
+              }
             >
               <div className="px-3 mb-2">
                 <h3
@@ -814,179 +831,183 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
                   </button>
                 ))}
               </nav>
-            </div>
+            </div >
 
             {/* File Browser */}
-            <div className="flex-1 overflow-y-auto p-4" style={{ background: colors.contentBg }}>
-              {sortedContents.length > 0 ? (
-                viewMode === 'icons' ? (
-                  <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
-                    {sortedContents.map((file, index) => (
-                      <motion.button
-                        key={file.id}
-                        onClick={() => handleItemClick(file)}
-                        onDoubleClick={() => handleItemDoubleClick(file)}
-                        className="flex flex-col items-center gap-1 p-3 rounded-lg transition-all focus:outline-none"
-                        style={{
-                          background: selectedItem?.id === file.id ? colors.fileSelectedBg : 'transparent',
-                        }}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.02 }}
-                        whileHover={{
-                          scale: 1.05,
-                          background: selectedItem?.id === file.id ? colors.fileSelectedBg : colors.fileHoverBg,
-                        }}
-                      >
-                        <span className="text-4xl">{file.icon}</span>
-                        <span
-                          className="text-[11px] font-medium text-center line-clamp-2 px-1"
-                          style={{ color: selectedItem?.id === file.id ? colors.fileSelectedText : colors.fileText }}
+            < div className="flex-1 overflow-y-auto p-4" style={{ background: colors.contentBg }}>
+              {
+                sortedContents.length > 0 ? (
+                  viewMode === 'icons' ? (
+                    <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                      {sortedContents.map((file, index) => (
+                        <motion.button
+                          key={file.id}
+                          onClick={() => handleItemClick(file)}
+                          onDoubleClick={() => handleItemDoubleClick(file)}
+                          className="flex flex-col items-center gap-1 p-3 rounded-lg transition-all focus:outline-none"
+                          style={{
+                            background: selectedItem?.id === file.id ? colors.fileSelectedBg : 'transparent',
+                          }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.02 }}
+                          whileHover={{
+                            scale: 1.05,
+                            background: selectedItem?.id === file.id ? colors.fileSelectedBg : colors.fileHoverBg,
+                          }}
                         >
-                          {file.name}
-                        </span>
-                      </motion.button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="space-y-0.5">
-                    {/* Header */}
-                    <div
-                      className="flex items-center gap-4 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide"
-                      style={{ color: colors.listHeaderText, borderBottom: `1px solid ${colors.listRowBorder}` }}
-                    >
-                      <span className="flex-1">Name</span>
-                      <span className="w-24">Modified</span>
-                      <span className="w-20 text-right">Size</span>
+                          <span className="text-4xl">{file.icon}</span>
+                          <span
+                            className="text-[11px] font-medium text-center line-clamp-2 px-1"
+                            style={{ color: selectedItem?.id === file.id ? colors.fileSelectedText : colors.fileText }}
+                          >
+                            {file.name}
+                          </span>
+                        </motion.button>
+                      ))}
                     </div>
-                    {sortedContents.map((file, index) => (
-                      <motion.button
-                        key={file.id}
-                        onClick={() => handleItemClick(file)}
-                        onDoubleClick={() => handleItemDoubleClick(file)}
-                        className="w-full flex items-center gap-4 px-3 py-2.5 rounded-lg transition-all text-left"
-                        style={{
-                          background: selectedItem?.id === file.id ? colors.fileSelectedBg : 'transparent',
-                        }}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.02 }}
-                        whileHover={{
-                          background: selectedItem?.id === file.id ? colors.fileSelectedBg : colors.fileHoverBg,
-                        }}
+                  ) : (
+                    <div className="space-y-0.5">
+                      {/* Header */}
+                      <div
+                        className="flex items-center gap-4 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide"
+                        style={{ color: colors.listHeaderText, borderBottom: `1px solid ${colors.listRowBorder}` }}
                       >
-                        <span className="text-lg">{file.icon}</span>
-                        <span
-                          className="flex-1 text-[13px] font-medium truncate"
-                          style={{ color: selectedItem?.id === file.id ? colors.fileSelectedText : colors.fileText }}
+                        <span className="flex-1">Name</span>
+                        <span className="w-24">Modified</span>
+                        <span className="w-20 text-right">Size</span>
+                      </div>
+                      {sortedContents.map((file, index) => (
+                        <motion.button
+                          key={file.id}
+                          onClick={() => handleItemClick(file)}
+                          onDoubleClick={() => handleItemDoubleClick(file)}
+                          className="w-full flex items-center gap-4 px-3 py-2.5 rounded-lg transition-all text-left"
+                          style={{
+                            background: selectedItem?.id === file.id ? colors.fileSelectedBg : 'transparent',
+                          }}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.02 }}
+                          whileHover={{
+                            background: selectedItem?.id === file.id ? colors.fileSelectedBg : colors.fileHoverBg,
+                          }}
                         >
-                          {file.name}
-                        </span>
-                        <span
-                          className="w-24 text-[11px]"
-                          style={{ color: selectedItem?.id === file.id ? colors.fileSelectedText : colors.listHeaderText }}
-                        >
-                          {file.modified}
-                        </span>
-                        <span
-                          className="w-20 text-[11px] text-right"
-                          style={{ color: selectedItem?.id === file.id ? colors.fileSelectedText : colors.listHeaderText }}
-                        >
-                          {file.size}
-                        </span>
-                      </motion.button>
-                    ))}
-                  </div>
+                          <span className="text-lg">{file.icon}</span>
+                          <span
+                            className="flex-1 text-[13px] font-medium truncate"
+                            style={{ color: selectedItem?.id === file.id ? colors.fileSelectedText : colors.fileText }}
+                          >
+                            {file.name}
+                          </span>
+                          <span
+                            className="w-24 text-[11px]"
+                            style={{ color: selectedItem?.id === file.id ? colors.fileSelectedText : colors.listHeaderText }}
+                          >
+                            {file.modified}
+                          </span>
+                          <span
+                            className="w-20 text-[11px] text-right"
+                            style={{ color: selectedItem?.id === file.id ? colors.fileSelectedText : colors.listHeaderText }}
+                          >
+                            {file.size}
+                          </span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  )
+                ) : (
+                  <motion.div
+                    className="flex flex-col items-center justify-center h-full py-16"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <span className="text-5xl mb-4">📂</span>
+                    <p className="text-[16px] font-semibold mb-1" style={{ color: colors.emptyTitle }}>
+                      This folder is empty
+                    </p>
+                    <p className="text-[13px]" style={{ color: colors.emptyText }}>
+                      Add tabs or blocks to see content here
+                    </p>
+                  </motion.div>
                 )
-              ) : (
-                <motion.div
-                  className="flex flex-col items-center justify-center h-full py-16"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <span className="text-5xl mb-4">📂</span>
-                  <p className="text-[16px] font-semibold mb-1" style={{ color: colors.emptyTitle }}>
-                    This folder is empty
-                  </p>
-                  <p className="text-[13px]" style={{ color: colors.emptyText }}>
-                    Add tabs or blocks to see content here
-                  </p>
-                </motion.div>
-              )}
-            </div>
+              }
+            </div >
 
             {/* Preview Panel */}
             <AnimatePresence>
-              {selectedItem && (
-                <motion.div
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: 240, opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="shrink-0 overflow-hidden"
-                  style={{
-                    background: colors.previewBg,
-                    borderLeft: `1px solid ${colors.previewBorder}`,
-                  }}
-                >
-                  <div className="p-4">
-                    {/* Preview Icon */}
-                    <div className="flex items-center justify-center py-6">
-                      <span className="text-6xl">{selectedItem.icon}</span>
-                    </div>
-
-                    {/* Info */}
-                    <h3
-                      className="text-[14px] font-semibold text-center mb-4"
-                      style={{ color: colors.previewText }}
-                    >
-                      {selectedItem.name}
-                    </h3>
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-[12px]">
-                        <span style={{ color: colors.previewLabelText }}>Kind</span>
-                        <span style={{ color: colors.previewValueText }}>{selectedItem.type}</span>
+              {
+                selectedItem && (
+                  <motion.div
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 240, opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="shrink-0 overflow-hidden"
+                    style={{
+                      background: colors.previewBg,
+                      borderLeft: `1px solid ${colors.previewBorder}`,
+                    }}
+                  >
+                    <div className="p-4">
+                      {/* Preview Icon */}
+                      <div className="flex items-center justify-center py-6">
+                        <span className="text-6xl">{selectedItem.icon}</span>
                       </div>
-                      {selectedItem.size && (
+
+                      {/* Info */}
+                      <h3
+                        className="text-[14px] font-semibold text-center mb-4"
+                        style={{ color: colors.previewText }}
+                      >
+                        {selectedItem.name}
+                      </h3>
+
+                      <div className="space-y-2">
                         <div className="flex justify-between text-[12px]">
-                          <span style={{ color: colors.previewLabelText }}>Size</span>
-                          <span style={{ color: colors.previewValueText }}>{selectedItem.size}</span>
+                          <span style={{ color: colors.previewLabelText }}>Kind</span>
+                          <span style={{ color: colors.previewValueText }}>{selectedItem.type}</span>
+                        </div>
+                        {selectedItem.size && (
+                          <div className="flex justify-between text-[12px]">
+                            <span style={{ color: colors.previewLabelText }}>Size</span>
+                            <span style={{ color: colors.previewValueText }}>{selectedItem.size}</span>
+                          </div>
+                        )}
+                        {selectedItem.modified && (
+                          <div className="flex justify-between text-[12px]">
+                            <span style={{ color: colors.previewLabelText }}>Modified</span>
+                            <span style={{ color: colors.previewValueText }}>{selectedItem.modified}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Block Preview */}
+                      {selectedItem.blocks && selectedItem.blocks.length > 0 && (
+                        <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${colors.previewBorder}` }}>
+                          <h4
+                            className="text-[11px] font-semibold uppercase tracking-wide mb-2"
+                            style={{ color: colors.previewLabelText }}
+                          >
+                            Preview
+                          </h4>
+                          <div
+                            className="text-[12px] overflow-hidden rounded-lg p-2"
+                            style={{ background: colors.previewBlockBg, maxHeight: 120 }}
+                          >
+                            <BlockRenderer block={selectedItem.blocks[0]} />
+                          </div>
                         </div>
                       )}
-                      {selectedItem.modified && (
-                        <div className="flex justify-between text-[12px]">
-                          <span style={{ color: colors.previewLabelText }}>Modified</span>
-                          <span style={{ color: colors.previewValueText }}>{selectedItem.modified}</span>
-                        </div>
-                      )}
                     </div>
-
-                    {/* Block Preview */}
-                    {selectedItem.blocks && selectedItem.blocks.length > 0 && (
-                      <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${colors.previewBorder}` }}>
-                        <h4
-                          className="text-[11px] font-semibold uppercase tracking-wide mb-2"
-                          style={{ color: colors.previewLabelText }}
-                        >
-                          Preview
-                        </h4>
-                        <div
-                          className="text-[12px] overflow-hidden rounded-lg p-2"
-                          style={{ background: colors.previewBlockBg, maxHeight: 120 }}
-                        >
-                          <BlockRenderer block={selectedItem.blocks[0]} />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  </motion.div>
+                )
+              }
+            </AnimatePresence >
+          </div >
 
           {/* Status Bar */}
-          <div
+          < div
             className="flex items-center justify-between px-4 py-1.5 text-[11px] shrink-0"
             style={{
               background: colors.statusBarBg,
@@ -996,9 +1017,9 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
           >
             <span>{sortedContents.length} items</span>
             {selectedItem && <span>Selected: {selectedItem.name}</span>}
-          </div>
-        </motion.div>
-      </div>
+          </div >
+        </motion.div >
+      </div >
     </>
   );
 }

@@ -76,6 +76,9 @@ model Desktop {
   statusWidget       StatusWidget?
   workbenchEntries   WorkbenchEntry[]
   emailCaptures      EmailCapture[]
+  // goOS additions
+  widgets            Widget[]
+  view               DesktopView?
 }
 
 // Email captures for gated content
@@ -125,9 +128,9 @@ model DesktopItem {
   // === goOS-specific fields ===
   // Item variant distinguishes meOS windows from goOS files
   itemVariant        String   @default("window")  // "window" | "goos-file"
-  // goOS file type (only for goos-file variant)
-  goosFileType       String?  // "note" | "case-study" | "folder"
-  // Rich text content for goOS editor (TipTap HTML)
+  // goOS file type: "note" | "case-study" | "folder" | "image" | "link" | "embed" | "download"
+  goosFileType       String?
+  // Rich text content for goOS editor (TipTap HTML) - used by note/case-study
   goosContent        String?  @db.Text
   // Publication status for visibility control
   publishStatus      String   @default("draft")   // "draft" | "published"
@@ -136,8 +139,35 @@ model DesktopItem {
   parentItemId       String?
   parentItem         DesktopItem?  @relation("FolderHierarchy", fields: [parentItemId], references: [id], onDelete: SetNull)
   children           DesktopItem[] @relation("FolderHierarchy")
-  // Future: access control (Phase 3)
-  accessLevel        String   @default("public")  // "public" | "locked"
+
+  // === Access Control ===
+  // "free" | "paid" | "email"
+  accessLevel        String   @default("free")
+  // Pricing for paid content
+  goosPriceAmount    Decimal? @db.Decimal(10, 2)
+  goosPriceCurrency  String?  @default("USD")
+
+  // === Image file type fields ===
+  goosImageUrl       String?
+  goosImageAlt       String?
+  goosImageCaption   String?
+
+  // === Link file type fields ===
+  goosLinkUrl        String?
+  goosLinkTitle      String?
+  goosLinkDescription String?
+  goosLinkFavicon    String?
+
+  // === Embed file type fields ===
+  // Supports: youtube, vimeo, spotify, figma, loom, codepen
+  goosEmbedUrl       String?
+  goosEmbedType      String?
+
+  // === Download file type fields ===
+  goosDownloadUrl    String?
+  goosDownloadName   String?
+  goosDownloadSize   Int?
+  goosDownloadType   String?
 
   @@index([parentItemId])
   @@index([desktopId, publishStatus])
@@ -196,6 +226,40 @@ model StatusWidget {
   isVisible   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// goOS Widgets - Small utility elements on desktop
+// Types: status (legacy), clock, book, tipjar, contact, links, feedback
+model Widget {
+  id          String   @id @default(cuid())
+  desktopId   String
+  desktop     Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  widgetType  String   // 'clock' | 'book' | 'tipjar' | 'contact' | 'links' | 'feedback'
+  positionX   Float
+  positionY   Float
+  title       String?
+  isVisible   Boolean  @default(true)
+  config      Json     @default("{}")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([desktopId])
+}
+
+// goOS Desktop View - Controls how desktop is displayed
+// Modes: desktop (default), page (scrollable), present (slideshow)
+model DesktopView {
+  id           String   @id @default(cuid())
+  desktopId    String   @unique
+  desktop      Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  activeMode   String   @default("desktop") // 'desktop' | 'page' | 'present'
+  pageOrder    Json     @default("[]")      // Array of item IDs for page view order
+  presentOrder Json     @default("[]")      // Array of item IDs for presentation order
+  presentAuto  Boolean  @default(false)     // Auto-advance slides
+  presentDelay Int      @default(5000)      // Ms between slides
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 // Workbench - Work-in-progress timeline entries

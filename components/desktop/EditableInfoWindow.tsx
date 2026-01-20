@@ -221,12 +221,12 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
               style={{
                 width: item.windowWidth || 440,
                 maxHeight: 'calc(100vh - 120px)',
-                borderRadius: isSketch ? '0px' : 'var(--radius-window)',
+                borderRadius: isSketch ? '12px' : 'var(--radius-window)',
                 background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated)',
                 backdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
                 WebkitBackdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
-                boxShadow: isSketch ? '6px 6px 0 #2B4AE2' : 'var(--shadow-window)',
-                border: isSketch ? '2px solid #2B4AE2' : 'var(--border-width) solid var(--border-glass-outer)',
+                boxShadow: isSketch ? '6px 6px 0 #4A6CF7' : 'var(--shadow-window)',
+                border: isSketch ? '1.5px solid #4A6CF7' : 'var(--border-width) solid var(--border-glass-outer)',
               }}
               initial={{ opacity: 0, scale: 0.88, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -243,19 +243,22 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 className="flex items-center px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
                 style={{
                   height: 'var(--window-header-height)',
-                  borderBottom: isSketch ? '2px solid #2B4AE2' : 'var(--border-width) solid var(--border-light)',
+                  borderBottom: isSketch ? '1.5px solid #4A6CF7' : 'var(--border-width) solid var(--border-light)',
                   background: isSketch ? '#FFFFFF' : 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
                 }}
                 onPointerDown={startDrag}
               >
                 {/* Traffic Lights - Uses CSS variables for size and gap */}
-                <div className="flex items-center group/traffic" style={{ gap: isSketch ? '12px' : 'var(--traffic-gap)' }} onPointerDown={(e) => e.stopPropagation()}>
+                <div className="flex items-center group/traffic" style={{ gap: isSketch ? '8px' : 'var(--traffic-gap)' }} onPointerDown={(e) => e.stopPropagation()}>
                   <button
                     onClick={onClose}
-                    className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center group hover:bg-[#2B4AE2] transition-colors" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"}
+                    className="rounded-full flex items-center justify-center transition-all duration-150"
                     style={isSketch ? {
-                      background: '#FFFFFF',
-                      border: '1.5px solid #2B4AE2',
+                      width: 10,
+                      height: 10,
+                      background: '#4A6CF7',
+                      border: 'none',
+                      borderRadius: '50%',
                     } : {
                       width: 'var(--traffic-size)',
                       height: 'var(--traffic-size)',
@@ -263,19 +266,21 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                       boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     }}
                   >
-                    {isSketch ? (
-                      <svg className="w-2 h-2 text-[#2B4AE2] group-hover:text-white" viewBox="0 0 8 8" fill="none" strokeWidth={3}>
-                        <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeLinecap="round" />
-                      </svg>
-                    ) : (
+                    {!isSketch && (
                       <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
                         <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                       </svg>
                     )}
                   </button>
                   <div
-                    className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white opacity-50" : "rounded-full flex items-center justify-center"}
-                    style={isSketch ? {} : {
+                    className="rounded-full flex items-center justify-center"
+                    style={isSketch ? {
+                      width: 10,
+                      height: 10,
+                      background: '#4A6CF7',
+                      border: 'none',
+                      borderRadius: '50%',
+                    } : {
                       width: 'var(--traffic-size)',
                       height: 'var(--traffic-size)',
                       background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
@@ -289,8 +294,14 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                     )}
                   </div>
                   <div
-                    className={isSketch ? "w-3.5 h-3.5 rounded-full flex items-center justify-center border-[1.5px] border-[#2B4AE2] bg-white opacity-50" : "rounded-full flex items-center justify-center"}
-                    style={isSketch ? {} : {
+                    className="rounded-full flex items-center justify-center"
+                    style={isSketch ? {
+                      width: 10,
+                      height: 10,
+                      background: '#4A6CF7',
+                      border: 'none',
+                      borderRadius: '50%',
+                    } : {
                       width: 'var(--traffic-size)',
                       height: 'var(--traffic-size)',
                       background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,

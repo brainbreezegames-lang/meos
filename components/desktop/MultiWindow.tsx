@@ -155,23 +155,23 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
     case 'sketch':
       return {
         windowBg: '#FFFFFF',
-        windowShadow: '6px 6px 0 #2B4AE2',
-        windowBorder: '2px solid #2B4AE2',
+        windowShadow: '6px 6px 0 #4A6CF7',
+        windowBorder: '1.5px solid #4A6CF7',
         headerBg: '#FFFFFF',
-        headerBorder: '2px solid #2B4AE2',
-        titleColor: '#2B4AE2',
-        subtitleColor: '#2B4AE2',
-        textPrimary: '#2B4AE2',
-        textSecondary: '#2B4AE2',
-        textTertiary: '#2B4AE2',
-        borderLight: 'rgba(43, 74, 226, 0.2)',
-        borderMedium: '#2B4AE2',
+        headerBorder: '1.5px solid #4A6CF7',
+        titleColor: '#4A6CF7',
+        subtitleColor: '#4A6CF7',
+        textPrimary: '#4A6CF7',
+        textSecondary: '#4A6CF7',
+        textTertiary: '#4A6CF7',
+        borderLight: 'rgba(74, 108, 247, 0.2)',
+        borderMedium: '#4A6CF7',
         tabActiveBg: '#FFFFFF',
-        tabActiveColor: '#2B4AE2',
-        tabInactiveColor: 'rgba(43, 74, 226, 0.6)',
-        accentColor: '#2B4AE2',
+        tabActiveColor: '#4A6CF7',
+        tabInactiveColor: 'rgba(74, 108, 247, 0.6)',
+        accentColor: '#4A6CF7',
         buttonBg: '#FFFFFF',
-        imageShadow: '4px 4px 0 #2B4AE2',
+        imageShadow: '4px 4px 0 #4A6CF7',
       };
     case 'monterey':
     default:
@@ -429,69 +429,83 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
               <button
                 onClick={handleClose}
                 aria-label="Close window"
-                className="rounded-full flex items-center justify-center transition-all duration-150 group hover:bg-[#2B4AE2]"
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={themeContext?.theme === 'sketch' ? {
-                  width: 14,
-                  height: 14,
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
+                  marginRight: 4,
+                  display: 'block'
                 } : {
                   width: 12,
                   height: 12,
                   background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
               >
-                <X size={8} strokeWidth={3} className="text-[#2B4AE2] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                {themeContext?.theme === 'sketch' ? null : (
+                  <X size={8} strokeWidth={3} className="text-[#a00000] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" />
+                )}
               </button>
 
               {/* Minimize */}
               <button
                 onClick={handleMinimize}
                 aria-label="Minimize window"
-                className="rounded-full flex items-center justify-center transition-all duration-150 group hover:bg-[#2B4AE2]"
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={themeContext?.theme === 'sketch' ? {
-                  width: 14,
-                  height: 14,
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
+                  marginRight: 4,
+                  display: 'block'
                 } : {
                   width: 12,
                   height: 12,
                   background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
               >
-                <Minus size={8} strokeWidth={3} className="text-[#2B4AE2] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                {themeContext?.theme === 'sketch' ? null : (
+                  <Minus size={8} strokeWidth={3} className="text-[#905d00] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" />
+                )}
               </button>
 
               {/* Maximize */}
               <button
                 onClick={handleMaximize}
                 aria-label={isMaximized ? "Restore window" : "Maximize window"}
-                className="rounded-full flex items-center justify-center transition-all duration-150 group hover:bg-[#2B4AE2]"
+                className="rounded-full flex items-center justify-center transition-all duration-150"
                 style={themeContext?.theme === 'sketch' ? {
-                  width: 14,
-                  height: 14,
-                  background: '#FFFFFF',
-                  border: '1.5px solid #2B4AE2',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: 10,
+                  height: 10,
+                  background: '#4A6CF7',
+                  border: 'none',
+                  borderRadius: '50%',
+                  display: 'block'
                 } : {
                   width: 12,
                   height: 12,
                   background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
               >
-                <Square size={6} strokeWidth={3} className="text-[#2B4AE2] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                {themeContext?.theme === 'sketch' ? null : (
+                  <Square size={6} strokeWidth={3} className="text-[#006500] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" />
+                )}
               </button>
             </div>
 
@@ -507,28 +521,48 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             >
               {item.windowTitle}
             </span>
-          </div>
+          </div >
 
           {/* Content */}
-          <div
+          < div
             className="flex-1 overflow-y-auto"
             style={{
               WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',
-            }}
+            }
+            }
           >
             {/* Header Section */}
-            <div
+            < div
               className="flex items-start gap-4"
               style={{ padding: '16px 20px' }}
             >
               {/* Header Image */}
-              {isOwner ? (
-                <EditableImage
-                  id={`${item.id}-header-image`}
-                  value={item.windowHeaderImage || item.thumbnailUrl}
-                  onChange={handleHeaderImageChange}
-                >
+              {
+                isOwner ? (
+                  <EditableImage
+                    id={`${item.id}-header-image`}
+                    value={item.windowHeaderImage || item.thumbnailUrl}
+                    onChange={handleHeaderImageChange}
+                  >
+                    <div
+                      className="relative w-16 h-16 overflow-hidden shrink-0"
+                      style={{
+                        borderRadius: themeContext?.theme === 'sketch' ? 4 : 12,
+                        boxShadow: colors.imageShadow,
+                        border: themeContext?.theme === 'sketch' ? '2px solid #2B4AE2' : 'none',
+                      }}
+                    >
+                      <Image
+                        src={item.windowHeaderImage || item.thumbnailUrl}
+                        alt={item.windowTitle}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    </div>
+                  </EditableImage>
+                ) : (
                   <div
                     className="relative w-16 h-16 overflow-hidden shrink-0"
                     style={{
@@ -545,25 +579,8 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                       sizes="64px"
                     />
                   </div>
-                </EditableImage>
-              ) : (
-                <div
-                  className="relative w-16 h-16 overflow-hidden shrink-0"
-                  style={{
-                    borderRadius: themeContext?.theme === 'sketch' ? 4 : 12,
-                    boxShadow: colors.imageShadow,
-                    border: themeContext?.theme === 'sketch' ? '2px solid #2B4AE2' : 'none',
-                  }}
-                >
-                  <Image
-                    src={item.windowHeaderImage || item.thumbnailUrl}
-                    alt={item.windowTitle}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                  />
-                </div>
-              )}
+                )
+              }
 
               {/* Title + Subtitle */}
               <div className="flex flex-col min-w-0 pt-1.5 flex-1">
@@ -629,35 +646,37 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   </>
                 )}
               </div>
-            </div>
+            </div >
 
             {/* Tabs */}
-            {item.useTabs && sortedTabs.length > 0 && (
-              <div
-                className="flex gap-1"
-                style={{
-                  padding: '0 20px 10px',
-                  borderBottom: `1px solid ${colors.borderLight}`,
-                }}
-              >
-                {sortedTabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTabId(tab.id)}
-                    className="px-3 py-1.5 font-medium transition-all"
-                    style={{
-                      fontSize: 12,
-                      borderRadius: 6,
-                      background: activeTabId === tab.id ? colors.tabActiveBg : 'transparent',
-                      color: activeTabId === tab.id ? colors.tabActiveColor : colors.tabInactiveColor,
-                    }}
-                  >
-                    {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            )}
+            {
+              item.useTabs && sortedTabs.length > 0 && (
+                <div
+                  className="flex gap-1"
+                  style={{
+                    padding: '0 20px 10px',
+                    borderBottom: `1px solid ${colors.borderLight}`,
+                  }}
+                >
+                  {sortedTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTabId(tab.id)}
+                      className="px-3 py-1.5 font-medium transition-all"
+                      style={{
+                        fontSize: 12,
+                        borderRadius: 6,
+                        background: activeTabId === tab.id ? colors.tabActiveBg : 'transparent',
+                        color: activeTabId === tab.id ? colors.tabActiveColor : colors.tabInactiveColor,
+                      }}
+                    >
+                      {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              )
+            }
 
             {/* Blocks */}
             <div className="pb-5">
@@ -735,15 +754,17 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             </div>
 
             {/* Comment Section */}
-            {item.commentsEnabled !== false && (
-              <CommentSection itemId={item.id} />
-            )}
-          </div>
-        </motion.div>
-      </div>
+            {
+              item.commentsEnabled !== false && (
+                <CommentSection itemId={item.id} />
+              )
+            }
+          </div >
+        </motion.div >
+      </div >
 
       {/* Inline Block Picker */}
-      <InlineBlockPicker
+      < InlineBlockPicker
         isOpen={blockPicker.isOpen}
         position={blockPicker.position}
         searchQuery={blockPicker.searchQuery}
