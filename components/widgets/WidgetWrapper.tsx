@@ -27,11 +27,14 @@ export function WidgetWrapper({
   const elementRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef<{ mouseX: number; mouseY: number; elemX: number; elemY: number } | null>(null);
   const hasDragged = useRef(false);
+  const currentPositionRef = useRef({ x: widget.positionX, y: widget.positionY });
 
   // Sync position with widget prop changes (only when not dragging)
   useEffect(() => {
     if (!isDragging) {
-      setPosition({ x: widget.positionX, y: widget.positionY });
+      const newPos = { x: widget.positionX, y: widget.positionY };
+      currentPositionRef.current = newPos;
+      setPosition(newPos);
     }
   }, [widget.positionX, widget.positionY, isDragging]);
 
@@ -79,6 +82,7 @@ export function WidgetWrapper({
       const clampedX = Math.max(0, Math.min(100, newX));
       const clampedY = Math.max(0, Math.min(100, newY));
 
+      currentPositionRef.current = { x: clampedX, y: clampedY };
       setPosition({ x: clampedX, y: clampedY });
     };
 
@@ -89,9 +93,9 @@ export function WidgetWrapper({
       const wasActualDrag = hasDragged.current;
       setIsDragging(false);
 
-      // Save the final position if we actually dragged
-      if (wasActualDrag && onPositionChange && dragStartRef.current) {
-        onPositionChange(position.x, position.y);
+      // Save the final position if we actually dragged (use ref for current value)
+      if (wasActualDrag && onPositionChange) {
+        onPositionChange(currentPositionRef.current.x, currentPositionRef.current.y);
       }
 
       dragStartRef.current = null;
