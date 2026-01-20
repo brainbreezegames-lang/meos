@@ -52,7 +52,8 @@ import {
 import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext';
 import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
 import { WidgetRenderer, WIDGET_METADATA } from '@/components/widgets';
-import { ViewSwitcher, PageView, PresentView, NotePresentView } from '@/components/views';
+import { ViewSwitcher, PageView, PresentView } from '@/components/views';
+import { PresentationView } from '@/components/presentation';
 import type { ViewMode, WidgetType } from '@/types';
 
 // Lazy load heavy editor component (includes TipTap + all extensions)
@@ -2857,19 +2858,19 @@ function GoOSDemoContent() {
                 const file = goosFiles.find(f => f.id === presentingFileId);
                 if (!file) return null;
                 return (
-                    <NotePresentView
+                    <PresentationView
                         note={{
                             id: file.id,
                             title: file.title,
-                            subtitle: null,
+                            subtitle: undefined,
                             content: file.content,
-                            headerImage: null,
-                            fileType: file.type as 'note' | 'case-study',
+                            headerImage: undefined,
                         }}
                         author={{
-                            username: 'demo-user',
+                            username: 'demo',
                             name: 'Demo User',
                         }}
+                        themeId="paper"
                         onClose={() => setPresentingFileId(null)}
                     />
                 );
