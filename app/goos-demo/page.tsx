@@ -1819,11 +1819,14 @@ function GoOSDemoContent() {
 
     // Widget creation handler
     const handleAddWidget = useCallback(async (widgetType: string) => {
-        await createWidget(widgetType as WidgetType, {
+        console.log('[handleAddWidget] Creating widget:', widgetType);
+        const result = await createWidget(widgetType as WidgetType, {
             x: 70 + Math.random() * 10,
             y: 20 + Math.random() * 10,
         });
-    }, [createWidget]);
+        console.log('[handleAddWidget] Result:', result);
+        console.log('[handleAddWidget] Widgets after create:', widgets);
+    }, [createWidget, widgets]);
 
     const openFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
@@ -2255,18 +2258,35 @@ function GoOSDemoContent() {
                     })}
                 </AnimatePresence>
 
-                {/* goOS Widgets */}
+                {/* goOS Widgets - always render container for debugging */}
+                <WidgetRenderer
+                    widgets={widgets}
+                    isOwner={true}
+                    onWidgetEdit={(widget) => {
+                        console.log('Edit widget:', widget);
+                    }}
+                    onWidgetPositionChange={(id, x, y) => {
+                        updateWidget(id, { positionX: x, positionY: y });
+                    }}
+                />
+                {/* Debug: Show widget count */}
                 {widgets.length > 0 && (
-                    <WidgetRenderer
-                        widgets={widgets}
-                        isOwner={true}
-                        onWidgetEdit={(widget) => {
-                            console.log('Edit widget:', widget);
+                    <div
+                        style={{
+                            position: 'fixed',
+                            bottom: '80px',
+                            right: '20px',
+                            padding: '8px 12px',
+                            background: '#2B4AE2',
+                            color: 'white',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            zIndex: 9999,
                         }}
-                        onWidgetPositionChange={(id, x, y) => {
-                            updateWidget(id, { positionX: x, positionY: y });
-                        }}
-                    />
+                    >
+                        Widgets: {widgets.length}
+                    </div>
                 )}
 
                 {/* goOS Editor Windows */}
