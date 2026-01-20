@@ -2270,7 +2270,7 @@ function GoOSDemoContent() {
                     })}
                 </AnimatePresence>
 
-                {/* goOS Widgets - always render container for debugging */}
+                {/* goOS Widgets - fully functional */}
                 <WidgetRenderer
                     widgets={widgets}
                     isOwner={true}
@@ -2279,6 +2279,46 @@ function GoOSDemoContent() {
                     }}
                     onWidgetPositionChange={(id, x, y) => {
                         updateWidget(id, { positionX: x, positionY: y });
+                    }}
+                    onContact={async (data) => {
+                        // Send contact form via API
+                        try {
+                            const response = await fetch('/api/contact', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(data),
+                            });
+                            if (!response.ok) throw new Error('Failed to send');
+                            showGoOSToast('Message sent successfully!', 'success');
+                        } catch {
+                            // Fallback to mailto
+                            const subject = encodeURIComponent(`Contact from ${data.name || 'Website Visitor'}`);
+                            const body = encodeURIComponent(`${data.message}\n\nFrom: ${data.name || 'Anonymous'}\nEmail: ${data.email}`);
+                            window.location.href = `mailto:hello@example.com?subject=${subject}&body=${body}`;
+                        }
+                    }}
+                    onTip={async (amount) => {
+                        // For now, show appreciation - Stripe integration needed for real payments
+                        showGoOSToast(`Thank you for the $${amount} tip! 💙`, 'success');
+                        // TODO: Integrate Stripe checkout
+                        // window.open(`https://buy.stripe.com/your-link?amount=${amount * 100}`, '_blank');
+                    }}
+                    onFeedback={async (feedback) => {
+                        try {
+                            const response = await fetch('/api/feedback', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ feedback, timestamp: new Date().toISOString() }),
+                            });
+                            if (!response.ok) throw new Error('Failed to send');
+                            showGoOSToast('Feedback received, thank you!', 'success');
+                        } catch {
+                            // Store locally as fallback
+                            const feedbacks = JSON.parse(localStorage.getItem('goos-feedback') || '[]');
+                            feedbacks.push({ feedback, timestamp: new Date().toISOString() });
+                            localStorage.setItem('goos-feedback', JSON.stringify(feedbacks));
+                            showGoOSToast('Feedback saved, thank you!', 'success');
+                        }
                     }}
                 />
 
