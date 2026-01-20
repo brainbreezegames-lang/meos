@@ -53,6 +53,7 @@ interface NotePresentViewProps {
   };
   autoAdvance?: boolean;
   autoAdvanceDelay?: number;
+  onClose?: () => void;
 }
 
 export function NotePresentView({
@@ -60,6 +61,7 @@ export function NotePresentView({
   author,
   autoAdvance = false,
   autoAdvanceDelay = 5000,
+  onClose,
 }: NotePresentViewProps) {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -94,8 +96,12 @@ export function NotePresentView({
   }, [totalSlides]);
 
   const handleClose = () => {
-    // Navigate back to the article page
-    router.push(`/${author.username}/${note.id}`);
+    if (onClose) {
+      onClose();
+    } else {
+      // Navigate back to the article page
+      router.push(`/${author.username}/${note.id}`);
+    }
   };
 
   // Keyboard navigation

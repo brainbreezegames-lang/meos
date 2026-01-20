@@ -52,7 +52,7 @@ import {
 import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext';
 import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
 import { WidgetRenderer, WIDGET_METADATA } from '@/components/widgets';
-import { ViewSwitcher, PageView, PresentView } from '@/components/views';
+import { ViewSwitcher, PageView, PresentView, NotePresentView } from '@/components/views';
 import type { ViewMode, WidgetType } from '@/types';
 
 // Lazy load heavy editor component (includes TipTap + all extensions)
@@ -1657,6 +1657,7 @@ function GoOSDemoContent() {
 
     // View mode state
     const [viewMode, setViewMode] = useState<ViewMode>('desktop');
+    const [presentingFileId, setPresentingFileId] = useState<string | null>(null);
 
     // Widget context
     const widgetContext = useWidgets();
@@ -2746,15 +2747,14 @@ function GoOSDemoContent() {
                     onOpenAsPage={() => {
                         const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
                         if (file && (file.type === 'note' || file.type === 'case-study')) {
-                            // Open in new tab for demo - in production this would use the actual username
-                            window.open(`/demo-user/${fileContextMenu.fileId}`, '_blank');
+                            // In demo, just open in editor - in production this navigates to /{username}/{id}
+                            openFile(fileContextMenu.fileId!);
                         }
                     }}
                     onOpenAsPresent={() => {
                         const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
                         if (file && (file.type === 'note' || file.type === 'case-study')) {
-                            // Open in new tab for demo - in production this would use the actual username
-                            window.open(`/demo-user/${fileContextMenu.fileId}/present`, '_blank');
+                            setPresentingFileId(fileContextMenu.fileId);
                         }
                     }}
                     onRename={() => setRenamingFileId(fileContextMenu.fileId)}
@@ -2808,6 +2808,29 @@ function GoOSDemoContent() {
                     canPaste={!!clipboard}
                 />
             )}
+
+            {/* Single Note Presentation Overlay */}
+            {presentingFileId && (() => {
+                const file = goosFiles.find(f => f.id === presentingFileId);
+                if (!file) return null;
+                return (
+                    <NotePresentView
+                        note={{
+                            id: file.id,
+                            title: file.title,
+                            subtitle: null,
+                            content: file.content,
+                            headerImage: null,
+                            fileType: file.type as 'note' | 'case-study',
+                        }}
+                        author={{
+                            username: 'demo-user',
+                            name: 'Demo User',
+                        }}
+                        onClose={() => setPresentingFileId(null)}
+                    />
+                );
+            })()}
 
             <SaveIndicator />
             <Toast />
