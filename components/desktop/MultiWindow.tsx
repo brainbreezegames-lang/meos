@@ -467,7 +467,6 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   background: '#ff5f57',
                   border: '1px solid #171412',
                   borderRadius: '50%',
-                  marginRight: 6,
                   display: 'block'
                 } : {
                   width: 12,
@@ -503,7 +502,6 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   background: '#f59e0b',
                   border: '1px solid #171412',
                   borderRadius: '50%',
-                  marginRight: 6,
                   display: 'block'
                 } : {
                   width: 12,
