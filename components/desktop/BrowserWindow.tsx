@@ -7,6 +7,7 @@ import type { DesktopItem, BlockData } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
 import { useThemeSafe } from '@/contexts/ThemeContext';
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
 import { BLOCK_DEFINITIONS, BLOCK_CATEGORIES } from '@/types/blocks';
