@@ -153,68 +153,71 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         imageShadow: '0 0 0 1px rgba(255,255,255,0.4) inset, 0 8px 24px -4px rgba(107,114,128,0.15)',
       };
     case 'sketch':
+      // Sketch now also uses CSS variables (same as Appart)
       return {
-        windowBg: '#FFFFFF',
-        windowShadow: '6px 6px 0 #4A6CF7',
-        windowBorder: '1.5px solid #4A6CF7',
-        headerBg: '#FFFFFF',
-        headerBorder: '1.5px solid #4A6CF7',
-        titleColor: '#4A6CF7',
-        subtitleColor: '#4A6CF7',
-        textPrimary: '#4A6CF7',
-        textSecondary: '#4A6CF7',
-        textTertiary: '#4A6CF7',
-        borderLight: 'rgba(74, 108, 247, 0.2)',
-        borderMedium: '#4A6CF7',
-        tabActiveBg: '#FFFFFF',
-        tabActiveColor: '#4A6CF7',
-        tabInactiveColor: 'rgba(74, 108, 247, 0.6)',
-        accentColor: '#4A6CF7',
-        buttonBg: '#FFFFFF',
-        imageShadow: '4px 4px 0 #4A6CF7',
+        windowBg: 'var(--color-bg-white)',
+        windowShadow: 'var(--shadow-window)',
+        windowBorder: '1.5px solid var(--color-text-primary)',
+        headerBg: 'var(--color-bg-white)',
+        headerBorder: '1.5px solid var(--color-text-primary)',
+        titleColor: 'var(--color-text-primary)',
+        subtitleColor: 'var(--color-text-secondary)',
+        textPrimary: 'var(--color-text-primary)',
+        textSecondary: 'var(--color-text-secondary)',
+        textTertiary: 'var(--color-text-muted)',
+        borderLight: 'var(--color-border-default)',
+        borderMedium: 'var(--color-text-primary)',
+        tabActiveBg: 'var(--color-bg-white)',
+        tabActiveColor: 'var(--color-text-primary)',
+        tabInactiveColor: 'var(--color-text-muted)',
+        accentColor: 'var(--color-accent-primary)',
+        buttonBg: 'var(--color-bg-white)',
+        imageShadow: 'var(--shadow-md)',
       };
     case 'brand-appart':
+    case 'appart':
       return {
-        windowBg: '#fbf9ef',
-        windowShadow: '4px 4px 0 rgba(23, 20, 18, 0.1)',
-        windowBorder: '1px solid #171412',
-        headerBg: '#fbf9ef',
-        headerBorder: '1px solid #171412',
-        titleColor: '#171412',
-        subtitleColor: '#8e827c',
-        textPrimary: '#171412',
-        textSecondary: '#8e827c',
-        textTertiary: '#8e827c',
-        borderLight: 'rgba(23, 20, 18, 0.1)',
-        borderMedium: '#171412',
-        tabActiveBg: '#FFFFFF',
-        tabActiveColor: '#171412',
-        tabInactiveColor: '#8e827c',
-        accentColor: '#ff7722',
-        buttonBg: '#FFFFFF',
-        imageShadow: '4px 4px 0 rgba(23, 20, 18, 0.1)',
+        windowBg: 'var(--color-bg-base)',
+        windowShadow: 'var(--shadow-window)',
+        windowBorder: '1px solid var(--color-text-primary)',
+        headerBg: 'var(--color-bg-base)',
+        headerBorder: '1px solid var(--color-text-primary)',
+        titleColor: 'var(--color-text-primary)',
+        subtitleColor: 'var(--color-text-muted)',
+        textPrimary: 'var(--color-text-primary)',
+        textSecondary: 'var(--color-text-muted)',
+        textTertiary: 'var(--color-text-muted)',
+        borderLight: 'var(--color-border-default)',
+        borderMedium: 'var(--color-text-primary)',
+        tabActiveBg: 'var(--color-bg-white)',
+        tabActiveColor: 'var(--color-text-primary)',
+        tabInactiveColor: 'var(--color-text-muted)',
+        accentColor: 'var(--color-accent-primary)',
+        buttonBg: 'var(--color-bg-white)',
+        imageShadow: 'var(--shadow-md)',
       };
     case 'monterey':
     default:
+      // Default uses CSS variables from design-system.css (Appart theme)
       return {
-        windowBg: 'rgba(30, 30, 35, 0.65)',
-        windowShadow: '0 40px 100px -20px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1)',
-        windowBorder: '1px solid rgba(255,255,255,0.1)',
-        headerBg: 'rgba(255,255,255,0.03)',
-        headerBorder: '1px solid rgba(255,255,255,0.05)',
-        titleColor: '#FFFFFF',
-        subtitleColor: 'rgba(255,255,255,0.7)',
-        textPrimary: '#FFFFFF',
-        textSecondary: 'rgba(255,255,255,0.6)',
-        textTertiary: 'rgba(255,255,255,0.4)',
-        borderLight: 'rgba(255,255,255,0.1)',
-        borderMedium: 'rgba(255,255,255,0.15)',
-        tabActiveBg: 'rgba(139, 92, 246, 0.15)',
-        tabActiveColor: '#A78BFA',
-        tabInactiveColor: 'rgba(255,255,255,0.5)',
-        accentColor: '#A78BFA',
-        buttonBg: 'rgba(255,255,255,0.1)',
-        imageShadow: '0 4px 12px rgba(0,0,0,0.3)',
+        windowBg: 'var(--color-bg-base)',
+        windowShadow: 'var(--shadow-window)',
+        windowBorder: '1px solid var(--color-text-primary)',
+        headerBg: 'var(--color-bg-base)',
+        headerBorder: '1px solid var(--color-text-primary)',
+        titleColor: 'var(--color-text-primary)',
+        subtitleColor: 'var(--color-text-muted)',
+        textPrimary: 'var(--color-text-primary)',
+        textSecondary: 'var(--color-text-muted)',
+        textTertiary: 'var(--color-text-muted)',
+        borderLight: 'var(--color-border-default)',
+        borderMedium: 'var(--color-text-primary)',
+        tabActiveBg: 'var(--color-bg-white)',
+        tabActiveColor: 'var(--color-text-primary)',
+        tabInactiveColor: 'var(--color-text-muted)',
+        accentColor: 'var(--color-accent-primary)',
+        buttonBg: 'var(--color-bg-white)',
+        imageShadow: 'var(--shadow-md)',
       };
   }
 }
@@ -453,26 +456,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleClose}
                 aria-label="Close window"
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
-                  borderRadius: '50%',
-                  marginRight: 4,
-                  display: 'block'
-                } : isBrandAppart ? {
+                style={{
                   width: 12,
                   height: 12,
-                  background: '#ff5f57',
-                  border: '1px solid #171412',
+                  background: 'var(--color-traffic-close)',
+                  border: '1px solid var(--color-text-primary)',
                   borderRadius: '50%',
-                  display: 'block'
-                } : {
-                  width: 12,
-                  height: 12,
-                  background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -488,26 +477,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleMinimize}
                 aria-label="Minimize window"
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
-                  borderRadius: '50%',
-                  marginRight: 4,
-                  display: 'block'
-                } : isBrandAppart ? {
+                style={{
                   width: 12,
                   height: 12,
-                  background: '#f59e0b',
-                  border: '1px solid #171412',
+                  background: 'var(--color-traffic-minimize)',
+                  border: '1px solid var(--color-text-primary)',
                   borderRadius: '50%',
-                  display: 'block'
-                } : {
-                  width: 12,
-                  height: 12,
-                  background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -523,25 +498,12 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleMaximize}
                 aria-label={isMaximized ? "Restore window" : "Maximize window"}
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
-                  borderRadius: '50%',
-                  display: 'block'
-                } : isBrandAppart ? {
+                style={{
                   width: 12,
                   height: 12,
-                  background: '#10b981',
-                  border: '1px solid #171412',
+                  background: 'var(--color-traffic-maximize)',
+                  border: '1px solid var(--color-text-primary)',
                   borderRadius: '50%',
-                  display: 'block'
-                } : {
-                  width: 12,
-                  height: 12,
-                  background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -592,9 +554,9 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                     <div
                       className="relative w-16 h-16 overflow-hidden shrink-0"
                       style={{
-                        borderRadius: themeContext?.theme === 'sketch' ? 4 : 12,
+                        borderRadius: 12,
                         boxShadow: colors.imageShadow,
-                        border: themeContext?.theme === 'sketch' ? '2px solid #2B4AE2' : 'none',
+                        border: '1px solid var(--color-border-default)',
                       }}
                     >
                       <Image
@@ -610,9 +572,9 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                   <div
                     className="relative w-16 h-16 overflow-hidden shrink-0"
                     style={{
-                      borderRadius: themeContext?.theme === 'sketch' ? 4 : 12,
+                      borderRadius: 12,
                       boxShadow: colors.imageShadow,
-                      border: themeContext?.theme === 'sketch' ? '2px solid #2B4AE2' : 'none',
+                      border: '1px solid var(--color-border-default)',
                     }}
                   >
                     <Image

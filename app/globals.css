@@ -50,27 +50,28 @@
     --border-highlight: rgba(255, 255, 255, 0.2);
 
     /* ============================================
-     THEME: SKETCH (goOS)
+     THEME: APPART (goOS) - Warm cream, orange, black
      ============================================ */
-    --sketch-bg: #F8F6F1;
-    /* oatmeal/cream */
-    --sketch-ink: #4A6CF7;
-    /* Main blue ink */
-    --sketch-highlight: #FFFFFF;
-    --sketch-accent-orange: #4A6CF7;
-    /* All accents are blue now */
+    --sketch-bg: #fbf9ef;
+    /* warm cream */
+    --sketch-ink: #171412;
+    /* warm black */
+    --sketch-highlight: #ffffff;
+    --sketch-accent-orange: #ff7722;
+    /* burnt orange */
     --sketch-border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
 
-    /* goOS Strict Theme Specs */
-    --goos-blue: #4A6CF7;
-    --goos-cream: #F8F6F1;
-    --goos-white: #FFFFFF;
-    --goos-blue-10: rgba(74, 108, 247, 0.1);
-    --goos-blue-20: rgba(74, 108, 247, 0.2);
-    --goos-blue-50: rgba(74, 108, 247, 0.5);
+    /* goOS Appart Theme Specs */
+    --goos-blue: #ff7722;
+    /* Now orange accent */
+    --goos-cream: #fbf9ef;
+    --goos-white: #ffffff;
+    --goos-blue-10: rgba(255, 119, 34, 0.1);
+    --goos-blue-20: rgba(255, 119, 34, 0.2);
+    --goos-blue-50: rgba(255, 119, 34, 0.5);
 
     /* goOS Halftone Pattern */
-    --goos-halftone: radial-gradient(var(--goos-blue) 1px, transparent 1px);
+    --goos-halftone: radial-gradient(#ff7722 1px, transparent 1px);
     --goos-halftone-size: 8px 8px;
     /* Increased spacing for better visibility */
 
@@ -206,46 +207,46 @@ html.theme-sketch {
     --tracking-wide: 0.02em;
 
     /* ========== COLORS ========== */
-    /* Backgrounds */
-    --bg-canvas: #FFFFFF;
-    /* Pure White */
-    --bg-surface: #FFFFFF;
-    /* Pure White */
-    --bg-elevated: #FFFFFF;
-    /* Pure White */
-    --bg-muted: #FFFFFF;
-    /* Pure White */
-    --bg-overlay: rgba(43, 74, 226, 0.1);
+    /* Backgrounds - Warm Cream */
+    --bg-canvas: #fbf9ef;
+    /* Warm cream */
+    --bg-surface: #fbf9ef;
+    /* Warm cream */
+    --bg-elevated: #ffffff;
+    /* White elevated */
+    --bg-muted: #f2f0e7;
+    /* Subtle cream */
+    --bg-overlay: rgba(255, 119, 34, 0.1);
 
-    /* Text Colors - Blue */
-    --text-primary: #2B4AE2;
-    --text-secondary: #2B4AE2;
-    --text-tertiary: #2B4AE2;
-    --text-disabled: rgba(43, 74, 226, 0.5);
-    --text-inverse: #FFFFFF;
+    /* Text Colors - Warm Black */
+    --text-primary: #171412;
+    --text-secondary: #4a4744;
+    --text-tertiary: #8e827c;
+    --text-disabled: rgba(23, 20, 18, 0.5);
+    --text-inverse: #ffffff;
 
-    /* Brand/Accent Colors */
-    --accent-primary: #2B4AE2;
-    --accent-dark: #2B4AE2;
-    --accent-light: #2B4AE2;
-    --accent-pale: #FFFFFF;
+    /* Brand/Accent Colors - Orange */
+    --accent-primary: #ff7722;
+    --accent-dark: #e5691e;
+    --accent-light: #ff7722;
+    --accent-pale: #fbf9ef;
 
     /* Semantic Colors */
-    --color-success: #2B4AE2;
-    --color-warning: #2B4AE2;
-    --color-error: #2B4AE2;
-    --color-info: #2B4AE2;
+    --color-success: #22c55e;
+    --color-warning: #ffc765;
+    --color-error: #ff3c34;
+    --color-info: #ff7722;
 
-    /* Window Controls - Blue on White */
-    --traffic-red: #FFFFFF;
-    --traffic-yellow: #FFFFFF;
-    --traffic-green: #FFFFFF;
-    --traffic-border: #2B4AE2;
+    /* Window Controls - Standard colors */
+    --traffic-red: #ff5f57;
+    --traffic-yellow: #ffbd2e;
+    --traffic-green: #28c840;
+    --traffic-border: #171412;
 
     /* Border Colors */
-    --border-strong: #2B4AE2;
-    --border-medium: #2B4AE2;
-    --border-subtle: rgba(43, 74, 226, 0.3);
+    --border-strong: rgba(23, 20, 18, 0.15);
+    --border-medium: rgba(23, 20, 18, 0.08);
+    --border-subtle: rgba(23, 20, 18, 0.05);
 
     /* ========== SPACING ========== */
     --space-0: 0;
@@ -270,14 +271,14 @@ html.theme-sketch {
     --border-width: 2px;
     --border-width-thin: 1.5px;
 
-    /* ========== SHADOWS (Hard Edge) ========== */
-    /* Hard blue shadows for that blueprint/technical look */
-    --shadow-sm: 2px 2px 0 #2B4AE2;
-    --shadow-md: 4px 4px 0 #2B4AE2;
-    --shadow-lg: 6px 6px 0 #2B4AE2;
-    --shadow-solid: 6px 6px 0 #2B4AE2;
-    --shadow-button: 2px 2px 0 #2B4AE2;
-    --shadow-button-active: 0px 0px 0 #2B4AE2;
+    /* ========== SHADOWS (Soft Warm) ========== */
+    /* Warm shadows using warm black */
+    --shadow-sm: 0 2px 8px rgba(23, 20, 18, 0.06);
+    --shadow-md: 0 4px 20px rgba(23, 20, 18, 0.08);
+    --shadow-lg: 0 8px 32px rgba(23, 20, 18, 0.12);
+    --shadow-solid: 0 16px 48px rgba(23, 20, 18, 0.15);
+    --shadow-button: 0 2px 8px rgba(23, 20, 18, 0.06);
+    --shadow-button-active: 0 1px 4px rgba(23, 20, 18, 0.1);
 
     /* ========== TRANSITIONS ========== */
     --transition-fast: 150ms ease;
@@ -306,19 +307,19 @@ html.theme-sketch {
     --font-size-small: var(--text-sm);
     --letter-spacing-normal: var(--tracking-normal);
 
-    /* Traffic lights - uniform blue style */
+    /* Traffic lights - standard colors */
     --traffic-size: 14px;
     --traffic-gap: 8px;
-    --traffic-red: #FFFFFF;
-    --traffic-red-hover: #2B4AE2;
-    --traffic-yellow: #FFFFFF;
-    --traffic-yellow-hover: #2B4AE2;
-    --traffic-green: #FFFFFF;
-    --traffic-green-hover: #2B4AE2;
+    --traffic-red: #ff5f57;
+    --traffic-red-hover: #e0443e;
+    --traffic-yellow: #ffbd2e;
+    --traffic-yellow-hover: #dfa023;
+    --traffic-green: #28c840;
+    --traffic-green-hover: #1aad2e;
 
-    /* Window shadows - solid offset style */
-    --shadow-window: 6px 6px 0 #2B4AE2;
-    --shadow-dock: 4px 4px 0 #2B4AE2;
+    /* Window shadows - soft warm style */
+    --shadow-window: 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08);
+    --shadow-dock: 0 8px 32px rgba(23, 20, 18, 0.12);
 
     /* Dock styling */
     --bg-dock: #FFFFFF;
@@ -448,15 +449,15 @@ html.theme-sketch {
     color: var(--text-primary);
 }
 
-/* ========== STICKY NOTE STYLES (MONOCHROME) ========== */
+/* ========== STICKY NOTE STYLES (APPART) ========== */
 .sticky-note {
     /* Dog-ear fold effect */
     clip-path: polygon(0% 0%, 100% 0%, 100% 88%, 92% 100%, 0% 100%);
     position: relative;
     font-family: var(--font-handwritten);
-    background-color: #FFFFFF;
-    color: #2B4AE2;
-    border: 2px solid #2B4AE2;
+    background-color: #ffc765;
+    color: #171412;
+    border: 1px solid #171412;
 }
 
 /* No colored variants - all default to white/blue */
