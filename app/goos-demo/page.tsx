@@ -144,25 +144,31 @@ const GoOSEditorWindow = dynamic(
 );
 
 // ============================================
-// GOOS DESIGN TOKENS - Brand Appart Warm Cream
+// GOOS DESIGN TOKENS - Brand Appart (aligned with useWidgetTheme)
 // ============================================
 const goOS = {
     colors: {
-        paper: '#fbf9ef',
+        paper: '#fbf9ef',       // Brand cream - matches useWidgetTheme
         cream: '#fbf9ef',
         headerBg: '#fbf9ef',
-        windowBg: '#ffffff',
-        border: '#1a1a1a',
+        windowBg: '#fbf9ef',    // Use cream, not white - matches useWidgetTheme
+        border: '#171412',      // Brand base dark - matches useWidgetTheme
         text: {
-            primary: '#1a1a1a',
-            secondary: '#4a4a4a',
-            muted: '#6b6b6b',
+            primary: '#171412',  // Brand base - matches useWidgetTheme
+            secondary: '#8e827c', // Brand grey - matches useWidgetTheme
+            muted: '#8e827c',
         },
         accent: {
-            primary: '#ff7722',
+            primary: '#ff7722',  // Brand orange
             dark: '#e56a1f',
             light: '#ff9955',
             pale: '#fff5ee',
+        },
+        traffic: {
+            close: '#ff5f57',
+            minimize: '#f59e0b',
+            maximize: '#10b981',
+            border: '#171412',   // Dark border for Brand Appart style
         },
         sticky: {
             yellow: '#fff9db',
@@ -174,10 +180,14 @@ const goOS = {
         }
     },
     shadows: {
-        solid: '6px 6px 0 rgba(0,0,0,0.08)',
-        hover: '8px 8px 0 rgba(0,0,0,0.12)',
-        sm: '2px 2px 0 rgba(0,0,0,0.06)',
-        button: '3px 3px 0 rgba(0,0,0,0.1)',
+        solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',    // Matches useWidgetTheme
+        hover: '6px 6px 0 rgba(23, 20, 18, 0.15)',   // Matches useWidgetTheme
+        sm: '2px 2px 0 rgba(23, 20, 18, 0.06)',
+        button: '3px 3px 0 rgba(23, 20, 18, 0.1)',
+    },
+    radii: {
+        card: '12px',   // Brand Appart uses 12px
+        button: '8px',
     },
     springs: {
         snappy: { type: "spring" as const, damping: 20, stiffness: 400 },
@@ -1324,7 +1334,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 : goOS.springs.gentle
             }
             onMouseDown={onFocus}
-            className="fixed flex flex-col rounded-xl overflow-hidden"
+            className="fixed flex flex-col overflow-hidden"
             style={{
                 left: defaultX,
                 top: defaultY,
@@ -1333,7 +1343,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 zIndex,
                 background: goOS.colors.windowBg,
                 border: `2px solid ${goOS.colors.border}`,
-                borderRadius: '16px',
+                borderRadius: goOS.radii.card,
                 boxShadow: goOS.shadows.solid
             }}
         >
@@ -1343,21 +1353,24 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
             >
                 <div className="flex items-center gap-2">
                     <TrafficLightButton
-                        color="#ff5f57"
+                        color={goOS.colors.traffic.close}
                         hoverColor="#ff3b30"
+                        borderColor={goOS.colors.traffic.border}
                         icon="×"
                         onClick={handleClose}
                         title="Close"
                     />
                     <TrafficLightButton
-                        color="#febc2e"
+                        color={goOS.colors.traffic.minimize}
                         hoverColor="#ffcc00"
+                        borderColor={goOS.colors.traffic.border}
                         icon="−"
                         title="Minimize"
                     />
                     <TrafficLightButton
-                        color="#28c840"
+                        color={goOS.colors.traffic.maximize}
                         hoverColor="#34c759"
+                        borderColor={goOS.colors.traffic.border}
                         icon="+"
                         title="Maximize"
                     />
