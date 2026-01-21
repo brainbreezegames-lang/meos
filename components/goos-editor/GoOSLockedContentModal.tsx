@@ -3,28 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Mail, X, FileText, Folder, BarChart3 } from 'lucide-react';
-
-// Brand Appart design tokens (aligned with useWidgetTheme)
-const goOS = {
-  colors: {
-    paper: '#fbf9ef',       // Brand cream
-    cream: '#fbf9ef',
-    headerBg: '#f2f0e7',
-    border: '#171412',      // Brand base dark
-    text: {
-      primary: '#171412',   // Brand base
-      secondary: '#8e827c', // Brand grey
-      muted: '#8e827c',
-    },
-    accent: {
-      primary: '#ff7722',   // Brand orange
-      light: '#ff9955',
-    },
-  },
-  shadows: {
-    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',
-  },
-};
+import { goOSTokens } from './GoOSTipTapEditor';
 
 interface GoOSLockedContentModalProps {
   isOpen: boolean;
@@ -79,11 +58,11 @@ export function GoOSLockedContentModal({
   const getFileIcon = () => {
     switch (file.type) {
       case 'folder':
-        return <Folder size={48} stroke={goOS.colors.border} strokeWidth={1.5} />;
+        return <Folder size={48} stroke={goOSTokens.colors.text.primary} strokeWidth={1.5} />;
       case 'case-study':
-        return <BarChart3 size={48} stroke={goOS.colors.border} strokeWidth={1.5} />;
+        return <BarChart3 size={48} stroke={goOSTokens.colors.text.primary} strokeWidth={1.5} />;
       default:
-        return <FileText size={48} stroke={goOS.colors.border} strokeWidth={1.5} />;
+        return <FileText size={48} stroke={goOSTokens.colors.text.primary} strokeWidth={1.5} />;
     }
   };
 
@@ -96,7 +75,12 @@ export function GoOSLockedContentModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 z-[9998]"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.3)',
+              zIndex: 9998,
+            }}
             onClick={onClose}
           />
 
@@ -106,62 +90,116 @@ export function GoOSLockedContentModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-0 flex items-center justify-center z-[9999] p-4"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+              padding: 16,
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div
-              className="w-full max-w-md rounded-lg overflow-hidden"
               style={{
-                background: goOS.colors.cream,
-                border: `2px solid ${goOS.colors.border}`,
-                boxShadow: goOS.shadows.solid,
+                width: '100%',
+                maxWidth: 448,
+                borderRadius: goOSTokens.radii.lg,
+                overflow: 'hidden',
+                background: goOSTokens.colors.cream,
+                border: `2px solid ${goOSTokens.colors.borderStrong}`,
+                boxShadow: goOSTokens.shadows.lg,
               }}
             >
               {/* Header */}
               <div
-                className="flex items-center justify-between px-4 py-3"
                 style={{
-                  background: goOS.colors.headerBg,
-                  borderBottom: `2px solid ${goOS.colors.border}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 16px',
+                  background: goOSTokens.colors.headerBg,
+                  borderBottom: `2px solid ${goOSTokens.colors.borderStrong}`,
                 }}
               >
-                <div className="flex items-center gap-2">
-                  <Lock size={16} stroke={goOS.colors.accent.primary} />
-                  <span className="font-medium text-sm" style={{ color: goOS.colors.text.primary }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Lock size={16} stroke={goOSTokens.colors.accent.primary} />
+                  <span
+                    style={{
+                      fontWeight: 500,
+                      fontSize: 14,
+                      color: goOSTokens.colors.text.primary,
+                      fontFamily: goOSTokens.fonts.body,
+                    }}
+                  >
                     Locked Content
                   </span>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-1 rounded hover:bg-black/5 transition-colors"
+                  style={{
+                    padding: 4,
+                    borderRadius: goOSTokens.radii.sm,
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <X size={16} stroke={goOS.colors.text.muted} />
+                  <X size={16} stroke={goOSTokens.colors.text.muted} />
                 </button>
               </div>
 
               {/* Content */}
-              <div className="p-6">
+              <div style={{ padding: 24 }}>
                 {/* File preview */}
-                <div className="flex flex-col items-center mb-6">
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    marginBottom: 24,
+                  }}
+                >
                   <div
-                    className="w-24 h-24 rounded-lg flex items-center justify-center mb-3"
                     style={{
-                      background: goOS.colors.paper,
-                      border: `2px solid ${goOS.colors.border}`,
-                      boxShadow: '4px 4px 0 rgba(0,0,0,0.08)',
+                      width: 96,
+                      height: 96,
+                      borderRadius: goOSTokens.radii.lg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: 12,
+                      background: goOSTokens.colors.paper,
+                      border: `2px solid ${goOSTokens.colors.borderStrong}`,
+                      boxShadow: goOSTokens.shadows.sm,
                     }}
                   >
                     {getFileIcon()}
                   </div>
                   <h3
-                    className="text-lg font-bold text-center"
-                    style={{ color: goOS.colors.text.primary }}
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 700,
+                      textAlign: 'center',
+                      color: goOSTokens.colors.text.primary,
+                      fontFamily: goOSTokens.fonts.display,
+                      margin: 0,
+                    }}
                   >
                     {file.title}
                   </h3>
                   <p
-                    className="text-sm mt-1 text-center"
-                    style={{ color: goOS.colors.text.muted }}
+                    style={{
+                      fontSize: 14,
+                      marginTop: 4,
+                      textAlign: 'center',
+                      color: goOSTokens.colors.text.muted,
+                      fontFamily: goOSTokens.fonts.body,
+                    }}
                   >
                     This content requires {unlockType === 'email' ? 'your email' : 'a purchase'} to access
                   </p>
@@ -172,36 +210,65 @@ export function GoOSLockedContentModal({
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-center py-4"
+                    style={{
+                      textAlign: 'center',
+                      padding: '16px 0',
+                    }}
                   >
-                    <div className="text-2xl mb-2">✓</div>
-                    <p className="font-medium" style={{ color: goOS.colors.accent.primary }}>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>✓</div>
+                    <p
+                      style={{
+                        fontWeight: 500,
+                        color: goOSTokens.colors.accent.primary,
+                        fontFamily: goOSTokens.fonts.body,
+                      }}
+                    >
                       Unlocked! Opening now...
                     </p>
                   </motion.div>
                 ) : unlockType === 'email' ? (
                   <form onSubmit={handleEmailSubmit}>
-                    <div className="mb-4">
+                    <div style={{ marginBottom: 16 }}>
                       <div
-                        className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
                         style={{
-                          background: goOS.colors.paper,
-                          border: `2px solid ${error ? '#ef4444' : goOS.colors.border}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          padding: '10px 12px',
+                          borderRadius: goOSTokens.radii.lg,
+                          background: goOSTokens.colors.paper,
+                          border: `2px solid ${error ? goOSTokens.colors.status.error : goOSTokens.colors.borderStrong}`,
                         }}
                       >
-                        <Mail size={18} stroke={goOS.colors.text.muted} />
+                        <Mail size={18} stroke={goOSTokens.colors.text.muted} />
                         <input
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="Enter your email"
-                          className="flex-1 bg-transparent outline-none text-sm"
-                          style={{ color: goOS.colors.text.primary }}
+                          style={{
+                            flex: 1,
+                            background: 'transparent',
+                            outline: 'none',
+                            border: 'none',
+                            fontSize: 14,
+                            color: goOSTokens.colors.text.primary,
+                            fontFamily: goOSTokens.fonts.body,
+                          }}
                           required
                         />
                       </div>
                       {error && (
-                        <p className="text-xs mt-1 text-red-500">{error}</p>
+                        <p
+                          style={{
+                            fontSize: 12,
+                            marginTop: 4,
+                            color: goOSTokens.colors.status.error,
+                            fontFamily: goOSTokens.fonts.body,
+                          }}
+                        >
+                          {error}
+                        </p>
                       )}
                     </div>
 
@@ -210,20 +277,32 @@ export function GoOSLockedContentModal({
                       disabled={isSubmitting || !email.trim()}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full py-3 rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{
-                        background: goOS.colors.accent.primary,
+                        width: '100%',
+                        padding: 12,
+                        borderRadius: goOSTokens.radii.lg,
+                        fontWeight: 500,
+                        fontSize: 14,
+                        background: goOSTokens.colors.accent.primary,
                         color: 'white',
-                        border: `2px solid ${goOS.colors.border}`,
-                        boxShadow: '4px 4px 0 rgba(0,0,0,0.1)',
+                        border: `2px solid ${goOSTokens.colors.borderStrong}`,
+                        boxShadow: goOSTokens.shadows.sm,
+                        cursor: isSubmitting || !email.trim() ? 'not-allowed' : 'pointer',
+                        opacity: isSubmitting || !email.trim() ? 0.5 : 1,
+                        fontFamily: goOSTokens.fonts.body,
                       }}
                     >
                       {isSubmitting ? 'Unlocking...' : 'Unlock with Email'}
                     </motion.button>
 
                     <p
-                      className="text-xs text-center mt-3"
-                      style={{ color: goOS.colors.text.muted }}
+                      style={{
+                        fontSize: 12,
+                        textAlign: 'center',
+                        marginTop: 12,
+                        color: goOSTokens.colors.text.muted,
+                        fontFamily: goOSTokens.fonts.body,
+                      }}
                     >
                       We&apos;ll send you a confirmation and you&apos;ll get access instantly.
                     </p>
@@ -231,10 +310,14 @@ export function GoOSLockedContentModal({
                 ) : (
                   <div>
                     {price && (
-                      <div className="text-center mb-4">
+                      <div style={{ textAlign: 'center', marginBottom: 16 }}>
                         <span
-                          className="text-3xl font-bold"
-                          style={{ color: goOS.colors.text.primary }}
+                          style={{
+                            fontSize: 32,
+                            fontWeight: 700,
+                            color: goOSTokens.colors.text.primary,
+                            fontFamily: goOSTokens.fonts.display,
+                          }}
                         >
                           ${price}
                         </span>
@@ -245,20 +328,31 @@ export function GoOSLockedContentModal({
                       onClick={onPurchase}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full py-3 rounded-lg font-medium text-sm"
                       style={{
-                        background: goOS.colors.accent.primary,
+                        width: '100%',
+                        padding: 12,
+                        borderRadius: goOSTokens.radii.lg,
+                        fontWeight: 500,
+                        fontSize: 14,
+                        background: goOSTokens.colors.accent.primary,
                         color: 'white',
-                        border: `2px solid ${goOS.colors.border}`,
-                        boxShadow: '4px 4px 0 rgba(0,0,0,0.1)',
+                        border: `2px solid ${goOSTokens.colors.borderStrong}`,
+                        boxShadow: goOSTokens.shadows.sm,
+                        cursor: 'pointer',
+                        fontFamily: goOSTokens.fonts.body,
                       }}
                     >
                       Buy Now
                     </motion.button>
 
                     <p
-                      className="text-xs text-center mt-3"
-                      style={{ color: goOS.colors.text.muted }}
+                      style={{
+                        fontSize: 12,
+                        textAlign: 'center',
+                        marginTop: 12,
+                        color: goOSTokens.colors.text.muted,
+                        fontFamily: goOSTokens.fonts.body,
+                      }}
                     >
                       Secure payment via Stripe. Instant access after purchase.
                     </p>

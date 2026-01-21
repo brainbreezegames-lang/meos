@@ -1,28 +1,27 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ExternalLink,
   Edit3,
   Copy,
-  Scissors,
-  Clipboard,
   Trash2,
   FolderOpen,
-  Share,
-  Download,
+  Share2,
   Eye,
   EyeOff,
-  Lock,
-  Unlock,
-  FileText,
-  Presentation,
 } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { FileType } from './GoOSFileIcon';
 import { PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
+
+// Menu dimensions for positioning calculations
+const MENU_WIDTH = 200;
+const MENU_ITEM_HEIGHT = 32;
+const MENU_PADDING = 4;
+const VIEWPORT_PADDING = 8;
 
 interface ContextMenuItem {
   id: string;
@@ -35,6 +34,7 @@ interface ContextMenuItem {
   danger?: boolean;
 }
 
+// Keep full interface for backward compatibility
 interface GoOSFileContextMenuProps {
   isOpen: boolean;
   position: { x: number; y: number };
@@ -48,7 +48,7 @@ interface GoOSFileContextMenuProps {
   onRename: () => void;
   onDuplicate: () => void;
   onCopy: () => void;
-  onCut: () => void;
+  onCut?: () => void;
   onPaste?: () => void;
   onDelete: () => void;
   onTogglePublish?: () => void;
@@ -64,188 +64,179 @@ export function GoOSFileContextMenu({
   onClose,
   fileType,
   fileStatus,
-  accessLevel,
+  // These props are accepted for backward compatibility but not displayed in the simplified menu
+  accessLevel: _accessLevel,
+  onOpenAsPage: _onOpenAsPage,
+  onOpenAsPresent: _onOpenAsPresent,
+  onCut: _onCut,
+  onPaste: _onPaste,
+  onToggleLock: _onToggleLock,
+  onExport: _onExport,
+  canPaste: _canPaste,
+  // Used props
   onOpen,
-  onOpenAsPage,
-  onOpenAsPresent,
   onRename,
   onDuplicate,
   onCopy,
-  onCut,
-  onPaste,
   onDelete,
   onTogglePublish,
-  onToggleLock,
-  onExport,
   onShare,
-  canPaste = false,
 }: GoOSFileContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const [focusedIndex, setFocusedIndex] = useState(0);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [pressedId, setPressedId] = useState<string | null>(null);
+  const [adjustedPosition, setAdjustedPosition] = useState(position);
+
   const isFolder = fileType === 'folder';
   const isDraft = fileStatus === 'draft';
-  const isLocked = accessLevel === 'locked';
 
-  const items: ContextMenuItem[] = [
-    {
-      id: 'open',
-      label: isFolder ? 'Open Folder' : 'Open',
-      icon: isFolder ? <FolderOpen size={14} /> : <ExternalLink size={14} />,
-      shortcut: '↵',
-      onClick: onOpen,
-    },
-    // Open as Page/Present for notes and case studies
-    ...((!isFolder && onOpenAsPage) ? [{
-      id: 'open-page',
-      label: 'Open as Page',
-      icon: <FileText size={14} />,
-      onClick: onOpenAsPage,
-    } as ContextMenuItem] : []),
-    ...((!isFolder && onOpenAsPresent) ? [{
-      id: 'open-present',
-      label: 'Open as Present',
-      icon: <Presentation size={14} />,
-      onClick: onOpenAsPresent,
-      dividerAfter: true,
-    } as ContextMenuItem] : []),
-    {
-      id: 'rename',
-      label: 'Rename',
-      icon: <Edit3 size={14} />,
-      shortcut: '↵',
-      onClick: onRename,
-      dividerAfter: !onOpenAsPage && !onOpenAsPresent,
-    },
-    {
-      id: 'copy',
-      label: 'Copy',
-      icon: <Copy size={14} />,
-      shortcut: '⌘C',
-      onClick: onCopy,
-    },
-    {
-      id: 'cut',
-      label: 'Cut',
-      icon: <Scissors size={14} />,
-      shortcut: '⌘X',
-      onClick: onCut,
-    },
-    {
-      id: 'paste',
-      label: 'Paste',
-      icon: <Clipboard size={14} />,
-      shortcut: '⌘V',
-      onClick: () => onPaste?.(),
-      disabled: !canPaste || !isFolder,
-      dividerAfter: true,
-    },
-    {
-      id: 'duplicate',
-      label: 'Duplicate',
-      icon: <Copy size={14} />,
-      shortcut: '⌘D',
-      onClick: onDuplicate,
-    },
-  ];
-
-  // Add file-specific items
-  if (!isFolder) {
-    items.push(
+  // Simplified, user-friendly menu items
+  const items: ContextMenuItem[] = useMemo(() => {
+    const menuItems: ContextMenuItem[] = [
       {
-        id: 'toggle-publish',
+        id: 'open',
+        label: isFolder ? 'Open' : 'Edit',
+        icon: isFolder ? <FolderOpen size={15} strokeWidth={1.75} /> : <Edit3 size={15} strokeWidth={1.75} />,
+        onClick: onOpen,
+      },
+      {
+        id: 'rename',
+        label: 'Rename',
+        icon: <Edit3 size={15} strokeWidth={1.75} />,
+        shortcut: '⏎',
+        onClick: onRename,
+        dividerAfter: true,
+      },
+    ];
+
+    // Only show publish toggle for files (not folders)
+    if (!isFolder && onTogglePublish) {
+      menuItems.push({
+        id: 'publish',
         label: isDraft ? 'Publish' : 'Unpublish',
-        icon: isDraft ? <Eye size={14} /> : <EyeOff size={14} />,
-        onClick: () => onTogglePublish?.(),
-        dividerAfter: true,
-      },
-      {
-        id: 'export',
-        label: 'Export as PDF',
-        icon: <Download size={14} />,
-        onClick: () => onExport?.(),
-      },
-      {
+        icon: isDraft ? <Eye size={15} strokeWidth={1.75} /> : <EyeOff size={15} strokeWidth={1.75} />,
+        onClick: onTogglePublish,
+      });
+    }
+
+    // Share option
+    if (onShare) {
+      menuItems.push({
         id: 'share',
-        label: 'Share Link',
-        icon: <Share size={14} />,
-        onClick: () => onShare?.(),
+        label: 'Share',
+        icon: <Share2 size={15} strokeWidth={1.75} />,
+        onClick: onShare,
+        dividerAfter: true,
+      });
+    }
+
+    // Common actions
+    menuItems.push(
+      {
+        id: 'duplicate',
+        label: 'Duplicate',
+        icon: <Copy size={15} strokeWidth={1.75} />,
+        shortcut: '⌘D',
+        onClick: onDuplicate,
       },
       {
-        id: 'toggle-lock',
-        label: isLocked ? 'Unlock' : 'Lock',
-        icon: isLocked ? <Unlock size={14} /> : <Lock size={14} />,
-        onClick: () => onToggleLock?.(),
+        id: 'copy',
+        label: 'Copy',
+        icon: <Copy size={15} strokeWidth={1.75} />,
+        shortcut: '⌘C',
+        onClick: onCopy,
         dividerAfter: true,
+      },
+      {
+        id: 'delete',
+        label: 'Move to Trash',
+        icon: <Trash2 size={15} strokeWidth={1.75} />,
+        shortcut: '⌘⌫',
+        onClick: onDelete,
+        danger: true,
       }
     );
-  }
 
-  // Add delete at the end
-  items.push({
-    id: 'delete',
-    label: 'Delete',
-    icon: <Trash2 size={14} />,
-    shortcut: '⌫',
-    onClick: onDelete,
-    danger: true,
-  });
+    return menuItems;
+  }, [isFolder, isDraft, onOpen, onRename, onTogglePublish, onShare, onDuplicate, onCopy, onDelete]);
 
-  const enabledItems = items.filter(item => !item.disabled);
+  // Calculate divider count for height estimation
+  const dividerCount = items.filter(item => item.dividerAfter).length;
+  const estimatedHeight = (items.length * MENU_ITEM_HEIGHT) + (MENU_PADDING * 2) + (dividerCount * 9);
+
+  // macOS-style viewport-aware positioning
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let x = position.x;
+    let y = position.y;
+
+    // Flip horizontally if too close to right edge
+    if (x + MENU_WIDTH + VIEWPORT_PADDING > viewportWidth) {
+      x = Math.max(VIEWPORT_PADDING, x - MENU_WIDTH);
+    }
+
+    // Flip vertically if too close to bottom edge
+    if (y + estimatedHeight + VIEWPORT_PADDING > viewportHeight) {
+      y = Math.max(VIEWPORT_PADDING, y - estimatedHeight);
+    }
+
+    // Ensure minimum distance from edges
+    x = Math.max(VIEWPORT_PADDING, Math.min(x, viewportWidth - MENU_WIDTH - VIEWPORT_PADDING));
+    y = Math.max(VIEWPORT_PADDING, Math.min(y, viewportHeight - estimatedHeight - VIEWPORT_PADDING));
+
+    setAdjustedPosition({ x, y });
+  }, [isOpen, position, estimatedHeight]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isOpen) return;
 
-    switch (e.key) {
-      case 'Escape':
-        e.preventDefault();
-        onClose();
-        break;
-      case 'ArrowDown':
-        e.preventDefault();
-        setFocusedIndex(prev => (prev + 1) % enabledItems.length);
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setFocusedIndex(prev => prev - 1 < 0 ? enabledItems.length - 1 : prev - 1);
-        break;
-      case 'Enter':
-      case ' ':
-        e.preventDefault();
-        const item = enabledItems[focusedIndex];
-        if (item && !item.disabled) {
-          item.onClick();
-          onClose();
-        }
-        break;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose();
     }
-  }, [isOpen, onClose, enabledItems, focusedIndex]);
+  }, [isOpen, onClose]);
 
-  // Focus management and event listeners
+  // Event listeners
   useEffect(() => {
     if (isOpen) {
-      setFocusedIndex(0);
-      const handleClick = (e: MouseEvent) => {
+      setHoveredId(null);
+
+      const handleClickOutside = (e: MouseEvent) => {
         if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
           onClose();
         }
       };
 
-      document.addEventListener('click', handleClick);
+      // Small delay to prevent immediate close on the same click that opened it
+      const timer = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 10);
+
       document.addEventListener('keydown', handleKeyDown);
 
-      setTimeout(() => menuRef.current?.focus(), 0);
-
       return () => {
-        document.removeEventListener('click', handleClick);
+        clearTimeout(timer);
+        document.removeEventListener('mousedown', handleClickOutside);
         document.removeEventListener('keydown', handleKeyDown);
       };
     }
   }, [isOpen, onClose, handleKeyDown]);
 
-  const getEnabledIndex = (item: ContextMenuItem) => {
-    return enabledItems.findIndex(i => i.id === item.id);
+  const handleItemClick = (item: ContextMenuItem) => {
+    if (item.disabled) return;
+
+    setPressedId(item.id);
+
+    // Brief visual feedback before closing
+    setTimeout(() => {
+      item.onClick();
+      onClose();
+    }, 80);
   };
 
   return (
@@ -254,90 +245,101 @@ export function GoOSFileContextMenu({
         <motion.div
           ref={menuRef}
           role="menu"
-          aria-label={`${fileType} context menu`}
-          tabIndex={-1}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.1 }}
+          aria-label="Context menu"
+          initial={{ opacity: 0, scale: 0.96, y: -4 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: -4 }}
+          transition={{
+            duration: 0.12,
+            ease: [0.2, 0, 0, 1], // Custom ease for snappy feel
+          }}
           style={{
             position: 'fixed',
-            top: position.y,
-            left: position.x,
+            top: adjustedPosition.y,
+            left: adjustedPosition.x,
             zIndex: 9999,
-            minWidth: 200,
+            width: MENU_WIDTH,
             background: goOSTokens.colors.paper,
-            border: `2px solid ${goOSTokens.colors.border}`,
-            borderRadius: 6,
-            boxShadow: goOSTokens.shadows.solid,
-            padding: '4px 0',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            borderRadius: 8,
+            boxShadow: `
+              0 0 0 1px ${goOSTokens.colors.border},
+              0 8px 30px rgba(23, 20, 18, 0.12),
+              0 2px 8px rgba(23, 20, 18, 0.08)
+            `,
+            padding: `${MENU_PADDING}px 0`,
             overflow: 'hidden',
             outline: 'none',
+            transformOrigin: 'top left',
           }}
-          onClick={(e) => e.stopPropagation()}
         >
           {items.map((item) => {
-            const enabledIndex = getEnabledIndex(item);
-            const isFocused = enabledIndex === focusedIndex && !item.disabled;
+            const isHovered = hoveredId === item.id;
+            const isPressed = pressedId === item.id;
 
             return (
               <React.Fragment key={item.id}>
-                <button
+                <motion.button
                   role="menuitem"
                   aria-disabled={item.disabled}
-                  onClick={() => {
-                    if (!item.disabled) {
-                      setActiveId(item.id);
-                      item.onClick();
-                      setTimeout(() => {
-                        onClose();
-                      }, 100);
-                    }
-                  }}
-                  onMouseEnter={() => {
-                    if (!item.disabled) {
-                      setFocusedIndex(enabledIndex);
-                    }
-                  }}
-                  onMouseDown={() => {
-                    if (!item.disabled) {
-                      setActiveId(item.id);
-                    }
-                  }}
-                  onMouseUp={() => setActiveId(null)}
-                  onMouseLeave={() => setActiveId(null)}
+                  onClick={() => handleItemClick(item)}
+                  onMouseEnter={() => !item.disabled && setHoveredId(item.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  onMouseDown={() => !item.disabled && setPressedId(item.id)}
+                  onMouseUp={() => setPressedId(null)}
                   disabled={item.disabled}
+                  animate={{
+                    backgroundColor: isPressed
+                      ? item.danger
+                        ? 'rgba(239, 68, 68, 0.15)'
+                        : 'rgba(255, 119, 34, 0.15)'
+                      : isHovered
+                      ? item.danger
+                        ? 'rgba(239, 68, 68, 0.08)'
+                        : 'rgba(255, 119, 34, 0.08)'
+                      : 'rgba(255, 255, 255, 0)',
+                    scale: isPressed ? 0.98 : 1,
+                  }}
+                  transition={{ duration: 0.1 }}
                   style={{
-                    width: '100%',
+                    width: `calc(100% - 8px)`,
+                    height: MENU_ITEM_HEIGHT,
+                    margin: '0 4px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 10,
-                    padding: '8px 12px',
-                    background: activeId === item.id
-                      ? item.danger ? '#fecaca' : `${goOSTokens.colors.accent.primary}30`
-                      : isFocused
-                      ? item.danger ? '#fef2f2' : goOSTokens.colors.accent.pale
-                      : 'transparent',
+                    padding: '0 8px',
+                    background: 'transparent',
                     border: 'none',
-                    cursor: item.disabled ? 'not-allowed' : 'pointer',
+                    borderRadius: 5,
+                    cursor: item.disabled ? 'default' : 'pointer',
                     fontFamily: goOSTokens.fonts.body,
                     fontSize: 13,
+                    fontWeight: 400,
+                    letterSpacing: '-0.01em',
                     color: item.danger
-                      ? '#ef4444'
+                      ? goOSTokens.colors.status.error
                       : item.disabled
                       ? goOSTokens.colors.text.muted
                       : goOSTokens.colors.text.primary,
-                    opacity: item.disabled ? 0.5 : 1,
+                    opacity: item.disabled ? 0.4 : 1,
                     textAlign: 'left',
-                    transition: 'background 0.08s ease-out, transform 0.08s ease-out',
-                    transform: activeId === item.id ? 'scale(0.98)' : 'scale(1)',
                     outline: 'none',
                   }}
                 >
                   <span
                     style={{
-                      color: item.danger ? '#ef4444' : goOSTokens.colors.text.secondary,
                       display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 20,
+                      color: item.danger
+                        ? goOSTokens.colors.status.error
+                        : isHovered
+                          ? goOSTokens.colors.accent.primary
+                          : goOSTokens.colors.text.secondary,
+                      transition: 'color 0.1s ease',
                     }}
                     aria-hidden="true"
                   >
@@ -348,22 +350,23 @@ export function GoOSFileContextMenu({
                     <span
                       style={{
                         fontSize: 11,
+                        fontWeight: 500,
                         color: goOSTokens.colors.text.muted,
-                        fontFamily: 'SF Mono, monospace',
+                        fontFamily: goOSTokens.fonts.mono,
+                        letterSpacing: '0.02em',
                       }}
-                      aria-label={`Keyboard shortcut: ${item.shortcut}`}
                     >
                       {item.shortcut}
                     </span>
                   )}
-                </button>
+                </motion.button>
                 {item.dividerAfter && (
                   <div
                     role="separator"
                     style={{
                       height: 1,
-                      background: goOSTokens.colors.border + '30',
-                      margin: '4px 8px',
+                      background: goOSTokens.colors.border,
+                      margin: '4px 12px',
                     }}
                   />
                 )}

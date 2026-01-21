@@ -111,14 +111,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   };
 
   const getIconBg = () => {
-    switch (type) {
-      case 'case-study':
-        return 'linear-gradient(135deg, #f0e8fd 0%, #e4d6fa 100%)';
-      case 'folder':
-        return 'linear-gradient(135deg, #fff5ee 0%, #ffe4cc 100%)';
-      default:
-        return 'linear-gradient(135deg, #ffffff 0%, #f5f3e8 100%)';
-    }
+    // Unified design - all file types use the same background
+    return goOSTokens.colors.contentBg;
   };
 
   const handleRenameSubmit = () => {
@@ -265,10 +259,10 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         style={{
           width: 52,
           height: 52,
-          borderRadius: 12,
+          borderRadius: goOSTokens.radii.lg,
           background: getIconBg(),
-          border: `1px solid rgba(0,0,0,0.08)`,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+          border: `1px solid ${goOSTokens.colors.border}`,
+          boxShadow: goOSTokens.shadows.sm,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -304,7 +298,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
               width: 16,
               height: 16,
               borderRadius: '50%',
-              background: '#6b7280',
+              background: goOSTokens.colors.text.muted,
               border: `1.5px solid ${goOSTokens.colors.border}`,
               display: 'flex',
               alignItems: 'center',

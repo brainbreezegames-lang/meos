@@ -17,36 +17,67 @@ import { GoOSEditorToolbar } from './GoOSEditorToolbar';
 
 const lowlight = createLowlight(common);
 
-// goOS Design Tokens (shared) - Brand Appart (aligned with useWidgetTheme)
+// goOS Design Tokens (unified) - Uses CSS variables from design-system.css
 export const goOSTokens = {
   colors: {
-    paper: '#fbf9ef',       // Brand cream
-    cream: '#fbf9ef',
-    headerBg: '#fbf9ef',    // Same as paper for consistency
-    windowBg: '#fbf9ef',    // Use cream, not white
-    border: '#171412',      // Brand base dark - matches useWidgetTheme
+    paper: 'var(--color-bg-base, #fbf9ef)',
+    cream: 'var(--color-bg-base, #fbf9ef)',
+    headerBg: 'var(--color-bg-subtle, #f2f0e7)',
+    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    contentBg: 'var(--color-bg-white, #ffffff)',
+    border: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    borderStrong: 'var(--color-text-primary, #171412)',
     text: {
-      primary: '#171412',   // Brand base
-      secondary: '#8e827c', // Brand grey
-      muted: '#8e827c',
+      primary: 'var(--color-text-primary, #171412)',
+      secondary: 'var(--color-text-secondary, #4a4744)',
+      muted: 'var(--color-text-muted, #8e827c)',
     },
     accent: {
-      primary: '#ff7722',   // Brand orange
-      dark: '#e56a1f',
-      light: '#ff9955',
-      pale: '#fff5ee',
+      primary: 'var(--color-accent-primary, #ff7722)',
+      primaryDark: 'var(--color-accent-primary-dark, #e56a1f)',
+      dark: 'var(--color-accent-primary-dark, #e56a1f)',
+      light: 'var(--color-accent-primary-light, #ff9955)',
+      pale: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.08))',
+    },
+    // Status colors - consistent across all components
+    status: {
+      success: 'var(--color-success, #10b981)',
+      successLight: 'var(--color-success-subtle, rgba(16, 185, 129, 0.1))',
+      successDark: 'var(--color-success-dark, #059669)',
+      error: 'var(--color-error, #ef4444)',
+      errorLight: 'var(--color-error-subtle, rgba(239, 68, 68, 0.1))',
+      errorDark: 'var(--color-error-dark, #dc2626)',
+      warning: 'var(--color-warning, #f59e0b)',
+      warningLight: 'var(--color-warning-subtle, rgba(245, 158, 11, 0.1))',
+      neutral: 'var(--color-text-muted, #8e827c)',
+    },
+    // Traffic light colors (standard macOS)
+    traffic: {
+      close: '#ff5f57',
+      minimize: '#ffbd2e',
+      maximize: '#28ca41',
+      disabled: 'var(--color-border-default, rgba(23, 20, 18, 0.2))',
     },
   },
   shadows: {
-    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',    // Brand Appart offset shadow
-    hover: '6px 6px 0 rgba(23, 20, 18, 0.15)',
-    sm: '2px 2px 0 rgba(23, 20, 18, 0.06)',
-    button: '3px 3px 0 rgba(23, 20, 18, 0.1)',
+    solid: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
+    hover: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+    sm: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
+    md: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+    lg: 'var(--shadow-lg, 0 8px 32px rgba(23, 20, 18, 0.12))',
+    button: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
+  },
+  radii: {
+    sm: 'var(--radius-sm, 6px)',
+    md: 'var(--radius-md, 8px)',
+    lg: 'var(--radius-lg, 12px)',
+    full: 'var(--radius-full, 9999px)',
   },
   fonts: {
-    display: "'Averia Serif Libre', Georgia, serif",
-    body: "'Instrument Sans', system-ui, sans-serif",
-    handwritten: "'Gochi Hand', cursive",
+    display: 'var(--font-headline, "Outfit", sans-serif)',
+    body: 'var(--font-body, "Inter", sans-serif)',
+    mono: 'var(--font-mono, "SF Mono", monospace)',
+    handwritten: 'var(--font-body, "Inter", sans-serif)',
   },
 };
 

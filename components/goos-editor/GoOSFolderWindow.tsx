@@ -181,7 +181,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           flex: 1,
           padding: 16,
           overflow: 'auto',
-          background: '#FFFFFF',
+          background: goOSTokens.colors.contentBg,
           position: 'relative',
           minHeight: 200,
         }}

@@ -51,10 +51,10 @@ export function GoOSAutoSaveIndicator({ status, lastSaved }: GoOSAutoSaveIndicat
               animate={{ scale: 1 }}
               transition={{ type: 'spring', damping: 15, stiffness: 400 }}
             >
-              <circle cx="6" cy="6" r="5" stroke="#22c55e" strokeWidth="1.5" />
+              <circle cx="6" cy="6" r="5" stroke={goOSTokens.colors.status.success} strokeWidth="1.5" />
               <path
                 d="M3.5 6L5 7.5L8.5 4"
-                stroke="#22c55e"
+                stroke={goOSTokens.colors.status.success}
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -62,19 +62,19 @@ export function GoOSAutoSaveIndicator({ status, lastSaved }: GoOSAutoSaveIndicat
             </motion.svg>
           ),
           text: lastSaved ? formatTimeAgo(lastSaved) : 'Saved',
-          color: '#22c55e',
+          color: goOSTokens.colors.status.success,
         };
       case 'error':
         return {
           icon: (
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <circle cx="6" cy="6" r="5" stroke="#ef4444" strokeWidth="1.5" />
-              <path d="M6 3.5v3" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" />
-              <circle cx="6" cy="8.5" r="0.75" fill="#ef4444" />
+              <circle cx="6" cy="6" r="5" stroke={goOSTokens.colors.status.error} strokeWidth="1.5" />
+              <path d="M6 3.5v3" stroke={goOSTokens.colors.status.error} strokeWidth="1.5" strokeLinecap="round" />
+              <circle cx="6" cy="8.5" r="0.75" fill={goOSTokens.colors.status.error} />
             </svg>
           ),
           text: 'Error saving',
-          color: '#ef4444',
+          color: goOSTokens.colors.status.error,
         };
       case 'offline':
         return {
@@ -118,8 +118,12 @@ export function GoOSAutoSaveIndicator({ status, lastSaved }: GoOSAutoSaveIndicat
             alignItems: 'center',
             gap: 6,
             padding: '4px 8px',
-            borderRadius: 4,
-            background: `${content.color}15`,
+            borderRadius: goOSTokens.radii.sm,
+            background: status === 'saved'
+              ? goOSTokens.colors.status.successLight
+              : status === 'error'
+              ? goOSTokens.colors.status.errorLight
+              : goOSTokens.colors.accent.pale,
             fontFamily: goOSTokens.fonts.body,
             fontSize: 11,
             fontWeight: 500,

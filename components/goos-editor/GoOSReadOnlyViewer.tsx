@@ -87,7 +87,7 @@ export function GoOSReadOnlyViewer({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#FF6B6B',
+              background: goOSTokens.colors.traffic.close,
               border: `1.5px solid ${goOSTokens.colors.border}`,
               cursor: 'pointer',
               padding: 0,
@@ -98,14 +98,14 @@ export function GoOSReadOnlyViewer({
             title="Close"
             aria-label="Close window"
           >
-            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.border} style={{ opacity: 0 }} className="traffic-icon" />
+            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.text.primary} style={{ opacity: 0 }} className="traffic-icon" />
           </button>
           <div
             style={{
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#ccc',
+              background: goOSTokens.colors.traffic.disabled,
               border: `1.5px solid ${goOSTokens.colors.border}`,
               opacity: 0.5,
             }}
@@ -115,7 +115,7 @@ export function GoOSReadOnlyViewer({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#ccc',
+              background: goOSTokens.colors.traffic.disabled,
               border: `1.5px solid ${goOSTokens.colors.border}`,
               opacity: 0.5,
             }}
