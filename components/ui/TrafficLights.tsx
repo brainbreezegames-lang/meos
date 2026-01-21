@@ -1,61 +1,63 @@
 'use client';
 
-import { useReducedMotion } from 'framer-motion';
+import { useState } from 'react';
 
 interface TrafficLightsProps {
   onClose: () => void;
   onMinimize?: () => void;
   onMaximize?: () => void;
-  /** Whether to show icons on hover (default: true) */
-  showIcons?: boolean;
+  isMaximized?: boolean;
 }
 
 /**
- * macOS-style traffic light buttons (close, minimize, maximize)
- * Extracted for reuse across window components
+ * Unified macOS-style traffic light buttons
+ * Uses CSS variables from design-system.css:
+ * - --color-traffic-close, --color-traffic-minimize, --color-traffic-maximize
+ * - --window-traffic-size (12px), --window-traffic-gap (8px)
  */
 export function TrafficLights({
   onClose,
   onMinimize,
   onMaximize,
-  showIcons = true,
+  isMaximized = false,
 }: TrafficLightsProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const [isHovered, setIsHovered] = useState(false);
 
-  const buttonBase = `
-    rounded-full flex items-center justify-center
-    transition-all duration-150 hover:brightness-90
-    focus-visible:outline-none focus-visible:ring-2
-    focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1
-  `.replace(/\s+/g, ' ').trim();
-
-  const iconBase = `
-    w-[8px] h-[8px]
-    ${showIcons ? 'opacity-0 group-hover/traffic:opacity-100' : 'opacity-0'}
-    transition-opacity
-  `.replace(/\s+/g, ' ').trim();
+  const buttonStyle = {
+    width: 'var(--window-traffic-size, 12px)',
+    height: 'var(--window-traffic-size, 12px)',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'filter 0.15s ease',
+    boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+  };
 
   return (
     <div
       className="flex items-center group/traffic"
-      style={{ gap: 'var(--traffic-gap, 8px)' }}
+      style={{ gap: 'var(--window-traffic-gap, 8px)' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onPointerDown={(e) => e.stopPropagation()}
     >
       {/* Close */}
       <button
         onClick={onClose}
         aria-label="Close window"
-        className={buttonBase}
         style={{
-          width: 'var(--traffic-size, 12px)',
-          height: 'var(--traffic-size, 12px)',
-          background: 'linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)',
-          boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+          ...buttonStyle,
+          background: 'var(--color-traffic-close, #ff5f57)',
         }}
       >
-        <svg className={iconBase} viewBox="0 0 8 8" fill="none">
-          <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-        </svg>
+        {isHovered && (
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+            <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+        )}
       </button>
 
       {/* Minimize */}
@@ -63,17 +65,16 @@ export function TrafficLights({
         <button
           onClick={onMinimize}
           aria-label="Minimize window"
-          className={buttonBase}
           style={{
-            width: 'var(--traffic-size, 12px)',
-            height: 'var(--traffic-size, 12px)',
-            background: 'linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)',
-            boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+            ...buttonStyle,
+            background: 'var(--color-traffic-minimize, #ffbd2e)',
           }}
         >
-          <svg className={iconBase} viewBox="0 0 8 8" fill="none">
-            <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-          </svg>
+          {isHovered && (
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+              <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+          )}
         </button>
       )}
 
@@ -81,25 +82,21 @@ export function TrafficLights({
       {onMaximize && (
         <button
           onClick={onMaximize}
-          aria-label="Maximize window"
-          className={buttonBase}
+          aria-label={isMaximized ? "Restore window" : "Maximize window"}
           style={{
-            width: 'var(--traffic-size, 12px)',
-            height: 'var(--traffic-size, 12px)',
-            background: 'linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)',
-            boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+            ...buttonStyle,
+            background: 'var(--color-traffic-maximize, #28c840)',
           }}
         >
-          <svg className={iconBase} viewBox="0 0 8 8" fill="none">
-            <path
-              d="M1 2.5L4 5.5L7 2.5"
-              stroke="rgba(0, 70, 0, 0.7)"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              transform="rotate(45 4 4)"
-            />
-          </svg>
+          {isHovered && (
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+              {isMaximized ? (
+                <path d="M2 2L6 6M6 2L2 6" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+              ) : (
+                <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+              )}
+            </svg>
+          )}
         </button>
       )}
     </div>

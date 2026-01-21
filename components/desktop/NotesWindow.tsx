@@ -343,63 +343,64 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
-            {/* Traffic Lights */}
+            {/* Traffic Lights - unified 12px design */}
             <div
-              className="flex items-center gap-2 group/traffic"
+              className="flex items-center group/traffic"
+              style={{ gap: 'var(--window-traffic-gap, 8px)' }}
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => windowContext.closeWindow(windowInstance.id)}
-                className="rounded-full flex items-center justify-center transition-all duration-150"
+                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 12,
-                  height: 12,
-                  background: '#ff5f57',
+                  width: 'var(--window-traffic-size, 12px)',
+                  height: 'var(--window-traffic-size, 12px)',
+                  borderRadius: '50%',
+                  background: 'var(--color-traffic-close, #ff5f57)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 aria-label="Close window"
               >
                 <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
               </button>
               <button
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                className="rounded-full flex items-center justify-center transition-all duration-150"
+                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 12,
-                  height: 12,
-                  background: '#ffbd2e',
+                  width: 'var(--window-traffic-size, 12px)',
+                  height: 'var(--window-traffic-size, 12px)',
+                  borderRadius: '50%',
+                  background: 'var(--color-traffic-minimize, #ffbd2e)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 aria-label="Minimize window"
               >
                 <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                  <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
               </button>
               <button
                 onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                className="rounded-full flex items-center justify-center transition-all duration-150"
+                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 12,
-                  height: 12,
-                  background: '#28ca41',
+                  width: 'var(--window-traffic-size, 12px)',
+                  height: 'var(--window-traffic-size, 12px)',
+                  borderRadius: '50%',
+                  background: 'var(--color-traffic-maximize, #28c840)',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 aria-label="Maximize window"
               >
                 <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                 </svg>
               </button>
             </div>

@@ -183,40 +183,44 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                 className="flex items-center h-[52px] px-4 shrink-0 relative"
                 style={{ borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))' }}
               >
-                {/* Traffic Lights */}
-                <div className="flex items-center gap-2 group/traffic">
+                {/* Traffic Lights - unified 12px design */}
+                <div
+                  className="flex items-center group/traffic"
+                  style={{ gap: 'var(--window-traffic-gap, 8px)' }}
+                >
                   <button
                     onClick={onClose}
-                    className="w-[12px] h-[12px] rounded-full flex items-center justify-center transition-all duration-150"
+                    className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                     style={{
-                      background: '#ff5f57',
+                      width: 'var(--window-traffic-size, 12px)',
+                      height: 'var(--window-traffic-size, 12px)',
+                      borderRadius: '50%',
+                      background: 'var(--color-traffic-close, #ff5f57)',
                       boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                      border: 'none',
+                      cursor: 'pointer',
                     }}
+                    aria-label="Close"
                   >
-                    <svg
-                      className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150"
-                      viewBox="0 0 8 8"
-                      fill="none"
-                    >
-                      <path
-                        d="M1 1L7 7M7 1L1 7"
-                        stroke="rgba(77, 0, 0, 0.7)"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                      />
+                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                      <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                     </svg>
                   </button>
                   <div
-                    className="w-[12px] h-[12px] rounded-full"
                     style={{
-                      background: '#ffbd2e',
+                      width: 'var(--window-traffic-size, 12px)',
+                      height: 'var(--window-traffic-size, 12px)',
+                      borderRadius: '50%',
+                      background: 'var(--color-traffic-minimize, #ffbd2e)',
                       boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     }}
                   />
                   <div
-                    className="w-[12px] h-[12px] rounded-full"
                     style={{
-                      background: '#28ca41',
+                      width: 'var(--window-traffic-size, 12px)',
+                      height: 'var(--window-traffic-size, 12px)',
+                      borderRadius: '50%',
+                      background: 'var(--color-traffic-maximize, #28c840)',
                       boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     }}
                   />

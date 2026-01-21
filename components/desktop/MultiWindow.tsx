@@ -294,72 +294,70 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
-            {/* Traffic Lights */}
+            {/* Traffic Lights - unified 12px design */}
             <div
-              className="flex items-center gap-2 group/traffic"
+              className="flex items-center group/traffic"
+              style={{ gap: 'var(--window-traffic-gap, 8px)' }}
               onPointerDown={(e) => e.stopPropagation()}
             >
               {/* Close */}
               <button
                 onClick={handleClose}
                 aria-label="Close window"
-                className="rounded-full flex items-center justify-center transition-all duration-150"
+                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 12,
-                  height: 12,
-                  background: 'var(--color-traffic-close)',
-                  border: '1px solid var(--color-text-primary)',
+                  width: 'var(--window-traffic-size, 12px)',
+                  height: 'var(--window-traffic-size, 12px)',
                   borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  background: 'var(--color-traffic-close, #ff5f57)',
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
               >
-                {themeContext?.theme === 'sketch' ? null : (
-                  <X size={8} strokeWidth={3} className="text-[#a00000] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" />
-                )}
+                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
               </button>
 
               {/* Minimize */}
               <button
                 onClick={handleMinimize}
                 aria-label="Minimize window"
-                className="rounded-full flex items-center justify-center transition-all duration-150"
+                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 12,
-                  height: 12,
-                  background: 'var(--color-traffic-minimize)',
-                  border: '1px solid var(--color-text-primary)',
+                  width: 'var(--window-traffic-size, 12px)',
+                  height: 'var(--window-traffic-size, 12px)',
                   borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  background: 'var(--color-traffic-minimize, #ffbd2e)',
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
               >
-                {themeContext?.theme === 'sketch' ? null : (
-                  <Minus size={8} strokeWidth={3} className="text-[#905d00] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" />
-                )}
+                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                  <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
               </button>
 
               {/* Maximize */}
               <button
                 onClick={handleMaximize}
                 aria-label={isMaximized ? "Restore window" : "Maximize window"}
-                className="rounded-full flex items-center justify-center transition-all duration-150"
+                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 12,
-                  height: 12,
-                  background: 'var(--color-traffic-maximize)',
-                  border: '1px solid var(--color-text-primary)',
+                  width: 'var(--window-traffic-size, 12px)',
+                  height: 'var(--window-traffic-size, 12px)',
                   borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  background: 'var(--color-traffic-maximize, #28c840)',
+                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
               >
-                {themeContext?.theme === 'sketch' ? null : (
-                  <Square size={6} strokeWidth={3} className="text-[#006500] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" />
-                )}
+                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                </svg>
               </button>
             </div>
 

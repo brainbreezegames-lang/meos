@@ -247,42 +247,43 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 }}
                 onPointerDown={startDrag}
               >
-                {/* Traffic Lights - Uses CSS variables for size and gap */}
-                <div className="flex items-center group/traffic" style={{ gap: 'var(--traffic-gap)' }} onPointerDown={(e) => e.stopPropagation()}>
+                {/* Traffic Lights - unified 12px design */}
+                <div className="flex items-center group/traffic" style={{ gap: 'var(--window-traffic-gap, 8px)' }} onPointerDown={(e) => e.stopPropagation()}>
                   <button
                     onClick={onClose}
-                    className="w-4 h-4 rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
+                    className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                     style={{
-                      background: theme.colors.traffic.close,
-                      border: `1.5px solid ${theme.colors.traffic.border}`,
+                      width: 'var(--window-traffic-size, 12px)',
+                      height: 'var(--window-traffic-size, 12px)',
+                      borderRadius: '50%',
+                      background: 'var(--color-traffic-close, #ff5f57)',
+                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                      border: 'none',
+                      cursor: 'pointer',
                     }}
                   >
-                    <svg className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none" style={{ color: theme.colors.traffic.border }}>
-                      <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                      <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                     </svg>
                   </button>
-                  <button
-                    className="w-4 h-4 rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 pointer-events-none"
+                  <div
                     style={{
-                      background: theme.colors.traffic.minimize,
-                      border: `1.5px solid ${theme.colors.traffic.border}`,
+                      width: 'var(--window-traffic-size, 12px)',
+                      height: 'var(--window-traffic-size, 12px)',
+                      borderRadius: '50%',
+                      background: 'var(--color-traffic-minimize, #ffbd2e)',
+                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     }}
-                  >
-                    <svg className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none" style={{ color: theme.colors.traffic.border }}>
-                      <path d="M1 4H7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                    </svg>
-                  </button>
-                  <button
-                    className="w-4 h-4 rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 pointer-events-none"
+                  />
+                  <div
                     style={{
-                      background: theme.colors.traffic.maximize,
-                      border: `1.5px solid ${theme.colors.traffic.border}`,
+                      width: 'var(--window-traffic-size, 12px)',
+                      height: 'var(--window-traffic-size, 12px)',
+                      borderRadius: '50%',
+                      background: 'var(--color-traffic-maximize, #28c840)',
+                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     }}
-                  >
-                    <svg className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none" style={{ color: theme.colors.traffic.border }}>
-                      <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" transform="rotate(45 4 4)" />
-                    </svg>
-                  </button>
+                  />
                 </div>
 
                 {/* Title */}
