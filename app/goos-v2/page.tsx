@@ -104,7 +104,12 @@ function PlayfulLoader() {
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-[#fbf9ef] p-6 rounded-xl border-2 border-[#171412] shadow-[6px_6px_0_rgba(23,20,18,0.1)]"
+                className="p-6 rounded-xl border-2"
+                style={{
+                    background: 'var(--color-bg-base)',
+                    borderColor: 'var(--color-text-primary)',
+                    boxShadow: 'var(--shadow-md)',
+                }}
             >
                 <div className="flex items-center gap-3">
                     <motion.span
@@ -120,11 +125,15 @@ function PlayfulLoader() {
                             key={message.text}
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-sm font-medium text-[#171412]"
+                            className="text-sm font-medium"
+                            style={{ color: 'var(--color-text-primary)' }}
                         >
                             {message.text}
                         </motion.div>
-                        <div className="text-xs text-[#8e827c] mt-1 font-mono w-8">
+                        <div
+                            className="text-xs mt-1 font-mono w-8"
+                            style={{ color: 'var(--color-text-muted)' }}
+                        >
                             {dots || '\u00A0'}
                         </div>
                     </div>
@@ -1480,7 +1489,7 @@ const GoOSGuestbook = React.memo(({
         return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
 
-    const noteColors = ['#FFFFFF'];
+    const noteColors = [goOS.colors.white];
 
     return (
         <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-instrument, system-ui)' }}>
@@ -1511,7 +1520,7 @@ const GoOSGuestbook = React.memo(({
                     placeholder="Write something nice..."
                     className="w-full h-20 px-3 py-2.5 resize-none focus:outline-none"
                     style={{
-                        background: '#FFFFFF',
+                        background: goOS.colors.white,
                         border: `2px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         color: goOS.colors.text.primary,
@@ -1600,7 +1609,7 @@ const GoOSGuestbook = React.memo(({
                                     <div
                                         className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-2.5"
                                         style={{
-                                            background: '#FFFFFF',
+                                            background: goOS.colors.white,
                                             border: `1px dashed ${goOS.colors.border}`,
                                             borderRadius: '2px',
                                         }}
@@ -1736,7 +1745,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                 <div
                     className="flex items-center justify-between px-3 py-2"
                     style={{
-                        background: '#FFFFFF',
+                        background: goOS.colors.white,
                         border: `2px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                     }}
@@ -1837,7 +1846,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                 <div
                     className="p-4"
                     style={{
-                        background: '#FFFFFF',
+                        background: goOS.colors.white,
                         border: `2px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         boxShadow: goOS.shadows.sm,
@@ -1915,11 +1924,11 @@ const GoOSStatusWidget = React.memo(({ statusWidget }: { statusWidget: StatusWid
     if (!statusWidget || !statusWidget.isVisible) return null;
 
     const statusColors: Record<string, { bg: string; dot: string; text: string }> = {
-        available: { bg: '#ffffff', dot: '#22c55e', text: '#1a1a1a' },
-        looking: { bg: '#ffffff', dot: '#ff7722', text: '#1a1a1a' },
-        taking: { bg: '#ffffff', dot: '#6b6b6b', text: '#1a1a1a' },
-        open: { bg: '#ffffff', dot: '#3d2fa9', text: '#1a1a1a' },
-        consulting: { bg: '#ffffff', dot: '#ff7722', text: '#1a1a1a' },
+        available: { bg: goOS.colors.white, dot: 'var(--color-success)', text: goOS.colors.text.primary },
+        looking: { bg: goOS.colors.white, dot: goOS.colors.accent.primary, text: goOS.colors.text.primary },
+        taking: { bg: goOS.colors.white, dot: goOS.colors.text.muted, text: goOS.colors.text.primary },
+        open: { bg: goOS.colors.white, dot: 'var(--color-accent-secondary)', text: goOS.colors.text.primary },
+        consulting: { bg: goOS.colors.white, dot: goOS.colors.accent.primary, text: goOS.colors.text.primary },
     };
 
     const colors = statusColors[statusWidget.statusType] || statusColors.available;
@@ -2704,7 +2713,7 @@ function GoOSDemoContent() {
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
                             className="fixed inset-0 z-[9000] flex flex-col items-center justify-center gap-6"
-                            style={{ background: '#fbf9ef' }}
+                            style={{ background: goOS.colors.cream }}
                         >
                             <motion.div
                                 initial={{ scale: 0.9, opacity: 0 }}
@@ -2731,10 +2740,10 @@ function GoOSDemoContent() {
                                 onClick={() => setViewMode('desktop')}
                                 style={{
                                     padding: '12px 24px',
-                                    background: '#1a1a1a',
-                                    color: '#ffffff',
+                                    background: goOS.colors.border,
+                                    color: goOS.colors.text.inverse,
                                     border: 'none',
-                                    borderRadius: '10px',
+                                    borderRadius: goOS.radii.button,
                                     fontSize: '14px',
                                     fontWeight: 600,
                                     cursor: 'pointer',
@@ -3193,7 +3202,7 @@ function GoOSDemoContent() {
                 <div
                     className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
                     style={{
-                        background: '#fbf9ef',
+                        background: goOS.colors.cream,
                         border: `2px solid ${goOS.colors.border}`,
                         boxShadow: goOS.shadows.solid
                     }}
@@ -3476,7 +3485,7 @@ function GoOSDemoContent() {
                             transform: 'translateX(-50%)',
                             padding: '12px 24px',
                             borderRadius: '8px',
-                            background: '#FFFFFF',
+                            background: goOS.colors.white,
                             border: `2px solid ${goOS.colors.border}`,
                             color: goOS.colors.text.primary,
                             fontWeight: 500,
