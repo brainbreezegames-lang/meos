@@ -19,6 +19,15 @@ export interface WidgetTheme {
             border: string;
         };
     };
+    status: {
+        [key: string]: {
+            color: string;
+            bgColor: string;
+            borderColor?: string;
+            gradient: string;
+            glow: string;
+        };
+    };
     shadows: {
         solid: string;
         hover: string;
