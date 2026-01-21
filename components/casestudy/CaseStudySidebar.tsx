@@ -97,8 +97,7 @@ export function CaseStudySidebar({
       style={{
         position: 'fixed',
         left: spacing.sidebarLeft,
-        top: '50%',
-        transform: 'translateY(-50%)',
+        top: 120, // Fixed position near top, not vertically centered
         width: spacing.sidebarWidth,
         zIndex: 100,
         display: 'flex',

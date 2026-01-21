@@ -36,31 +36,19 @@ const itemVariants = {
   },
 };
 
-// Single image component
+// Single image component - NO full-bleed, stays within content area
 function ContentImage({ image }: { image: ImageData }) {
   const { spacing } = caseStudyTokens;
-  const isFullWidth = image.layout === 'full-width';
 
   return (
     <figure
       style={{
         margin: 0,
         padding: 0,
-        ...(isFullWidth
-          ? {
-              // Full-bleed images - break out to full viewport width
-              width: '100vw',
-              marginLeft: 'calc(-50vw + 50%)',
-              marginRight: 'calc(-50vw + 50%)',
-              marginTop: 56,
-              marginBottom: 56,
-            }
-          : {
-              width: '100%',
-              maxWidth: spacing.contentMaxWidth,
-              marginTop: 40,
-              marginBottom: 40,
-            }),
+        width: '100%',
+        maxWidth: spacing.contentMaxWidth,
+        marginTop: 48,
+        marginBottom: 48,
       }}
     >
       <img
@@ -71,11 +59,7 @@ function ContentImage({ image }: { image: ImageData }) {
           width: '100%',
           height: 'auto',
           display: 'block',
-          ...(isFullWidth
-            ? {}
-            : {
-                borderRadius: 8,
-              }),
+          borderRadius: 8,
         }}
       />
       {image.caption && (
@@ -86,8 +70,6 @@ function ContentImage({ image }: { image: ImageData }) {
             fontSize: 14,
             color: caseStudyTokens.colors.textMuted,
             textAlign: 'center',
-            paddingLeft: isFullWidth ? 24 : 0,
-            paddingRight: isFullWidth ? 24 : 0,
           }}
         >
           {image.caption}
@@ -97,8 +79,9 @@ function ContentImage({ image }: { image: ImageData }) {
   );
 }
 
-// Image grid component (2-up or 3-up)
+// Image grid component (2-up or 3-up) - NO full-bleed, stays within content area
 function ContentImageGrid({ images }: { images: ImageData[] }) {
+  const { spacing } = caseStudyTokens;
   const columns = images.length >= 3 ? 3 : 2;
 
   return (
@@ -107,17 +90,14 @@ function ContentImageGrid({ images }: { images: ImageData[] }) {
         display: 'grid',
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
         gap: 16,
-        // Full-bleed image grid
-        width: '100vw',
-        marginLeft: 'calc(-50vw + 50%)',
-        marginRight: 'calc(-50vw + 50%)',
-        padding: '0 48px',
-        marginTop: 56,
-        marginBottom: 56,
+        width: '100%',
+        maxWidth: spacing.contentMaxWidth,
+        marginTop: 48,
+        marginBottom: 48,
       }}
     >
       {images.map((image, index) => (
-        <figure key={index} style={{ margin: 0 }}>
+        <figure key={index} style={{ margin: 0, borderRadius: 8, overflow: 'hidden' }}>
           <img
             src={image.src}
             alt={image.alt}
