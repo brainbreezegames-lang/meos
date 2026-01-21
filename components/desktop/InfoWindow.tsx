@@ -283,8 +283,8 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
                     <div
                       className="absolute -inset-3 rounded-[18px] opacity-60 blur-xl"
                       style={{
-                        background: isSketch ? '#FFFFFF' : 'var(--accent-primary)',
-                        display: (isSketch || isBrandAppart) ? 'none' : 'block',
+                        background: theme.colors.text.accent,
+                        display: showAmbientGlow ? 'block' : 'none',
                       }}
                       aria-hidden="true"
                     />
