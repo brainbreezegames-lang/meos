@@ -13,17 +13,17 @@ interface StatusWidgetProps {
 
 /**
  * Availability status widget
- * Uses ONLY CSS variables from design-system.css
+ * Uses ONLY CSS variables from design-system.css (--color-*, --shadow-*, etc.)
  */
 export function StatusWidget({ status, label, sublabel }: StatusWidgetProps) {
   const getStatusColor = () => {
     switch (status) {
       case 'available':
-        return 'var(--ds-status-available)';
+        return 'var(--color-success)';
       case 'busy':
-        return 'var(--ds-status-busy)';
+        return 'var(--color-error)';
       case 'away':
-        return 'var(--ds-status-away)';
+        return 'var(--color-warning)';
     }
   };
 
@@ -34,25 +34,25 @@ export function StatusWidget({ status, label, sublabel }: StatusWidgetProps) {
       transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.3 }}
       style={{
         position: 'fixed',
-        bottom: 'var(--ds-space-20)',
-        right: 'var(--ds-space-6)',
+        bottom: 80,
+        right: 24,
         display: 'flex',
         alignItems: 'center',
-        gap: 'var(--ds-space-3)',
-        padding: 'var(--ds-space-3) var(--ds-space-4)',
-        background: 'var(--ds-surface-elevated)',
-        border: '2px solid var(--ds-border-strong)',
-        borderRadius: 'var(--ds-radius-lg)',
-        boxShadow: 'var(--ds-shadow-md)',
-        zIndex: 'var(--ds-z-dropdown)',
+        gap: 12,
+        padding: 'var(--status-padding, 14px 18px)',
+        background: 'var(--color-bg-elevated)',
+        border: '2px solid var(--color-border-strong)',
+        borderRadius: 'var(--status-radius, 14px)',
+        boxShadow: 'var(--shadow-status)',
+        zIndex: 'var(--z-status-widget, 350)',
       }}
     >
       {/* Status indicator */}
       <div
         style={{
-          width: 10,
-          height: 10,
-          borderRadius: 'var(--ds-radius-full)',
+          width: 'var(--status-dot-size, 10px)',
+          height: 'var(--status-dot-size, 10px)',
+          borderRadius: 'var(--radius-full)',
           background: getStatusColor(),
           boxShadow: `0 0 8px ${getStatusColor()}`,
         }}
@@ -62,22 +62,22 @@ export function StatusWidget({ status, label, sublabel }: StatusWidgetProps) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span
           style={{
-            fontSize: 'var(--ds-text-xs)',
-            fontWeight: 'var(--ds-weight-semibold)',
-            fontFamily: 'var(--ds-font-body)',
-            color: 'var(--ds-text-secondary)',
+            fontSize: 'var(--font-size-xs, 10px)',
+            fontWeight: 'var(--font-weight-semibold, 600)',
+            fontFamily: 'var(--font-family)',
+            color: 'var(--color-text-secondary)',
             textTransform: 'uppercase',
-            letterSpacing: 'var(--ds-tracking-wider)',
+            letterSpacing: 'var(--letter-spacing-wide, 0.05em)',
           }}
         >
           {status.toUpperCase()}
         </span>
         <span
           style={{
-            fontSize: 'var(--ds-text-sm)',
-            fontWeight: 'var(--ds-weight-medium)',
-            fontFamily: 'var(--ds-font-body)',
-            color: 'var(--ds-text-primary)',
+            fontSize: 'var(--font-size-sm, 12px)',
+            fontWeight: 'var(--font-weight-medium, 500)',
+            fontFamily: 'var(--font-family)',
+            color: 'var(--color-text-primary)',
           }}
         >
           {label}
@@ -85,9 +85,9 @@ export function StatusWidget({ status, label, sublabel }: StatusWidgetProps) {
         {sublabel && (
           <span
             style={{
-              fontSize: 'var(--ds-text-xs)',
-              fontFamily: 'var(--ds-font-body)',
-              color: 'var(--ds-text-muted)',
+              fontSize: 'var(--font-size-xs, 10px)',
+              fontFamily: 'var(--font-family)',
+              color: 'var(--color-text-muted)',
             }}
           >
             {sublabel}

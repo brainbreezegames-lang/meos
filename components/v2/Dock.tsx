@@ -18,7 +18,7 @@ interface DockProps {
 
 /**
  * macOS-style dock
- * Uses ONLY CSS variables from design-system.css
+ * Uses ONLY CSS variables from design-system.css (--color-*, --shadow-*, etc.)
  */
 export function Dock({ items }: DockProps) {
   return (
@@ -33,18 +33,20 @@ export function Dock({ items }: DockProps) {
       }}
       style={{
         position: 'fixed',
-        bottom: 'var(--ds-space-4)',
+        bottom: 16,
         left: '50%',
         transform: 'translateX(-50%)',
         display: 'flex',
         alignItems: 'center',
-        gap: 'var(--ds-space-2)',
-        padding: 'var(--ds-space-2)',
-        background: 'var(--ds-dock-bg)',
-        border: '1px solid var(--ds-dock-border)',
-        borderRadius: 'var(--ds-radius-xl)',
-        boxShadow: 'var(--ds-shadow-lg)',
-        zIndex: 'var(--ds-z-sticky)',
+        gap: 'var(--dock-icon-gap, 8px)',
+        padding: 'var(--dock-padding, 10px 16px)',
+        background: 'var(--color-bg-elevated)',
+        backdropFilter: 'blur(var(--blur-medium, 20px))',
+        WebkitBackdropFilter: 'blur(var(--blur-medium, 20px))',
+        border: '1px solid var(--color-border-subtle)',
+        borderRadius: 'var(--radius-dock, 20px)',
+        boxShadow: 'var(--shadow-dock)',
+        zIndex: 'var(--z-dock, 300)',
       }}
     >
       {items.map((item) => (
@@ -67,21 +69,21 @@ function DockIcon({ item }: { item: DockItem }) {
         damping: 20,
       }}
       style={{
-        width: 48,
-        height: 48,
+        width: 'var(--dock-icon-size, 44px)',
+        height: 'var(--dock-icon-size, 44px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'transparent',
         border: 'none',
-        borderRadius: 'var(--ds-radius-lg)',
+        borderRadius: 'var(--dock-icon-radius, 12px)',
         cursor: 'pointer',
         position: 'relative',
-        color: 'var(--ds-text-primary)',
-        transition: `background var(--ds-duration-fast) var(--ds-ease-out)`,
+        color: 'var(--color-text-primary)',
+        transition: 'background var(--transition-fast, 150ms) var(--ease-out)',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'var(--ds-dock-item-hover)';
+        e.currentTarget.style.background = 'var(--color-bg-subtle-hover)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = 'transparent';
@@ -97,10 +99,10 @@ function DockIcon({ item }: { item: DockItem }) {
             bottom: -2,
             left: '50%',
             transform: 'translateX(-50%)',
-            width: 4,
-            height: 4,
-            borderRadius: 'var(--ds-radius-full)',
-            background: 'var(--ds-text-primary)',
+            width: 'var(--dock-active-dot-size, 4px)',
+            height: 'var(--dock-active-dot-size, 4px)',
+            borderRadius: 'var(--radius-full)',
+            background: 'var(--color-text-primary)',
           }}
         />
       )}
@@ -112,18 +114,18 @@ function DockIcon({ item }: { item: DockItem }) {
             position: 'absolute',
             top: 2,
             right: 2,
-            minWidth: 16,
-            height: 16,
+            minWidth: 'var(--dock-badge-size, 16px)',
+            height: 'var(--dock-badge-size, 16px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '0 4px',
-            fontSize: 'var(--ds-text-xs)',
-            fontWeight: 'var(--ds-weight-bold)',
-            fontFamily: 'var(--ds-font-body)',
-            color: 'var(--ds-text-inverse)',
-            background: 'var(--ds-accent)',
-            borderRadius: 'var(--ds-radius-full)',
+            fontSize: 'var(--font-size-xs, 10px)',
+            fontWeight: 'var(--font-weight-bold, 700)',
+            fontFamily: 'var(--font-family)',
+            color: 'var(--color-text-on-accent)',
+            background: 'var(--color-accent-primary)',
+            borderRadius: 'var(--radius-full)',
           }}
         >
           {item.badge > 9 ? '9+' : item.badge}

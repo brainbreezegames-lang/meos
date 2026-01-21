@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Square, FileText, Presentation } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { FileText, Presentation } from 'lucide-react';
 import { GoOSTipTapEditor, goOSTokens } from './GoOSTipTapEditor';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
+import { GoOSTrafficLights } from './GoOSTrafficLights';
 import { AccessLevel } from '@/contexts/GoOSContext';
-import { useThemeSafe } from '@/contexts/ThemeContext';
-import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 export interface GoOSFile {
   id: string;
@@ -108,9 +107,6 @@ export function GoOSEditorWindow({
   // Reading time (average 200 words per minute)
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-
-  const theme = useWidgetTheme();
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -119,26 +115,21 @@ export function GoOSEditorWindow({
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       style={{
         position: 'fixed',
-        top: isMaximized ? 28 : '10%',
-        left: isMaximized ? 0 : '15%',
-        right: isMaximized ? 0 : '15%',
-        bottom: isMaximized ? 80 : '10%',
-        width: isMaximized ? '100%' : 'auto',
-        minWidth: isMaximized ? '100%' : 600,
-        maxWidth: isMaximized ? '100%' : 900,
-        height: isMaximized ? 'auto' : 'auto',
-        maxHeight: isMaximized ? '100%' : '80vh',
-        background: theme.colors.paper,
-        border: `2px solid ${theme.colors.border}`,
-        borderRadius: isMaximized ? 0 : theme.radii.card,
-        boxShadow: isMaximized
-          ? 'none'
-          : theme.shadows.solid,
+        top: isMaximized ? 'var(--menubar-height, 36px)' : '10%',
+        left: isMaximized ? 0 : '50%',
+        transform: isMaximized ? 'none' : 'translateX(-50%)',
+        width: isMaximized ? '100%' : 'min(900px, 90vw)',
+        height: isMaximized ? 'calc(100vh - var(--menubar-height, 36px) - 80px)' : 'min(80vh, 700px)',
+        minWidth: 400,
+        background: 'var(--color-bg-base)',
+        border: isMaximized ? 'none' : '2px solid var(--color-border-default)',
+        borderRadius: isMaximized ? 0 : 'var(--window-radius, 14px)',
+        boxShadow: isMaximized ? 'none' : 'var(--shadow-window)',
         zIndex,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        opacity: isActive ? 1 : 0.9,
+        opacity: isActive ? 1 : 0.95,
       }}
     >
       {/* Title Bar */}
@@ -146,85 +137,27 @@ export function GoOSEditorWindow({
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: '10px 12px',
-          background: theme.colors.paper,
-          borderBottom: `2px solid ${theme.colors.border}`,
+          padding: '10px 14px',
+          background: 'var(--color-bg-subtle)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           gap: 12,
           cursor: isMaximized ? 'default' : 'grab',
+          flexShrink: 0,
         }}
       >
         {/* Traffic Lights */}
-        <div style={{ display: 'flex', gap: 6 }} role="group" aria-label="Window controls">
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              background: theme.colors.traffic.close,
-              border: `1.5px solid ${theme.colors.traffic.border}`,
-              cursor: 'pointer',
-              padding: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            title="Close"
-            aria-label="Close window"
-            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
-          >
-            <X size={8} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
-          </button>
-          <button
-            type="button"
-            onClick={onMinimize}
-            style={{
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              background: theme.colors.traffic.minimize,
-              border: `1.5px solid ${theme.colors.traffic.border}`,
-              cursor: 'pointer',
-              padding: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            title="Minimize"
-            aria-label="Minimize window"
-            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
-          >
-            <Minus size={8} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
-          </button>
-          <button
-            type="button"
-            onClick={onMaximize}
-            style={{
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              background: theme.colors.traffic.maximize,
-              border: `1.5px solid ${theme.colors.traffic.border}`,
-              cursor: 'pointer',
-              padding: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            title={isMaximized ? 'Restore' : 'Maximize'}
-            aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
-            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
-          >
-            <Square size={6} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
-          </button>
-        </div>
+        <GoOSTrafficLights
+          onClose={onClose}
+          onMinimize={onMinimize}
+          onMaximize={onMaximize}
+          isMaximized={isMaximized}
+        />
 
         {/* File Icon + Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <FileIcon
             size={16}
-            color={theme.colors.text.primary}
+            color="var(--color-text-secondary)"
             strokeWidth={1.5}
           />
 
@@ -242,13 +175,13 @@ export function GoOSEditorWindow({
               style={{
                 flex: 1,
                 padding: '4px 8px',
-                fontSize: 14,
-                fontWeight: 600,
-                fontFamily: theme.fonts.heading,
-                color: theme.colors.text.primary,
-                background: theme.colors.paper,
-                border: `1.5px solid ${theme.colors.border}`,
-                borderRadius: 4,
+                fontSize: 'var(--font-size-md, 14px)',
+                fontWeight: 'var(--font-weight-semibold, 600)',
+                fontFamily: 'var(--font-family)',
+                color: 'var(--color-text-primary)',
+                background: 'var(--color-bg-base)',
+                border: '1.5px solid var(--color-accent-primary)',
+                borderRadius: 'var(--radius-sm, 6px)',
                 outline: 'none',
               }}
             />
@@ -256,10 +189,10 @@ export function GoOSEditorWindow({
             <span
               onClick={() => setIsEditingTitle(true)}
               style={{
-                fontSize: 14,
-                fontWeight: 600,
-                fontFamily: theme.fonts.heading,
-                color: theme.colors.text.primary,
+                fontSize: 'var(--font-size-md, 14px)',
+                fontWeight: 'var(--font-weight-semibold, 600)',
+                fontFamily: 'var(--font-family)',
+                color: 'var(--color-text-primary)',
                 cursor: 'text',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -284,17 +217,35 @@ export function GoOSEditorWindow({
         />
       </div>
 
-      {/* Editor */}
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <GoOSTipTapEditor
-          content={content}
-          onChange={setContent}
-          onSave={triggerSave}
-          placeholder={file.type === 'case-study'
-            ? 'Start writing your case study...'
-            : 'Start writing...'}
-          autoFocus
-        />
+      {/* Editor - responsive container */}
+      <div
+        style={{
+          flex: 1,
+          overflow: 'hidden',
+          display: 'flex',
+          justifyContent: 'center',
+          background: 'var(--color-bg-white)',
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            maxWidth: isMaximized ? '800px' : '100%',
+            height: '100%',
+            margin: isMaximized ? '0 auto' : 0,
+            padding: isMaximized ? '0 24px' : 0,
+          }}
+        >
+          <GoOSTipTapEditor
+            content={content}
+            onChange={setContent}
+            onSave={triggerSave}
+            placeholder={file.type === 'case-study'
+              ? 'Start writing your case study...'
+              : 'Start writing...'}
+            autoFocus
+          />
+        </div>
       </div>
 
       {/* Footer with stats */}
@@ -304,11 +255,12 @@ export function GoOSEditorWindow({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          borderTop: `2px solid ${theme.colors.border}`,
-          background: theme.colors.paper,
-          fontSize: 11,
-          fontFamily: theme.fonts.mono,
-          color: theme.colors.text.secondary,
+          borderTop: '1px solid var(--color-border-subtle)',
+          background: 'var(--color-bg-subtle)',
+          fontSize: 'var(--font-size-xs, 10px)',
+          fontFamily: 'ui-monospace, "SF Mono", monospace',
+          color: 'var(--color-text-muted)',
+          flexShrink: 0,
         }}
       >
         <div style={{ display: 'flex', gap: 16 }}>
@@ -316,19 +268,8 @@ export function GoOSEditorWindow({
           <span>{charCount} characters</span>
           <span>{readingTime} min read</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontFamily: goOSTokens.fonts.handwritten, fontSize: 12 }}>
-            goOS Editor
-          </span>
-        </div>
+        <span style={{ fontSize: 11 }}>goOS Editor</span>
       </div>
-
-      {/* Styles for traffic light hover */}
-      <style jsx>{`
-        button:hover .traffic-icon {
-          opacity: 1 !important;
-        }
-      `}</style>
     </motion.div>
   );
 }

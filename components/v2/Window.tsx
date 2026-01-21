@@ -20,7 +20,7 @@ interface WindowProps {
 
 /**
  * macOS-style draggable window
- * Uses ONLY CSS variables from design-system.css
+ * Uses ONLY CSS variables from design-system.css (--color-*, --shadow-*, etc.)
  */
 export function Window({
   id,
@@ -64,7 +64,7 @@ export function Window({
         style={{
           position: 'fixed',
           inset: 0,
-          padding: isMaximized ? 0 : 'var(--ds-space-10)',
+          padding: isMaximized ? 0 : 40,
           pointerEvents: 'none',
           zIndex: zIndex - 1,
         }}
@@ -89,26 +89,26 @@ export function Window({
           }}
           style={{
             position: 'fixed',
-            top: isMaximized ? 28 : initialPosition.y,
+            top: isMaximized ? 'var(--menubar-height, 36px)' : initialPosition.y,
             left: isMaximized ? 0 : initialPosition.x,
             width: isMaximized ? '100%' : initialSize.width,
-            height: isMaximized ? 'calc(100% - 28px)' : initialSize.height,
+            height: isMaximized ? 'calc(100% - var(--menubar-height, 36px))' : initialSize.height,
             minWidth: minSize.width,
             minHeight: minSize.height,
             zIndex: isActive ? zIndex + 100 : zIndex,
             display: 'flex',
             flexDirection: 'column',
-            background: 'var(--ds-window-bg)',
-            border: '2px solid var(--ds-window-border)',
-            borderRadius: isMaximized ? 0 : 'var(--ds-window-radius)',
-            boxShadow: isActive ? 'var(--ds-shadow-window-active)' : 'var(--ds-shadow-window)',
+            background: 'var(--color-bg-base)',
+            border: '2px solid var(--color-border-default)',
+            borderRadius: isMaximized ? 0 : 'var(--window-radius, 14px)',
+            boxShadow: isActive ? 'var(--shadow-window)' : 'var(--shadow-md)',
             overflow: 'hidden',
             cursor: isMaximized ? 'default' : 'grab',
             opacity: isActive ? 1 : 0.95,
           }}
           whileDrag={{
             cursor: 'grabbing',
-            boxShadow: 'var(--ds-shadow-window-drag)',
+            boxShadow: 'var(--shadow-xl)',
           }}
         >
           {/* Title Bar */}
@@ -116,10 +116,10 @@ export function Window({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 'var(--ds-space-3)',
-              padding: 'var(--ds-space-3) var(--ds-space-4)',
-              background: 'var(--ds-window-header-bg)',
-              borderBottom: '1px solid var(--ds-border-subtle)',
+              gap: 12,
+              padding: '10px 14px',
+              background: 'var(--color-bg-subtle)',
+              borderBottom: '1px solid var(--color-border-subtle)',
               userSelect: 'none',
               WebkitUserSelect: 'none',
               flexShrink: 0,
@@ -129,6 +129,7 @@ export function Window({
               onClose={handleClose}
               onMinimize={handleMinimize}
               onMaximize={handleMaximize}
+              isMaximized={isMaximized}
             />
 
             {/* Window title */}
@@ -138,21 +139,21 @@ export function Window({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 'var(--ds-space-2)',
+                gap: 8,
               }}
             >
               {icon && (
-                <span style={{ display: 'flex', color: 'var(--ds-text-secondary)' }}>
+                <span style={{ display: 'flex', color: 'var(--color-text-secondary)' }}>
                   {icon}
                 </span>
               )}
               <span
                 style={{
-                  fontSize: 'var(--ds-text-sm)',
-                  fontWeight: 'var(--ds-weight-medium)',
-                  fontFamily: 'var(--ds-font-body)',
-                  color: 'var(--ds-text-primary)',
-                  letterSpacing: 'var(--ds-tracking-tight)',
+                  fontSize: 'var(--font-size-base, 13px)',
+                  fontWeight: 'var(--font-weight-medium, 500)',
+                  fontFamily: 'var(--font-family)',
+                  color: 'var(--color-text-primary)',
+                  letterSpacing: 'var(--letter-spacing-tight, -0.02em)',
                 }}
               >
                 {title}
@@ -168,7 +169,7 @@ export function Window({
             style={{
               flex: 1,
               overflow: 'auto',
-              background: 'var(--ds-surface-base)',
+              background: 'var(--color-bg-white)',
             }}
           >
             {children}

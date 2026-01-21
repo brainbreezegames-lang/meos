@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { X, Minus, Square } from 'lucide-react';
 
-interface TrafficLightsProps {
+interface GoOSTrafficLightsProps {
   onClose: () => void;
   onMinimize?: () => void;
   onMaximize?: () => void;
@@ -11,18 +11,18 @@ interface TrafficLightsProps {
 }
 
 /**
- * macOS-style traffic light buttons
- * Uses ONLY CSS variables from design-system.css (--color-* prefix)
+ * Unified macOS-style traffic light buttons
+ * Uses ONLY CSS variables from design-system.css
  *
  * Standard size: 12px (matching --window-traffic-size)
  * Standard gap: 8px (matching --window-traffic-gap)
  */
-export function TrafficLights({
+export function GoOSTrafficLights({
   onClose,
   onMinimize,
   onMaximize,
   isMaximized = false,
-}: TrafficLightsProps) {
+}: GoOSTrafficLightsProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const buttonStyle: React.CSSProperties = {
@@ -35,17 +35,16 @@ export function TrafficLights({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 0,
-    transition: 'transform var(--transition-fast, 150ms) var(--ease-out, ease-out)',
+    transition: 'transform var(--transition-fast) var(--ease-out), opacity var(--transition-fast) var(--ease-out)',
   };
 
   const iconStyle: React.CSSProperties = {
     opacity: isHovered ? 1 : 0,
-    transition: 'opacity var(--transition-fast, 150ms) var(--ease-out, ease-out)',
+    transition: 'opacity var(--transition-fast) var(--ease-out)',
   };
 
   return (
     <div
-      className="traffic-lights"
       role="group"
       aria-label="Window controls"
       onMouseEnter={() => setIsHovered(true)}
@@ -120,3 +119,5 @@ export function TrafficLights({
     </div>
   );
 }
+
+export default GoOSTrafficLights;

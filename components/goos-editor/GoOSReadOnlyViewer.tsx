@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, Minus, Square, FileText, Presentation } from 'lucide-react';
-import { goOSTokens } from './GoOSTipTapEditor';
+import { FileText, Presentation } from 'lucide-react';
+import { GoOSTrafficLights } from './GoOSTrafficLights';
 import type { PublishStatus } from './GoOSPublishToggle';
 
 interface GoOSFile {
@@ -20,14 +20,20 @@ interface GoOSFile {
 interface GoOSReadOnlyViewerProps {
   file: GoOSFile;
   onClose: () => void;
+  onMinimize?: () => void;
+  onMaximize?: () => void;
   isActive?: boolean;
+  isMaximized?: boolean;
   zIndex?: number;
 }
 
 export function GoOSReadOnlyViewer({
   file,
   onClose,
+  onMinimize,
+  onMaximize,
   isActive = true,
+  isMaximized = false,
   zIndex = 100,
 }: GoOSReadOnlyViewerProps) {
   const FileIcon = file.type === 'case-study' ? Presentation : FileText;
@@ -49,22 +55,21 @@ export function GoOSReadOnlyViewer({
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       style={{
         position: 'fixed',
-        top: '10%',
-        left: '15%',
-        right: '15%',
-        bottom: '10%',
-        minWidth: 600,
-        maxWidth: 900,
-        maxHeight: '80vh',
-        background: goOSTokens.colors.cream,
-        border: `2px solid ${goOSTokens.colors.border}`,
-        borderRadius: 8,
-        boxShadow: goOSTokens.shadows.solid,
+        top: isMaximized ? 'var(--menubar-height, 36px)' : '10%',
+        left: isMaximized ? 0 : '50%',
+        transform: isMaximized ? 'none' : 'translateX(-50%)',
+        width: isMaximized ? '100%' : 'min(900px, 90vw)',
+        height: isMaximized ? 'calc(100vh - var(--menubar-height, 36px) - 80px)' : 'min(80vh, 700px)',
+        minWidth: 400,
+        background: 'var(--color-bg-base)',
+        border: isMaximized ? 'none' : '2px solid var(--color-border-default)',
+        borderRadius: isMaximized ? 0 : 'var(--window-radius, 14px)',
+        boxShadow: isMaximized ? 'none' : 'var(--shadow-window)',
         zIndex,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        opacity: isActive ? 1 : 0.9,
+        opacity: isActive ? 1 : 0.95,
       }}
     >
       {/* Title Bar */}
@@ -72,69 +77,34 @@ export function GoOSReadOnlyViewer({
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: '10px 12px',
-          background: goOSTokens.colors.headerBg,
-          borderBottom: `2px solid ${goOSTokens.colors.border}`,
+          padding: '10px 14px',
+          background: 'var(--color-bg-subtle)',
+          borderBottom: '1px solid var(--color-border-subtle)',
           gap: 12,
+          flexShrink: 0,
         }}
       >
-        {/* Close Button */}
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              background: goOSTokens.colors.traffic.close,
-              border: `1.5px solid ${goOSTokens.colors.border}`,
-              cursor: 'pointer',
-              padding: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            title="Close"
-            aria-label="Close window"
-          >
-            <X size={8} strokeWidth={2.5} color={goOSTokens.colors.text.primary} style={{ opacity: 0 }} className="traffic-icon" />
-          </button>
-          <div
-            style={{
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              background: goOSTokens.colors.traffic.disabled,
-              border: `1.5px solid ${goOSTokens.colors.border}`,
-              opacity: 0.5,
-            }}
-          />
-          <div
-            style={{
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              background: goOSTokens.colors.traffic.disabled,
-              border: `1.5px solid ${goOSTokens.colors.border}`,
-              opacity: 0.5,
-            }}
-          />
-        </div>
+        {/* Traffic Lights */}
+        <GoOSTrafficLights
+          onClose={onClose}
+          onMinimize={onMinimize}
+          onMaximize={onMaximize}
+          isMaximized={isMaximized}
+        />
 
         {/* File Icon + Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <FileIcon
             size={16}
-            stroke={goOSTokens.colors.border}
+            color="var(--color-text-secondary)"
             strokeWidth={1.5}
           />
           <span
             style={{
-              fontSize: 14,
-              fontWeight: 600,
-              fontFamily: goOSTokens.fonts.body,
-              color: goOSTokens.colors.text.primary,
+              fontSize: 'var(--font-size-md, 14px)',
+              fontWeight: 'var(--font-weight-semibold, 600)',
+              fontFamily: 'var(--font-family)',
+              color: 'var(--color-text-primary)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -147,33 +117,43 @@ export function GoOSReadOnlyViewer({
         {/* Reading time */}
         <span
           style={{
-            fontSize: 11,
-            fontFamily: goOSTokens.fonts.body,
-            color: goOSTokens.colors.text.muted,
+            fontSize: 'var(--font-size-xs, 10px)',
+            fontFamily: 'var(--font-family)',
+            color: 'var(--color-text-muted)',
           }}
         >
           {readingTime} min read
         </span>
       </div>
 
-      {/* Content */}
+      {/* Content - responsive */}
       <div
         style={{
           flex: 1,
           overflow: 'auto',
-          padding: '24px 32px',
+          display: 'flex',
+          justifyContent: 'center',
+          background: 'var(--color-bg-white)',
         }}
       >
         <div
-          className="goos-content prose prose-sm max-w-none"
           style={{
-            fontFamily: goOSTokens.fonts.body,
-            fontSize: 15,
-            lineHeight: 1.7,
-            color: goOSTokens.colors.text.primary,
+            width: '100%',
+            maxWidth: isMaximized ? '720px' : '100%',
+            padding: isMaximized ? '32px 24px' : '24px 32px',
           }}
-          dangerouslySetInnerHTML={{ __html: file.content }}
-        />
+        >
+          <div
+            className="goos-content prose prose-sm max-w-none"
+            style={{
+              fontFamily: 'var(--font-family)',
+              fontSize: 'var(--font-size-lg, 16px)',
+              lineHeight: 1.7,
+              color: 'var(--color-text-primary)',
+            }}
+            dangerouslySetInnerHTML={{ __html: file.content }}
+          />
+        </div>
       </div>
 
       {/* Footer */}
@@ -183,46 +163,39 @@ export function GoOSReadOnlyViewer({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          borderTop: `2px solid ${goOSTokens.colors.border}`,
-          background: goOSTokens.colors.headerBg,
-          fontSize: 11,
-          fontFamily: goOSTokens.fonts.body,
-          color: goOSTokens.colors.text.muted,
+          borderTop: '1px solid var(--color-border-subtle)',
+          background: 'var(--color-bg-subtle)',
+          fontSize: 'var(--font-size-xs, 10px)',
+          fontFamily: 'ui-monospace, "SF Mono", monospace',
+          color: 'var(--color-text-muted)',
+          flexShrink: 0,
         }}
       >
         <span>{wordCount} words</span>
-        <span style={{ fontFamily: goOSTokens.fonts.handwritten, fontSize: 12 }}>
-          goOS
-        </span>
+        <span style={{ fontSize: 11 }}>goOS</span>
       </div>
 
-      {/* Styles for traffic light hover */}
-      <style jsx>{`
-        button:hover .traffic-icon {
-          opacity: 1 !important;
-        }
+      {/* Content styles */}
+      <style jsx global>{`
         .goos-content h1 {
-          font-family: ${goOSTokens.fonts.display};
           font-size: 28px;
           font-weight: 700;
           margin-bottom: 16px;
-          color: ${goOSTokens.colors.text.primary};
+          color: var(--color-text-primary);
         }
         .goos-content h2 {
-          font-family: ${goOSTokens.fonts.display};
           font-size: 22px;
           font-weight: 600;
           margin-top: 24px;
           margin-bottom: 12px;
-          color: ${goOSTokens.colors.text.primary};
+          color: var(--color-text-primary);
         }
         .goos-content h3 {
-          font-family: ${goOSTokens.fonts.display};
           font-size: 18px;
           font-weight: 600;
           margin-top: 20px;
           margin-bottom: 8px;
-          color: ${goOSTokens.colors.text.primary};
+          color: var(--color-text-primary);
         }
         .goos-content p {
           margin-bottom: 16px;
@@ -235,24 +208,24 @@ export function GoOSReadOnlyViewer({
           margin-bottom: 4px;
         }
         .goos-content a {
-          color: ${goOSTokens.colors.accent.primary};
+          color: var(--color-accent-primary);
           text-decoration: underline;
         }
         .goos-content blockquote {
-          border-left: 3px solid ${goOSTokens.colors.accent.primary};
+          border-left: 3px solid var(--color-accent-primary);
           padding-left: 16px;
           margin: 16px 0;
           font-style: italic;
-          color: ${goOSTokens.colors.text.secondary};
+          color: var(--color-text-secondary);
         }
         .goos-content code {
-          background: ${goOSTokens.colors.headerBg};
+          background: var(--color-bg-subtle);
           padding: 2px 6px;
           border-radius: 4px;
           font-size: 13px;
         }
         .goos-content pre {
-          background: ${goOSTokens.colors.headerBg};
+          background: var(--color-bg-subtle);
           padding: 16px;
           border-radius: 6px;
           overflow-x: auto;
