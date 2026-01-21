@@ -66,6 +66,38 @@ export const useWidgetTheme = (): WidgetTheme => {
                 border: '#2B4AE2',
             },
         },
+        status: {
+            available: {
+                color: '#10b981',
+                bgColor: 'rgba(16, 185, 129, 0.1)',
+                gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                glow: '0 0 20px rgba(16, 185, 129, 0.4)',
+            },
+            looking: {
+                color: '#3b82f6',
+                bgColor: 'rgba(59, 130, 246, 0.1)',
+                gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                glow: '0 0 20px rgba(59, 130, 246, 0.4)',
+            },
+            taking: {
+                color: '#f59e0b',
+                bgColor: 'rgba(245, 158, 11, 0.1)',
+                gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                glow: '0 0 20px rgba(245, 158, 11, 0.4)',
+            },
+            open: {
+                color: '#8b5cf6',
+                bgColor: 'rgba(139, 92, 246, 0.1)',
+                gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                glow: '0 0 20px rgba(139, 92, 246, 0.4)',
+            },
+            consulting: {
+                color: '#06b6d4',
+                bgColor: 'rgba(6, 182, 212, 0.1)',
+                gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+                glow: '0 0 20px rgba(6, 182, 212, 0.4)',
+            },
+        },
         shadows: {
             solid: '4px 4px 0 #2B4AE2',
             hover: '6px 6px 0 #2B4AE2',
@@ -99,6 +131,43 @@ export const useWidgetTheme = (): WidgetTheme => {
                 border: '#171412',
             },
         },
+        status: {
+            available: {
+                color: '#3d2fa9',
+                bgColor: '#f2f0e7',
+                borderColor: '#3d2fa9',
+                gradient: 'transparent',
+                glow: 'none',
+            },
+            looking: {
+                color: '#ff7722',
+                bgColor: '#f2f0e7',
+                borderColor: '#ff7722',
+                gradient: 'transparent',
+                glow: 'none',
+            },
+            taking: {
+                color: '#ffc765',
+                bgColor: '#f2f0e7',
+                borderColor: '#ffc765',
+                gradient: 'transparent',
+                glow: 'none',
+            },
+            open: {
+                color: '#ff3c34',
+                bgColor: '#f2f0e7',
+                borderColor: '#ff3c34',
+                gradient: 'transparent',
+                glow: 'none',
+            },
+            consulting: {
+                color: '#8e827c',
+                bgColor: '#f2f0e7',
+                borderColor: '#8e827c',
+                gradient: 'transparent',
+                glow: 'none',
+            },
+        },
         shadows: {
             solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',
             hover: '6px 6px 0 rgba(23, 20, 18, 0.15)',
@@ -130,6 +199,38 @@ export const useWidgetTheme = (): WidgetTheme => {
                 minimize: '#FFBD2E',
                 maximize: '#28CA41',
                 border: 'transparent',
+            },
+        },
+        status: {
+            available: {
+                color: 'var(--accent-success)',
+                bgColor: 'rgba(16, 185, 129, 0.1)',
+                gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                glow: '0 0 20px rgba(16, 185, 129, 0.4)',
+            },
+            looking: {
+                color: 'var(--accent-primary)',
+                bgColor: 'rgba(59, 130, 246, 0.1)',
+                gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                glow: '0 0 20px rgba(59, 130, 246, 0.4)',
+            },
+            taking: {
+                color: 'var(--accent-warning)',
+                bgColor: 'rgba(245, 158, 11, 0.1)',
+                gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                glow: '0 0 20px rgba(245, 158, 11, 0.4)',
+            },
+            open: {
+                color: 'var(--accent-secondary)',
+                bgColor: 'rgba(139, 92, 246, 0.1)',
+                gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                glow: '0 0 20px rgba(139, 92, 246, 0.4)',
+            },
+            consulting: {
+                color: 'var(--accent-info)',
+                bgColor: 'rgba(6, 182, 212, 0.1)',
+                gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+                glow: '0 0 20px rgba(6, 182, 212, 0.4)',
             },
         },
         shadows: {
