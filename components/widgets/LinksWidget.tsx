@@ -30,7 +30,7 @@ const DEFAULT_CONFIG: LinksWidgetConfig = {
 };
 
 // Map icon names to Lucide icons
-const ICON_MAP: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>> = {
+const ICON_MAP: Record<string, React.ComponentType<any>> = {
   twitter: Twitter,
   github: Github,
   linkedin: Linkedin,

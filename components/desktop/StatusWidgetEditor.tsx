@@ -4,7 +4,56 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff } from 'lucide-react';
 import type { StatusWidget, StatusType } from '@/types';
-import { STATUS_CONFIG } from './StatusWidget';
+
+const STATUS_CONFIG: Record<StatusType, {
+  emoji: string;
+  gradient: string;
+  glow: string;
+  label: string;
+  color: string;
+  bgColor: string;
+}> = {
+  available: {
+    emoji: '✦',
+    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    glow: '0 0 20px rgba(16, 185, 129, 0.4)',
+    label: 'Available',
+    color: '#10b981',
+    bgColor: 'rgba(16, 185, 129, 0.1)',
+  },
+  looking: {
+    emoji: '◈',
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    glow: '0 0 20px rgba(59, 130, 246, 0.4)',
+    label: 'Looking for',
+    color: '#3b82f6',
+    bgColor: 'rgba(59, 130, 246, 0.1)',
+  },
+  taking: {
+    emoji: '◇',
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    glow: '0 0 20px rgba(245, 158, 11, 0.4)',
+    label: 'Taking',
+    color: '#f59e0b',
+    bgColor: 'rgba(245, 158, 11, 0.1)',
+  },
+  open: {
+    emoji: '○',
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+    glow: '0 0 20px rgba(139, 92, 246, 0.4)',
+    label: 'Open to',
+    color: '#8b5cf6',
+    bgColor: 'rgba(139, 92, 246, 0.1)',
+  },
+  consulting: {
+    emoji: '◎',
+    gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+    glow: '0 0 20px rgba(6, 182, 212, 0.4)',
+    label: 'Consulting',
+    color: '#06b6d4',
+    bgColor: 'rgba(6, 182, 212, 0.1)',
+  },
+};
 
 interface StatusWidgetEditorProps {
   statusWidget: StatusWidget | null;
