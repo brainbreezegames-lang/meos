@@ -319,7 +319,7 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
                     <h2
                       className="info-window-title text-[22px] font-bold tracking-tight leading-tight"
                       style={{
-                        color: isSketch ? '#2B4AE2' : (isBrandAppart ? '#1a1a1a' : 'var(--text-primary)'),
+                        color: theme.colors.text.primary,
                         letterSpacing: '-0.02em',
                       }}
                     >
