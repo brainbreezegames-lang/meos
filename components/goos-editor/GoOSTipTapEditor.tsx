@@ -17,31 +17,31 @@ import { GoOSEditorToolbar } from './GoOSEditorToolbar';
 
 const lowlight = createLowlight(common);
 
-// goOS Design Tokens (shared) - Mediterranean Blue
+// goOS Design Tokens (shared) - Brand Appart Warm Cream
 export const goOSTokens = {
   colors: {
-    paper: '#FAF7F2',
-    cream: '#FEFEFE',
-    headerBg: '#E8ECFB',
-    windowBg: '#F8FAFF',
-    border: '#2B4AE2',
+    paper: '#fbf9ef',
+    cream: '#fbf9ef',
+    headerBg: '#f5f3e8',
+    windowBg: '#ffffff',
+    border: '#1a1a1a',
     text: {
-      primary: '#1E3494',
-      secondary: '#2B4AE2',
-      muted: '#5B73E8',
+      primary: '#1a1a1a',
+      secondary: '#4a4a4a',
+      muted: '#6b6b6b',
     },
     accent: {
-      primary: '#2B4AE2',
-      dark: '#1E3494',
-      light: '#5B73E8',
-      pale: '#E8ECFB',
+      primary: '#ff7722',
+      dark: '#e56a1f',
+      light: '#ff9955',
+      pale: '#fff5ee',
     },
   },
   shadows: {
-    solid: '4px 4px 16px rgba(43, 74, 226, 0.15)',
-    hover: '6px 6px 20px rgba(43, 74, 226, 0.20)',
-    sm: '2px 2px 8px rgba(43, 74, 226, 0.10)',
-    button: '2px 2px 8px rgba(43, 74, 226, 0.12)',
+    solid: '0 8px 24px rgba(0, 0, 0, 0.1)',
+    hover: '0 12px 32px rgba(0, 0, 0, 0.12)',
+    sm: '0 4px 12px rgba(0, 0, 0, 0.06)',
+    button: '0 2px 8px rgba(0, 0, 0, 0.08)',
   },
   fonts: {
     display: "'Averia Serif Libre', Georgia, serif",

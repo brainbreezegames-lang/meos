@@ -113,11 +113,11 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   const getIconBg = () => {
     switch (type) {
       case 'case-study':
-        return 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)';
+        return 'linear-gradient(135deg, #f0e8fd 0%, #e4d6fa 100%)';
       case 'folder':
-        return 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
+        return 'linear-gradient(135deg, #fff5ee 0%, #ffe4cc 100%)';
       default:
-        return 'linear-gradient(135deg, #fef7ed 0%, #fed7aa 100%)';
+        return 'linear-gradient(135deg, #ffffff 0%, #f5f3e8 100%)';
     }
   };
 
@@ -265,10 +265,10 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         style={{
           width: 52,
           height: 52,
-          borderRadius: 8,
+          borderRadius: 12,
           background: getIconBg(),
-          border: `2px solid ${goOSTokens.colors.border}`,
-          boxShadow: goOSTokens.shadows.sm,
+          border: `1px solid rgba(0,0,0,0.08)`,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

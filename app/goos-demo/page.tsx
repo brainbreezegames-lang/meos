@@ -63,8 +63,8 @@ const GoOSEditorWindow = dynamic(
     {
         loading: () => (
             <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-                <div className="bg-[#FAF8F0] p-6 rounded-lg border-2 border-[#2B4AE2] shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
-                    <div className="animate-pulse text-sm font-medium text-[#1E3494]">Loading editor...</div>
+                <div className="bg-[#FAF8F0] p-6 rounded-lg border-2 border-[#1a1a1a] shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
+                    <div className="animate-pulse text-sm font-medium text-[#1a1a1a]">Loading editor...</div>
                 </div>
             </div>
         ),
@@ -73,40 +73,40 @@ const GoOSEditorWindow = dynamic(
 );
 
 // ============================================
-// GOOS DESIGN TOKENS - Mediterranean Blue (Blue is the new black)
+// GOOS DESIGN TOKENS - Brand Appart Warm Cream
 // ============================================
 const goOS = {
     colors: {
-        paper: '#FFFFFF',
-        cream: '#FFFFFF',
-        headerBg: '#FFFFFF',
-        windowBg: '#FFFFFF',
-        border: '#2B4AE2',
+        paper: '#fbf9ef',
+        cream: '#fbf9ef',
+        headerBg: '#fbf9ef',
+        windowBg: '#ffffff',
+        border: '#1a1a1a',
         text: {
-            primary: '#2B4AE2',
-            secondary: '#2B4AE2',
-            muted: '#2B4AE2',
+            primary: '#1a1a1a',
+            secondary: '#4a4a4a',
+            muted: '#6b6b6b',
         },
         accent: {
-            primary: '#2B4AE2',
-            dark: '#2B4AE2',
-            light: '#2B4AE2',
-            pale: '#FFFFFF',
+            primary: '#ff7722',
+            dark: '#e56a1f',
+            light: '#ff9955',
+            pale: '#fff5ee',
         },
         sticky: {
-            yellow: '#FFFFFF',
-            blue: '#FFFFFF',
-            pink: '#FFFFFF',
-            green: '#FFFFFF',
-            orange: '#FFFFFF',
-            purple: '#FFFFFF',
+            yellow: '#fff9db',
+            blue: '#e8f4fd',
+            pink: '#fde8f0',
+            green: '#e8fde8',
+            orange: '#fff0e6',
+            purple: '#f0e8fd',
         }
     },
     shadows: {
-        solid: '6px 6px 0 #2B4AE2',
-        hover: '8px 8px 0 #2B4AE2',
-        sm: '2px 2px 0 #2B4AE2',
-        button: '2px 2px 0 #2B4AE2',
+        solid: '6px 6px 0 rgba(0,0,0,0.08)',
+        hover: '8px 8px 0 rgba(0,0,0,0.12)',
+        sm: '2px 2px 0 rgba(0,0,0,0.06)',
+        button: '3px 3px 0 rgba(0,0,0,0.1)',
     },
     springs: {
         snappy: { type: "spring" as const, damping: 20, stiffness: 400 },
@@ -827,17 +827,18 @@ const StickyNote = React.memo(({
             transition={goOS.springs.bouncy}
             className="sticky-note relative cursor-grab active:cursor-grabbing select-none"
             style={{
-                backgroundColor: '#FFFFFF',
-                border: `2px solid ${goOS.colors.border}`,
+                backgroundColor: goOS.colors.sticky[color] || goOS.colors.sticky.yellow,
+                border: `1.5px solid rgba(0,0,0,0.1)`,
                 color: goOS.colors.text.primary,
                 minWidth: '100px',
-                padding: '12px 10px 16px 10px',
+                padding: '14px 12px 18px 12px',
+                borderRadius: '2px',
                 zIndex: isDragging ? 100 : isHovered ? 50 : 1,
                 boxShadow: isDragging
-                    ? '8px 8px 0 rgba(43, 74, 226, 0.2)'
+                    ? '8px 8px 16px rgba(0,0,0,0.15)'
                     : isHovered
-                        ? '6px 6px 0 rgba(43, 74, 226, 0.12)'
-                        : '4px 4px 0 rgba(43, 74, 226, 0.08)',
+                        ? '6px 6px 12px rgba(0,0,0,0.1)'
+                        : '4px 4px 8px rgba(0,0,0,0.06)',
             }}
         >
             <div className="relative z-10" style={{ fontFamily: 'var(--font-gochi, "Comic Sans MS", cursive)' }}>
@@ -990,35 +991,36 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={goOS.springs.gentle}
             onMouseDown={onFocus}
-            className="fixed flex flex-col rounded-sm overflow-hidden"
+            className="fixed flex flex-col rounded-xl overflow-hidden"
             style={{
                 left: defaultX,
                 top: defaultY,
                 width,
                 height,
                 zIndex,
-                background: goOS.colors.cream,
-                border: `2px solid ${goOS.colors.border}`,
-                boxShadow: goOS.shadows.solid
+                background: goOS.colors.windowBg,
+                border: `1px solid rgba(0,0,0,0.1)`,
+                boxShadow: '0 10px 40px rgba(0,0,0,0.12), 0 2px 10px rgba(0,0,0,0.06)'
             }}
         >
             <div
-                className="h-8 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0"
-                style={{ background: '#FFFFFF', borderBottom: `2px solid ${goOS.colors.border}` }}
+                className="h-10 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0"
+                style={{ background: goOS.colors.cream, borderBottom: `1px solid rgba(0,0,0,0.06)` }}
             >
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                     <button
                         onClick={(e) => { e.stopPropagation(); onClose(); }}
-                        className="w-4 h-4 flex items-center justify-center rounded-full bg-white border border-[#2B4AE2] hover:bg-[#2B4AE2] group transition-colors"
-                    >
-                        <X size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
-                    </button>
-                    <button className="w-4 h-4 flex items-center justify-center rounded-full bg-white border border-[#2B4AE2] hover:bg-[#2B4AE2] group transition-colors">
-                        <Minus size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
-                    </button>
-                    <button className="w-4 h-4 flex items-center justify-center rounded-full bg-white border border-[#2B4AE2] hover:bg-[#2B4AE2] group transition-colors">
-                        <Square size={6} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
-                    </button>
+                        className="w-3 h-3 rounded-full transition-all hover:scale-110"
+                        style={{ background: '#ff5f57' }}
+                    />
+                    <button
+                        className="w-3 h-3 rounded-full transition-all hover:scale-110"
+                        style={{ background: '#febc2e' }}
+                    />
+                    <button
+                        className="w-3 h-3 rounded-full transition-all hover:scale-110"
+                        style={{ background: '#28c840' }}
+                    />
                 </div>
                 <div className="flex items-center gap-2 pointer-events-none">
                     {icon && <span className="opacity-60">{icon}</span>}
@@ -1223,7 +1225,7 @@ const GoOSGuestbook = React.memo(({
                                     style={{
                                         background: noteColors[i % noteColors.length],
                                         minHeight: '100px',
-                                        boxShadow: '3px 3px 0 #2B4AE2',
+                                        boxShadow: '3px 3px 0 rgba(0,0,0,0.08)',
                                     }}
                                 >
                                     {/* Tape effect */}
@@ -1402,7 +1404,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                     </h4>
                     <div className="space-y-2.5">
                         {data.sources.map((source, i) => {
-                            const colors = ['#2B4AE2', '#2B4AE2', '#2B4AE2', '#2B4AE2', '#2B4AE2'];
+                            const colors = ['#ff7722', '#3d2fa9', '#1a1a1a', '#e56a1f', '#6b6b6b'];
                             return (
                                 <div key={source.name}>
                                     <div className="flex items-center justify-between text-sm mb-1">
@@ -1545,11 +1547,11 @@ const GoOSStatusWidget = React.memo(({ statusWidget }: { statusWidget: StatusWid
     if (!statusWidget || !statusWidget.isVisible) return null;
 
     const statusColors: Record<string, { bg: string; dot: string; text: string }> = {
-        available: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
-        looking: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
-        taking: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
-        open: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
-        consulting: { bg: '#FFFFFF', dot: '#2B4AE2', text: '#2B4AE2' },
+        available: { bg: '#ffffff', dot: '#22c55e', text: '#1a1a1a' },
+        looking: { bg: '#ffffff', dot: '#ff7722', text: '#1a1a1a' },
+        taking: { bg: '#ffffff', dot: '#6b6b6b', text: '#1a1a1a' },
+        open: { bg: '#ffffff', dot: '#3d2fa9', text: '#1a1a1a' },
+        consulting: { bg: '#ffffff', dot: '#ff7722', text: '#1a1a1a' },
     };
 
     const colors = statusColors[statusWidget.statusType] || statusColors.available;
@@ -2189,7 +2191,7 @@ function GoOSDemoContent() {
             className="min-h-screen w-full relative overflow-hidden theme-sketch"
             style={{
                 backgroundColor: goOS.colors.paper,
-                backgroundImage: 'radial-gradient(#d4d4d4 1px, transparent 1px)',
+                backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
                 backgroundSize: '24px 24px',
             }}
             onContextMenu={handleDesktopContextMenu}
@@ -2207,7 +2209,7 @@ function GoOSDemoContent() {
             {/* MENU BAR */}
             <header
                 className="h-10 flex items-center justify-between px-5 fixed top-0 left-0 right-0 z-[2000] select-none"
-                style={{ background: goOS.colors.headerBg, borderBottom: `2px solid ${goOS.colors.border}` }}
+                style={{ background: goOS.colors.headerBg, borderBottom: `1px solid rgba(0,0,0,0.08)` }}
             >
                 <div className="flex items-center gap-6">
                     <motion.button
@@ -2287,8 +2289,8 @@ function GoOSDemoContent() {
 
                 if (!firstFile) {
                     return (
-                        <div className="fixed inset-0 z-[9000] bg-white flex items-center justify-center">
-                            <p style={{ color: '#666' }}>No published content yet</p>
+                        <div className="fixed inset-0 z-[9000] flex items-center justify-center" style={{ background: '#fbf9ef' }}>
+                            <p style={{ color: '#6b6b6b' }}>No published content yet</p>
                             <button
                                 onClick={() => setViewMode('desktop')}
                                 style={{
@@ -2296,10 +2298,10 @@ function GoOSDemoContent() {
                                     top: '24px',
                                     right: '24px',
                                     padding: '8px 16px',
-                                    background: '#2B4AE2',
-                                    color: '#FFFFFF',
+                                    background: '#1a1a1a',
+                                    color: '#ffffff',
                                     border: 'none',
-                                    borderRadius: '6px',
+                                    borderRadius: '8px',
                                     fontSize: '13px',
                                     fontWeight: 600,
                                     cursor: 'pointer',
@@ -2755,11 +2757,11 @@ function GoOSDemoContent() {
             {/* DOCK */}
             <footer className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[3000]">
                 <div
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl backdrop-blur-md"
                     style={{
-                        background: goOS.colors.headerBg,
-                        border: `2px solid ${goOS.colors.border}`,
-                        boxShadow: '6px 6px 0 #2B4AE2'
+                        background: 'rgba(255,255,255,0.85)',
+                        border: `1px solid rgba(0,0,0,0.08)`,
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)'
                     }}
                 >
                     <RubberDuck />
@@ -3046,7 +3048,7 @@ function GoOSDemoContent() {
                             fontWeight: 500,
                             fontSize: '14px',
                             zIndex: 9999,
-                            boxShadow: '4px 4px 0 #2B4AE2',
+                            boxShadow: '4px 4px 0 rgba(0,0,0,0.08)',
                         }}
                     >
                         {goosToast.message}

@@ -4,18 +4,19 @@ import React from 'react';
 import { Monitor, FileText } from 'lucide-react';
 import type { ViewMode } from '@/types';
 
-// goOS Design Tokens - Mediterranean Blue
+// goOS Design Tokens - Brand Appart Warm Cream
 const goOS = {
   colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
+    paper: '#ffffff',
+    border: '#1a1a1a',
     text: {
-      primary: '#2B4AE2',
-      secondary: '#6B7FE8',
+      primary: '#1a1a1a',
+      secondary: '#6b6b6b',
     },
+    accent: '#ff7722',
   },
   shadows: {
-    solid: '3px 3px 0 #2B4AE2',
+    solid: '0 2px 8px rgba(0,0,0,0.08)',
   },
   fonts: {
     heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
@@ -56,9 +57,9 @@ export function ViewSwitcher({ currentView, onViewChange, className = '' }: View
       className={`flex items-center ${className}`}
       style={{
         padding: '3px',
-        borderRadius: '8px',
+        borderRadius: '10px',
         background: goOS.colors.paper,
-        border: `2px solid ${goOS.colors.border}`,
+        border: `1px solid rgba(0,0,0,0.1)`,
         boxShadow: goOS.shadows.solid,
         gap: '2px',
       }}
@@ -91,7 +92,7 @@ export function ViewSwitcher({ currentView, onViewChange, className = '' }: View
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.background = 'rgba(43, 74, 226, 0.1)';
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)';
               }
             }}
             onMouseLeave={(e) => {
@@ -120,7 +121,7 @@ export function ViewSwitcherCompact({ currentView, onViewChange }: ViewSwitcherP
         padding: '2px',
         borderRadius: '6px',
         background: goOS.colors.paper,
-        border: `2px solid ${goOS.colors.border}`,
+        border: `1px solid rgba(0,0,0,0.1)`,
       }}
     >
       {VIEW_OPTIONS.map(({ mode, icon: Icon, label }) => {
@@ -136,7 +137,7 @@ export function ViewSwitcherCompact({ currentView, onViewChange }: ViewSwitcherP
               justifyContent: 'center',
               width: '28px',
               height: '28px',
-              borderRadius: '4px',
+              borderRadius: '6px',
               background: isActive ? goOS.colors.border : 'transparent',
               color: isActive ? goOS.colors.paper : goOS.colors.text.primary,
               cursor: 'pointer',
@@ -146,7 +147,7 @@ export function ViewSwitcherCompact({ currentView, onViewChange }: ViewSwitcherP
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.background = 'rgba(43, 74, 226, 0.1)';
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)';
               }
             }}
             onMouseLeave={(e) => {

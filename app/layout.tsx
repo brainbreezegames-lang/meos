@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, Source_Code_Pro, Averia_Serif_Libre, Instrument_Sans, Gochi_Hand } from "next/font/google";
+import { IBM_Plex_Sans, Source_Code_Pro, Averia_Serif_Libre, Instrument_Sans, Gochi_Hand, Inter, Outfit } from "next/font/google";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { CommentProvider } from "@/contexts/CommentContext";
 import "./globals.css";
@@ -46,6 +46,17 @@ const instrumentSans = Instrument_Sans({
   variable: "--font-instrument",
 });
 
+// Brand Appart Design System Fonts
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+});
+
 // Handwritten font for sticky notes
 const gochiHand = Gochi_Hand({
   weight: "400",
@@ -60,7 +71,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} ${averiaSerifLibre.variable} ${instrumentSans.variable} ${gochiHand.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
+      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} ${averiaSerifLibre.variable} ${instrumentSans.variable} ${gochiHand.variable} ${inter.variable} ${outfit.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
 
 
         <SessionProvider>
