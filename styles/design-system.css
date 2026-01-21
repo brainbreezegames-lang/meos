@@ -1,0 +1,415 @@
+/**
+ * goOS Design System v2
+ *
+ * SINGLE SOURCE OF TRUTH for all design tokens.
+ * ALL components must use these CSS variables - no hardcoded colors.
+ *
+ * Theme switching: Set data-theme attribute on :root
+ * Example: document.documentElement.dataset.theme = 'sketch'
+ *
+ * Future theme editor: Use setProperty to override any token
+ * Example: document.documentElement.style.setProperty('--ds-accent', '#newcolor')
+ */
+
+/* =============================================================================
+   COLOR PRIMITIVES (OKLCH for perceptual uniformity)
+   These are the raw color values - not used directly in components
+   ============================================================================= */
+
+:root {
+  /* Brand Appart Primitives */
+  --color-cream-50: oklch(98% 0.01 85);
+  --color-cream-100: oklch(96% 0.015 85);   /* #fbf9ef equivalent */
+  --color-cream-200: oklch(94% 0.02 85);
+  --color-cream-300: oklch(90% 0.02 85);
+
+  --color-warm-dark-50: oklch(50% 0.02 60);
+  --color-warm-dark-100: oklch(40% 0.02 60);
+  --color-warm-dark-200: oklch(30% 0.02 60);
+  --color-warm-dark-300: oklch(20% 0.015 60);  /* #171412 equivalent */
+  --color-warm-dark-400: oklch(15% 0.01 60);
+
+  --color-warm-grey-100: oklch(70% 0.02 60);
+  --color-warm-grey-200: oklch(60% 0.025 60);  /* #8e827c equivalent */
+  --color-warm-grey-300: oklch(50% 0.025 60);
+
+  --color-orange-100: oklch(85% 0.12 50);
+  --color-orange-200: oklch(75% 0.18 45);
+  --color-orange-300: oklch(70% 0.2 40);      /* #ff7722 equivalent */
+  --color-orange-400: oklch(60% 0.18 40);
+  --color-orange-500: oklch(50% 0.15 40);
+
+  --color-purple-100: oklch(70% 0.12 280);
+  --color-purple-200: oklch(55% 0.15 280);
+  --color-purple-300: oklch(45% 0.18 280);    /* #3d2fa9 equivalent */
+
+  --color-red-300: oklch(65% 0.2 25);         /* #ff3c34 equivalent */
+  --color-yellow-300: oklch(85% 0.15 85);     /* #ffc765 equivalent */
+
+  /* Sketch Theme Primitives */
+  --color-blue-100: oklch(90% 0.05 250);
+  --color-blue-200: oklch(70% 0.12 250);
+  --color-blue-300: oklch(55% 0.18 250);      /* #2B4AE2 equivalent */
+  --color-blue-400: oklch(45% 0.15 250);
+}
+
+/* =============================================================================
+   SEMANTIC TOKENS - Brand Appart (Default)
+   These are what components actually use
+   ============================================================================= */
+
+:root,
+[data-theme="brand-appart"] {
+  /* ─────────────────────────────────────────────────────────────────────────
+     SURFACES
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-surface-base: var(--color-cream-100);
+  --ds-surface-elevated: var(--color-cream-50);
+  --ds-surface-sunken: var(--color-cream-200);
+  --ds-surface-overlay: oklch(98% 0.01 85 / 95%);
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     BORDERS
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-border-strong: var(--color-warm-dark-300);
+  --ds-border-medium: oklch(20% 0.015 60 / 20%);
+  --ds-border-subtle: oklch(20% 0.015 60 / 10%);
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     TEXT
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-text-primary: var(--color-warm-dark-300);
+  --ds-text-secondary: var(--color-warm-grey-200);
+  --ds-text-muted: var(--color-warm-grey-100);
+  --ds-text-inverse: var(--color-cream-100);
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     ACCENT & SEMANTIC
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-accent: var(--color-orange-300);
+  --ds-accent-hover: var(--color-orange-400);
+  --ds-accent-subtle: oklch(70% 0.2 40 / 15%);
+
+  --ds-success: var(--color-purple-300);
+  --ds-warning: var(--color-yellow-300);
+  --ds-error: var(--color-red-300);
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     TRAFFIC LIGHTS (macOS window controls)
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-traffic-close: oklch(65% 0.22 25);
+  --ds-traffic-minimize: oklch(80% 0.18 85);
+  --ds-traffic-maximize: oklch(70% 0.2 145);
+  --ds-traffic-border: var(--color-warm-dark-300);
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     SHADOWS (offset style for Brand Appart)
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-shadow-xs: 2px 2px 0 oklch(20% 0.015 60 / 6%);
+  --ds-shadow-sm: 3px 3px 0 oklch(20% 0.015 60 / 8%);
+  --ds-shadow-md: 4px 4px 0 oklch(20% 0.015 60 / 10%);
+  --ds-shadow-lg: 6px 6px 0 oklch(20% 0.015 60 / 12%);
+  --ds-shadow-xl: 8px 8px 0 oklch(20% 0.015 60 / 15%);
+
+  /* Window-specific shadows */
+  --ds-shadow-window: 4px 4px 0 oklch(20% 0.015 60 / 10%);
+  --ds-shadow-window-active: 6px 6px 0 oklch(20% 0.015 60 / 15%);
+  --ds-shadow-window-drag: 8px 8px 0 oklch(20% 0.015 60 / 18%);
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     RADII
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-radius-xs: 4px;
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 8px;
+  --ds-radius-lg: 12px;
+  --ds-radius-xl: 16px;
+  --ds-radius-full: 9999px;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     SPACING (4pt grid)
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 20px;
+  --ds-space-6: 24px;
+  --ds-space-8: 32px;
+  --ds-space-10: 40px;
+  --ds-space-12: 48px;
+  --ds-space-16: 64px;
+  --ds-space-20: 80px;
+  --ds-space-24: 96px;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     TYPOGRAPHY
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ds-font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+
+  /* Type scale (modular scale 1.25 - major third) */
+  --ds-text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
+  --ds-text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
+  --ds-text-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+  --ds-text-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --ds-text-xl: clamp(1.15rem, 1.05rem + 0.5vw, 1.25rem);
+  --ds-text-2xl: clamp(1.4rem, 1.2rem + 1vw, 1.5rem);
+  --ds-text-3xl: clamp(1.75rem, 1.5rem + 1.25vw, 2rem);
+  --ds-text-4xl: clamp(2.2rem, 1.8rem + 2vw, 2.5rem);
+
+  /* Line heights */
+  --ds-leading-tight: 1.2;
+  --ds-leading-snug: 1.35;
+  --ds-leading-normal: 1.5;
+  --ds-leading-relaxed: 1.65;
+
+  /* Font weights */
+  --ds-weight-normal: 400;
+  --ds-weight-medium: 500;
+  --ds-weight-semibold: 600;
+  --ds-weight-bold: 700;
+
+  /* Letter spacing */
+  --ds-tracking-tight: -0.02em;
+  --ds-tracking-normal: 0;
+  --ds-tracking-wide: 0.02em;
+  --ds-tracking-wider: 0.05em;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     TRANSITIONS
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+  --ds-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ds-ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+
+  --ds-duration-fast: 100ms;
+  --ds-duration-normal: 200ms;
+  --ds-duration-slow: 300ms;
+  --ds-duration-slower: 500ms;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     Z-INDEX SCALE
+     ───────────────────────────────────────────────────────────────────────── */
+  --ds-z-base: 0;
+  --ds-z-dropdown: 100;
+  --ds-z-sticky: 200;
+  --ds-z-window: 300;
+  --ds-z-window-active: 400;
+  --ds-z-modal-backdrop: 500;
+  --ds-z-modal: 600;
+  --ds-z-toast: 700;
+  --ds-z-tooltip: 800;
+}
+
+/* =============================================================================
+   SKETCH THEME
+   Blueprint/Mediterranean blue aesthetic
+   ============================================================================= */
+
+[data-theme="sketch"] {
+  /* Surfaces */
+  --ds-surface-base: #FFFFFF;
+  --ds-surface-elevated: #FFFFFF;
+  --ds-surface-sunken: #F8F9FE;
+  --ds-surface-overlay: rgba(255, 255, 255, 0.95);
+
+  /* Borders */
+  --ds-border-strong: var(--color-blue-300);
+  --ds-border-medium: oklch(55% 0.18 250 / 30%);
+  --ds-border-subtle: oklch(55% 0.18 250 / 15%);
+
+  /* Text */
+  --ds-text-primary: var(--color-blue-300);
+  --ds-text-secondary: var(--color-blue-300);
+  --ds-text-muted: var(--color-blue-200);
+  --ds-text-inverse: #FFFFFF;
+
+  /* Accent */
+  --ds-accent: var(--color-blue-300);
+  --ds-accent-hover: var(--color-blue-400);
+  --ds-accent-subtle: oklch(55% 0.18 250 / 10%);
+
+  /* Traffic lights - monochrome blue for sketch */
+  --ds-traffic-close: var(--color-blue-300);
+  --ds-traffic-minimize: var(--color-blue-300);
+  --ds-traffic-maximize: var(--color-blue-300);
+  --ds-traffic-border: transparent;
+
+  /* Shadows - solid offset for sketch */
+  --ds-shadow-xs: 2px 2px 0 var(--color-blue-300);
+  --ds-shadow-sm: 3px 3px 0 var(--color-blue-300);
+  --ds-shadow-md: 4px 4px 0 var(--color-blue-300);
+  --ds-shadow-lg: 6px 6px 0 var(--color-blue-300);
+  --ds-shadow-xl: 8px 8px 0 var(--color-blue-300);
+
+  --ds-shadow-window: 4px 4px 0 var(--color-blue-300);
+  --ds-shadow-window-active: 6px 6px 0 var(--color-blue-300);
+  --ds-shadow-window-drag: 8px 8px 0 var(--color-blue-300);
+}
+
+/* =============================================================================
+   MONTEREY THEME
+   Classic macOS with soft shadows and vibrant colors
+   ============================================================================= */
+
+[data-theme="monterey"] {
+  /* Surfaces */
+  --ds-surface-base: #FFFFFF;
+  --ds-surface-elevated: #FFFFFF;
+  --ds-surface-sunken: #F5F5F7;
+  --ds-surface-overlay: rgba(255, 255, 255, 0.85);
+
+  /* Borders */
+  --ds-border-strong: oklch(25% 0.01 250);
+  --ds-border-medium: oklch(0% 0 0 / 12%);
+  --ds-border-subtle: oklch(0% 0 0 / 6%);
+
+  /* Text */
+  --ds-text-primary: oklch(15% 0.01 250);
+  --ds-text-secondary: oklch(45% 0.01 250);
+  --ds-text-muted: oklch(60% 0.01 250);
+  --ds-text-inverse: #FFFFFF;
+
+  /* Accent - Apple blue */
+  --ds-accent: oklch(55% 0.22 250);
+  --ds-accent-hover: oklch(45% 0.2 250);
+  --ds-accent-subtle: oklch(55% 0.22 250 / 10%);
+
+  /* Traffic lights - classic macOS */
+  --ds-traffic-close: oklch(65% 0.25 25);
+  --ds-traffic-minimize: oklch(80% 0.2 85);
+  --ds-traffic-maximize: oklch(70% 0.22 145);
+  --ds-traffic-border: transparent;
+
+  /* Shadows - soft blur for Monterey */
+  --ds-shadow-xs: 0 1px 2px oklch(0% 0 0 / 5%);
+  --ds-shadow-sm: 0 2px 4px oklch(0% 0 0 / 8%), 0 1px 2px oklch(0% 0 0 / 4%);
+  --ds-shadow-md: 0 4px 8px oklch(0% 0 0 / 10%), 0 2px 4px oklch(0% 0 0 / 5%);
+  --ds-shadow-lg: 0 8px 16px oklch(0% 0 0 / 12%), 0 4px 8px oklch(0% 0 0 / 6%);
+  --ds-shadow-xl: 0 16px 32px oklch(0% 0 0 / 15%), 0 8px 16px oklch(0% 0 0 / 8%);
+
+  --ds-shadow-window: 0 20px 40px oklch(0% 0 0 / 20%), 0 0 1px oklch(0% 0 0 / 10%);
+  --ds-shadow-window-active: 0 30px 60px oklch(0% 0 0 / 25%), 0 0 1px oklch(0% 0 0 / 15%);
+  --ds-shadow-window-drag: 0 40px 80px oklch(0% 0 0 / 30%), 0 0 1px oklch(0% 0 0 / 20%);
+}
+
+/* =============================================================================
+   DARK THEME
+   Premium tech with subtle elevation
+   ============================================================================= */
+
+[data-theme="dark"] {
+  /* Surfaces - elevation via lightness, not shadow */
+  --ds-surface-base: oklch(15% 0.01 250);
+  --ds-surface-elevated: oklch(20% 0.01 250);
+  --ds-surface-sunken: oklch(12% 0.01 250);
+  --ds-surface-overlay: oklch(20% 0.01 250 / 95%);
+
+  /* Borders */
+  --ds-border-strong: oklch(40% 0.01 250);
+  --ds-border-medium: oklch(100% 0 0 / 12%);
+  --ds-border-subtle: oklch(100% 0 0 / 6%);
+
+  /* Text */
+  --ds-text-primary: oklch(95% 0.01 250);
+  --ds-text-secondary: oklch(70% 0.01 250);
+  --ds-text-muted: oklch(50% 0.01 250);
+  --ds-text-inverse: oklch(15% 0.01 250);
+
+  /* Accent - slightly desaturated for dark mode */
+  --ds-accent: oklch(65% 0.18 250);
+  --ds-accent-hover: oklch(70% 0.2 250);
+  --ds-accent-subtle: oklch(65% 0.18 250 / 15%);
+
+  /* Traffic lights */
+  --ds-traffic-close: oklch(65% 0.22 25);
+  --ds-traffic-minimize: oklch(75% 0.15 85);
+  --ds-traffic-maximize: oklch(65% 0.18 145);
+  --ds-traffic-border: transparent;
+
+  /* Shadows - minimal in dark mode, use surface elevation instead */
+  --ds-shadow-xs: 0 1px 2px oklch(0% 0 0 / 20%);
+  --ds-shadow-sm: 0 2px 4px oklch(0% 0 0 / 25%);
+  --ds-shadow-md: 0 4px 8px oklch(0% 0 0 / 30%);
+  --ds-shadow-lg: 0 8px 16px oklch(0% 0 0 / 35%);
+  --ds-shadow-xl: 0 16px 32px oklch(0% 0 0 / 40%);
+
+  --ds-shadow-window: 0 20px 50px oklch(0% 0 0 / 50%);
+  --ds-shadow-window-active: 0 25px 60px oklch(0% 0 0 / 60%);
+  --ds-shadow-window-drag: 0 30px 70px oklch(0% 0 0 / 70%);
+
+  /* Reduce text weight slightly for dark backgrounds */
+  --ds-weight-normal: 350;
+}
+
+/* =============================================================================
+   UTILITY CLASSES (optional - use sparingly)
+   ============================================================================= */
+
+.ds-surface-base { background: var(--ds-surface-base); }
+.ds-surface-elevated { background: var(--ds-surface-elevated); }
+.ds-text-primary { color: var(--ds-text-primary); }
+.ds-text-secondary { color: var(--ds-text-secondary); }
+.ds-text-muted { color: var(--ds-text-muted); }
+.ds-border { border: 1px solid var(--ds-border-medium); }
+.ds-border-strong { border: 2px solid var(--ds-border-strong); }
+.ds-shadow-md { box-shadow: var(--ds-shadow-md); }
+.ds-shadow-lg { box-shadow: var(--ds-shadow-lg); }
+.ds-radius-md { border-radius: var(--ds-radius-md); }
+.ds-radius-lg { border-radius: var(--ds-radius-lg); }
+
+/* =============================================================================
+   COMPONENT TOKENS (specific to goOS)
+   ============================================================================= */
+
+:root,
+[data-theme="brand-appart"] {
+  /* Window */
+  --ds-window-bg: var(--ds-surface-base);
+  --ds-window-header-bg: var(--ds-surface-base);
+  --ds-window-border: var(--ds-border-strong);
+  --ds-window-radius: var(--ds-radius-lg);
+
+  /* Dock */
+  --ds-dock-bg: var(--ds-surface-elevated);
+  --ds-dock-border: var(--ds-border-subtle);
+  --ds-dock-item-hover: var(--ds-accent-subtle);
+
+  /* Desktop */
+  --ds-desktop-bg: var(--ds-surface-sunken);
+
+  /* File icons */
+  --ds-file-icon-bg: linear-gradient(135deg, var(--ds-surface-elevated) 0%, var(--ds-surface-sunken) 100%);
+  --ds-file-icon-border: var(--ds-border-subtle);
+  --ds-file-icon-shadow: var(--ds-shadow-sm);
+
+  /* Status widget */
+  --ds-status-available: var(--ds-success);
+  --ds-status-busy: var(--ds-error);
+  --ds-status-away: var(--ds-warning);
+}
+
+[data-theme="sketch"] {
+  --ds-window-bg: var(--ds-surface-base);
+  --ds-window-header-bg: var(--ds-surface-base);
+  --ds-window-border: var(--ds-border-strong);
+  --ds-window-radius: var(--ds-radius-md);
+
+  --ds-file-icon-bg: var(--ds-surface-base);
+  --ds-file-icon-border: var(--ds-border-strong);
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ds-duration-fast: 0ms;
+    --ds-duration-normal: 0ms;
+    --ds-duration-slow: 0ms;
+    --ds-duration-slower: 0ms;
+  }
+}
