@@ -410,8 +410,7 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
               </motion.div>
             </div>
           </>
-        )
-        }
-      </AnimatePresence >
+        )}
+      </AnimatePresence>
     );
   }

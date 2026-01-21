@@ -4,6 +4,8 @@ import { useThemeSafe } from '@/contexts/ThemeContext';
 export interface WidgetTheme {
     colors: {
         paper: string;
+        background: string;
+        blur: string;
         border: string;
         text: {
             primary: string;
