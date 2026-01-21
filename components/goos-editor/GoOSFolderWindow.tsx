@@ -56,8 +56,6 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         minHeight: 280,
         background: theme.colors.paper,
         border: `2px solid ${theme.colors.border}`,
-        borderRadius: isBrandAppart ? theme.radii.card : theme.radii.card, // Actually radius depends on theme.radii.card
-        // Wait, theme.radii.card is defined per theme. So just theme.radii.card.
         borderRadius: theme.radii.card,
         boxShadow: theme.shadows.solid,
         zIndex,
@@ -156,7 +154,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             style={{
               fontSize: 14,
               fontWeight: 600,
-              fontFamily: theme.fonts.heading, // Using theme font for consistency
+              fontFamily: theme.fonts.heading,
               color: theme.colors.text.primary,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -196,13 +194,13 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               alignItems: 'center',
               justifyContent: 'center',
               height: '100%',
-              color: goOSTokens.colors.text.muted,
-              fontFamily: goOSTokens.fonts.body,
+              color: theme.colors.text.muted,
+              fontFamily: theme.fonts.heading,
               textAlign: 'center',
               gap: 12,
             }}
           >
-            <Folder size={48} strokeWidth={1} stroke="#2B4AE2" />
+            <Folder size={48} strokeWidth={1} color={theme.colors.border} />
             <div>
               <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 4 }}>This folder is empty</p>
               <p style={{ fontSize: 12 }}>Drag files here to add them</p>
