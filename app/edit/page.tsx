@@ -347,7 +347,7 @@ export default function EditPage() {
   }
 
   // Get initial theme from desktop
-  const validThemes: ThemeId[] = ['monterey', 'dark', 'bluren', 'refined'];
+  const validThemes: ThemeId[] = ['monterey', 'dark', 'bluren', 'refined', 'sketch', 'brand-appart'];
   const initialTheme = validThemes.includes(desktop.theme as ThemeId)
     ? (desktop.theme as ThemeId)
     : 'monterey';
