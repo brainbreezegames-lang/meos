@@ -35,7 +35,7 @@ import {
 } from 'lucide-react';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+// ThemeProvider removed - using only Appart theme via data-theme attribute
 import { WindowManager } from '@/components/desktop/MultiWindow';
 import { StatusWidget } from '@/components/desktop';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
@@ -946,7 +946,7 @@ const StickyNote = React.memo(({
                         : '4px 4px 8px rgba(0,0,0,0.06)',
             }}
         >
-            <div className="relative z-10" style={{ fontFamily: 'var(--font-gochi, "Comic Sans MS", cursive)' }}>
+            <div className="relative z-10" style={{ fontFamily: 'var(--font-gochi, cursive)' }}>
                 {children}
             </div>
             <div
@@ -3503,11 +3503,21 @@ function GoOSDemoContent() {
 }
 
 // ============================================
-// MAIN EXPORT
+// MAIN EXPORT - Appart Theme Only
 // ============================================
 export default function GoOSDemoPage() {
     return (
-        <ThemeProvider initialTheme="brand-appart" forceTheme={true}>
+        <div
+            data-theme="appart"
+            style={{
+                // Override any inherited styles from globals.css
+                background: 'var(--color-bg-base)',
+                color: 'var(--color-text-primary)',
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                minHeight: '100vh',
+                position: 'relative',
+            }}
+        >
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
                     <GoOSProvider viewMode="owner" localOnly={true} initialFiles={INITIAL_GOOS_FILES}>
@@ -3517,6 +3527,6 @@ export default function GoOSDemoPage() {
                     </GoOSProvider>
                 </WindowProvider>
             </EditProvider>
-        </ThemeProvider>
+        </div>
     );
 }

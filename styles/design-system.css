@@ -14,205 +14,206 @@
    ============================================================================= */
 
 :root,
-[data-theme="appart"] {
-  /* ─────────────────────────────────────────────────────────────────────────
+[data-theme="appart"],
+[data-theme="brand-appart"] {
+   /* ─────────────────────────────────────────────────────────────────────────
      BACKGROUNDS
      ───────────────────────────────────────────────────────────────────────── */
-  --color-bg-base: #fbf9ef;
-  --color-bg-gradient: linear-gradient(180deg, #fbf9ef 0%, #f5f3e9 100%);
-  --color-bg-elevated: rgba(255, 255, 255, 0.85);
-  --color-bg-overlay: rgba(251, 249, 239, 0.8);
-  --color-bg-subtle: #f2f0e7;
-  --color-bg-subtle-hover: #ebe9df;
-  --color-bg-inverse: #171412;
-  --color-bg-white: #ffffff;
+   --color-bg-base: #fbf9ef;
+   --color-bg-gradient: linear-gradient(180deg, #fbf9ef 0%, #f5f3e9 100%);
+   --color-bg-elevated: rgba(255, 255, 255, 0.85);
+   --color-bg-overlay: rgba(251, 249, 239, 0.8);
+   --color-bg-subtle: #f2f0e7;
+   --color-bg-subtle-hover: #ebe9df;
+   --color-bg-inverse: #171412;
+   --color-bg-white: #ffffff;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      TEXT
      ───────────────────────────────────────────────────────────────────────── */
-  --color-text-primary: #171412;
-  --color-text-secondary: #4a4744;
-  --color-text-muted: #8e827c;
-  --color-text-inverse: #ffffff;
-  --color-text-on-accent: #ffffff;
+   --color-text-primary: #171412;
+   --color-text-secondary: #4a4744;
+   --color-text-muted: #8e827c;
+   --color-text-inverse: #ffffff;
+   --color-text-on-accent: #ffffff;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      ACCENT COLORS
      ───────────────────────────────────────────────────────────────────────── */
-  --color-accent-primary: #ff7722;
-  --color-accent-primary-hover: #e5691e;
-  --color-accent-primary-active: #cc5d1a;
-  --color-accent-primary-subtle: rgba(255, 119, 34, 0.1);
-  --color-accent-primary-glow: rgba(255, 119, 34, 0.4);
+   --color-accent-primary: #ff7722;
+   --color-accent-primary-hover: #e5691e;
+   --color-accent-primary-active: #cc5d1a;
+   --color-accent-primary-subtle: rgba(255, 119, 34, 0.1);
+   --color-accent-primary-glow: rgba(255, 119, 34, 0.4);
 
-  --color-accent-secondary: #3d2fa9;
-  --color-accent-secondary-hover: #352994;
-  --color-accent-secondary-subtle: rgba(61, 47, 169, 0.1);
+   --color-accent-secondary: #3d2fa9;
+   --color-accent-secondary-hover: #352994;
+   --color-accent-secondary-subtle: rgba(61, 47, 169, 0.1);
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      SEMANTIC COLORS
      ───────────────────────────────────────────────────────────────────────── */
-  --color-success: #22c55e;
-  --color-success-subtle: rgba(34, 197, 94, 0.15);
-  --color-warning: #ffc765;
-  --color-warning-subtle: rgba(255, 199, 101, 0.2);
-  --color-error: #ff3c34;
-  --color-error-subtle: rgba(255, 60, 52, 0.1);
+   --color-success: #22c55e;
+   --color-success-subtle: rgba(34, 197, 94, 0.15);
+   --color-warning: #ffc765;
+   --color-warning-subtle: rgba(255, 199, 101, 0.2);
+   --color-error: #ff3c34;
+   --color-error-subtle: rgba(255, 60, 52, 0.1);
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      BORDERS
      ───────────────────────────────────────────────────────────────────────── */
-  --color-border-default: rgba(23, 20, 18, 0.08);
-  --color-border-subtle: rgba(23, 20, 18, 0.05);
-  --color-border-strong: rgba(23, 20, 18, 0.15);
+   --color-border-default: rgba(23, 20, 18, 0.08);
+   --color-border-subtle: rgba(23, 20, 18, 0.05);
+   --color-border-strong: rgba(23, 20, 18, 0.15);
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      TRAFFIC LIGHTS (Window controls)
      ───────────────────────────────────────────────────────────────────────── */
-  --color-traffic-close: #ff5f57;
-  --color-traffic-minimize: #ffbd2e;
-  --color-traffic-maximize: #28c840;
-  --color-traffic-inactive: rgba(23, 20, 18, 0.15);
+   --color-traffic-close: #ff5f57;
+   --color-traffic-minimize: #ffbd2e;
+   --color-traffic-maximize: #28c840;
+   --color-traffic-inactive: rgba(23, 20, 18, 0.15);
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      SHADOWS
      Warm shadows using rgba(23, 20, 18, ...)
      ───────────────────────────────────────────────────────────────────────── */
-  --shadow-color: rgba(23, 20, 18, 0.08);
-  --shadow-color-medium: rgba(23, 20, 18, 0.12);
-  --shadow-color-strong: rgba(23, 20, 18, 0.15);
+   --shadow-color: rgba(23, 20, 18, 0.08);
+   --shadow-color-medium: rgba(23, 20, 18, 0.12);
+   --shadow-color-strong: rgba(23, 20, 18, 0.15);
 
-  --shadow-sm: 0 2px 8px rgba(23, 20, 18, 0.06);
-  --shadow-md: 0 4px 20px rgba(23, 20, 18, 0.08);
-  --shadow-lg: 0 8px 32px rgba(23, 20, 18, 0.12);
-  --shadow-xl: 0 16px 48px rgba(23, 20, 18, 0.15);
+   --shadow-sm: 0 2px 8px rgba(23, 20, 18, 0.06);
+   --shadow-md: 0 4px 20px rgba(23, 20, 18, 0.08);
+   --shadow-lg: 0 8px 32px rgba(23, 20, 18, 0.12);
+   --shadow-xl: 0 16px 48px rgba(23, 20, 18, 0.15);
 
-  /* Component-specific shadows */
-  --shadow-menubar: 0 4px 20px rgba(23, 20, 18, 0.06);
-  --shadow-dock: 0 8px 32px rgba(23, 20, 18, 0.12);
-  --shadow-window: 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08);
-  --shadow-dropdown: 0 8px 30px rgba(23, 20, 18, 0.15);
-  --shadow-tooltip: 0 4px 12px rgba(23, 20, 18, 0.2);
-  --shadow-status: 0 4px 16px rgba(23, 20, 18, 0.08);
+   /* Component-specific shadows */
+   --shadow-menubar: 0 4px 20px rgba(23, 20, 18, 0.06);
+   --shadow-dock: 0 8px 32px rgba(23, 20, 18, 0.12);
+   --shadow-window: 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08);
+   --shadow-dropdown: 0 8px 30px rgba(23, 20, 18, 0.15);
+   --shadow-tooltip: 0 4px 12px rgba(23, 20, 18, 0.2);
+   --shadow-status: 0 4px 16px rgba(23, 20, 18, 0.08);
 
-  /* Desktop icon shadows */
-  --shadow-icon: 0 2px 8px rgba(23, 20, 18, 0.06);
-  --shadow-icon-hover: 0 8px 24px rgba(23, 20, 18, 0.1);
-  --shadow-icon-drag: 0 20px 40px rgba(23, 20, 18, 0.2);
+   /* Desktop icon shadows */
+   --shadow-icon: 0 2px 8px rgba(23, 20, 18, 0.06);
+   --shadow-icon-hover: 0 8px 24px rgba(23, 20, 18, 0.1);
+   --shadow-icon-drag: 0 20px 40px rgba(23, 20, 18, 0.2);
 
-  /* Badge glow */
-  --shadow-badge: 0 2px 6px rgba(255, 119, 34, 0.4);
+   /* Badge glow */
+   --shadow-badge: 0 2px 6px rgba(255, 119, 34, 0.4);
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      BORDER RADIUS
      ───────────────────────────────────────────────────────────────────────── */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-xl: 14px;
-  --radius-xxl: 16px;
-  --radius-dock: 20px;
-  --radius-full: 9999px;
+   --radius-xs: 4px;
+   --radius-sm: 6px;
+   --radius-md: 10px;
+   --radius-lg: 12px;
+   --radius-xl: 14px;
+   --radius-xxl: 16px;
+   --radius-dock: 20px;
+   --radius-full: 9999px;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      TYPOGRAPHY
      ───────────────────────────────────────────────────────────────────────── */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+   --font-weight-normal: 400;
+   --font-weight-medium: 500;
+   --font-weight-semibold: 600;
+   --font-weight-bold: 700;
 
-  --font-size-xs: 10px;
-  --font-size-sm: 12px;
-  --font-size-base: 13px;
-  --font-size-md: 14px;
-  --font-size-lg: 16px;
-  --font-size-xl: 18px;
-  --font-size-2xl: 24px;
+   --font-size-xs: 10px;
+   --font-size-sm: 12px;
+   --font-size-base: 13px;
+   --font-size-md: 14px;
+   --font-size-lg: 16px;
+   --font-size-xl: 18px;
+   --font-size-2xl: 24px;
 
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
+   --line-height-tight: 1.2;
+   --line-height-normal: 1.5;
 
-  --letter-spacing-tight: -0.02em;
-  --letter-spacing-normal: 0;
-  --letter-spacing-wide: 0.05em;
+   --letter-spacing-tight: -0.02em;
+   --letter-spacing-normal: 0;
+   --letter-spacing-wide: 0.05em;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      BLUR / GLASSMORPHISM
      ───────────────────────────────────────────────────────────────────────── */
-  --blur-subtle: 12px;
-  --blur-medium: 20px;
-  --blur-heavy: 24px;
+   --blur-subtle: 12px;
+   --blur-medium: 20px;
+   --blur-heavy: 24px;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      TRANSITIONS
      ───────────────────────────────────────────────────────────────────────── */
-  --transition-fast: 150ms;
-  --transition-medium: 200ms;
-  --transition-slow: 300ms;
-  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+   --transition-fast: 150ms;
+   --transition-medium: 200ms;
+   --transition-slow: 300ms;
+   --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      COMPONENT DIMENSIONS
      ───────────────────────────────────────────────────────────────────────── */
-  /* Menu Bar */
-  --menubar-height: 36px;
-  --menubar-margin: 12px;
+   /* Menu Bar */
+   --menubar-height: 36px;
+   --menubar-margin: 12px;
 
-  /* Dock */
-  --dock-padding: 10px 16px;
-  --dock-icon-size: 44px;
-  --dock-icon-radius: 12px;
-  --dock-icon-gap: 8px;
-  --dock-active-dot-size: 4px;
-  --dock-badge-size: 16px;
+   /* Dock */
+   --dock-padding: 10px 16px;
+   --dock-icon-size: 44px;
+   --dock-icon-radius: 12px;
+   --dock-icon-gap: 8px;
+   --dock-active-dot-size: 4px;
+   --dock-badge-size: 16px;
 
-  /* Desktop Icons */
-  --desktop-icon-size: 64px;
-  --desktop-icon-radius: 16px;
-  --desktop-icon-label-max-width: 80px;
-  --desktop-icon-gap: 6px;
+   /* Desktop Icons */
+   --desktop-icon-size: 64px;
+   --desktop-icon-radius: 16px;
+   --desktop-icon-label-max-width: 80px;
+   --desktop-icon-gap: 6px;
 
-  /* Windows */
-  --window-titlebar-height: 44px;
-  --window-radius: 14px;
-  --window-traffic-size: 12px;
-  --window-traffic-gap: 8px;
+   /* Windows */
+   --window-titlebar-height: 44px;
+   --window-radius: 14px;
+   --window-traffic-size: 12px;
+   --window-traffic-gap: 8px;
 
-  /* Status Widget */
-  --status-padding: 14px 18px;
-  --status-radius: 14px;
-  --status-dot-size: 10px;
-  --status-arrow-size: 32px;
+   /* Status Widget */
+   --status-padding: 14px 18px;
+   --status-radius: 14px;
+   --status-dot-size: 10px;
+   --status-arrow-size: 32px;
 
-  /* Context Menu */
-  --context-menu-radius: 12px;
-  --context-menu-item-height: 32px;
-  --context-menu-min-width: 180px;
+   /* Context Menu */
+   --context-menu-radius: 12px;
+   --context-menu-item-height: 32px;
+   --context-menu-min-width: 180px;
 
-  /* Inputs */
-  --input-radius: 10px;
-  --input-padding: 10px 14px;
-  --input-focus-ring: 3px;
+   /* Inputs */
+   --input-radius: 10px;
+   --input-padding: 10px 14px;
+   --input-focus-ring: 3px;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      Z-INDEX SCALE
      ───────────────────────────────────────────────────────────────────────── */
-  --z-desktop: 0;
-  --z-desktop-icons: 10;
-  --z-window-base: 100;
-  --z-window-active: 200;
-  --z-dock: 300;
-  --z-menubar: 400;
-  --z-dropdown: 500;
-  --z-modal-backdrop: 600;
-  --z-modal: 700;
-  --z-tooltip: 800;
-  --z-status-widget: 350;
+   --z-desktop: 0;
+   --z-desktop-icons: 10;
+   --z-window-base: 100;
+   --z-window-active: 200;
+   --z-dock: 300;
+   --z-menubar: 400;
+   --z-dropdown: 500;
+   --z-modal-backdrop: 600;
+   --z-modal: 700;
+   --z-tooltip: 800;
+   --z-status-widget: 350;
 }
 
 /* =============================================================================
@@ -221,73 +222,73 @@
    ============================================================================= */
 
 [data-theme="default"] {
-  --color-bg-base: #ffffff;
-  --color-bg-gradient: #ffffff;
-  --color-bg-elevated: rgba(255, 255, 255, 0.9);
-  --color-bg-overlay: rgba(255, 255, 255, 0.85);
-  --color-bg-subtle: #f5f5f5;
-  --color-bg-subtle-hover: #ebebeb;
-  --color-bg-inverse: #1a1a1a;
-  --color-bg-white: #ffffff;
+   --color-bg-base: #ffffff;
+   --color-bg-gradient: #ffffff;
+   --color-bg-elevated: rgba(255, 255, 255, 0.9);
+   --color-bg-overlay: rgba(255, 255, 255, 0.85);
+   --color-bg-subtle: #f5f5f5;
+   --color-bg-subtle-hover: #ebebeb;
+   --color-bg-inverse: #1a1a1a;
+   --color-bg-white: #ffffff;
 
-  --color-text-primary: #000000;
-  --color-text-secondary: #4a4a4a;
-  --color-text-muted: #6b7280;
-  --color-text-inverse: #ffffff;
-  --color-text-on-accent: #ffffff;
+   --color-text-primary: #000000;
+   --color-text-secondary: #4a4a4a;
+   --color-text-muted: #6b7280;
+   --color-text-inverse: #ffffff;
+   --color-text-on-accent: #ffffff;
 
-  --color-accent-primary: #3b82f6;
-  --color-accent-primary-hover: #2563eb;
-  --color-accent-primary-active: #1d4ed8;
-  --color-accent-primary-subtle: rgba(59, 130, 246, 0.1);
-  --color-accent-primary-glow: rgba(59, 130, 246, 0.4);
+   --color-accent-primary: #3b82f6;
+   --color-accent-primary-hover: #2563eb;
+   --color-accent-primary-active: #1d4ed8;
+   --color-accent-primary-subtle: rgba(59, 130, 246, 0.1);
+   --color-accent-primary-glow: rgba(59, 130, 246, 0.4);
 
-  --color-accent-secondary: #8b5cf6;
-  --color-accent-secondary-hover: #7c3aed;
-  --color-accent-secondary-subtle: rgba(139, 92, 246, 0.1);
+   --color-accent-secondary: #8b5cf6;
+   --color-accent-secondary-hover: #7c3aed;
+   --color-accent-secondary-subtle: rgba(139, 92, 246, 0.1);
 
-  --color-border-default: rgba(0, 0, 0, 0.1);
-  --color-border-subtle: rgba(0, 0, 0, 0.05);
-  --color-border-strong: rgba(0, 0, 0, 0.15);
+   --color-border-default: rgba(0, 0, 0, 0.1);
+   --color-border-subtle: rgba(0, 0, 0, 0.05);
+   --color-border-strong: rgba(0, 0, 0, 0.15);
 
-  --shadow-color: rgba(0, 0, 0, 0.08);
-  --shadow-color-medium: rgba(0, 0, 0, 0.12);
-  --shadow-color-strong: rgba(0, 0, 0, 0.18);
+   --shadow-color: rgba(0, 0, 0, 0.08);
+   --shadow-color-medium: rgba(0, 0, 0, 0.12);
+   --shadow-color-strong: rgba(0, 0, 0, 0.18);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15);
+   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15);
 
-  --shadow-menubar: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-dock: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-window: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.12);
-  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.15);
-  --shadow-tooltip: 0 4px 12px rgba(0, 0, 0, 0.2);
-  --shadow-status: 0 4px 16px rgba(0, 0, 0, 0.1);
+   --shadow-menubar: 0 2px 8px rgba(0, 0, 0, 0.08);
+   --shadow-dock: 0 8px 24px rgba(0, 0, 0, 0.12);
+   --shadow-window: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.12);
+   --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.15);
+   --shadow-tooltip: 0 4px 12px rgba(0, 0, 0, 0.2);
+   --shadow-status: 0 4px 16px rgba(0, 0, 0, 0.1);
 
-  --shadow-icon: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-icon-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
-  --shadow-icon-drag: 0 20px 40px rgba(0, 0, 0, 0.2);
+   --shadow-icon: 0 2px 6px rgba(0, 0, 0, 0.08);
+   --shadow-icon-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+   --shadow-icon-drag: 0 20px 40px rgba(0, 0, 0, 0.2);
 
-  --shadow-badge: 0 2px 6px rgba(59, 130, 246, 0.4);
+   --shadow-badge: 0 2px 6px rgba(59, 130, 246, 0.4);
 
-  /* Slightly smaller radii */
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
-  --radius-xxl: 14px;
-  --radius-dock: 16px;
+   /* Slightly smaller radii */
+   --radius-md: 8px;
+   --radius-lg: 10px;
+   --radius-xl: 12px;
+   --radius-xxl: 14px;
+   --radius-dock: 16px;
 
-  /* Smaller component dimensions */
-  --menubar-margin: 0px;
-  --dock-padding: 8px 12px;
-  --dock-icon-radius: 10px;
-  --dock-icon-gap: 6px;
-  --desktop-icon-radius: 12px;
-  --window-titlebar-height: 40px;
-  --window-radius: 12px;
-  --status-radius: 12px;
+   /* Smaller component dimensions */
+   --menubar-margin: 0px;
+   --dock-padding: 8px 12px;
+   --dock-icon-radius: 10px;
+   --dock-icon-gap: 6px;
+   --desktop-icon-radius: 12px;
+   --window-titlebar-height: 40px;
+   --window-radius: 12px;
+   --status-radius: 12px;
 }
 
 /* =============================================================================
@@ -296,35 +297,35 @@
    ============================================================================= */
 
 * {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
+   scrollbar-width: thin;
+   scrollbar-color: transparent transparent;
 }
 
 *:hover {
-  scrollbar-color: var(--color-border-strong) transparent;
+   scrollbar-color: var(--color-border-strong) transparent;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+   width: 8px;
+   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+   background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: var(--radius-full);
-  transition: background var(--transition-medium) var(--ease-out);
+   background: transparent;
+   border-radius: var(--radius-full);
+   transition: background var(--transition-medium) var(--ease-out);
 }
 
 *:hover::-webkit-scrollbar-thumb {
-  background: rgba(23, 20, 18, 0.2);
+   background: rgba(23, 20, 18, 0.2);
 }
 
 *:hover::-webkit-scrollbar-thumb:hover {
-  background: rgba(23, 20, 18, 0.35);
+   background: rgba(23, 20, 18, 0.35);
 }
 
 /* =============================================================================
@@ -332,13 +333,13 @@
    ============================================================================= */
 
 ::selection {
-  background: var(--color-accent-primary-subtle);
+   background: var(--color-accent-primary-subtle);
 }
 
 /* Drag selection box */
 .selection-box {
-  background: var(--color-accent-primary-subtle);
-  border: 1px solid rgba(255, 119, 34, 0.4);
+   background: var(--color-accent-primary-subtle);
+   border: 1px solid rgba(255, 119, 34, 0.4);
 }
 
 /* =============================================================================
@@ -346,19 +347,19 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --transition-fast: 0ms;
-    --transition-medium: 0ms;
-    --transition-slow: 0ms;
-  }
+   :root {
+      --transition-fast: 0ms;
+      --transition-medium: 0ms;
+      --transition-slow: 0ms;
+   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+   *,
+   *::before,
+   *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+   }
 }
 
 /* =============================================================================
@@ -366,13 +367,13 @@
    ============================================================================= */
 
 .visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   padding: 0;
+   margin: -1px;
+   overflow: hidden;
+   clip: rect(0, 0, 0, 0);
+   white-space: nowrap;
+   border: 0;
 }
