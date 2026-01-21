@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useDragControls, useReducedMotion } from 'framer-motion';
 import { FileText, Presentation } from 'lucide-react';
 import { GoOSTipTapEditor, goOSTokens } from './GoOSTipTapEditor';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
@@ -50,6 +50,9 @@ export function GoOSEditorWindow({
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const constraintsRef = useRef<HTMLDivElement>(null);
+  const dragControls = useDragControls();
+  const prefersReducedMotion = useReducedMotion();
 
   // Auto-save with debounce
   const triggerSave = useCallback(() => {
@@ -107,170 +110,199 @@ export function GoOSEditorWindow({
   // Reading time (average 200 words per minute)
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
+  // Start drag from title bar
+  const startDrag = (event: React.PointerEvent) => {
+    if (!isMaximized) {
+      dragControls.start(event);
+    }
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: 20 }}
-      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-      style={{
-        position: 'fixed',
-        top: isMaximized ? 'var(--menubar-height, 36px)' : '10%',
-        left: isMaximized ? 0 : '50%',
-        transform: isMaximized ? 'none' : 'translateX(-50%)',
-        width: isMaximized ? '100%' : 'min(900px, 90vw)',
-        height: isMaximized ? 'calc(100vh - var(--menubar-height, 36px) - 80px)' : 'min(80vh, 700px)',
-        minWidth: 400,
-        background: 'var(--color-bg-base)',
-        border: isMaximized ? 'none' : '2px solid var(--color-border-default)',
-        borderRadius: isMaximized ? 0 : 'var(--window-radius, 14px)',
-        boxShadow: isMaximized ? 'none' : 'var(--shadow-window)',
-        zIndex,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        opacity: isActive ? 1 : 0.95,
-      }}
-    >
-      {/* Title Bar */}
+    <>
+      {/* Drag constraints container - covers entire screen minus margins */}
       <div
+        ref={constraintsRef}
+        className="fixed inset-0 pointer-events-none"
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '10px 14px',
-          background: 'var(--color-bg-subtle)',
-          borderBottom: '1px solid var(--color-border-subtle)',
-          gap: 12,
-          cursor: isMaximized ? 'default' : 'grab',
-          flexShrink: 0,
+          top: 'var(--menubar-height, 40px)',
+          bottom: '80px',
+          left: '20px',
+          right: '20px',
+          zIndex: zIndex - 1
         }}
-      >
-        {/* Traffic Lights */}
-        <GoOSTrafficLights
-          onClose={onClose}
-          onMinimize={onMinimize}
-          onMaximize={onMaximize}
-          isMaximized={isMaximized}
-        />
-
-        {/* File Icon + Title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-          <FileIcon
-            size={16}
-            color="var(--color-text-secondary)"
-            strokeWidth={1.5}
-          />
-
-          {isEditingTitle ? (
-            <input
-              ref={titleInputRef}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onBlur={() => setIsEditingTitle(false)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === 'Escape') {
-                  setIsEditingTitle(false);
-                }
-              }}
-              style={{
-                flex: 1,
-                padding: '4px 8px',
-                fontSize: 'var(--font-size-md, 14px)',
-                fontWeight: 'var(--font-weight-semibold, 600)',
-                fontFamily: 'var(--font-family)',
-                color: 'var(--color-text-primary)',
-                background: 'var(--color-bg-base)',
-                border: '1.5px solid var(--color-accent-primary)',
-                borderRadius: 'var(--radius-sm, 6px)',
-                outline: 'none',
-              }}
-            />
-          ) : (
-            <span
-              onClick={() => setIsEditingTitle(true)}
-              style={{
-                fontSize: 'var(--font-size-md, 14px)',
-                fontWeight: 'var(--font-weight-semibold, 600)',
-                fontFamily: 'var(--font-family)',
-                color: 'var(--color-text-primary)',
-                cursor: 'text',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-              title="Click to edit title"
-            >
-              {title || 'Untitled'}
-            </span>
-          )}
-
-          <GoOSPublishBadge status={file.status} />
-        </div>
-
-        {/* Save Status */}
-        <GoOSAutoSaveIndicator status={saveStatus} lastSaved={lastSaved} />
-
-        {/* Publish Toggle */}
-        <GoOSPublishToggle
-          status={file.status}
-          onChange={handlePublishChange}
-        />
-      </div>
-
-      {/* Editor - responsive container */}
-      <div
+      />
+      <motion.div
+        drag={!isMaximized}
+        dragControls={dragControls}
+        dragListener={false}
+        dragConstraints={constraintsRef}
+        dragElastic={0.05}
+        dragMomentum={false}
+        initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
+        animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+        exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         style={{
-          flex: 1,
+          position: 'fixed',
+          top: isMaximized ? 'var(--menubar-height, 40px)' : '10%',
+          left: isMaximized ? 0 : '50%',
+          x: isMaximized ? 0 : '-50%',
+          width: isMaximized ? '100%' : 'min(900px, 90vw)',
+          height: isMaximized ? 'calc(100vh - var(--menubar-height, 40px) - 80px)' : 'min(80vh, 700px)',
+          minWidth: 400,
+          background: 'var(--color-bg-base)',
+          border: isMaximized ? 'none' : '2px solid var(--color-text-primary, #171412)',
+          borderRadius: isMaximized ? 0 : 'var(--radius-lg, 12px)',
+          boxShadow: isMaximized ? 'none' : 'var(--shadow-md)',
+          zIndex,
+          display: 'flex',
+          flexDirection: 'column',
           overflow: 'hidden',
-          display: 'flex',
-          justifyContent: 'center',
-          background: 'var(--color-bg-white)',
+          opacity: isActive ? 1 : 0.95,
         }}
       >
+        {/* Title Bar - Drag Handle */}
         <div
+          onPointerDown={startDrag}
           style={{
-            width: '100%',
-            maxWidth: isMaximized ? '800px' : '100%',
-            height: '100%',
-            margin: isMaximized ? '0 auto' : 0,
-            padding: isMaximized ? '0 24px' : 0,
+            display: 'flex',
+            alignItems: 'center',
+            padding: '10px 14px',
+            background: 'var(--color-bg-base)',
+            borderBottom: '2px solid var(--color-text-primary, #171412)',
+            gap: 12,
+            cursor: isMaximized ? 'default' : 'grab',
+            flexShrink: 0,
+            touchAction: 'none',
           }}
         >
-          <GoOSTipTapEditor
-            content={content}
-            onChange={setContent}
-            onSave={triggerSave}
-            placeholder={file.type === 'case-study'
-              ? 'Start writing your case study...'
-              : 'Start writing...'}
-            autoFocus
+          {/* Traffic Lights */}
+          <GoOSTrafficLights
+            onClose={onClose}
+            onMinimize={onMinimize}
+            onMaximize={onMaximize}
+            isMaximized={isMaximized}
+          />
+
+          {/* File Icon + Title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+            <FileIcon
+              size={16}
+              color="var(--color-text-secondary)"
+              strokeWidth={1.5}
+            />
+
+            {isEditingTitle ? (
+              <input
+                ref={titleInputRef}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onBlur={() => setIsEditingTitle(false)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === 'Escape') {
+                    setIsEditingTitle(false);
+                  }
+                }}
+                style={{
+                  flex: 1,
+                  padding: '4px 8px',
+                  fontSize: 'var(--font-size-md, 14px)',
+                  fontWeight: 'var(--font-weight-semibold, 600)',
+                  fontFamily: 'var(--font-family)',
+                  color: 'var(--color-text-primary)',
+                  background: 'var(--color-bg-base)',
+                  border: '1.5px solid var(--color-accent-primary)',
+                  borderRadius: 'var(--radius-sm, 6px)',
+                  outline: 'none',
+                }}
+              />
+            ) : (
+              <span
+                onClick={() => setIsEditingTitle(true)}
+                style={{
+                  fontSize: 'var(--font-size-md, 14px)',
+                  fontWeight: 'var(--font-weight-semibold, 600)',
+                  fontFamily: 'var(--font-family)',
+                  color: 'var(--color-text-primary)',
+                  cursor: 'text',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title="Click to edit title"
+              >
+                {title || 'Untitled'}
+              </span>
+            )}
+
+            <GoOSPublishBadge status={file.status} />
+          </div>
+
+          {/* Save Status */}
+          <GoOSAutoSaveIndicator status={saveStatus} lastSaved={lastSaved} />
+
+          {/* Publish Toggle */}
+          <GoOSPublishToggle
+            status={file.status}
+            onChange={handlePublishChange}
           />
         </div>
-      </div>
 
-      {/* Footer with stats */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '8px 16px',
-          borderTop: '1px solid var(--color-border-subtle)',
-          background: 'var(--color-bg-subtle)',
-          fontSize: 'var(--font-size-xs, 10px)',
-          fontFamily: 'ui-monospace, "SF Mono", monospace',
-          color: 'var(--color-text-muted)',
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ display: 'flex', gap: 16 }}>
-          <span>{wordCount} words</span>
-          <span>{charCount} characters</span>
-          <span>{readingTime} min read</span>
+        {/* Editor - responsive container */}
+        <div
+          style={{
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            justifyContent: 'center',
+            background: 'var(--color-bg-white)',
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: isMaximized ? '800px' : '100%',
+              height: '100%',
+              margin: isMaximized ? '0 auto' : 0,
+              padding: isMaximized ? '0 24px' : 0,
+            }}
+          >
+            <GoOSTipTapEditor
+              content={content}
+              onChange={setContent}
+              onSave={triggerSave}
+              placeholder={file.type === 'case-study'
+                ? 'Start writing your case study...'
+                : 'Start writing...'}
+              autoFocus
+            />
+          </div>
         </div>
-        <span style={{ fontSize: 11 }}>goOS Editor</span>
-      </div>
-    </motion.div>
+
+        {/* Footer with stats */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 16px',
+            borderTop: '1px solid var(--color-border-subtle)',
+            background: 'var(--color-bg-subtle)',
+            fontSize: 'var(--font-size-xs, 10px)',
+            fontFamily: 'ui-monospace, "SF Mono", monospace',
+            color: 'var(--color-text-muted)',
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: 'flex', gap: 16 }}>
+            <span>{wordCount} words</span>
+            <span>{charCount} characters</span>
+            <span>{readingTime} min read</span>
+          </div>
+          <span style={{ fontSize: 11 }}>goOS Editor</span>
+        </div>
+      </motion.div>
+    </>
   );
 }
 

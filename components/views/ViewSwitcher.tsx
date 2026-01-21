@@ -2,24 +2,19 @@
 
 import React from 'react';
 import { Monitor, FileText } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { ViewMode } from '@/types';
 
-// goOS Design Tokens - Brand Appart (aligned with useWidgetTheme)
+// goOS Design Tokens - Brand Appart (uses CSS variables)
 const goOS = {
   colors: {
-    paper: '#fbf9ef',       // Brand cream
-    border: '#171412',      // Brand base dark - matches useWidgetTheme
+    paper: 'var(--color-bg-base, #fbf9ef)',
+    border: 'var(--color-text-primary, #171412)',
     text: {
-      primary: '#171412',   // Brand base
-      secondary: '#8e827c', // Brand grey
+      primary: 'var(--color-text-primary, #171412)',
+      secondary: 'var(--color-text-muted, #8e827c)',
     },
-    accent: '#ff7722',      // Brand orange
-  },
-  shadows: {
-    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)', // Brand Appart offset shadow
-  },
-  fonts: {
-    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+    accent: 'var(--color-accent-primary, #ff7722)',
   },
 };
 
@@ -30,24 +25,20 @@ interface ViewSwitcherProps {
 }
 
 // Global view toggle: Desktop (OS experience) | Page (linear portfolio)
-// Note: Present mode is only for individual Notes, not the whole desktop
 const VIEW_OPTIONS: {
   mode: ViewMode;
   icon: React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>;
   label: string;
-  description: string;
 }[] = [
   {
     mode: 'desktop',
     icon: Monitor,
     label: 'Desktop',
-    description: 'Interactive desktop experience',
   },
   {
     mode: 'page',
     icon: FileText,
     label: 'Page',
-    description: 'Linear portfolio view',
   },
 ];
 
@@ -57,60 +48,48 @@ export function ViewSwitcher({ currentView, onViewChange, className = '' }: View
       className={`flex items-center ${className}`}
       style={{
         padding: '3px',
-        borderRadius: '10px',
+        borderRadius: '8px',
         background: goOS.colors.paper,
-        border: `1px solid rgba(0,0,0,0.1)`,
-        boxShadow: goOS.shadows.solid,
+        border: `2px solid ${goOS.colors.border}`,
         gap: '2px',
       }}
     >
       {VIEW_OPTIONS.map(({ mode, icon: Icon, label }) => {
         const isActive = currentView === mode;
         return (
-          <button
+          <motion.button
             key={mode}
-            onClick={() => {
-              console.log('[ViewSwitcher] Switching to:', mode);
-              onViewChange(mode);
-            }}
+            onClick={() => onViewChange(mode)}
+            whileHover={!isActive ? { scale: 1.02 } : undefined}
+            whileTap={{ scale: 0.98 }}
             title={label}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 10px',
+              gap: '5px',
+              padding: '5px 10px',
               borderRadius: '5px',
               background: isActive ? goOS.colors.border : 'transparent',
               color: isActive ? goOS.colors.paper : goOS.colors.text.primary,
-              fontSize: '12px',
+              fontSize: '11px',
               fontWeight: 600,
-              fontFamily: goOS.fonts.heading,
+              letterSpacing: '0.01em',
               cursor: 'pointer',
               border: 'none',
               outline: 'none',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.background = 'transparent';
-              }
+              transition: 'background 0.15s ease, color 0.15s ease',
             }}
           >
-            <Icon size={14} strokeWidth={2} />
+            <Icon size={13} strokeWidth={2.2} />
             <span>{label}</span>
-          </button>
+          </motion.button>
         );
       })}
     </div>
   );
 }
 
-// Compact version for menu bar
+// Compact version for menu bar (icon only)
 export function ViewSwitcherCompact({ currentView, onViewChange }: ViewSwitcherProps) {
   return (
     <div
@@ -121,43 +100,35 @@ export function ViewSwitcherCompact({ currentView, onViewChange }: ViewSwitcherP
         padding: '2px',
         borderRadius: '6px',
         background: goOS.colors.paper,
-        border: `1px solid rgba(0,0,0,0.1)`,
+        border: `2px solid ${goOS.colors.border}`,
       }}
     >
       {VIEW_OPTIONS.map(({ mode, icon: Icon, label }) => {
         const isActive = currentView === mode;
         return (
-          <button
+          <motion.button
             key={mode}
             onClick={() => onViewChange(mode)}
+            whileHover={!isActive ? { scale: 1.05 } : undefined}
+            whileTap={{ scale: 0.95 }}
             title={label}
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '28px',
-              height: '28px',
-              borderRadius: '6px',
+              width: '26px',
+              height: '26px',
+              borderRadius: '4px',
               background: isActive ? goOS.colors.border : 'transparent',
               color: isActive ? goOS.colors.paper : goOS.colors.text.primary,
               cursor: 'pointer',
               border: 'none',
               outline: 'none',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.background = 'transparent';
-              }
+              transition: 'background 0.15s ease, color 0.15s ease',
             }}
           >
-            <Icon size={16} strokeWidth={2} />
-          </button>
+            <Icon size={14} strokeWidth={2.2} />
+          </motion.button>
         );
       })}
     </div>

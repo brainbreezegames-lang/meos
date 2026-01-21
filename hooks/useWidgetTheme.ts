@@ -48,12 +48,13 @@ export interface WidgetTheme {
 }
 
 // ONE unified theme using CSS variables - EXACT variable names from design-system.css
+// Border uses color-text-primary for bolder "dock app" style (2px solid dark border)
 const unifiedTheme: WidgetTheme = {
   colors: {
     paper: 'var(--color-bg-base)',
     background: 'var(--color-bg-base)',
     blur: 'none',
-    border: 'var(--color-border-default)',
+    border: 'var(--color-text-primary)',
     text: {
       primary: 'var(--color-text-primary)',
       secondary: 'var(--color-text-secondary)',
@@ -106,8 +107,8 @@ const unifiedTheme: WidgetTheme = {
     },
   },
   shadows: {
-    solid: 'var(--shadow-sm)',
-    hover: 'var(--shadow-md)',
+    solid: 'var(--shadow-md)',
+    hover: 'var(--shadow-lg)',
   },
   radii: {
     card: 'var(--radius-lg)',

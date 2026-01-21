@@ -32,6 +32,7 @@ import {
     BarChart3,
     BookOpen,
     PenLine,
+    Presentation,
 } from 'lucide-react';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
@@ -1165,7 +1166,7 @@ const TypewriterText = React.memo(({
 TypewriterText.displayName = 'TypewriterText';
 
 // ============================================
-// DOCK ICON - Enhanced with bounce and tooltip
+// DOCK ICON - Enhanced with bounce, wobble and tooltip
 // ============================================
 const DockIcon = React.memo(({
     icon,
@@ -1186,7 +1187,7 @@ const DockIcon = React.memo(({
     const handleClick = () => {
         setJustClicked(true);
         onClick();
-        setTimeout(() => setJustClicked(false), 400);
+        setTimeout(() => setJustClicked(false), 500);
     };
 
     return (
@@ -1195,8 +1196,9 @@ const DockIcon = React.memo(({
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
             animate={{
-                y: isHovered ? -12 : 0,
-                scale: justClicked ? [1, 0.9, 1.05, 1] : 1,
+                y: isHovered ? -14 : 0,
+                scale: justClicked ? [1, 0.85, 1.15, 0.95, 1] : 1,
+                rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
             }}
             transition={goOS.springs.bouncy}
             className="relative flex flex-col items-center focus:outline-none"
@@ -1205,32 +1207,43 @@ const DockIcon = React.memo(({
             <AnimatePresence>
                 {isHovered && label && (
                     <motion.div
-                        initial={{ opacity: 0, y: 4, scale: 0.9 }}
+                        initial={{ opacity: 0, y: 6, scale: 0.85 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 4, scale: 0.9 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap z-50"
+                        exit={{ opacity: 0, y: 6, scale: 0.85 }}
+                        transition={{ type: 'spring', damping: 20, stiffness: 400 }}
+                        className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap z-50"
                         style={{
                             background: goOS.colors.text.primary,
                             color: goOS.colors.paper,
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                            border: `1px solid rgba(255,255,255,0.1)`,
                         }}
                     >
                         {label}
+                        {/* Tooltip arrow */}
+                        <div
+                            className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45"
+                            style={{ background: goOS.colors.text.primary }}
+                        />
                     </motion.div>
                 )}
             </AnimatePresence>
 
             <motion.div
-                className={`w-11 h-11 flex items-center justify-center rounded-xl transition-colors ${isActive ? 'bg-white' : 'hover:bg-black/5'}`}
+                className={`w-11 h-11 flex items-center justify-center rounded-xl ${isActive ? '' : ''}`}
                 style={{
-                    border: isActive ? `1.5px solid ${goOS.colors.border}` : 'none',
-                    boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                    background: isActive ? goOS.colors.white : isHovered ? 'rgba(0,0,0,0.04)' : 'transparent',
+                    border: isActive ? `2px solid ${goOS.colors.border}` : '2px solid transparent',
+                    boxShadow: isActive ? goOS.shadows.sm : 'none',
                 }}
                 animate={{
-                    scale: isHovered && !justClicked ? 1.1 : 1,
+                    scale: isHovered && !justClicked ? 1.12 : 1,
+                    rotate: isHovered && !justClicked ? [0, -2, 2, 0] : 0,
                 }}
-                transition={goOS.springs.gentle}
+                transition={{
+                    scale: goOS.springs.gentle,
+                    rotate: { duration: 0.4, ease: 'easeInOut' }
+                }}
             >
                 {icon}
             </motion.div>
@@ -1238,10 +1251,14 @@ const DockIcon = React.memo(({
             {/* Badge with bounce animation */}
             {badge !== undefined && badge > 0 && (
                 <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute -top-1 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
-                    style={{ background: goOS.colors.accent.primary }}
+                    initial={{ scale: 0, rotate: -20 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={goOS.springs.bouncy}
+                    className="absolute -top-1 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
+                    style={{
+                        background: goOS.colors.accent.primary,
+                        boxShadow: '0 2px 6px rgba(255, 119, 34, 0.4)',
+                    }}
                 >
                     {badge}
                 </motion.span>
@@ -1252,6 +1269,7 @@ const DockIcon = React.memo(({
                 <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
+                    transition={goOS.springs.gentle}
                     className="w-1.5 h-1.5 rounded-full mt-1"
                     style={{ background: goOS.colors.accent.primary }}
                 />
@@ -2117,6 +2135,8 @@ function GoOSDemoContent() {
     // goOS Editor UI state (local only)
     const [openEditors, setOpenEditors] = useState<string[]>([]);
     const [activeEditorId, setActiveEditorId] = useState<string | null>(null);
+    const [minimizedEditors, setMinimizedEditors] = useState<Set<string>>(new Set());
+    const [maximizedEditors, setMaximizedEditors] = useState<Set<string>>(new Set());
     const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
     const [renamingFileId, setRenamingFileId] = useState<string | null>(null);
     const [clipboard, setClipboard] = useState<{ files: GoOSFile[]; operation: 'copy' | 'cut' } | null>(null);
@@ -2356,11 +2376,57 @@ function GoOSDemoContent() {
 
     const closeEditor = useCallback((fileId: string) => {
         setOpenEditors(prev => prev.filter(id => id !== fileId));
+        setMinimizedEditors(prev => {
+            const next = new Set(prev);
+            next.delete(fileId);
+            return next;
+        });
+        setMaximizedEditors(prev => {
+            const next = new Set(prev);
+            next.delete(fileId);
+            return next;
+        });
         if (activeEditorId === fileId) {
             const remaining = openEditors.filter(id => id !== fileId);
             setActiveEditorId(remaining.length > 0 ? remaining[remaining.length - 1] : null);
         }
     }, [activeEditorId, openEditors]);
+
+    const minimizeEditor = useCallback((fileId: string) => {
+        setMinimizedEditors(prev => {
+            const next = new Set(prev);
+            next.add(fileId);
+            return next;
+        });
+        // When minimizing, switch to next available editor
+        if (activeEditorId === fileId) {
+            const remaining = openEditors.filter(id => id !== fileId && !minimizedEditors.has(id));
+            setActiveEditorId(remaining.length > 0 ? remaining[remaining.length - 1] : null);
+        }
+    }, [activeEditorId, openEditors, minimizedEditors]);
+
+    const restoreEditor = useCallback((fileId: string) => {
+        setMinimizedEditors(prev => {
+            const next = new Set(prev);
+            next.delete(fileId);
+            return next;
+        });
+        setActiveEditorId(fileId);
+        setWindowZ(prev => ({ ...prev, [`editor-${fileId}`]: topZIndex + 1 }));
+        setTopZIndex(prev => prev + 1);
+    }, [topZIndex]);
+
+    const toggleMaximizeEditor = useCallback((fileId: string) => {
+        setMaximizedEditors(prev => {
+            const next = new Set(prev);
+            if (next.has(fileId)) {
+                next.delete(fileId);
+            } else {
+                next.add(fileId);
+            }
+            return next;
+        });
+    }, []);
 
     const updateFile = useCallback((fileId: string, updates: Partial<GoOSFile>) => {
         // Use API persistence
@@ -2624,17 +2690,21 @@ function GoOSDemoContent() {
             {/* CONFETTI CELEBRATION */}
             <ConfettiBurst isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
 
-            {/* MENU BAR */}
+            {/* MENU BAR - Clean, minimal design with centered toggle */}
             <header
-                className="h-10 flex items-center justify-between px-5 fixed top-0 left-0 right-0 z-[2000] select-none"
-                style={{ background: goOS.colors.headerBg, borderBottom: `1px solid rgba(0,0,0,0.08)` }}
+                className="h-11 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
+                style={{
+                    background: goOS.colors.headerBg,
+                    borderBottom: `2px solid ${goOS.colors.border}`,
+                }}
             >
-                <div className="flex items-center gap-6">
+                {/* Left: Logo */}
+                <div className="flex items-center gap-3 min-w-[100px]">
                     <motion.button
                         onClick={handleLogoClick}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="text-xl font-bold relative"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="text-lg font-bold relative tracking-tight"
                         style={{ color: goOS.colors.text.primary }}
                     >
                         goOS
@@ -2665,27 +2735,19 @@ function GoOSDemoContent() {
                             )}
                         </AnimatePresence>
                     </motion.button>
-                    <nav className="flex gap-4 text-sm" style={{ color: goOS.colors.text.secondary }}>
-                        {['File', 'Edit', 'View', 'Help'].map(item => (
-                            <motion.span key={item} whileHover={{ scale: 1.05 }} className="cursor-pointer" style={{ ['--hover-color' as string]: goOS.colors.accent.primary }}>
-                                {item}
-                            </motion.span>
-                        ))}
-                    </nav>
                 </div>
-                <div className="flex items-center gap-4 text-sm" style={{ color: goOS.colors.text.secondary }}>
-                    {/* View Switcher */}
+
+                {/* Center: View Switcher - The main action */}
+                <div className="absolute left-1/2 -translate-x-1/2">
                     <ViewSwitcher
                         currentView={viewMode}
                         onViewChange={setViewMode}
                     />
-                    <TypewriterText text={greeting} className="text-xs hidden sm:block" />
-                    <div className="flex items-center gap-1.5">
-                        <Battery size={14} strokeWidth={2} />
-                        <span className="text-xs font-medium">87%</span>
-                    </div>
-                    <Wifi size={14} strokeWidth={2} />
-                    <span className="font-semibold" style={{ color: goOS.colors.text.primary }}>{time}</span>
+                </div>
+
+                {/* Right: Minimal system info */}
+                <div className="flex items-center gap-3 text-sm min-w-[100px] justify-end" style={{ color: goOS.colors.text.secondary }}>
+                    <span className="font-medium text-xs" style={{ color: goOS.colors.text.primary }}>{time}</span>
                 </div>
             </header>
 
@@ -2921,7 +2983,9 @@ function GoOSDemoContent() {
 
                         {/* goOS Editor Windows */}
                         <AnimatePresence>
-                            {openEditors.map((fileId) => {
+                            {openEditors
+                                .filter(fileId => !minimizedEditors.has(fileId))
+                                .map((fileId) => {
                                 const file = goosFiles.find(f => f.id === fileId);
                                 if (!file) return null;
                                 return (
@@ -2929,6 +2993,9 @@ function GoOSDemoContent() {
                                         key={file.id}
                                         file={file}
                                         onClose={() => closeEditor(file.id)}
+                                        onMinimize={() => minimizeEditor(file.id)}
+                                        onMaximize={() => toggleMaximizeEditor(file.id)}
+                                        isMaximized={maximizedEditors.has(file.id)}
                                         onUpdate={(updates) => {
                                             // Use auto-save for content/title changes (debounced)
                                             if (updates.content !== undefined || updates.title !== undefined) {
@@ -3279,6 +3346,28 @@ function GoOSDemoContent() {
                         onClick={() => createFile('note')}
                         label="New Note"
                     />
+                    {/* Minimized Editors */}
+                    {minimizedEditors.size > 0 && (
+                        <>
+                            <div className="w-px h-8 bg-black/10 mx-1" />
+                            {Array.from(minimizedEditors).map(fileId => {
+                                const file = goosFiles.find(f => f.id === fileId);
+                                if (!file) return null;
+                                return (
+                                    <DockIcon
+                                        key={`minimized-${fileId}`}
+                                        icon={file.type === 'case-study'
+                                            ? <Presentation size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />
+                                            : <FileText size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />
+                                        }
+                                        onClick={() => restoreEditor(fileId)}
+                                        label={file.title || 'Untitled'}
+                                        isActive={false}
+                                    />
+                                );
+                            })}
+                        </>
+                    )}
                 </div>
             </footer>
 

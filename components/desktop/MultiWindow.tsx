@@ -46,14 +46,15 @@ interface ThemeColors {
 }
 
 // Unified design system - uses CSS variables from design-system.css
+// Now matching the bolder "dock app" style: 2px solid dark border, clean shadow
 function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
   // ONE design system - Appart theme via CSS variables
   return {
     windowBg: 'var(--color-bg-base, #fbf9ef)',
-    windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
-    windowBorder: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    windowShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+    windowBorder: '2px solid var(--color-text-primary, #171412)',
     headerBg: 'var(--color-bg-base, #fbf9ef)',
-    headerBorder: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    headerBorder: '2px solid var(--color-text-primary, #171412)',
     titleColor: 'var(--color-text-primary, #171412)',
     subtitleColor: 'var(--color-text-muted, #8e827c)',
     textPrimary: 'var(--color-text-primary, #171412)',
@@ -89,8 +90,6 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
   const isMaximized = windowInstance.state === 'maximized';
   const isMinimized = windowInstance.state === 'minimized';
   const colors = getThemeColors(themeContext?.theme);
-  const isSketch = themeContext?.theme === 'sketch';
-  const isBrandAppart = themeContext?.theme === 'brand-appart';
 
   // Reset active tab when item changes
   useEffect(() => {
@@ -271,10 +270,8 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isSketch ? 4 : (isMaximized ? 12 : 14),
+            borderRadius: isMaximized ? 12 : 'var(--radius-lg, 12px)',
             background: colors.windowBg,
-            backdropFilter: (isSketch || isBrandAppart) ? 'none' : 'blur(20px)',
-            WebkitBackdropFilter: (isSketch || isBrandAppart) ? 'none' : 'blur(20px)',
             boxShadow: colors.windowShadow,
             border: colors.windowBorder,
             opacity: isActive ? 1 : 0.95,
