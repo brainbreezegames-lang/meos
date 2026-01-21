@@ -290,9 +290,9 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                   className="absolute left-1/2 -translate-x-1/2 font-medium truncate max-w-[55%] select-none"
                   style={{
                     fontSize: '13px',
-                    color: isSketch ? '#2B4AE2' : 'var(--text-primary)',
+                    color: theme.colors.text.primary,
                     opacity: 0.85,
-                    fontFamily: isSketch ? '"Comic Sans MS", "Chalkboard SE", sans-serif' : 'var(--font-display)',
+                    fontFamily: theme.fonts.heading,
                     letterSpacing: 'var(--letter-spacing-tight)',
                   }}
                 >
