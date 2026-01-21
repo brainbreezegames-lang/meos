@@ -3159,11 +3159,11 @@ function GoOSDemoContent() {
             {/* DOCK */}
             <footer className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[3000]">
                 <div
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl backdrop-blur-md"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
                     style={{
-                        background: 'rgba(255,255,255,0.85)',
-                        border: `1px solid rgba(0,0,0,0.08)`,
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)'
+                        background: '#fbf9ef',
+                        border: `2px solid ${goOS.colors.border}`,
+                        boxShadow: goOS.shadows.solid
                     }}
                 >
                     <RubberDuck />
