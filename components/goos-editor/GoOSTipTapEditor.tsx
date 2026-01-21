@@ -17,31 +17,31 @@ import { GoOSEditorToolbar } from './GoOSEditorToolbar';
 
 const lowlight = createLowlight(common);
 
-// goOS Design Tokens (shared) - Brand Appart Warm Cream
+// goOS Design Tokens (shared) - Brand Appart (aligned with useWidgetTheme)
 export const goOSTokens = {
   colors: {
-    paper: '#fbf9ef',
+    paper: '#fbf9ef',       // Brand cream
     cream: '#fbf9ef',
-    headerBg: '#f5f3e8',
-    windowBg: '#ffffff',
-    border: '#1a1a1a',
+    headerBg: '#fbf9ef',    // Same as paper for consistency
+    windowBg: '#fbf9ef',    // Use cream, not white
+    border: '#171412',      // Brand base dark - matches useWidgetTheme
     text: {
-      primary: '#1a1a1a',
-      secondary: '#4a4a4a',
-      muted: '#6b6b6b',
+      primary: '#171412',   // Brand base
+      secondary: '#8e827c', // Brand grey
+      muted: '#8e827c',
     },
     accent: {
-      primary: '#ff7722',
+      primary: '#ff7722',   // Brand orange
       dark: '#e56a1f',
       light: '#ff9955',
       pale: '#fff5ee',
     },
   },
   shadows: {
-    solid: '0 8px 24px rgba(0, 0, 0, 0.1)',
-    hover: '0 12px 32px rgba(0, 0, 0, 0.12)',
-    sm: '0 4px 12px rgba(0, 0, 0, 0.06)',
-    button: '0 2px 8px rgba(0, 0, 0, 0.08)',
+    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',    // Brand Appart offset shadow
+    hover: '6px 6px 0 rgba(23, 20, 18, 0.15)',
+    sm: '2px 2px 0 rgba(23, 20, 18, 0.06)',
+    button: '3px 3px 0 rgba(23, 20, 18, 0.1)',
   },
   fonts: {
     display: "'Averia Serif Libre', Georgia, serif",

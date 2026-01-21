@@ -19,9 +19,11 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const dragControls = useDragControls();
   const prefersReducedMotion = useReducedMotion();
-  const dragControls = useDragControls();
-  const prefersReducedMotion = useReducedMotion();
   const theme = useWidgetTheme();
+
+  // Derive theme variants for conditional styling
+  const isSketch = theme.colors.border === '#2B4AE2';
+  const isBrandAppart = theme.colors.border === '#171412';
 
   // Reset active tab when item changes
   useEffect(() => {
@@ -188,11 +190,10 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
               <div
                 className="window-title-bar flex items-center h-[52px] px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
                 style={{
-                  style={{
                   borderBottom: `2px solid ${theme.colors.border}`,
-              background: theme.colors.paper,
+                  background: theme.colors.paper,
                 }}
-              onPointerDown={startDrag}
+                onPointerDown={startDrag}
               >
               {/* Traffic Lights - 44px touch targets with visual dots */}
               <div

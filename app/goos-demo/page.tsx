@@ -1349,7 +1349,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
         >
             <div
                 className="h-10 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0 group"
-                style={{ background: goOS.colors.cream, borderBottom: `2px solid ${goOS.colors.border}`, borderRadius: '14px 14px 0 0' }}
+                style={{ background: goOS.colors.cream, borderBottom: `2px solid ${goOS.colors.border}`, borderRadius: '10px 10px 0 0' }}
             >
                 <div className="flex items-center gap-2">
                     <TrafficLightButton
