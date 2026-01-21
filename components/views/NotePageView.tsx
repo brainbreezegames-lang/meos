@@ -1,31 +1,43 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, FileText, Presentation, Play } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Play } from 'lucide-react';
 import type { ThemeId } from '@/contexts/ThemeContext';
 
-// goOS Design Tokens - Mediterranean Blue (default theme for article pages)
-const goOS = {
+/**
+ * Belle Duffner-style Case Study Page View
+ *
+ * Reference: https://belleduffner.com/reforgerobotics
+ *
+ * Features:
+ * - Full-bleed hero image with title overlay and curved wave transition
+ * - Sticky sidebar with scroll-spy navigation
+ * - Serif display typography for headings
+ * - Full-width images that break out of container
+ * - "More Case Studies" section at bottom
+ */
+
+// Design tokens
+const tokens = {
   colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
-    background: '#F8F9FE',
+    background: '#FFFFFF',
     text: {
-      primary: '#1a1a2e',
-      secondary: '#4a4a6a',
-      muted: '#8a8aaa',
-      accent: '#2B4AE2',
+      primary: '#1A1A1A',
+      secondary: '#4A4A4A',
+      muted: 'rgba(26, 26, 26, 0.4)',
     },
-  },
-  shadows: {
-    solid: '4px 4px 0 #2B4AE2',
-    subtle: '0 4px 24px rgba(43, 74, 226, 0.1)',
+    border: 'rgba(26, 26, 26, 0.1)',
+    overlay: 'rgba(0, 0, 0, 0.3)',
   },
   fonts: {
-    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-    body: '"SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif',
-    serif: '"New York", "Iowan Old Style", Georgia, serif',
+    display: '"Playfair Display", Georgia, "Times New Roman", serif',
+    body: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+  },
+  spacing: {
+    contentMaxWidth: '680px',
+    sidebarWidth: '200px',
+    sidebarLeft: '48px',
   },
 };
 
@@ -40,6 +52,7 @@ interface NotePageViewProps {
     fileType: 'note' | 'case-study';
     accessLevel: 'free' | 'paid' | 'email';
     priceAmount: number | null;
+    icon?: string | null;
   };
   author: {
     username: string;
@@ -47,15 +60,74 @@ interface NotePageViewProps {
     image: string | null;
   };
   theme?: ThemeId;
+  otherNotes?: Array<{
+    id: string;
+    title: string;
+    subtitle: string | null;
+    headerImage: string | null;
+  }>;
 }
 
-export function NotePageView({ note, author, theme = 'sketch' }: NotePageViewProps) {
-  // Calculate reading time
-  const wordCount = note.content
-    .replace(/<[^>]*>/g, ' ')
-    .split(/\s+/)
-    .filter(Boolean).length;
-  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+// Parse H2 headings from HTML content for sidebar navigation
+function parseHeadings(htmlContent: string): Array<{ id: string; text: string }> {
+  const headings: Array<{ id: string; text: string }> = [];
+  const h2Regex = /<h2[^>]*>(.*?)<\/h2>/gi;
+  let match;
+  let index = 0;
+
+  while ((match = h2Regex.exec(htmlContent)) !== null) {
+    const text = match[1].replace(/<[^>]*>/g, '').trim();
+    if (text) {
+      headings.push({
+        id: `section-${index}`,
+        text,
+      });
+      index++;
+    }
+  }
+
+  return headings;
+}
+
+// Extract first image from content for hero if no header image
+function extractFirstImage(htmlContent: string): string | null {
+  const imgMatch = htmlContent.match(/<img[^>]+src="([^"]+)"/i);
+  return imgMatch ? imgMatch[1] : null;
+}
+
+// Remove first image from content if it's being used as hero
+function removeFirstImage(htmlContent: string): string {
+  return htmlContent.replace(/<p>\s*<img[^>]+>\s*<\/p>|<img[^>]+>/i, '');
+}
+
+// Add IDs to H2 headings for scroll navigation
+function addHeadingIds(htmlContent: string): string {
+  let index = 0;
+  return htmlContent.replace(/<h2([^>]*)>/gi, () => {
+    const id = `section-${index}`;
+    index++;
+    return `<h2 id="${id}"$1>`;
+  });
+}
+
+export function NotePageView({ note, author, theme = 'sketch', otherNotes = [] }: NotePageViewProps) {
+  const [activeSection, setActiveSection] = useState<string>('');
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Parse headings for sidebar
+  const headings = useMemo(() => parseHeadings(note.content), [note.content]);
+
+  // Determine hero image
+  const heroImage = note.headerImage || extractFirstImage(note.content);
+
+  // Process content - remove first image if used as hero, add IDs to headings
+  const processedContent = useMemo(() => {
+    let content = note.content;
+    if (!note.headerImage && heroImage) {
+      content = removeFirstImage(content);
+    }
+    return addHeadingIds(content);
+  }, [note.content, note.headerImage, heroImage]);
 
   // Format date
   const publishDate = note.publishedAt
@@ -66,462 +138,673 @@ export function NotePageView({ note, author, theme = 'sketch' }: NotePageViewPro
       })
     : null;
 
-  const FileIcon = note.fileType === 'case-study' ? Presentation : FileText;
+  // Scroll spy effect
+  useEffect(() => {
+    if (headings.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: '-20% 0px -80% 0px',
+        threshold: 0,
+      }
+    );
+
+    headings.forEach(({ id }) => {
+      const element = document.getElementById(id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [headings]);
+
+  // Smooth scroll to section
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: goOS.colors.background,
+        background: tokens.colors.background,
       }}
     >
-      {/* Navigation bar */}
-      <nav
+      {/* Hero Section - Full Bleed with Title Overlay */}
+      <section
         style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          background: goOS.colors.paper,
-          borderBottom: `2px solid ${goOS.colors.border}`,
-          padding: '12px 24px',
+          position: 'relative',
+          width: '100vw',
+          height: heroImage ? '70vh' : '40vh',
+          minHeight: heroImage ? '500px' : '300px',
+          overflow: 'hidden',
+          background: heroImage ? 'transparent' : tokens.colors.text.primary,
         }}
       >
-        <div
-          style={{
-            maxWidth: '800px',
-            margin: '0 auto',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Link
-            href={`/${author.username}`}
+        {/* Hero Image */}
+        {heroImage && (
+          <img
+            src={heroImage}
+            alt={note.title}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: goOS.colors.text.accent,
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: 600,
-              fontFamily: goOS.fonts.heading,
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
             }}
-          >
-            <ArrowLeft size={18} strokeWidth={2} />
-            <span>Back to {author.name}&apos;s Desktop</span>
-          </Link>
-
-          {/* Present button */}
-          <Link
-            href={`/${author.username}/${note.id}/present`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              background: goOS.colors.paper,
-              border: `2px solid ${goOS.colors.border}`,
-              color: goOS.colors.text.accent,
-              textDecoration: 'none',
-              fontSize: '13px',
-              fontWeight: 600,
-              fontFamily: goOS.fonts.heading,
-              boxShadow: '2px 2px 0 ' + goOS.colors.border,
-              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translate(-1px, -1px)';
-              e.currentTarget.style.boxShadow = '3px 3px 0 ' + goOS.colors.border;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translate(0, 0)';
-              e.currentTarget.style.boxShadow = '2px 2px 0 ' + goOS.colors.border;
-            }}
-          >
-            <Play size={14} strokeWidth={2} />
-            <span>Present</span>
-          </Link>
-        </div>
-      </nav>
-
-      {/* Article content */}
-      <article
-        style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '48px 24px 96px',
-        }}
-      >
-        {/* Header image */}
-        {note.headerImage && (
-          <div
-            style={{
-              marginBottom: '32px',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              border: `2px solid ${goOS.colors.border}`,
-              boxShadow: goOS.shadows.solid,
-            }}
-          >
-            <img
-              src={note.headerImage}
-              alt={note.title}
-              style={{
-                width: '100%',
-                height: 'auto',
-                maxHeight: '400px',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
-          </div>
+          />
         )}
 
-        {/* Article header */}
-        <header style={{ marginBottom: '32px' }}>
-          {/* Type badge */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '4px',
-              background: goOS.colors.border,
-              color: goOS.colors.paper,
-              marginBottom: '16px',
-            }}
-          >
-            <FileIcon size={14} strokeWidth={2} />
-            <span
-              style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                fontFamily: goOS.fonts.heading,
-              }}
-            >
-              {note.fileType === 'case-study' ? 'Case Study' : 'Note'}
-            </span>
-          </div>
+        {/* Overlay for text readability */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: heroImage
+              ? 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%)'
+              : 'transparent',
+          }}
+        />
 
-          {/* Title */}
+        {/* Hero Title - Centered on image */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0 24px',
+            textAlign: 'center',
+          }}
+        >
           <h1
             style={{
-              fontSize: 'clamp(28px, 5vw, 42px)',
-              fontWeight: 700,
-              color: goOS.colors.text.primary,
-              fontFamily: goOS.fonts.heading,
-              lineHeight: 1.2,
-              marginBottom: '12px',
-              letterSpacing: '-0.02em',
+              fontFamily: tokens.fonts.display,
+              fontSize: 'clamp(48px, 8vw, 80px)',
+              fontWeight: 400,
+              fontStyle: 'italic',
+              color: '#FFFFFF',
+              lineHeight: 1.1,
+              letterSpacing: '-0.01em',
+              textShadow: '0 2px 40px rgba(0,0,0,0.3)',
+              maxWidth: '900px',
             }}
           >
             {note.title}
           </h1>
 
-          {/* Subtitle */}
-          {note.subtitle && (
-            <p
+          {/* Decorative dot */}
+          <div
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: '#FFFFFF',
+              marginTop: '24px',
+              opacity: 0.8,
+            }}
+          />
+        </div>
+
+        {/* Curved wave at bottom */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            height: '80px',
+            background: tokens.colors.background,
+            borderTopLeftRadius: '50% 100%',
+            borderTopRightRadius: '50% 100%',
+          }}
+        />
+      </section>
+
+      {/* Main Layout - Sidebar + Content */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: headings.length > 0 ? `${tokens.spacing.sidebarWidth} 1fr` : '1fr',
+          maxWidth: '1400px',
+          margin: '0 auto',
+        }}
+      >
+        {/* Sticky Sidebar */}
+        {headings.length > 0 && (
+          <aside
+            style={{
+              position: 'sticky',
+              top: '120px',
+              height: 'fit-content',
+              paddingLeft: tokens.spacing.sidebarLeft,
+              paddingTop: '40px',
+            }}
+          >
+            {/* Back link */}
+            <Link
+              href={`/${author.username}`}
               style={{
-                fontSize: '18px',
-                color: goOS.colors.text.secondary,
-                fontFamily: goOS.fonts.body,
-                lineHeight: 1.5,
-                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '14px',
+                color: tokens.colors.text.muted,
+                textDecoration: 'none',
+                fontFamily: tokens.fonts.body,
+                marginBottom: '32px',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = tokens.colors.text.primary;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = tokens.colors.text.muted;
               }}
             >
-              {note.subtitle}
-            </p>
-          )}
+              <ArrowLeft size={16} />
+              <span>Back</span>
+            </Link>
 
-          {/* Meta info */}
+            {/* Section navigation */}
+            <nav
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
+              {headings.map(({ id, text }) => (
+                <button
+                  key={id}
+                  onClick={() => scrollToSection(id)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontFamily: tokens.fonts.body,
+                    color: activeSection === id
+                      ? tokens.colors.text.primary
+                      : tokens.colors.text.muted,
+                    fontWeight: activeSection === id ? 500 : 400,
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeSection !== id) {
+                      e.currentTarget.style.color = 'rgba(26, 26, 26, 0.7)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeSection !== id) {
+                      e.currentTarget.style.color = tokens.colors.text.muted;
+                    }
+                  }}
+                >
+                  {text}
+                </button>
+              ))}
+            </nav>
+          </aside>
+        )}
+
+        {/* Main Content */}
+        <main
+          style={{
+            maxWidth: tokens.spacing.contentMaxWidth,
+            padding: '0 24px 120px',
+            margin: headings.length > 0 ? '0' : '0 auto',
+          }}
+        >
+          {/* Project Meta - Icon + Name + Tags */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '16px',
-              flexWrap: 'wrap',
-              paddingTop: '16px',
-              borderTop: `2px solid ${goOS.colors.border}`,
+              marginBottom: '32px',
+              paddingTop: '40px',
             }}
           >
-            {/* Author */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              {author.image ? (
-                <img
-                  src={author.image}
-                  alt={author.name}
+            {/* Project icon */}
+            {note.icon && (
+              <img
+                src={note.icon}
+                alt=""
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '12px',
+                  objectFit: 'cover',
+                }}
+              />
+            )}
+            <div>
+              <h2
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  fontFamily: tokens.fonts.body,
+                  color: tokens.colors.text.primary,
+                  marginBottom: '4px',
+                }}
+              >
+                {note.title}
+              </h2>
+              {note.subtitle && (
+                <p
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    border: `2px solid ${goOS.colors.border}`,
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    background: goOS.colors.border,
-                    color: goOS.colors.paper,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     fontSize: '14px',
-                    fontWeight: 700,
-                    fontFamily: goOS.fonts.heading,
+                    fontFamily: tokens.fonts.body,
+                    color: tokens.colors.text.muted,
                   }}
                 >
-                  {author.name[0]}
-                </div>
+                  {note.subtitle}
+                </p>
               )}
-              <span
-                style={{
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: goOS.colors.text.primary,
-                  fontFamily: goOS.fonts.heading,
-                }}
-              >
-                {author.name}
-              </span>
-            </div>
-
-            {/* Date */}
-            {publishDate && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  color: goOS.colors.text.muted,
-                  fontSize: '13px',
-                  fontFamily: goOS.fonts.body,
-                }}
-              >
-                <Calendar size={14} strokeWidth={2} />
-                <span>{publishDate}</span>
-              </div>
-            )}
-
-            {/* Reading time */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                color: goOS.colors.text.muted,
-                fontSize: '13px',
-                fontFamily: goOS.fonts.body,
-              }}
-            >
-              <Clock size={14} strokeWidth={2} />
-              <span>{readingTime} min read</span>
             </div>
           </div>
-        </header>
 
-        {/* Access gate for paid/email content */}
-        {note.accessLevel !== 'free' && (
+          {/* Article Content */}
           <div
+            ref={contentRef}
+            className="case-study-content"
             style={{
-              padding: '24px',
-              borderRadius: '8px',
-              background: goOS.colors.paper,
-              border: `2px solid ${goOS.colors.border}`,
-              boxShadow: goOS.shadows.solid,
-              marginBottom: '32px',
+              fontFamily: tokens.fonts.body,
+              fontSize: '18px',
+              lineHeight: 1.7,
+              color: tokens.colors.text.primary,
+            }}
+            dangerouslySetInnerHTML={{ __html: processedContent }}
+          />
+        </main>
+      </div>
+
+      {/* More Case Studies Section */}
+      {otherNotes.length > 0 && (
+        <section
+          style={{
+            maxWidth: '1000px',
+            margin: '0 auto',
+            padding: '96px 24px 64px',
+            borderTop: `1px solid ${tokens.colors.border}`,
+          }}
+        >
+          <h3
+            style={{
+              fontSize: '12px',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+              color: tokens.colors.text.muted,
               textAlign: 'center',
+              marginBottom: '48px',
+              fontFamily: tokens.fonts.body,
             }}
           >
-            <span style={{ fontSize: '32px', display: 'block', marginBottom: '12px' }}>
-              {note.accessLevel === 'paid' ? '💰' : '✉️'}
-            </span>
-            <h3
-              style={{
-                fontSize: '18px',
-                fontWeight: 700,
-                color: goOS.colors.text.primary,
-                fontFamily: goOS.fonts.heading,
-                marginBottom: '8px',
-              }}
-            >
-              {note.accessLevel === 'paid' ? 'Premium Content' : 'Email Required'}
-            </h3>
-            <p
-              style={{
-                fontSize: '14px',
-                color: goOS.colors.text.secondary,
-                fontFamily: goOS.fonts.body,
-                marginBottom: '16px',
-              }}
-            >
-              {note.accessLevel === 'paid'
-                ? `This content is available for $${note.priceAmount || '0'}`
-                : 'Enter your email to unlock this content'}
-            </p>
-            <button
-              style={{
-                padding: '12px 24px',
-                borderRadius: '6px',
-                background: goOS.colors.border,
-                color: goOS.colors.paper,
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 600,
-                fontFamily: goOS.fonts.heading,
-              }}
-            >
-              {note.accessLevel === 'paid' ? 'Purchase Access' : 'Enter Email'}
-            </button>
-          </div>
-        )}
+            More Case Studies
+          </h3>
 
-        {/* Article body */}
-        <div
-          className="goos-article-content"
-          style={{
-            fontFamily: goOS.fonts.serif,
-            fontSize: '18px',
-            lineHeight: 1.8,
-            color: goOS.colors.text.primary,
-          }}
-          dangerouslySetInnerHTML={{ __html: note.content }}
-        />
-      </article>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '32px',
+              marginBottom: '48px',
+            }}
+          >
+            {otherNotes.slice(0, 4).map((otherNote) => (
+              <Link
+                key={otherNote.id}
+                href={`/${author.username}/${otherNote.id}`}
+                style={{
+                  textDecoration: 'none',
+                  display: 'block',
+                  transition: 'transform 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                {otherNote.headerImage && (
+                  <div
+                    style={{
+                      width: '100%',
+                      aspectRatio: '16 / 10',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      marginBottom: '20px',
+                    }}
+                  >
+                    <img
+                      src={otherNote.headerImage}
+                      alt=""
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  </div>
+                )}
+                <h4
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 600,
+                    fontFamily: tokens.fonts.body,
+                    color: tokens.colors.text.primary,
+                    marginBottom: '6px',
+                  }}
+                >
+                  {otherNote.title}
+                </h4>
+                {otherNote.subtitle && (
+                  <p
+                    style={{
+                      fontSize: '15px',
+                      fontFamily: tokens.fonts.body,
+                      color: tokens.colors.text.muted,
+                    }}
+                  >
+                    {otherNote.subtitle}
+                  </p>
+                )}
+              </Link>
+            ))}
+          </div>
+
+          {/* View All Button */}
+          <Link
+            href={`/${author.username}`}
+            style={{
+              display: 'block',
+              width: '100%',
+              padding: '20px',
+              border: `1px solid ${tokens.colors.border}`,
+              borderRadius: '8px',
+              background: 'transparent',
+              fontSize: '15px',
+              fontWeight: 500,
+              fontFamily: tokens.fonts.body,
+              color: tokens.colors.text.primary,
+              textDecoration: 'none',
+              textAlign: 'center',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(0,0,0,0.02)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            View all work
+          </Link>
+        </section>
+      )}
 
       {/* Footer */}
       <footer
         style={{
-          borderTop: `2px solid ${goOS.colors.border}`,
-          background: goOS.colors.paper,
-          padding: '24px',
+          maxWidth: tokens.spacing.contentMaxWidth,
+          margin: '0 auto',
+          padding: '64px 24px',
           textAlign: 'center',
+          borderTop: `1px solid ${tokens.colors.border}`,
         }}
       >
+        <p
+          style={{
+            fontSize: '14px',
+            color: tokens.colors.text.muted,
+            fontFamily: tokens.fonts.body,
+            marginBottom: '16px',
+          }}
+        >
+          {author.name}
+        </p>
         <Link
           href={`/${author.username}`}
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            color: goOS.colors.text.accent,
-            textDecoration: 'none',
             fontSize: '14px',
-            fontWeight: 600,
-            fontFamily: goOS.fonts.heading,
+            color: tokens.colors.text.primary,
+            fontFamily: tokens.fonts.body,
+            textDecoration: 'none',
           }}
         >
-          <ArrowLeft size={18} strokeWidth={2} />
-          <span>View more from {author.name}</span>
+          ← Back to Desktop
         </Link>
-        <p
-          style={{
-            marginTop: '12px',
-            fontSize: '12px',
-            color: goOS.colors.text.muted,
-            fontFamily: goOS.fonts.body,
-          }}
-        >
-          Built with goOS
-        </p>
       </footer>
 
-      {/* Article styling */}
+      {/* Case Study Content Styles */}
       <style jsx global>{`
-        .goos-article-content h1 {
-          font-family: ${goOS.fonts.heading};
-          font-size: 32px;
-          font-weight: 700;
-          margin: 32px 0 16px;
-          color: ${goOS.colors.text.primary};
-          letter-spacing: -0.02em;
+        /* Import Playfair Display for serif headings */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+        .case-study-content {
+          overflow: hidden;
         }
-        .goos-article-content h2 {
-          font-family: ${goOS.fonts.heading};
-          font-size: 26px;
-          font-weight: 600;
-          margin: 28px 0 14px;
-          color: ${goOS.colors.text.primary};
+
+        /* Section Labels - H4 becomes small uppercase label */
+        .case-study-content h4 {
+          font-size: 12px;
+          font-weight: 500;
+          font-family: ${tokens.fonts.body};
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: ${tokens.colors.text.muted};
+          margin: 64px 0 16px;
         }
-        .goos-article-content h3 {
-          font-family: ${goOS.fonts.heading};
-          font-size: 20px;
-          font-weight: 600;
-          margin: 24px 0 12px;
-          color: ${goOS.colors.text.primary};
+
+        .case-study-content h4:first-child {
+          margin-top: 0;
         }
-        .goos-article-content p {
-          margin-bottom: 20px;
+
+        /* Main Headings - H2 in serif */
+        .case-study-content h2 {
+          font-family: ${tokens.fonts.display};
+          font-size: 36px;
+          font-weight: 400;
+          line-height: 1.15;
+          letter-spacing: -0.01em;
+          color: ${tokens.colors.text.primary};
+          margin: 24px 0;
+          max-width: 600px;
         }
-        .goos-article-content ul,
-        .goos-article-content ol {
-          margin-bottom: 20px;
-          padding-left: 28px;
+
+        /* Sub Headings - H3 */
+        .case-study-content h3 {
+          font-family: ${tokens.fonts.display};
+          font-size: 28px;
+          font-weight: 400;
+          line-height: 1.2;
+          color: ${tokens.colors.text.primary};
+          margin: 48px 0 16px;
         }
-        .goos-article-content li {
-          margin-bottom: 8px;
+
+        /* Body text */
+        .case-study-content p {
+          margin: 0 0 24px;
         }
-        .goos-article-content a {
-          color: ${goOS.colors.text.accent};
+
+        .case-study-content p:last-child {
+          margin-bottom: 0;
+        }
+
+        /* Links */
+        .case-study-content a {
+          color: ${tokens.colors.text.primary};
           text-decoration: underline;
-          text-underline-offset: 2px;
+          text-underline-offset: 3px;
+          text-decoration-thickness: 1px;
         }
-        .goos-article-content a:hover {
+
+        .case-study-content a:hover {
           text-decoration-thickness: 2px;
         }
-        .goos-article-content blockquote {
-          border-left: 4px solid ${goOS.colors.border};
-          padding-left: 20px;
-          margin: 24px 0;
+
+        /* Links with external arrow (deliverables) */
+        .case-study-content a[href^="http"]::after {
+          content: " ↗";
+          font-size: 0.9em;
+        }
+
+        /* Bold text */
+        .case-study-content strong {
+          font-weight: 600;
+        }
+
+        /* Italic text */
+        .case-study-content em {
           font-style: italic;
-          color: ${goOS.colors.text.secondary};
         }
-        .goos-article-content code {
-          background: rgba(43, 74, 226, 0.1);
-          padding: 2px 8px;
+
+        /* Lists */
+        .case-study-content ul,
+        .case-study-content ol {
+          margin: 24px 0;
+          padding-left: 28px;
+        }
+
+        .case-study-content li {
+          margin: 8px 0;
+        }
+
+        /* Blockquotes */
+        .case-study-content blockquote {
+          border-left: 3px solid ${tokens.colors.text.primary};
+          margin: 32px 0;
+          padding: 4px 0 4px 24px;
+          font-family: ${tokens.fonts.display};
+          font-size: 24px;
+          font-style: italic;
+          line-height: 1.4;
+          color: ${tokens.colors.text.secondary};
+        }
+
+        /* Images - Full width by default */
+        .case-study-content img {
+          display: block;
+          width: 100vw;
+          max-width: none;
+          height: auto;
+          margin: 48px calc(-50vw + 50%);
+          object-fit: cover;
+        }
+
+        /* Image grids - when two images are adjacent */
+        .case-study-content p + p img,
+        .case-study-content img + img {
+          margin-top: 16px;
+        }
+
+        /* Code */
+        .case-study-content code {
+          font-family: "SF Mono", Monaco, Consolas, monospace;
+          font-size: 0.9em;
+          background: rgba(0, 0, 0, 0.05);
+          padding: 2px 6px;
           border-radius: 4px;
-          font-size: 15px;
-          font-family: "SF Mono", Monaco, monospace;
         }
-        .goos-article-content pre {
-          background: ${goOS.colors.paper};
-          padding: 20px;
+
+        .case-study-content pre {
+          background: #1a1a1a;
+          color: #f5f5f5;
+          padding: 24px;
           border-radius: 8px;
           overflow-x: auto;
-          margin: 24px 0;
-          border: 2px solid ${goOS.colors.border};
-          box-shadow: ${goOS.shadows.solid};
+          margin: 32px 0;
+          font-size: 14px;
+          line-height: 1.6;
         }
-        .goos-article-content pre code {
+
+        .case-study-content pre code {
           background: none;
           padding: 0;
+          font-size: inherit;
         }
-        .goos-article-content img {
-          max-width: 100%;
-          height: auto;
-          border-radius: 8px;
-          margin: 24px 0;
-          border: 2px solid ${goOS.colors.border};
-          box-shadow: ${goOS.shadows.solid};
-        }
-        .goos-article-content hr {
+
+        /* Horizontal rules - section dividers */
+        .case-study-content hr {
           border: none;
-          border-top: 2px dashed ${goOS.colors.border};
-          margin: 40px 0;
+          height: 1px;
+          background: ${tokens.colors.border};
+          margin: 64px 0;
+        }
+
+        /* Tables */
+        .case-study-content table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 32px 0;
+          font-size: 16px;
+        }
+
+        .case-study-content th,
+        .case-study-content td {
+          border: 1px solid ${tokens.colors.border};
+          padding: 12px 16px;
+          text-align: left;
+        }
+
+        .case-study-content th {
+          background: rgba(0, 0, 0, 0.02);
+          font-weight: 600;
+        }
+
+        /* Responsive - Hide sidebar on tablets */
+        @media (max-width: 1024px) {
+          .case-study-content img {
+            width: calc(100% + 48px);
+            margin-left: -24px;
+            margin-right: -24px;
+          }
+        }
+
+        /* Responsive - Mobile typography */
+        @media (max-width: 640px) {
+          .case-study-content h2 {
+            font-size: 28px;
+          }
+
+          .case-study-content h3 {
+            font-size: 22px;
+          }
+
+          .case-study-content {
+            font-size: 16px;
+          }
+
+          .case-study-content blockquote {
+            font-size: 20px;
+            padding-left: 16px;
+          }
+
+          .case-study-content img {
+            width: calc(100% + 32px);
+            margin-left: -16px;
+            margin-right: -16px;
+          }
         }
       `}</style>
     </div>

@@ -238,11 +238,13 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         parentId: null,
         position: { x: 5, y: 35 },
+        headerImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1920&h=1080&fit=crop',
     },
     {
         id: 'file-2',
         type: 'case-study',
         title: 'Reforge Robotics',
+        headerImage: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&h=1080&fit=crop',
         content: `<img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&h=1080&fit=crop" alt="Robotics hero" />
 
 <h2>Overview</h2>
@@ -326,6 +328,7 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         updatedAt: new Date(Date.now()),
         parentId: null,
         position: { x: 21, y: 35 },
+        headerImage: 'https://images.unsplash.com/photo-1675271591211-930246f80c5d?w=1920&h=1080&fit=crop',
     },
 ];
 
@@ -2957,7 +2960,7 @@ function GoOSDemoContent() {
                         id: f.id,
                         title: f.title,
                         subtitle: null,
-                        headerImage: null,
+                        headerImage: f.headerImage || null,
                         fileType: f.type as 'note' | 'case-study',
                     }));
 
@@ -2968,7 +2971,7 @@ function GoOSDemoContent() {
                             title: file.title,
                             subtitle: null,
                             content: file.content,
-                            headerImage: null,
+                            headerImage: file.headerImage || null,
                             publishedAt: file.publishedAt ? new Date(file.publishedAt) : null,
                             fileType: file.type as 'note' | 'case-study',
                         }}

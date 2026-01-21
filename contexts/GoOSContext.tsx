@@ -22,6 +22,8 @@ export interface GoOSFileData {
   parentId: string | null;
   position: { x: number; y: number };
   childCount?: number;
+  // Header image for notes/case studies (hero image)
+  headerImage?: string | null;
   // Pricing for paid access
   priceAmount?: number | null;
   priceCurrency?: string | null;

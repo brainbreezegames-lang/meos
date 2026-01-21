@@ -104,6 +104,7 @@ export default async function NoteArticlePage({ params }: PageProps) {
     fileType: (note.goosFileType || 'note') as 'note' | 'case-study',
     accessLevel: (note.accessLevel || 'free') as 'free' | 'paid' | 'email',
     priceAmount: note.goosPriceAmount ? Number(note.goosPriceAmount) : null,
+    icon: note.windowIcon || null,
   };
 
   const authorData = {
@@ -112,11 +113,23 @@ export default async function NoteArticlePage({ params }: PageProps) {
     image: user.image || null,
   };
 
+  // Get other published notes for "More Case Studies" section
+  const otherNotes = desktop.items
+    .filter((item) => item.id !== note.id)
+    .slice(0, 4)
+    .map((item) => ({
+      id: item.id,
+      title: item.windowTitle || item.label,
+      subtitle: item.windowSubtitle || null,
+      headerImage: item.windowHeaderImage || null,
+    }));
+
   return (
     <NotePageView
       note={noteData}
       author={authorData}
       theme={theme}
+      otherNotes={otherNotes}
     />
   );
 }
