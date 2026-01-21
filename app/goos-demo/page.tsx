@@ -1270,10 +1270,11 @@ const TrafficLightButton = ({
             title={title}
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.9 }}
-            className="w-3 h-3 rounded-full flex items-center justify-center"
+            className="w-3 h-3 rounded-full flex items-center justify-center box-border"
             style={{
                 background: isHovered ? hoverColor : color,
                 transition: 'background 0.15s ease',
+                border: '1.5px solid #1a1a1a',
             }}
         >
             <motion.span
@@ -1329,13 +1330,13 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 height,
                 zIndex,
                 background: goOS.colors.windowBg,
-                border: `1px solid rgba(0,0,0,0.1)`,
-                boxShadow: '0 10px 40px rgba(0,0,0,0.12), 0 2px 10px rgba(0,0,0,0.06)'
+                border: `2px solid ${goOS.colors.border}`,
+                borderRadius: '16px',
+                boxShadow: goOS.shadows.solid
             }}
         >
-            <div
                 className="h-10 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0 group"
-                style={{ background: goOS.colors.cream, borderBottom: `1px solid rgba(0,0,0,0.06)` }}
+                style={{ background: goOS.colors.cream, borderBottom: `2px solid ${goOS.colors.border}`, borderRadius: '14px 14px 0 0' }}
             >
                 <div className="flex items-center gap-2">
                     <TrafficLightButton
@@ -1364,7 +1365,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 </div>
             </div>
             <div className="flex-1 overflow-auto">{children}</div>
-        </motion.div>
+        </motion.div >
     );
 }
 
