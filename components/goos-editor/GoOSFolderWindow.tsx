@@ -7,6 +7,7 @@ import { goOSTokens } from './GoOSTipTapEditor';
 import { GoOSFileIcon } from './GoOSFileIcon';
 import type { GoOSFile } from './GoOSEditorWindow';
 import { useThemeSafe } from '@/contexts/ThemeContext';
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 interface GoOSFolderWindowProps {
   folder: GoOSFile;
@@ -33,23 +34,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
 }: GoOSFolderWindowProps) {
   const filesInFolder = files.filter(f => f.parentFolderId === folder.id);
 
-  const { theme } = useThemeSafe() || {};
-  const isBrandAppart = theme === 'brand-appart';
-
-  // Theme colors
-  const themeColors = isBrandAppart ? {
-    border: '#1a1a1a',
-    bg: '#ffffff',
-    text: '#1a1a1a',
-    muted: '#4a4a4a',
-    highlight: '#ff7722',
-  } : {
-    border: '#2B4AE2', // Sketch Blue default
-    bg: '#FFFFFF',
-    text: '#2B4AE2',
-    muted: goOSTokens.colors.text.muted,
-    highlight: '#2B4AE2',
-  };
+  const theme = useWidgetTheme();
 
   return (
     <motion.div
