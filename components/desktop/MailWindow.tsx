@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem } from '@/types';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
-import { useThemeSafe } from '@/contexts/ThemeContext';
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 interface MailWindowProps {
   window: WindowInstance;
@@ -14,8 +14,7 @@ interface MailWindowProps {
 
 export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
   const windowContext = useWindowContext();
-  const { theme } = useThemeSafe() || {};
-  const isSketch = theme === 'sketch';
+  const theme = useWidgetTheme();
   const windowRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
@@ -107,16 +106,10 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isSketch ? (isMaximized ? '0' : '12px') : (isMaximized ? 'var(--radius-lg)' : 'var(--radius-window)'),
-            background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated)',
-            backdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
-            WebkitBackdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
-            boxShadow: isSketch
-              ? '6px 6px 0 #4A6CF7'
-              : (isActive
-                ? '0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 12px 40px -8px rgba(0, 0, 0, 0.35)'
-                : 'var(--shadow-lg)'),
-            border: isSketch ? '1.5px solid #4A6CF7' : 'var(--border-width) solid var(--border-glass-outer)',
+            borderRadius: isMaximized ? '0' : theme.radii.card,
+            background: theme.colors.paper,
+            boxShadow: isMaximized ? 'none' : theme.shadows.solid,
+            border: `2px solid ${theme.colors.border}`,
             opacity: isActive ? 1 : 0.95,
           }}
           initial={{ opacity: 0, scale: 0.9 }}
@@ -129,82 +122,73 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
             className="flex items-center justify-between px-4 shrink-0 select-none"
             style={{
               height: 'var(--window-header-height)',
-              borderBottom: isSketch ? '1.5px solid #4A6CF7' : 'var(--border-width) solid var(--border-light)',
-              background: isSketch ? '#FFFFFF' : 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
+              borderBottom: `2px solid ${theme.colors.border}`,
+              background: theme.colors.paper,
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
             {/* Traffic Lights */}
             <div
               className="flex items-center group/traffic"
-              style={{ gap: isSketch ? '8px' : 'var(--traffic-gap)' }}
+              style={{ gap: 8 }}
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => windowContext.closeWindow(windowInstance.id)}
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
+                style={{
+                  width: 14,
+                  height: 14,
+                  background: theme.colors.traffic.close,
+                  border: `1.5px solid ${theme.colors.traffic.border}`,
                   borderRadius: '50%',
-                } : {
-                  width: 'var(--traffic-size)',
-                  height: 'var(--traffic-size)',
-                  background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
                 }}
               >
-                {!isSketch && (
-                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                  </svg>
-                )}
+                <svg className={`w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity text-[${theme.colors.traffic.border}]`} viewBox="0 0 8 8" fill="none">
+                  <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
               </button>
               <button
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
+                style={{
+                  width: 14,
+                  height: 14,
+                  background: theme.colors.traffic.minimize,
+                  border: `1.5px solid ${theme.colors.traffic.border}`,
                   borderRadius: '50%',
-                } : {
-                  width: 'var(--traffic-size)',
-                  height: 'var(--traffic-size)',
-                  background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
                 }}
               >
-                {!isSketch && (
-                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                  </svg>
-                )}
+                <svg className={`w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity text-[${theme.colors.traffic.border}]`} viewBox="0 0 8 8" fill="none">
+                  <path d="M1 4H7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
               </button>
               <button
                 onClick={() => windowContext.maximizeWindow(windowInstance.id)}
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
+                style={{
+                  width: 14,
+                  height: 14,
+                  background: theme.colors.traffic.maximize,
+                  border: `1.5px solid ${theme.colors.traffic.border}`,
                   borderRadius: '50%',
-                } : {
-                  width: 'var(--traffic-size)',
-                  height: 'var(--traffic-size)',
-                  background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
                 }}
               >
-                {!isSketch && (
-                  <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                  </svg>
-                )}
+                <svg className={`w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity text-[${theme.colors.traffic.border}]`} viewBox="0 0 8 8" fill="none">
+                  <path d="M1 2.5L4 5.5L7 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                </svg>
               </button>
             </div>
 
