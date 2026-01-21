@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
-import { useThemeSafe } from '@/contexts/ThemeContext';
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { EditableText, EditableImage } from '@/components/editing/Editable';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
@@ -20,8 +20,7 @@ interface EditableInfoWindowProps {
 
 export function EditableInfoWindow({ item, onClose, position }: EditableInfoWindowProps) {
   const context = useEditContextSafe();
-  const themeContext = useThemeSafe();
-  const isSketch = themeContext?.theme === 'sketch';
+  const theme = useWidgetTheme();
   const windowRef = useRef<HTMLDivElement>(null);
   const constraintsRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
@@ -211,7 +210,7 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
             {/* Window - Uses CSS variables for theming */}
             <motion.div
               ref={windowRef}
-              className="max-w-[92vw] overflow-hidden flex flex-col glass-elevated pointer-events-auto"
+              className="max-w-[92vw] overflow-hidden flex flex-col pointer-events-auto"
               drag
               dragControls={dragControls}
               dragListener={false}
@@ -221,12 +220,12 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
               style={{
                 width: item.windowWidth || 440,
                 maxHeight: 'calc(100vh - 120px)',
-                borderRadius: isSketch ? '12px' : 'var(--radius-window)',
-                background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated)',
-                backdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
-                WebkitBackdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
-                boxShadow: isSketch ? '6px 6px 0 #4A6CF7' : 'var(--shadow-window)',
-                border: isSketch ? '1.5px solid #4A6CF7' : 'var(--border-width) solid var(--border-glass-outer)',
+                borderRadius: theme.radii.window,
+                background: theme.colors.background,
+                backdropFilter: theme.colors.blur,
+                WebkitBackdropFilter: theme.colors.blur,
+                boxShadow: theme.shadows.window.inactive,
+                border: theme.colors.border,
               }}
               initial={{ opacity: 0, scale: 0.88, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -243,77 +242,47 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 className="flex items-center px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
                 style={{
                   height: 'var(--window-header-height)',
-                  borderBottom: isSketch ? '1.5px solid #4A6CF7' : 'var(--border-width) solid var(--border-light)',
-                  background: isSketch ? '#FFFFFF' : 'linear-gradient(180deg, var(--border-glass-inner) 0%, transparent 100%)',
+                  borderBottom: `2px solid ${theme.colors.border}`,
+                  background: theme.colors.paper,
                 }}
                 onPointerDown={startDrag}
               >
                 {/* Traffic Lights - Uses CSS variables for size and gap */}
-                <div className="flex items-center group/traffic" style={{ gap: isSketch ? '8px' : 'var(--traffic-gap)' }} onPointerDown={(e) => e.stopPropagation()}>
+                <div className="flex items-center group/traffic" style={{ gap: 'var(--traffic-gap)' }} onPointerDown={(e) => e.stopPropagation()}>
                   <button
                     onClick={onClose}
-                    className="rounded-full flex items-center justify-center transition-all duration-150"
-                    style={isSketch ? {
-                      width: 10,
-                      height: 10,
-                      background: '#4A6CF7',
-                      border: 'none',
-                      borderRadius: '50%',
-                    } : {
-                      width: 'var(--traffic-size)',
-                      height: 'var(--traffic-size)',
-                      background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
-                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    className="w-4 h-4 rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
+                    style={{
+                      background: theme.colors.traffic.close,
+                      border: `1.5px solid ${theme.colors.traffic.border}`,
                     }}
                   >
-                    {!isSketch && (
-                      <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                        <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                      </svg>
-                    )}
+                    <svg className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none" style={{ color: theme.colors.traffic.border }}>
+                      <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                    </svg>
                   </button>
-                  <div
-                    className="rounded-full flex items-center justify-center"
-                    style={isSketch ? {
-                      width: 10,
-                      height: 10,
-                      background: '#4A6CF7',
-                      border: 'none',
-                      borderRadius: '50%',
-                    } : {
-                      width: 'var(--traffic-size)',
-                      height: 'var(--traffic-size)',
-                      background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
-                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  <button
+                    className="w-4 h-4 rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 pointer-events-none"
+                    style={{
+                      background: theme.colors.traffic.minimize,
+                      border: `1.5px solid ${theme.colors.traffic.border}`,
                     }}
                   >
-                    {!isSketch && (
-                      <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                        <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                      </svg>
-                    )}
-                  </div>
-                  <div
-                    className="rounded-full flex items-center justify-center"
-                    style={isSketch ? {
-                      width: 10,
-                      height: 10,
-                      background: '#4A6CF7',
-                      border: 'none',
-                      borderRadius: '50%',
-                    } : {
-                      width: 'var(--traffic-size)',
-                      height: 'var(--traffic-size)',
-                      background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
-                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                    <svg className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none" style={{ color: theme.colors.traffic.border }}>
+                      <path d="M1 4H7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                  <button
+                    className="w-4 h-4 rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 pointer-events-none"
+                    style={{
+                      background: theme.colors.traffic.maximize,
+                      border: `1.5px solid ${theme.colors.traffic.border}`,
                     }}
                   >
-                    {!isSketch && (
-                      <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150" viewBox="0 0 8 8" fill="none">
-                        <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                      </svg>
-                    )}
-                  </div>
+                    <svg className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none" style={{ color: theme.colors.traffic.border }}>
+                      <rect x="1" y="2.5" width="4" height="4" stroke="currentColor" strokeWidth="1" fill="none" transform="rotate(45 4 4)" />
+                    </svg>
+                  </button>
                 </div>
 
                 {/* Title */}
