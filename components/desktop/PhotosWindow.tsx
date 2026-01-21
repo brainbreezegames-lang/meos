@@ -268,6 +268,45 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         favoriteColor: '#EA580C',
       };
 
+    case 'brand-appart':
+      return {
+        windowBg: '#fbf9ef',
+        windowShadow: '4px 4px 0 rgba(23, 20, 18, 0.1), 0 0 0 1px #171412',
+        windowShadowInactive: '3px 3px 0 rgba(23, 20, 18, 0.08)',
+
+        titleBarBg: '#fbf9ef',
+        titleBarBorder: '#171412',
+        titleText: '#171412',
+        badgeBg: 'rgba(23, 20, 18, 0.08)',
+        badgeText: '#8e827c',
+
+        toolbarBg: '#fbf9ef',
+        toolbarBorder: 'rgba(23, 20, 18, 0.15)',
+        toolbarText: '#8e827c',
+        toolbarHoverBg: 'rgba(23, 20, 18, 0.06)',
+        toolbarActiveBg: '#ff7722',
+        toolbarActiveText: '#FFFFFF',
+
+        contentBg: '#fbf9ef',
+        photoCardBg: '#FFFFFF',
+        photoCardShadow: '2px 2px 0 rgba(23, 20, 18, 0.08)',
+        photoCardHoverShadow: '4px 4px 0 rgba(23, 20, 18, 0.12)',
+        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(23, 20, 18, 0.6) 100%)',
+
+        emptyBg: 'rgba(23, 20, 18, 0.04)',
+        emptyIcon: '#8e827c',
+        emptyTitle: '#171412',
+        emptyText: '#8e827c',
+
+        lightboxBg: 'rgba(251, 249, 239, 0.98)',
+        lightboxText: '#171412',
+        lightboxButtonBg: 'rgba(23, 20, 18, 0.08)',
+        lightboxButtonHoverBg: 'rgba(23, 20, 18, 0.15)',
+
+        accent: '#ff7722',
+        favoriteColor: '#ff7722',
+      };
+
     case 'monterey':
     default:
       return {
@@ -324,6 +363,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
   const isSketch = themeContext?.theme === 'sketch';
+  const isBrandAppart = themeContext?.theme === 'brand-appart';
 
   const colors = useMemo(() => getThemeColors(themeContext?.theme), [themeContext?.theme]);
 
@@ -482,6 +522,12 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                     border: 'none',
                     borderRadius: '50%',
                     marginRight: 4,
+                  } : isBrandAppart ? {
+                    width: 12,
+                    height: 12,
+                    background: '#ff5f57',
+                    border: '1px solid #171412',
+                    borderRadius: '50%',
                   } : {
                     width: 12,
                     height: 12,
@@ -509,6 +555,12 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                     border: 'none',
                     borderRadius: '50%',
                     marginRight: 4,
+                  } : isBrandAppart ? {
+                    width: 12,
+                    height: 12,
+                    background: '#f59e0b',
+                    border: '1px solid #171412',
+                    borderRadius: '50%',
                   } : {
                     width: 12,
                     height: 12,
@@ -534,6 +586,12 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                     height: 10,
                     background: '#4A6CF7',
                     border: 'none',
+                    borderRadius: '50%',
+                  } : isBrandAppart ? {
+                    width: 12,
+                    height: 12,
+                    background: '#10b981',
+                    border: '1px solid #171412',
                     borderRadius: '50%',
                   } : {
                     width: 12,
