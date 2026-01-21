@@ -57,17 +57,87 @@ import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType } from '@/types';
 
+// ============================================
+// PLAYFUL LOADING MESSAGES
+// ============================================
+const LOADING_MESSAGES = [
+    { text: "Warming up the pixels...", emoji: "✨" },
+    { text: "Feeding the code hamsters...", emoji: "🐹" },
+    { text: "Convincing electrons to cooperate...", emoji: "⚡" },
+    { text: "Polishing the interface...", emoji: "💅" },
+    { text: "Brewing some fresh code...", emoji: "☕" },
+    { text: "Teaching bits to dance...", emoji: "💃" },
+    { text: "Waking up the servers...", emoji: "😴" },
+    { text: "Untangling the spaghetti code...", emoji: "🍝" },
+    { text: "Asking AI for directions...", emoji: "🤖" },
+    { text: "Summoning the editor spirits...", emoji: "👻" },
+    { text: "Almost there, pinky promise...", emoji: "🤙" },
+    { text: "Loading awesomeness...", emoji: "🚀" },
+];
+
+function PlayfulLoader() {
+    const [messageIndex, setMessageIndex] = useState(0);
+    const [dots, setDots] = useState('');
+
+    useEffect(() => {
+        // Rotate messages every 2 seconds
+        const messageInterval = setInterval(() => {
+            setMessageIndex(prev => (prev + 1) % LOADING_MESSAGES.length);
+        }, 2000);
+
+        // Animate dots every 400ms
+        const dotInterval = setInterval(() => {
+            setDots(prev => prev.length >= 3 ? '' : prev + '.');
+        }, 400);
+
+        return () => {
+            clearInterval(messageInterval);
+            clearInterval(dotInterval);
+        };
+    }, []);
+
+    const message = LOADING_MESSAGES[messageIndex];
+
+    return (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-[#fbf9ef] p-6 rounded-xl border-2 border-[#1a1a1a] shadow-[6px_6px_0_rgba(0,0,0,0.1)]"
+            >
+                <div className="flex items-center gap-3">
+                    <motion.span
+                        key={messageIndex}
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        className="text-2xl"
+                    >
+                        {message.emoji}
+                    </motion.span>
+                    <div>
+                        <motion.div
+                            key={message.text}
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-sm font-medium text-[#1a1a1a]"
+                        >
+                            {message.text}
+                        </motion.div>
+                        <div className="text-xs text-[#6b6b6b] mt-1 font-mono w-8">
+                            {dots || '\u00A0'}
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+        </div>
+    );
+}
+
 // Lazy load heavy editor component (includes TipTap + all extensions)
 const GoOSEditorWindow = dynamic(
     () => import('@/components/goos-editor/GoOSEditorWindow').then(mod => ({ default: mod.GoOSEditorWindow })),
     {
-        loading: () => (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/20 z-50">
-                <div className="bg-[#FAF8F0] p-6 rounded-lg border-2 border-[#1a1a1a] shadow-[6px_6px_0_rgba(0,0,0,0.1)]">
-                    <div className="animate-pulse text-sm font-medium text-[#1a1a1a]">Loading editor...</div>
-                </div>
-            </div>
-        ),
+        loading: () => <PlayfulLoader />,
         ssr: false
     }
 );
@@ -1092,7 +1162,7 @@ const DockIcon = React.memo(({
 DockIcon.displayName = 'DockIcon';
 
 // ============================================
-// SKETCH WINDOW
+// SKETCH WINDOW WITH MICRO-ANIMATIONS
 // ============================================
 interface SketchWindowProps {
     id: string;
@@ -1109,7 +1179,64 @@ interface SketchWindowProps {
     children: React.ReactNode;
 }
 
+// Traffic light button with hover icon reveal
+const TrafficLightButton = ({
+    color,
+    hoverColor,
+    icon,
+    onClick,
+    title,
+}: {
+    color: string;
+    hoverColor: string;
+    icon: string;
+    onClick?: (e: React.MouseEvent) => void;
+    title: string;
+}) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
+        <motion.button
+            onClick={onClick}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            title={title}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+            className="w-3 h-3 rounded-full flex items-center justify-center"
+            style={{
+                background: isHovered ? hoverColor : color,
+                transition: 'background 0.15s ease',
+            }}
+        >
+            <motion.span
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0 }}
+                style={{
+                    fontSize: 8,
+                    lineHeight: 1,
+                    color: 'rgba(0,0,0,0.5)',
+                }}
+            >
+                {icon}
+            </motion.span>
+        </motion.button>
+    );
+};
+
 function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, height, onClose, onFocus, children }: SketchWindowProps) {
+    const [isClosing, setIsClosing] = useState(false);
+
+    const handleClose = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsClosing(true);
+        // Wait for animation to complete before actually closing
+        setTimeout(() => {
+            onClose();
+            setIsClosing(false);
+        }, 200);
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -1117,9 +1244,15 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
             drag
             dragMomentum={false}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={goOS.springs.gentle}
+            animate={isClosing
+                ? { opacity: 0, scale: 0.8, y: -10, rotate: -2 }
+                : { opacity: 1, scale: 1, y: 0, rotate: 0 }
+            }
+            exit={{ opacity: 0, scale: 0.8, y: -10 }}
+            transition={isClosing
+                ? { duration: 0.2, ease: [0.4, 0, 1, 1] }
+                : goOS.springs.gentle
+            }
             onMouseDown={onFocus}
             className="fixed flex flex-col rounded-xl overflow-hidden"
             style={{
@@ -1134,22 +1267,28 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
             }}
         >
             <div
-                className="h-10 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0"
+                className="h-10 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0 group"
                 style={{ background: goOS.colors.cream, borderBottom: `1px solid rgba(0,0,0,0.06)` }}
             >
                 <div className="flex items-center gap-2">
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onClose(); }}
-                        className="w-3 h-3 rounded-full transition-all hover:scale-110"
-                        style={{ background: '#ff5f57' }}
+                    <TrafficLightButton
+                        color="#ff5f57"
+                        hoverColor="#ff3b30"
+                        icon="×"
+                        onClick={handleClose}
+                        title="Close"
                     />
-                    <button
-                        className="w-3 h-3 rounded-full transition-all hover:scale-110"
-                        style={{ background: '#febc2e' }}
+                    <TrafficLightButton
+                        color="#febc2e"
+                        hoverColor="#ffcc00"
+                        icon="−"
+                        title="Minimize"
                     />
-                    <button
-                        className="w-3 h-3 rounded-full transition-all hover:scale-110"
-                        style={{ background: '#28c840' }}
+                    <TrafficLightButton
+                        color="#28c840"
+                        hoverColor="#34c759"
+                        icon="+"
+                        title="Maximize"
                     />
                 </div>
                 <div className="flex items-center gap-2 pointer-events-none">
