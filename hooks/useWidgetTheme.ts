@@ -54,6 +54,8 @@ export const useWidgetTheme = (): WidgetTheme => {
     const sketchTheme: WidgetTheme = {
         colors: {
             paper: '#FFFFFF',
+            background: '#FFFFFF',
+            blur: 'none',
             border: '#2B4AE2',
             text: {
                 primary: '#2B4AE2',
@@ -120,6 +122,8 @@ export const useWidgetTheme = (): WidgetTheme => {
     const brandAppartTheme: WidgetTheme = {
         colors: {
             paper: '#fbf9ef', // Brand cream
+            background: '#fbf9ef',
+            blur: 'none',
             border: '#171412', // Brand base (dark)
             text: {
                 primary: '#171412',
@@ -191,6 +195,8 @@ export const useWidgetTheme = (): WidgetTheme => {
     const standardTheme: WidgetTheme = {
         colors: {
             paper: 'var(--bg-elevated)',
+            background: 'var(--bg-glass-elevated)',
+            blur: 'var(--blur-glass)',
             border: 'var(--border-medium)',
             text: {
                 primary: 'var(--text-primary)',
