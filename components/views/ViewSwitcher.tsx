@@ -4,19 +4,19 @@ import React from 'react';
 import { Monitor, FileText } from 'lucide-react';
 import type { ViewMode } from '@/types';
 
-// goOS Design Tokens - Brand Appart Warm Cream
+// goOS Design Tokens - Brand Appart (aligned with useWidgetTheme)
 const goOS = {
   colors: {
-    paper: '#ffffff',
-    border: '#1a1a1a',
+    paper: '#fbf9ef',       // Brand cream
+    border: '#171412',      // Brand base dark - matches useWidgetTheme
     text: {
-      primary: '#1a1a1a',
-      secondary: '#6b6b6b',
+      primary: '#171412',   // Brand base
+      secondary: '#8e827c', // Brand grey
     },
-    accent: '#ff7722',
+    accent: '#ff7722',      // Brand orange
   },
   shadows: {
-    solid: '0 2px 8px rgba(0,0,0,0.08)',
+    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)', // Brand Appart offset shadow
   },
   fonts: {
     heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
