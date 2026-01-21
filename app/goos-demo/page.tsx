@@ -1064,6 +1064,72 @@ const RubberDuck = React.memo(({ onClick }: { onClick?: () => void }) => {
 RubberDuck.displayName = 'RubberDuck';
 
 // ============================================
+// TYPEWRITER TEXT - Playful text reveal
+// ============================================
+const TypewriterText = React.memo(({
+    text,
+    className,
+    style,
+}: {
+    text: string;
+    className?: string;
+    style?: React.CSSProperties;
+}) => {
+    const [displayedText, setDisplayedText] = useState('');
+    const [isComplete, setIsComplete] = useState(false);
+
+    useEffect(() => {
+        if (!text) {
+            setDisplayedText('');
+            setIsComplete(true);
+            return;
+        }
+
+        setDisplayedText('');
+        setIsComplete(false);
+        let currentIndex = 0;
+
+        // Type each character with natural timing variation
+        const typeNextChar = () => {
+            if (currentIndex < text.length) {
+                setDisplayedText(text.slice(0, currentIndex + 1));
+                currentIndex++;
+                // Vary timing: faster for spaces, slight pause on punctuation
+                const char = text[currentIndex - 1];
+                let delay = 40 + Math.random() * 20; // Base 40-60ms
+                if (char === ' ') delay = 20;
+                if ('.!?'.includes(char)) delay = 150;
+                if (',;:'.includes(char)) delay = 80;
+                setTimeout(typeNextChar, delay);
+            } else {
+                setIsComplete(true);
+            }
+        };
+
+        // Small initial delay before starting
+        const startTimeout = setTimeout(typeNextChar, 200);
+        return () => clearTimeout(startTimeout);
+    }, [text]);
+
+    return (
+        <span className={className} style={style}>
+            {displayedText}
+            {!isComplete && (
+                <motion.span
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
+                    style={{ marginLeft: 1 }}
+                >
+                    |
+                </motion.span>
+            )}
+        </span>
+    );
+});
+
+TypewriterText.displayName = 'TypewriterText';
+
+// ============================================
 // DOCK ICON - Enhanced with bounce and tooltip
 // ============================================
 const DockIcon = React.memo(({
@@ -2571,7 +2637,7 @@ function GoOSDemoContent() {
                         currentView={viewMode}
                         onViewChange={setViewMode}
                     />
-                    <span className="text-xs hidden sm:block">{greeting}</span>
+                    <TypewriterText text={greeting} className="text-xs hidden sm:block" />
                     <div className="flex items-center gap-1.5">
                         <Battery size={14} strokeWidth={2} />
                         <span className="text-xs font-medium">87%</span>
@@ -2599,27 +2665,51 @@ function GoOSDemoContent() {
 
                 if (!firstFile) {
                     return (
-                        <div className="fixed inset-0 z-[9000] flex items-center justify-center" style={{ background: '#fbf9ef' }}>
-                            <p style={{ color: '#6b6b6b' }}>No published content yet</p>
-                            <button
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="fixed inset-0 z-[9000] flex flex-col items-center justify-center gap-6"
+                            style={{ background: '#fbf9ef' }}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: 0.1, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                                className="text-center"
+                            >
+                                <motion.span
+                                    className="text-6xl block mb-4"
+                                    animate={{ y: [0, -5, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                >
+                                    📝
+                                </motion.span>
+                                <p className="text-lg font-medium mb-2" style={{ color: '#1a1a1a' }}>No published content yet</p>
+                                <p className="text-sm" style={{ color: '#6b6b6b' }}>Switch to Desktop to create and publish your first piece</p>
+                            </motion.div>
+                            <motion.button
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2, duration: 0.3 }}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => setViewMode('desktop')}
                                 style={{
-                                    position: 'fixed',
-                                    top: '24px',
-                                    right: '24px',
-                                    padding: '8px 16px',
+                                    padding: '12px 24px',
                                     background: '#1a1a1a',
                                     color: '#ffffff',
                                     border: 'none',
-                                    borderRadius: '8px',
-                                    fontSize: '13px',
+                                    borderRadius: '10px',
+                                    fontSize: '14px',
                                     fontWeight: 600,
                                     cursor: 'pointer',
                                 }}
                             >
                                 ← Back to Desktop
-                            </button>
-                        </div>
+                            </motion.button>
+                        </motion.div>
                     );
                 }
 
