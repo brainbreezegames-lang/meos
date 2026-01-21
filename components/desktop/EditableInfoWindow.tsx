@@ -220,12 +220,12 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
               style={{
                 width: item.windowWidth || 440,
                 maxHeight: 'calc(100vh - 120px)',
-                borderRadius: theme.radii.window,
+                borderRadius: theme.radii.card,
                 background: theme.colors.background,
                 backdropFilter: theme.colors.blur,
                 WebkitBackdropFilter: theme.colors.blur,
-                boxShadow: theme.shadows.window.inactive,
-                border: theme.colors.border,
+                boxShadow: theme.shadows.solid,
+                border: `1px solid ${theme.colors.border}`,
               }}
               initial={{ opacity: 0, scale: 0.88, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
