@@ -21,6 +21,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
   const windowContext = useWindowContext();
   const { theme } = useThemeSafe() || {};
   const isSketch = theme === 'sketch';
+  const isBrandAppart = theme === 'brand-appart';
   const windowRef = useRef<HTMLDivElement>(null);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [showBlockPicker, setShowBlockPicker] = useState(false);
@@ -119,16 +120,20 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isSketch ? '0px' : (isMaximized ? 'var(--radius-lg)' : 'var(--radius-window)'),
-            background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated)',
-            backdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
-            WebkitBackdropFilter: isSketch ? 'none' : 'var(--blur-glass)',
+            borderRadius: isSketch ? '0px' : (isMaximized ? 'var(--radius-lg)' : (isBrandAppart ? '16px' : 'var(--radius-window)')),
+            background: isSketch || isBrandAppart ? '#FFFFFF' : 'var(--bg-glass-elevated)',
+            backdropFilter: (isSketch || isBrandAppart) ? 'none' : 'var(--blur-glass)',
+            WebkitBackdropFilter: (isSketch || isBrandAppart) ? 'none' : 'var(--blur-glass)',
             boxShadow: isSketch
               ? '6px 6px 0 #2B4AE2'
-              : (isActive
-                ? '0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 12px 40px -8px rgba(0, 0, 0, 0.35)'
-                : 'var(--shadow-lg)'),
-            border: isSketch ? '2px solid #2B4AE2' : 'var(--border-width) solid var(--border-glass-outer)',
+              : (isBrandAppart
+                ? '8px 8px 0 rgba(0,0,0,0.10)'
+                : (isActive
+                  ? '0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 12px 40px -8px rgba(0, 0, 0, 0.35)'
+                  : 'var(--shadow-lg)')),
+            border: isSketch
+              ? '2px solid #2B4AE2'
+              : (isBrandAppart ? '2px solid #1a1a1a' : 'var(--border-width) solid var(--border-glass-outer)'),
             opacity: isActive ? 1 : 0.95,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
@@ -140,8 +145,10 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
           <div
             className="flex items-end shrink-0 select-none"
             style={{
-              background: isSketch ? '#FFFFFF' : 'var(--bg-elevated)',
-              borderBottom: isSketch ? '2px solid #2B4AE2' : 'var(--border-width) solid var(--border-light)',
+              background: isSketch || isBrandAppart ? '#FFFFFF' : 'var(--bg-elevated)',
+              borderBottom: isSketch
+                ? '2px solid #2B4AE2'
+                : (isBrandAppart ? '2px solid #1a1a1a' : 'var(--border-width) solid var(--border-light)'),
             }}
           >
             {/* Traffic Lights */}
@@ -154,7 +161,13 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                 onClick={() => windowContext.closeWindow(windowInstance.id)}
                 aria-label="Close window"
                 className={isSketch ? "rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
-                style={isSketch ? {
+                style={isBrandAppart ? {
+                  width: '12px',
+                  height: '12px',
+                  background: '#ff5f57',
+                  border: '2px solid #1a1a1a',
+                  borderRadius: '50%'
+                } : (isSketch ? {
                   width: 10,
                   height: 10,
                   background: '#4A6CF7',
@@ -166,9 +179,9 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                   height: 'var(--traffic-size)',
                   background: `linear-gradient(180deg, var(--traffic-red) 0%, var(--traffic-red-hover) 100%)`,
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                }}
+                })}
               >
-                {isSketch ? null : (
+                {isSketch || isBrandAppart ? null : (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                   </svg>
@@ -178,7 +191,13 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
                 aria-label="Minimize window"
                 className={isSketch ? "rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
-                style={isSketch ? {
+                style={isBrandAppart ? {
+                  width: '12px',
+                  height: '12px',
+                  background: '#f59e0b',
+                  border: '2px solid #1a1a1a',
+                  borderRadius: '50%'
+                } : (isSketch ? {
                   width: 10,
                   height: 10,
                   background: '#4A6CF7',
@@ -190,9 +209,9 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                   height: 'var(--traffic-size)',
                   background: `linear-gradient(180deg, var(--traffic-yellow) 0%, var(--traffic-yellow-hover) 100%)`,
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                }}
+                })}
               >
-                {isSketch ? null : (
+                {isSketch || isBrandAppart ? null : (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 4H7" stroke="rgba(77, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
                   </svg>
@@ -202,7 +221,13 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                 onClick={() => windowContext.maximizeWindow(windowInstance.id)}
                 aria-label="Maximize window"
                 className={isSketch ? "rounded-full flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4AE2] focus-visible:ring-offset-1" : "rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-1"}
-                style={isSketch ? {
+                style={isBrandAppart ? {
+                  width: '12px',
+                  height: '12px',
+                  background: '#10b981',
+                  border: '2px solid #1a1a1a',
+                  borderRadius: '50%'
+                } : (isSketch ? {
                   width: 10,
                   height: 10,
                   background: '#4A6CF7',
@@ -213,9 +238,9 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                   height: 'var(--traffic-size)',
                   background: `linear-gradient(180deg, var(--traffic-green) 0%, var(--traffic-green-hover) 100%)`,
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                }}
+                })}
               >
-                {isSketch ? null : (
+                {isSketch || isBrandAppart ? null : (
                   <svg className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
                     <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                   </svg>
