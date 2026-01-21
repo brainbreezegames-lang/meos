@@ -80,7 +80,7 @@ export interface RelatedStudy {
   fileType: 'note' | 'case-study';
 }
 
-// Design tokens for the case study theme (Belle Duffner-inspired)
+// Design tokens for the case study theme (goOS design system)
 export const caseStudyTokens = {
   colors: {
     background: '#ffffff',     // Pure white
@@ -88,19 +88,17 @@ export const caseStudyTokens = {
     text: '#1a1a1a',           // Near black
     textMuted: 'rgba(0, 0, 0, 0.4)',   // 40% opacity black
     textLight: 'rgba(0, 0, 0, 0.5)',   // 50% opacity
-    accent: '#000000',         // Black for links/emphasis
+    accent: '#2B4AE2',         // goOS blue for links/emphasis
     border: 'rgba(0, 0, 0, 0.1)',      // 10% border
     borderLight: 'rgba(0, 0, 0, 0.05)', // 5% border
     hero: '#1a1410',           // Dark overlay for hero
     heroText: '#ffffff',       // White text on hero
   },
   fonts: {
-    // Editorial serif for display/headings (like Freight Display)
-    display: '"Newsreader", "Freight Display Pro", Georgia, serif',
-    // Sans-serif for body text (clean, readable)
-    body: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
-    // UI elements
-    ui: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+    // goOS design system fonts
+    display: 'var(--font-averia), "Averia Serif Libre", Georgia, serif',
+    body: 'var(--font-instrument), "Instrument Sans", system-ui, sans-serif',
+    ui: 'var(--font-instrument), "Instrument Sans", system-ui, sans-serif',
   },
   spacing: {
     sectionGap: 60,

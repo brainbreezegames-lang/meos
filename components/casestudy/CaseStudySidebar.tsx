@@ -54,21 +54,32 @@ export function CaseStudySidebar({
   authorName = 'Desktop',
 }: CaseStudySidebarProps) {
   const prefersReducedMotion = useReducedMotion();
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isPastHero, setIsPastHero] = useState(false);
   const { colors, fonts, spacing, typography } = caseStudyTokens;
 
   const sectionIds = entries.map((e) => e.id);
   const activeSection = useScrollSpy(sectionIds);
 
-  // Hide sidebar below 1024px
+  // Hide sidebar below 1024px and only show after scrolling past hero
   useEffect(() => {
-    const checkWidth = () => {
-      setIsVisible(window.innerWidth > 1024);
+    const checkVisibility = () => {
+      const isWideEnough = window.innerWidth > 1024;
+      // Hero is 75vh, show sidebar after scrolling past 60% of hero
+      const heroHeight = window.innerHeight * 0.6;
+      const scrolledPastHero = window.scrollY > heroHeight;
+
+      setIsVisible(isWideEnough);
+      setIsPastHero(scrolledPastHero);
     };
 
-    checkWidth();
-    window.addEventListener('resize', checkWidth);
-    return () => window.removeEventListener('resize', checkWidth);
+    checkVisibility();
+    window.addEventListener('resize', checkVisibility);
+    window.addEventListener('scroll', checkVisibility, { passive: true });
+    return () => {
+      window.removeEventListener('resize', checkVisibility);
+      window.removeEventListener('scroll', checkVisibility);
+    };
   }, []);
 
   const scrollToSection = useCallback(
@@ -84,13 +95,14 @@ export function CaseStudySidebar({
     [prefersReducedMotion]
   );
 
-  if (!isVisible) return null;
+  // Don't render if screen is too narrow or haven't scrolled past hero
+  if (!isVisible || !isPastHero) return null;
 
   return (
     <motion.nav
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.6 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       style={{
         position: 'fixed',
         left: spacing.sidebarLeft,

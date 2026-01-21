@@ -48,9 +48,12 @@ function ContentImage({ image }: { image: ImageData }) {
         padding: 0,
         ...(isFullWidth
           ? {
-              width: '100vw',
-              marginLeft: 'calc(-50vw + 50%)',
-              marginRight: 'calc(-50vw + 50%)',
+              // Break out of content container but don't go full viewport
+              // Stay within a reasonable max-width to avoid sidebar overlap
+              width: 'calc(100% + 120px)',
+              maxWidth: 1000,
+              marginLeft: -60,
+              marginRight: -60,
               marginTop: 48,
               marginBottom: 48,
             }
@@ -85,8 +88,6 @@ function ContentImage({ image }: { image: ImageData }) {
             fontSize: 14,
             color: caseStudyTokens.colors.textMuted,
             textAlign: 'center',
-            paddingLeft: isFullWidth ? 24 : 0,
-            paddingRight: isFullWidth ? 24 : 0,
           }}
         >
           {image.caption}
@@ -106,10 +107,11 @@ function ContentImageGrid({ images }: { images: ImageData[] }) {
         display: 'grid',
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
         gap: 16,
-        width: '100vw',
-        marginLeft: 'calc(-50vw + 50%)',
-        marginRight: 'calc(-50vw + 50%)',
-        padding: '0 48px',
+        // Break out of content container but stay within bounds
+        width: 'calc(100% + 120px)',
+        maxWidth: 1000,
+        marginLeft: -60,
+        marginRight: -60,
         marginTop: 48,
         marginBottom: 48,
       }}
