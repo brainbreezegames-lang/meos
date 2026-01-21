@@ -4,10 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import type { StatusWidget as StatusWidgetType, StatusType } from '@/types';
-
-interface StatusWidgetProps {
-  statusWidget: StatusWidgetType | null;
-  isOwner?: boolean;
+import { useThemeSafe } from '@/contexts/ThemeContext';
 
 interface StatusWidgetProps {
   statusWidget: StatusWidgetType | null;
