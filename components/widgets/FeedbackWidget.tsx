@@ -5,20 +5,22 @@ import { MessageSquare, Send, X, Check } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
-// goOS Design Tokens - Mediterranean Blue
+// goOS Design Tokens - Brand Appart (aligned with useWidgetTheme)
 const goOS = {
   colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
+    paper: '#fbf9ef',       // Brand cream
+    border: '#171412',      // Brand base dark
     text: {
-      primary: '#2B4AE2',
-      secondary: '#2B4AE2',
-      muted: '#6B7FE8',
+      primary: '#171412',   // Brand base
+      secondary: '#8e827c', // Brand grey
+      muted: '#8e827c',
     },
-    success: '#22C55E',
+    accent: '#ff7722',      // Brand orange
+    success: '#3d2fa9',     // Brand purple
   },
   shadows: {
-    solid: '4px 4px 0 #2B4AE2',
+    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',
+    hover: '6px 6px 0 rgba(23, 20, 18, 0.15)',
   },
   fonts: {
     heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
@@ -98,7 +100,7 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
+            e.currentTarget.style.boxShadow = goOS.shadows.hover;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translate(0, 0)';

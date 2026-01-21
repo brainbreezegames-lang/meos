@@ -173,6 +173,27 @@ function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
         buttonBg: '#FFFFFF',
         imageShadow: '4px 4px 0 #4A6CF7',
       };
+    case 'brand-appart':
+      return {
+        windowBg: '#fbf9ef',
+        windowShadow: '4px 4px 0 rgba(23, 20, 18, 0.1)',
+        windowBorder: '1px solid #171412',
+        headerBg: '#fbf9ef',
+        headerBorder: '1px solid #171412',
+        titleColor: '#171412',
+        subtitleColor: '#8e827c',
+        textPrimary: '#171412',
+        textSecondary: '#8e827c',
+        textTertiary: '#8e827c',
+        borderLight: 'rgba(23, 20, 18, 0.1)',
+        borderMedium: '#171412',
+        tabActiveBg: '#FFFFFF',
+        tabActiveColor: '#171412',
+        tabInactiveColor: '#8e827c',
+        accentColor: '#ff7722',
+        buttonBg: '#FFFFFF',
+        imageShadow: '4px 4px 0 rgba(23, 20, 18, 0.1)',
+      };
     case 'monterey':
     default:
       return {

@@ -5,21 +5,21 @@ import { ChevronLeft, ChevronRight, X, Play, Pause, Maximize2, Minimize2 } from 
 import type { DesktopItem, GoOSFileType } from '@/types';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS } from '@/lib/goos/fileTypeMapping';
 
-// goOS Design Tokens - Mediterranean Blue
+// Brand Appart design tokens (aligned with useWidgetTheme)
 const goOS = {
   colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
-    background: '#0B0F1A',
+    paper: '#fbf9ef',         // Brand cream
+    border: '#171412',        // Brand base dark
+    background: '#171412',    // Dark presentation background
     text: {
       primary: '#FFFFFF',
       secondary: 'rgba(255, 255, 255, 0.7)',
       muted: 'rgba(255, 255, 255, 0.5)',
     },
-    accent: '#2B4AE2',
+    accent: '#ff7722',        // Brand orange
   },
   shadows: {
-    solid: '4px 4px 0 #2B4AE2',
+    solid: '4px 4px 0 rgba(23, 20, 18, 0.2)',
   },
   fonts: {
     heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',

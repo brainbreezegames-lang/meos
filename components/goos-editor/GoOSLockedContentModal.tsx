@@ -4,25 +4,25 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Mail, X, FileText, Folder, BarChart3 } from 'lucide-react';
 
-// Design tokens - Mediterranean Blue (Blue is the new black)
+// Brand Appart design tokens (aligned with useWidgetTheme)
 const goOS = {
   colors: {
-    paper: '#FAF7F2',
-    cream: '#FEFEFE',
-    headerBg: '#E8ECFB',
-    border: '#2B4AE2',
+    paper: '#fbf9ef',       // Brand cream
+    cream: '#fbf9ef',
+    headerBg: '#f2f0e7',
+    border: '#171412',      // Brand base dark
     text: {
-      primary: '#1E3494',
-      secondary: '#2B4AE2',
-      muted: '#5B73E8',
+      primary: '#171412',   // Brand base
+      secondary: '#8e827c', // Brand grey
+      muted: '#8e827c',
     },
     accent: {
-      primary: '#2B4AE2',
-      light: '#5B73E8',
+      primary: '#ff7722',   // Brand orange
+      light: '#ff9955',
     },
   },
   shadows: {
-    solid: '4px 4px 16px rgba(43, 74, 226, 0.15)',
+    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',
   },
 };
 

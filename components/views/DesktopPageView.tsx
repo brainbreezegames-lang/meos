@@ -6,22 +6,22 @@ import { ArrowLeft, Calendar, Clock, FileText, Presentation, Lock, Mail, DollarS
 import { generateSlug } from '@/lib/utils';
 import type { ThemeId } from '@/contexts/ThemeContext';
 
-// goOS Design Tokens - Mediterranean Blue
+// Brand Appart design tokens (aligned with useWidgetTheme)
 const goOS = {
   colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
-    background: '#F8F9FE',
+    paper: '#fbf9ef',         // Brand cream
+    border: '#171412',        // Brand base dark
+    background: '#fbf9ef',    // Brand cream
     text: {
-      primary: '#1a1a2e',
-      secondary: '#4a4a6a',
-      muted: '#8a8aaa',
-      accent: '#2B4AE2',
+      primary: '#171412',     // Brand base
+      secondary: '#8e827c',   // Brand grey
+      muted: '#8e827c',
+      accent: '#ff7722',      // Brand orange
     },
   },
   shadows: {
-    solid: '4px 4px 0 #2B4AE2',
-    hover: '6px 6px 0 #2B4AE2',
+    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',
+    hover: '6px 6px 0 rgba(23, 20, 18, 0.15)',
   },
   fonts: {
     heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',

@@ -104,7 +104,7 @@ function PlayfulLoader() {
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-[#fbf9ef] p-6 rounded-xl border-2 border-[#1a1a1a] shadow-[6px_6px_0_rgba(0,0,0,0.1)]"
+                className="bg-[#fbf9ef] p-6 rounded-xl border-2 border-[#171412] shadow-[6px_6px_0_rgba(23,20,18,0.1)]"
             >
                 <div className="flex items-center gap-3">
                     <motion.span
@@ -120,11 +120,11 @@ function PlayfulLoader() {
                             key={message.text}
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-sm font-medium text-[#1a1a1a]"
+                            className="text-sm font-medium text-[#171412]"
                         >
                             {message.text}
                         </motion.div>
-                        <div className="text-xs text-[#6b6b6b] mt-1 font-mono w-8">
+                        <div className="text-xs text-[#8e827c] mt-1 font-mono w-8">
                             {dots || '\u00A0'}
                         </div>
                     </div>

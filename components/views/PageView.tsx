@@ -4,19 +4,22 @@ import React, { useMemo } from 'react';
 import type { DesktopItem, GoOSFileType } from '@/types';
 import { FILE_TYPE_ICONS, FILE_TYPE_LABELS } from '@/lib/goos/fileTypeMapping';
 
-// Clean, distraction-free design tokens
+// Brand Appart design tokens (aligned with useWidgetTheme)
 const pageStyles = {
   colors: {
-    background: '#FAFAFA',
-    paper: '#FFFFFF',
+    background: '#fbf9ef',    // Brand cream
+    paper: '#fbf9ef',
     text: {
-      primary: '#1a1a1a',
-      secondary: '#666666',
-      muted: '#999999',
+      primary: '#171412',     // Brand base
+      secondary: '#8e827c',   // Brand grey
+      muted: '#8e827c',
     },
-    accent: '#2B4AE2',
-    border: '#E5E5E5',
-    divider: '#EEEEEE',
+    accent: '#ff7722',        // Brand orange
+    border: '#171412',
+    divider: 'rgba(23, 20, 18, 0.1)',
+  },
+  shadows: {
+    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',
   },
   fonts: {
     heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',

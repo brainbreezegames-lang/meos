@@ -18,17 +18,18 @@ import type { ThemeId } from '@/contexts/ThemeContext';
  * - "More Case Studies" section at bottom
  */
 
-// Design tokens
+// Brand Appart design tokens (aligned with useWidgetTheme)
 const tokens = {
   colors: {
-    background: '#FFFFFF',
+    background: '#fbf9ef',    // Brand cream
     text: {
-      primary: '#1A1A1A',
-      secondary: '#4A4A4A',
-      muted: 'rgba(26, 26, 26, 0.4)',
+      primary: '#171412',     // Brand base
+      secondary: '#8e827c',   // Brand grey
+      muted: 'rgba(23, 20, 18, 0.4)',
     },
-    border: 'rgba(26, 26, 26, 0.1)',
-    overlay: 'rgba(0, 0, 0, 0.3)',
+    border: 'rgba(23, 20, 18, 0.1)',
+    overlay: 'rgba(23, 20, 18, 0.3)',
+    accent: '#ff7722',        // Brand orange
   },
   fonts: {
     display: '"Playfair Display", Georgia, "Times New Roman", serif',
