@@ -54,10 +54,12 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         height: 'min(400px, 70vh)',
         minWidth: 320,
         minHeight: 280,
-        background: themeColors.bg,
-        border: `2px solid ${themeColors.border}`,
-        borderRadius: isBrandAppart ? 16 : 8,
-        boxShadow: isBrandAppart ? '8px 8px 0 rgba(0,0,0,0.1)' : `6px 6px 0 ${themeColors.border}`,
+        background: theme.colors.paper,
+        border: `2px solid ${theme.colors.border}`,
+        borderRadius: isBrandAppart ? theme.radii.card : theme.radii.card, // Actually radius depends on theme.radii.card
+        // Wait, theme.radii.card is defined per theme. So just theme.radii.card.
+        borderRadius: theme.radii.card,
+        boxShadow: theme.shadows.solid,
         zIndex,
         display: 'flex',
         flexDirection: 'column',
@@ -71,8 +73,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           display: 'flex',
           alignItems: 'center',
           padding: '10px 12px',
-          background: isBrandAppart ? '#fbf9ef' : '#FFFFFF',
-          borderBottom: `2px solid ${themeColors.border}`,
+          background: theme.colors.paper,
+          borderBottom: `2px solid ${theme.colors.border}`,
           gap: 12,
           cursor: 'grab',
         }}
@@ -86,8 +88,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: isBrandAppart ? '#ff5f57' : '#FFFFFF',
-              border: `1.5px solid ${themeColors.border}`,
+              background: theme.colors.traffic.close,
+              border: `1.5px solid ${theme.colors.traffic.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -96,9 +98,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             }}
             title="Close"
             aria-label="Close window"
-            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
+            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
           >
-            {isBrandAppart ? null : <X size={8} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
+            <X size={8} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
           </button>
           <button
             type="button"
@@ -106,8 +108,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: isBrandAppart ? '#f59e0b' : '#FFFFFF',
-              border: `1.5px solid ${themeColors.border}`,
+              background: theme.colors.traffic.minimize,
+              border: `1.5px solid ${theme.colors.traffic.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -116,9 +118,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             }}
             title="Minimize"
             aria-label="Minimize window"
-            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
+            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
           >
-            {isBrandAppart ? null : <Minus size={8} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
+            <Minus size={8} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
           </button>
           <button
             type="button"
@@ -126,8 +128,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: isBrandAppart ? '#10b981' : '#FFFFFF',
-              border: `1.5px solid ${themeColors.border}`,
+              background: theme.colors.traffic.maximize,
+              border: `1.5px solid ${theme.colors.traffic.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -136,9 +138,9 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             }}
             title="Maximize"
             aria-label="Maximize window"
-            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
+            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
           >
-            {isBrandAppart ? null : <Square size={6} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
+            <Square size={6} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
           </button>
         </div>
 
@@ -146,16 +148,16 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <FolderOpen
             size={18}
-            fill={isBrandAppart ? themeColors.text : "#FFFFFF"}
-            color={themeColors.text}
+            fill={theme.colors.text.primary}
+            color={theme.colors.text.primary}
             strokeWidth={1.5}
           />
           <span
             style={{
               fontSize: 14,
               fontWeight: 600,
-              fontFamily: goOSTokens.fonts.body,
-              color: themeColors.text,
+              fontFamily: theme.fonts.heading, // Using theme font for consistency
+              color: theme.colors.text.primary,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -166,8 +168,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           <span
             style={{
               fontSize: 11,
-              fontFamily: goOSTokens.fonts.body,
-              color: themeColors.muted,
+              fontFamily: theme.fonts.mono,
+              color: theme.colors.text.muted,
             }}
           >
             {filesInFolder.length} {filesInFolder.length === 1 ? 'item' : 'items'}
@@ -240,11 +242,11 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          borderTop: `2px solid ${themeColors.border}`,
-          background: themeColors.bg,
+          borderTop: `2px solid ${theme.colors.border}`,
+          background: theme.colors.paper,
           fontSize: 11,
-          fontFamily: goOSTokens.fonts.body,
-          color: themeColors.text,
+          fontFamily: theme.fonts.mono,
+          color: theme.colors.text.primary,
         }}
       >
         <span>{filesInFolder.length} {filesInFolder.length === 1 ? 'item' : 'items'}</span>
