@@ -7,6 +7,7 @@ import { GoOSTipTapEditor, goOSTokens } from './GoOSTipTapEditor';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
+import { useThemeSafe } from '@/contexts/ThemeContext';
 
 export interface GoOSFile {
   id: string;
@@ -107,6 +108,25 @@ export function GoOSEditorWindow({
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   return (
+  const { theme } = useThemeSafe() || {};
+  const isBrandAppart = theme === 'brand-appart';
+
+  // Theme colors
+  const themeColors = isBrandAppart ? {
+    border: '#1a1a1a',
+    bg: '#ffffff',
+    text: '#1a1a1a',
+    secondary: '#4a4a4a',
+    highlight: '#ff7722',
+  } : {
+    border: '#2B4AE2', // Sketch Blue default
+    bg: '#FFFFFF',
+    text: '#2B4AE2',
+    secondary: '#2B4AE2',
+    highlight: '#2B4AE2',
+  };
+
+  return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -123,10 +143,12 @@ export function GoOSEditorWindow({
         maxWidth: isMaximized ? '100%' : 900,
         height: isMaximized ? 'auto' : 'auto',
         maxHeight: isMaximized ? '100%' : '80vh',
-        background: '#FFFFFF',
-        border: '2px solid #2B4AE2',
-        borderRadius: isMaximized ? 0 : 8,
-        boxShadow: isMaximized ? 'none' : '6px 6px 0 #2B4AE2',
+        background: themeColors.bg,
+        border: `2px solid ${themeColors.border}`,
+        borderRadius: isMaximized ? 0 : (isBrandAppart ? 16 : 8),
+        boxShadow: isMaximized
+          ? 'none'
+          : (isBrandAppart ? '8px 8px 0 rgba(0,0,0,0.1)' : `6px 6px 0 ${themeColors.border}`),
         zIndex,
         display: 'flex',
         flexDirection: 'column',
@@ -140,8 +162,8 @@ export function GoOSEditorWindow({
           display: 'flex',
           alignItems: 'center',
           padding: '10px 12px',
-          background: '#FFFFFF',
-          borderBottom: '2px solid #2B4AE2',
+          background: isBrandAppart ? '#fbf9ef' : '#FFFFFF',
+          borderBottom: `2px solid ${themeColors.border}`,
           gap: 12,
           cursor: isMaximized ? 'default' : 'grab',
         }}
@@ -155,8 +177,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#FFFFFF',
-              border: '1.5px solid #2B4AE2',
+              background: isBrandAppart ? '#ff5f57' : '#FFFFFF',
+              border: `1.5px solid ${themeColors.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -165,9 +187,9 @@ export function GoOSEditorWindow({
             }}
             title="Close"
             aria-label="Close window"
-            className="group hover:bg-[#2B4AE2] transition-colors"
+            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
           >
-            <X size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
+            {isBrandAppart ? null : <X size={8} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
           </button>
           <button
             type="button"
@@ -176,8 +198,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#FFFFFF',
-              border: '1.5px solid #2B4AE2',
+              background: isBrandAppart ? '#f59e0b' : '#FFFFFF',
+              border: `1.5px solid ${themeColors.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -186,9 +208,9 @@ export function GoOSEditorWindow({
             }}
             title="Minimize"
             aria-label="Minimize window"
-            className="group hover:bg-[#2B4AE2] transition-colors"
+            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
           >
-            <Minus size={8} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
+            {isBrandAppart ? null : <Minus size={8} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
           </button>
           <button
             type="button"
@@ -197,8 +219,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: '#FFFFFF',
-              border: '1.5px solid #2B4AE2',
+              background: isBrandAppart ? '#10b981' : '#FFFFFF',
+              border: `1.5px solid ${themeColors.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -207,9 +229,9 @@ export function GoOSEditorWindow({
             }}
             title={isMaximized ? 'Restore' : 'Maximize'}
             aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
-            className="group hover:bg-[#2B4AE2] transition-colors"
+            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
           >
-            <Square size={6} strokeWidth={3} className="text-[#2B4AE2] group-hover:text-white" />
+            {isBrandAppart ? null : <Square size={6} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
           </button>
         </div>
 
@@ -217,7 +239,7 @@ export function GoOSEditorWindow({
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <FileIcon
             size={16}
-            className="text-[#2B4AE2]"
+            color={themeColors.text}
             strokeWidth={1.5}
           />
 
@@ -238,9 +260,9 @@ export function GoOSEditorWindow({
                 fontSize: 14,
                 fontWeight: 600,
                 fontFamily: goOSTokens.fonts.body,
-                color: '#2B4AE2',
-                background: '#FFFFFF',
-                border: '1.5px solid #2B4AE2',
+                color: themeColors.text,
+                background: themeColors.bg,
+                border: `1.5px solid ${themeColors.border}`,
                 borderRadius: 4,
                 outline: 'none',
               }}
@@ -252,7 +274,7 @@ export function GoOSEditorWindow({
                 fontSize: 14,
                 fontWeight: 600,
                 fontFamily: goOSTokens.fonts.body,
-                color: '#2B4AE2',
+                color: themeColors.text,
                 cursor: 'text',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -297,11 +319,11 @@ export function GoOSEditorWindow({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          borderTop: '2px solid #2B4AE2',
-          background: '#FFFFFF',
+          borderTop: `2px solid ${themeColors.border}`,
+          background: themeColors.bg,
           fontSize: 11,
           fontFamily: goOSTokens.fonts.body,
-          color: '#2B4AE2',
+          color: themeColors.secondary,
         }}
       >
         <div style={{ display: 'flex', gap: 16 }}>
