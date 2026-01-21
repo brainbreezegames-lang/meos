@@ -242,12 +242,74 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
     {
         id: 'file-2',
         type: 'case-study',
-        title: 'Design System Case Study',
-        content: '<h1>Building a Design System</h1><h2>The Challenge</h2><p>Our team needed a unified design language across 5 products...</p><h2>The Solution</h2><p>We built a comprehensive component library with...</p>',
-        status: 'draft',
+        title: 'Reforge Robotics',
+        content: `<img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&h=1080&fit=crop" alt="Robotics hero" />
+
+<h2>Overview</h2>
+
+<p>In my recent side time, I built a brand design studio, called "BOWEN," with only me and my partner. Reforge Robotics is one of the first clients we worked with to build their brand from 0 to 1 development and deployment. The result of this collaboration is a fully-fleshed out brand guidelines, a website, and ongoing marketing collateral. This project is still ongoing as of now.</p>
+
+<h4>Deliverables</h4>
+
+<p>Website ↗</p>
+
+<img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=1920&h=1080&fit=crop" alt="Robot arm in factory" />
+
+<h2>The Logo</h2>
+
+<h4>The Challenge</h4>
+
+<p>Building a bold look for an even bolder company. Reforge Robotics needed a visual identity that communicated innovation, precision, and forward-thinking technology while remaining approachable and memorable.</p>
+
+<p>We explored dozens of concepts, from abstract geometric forms to more literal robotic interpretations. The final direction emerged from the intersection of industrial strength and elegant simplicity.</p>
+
+<img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop" alt="Logo concept R" />
+<img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=800&fit=crop" alt="Technology abstract" />
+
+<p>The mark represents the fusion of human ingenuity and machine precision. The angular forms suggest forward momentum while maintaining a sense of stability and trust.</p>
+
+<img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&h=1080&fit=crop" alt="Robotics lab" />
+
+<h2>The Brand</h2>
+
+<h4>Visual System</h4>
+
+<p>The brand system extends beyond the logo to create a cohesive visual language. We developed a comprehensive color palette rooted in industrial blues and metallic accents, balanced with warm neutrals for approachability.</p>
+
+<img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1920&h=1080&fit=crop" alt="Tech brand colors" />
+
+<p>Typography plays a crucial role in establishing the brand's voice. We paired a geometric sans-serif for headlines with a highly legible body font, creating a balance between innovation and clarity.</p>
+
+<img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&h=1080&fit=crop" alt="Robot detail" />
+<img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=1920&h=1080&fit=crop" alt="Industrial robotics" />
+
+<h2>UI & Visual</h2>
+
+<h4>Digital Experience</h4>
+
+<p>The website serves as the primary touchpoint for potential clients and partners. We designed an experience that showcases Reforge's capabilities while maintaining the sophisticated, professional tone established in the brand guidelines.</p>
+
+<img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&h=1080&fit=crop" alt="Website mockup" />
+
+<p>Interactive elements and subtle animations bring the brand to life on screen, creating moments of delight without compromising usability or performance.</p>
+
+<img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1920&h=1080&fit=crop" alt="UI components" />
+
+<h2>Final Delivery</h2>
+
+<h4>Brand Guidelines</h4>
+
+<p>The complete brand package includes comprehensive guidelines covering logo usage, color specifications, typography hierarchies, photography direction, and voice & tone principles.</p>
+
+<img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&h=1080&fit=crop" alt="Brand book" />
+
+<p>This living document ensures consistency across all touchpoints as Reforge continues to grow and evolve. The system is designed to be both rigorous and flexible, providing clear guardrails while allowing room for creative expression.</p>
+
+<img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&h=1080&fit=crop" alt="Final presentation" />`,
+        status: 'published',
         accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         parentId: null,
         position: { x: 140, y: 320 },
