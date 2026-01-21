@@ -1,5 +1,6 @@
 'use client';
 
+// goOS v2 - Clean architecture with CSS design system
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
