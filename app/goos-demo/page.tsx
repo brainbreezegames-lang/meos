@@ -1250,12 +1250,14 @@ interface SketchWindowProps {
 const TrafficLightButton = ({
     color,
     hoverColor,
+    borderColor,
     icon,
     onClick,
     title,
 }: {
     color: string;
     hoverColor: string;
+    borderColor?: string;
     icon: string;
     onClick?: (e: React.MouseEvent) => void;
     title: string;
@@ -1274,7 +1276,7 @@ const TrafficLightButton = ({
             style={{
                 background: isHovered ? hoverColor : color,
                 transition: 'background 0.15s ease',
-                border: '1.5px solid #1a1a1a',
+                border: `1.5px solid ${borderColor || 'transparent'}`,
             }}
         >
             <motion.span
@@ -1283,7 +1285,7 @@ const TrafficLightButton = ({
                 style={{
                     fontSize: 8,
                     lineHeight: 1,
-                    color: 'rgba(0,0,0,0.5)',
+                    color: borderColor || 'rgba(0,0,0,0.5)',
                 }}
             >
                 {icon}
