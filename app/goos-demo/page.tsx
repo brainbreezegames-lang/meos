@@ -1335,6 +1335,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 boxShadow: goOS.shadows.solid
             }}
         >
+            <div
                 className="h-10 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0 group"
                 style={{ background: goOS.colors.cream, borderBottom: `2px solid ${goOS.colors.border}`, borderRadius: '14px 14px 0 0' }}
             >
