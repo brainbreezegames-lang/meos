@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "goOS Theme Schema",
+  "description": "Defines all required tokens for a goOS theme",
+  "type": "object",
+  "required": ["name", "id", "colors", "radius", "typography", "effects"],
+  "properties": {
+    "name": { "type": "string" },
+    "id": { "type": "string" },
+
+    "colors": {
+      "type": "object",
+      "required": ["bg", "text", "accent", "semantic", "border", "shadow"],
+      "properties": {
+        "bg": {
+          "type": "object",
+          "required": ["base", "elevated", "overlay", "subtle", "inverse"],
+          "properties": {
+            "base": { "type": "string", "description": "Main desktop background" },
+            "elevated": { "type": "string", "description": "Dock, floating panels" },
+            "overlay": { "type": "string", "description": "Modal backgrounds" },
+            "subtle": { "type": "string", "description": "Hover states, secondary surfaces" },
+            "inverse": { "type": "string", "description": "Dark surfaces in light theme" }
+          }
+        },
+        "text": {
+          "type": "object",
+          "required": ["primary", "secondary", "muted", "inverse", "onAccent"],
+          "properties": {
+            "primary": { "type": "string", "description": "Main text" },
+            "secondary": { "type": "string", "description": "Less important text" },
+            "muted": { "type": "string", "description": "Disabled, placeholders" },
+            "inverse": { "type": "string", "description": "Text on dark backgrounds" },
+            "onAccent": { "type": "string", "description": "Text on accent color backgrounds" }
+          }
+        },
+        "accent": {
+          "type": "object",
+          "required": ["primary", "primaryHover", "primarySubtle", "secondary", "secondaryHover"],
+          "properties": {
+            "primary": { "type": "string", "description": "Main action color" },
+            "primaryHover": { "type": "string", "description": "Hover state" },
+            "primarySubtle": { "type": "string", "description": "Light tint for backgrounds" },
+            "secondary": { "type": "string", "description": "Secondary accent" },
+            "secondaryHover": { "type": "string", "description": "Secondary hover" }
+          }
+        },
+        "semantic": {
+          "type": "object",
+          "required": ["success", "successSubtle", "warning", "warningSubtle", "error", "errorSubtle"],
+          "properties": {
+            "success": { "type": "string" },
+            "successSubtle": { "type": "string" },
+            "warning": { "type": "string" },
+            "warningSubtle": { "type": "string" },
+            "error": { "type": "string" },
+            "errorSubtle": { "type": "string" }
+          }
+        },
+        "border": {
+          "type": "object",
+          "required": ["default", "subtle", "strong"],
+          "properties": {
+            "default": { "type": "string" },
+            "subtle": { "type": "string" },
+            "strong": { "type": "string" }
+          }
+        },
+        "shadow": {
+          "type": "object",
+          "required": ["color", "colorStrong"],
+          "properties": {
+            "color": { "type": "string", "description": "Base shadow color" },
+            "colorStrong": { "type": "string", "description": "Stronger shadow for emphasis" }
+          }
+        }
+      }
+    },
+
+    "radius": {
+      "type": "object",
+      "required": ["small", "medium", "large", "xl", "full"],
+      "properties": {
+        "small": { "type": "string", "description": "Buttons, inputs, tags" },
+        "medium": { "type": "string", "description": "Cards, icons" },
+        "large": { "type": "string", "description": "Panels, modals" },
+        "xl": { "type": "string", "description": "Dock, large panels" },
+        "full": { "type": "string", "description": "Pills, circular" }
+      }
+    },
+
+    "typography": {
+      "type": "object",
+      "required": ["fontFamily", "weightNormal", "weightMedium", "weightSemibold", "weightBold"],
+      "properties": {
+        "fontFamily": { "type": "string" },
+        "weightNormal": { "type": "string" },
+        "weightMedium": { "type": "string" },
+        "weightSemibold": { "type": "string" },
+        "weightBold": { "type": "string" }
+      }
+    },
+
+    "effects": {
+      "type": "object",
+      "required": ["blurSubtle", "blurHeavy", "shadowSmall", "shadowMedium", "shadowLarge", "shadowWindow"],
+      "properties": {
+        "blurSubtle": { "type": "string" },
+        "blurHeavy": { "type": "string" },
+        "shadowSmall": { "type": "string" },
+        "shadowMedium": { "type": "string" },
+        "shadowLarge": { "type": "string" },
+        "shadowWindow": { "type": "string" }
+      }
+    }
+  }
+}

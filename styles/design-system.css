@@ -1,404 +1,344 @@
 /**
- * goOS Design System v2
+ * goOS Design System
  *
- * SINGLE SOURCE OF TRUTH for all design tokens.
- * ALL components must use these CSS variables - no hardcoded colors.
+ * Theme switching: Set data-theme attribute on <html>
+ * Example: document.documentElement.dataset.theme = 'appart'
  *
- * Theme switching: Set data-theme attribute on :root
- * Example: document.documentElement.dataset.theme = 'sketch'
- *
- * Future theme editor: Use setProperty to override any token
- * Example: document.documentElement.style.setProperty('--ds-accent', '#newcolor')
+ * All components use these CSS variables exclusively.
+ * Never hardcode colors, shadows, or radii in components.
  */
 
 /* =============================================================================
-   COLOR PRIMITIVES (OKLCH for perceptual uniformity)
-   These are the raw color values - not used directly in components
-   ============================================================================= */
-
-:root {
-  /* Brand Appart Primitives */
-  --color-cream-50: oklch(98% 0.01 85);
-  --color-cream-100: oklch(96% 0.015 85);   /* #fbf9ef equivalent */
-  --color-cream-200: oklch(94% 0.02 85);
-  --color-cream-300: oklch(90% 0.02 85);
-
-  --color-warm-dark-50: oklch(50% 0.02 60);
-  --color-warm-dark-100: oklch(40% 0.02 60);
-  --color-warm-dark-200: oklch(30% 0.02 60);
-  --color-warm-dark-300: oklch(20% 0.015 60);  /* #171412 equivalent */
-  --color-warm-dark-400: oklch(15% 0.01 60);
-
-  --color-warm-grey-100: oklch(70% 0.02 60);
-  --color-warm-grey-200: oklch(60% 0.025 60);  /* #8e827c equivalent */
-  --color-warm-grey-300: oklch(50% 0.025 60);
-
-  --color-orange-100: oklch(85% 0.12 50);
-  --color-orange-200: oklch(75% 0.18 45);
-  --color-orange-300: oklch(70% 0.2 40);      /* #ff7722 equivalent */
-  --color-orange-400: oklch(60% 0.18 40);
-  --color-orange-500: oklch(50% 0.15 40);
-
-  --color-purple-100: oklch(70% 0.12 280);
-  --color-purple-200: oklch(55% 0.15 280);
-  --color-purple-300: oklch(45% 0.18 280);    /* #3d2fa9 equivalent */
-
-  --color-red-300: oklch(65% 0.2 25);         /* #ff3c34 equivalent */
-  --color-yellow-300: oklch(85% 0.15 85);     /* #ffc765 equivalent */
-
-  /* Sketch Theme Primitives */
-  --color-blue-100: oklch(90% 0.05 250);
-  --color-blue-200: oklch(70% 0.12 250);
-  --color-blue-300: oklch(55% 0.18 250);      /* #2B4AE2 equivalent */
-  --color-blue-400: oklch(45% 0.15 250);
-}
-
-/* =============================================================================
-   SEMANTIC TOKENS - Brand Appart (Default)
-   These are what components actually use
+   APPART THEME (Default)
+   Warm creative studio — cream, orange, confident
    ============================================================================= */
 
 :root,
-[data-theme="brand-appart"] {
+[data-theme="appart"] {
   /* ─────────────────────────────────────────────────────────────────────────
-     SURFACES
+     BACKGROUNDS
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-surface-base: var(--color-cream-100);
-  --ds-surface-elevated: var(--color-cream-50);
-  --ds-surface-sunken: var(--color-cream-200);
-  --ds-surface-overlay: oklch(98% 0.01 85 / 95%);
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     BORDERS
-     ───────────────────────────────────────────────────────────────────────── */
-  --ds-border-strong: var(--color-warm-dark-300);
-  --ds-border-medium: oklch(20% 0.015 60 / 20%);
-  --ds-border-subtle: oklch(20% 0.015 60 / 10%);
+  --color-bg-base: #fbf9ef;
+  --color-bg-gradient: linear-gradient(180deg, #fbf9ef 0%, #f5f3e9 100%);
+  --color-bg-elevated: rgba(255, 255, 255, 0.85);
+  --color-bg-overlay: rgba(251, 249, 239, 0.8);
+  --color-bg-subtle: #f2f0e7;
+  --color-bg-subtle-hover: #ebe9df;
+  --color-bg-inverse: #171412;
+  --color-bg-white: #ffffff;
 
   /* ─────────────────────────────────────────────────────────────────────────
      TEXT
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-text-primary: var(--color-warm-dark-300);
-  --ds-text-secondary: var(--color-warm-grey-200);
-  --ds-text-muted: var(--color-warm-grey-100);
-  --ds-text-inverse: var(--color-cream-100);
+  --color-text-primary: #171412;
+  --color-text-secondary: #4a4744;
+  --color-text-muted: #8e827c;
+  --color-text-inverse: #ffffff;
+  --color-text-on-accent: #ffffff;
 
   /* ─────────────────────────────────────────────────────────────────────────
-     ACCENT & SEMANTIC
+     ACCENT COLORS
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-accent: var(--color-orange-300);
-  --ds-accent-hover: var(--color-orange-400);
-  --ds-accent-subtle: oklch(70% 0.2 40 / 15%);
+  --color-accent-primary: #ff7722;
+  --color-accent-primary-hover: #e5691e;
+  --color-accent-primary-active: #cc5d1a;
+  --color-accent-primary-subtle: rgba(255, 119, 34, 0.1);
+  --color-accent-primary-glow: rgba(255, 119, 34, 0.4);
 
-  --ds-success: var(--color-purple-300);
-  --ds-warning: var(--color-yellow-300);
-  --ds-error: var(--color-red-300);
+  --color-accent-secondary: #3d2fa9;
+  --color-accent-secondary-hover: #352994;
+  --color-accent-secondary-subtle: rgba(61, 47, 169, 0.1);
 
   /* ─────────────────────────────────────────────────────────────────────────
-     TRAFFIC LIGHTS (macOS window controls)
+     SEMANTIC COLORS
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-traffic-close: oklch(65% 0.22 25);
-  --ds-traffic-minimize: oklch(80% 0.18 85);
-  --ds-traffic-maximize: oklch(70% 0.2 145);
-  --ds-traffic-border: var(--color-warm-dark-300);
+  --color-success: #22c55e;
+  --color-success-subtle: rgba(34, 197, 94, 0.15);
+  --color-warning: #ffc765;
+  --color-warning-subtle: rgba(255, 199, 101, 0.2);
+  --color-error: #ff3c34;
+  --color-error-subtle: rgba(255, 60, 52, 0.1);
 
   /* ─────────────────────────────────────────────────────────────────────────
-     SHADOWS (offset style for Brand Appart)
+     BORDERS
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-shadow-xs: 2px 2px 0 oklch(20% 0.015 60 / 6%);
-  --ds-shadow-sm: 3px 3px 0 oklch(20% 0.015 60 / 8%);
-  --ds-shadow-md: 4px 4px 0 oklch(20% 0.015 60 / 10%);
-  --ds-shadow-lg: 6px 6px 0 oklch(20% 0.015 60 / 12%);
-  --ds-shadow-xl: 8px 8px 0 oklch(20% 0.015 60 / 15%);
-
-  /* Window-specific shadows */
-  --ds-shadow-window: 4px 4px 0 oklch(20% 0.015 60 / 10%);
-  --ds-shadow-window-active: 6px 6px 0 oklch(20% 0.015 60 / 15%);
-  --ds-shadow-window-drag: 8px 8px 0 oklch(20% 0.015 60 / 18%);
+  --color-border-default: rgba(23, 20, 18, 0.08);
+  --color-border-subtle: rgba(23, 20, 18, 0.05);
+  --color-border-strong: rgba(23, 20, 18, 0.15);
 
   /* ─────────────────────────────────────────────────────────────────────────
-     RADII
+     TRAFFIC LIGHTS (Window controls)
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-radius-xs: 4px;
-  --ds-radius-sm: 6px;
-  --ds-radius-md: 8px;
-  --ds-radius-lg: 12px;
-  --ds-radius-xl: 16px;
-  --ds-radius-full: 9999px;
+  --color-traffic-close: #ff5f57;
+  --color-traffic-minimize: #ffbd2e;
+  --color-traffic-maximize: #28c840;
+  --color-traffic-inactive: rgba(23, 20, 18, 0.15);
 
   /* ─────────────────────────────────────────────────────────────────────────
-     SPACING (4pt grid)
+     SHADOWS
+     Warm shadows using rgba(23, 20, 18, ...)
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-space-1: 4px;
-  --ds-space-2: 8px;
-  --ds-space-3: 12px;
-  --ds-space-4: 16px;
-  --ds-space-5: 20px;
-  --ds-space-6: 24px;
-  --ds-space-8: 32px;
-  --ds-space-10: 40px;
-  --ds-space-12: 48px;
-  --ds-space-16: 64px;
-  --ds-space-20: 80px;
-  --ds-space-24: 96px;
+  --shadow-color: rgba(23, 20, 18, 0.08);
+  --shadow-color-medium: rgba(23, 20, 18, 0.12);
+  --shadow-color-strong: rgba(23, 20, 18, 0.15);
+
+  --shadow-sm: 0 2px 8px rgba(23, 20, 18, 0.06);
+  --shadow-md: 0 4px 20px rgba(23, 20, 18, 0.08);
+  --shadow-lg: 0 8px 32px rgba(23, 20, 18, 0.12);
+  --shadow-xl: 0 16px 48px rgba(23, 20, 18, 0.15);
+
+  /* Component-specific shadows */
+  --shadow-menubar: 0 4px 20px rgba(23, 20, 18, 0.06);
+  --shadow-dock: 0 8px 32px rgba(23, 20, 18, 0.12);
+  --shadow-window: 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08);
+  --shadow-dropdown: 0 8px 30px rgba(23, 20, 18, 0.15);
+  --shadow-tooltip: 0 4px 12px rgba(23, 20, 18, 0.2);
+  --shadow-status: 0 4px 16px rgba(23, 20, 18, 0.08);
+
+  /* Desktop icon shadows */
+  --shadow-icon: 0 2px 8px rgba(23, 20, 18, 0.06);
+  --shadow-icon-hover: 0 8px 24px rgba(23, 20, 18, 0.1);
+  --shadow-icon-drag: 0 20px 40px rgba(23, 20, 18, 0.2);
+
+  /* Badge glow */
+  --shadow-badge: 0 2px 6px rgba(255, 119, 34, 0.4);
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     BORDER RADIUS
+     ───────────────────────────────────────────────────────────────────────── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-xxl: 16px;
+  --radius-dock: 20px;
+  --radius-full: 9999px;
 
   /* ─────────────────────────────────────────────────────────────────────────
      TYPOGRAPHY
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --ds-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --ds-font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Type scale (modular scale 1.25 - major third) */
-  --ds-text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
-  --ds-text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
-  --ds-text-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
-  --ds-text-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --ds-text-xl: clamp(1.15rem, 1.05rem + 0.5vw, 1.25rem);
-  --ds-text-2xl: clamp(1.4rem, 1.2rem + 1vw, 1.5rem);
-  --ds-text-3xl: clamp(1.75rem, 1.5rem + 1.25vw, 2rem);
-  --ds-text-4xl: clamp(2.2rem, 1.8rem + 2vw, 2.5rem);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
-  /* Line heights */
-  --ds-leading-tight: 1.2;
-  --ds-leading-snug: 1.35;
-  --ds-leading-normal: 1.5;
-  --ds-leading-relaxed: 1.65;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
 
-  /* Font weights */
-  --ds-weight-normal: 400;
-  --ds-weight-medium: 500;
-  --ds-weight-semibold: 600;
-  --ds-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
 
-  /* Letter spacing */
-  --ds-tracking-tight: -0.02em;
-  --ds-tracking-normal: 0;
-  --ds-tracking-wide: 0.02em;
-  --ds-tracking-wider: 0.05em;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.05em;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     BLUR / GLASSMORPHISM
+     ───────────────────────────────────────────────────────────────────────── */
+  --blur-subtle: 12px;
+  --blur-medium: 20px;
+  --blur-heavy: 24px;
 
   /* ─────────────────────────────────────────────────────────────────────────
      TRANSITIONS
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-ease-out: cubic-bezier(0.25, 1, 0.5, 1);
-  --ds-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ds-ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --transition-fast: 150ms;
+  --transition-medium: 200ms;
+  --transition-slow: 300ms;
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  --ds-duration-fast: 100ms;
-  --ds-duration-normal: 200ms;
-  --ds-duration-slow: 300ms;
-  --ds-duration-slower: 500ms;
+  /* ─────────────────────────────────────────────────────────────────────────
+     COMPONENT DIMENSIONS
+     ───────────────────────────────────────────────────────────────────────── */
+  /* Menu Bar */
+  --menubar-height: 36px;
+  --menubar-margin: 12px;
+
+  /* Dock */
+  --dock-padding: 10px 16px;
+  --dock-icon-size: 44px;
+  --dock-icon-radius: 12px;
+  --dock-icon-gap: 8px;
+  --dock-active-dot-size: 4px;
+  --dock-badge-size: 16px;
+
+  /* Desktop Icons */
+  --desktop-icon-size: 64px;
+  --desktop-icon-radius: 16px;
+  --desktop-icon-label-max-width: 80px;
+  --desktop-icon-gap: 6px;
+
+  /* Windows */
+  --window-titlebar-height: 44px;
+  --window-radius: 14px;
+  --window-traffic-size: 12px;
+  --window-traffic-gap: 8px;
+
+  /* Status Widget */
+  --status-padding: 14px 18px;
+  --status-radius: 14px;
+  --status-dot-size: 10px;
+  --status-arrow-size: 32px;
+
+  /* Context Menu */
+  --context-menu-radius: 12px;
+  --context-menu-item-height: 32px;
+  --context-menu-min-width: 180px;
+
+  /* Inputs */
+  --input-radius: 10px;
+  --input-padding: 10px 14px;
+  --input-focus-ring: 3px;
 
   /* ─────────────────────────────────────────────────────────────────────────
      Z-INDEX SCALE
      ───────────────────────────────────────────────────────────────────────── */
-  --ds-z-base: 0;
-  --ds-z-dropdown: 100;
-  --ds-z-sticky: 200;
-  --ds-z-window: 300;
-  --ds-z-window-active: 400;
-  --ds-z-modal-backdrop: 500;
-  --ds-z-modal: 600;
-  --ds-z-toast: 700;
-  --ds-z-tooltip: 800;
+  --z-desktop: 0;
+  --z-desktop-icons: 10;
+  --z-window-base: 100;
+  --z-window-active: 200;
+  --z-dock: 300;
+  --z-menubar: 400;
+  --z-dropdown: 500;
+  --z-modal-backdrop: 600;
+  --z-modal: 700;
+  --z-tooltip: 800;
+  --z-status-widget: 350;
 }
 
 /* =============================================================================
-   SKETCH THEME
-   Blueprint/Mediterranean blue aesthetic
+   DEFAULT THEME (Blue)
+   Classic clean theme
    ============================================================================= */
 
-[data-theme="sketch"] {
-  /* Surfaces */
-  --ds-surface-base: #FFFFFF;
-  --ds-surface-elevated: #FFFFFF;
-  --ds-surface-sunken: #F8F9FE;
-  --ds-surface-overlay: rgba(255, 255, 255, 0.95);
+[data-theme="default"] {
+  --color-bg-base: #ffffff;
+  --color-bg-gradient: #ffffff;
+  --color-bg-elevated: rgba(255, 255, 255, 0.9);
+  --color-bg-overlay: rgba(255, 255, 255, 0.85);
+  --color-bg-subtle: #f5f5f5;
+  --color-bg-subtle-hover: #ebebeb;
+  --color-bg-inverse: #1a1a1a;
+  --color-bg-white: #ffffff;
 
-  /* Borders */
-  --ds-border-strong: var(--color-blue-300);
-  --ds-border-medium: oklch(55% 0.18 250 / 30%);
-  --ds-border-subtle: oklch(55% 0.18 250 / 15%);
+  --color-text-primary: #000000;
+  --color-text-secondary: #4a4a4a;
+  --color-text-muted: #6b7280;
+  --color-text-inverse: #ffffff;
+  --color-text-on-accent: #ffffff;
 
-  /* Text */
-  --ds-text-primary: var(--color-blue-300);
-  --ds-text-secondary: var(--color-blue-300);
-  --ds-text-muted: var(--color-blue-200);
-  --ds-text-inverse: #FFFFFF;
+  --color-accent-primary: #3b82f6;
+  --color-accent-primary-hover: #2563eb;
+  --color-accent-primary-active: #1d4ed8;
+  --color-accent-primary-subtle: rgba(59, 130, 246, 0.1);
+  --color-accent-primary-glow: rgba(59, 130, 246, 0.4);
 
-  /* Accent */
-  --ds-accent: var(--color-blue-300);
-  --ds-accent-hover: var(--color-blue-400);
-  --ds-accent-subtle: oklch(55% 0.18 250 / 10%);
+  --color-accent-secondary: #8b5cf6;
+  --color-accent-secondary-hover: #7c3aed;
+  --color-accent-secondary-subtle: rgba(139, 92, 246, 0.1);
 
-  /* Traffic lights - monochrome blue for sketch */
-  --ds-traffic-close: var(--color-blue-300);
-  --ds-traffic-minimize: var(--color-blue-300);
-  --ds-traffic-maximize: var(--color-blue-300);
-  --ds-traffic-border: transparent;
+  --color-border-default: rgba(0, 0, 0, 0.1);
+  --color-border-subtle: rgba(0, 0, 0, 0.05);
+  --color-border-strong: rgba(0, 0, 0, 0.15);
 
-  /* Shadows - solid offset for sketch */
-  --ds-shadow-xs: 2px 2px 0 var(--color-blue-300);
-  --ds-shadow-sm: 3px 3px 0 var(--color-blue-300);
-  --ds-shadow-md: 4px 4px 0 var(--color-blue-300);
-  --ds-shadow-lg: 6px 6px 0 var(--color-blue-300);
-  --ds-shadow-xl: 8px 8px 0 var(--color-blue-300);
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --shadow-color-medium: rgba(0, 0, 0, 0.12);
+  --shadow-color-strong: rgba(0, 0, 0, 0.18);
 
-  --ds-shadow-window: 4px 4px 0 var(--color-blue-300);
-  --ds-shadow-window-active: 6px 6px 0 var(--color-blue-300);
-  --ds-shadow-window-drag: 8px 8px 0 var(--color-blue-300);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15);
+
+  --shadow-menubar: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-dock: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-window: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 32px rgba(0, 0, 0, 0.12);
+  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-tooltip: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-status: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  --shadow-icon: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-icon-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+  --shadow-icon-drag: 0 20px 40px rgba(0, 0, 0, 0.2);
+
+  --shadow-badge: 0 2px 6px rgba(59, 130, 246, 0.4);
+
+  /* Slightly smaller radii */
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-xxl: 14px;
+  --radius-dock: 16px;
+
+  /* Smaller component dimensions */
+  --menubar-margin: 0px;
+  --dock-padding: 8px 12px;
+  --dock-icon-radius: 10px;
+  --dock-icon-gap: 6px;
+  --desktop-icon-radius: 12px;
+  --window-titlebar-height: 40px;
+  --window-radius: 12px;
+  --status-radius: 12px;
 }
 
 /* =============================================================================
-   MONTEREY THEME
-   Classic macOS with soft shadows and vibrant colors
+   SCROLLBAR STYLING
+   Minimal, appears on hover
    ============================================================================= */
 
-[data-theme="monterey"] {
-  /* Surfaces */
-  --ds-surface-base: #FFFFFF;
-  --ds-surface-elevated: #FFFFFF;
-  --ds-surface-sunken: #F5F5F7;
-  --ds-surface-overlay: rgba(255, 255, 255, 0.85);
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
 
-  /* Borders */
-  --ds-border-strong: oklch(25% 0.01 250);
-  --ds-border-medium: oklch(0% 0 0 / 12%);
-  --ds-border-subtle: oklch(0% 0 0 / 6%);
+*:hover {
+  scrollbar-color: var(--color-border-strong) transparent;
+}
 
-  /* Text */
-  --ds-text-primary: oklch(15% 0.01 250);
-  --ds-text-secondary: oklch(45% 0.01 250);
-  --ds-text-muted: oklch(60% 0.01 250);
-  --ds-text-inverse: #FFFFFF;
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-  /* Accent - Apple blue */
-  --ds-accent: oklch(55% 0.22 250);
-  --ds-accent-hover: oklch(45% 0.2 250);
-  --ds-accent-subtle: oklch(55% 0.22 250 / 10%);
+::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  /* Traffic lights - classic macOS */
-  --ds-traffic-close: oklch(65% 0.25 25);
-  --ds-traffic-minimize: oklch(80% 0.2 85);
-  --ds-traffic-maximize: oklch(70% 0.22 145);
-  --ds-traffic-border: transparent;
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: var(--radius-full);
+  transition: background var(--transition-medium) var(--ease-out);
+}
 
-  /* Shadows - soft blur for Monterey */
-  --ds-shadow-xs: 0 1px 2px oklch(0% 0 0 / 5%);
-  --ds-shadow-sm: 0 2px 4px oklch(0% 0 0 / 8%), 0 1px 2px oklch(0% 0 0 / 4%);
-  --ds-shadow-md: 0 4px 8px oklch(0% 0 0 / 10%), 0 2px 4px oklch(0% 0 0 / 5%);
-  --ds-shadow-lg: 0 8px 16px oklch(0% 0 0 / 12%), 0 4px 8px oklch(0% 0 0 / 6%);
-  --ds-shadow-xl: 0 16px 32px oklch(0% 0 0 / 15%), 0 8px 16px oklch(0% 0 0 / 8%);
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(23, 20, 18, 0.2);
+}
 
-  --ds-shadow-window: 0 20px 40px oklch(0% 0 0 / 20%), 0 0 1px oklch(0% 0 0 / 10%);
-  --ds-shadow-window-active: 0 30px 60px oklch(0% 0 0 / 25%), 0 0 1px oklch(0% 0 0 / 15%);
-  --ds-shadow-window-drag: 0 40px 80px oklch(0% 0 0 / 30%), 0 0 1px oklch(0% 0 0 / 20%);
+*:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(23, 20, 18, 0.35);
 }
 
 /* =============================================================================
-   DARK THEME
-   Premium tech with subtle elevation
+   SELECTION STYLING
    ============================================================================= */
 
-[data-theme="dark"] {
-  /* Surfaces - elevation via lightness, not shadow */
-  --ds-surface-base: oklch(15% 0.01 250);
-  --ds-surface-elevated: oklch(20% 0.01 250);
-  --ds-surface-sunken: oklch(12% 0.01 250);
-  --ds-surface-overlay: oklch(20% 0.01 250 / 95%);
-
-  /* Borders */
-  --ds-border-strong: oklch(40% 0.01 250);
-  --ds-border-medium: oklch(100% 0 0 / 12%);
-  --ds-border-subtle: oklch(100% 0 0 / 6%);
-
-  /* Text */
-  --ds-text-primary: oklch(95% 0.01 250);
-  --ds-text-secondary: oklch(70% 0.01 250);
-  --ds-text-muted: oklch(50% 0.01 250);
-  --ds-text-inverse: oklch(15% 0.01 250);
-
-  /* Accent - slightly desaturated for dark mode */
-  --ds-accent: oklch(65% 0.18 250);
-  --ds-accent-hover: oklch(70% 0.2 250);
-  --ds-accent-subtle: oklch(65% 0.18 250 / 15%);
-
-  /* Traffic lights */
-  --ds-traffic-close: oklch(65% 0.22 25);
-  --ds-traffic-minimize: oklch(75% 0.15 85);
-  --ds-traffic-maximize: oklch(65% 0.18 145);
-  --ds-traffic-border: transparent;
-
-  /* Shadows - minimal in dark mode, use surface elevation instead */
-  --ds-shadow-xs: 0 1px 2px oklch(0% 0 0 / 20%);
-  --ds-shadow-sm: 0 2px 4px oklch(0% 0 0 / 25%);
-  --ds-shadow-md: 0 4px 8px oklch(0% 0 0 / 30%);
-  --ds-shadow-lg: 0 8px 16px oklch(0% 0 0 / 35%);
-  --ds-shadow-xl: 0 16px 32px oklch(0% 0 0 / 40%);
-
-  --ds-shadow-window: 0 20px 50px oklch(0% 0 0 / 50%);
-  --ds-shadow-window-active: 0 25px 60px oklch(0% 0 0 / 60%);
-  --ds-shadow-window-drag: 0 30px 70px oklch(0% 0 0 / 70%);
-
-  /* Reduce text weight slightly for dark backgrounds */
-  --ds-weight-normal: 350;
+::selection {
+  background: var(--color-accent-primary-subtle);
 }
 
-/* =============================================================================
-   UTILITY CLASSES (optional - use sparingly)
-   ============================================================================= */
-
-.ds-surface-base { background: var(--ds-surface-base); }
-.ds-surface-elevated { background: var(--ds-surface-elevated); }
-.ds-text-primary { color: var(--ds-text-primary); }
-.ds-text-secondary { color: var(--ds-text-secondary); }
-.ds-text-muted { color: var(--ds-text-muted); }
-.ds-border { border: 1px solid var(--ds-border-medium); }
-.ds-border-strong { border: 2px solid var(--ds-border-strong); }
-.ds-shadow-md { box-shadow: var(--ds-shadow-md); }
-.ds-shadow-lg { box-shadow: var(--ds-shadow-lg); }
-.ds-radius-md { border-radius: var(--ds-radius-md); }
-.ds-radius-lg { border-radius: var(--ds-radius-lg); }
-
-/* =============================================================================
-   COMPONENT TOKENS (specific to goOS)
-   ============================================================================= */
-
-:root,
-[data-theme="brand-appart"] {
-  /* Window */
-  --ds-window-bg: var(--ds-surface-base);
-  --ds-window-header-bg: var(--ds-surface-base);
-  --ds-window-border: var(--ds-border-strong);
-  --ds-window-radius: var(--ds-radius-lg);
-
-  /* Dock */
-  --ds-dock-bg: var(--ds-surface-elevated);
-  --ds-dock-border: var(--ds-border-subtle);
-  --ds-dock-item-hover: var(--ds-accent-subtle);
-
-  /* Desktop */
-  --ds-desktop-bg: var(--ds-surface-sunken);
-
-  /* File icons */
-  --ds-file-icon-bg: linear-gradient(135deg, var(--ds-surface-elevated) 0%, var(--ds-surface-sunken) 100%);
-  --ds-file-icon-border: var(--ds-border-subtle);
-  --ds-file-icon-shadow: var(--ds-shadow-sm);
-
-  /* Status widget */
-  --ds-status-available: var(--ds-success);
-  --ds-status-busy: var(--ds-error);
-  --ds-status-away: var(--ds-warning);
-}
-
-[data-theme="sketch"] {
-  --ds-window-bg: var(--ds-surface-base);
-  --ds-window-header-bg: var(--ds-surface-base);
-  --ds-window-border: var(--ds-border-strong);
-  --ds-window-radius: var(--ds-radius-md);
-
-  --ds-file-icon-bg: var(--ds-surface-base);
-  --ds-file-icon-border: var(--ds-border-strong);
+/* Drag selection box */
+.selection-box {
+  background: var(--color-accent-primary-subtle);
+  border: 1px solid rgba(255, 119, 34, 0.4);
 }
 
 /* =============================================================================
@@ -407,9 +347,32 @@
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --ds-duration-fast: 0ms;
-    --ds-duration-normal: 0ms;
-    --ds-duration-slow: 0ms;
-    --ds-duration-slower: 0ms;
+    --transition-fast: 0ms;
+    --transition-medium: 0ms;
+    --transition-slow: 0ms;
   }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =============================================================================
+   UTILITY CLASSES (use sparingly)
+   ============================================================================= */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
