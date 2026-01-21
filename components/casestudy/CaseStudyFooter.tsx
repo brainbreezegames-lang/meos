@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { caseStudyTokens, type RelatedStudy } from '@/lib/casestudy/types';
 
 interface CaseStudyFooterProps {
@@ -14,18 +15,18 @@ interface CaseStudyFooterProps {
 
 // Card animation
 const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5,
+      duration: 0.55,
       ease: [0.25, 0.1, 0.25, 1],
     },
   },
 };
 
-// Related study card
+// Related study card - Brand Appart style
 function StudyCard({
   study,
   onClick,
@@ -49,19 +50,19 @@ function StudyCard({
         background: 'none',
         cursor: 'pointer',
         textAlign: 'left',
-        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-        transition: 'transform 0.3s ease',
       }}
     >
-      {/* Large image */}
+      {/* Image container */}
       <div
         style={{
           width: '100%',
           aspectRatio: '16 / 10',
-          borderRadius: 8,
+          borderRadius: 16,
           overflow: 'hidden',
           marginBottom: 20,
-          background: colors.borderLight,
+          background: colors.surfaceAlt,
+          transform: isHovered ? 'scale(1.02)' : 'scale(1)',
+          transition: 'transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1)',
         }}
       >
         {study.headerImage ? (
@@ -80,13 +81,14 @@ function StudyCard({
             style={{
               width: '100%',
               height: '100%',
-              background: `linear-gradient(135deg, ${colors.borderLight} 0%, ${colors.border} 100%)`,
+              background: `linear-gradient(135deg, ${colors.surfaceAlt} 0%, ${colors.border} 100%)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontFamily: fonts.display,
-              fontSize: 32,
-              fontStyle: 'italic',
+              fontSize: 48,
+              fontWeight: 700,
+              letterSpacing: '-0.03em',
               color: colors.textMuted,
             }}
           >
@@ -98,12 +100,13 @@ function StudyCard({
       {/* Title */}
       <h3
         style={{
-          fontFamily: fonts.body,
+          fontFamily: fonts.display,
           fontSize: typography.cardTitle.size,
           fontWeight: typography.cardTitle.weight,
+          letterSpacing: typography.cardTitle.letterSpacing,
           lineHeight: typography.cardTitle.lineHeight,
           color: colors.text,
-          marginBottom: 6,
+          marginBottom: 8,
         }}
       >
         {study.title}
@@ -135,7 +138,7 @@ export function CaseStudyFooter({
   onViewAllClick,
 }: CaseStudyFooterProps) {
   const prefersReducedMotion = useReducedMotion();
-  const { colors, fonts, spacing } = caseStudyTokens;
+  const { colors, fonts, spacing, typography } = caseStudyTokens;
 
   // Only show first 2 related studies
   const displayStudies = relatedStudies.slice(0, 2);
@@ -145,7 +148,7 @@ export function CaseStudyFooter({
       style={{
         maxWidth: spacing.contentMaxWidth,
         margin: '0 auto',
-        padding: `64px ${spacing.contentPadding}px 96px`,
+        padding: `80px ${spacing.contentPadding}px 120px`,
       }}
     >
       {/* More Case Studies Section */}
@@ -156,15 +159,34 @@ export function CaseStudyFooter({
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6 }}
         >
-          {/* Section divider */}
-          <div
-            style={{
-              width: 48,
-              height: 1,
-              background: colors.border,
-              margin: '0 auto 48px',
-            }}
-          />
+          {/* Section header */}
+          <div style={{ marginBottom: 40 }}>
+            <p
+              style={{
+                fontFamily: fonts.ui,
+                fontSize: typography.sectionLabel.size,
+                fontWeight: typography.sectionLabel.weight,
+                letterSpacing: typography.sectionLabel.letterSpacing,
+                textTransform: 'uppercase',
+                color: colors.accent,
+                marginBottom: 12,
+              }}
+            >
+              More Work
+            </p>
+            <h2
+              style={{
+                fontFamily: fonts.display,
+                fontSize: 32,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+                color: colors.text,
+              }}
+            >
+              Related Projects
+            </h2>
+          </div>
 
           {/* Grid of related studies */}
           <div
@@ -193,34 +215,36 @@ export function CaseStudyFooter({
             ))}
           </div>
 
-          {/* View all work button - full width */}
+          {/* View all work button - accent styled */}
           {onViewAllClick && (
             <button
               onClick={onViewAllClick}
               style={{
-                display: 'block',
-                width: '100%',
-                padding: '20px 24px',
-                border: `1px solid ${colors.border}`,
-                borderRadius: 8,
-                background: 'transparent',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '16px 28px',
+                border: 'none',
+                borderRadius: 12,
+                background: colors.text,
                 fontFamily: fonts.body,
                 fontSize: 15,
-                fontWeight: 500,
-                color: colors.text,
+                fontWeight: 600,
+                color: colors.background,
                 cursor: 'pointer',
-                transition: 'background 0.2s ease, border-color 0.2s ease',
+                transition: 'transform 0.2s ease, opacity 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = colors.borderLight;
-                e.currentTarget.style.borderColor = colors.textMuted;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.opacity = '0.9';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = colors.border;
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.opacity = '1';
               }}
             >
               View all work
+              <ArrowRight size={16} strokeWidth={2} />
             </button>
           )}
         </motion.section>
@@ -229,16 +253,19 @@ export function CaseStudyFooter({
       {/* Footer info */}
       <div
         style={{
-          marginTop: 64,
-          paddingTop: 32,
+          marginTop: 80,
+          paddingTop: 40,
           borderTop: `1px solid ${colors.border}`,
-          textAlign: 'center',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <p
           style={{
             fontFamily: fonts.ui,
             fontSize: 14,
+            fontWeight: 500,
             color: colors.textMuted,
           }}
         >
@@ -248,8 +275,8 @@ export function CaseStudyFooter({
           style={{
             fontFamily: fonts.ui,
             fontSize: 12,
+            fontWeight: 500,
             color: colors.textLight,
-            marginTop: 8,
           }}
         >
           Built with goOS

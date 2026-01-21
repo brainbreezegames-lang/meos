@@ -18,27 +18,27 @@ const containerVariants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.04,
-      delayChildren: 0.2,
+      staggerChildren: 0.035,
+      delayChildren: 0.15,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5,
+      duration: 0.55,
       ease: [0.25, 0.1, 0.25, 1],
     },
   },
 };
 
-// Single image component - NO full-bleed, stays within content area
+// Single image component - stays within content area
 function ContentImage({ image }: { image: ImageData }) {
-  const { spacing } = caseStudyTokens;
+  const { spacing, colors } = caseStudyTokens;
 
   return (
     <figure
@@ -47,8 +47,8 @@ function ContentImage({ image }: { image: ImageData }) {
         padding: 0,
         width: '100%',
         maxWidth: spacing.contentMaxWidth,
-        marginTop: 48,
-        marginBottom: 48,
+        marginTop: 56,
+        marginBottom: 56,
       }}
     >
       <img
@@ -59,17 +59,19 @@ function ContentImage({ image }: { image: ImageData }) {
           width: '100%',
           height: 'auto',
           display: 'block',
-          borderRadius: 8,
+          borderRadius: 12,
         }}
       />
       {image.caption && (
         <figcaption
           style={{
-            marginTop: 16,
+            marginTop: 14,
             fontFamily: caseStudyTokens.fonts.ui,
-            fontSize: 14,
+            fontSize: 13,
+            fontWeight: 500,
             color: caseStudyTokens.colors.textMuted,
             textAlign: 'center',
+            letterSpacing: '0.01em',
           }}
         >
           {image.caption}
@@ -79,7 +81,7 @@ function ContentImage({ image }: { image: ImageData }) {
   );
 }
 
-// Image grid component (2-up or 3-up) - NO full-bleed, stays within content area
+// Image grid component (2-up or 3-up) - stays within content area
 function ContentImageGrid({ images }: { images: ImageData[] }) {
   const { spacing } = caseStudyTokens;
   const columns = images.length >= 3 ? 3 : 2;
@@ -92,12 +94,12 @@ function ContentImageGrid({ images }: { images: ImageData[] }) {
         gap: 16,
         width: '100%',
         maxWidth: spacing.contentMaxWidth,
-        marginTop: 48,
-        marginBottom: 48,
+        marginTop: 56,
+        marginBottom: 56,
       }}
     >
       {images.map((image, index) => (
-        <figure key={index} style={{ margin: 0, borderRadius: 8, overflow: 'hidden' }}>
+        <figure key={index} style={{ margin: 0, borderRadius: 12, overflow: 'hidden' }}>
           <img
             src={image.src}
             alt={image.alt}
@@ -130,9 +132,9 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             letterSpacing: typography.sectionLabel.letterSpacing,
             lineHeight: typography.sectionLabel.lineHeight,
             textTransform: 'uppercase',
-            color: colors.textMuted,
-            marginTop: 96,  // More spacing before section labels
-            marginBottom: 24,
+            color: colors.accent,
+            marginTop: 100,
+            marginBottom: 20,
           }}
         >
           {block.content as string}
@@ -149,9 +151,9 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             letterSpacing: typography.h1.letterSpacing,
             lineHeight: typography.h1.lineHeight,
             color: colors.text,
-            marginTop: 8,
-            marginBottom: 28,
-            maxWidth: 600,
+            marginTop: 12,
+            marginBottom: 32,
+            maxWidth: 640,
           }}
         >
           {block.content as string}
@@ -169,9 +171,9 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             letterSpacing: typography.h2.letterSpacing,
             lineHeight: typography.h2.lineHeight,
             color: colors.text,
-            marginTop: 80,  // More spacing before section headings
-            marginBottom: 32,
-            maxWidth: 600,
+            marginTop: 88,
+            marginBottom: 28,
+            maxWidth: 640,
             scrollMarginTop: 100,
           }}
         >
@@ -189,8 +191,8 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             letterSpacing: typography.h3.letterSpacing,
             lineHeight: typography.h3.lineHeight,
             color: colors.text,
-            marginTop: 40,
-            marginBottom: 16,
+            marginTop: 48,
+            marginBottom: 18,
           }}
         >
           {block.content as string}
@@ -205,8 +207,9 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             fontSize: block.isLead ? typography.lead.size : typography.body.size,
             fontWeight: typography.body.weight,
             lineHeight: block.isLead ? typography.lead.lineHeight : typography.body.lineHeight,
+            letterSpacing: block.isLead ? typography.lead.letterSpacing : typography.body.letterSpacing,
             color: colors.text,
-            marginBottom: 28,  // More paragraph spacing
+            marginBottom: 32,
           }}
           dangerouslySetInnerHTML={{ __html: block.content as string }}
         />
@@ -217,16 +220,17 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
         <blockquote
           style={{
             fontFamily: fonts.display,
-            fontSize: 22,
-            fontStyle: 'italic',
-            lineHeight: 1.5,
+            fontSize: 24,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+            lineHeight: 1.4,
             color: colors.text,
-            borderLeft: `2px solid ${colors.border}`,
-            paddingLeft: 24,
+            borderLeft: `3px solid ${colors.accent}`,
+            paddingLeft: 28,
             marginLeft: 0,
             marginRight: 0,
-            marginTop: 40,
-            marginBottom: 40,
+            marginTop: 48,
+            marginBottom: 48,
           }}
           dangerouslySetInnerHTML={{ __html: block.content as string }}
         />
@@ -242,8 +246,8 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             lineHeight: typography.body.lineHeight,
             color: colors.text,
             paddingLeft: 24,
-            marginTop: 16,
-            marginBottom: 24,
+            marginTop: 20,
+            marginBottom: 28,
           }}
           dangerouslySetInnerHTML={{ __html: block.content as string }}
         />
@@ -255,14 +259,15 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
           style={{
             fontFamily: 'SFMono-Regular, Menlo, Monaco, Consolas, monospace',
             fontSize: 14,
-            lineHeight: 1.6,
+            lineHeight: 1.65,
             color: colors.text,
-            background: colors.borderLight,
-            padding: 24,
-            borderRadius: 8,
+            background: colors.surfaceAlt,
+            padding: 28,
+            borderRadius: 12,
             overflow: 'auto',
-            marginTop: 32,
-            marginBottom: 32,
+            marginTop: 36,
+            marginBottom: 36,
+            border: `1px solid ${colors.border}`,
           }}
         >
           <code>{block.content as string}</code>
@@ -276,8 +281,8 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             border: 'none',
             height: 1,
             background: colors.border,
-            marginTop: 56,
-            marginBottom: 56,
+            marginTop: 64,
+            marginBottom: 64,
           }}
         />
       );
@@ -311,7 +316,7 @@ export function CaseStudyContent({
       style={{
         maxWidth: spacing.contentMaxWidth,
         margin: '0 auto',
-        padding: `0 ${spacing.contentPadding}px 96px`,
+        padding: `0 ${spacing.contentPadding}px 120px`,
       }}
     >
       {/* Project Meta Section */}
@@ -321,9 +326,9 @@ export function CaseStudyContent({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 16,
-            marginBottom: 56,  // More spacing after meta
-            marginTop: -40, // Pull up into curved wave area
+            gap: 18,
+            marginBottom: 64,
+            marginTop: -32,
           }}
         >
           {/* Project Icon */}
@@ -332,9 +337,9 @@ export function CaseStudyContent({
               src={projectIcon}
               alt=""
               style={{
-                width: 64,
-                height: 64,
-                borderRadius: 12,
+                width: 56,
+                height: 56,
+                borderRadius: 14,
                 objectFit: 'cover',
               }}
             />
@@ -348,8 +353,9 @@ export function CaseStudyContent({
                   fontFamily: fonts.body,
                   fontSize: typography.metaName.size,
                   fontWeight: typography.metaName.weight,
+                  letterSpacing: typography.metaName.letterSpacing,
                   color: colors.text,
-                  marginBottom: 4,
+                  marginBottom: 3,
                 }}
               >
                 {projectName}
@@ -363,7 +369,9 @@ export function CaseStudyContent({
                   fontFamily: fonts.body,
                   fontSize: typography.metaTags.size,
                   fontWeight: typography.metaTags.weight,
-                  color: colors.textMuted,
+                  letterSpacing: typography.metaTags.letterSpacing,
+                  color: colors.accent,
+                  textTransform: 'uppercase',
                 }}
               >
                 {projectTags}
@@ -387,19 +395,18 @@ export function CaseStudyContent({
       <style jsx global>{`
         /* Link styles */
         .casestudy-content a {
-          color: ${colors.text};
-          text-decoration: underline;
-          text-underline-offset: 3px;
-          text-decoration-thickness: 1px;
+          color: ${colors.accent};
+          text-decoration: none;
+          font-weight: 500;
           transition: opacity 0.15s ease;
         }
         .casestudy-content a:hover {
-          opacity: 0.7;
+          opacity: 0.75;
         }
 
         /* List item spacing */
         .casestudy-content li {
-          margin-bottom: 8px;
+          margin-bottom: 10px;
         }
 
         /* Strong text */
@@ -434,22 +441,23 @@ export function DeliverableLink({
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
+        gap: 8,
         fontFamily: fonts.body,
         fontSize: 16,
-        color: colors.text,
+        fontWeight: 600,
+        color: colors.accent,
         textDecoration: 'none',
         transition: 'opacity 0.15s ease',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.textDecoration = 'underline';
+        e.currentTarget.style.opacity = '0.75';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.textDecoration = 'none';
+        e.currentTarget.style.opacity = '1';
       }}
     >
       {children}
-      <ExternalLink size={14} style={{ opacity: 0.6 }} />
+      <ExternalLink size={15} />
     </a>
   );
 }

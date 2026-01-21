@@ -95,6 +95,7 @@ export function CaseStudyPageView({
         <CaseStudyHero
           imageUrl={parsedContent.heroImage}
           title={note.title}
+          subtitle={note.subtitle}
         />
 
         {/* Sidebar navigation (fixed position, only visible after scrolling past hero) */}
@@ -131,11 +132,11 @@ export function CaseStudyPageView({
         </main>
       </div>
 
-      {/* Global styles - using goOS design system fonts */}
+      {/* Global styles - Brand Appart aesthetic */}
       <style jsx global>{`
         /* Custom scrollbar */
         ::-webkit-scrollbar {
-          width: 8px;
+          width: 6px;
         }
 
         ::-webkit-scrollbar-track {
@@ -143,12 +144,12 @@ export function CaseStudyPageView({
         }
 
         ::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.15);
-          border-radius: 4px;
+          background: rgba(0, 0, 0, 0.12);
+          border-radius: 3px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-          background: rgba(0, 0, 0, 0.25);
+          background: rgba(0, 0, 0, 0.2);
         }
 
         /* Reduced motion support */
@@ -160,9 +161,9 @@ export function CaseStudyPageView({
           }
         }
 
-        /* Selection color */
+        /* Selection color - warm orange tint */
         ::selection {
-          background: rgba(0, 0, 0, 0.1);
+          background: rgba(255, 119, 34, 0.15);
         }
       `}</style>
     </div>

@@ -80,56 +80,66 @@ export interface RelatedStudy {
   fileType: 'note' | 'case-study';
 }
 
-// Design tokens for the case study theme (goOS design system)
+// Design tokens for the case study theme (Brand Appart-inspired bold style)
 export const caseStudyTokens = {
   colors: {
-    background: '#ffffff',     // Pure white
-    surface: '#ffffff',        // Pure white for cards
-    text: 'rgba(0, 0, 0, 0.85)',       // 85% opacity for softer reading
-    textMuted: 'rgba(0, 0, 0, 0.4)',   // 40% opacity black
-    textLight: 'rgba(0, 0, 0, 0.5)',   // 50% opacity
-    accent: '#2B4AE2',         // goOS blue for links/emphasis
-    border: 'rgba(0, 0, 0, 0.1)',      // 10% border
-    borderLight: 'rgba(0, 0, 0, 0.05)', // 5% border
-    hero: '#1a1410',           // Dark overlay for hero
-    heroText: '#ffffff',       // White text on hero
+    // Warm cream base
+    background: '#fbf9ef',
+    surface: '#ffffff',
+    surfaceAlt: '#f5f3e8',
+    // Text colors - rich blacks and warm grays
+    text: '#1a1a1a',
+    textMuted: '#6b6b6b',
+    textLight: '#999999',
+    // Accent colors - bold and vibrant
+    accent: '#ff7722',        // Warm orange
+    accentAlt: '#3d2fa9',     // Deep purple
+    // Borders
+    border: 'rgba(0, 0, 0, 0.08)',
+    borderLight: 'rgba(0, 0, 0, 0.04)',
+    // Hero
+    hero: '#1a1410',
+    heroText: '#ffffff',
+    // Watermark text (very faded)
+    watermark: 'rgba(0, 0, 0, 0.06)',
   },
   fonts: {
-    // goOS design system fonts
-    display: 'var(--font-averia), "Averia Serif Libre", Georgia, serif',
+    // Bold chunky sans-serif for headlines
+    display: 'var(--font-instrument), "Instrument Sans", system-ui, sans-serif',
+    // Clean body font
     body: 'var(--font-instrument), "Instrument Sans", system-ui, sans-serif',
     ui: 'var(--font-instrument), "Instrument Sans", system-ui, sans-serif',
   },
   spacing: {
-    sectionGap: 60,
-    paragraphGap: 24,
-    contentMaxWidth: 680,
-    sidebarWidth: 200,
-    sidebarLeft: 48,
-    contentPadding: 24,
+    sectionGap: 80,
+    paragraphGap: 28,
+    contentMaxWidth: 720,
+    sidebarWidth: 64,         // Narrower for icon-only
+    sidebarLeft: 32,
+    contentPadding: 32,
   },
   typography: {
-    // Hero title (on image, centered, italic)
-    heroTitle: { size: 80, weight: 400, letterSpacing: '-0.02em', lineHeight: 1.1, fontStyle: 'italic' },
-    // Main heading (serif, normal weight for elegance)
-    title: { size: 48, weight: 400, letterSpacing: '-0.01em', lineHeight: 1.15 },
-    // Section heading
-    h1: { size: 36, weight: 400, letterSpacing: '-0.01em', lineHeight: 1.2 },
-    h2: { size: 32, weight: 400, letterSpacing: '-0.01em', lineHeight: 1.25 },
-    h3: { size: 24, weight: 500, letterSpacing: '0', lineHeight: 1.35 },
+    // Hero title - massive chunky headline
+    heroTitle: { size: 96, weight: 700, letterSpacing: '-0.04em', lineHeight: 0.95 },
+    // Main heading - bold and tight
+    title: { size: 64, weight: 700, letterSpacing: '-0.03em', lineHeight: 1.0 },
+    // Section headings - chunky
+    h1: { size: 48, weight: 700, letterSpacing: '-0.03em', lineHeight: 1.05 },
+    h2: { size: 40, weight: 700, letterSpacing: '-0.02em', lineHeight: 1.1 },
+    h3: { size: 28, weight: 600, letterSpacing: '-0.01em', lineHeight: 1.2 },
     // Section label (uppercase, wide letter-spacing)
-    sectionLabel: { size: 12, weight: 500, letterSpacing: '0.15em', lineHeight: 1.5 },
-    // Body text - generous line height for readability
-    lead: { size: 20, weight: 400, letterSpacing: '0', lineHeight: 1.8 },
-    body: { size: 18, weight: 400, letterSpacing: '0', lineHeight: 1.75 },
+    sectionLabel: { size: 11, weight: 600, letterSpacing: '0.12em', lineHeight: 1.5 },
+    // Body text - comfortable reading
+    lead: { size: 22, weight: 400, letterSpacing: '-0.01em', lineHeight: 1.65 },
+    body: { size: 18, weight: 400, letterSpacing: '-0.005em', lineHeight: 1.7 },
     // Meta info
-    metaName: { size: 16, weight: 600, letterSpacing: '0', lineHeight: 1.4 },
-    metaTags: { size: 14, weight: 400, letterSpacing: '0', lineHeight: 1.4 },
+    metaName: { size: 16, weight: 600, letterSpacing: '-0.01em', lineHeight: 1.4 },
+    metaTags: { size: 13, weight: 500, letterSpacing: '0.02em', lineHeight: 1.4 },
     // Sidebar
-    sidebar: { size: 14, weight: 400, letterSpacing: '0', lineHeight: 1.5 },
-    sidebarActive: { size: 14, weight: 500, letterSpacing: '0', lineHeight: 1.5 },
+    sidebar: { size: 12, weight: 500, letterSpacing: '0', lineHeight: 1.4 },
+    sidebarActive: { size: 12, weight: 600, letterSpacing: '0', lineHeight: 1.4 },
     // Cards
-    cardTitle: { size: 20, weight: 600, letterSpacing: '0', lineHeight: 1.3 },
-    cardSubtitle: { size: 15, weight: 400, letterSpacing: '0', lineHeight: 1.4 },
+    cardTitle: { size: 24, weight: 700, letterSpacing: '-0.02em', lineHeight: 1.15 },
+    cardSubtitle: { size: 15, weight: 400, letterSpacing: '0', lineHeight: 1.5 },
   },
 } as const;
