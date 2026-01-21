@@ -5,25 +5,7 @@ import { Coffee, Heart, X } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
-// goOS Design Tokens - Mediterranean Blue
-const goOS = {
-  colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
-    text: {
-      primary: '#2B4AE2',
-      secondary: '#2B4AE2',
-      muted: '#6B7FE8',
-    },
-  },
-  shadows: {
-    solid: '4px 4px 0 #2B4AE2',
-  },
-  fonts: {
-    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
-  },
-};
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 interface TipJarWidgetConfig {
   amounts: number[];
@@ -51,6 +33,8 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customValue, setCustomValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const theme = useWidgetTheme();
 
   const config: TipJarWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<TipJarWidgetConfig>) };
 
@@ -81,10 +65,10 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
         <button
           onDoubleClick={() => setIsExpanded(true)}
           style={{
-            background: goOS.colors.paper,
-            border: `2px solid ${goOS.colors.border}`,
-            borderRadius: '8px',
-            boxShadow: goOS.shadows.solid,
+            background: theme.colors.paper,
+            border: `2px solid ${theme.colors.border}`,
+            borderRadius: theme.radii.card,
+            boxShadow: theme.shadows.solid,
             padding: '10px 16px',
             cursor: 'pointer',
             display: 'flex',
@@ -94,24 +78,24 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
+            e.currentTarget.style.boxShadow = theme.shadows.hover;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translate(0, 0)';
-            e.currentTarget.style.boxShadow = goOS.shadows.solid;
+            e.currentTarget.style.boxShadow = theme.shadows.solid;
           }}
         >
           <Coffee
             size={18}
             strokeWidth={2}
-            style={{ color: goOS.colors.text.primary }}
+            style={{ color: theme.colors.text.accent || theme.colors.text.primary }}
           />
           <span
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: goOS.colors.text.primary,
-              fontFamily: goOS.fonts.heading,
+              color: theme.colors.text.primary,
+              fontFamily: theme.fonts.heading,
               letterSpacing: '0.01em',
               whiteSpace: 'nowrap',
             }}
@@ -122,10 +106,10 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
       ) : (
         <div
           style={{
-            background: goOS.colors.paper,
-            border: `2px solid ${goOS.colors.border}`,
-            borderRadius: '8px',
-            boxShadow: goOS.shadows.solid,
+            background: theme.colors.paper,
+            border: `2px solid ${theme.colors.border}`,
+            borderRadius: theme.radii.card,
+            boxShadow: theme.shadows.solid,
             width: '220px',
             overflow: 'hidden',
           }}
@@ -134,20 +118,20 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
           <div
             style={{
               padding: '12px 14px',
-              borderBottom: `2px solid ${goOS.colors.border}`,
+              borderBottom: `2px solid ${theme.colors.border}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Coffee size={16} strokeWidth={2} style={{ color: goOS.colors.text.primary }} />
+              <Coffee size={16} strokeWidth={2} style={{ color: theme.colors.text.accent || theme.colors.text.primary }} />
               <span
                 style={{
                   fontSize: '13px',
                   fontWeight: 700,
-                  color: goOS.colors.text.primary,
-                  fontFamily: goOS.fonts.heading,
+                  color: theme.colors.text.primary,
+                  fontFamily: theme.fonts.heading,
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                 }}
@@ -162,7 +146,7 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
                 background: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                color: goOS.colors.text.primary,
+                color: theme.colors.text.primary,
               }}
             >
               <X size={16} strokeWidth={2} />
@@ -184,12 +168,12 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
                     flex: 1,
                     padding: '10px 8px',
                     borderRadius: '6px',
-                    border: `2px solid ${goOS.colors.border}`,
-                    background: selectedAmount === amount ? goOS.colors.border : goOS.colors.paper,
-                    color: selectedAmount === amount ? goOS.colors.paper : goOS.colors.text.primary,
+                    border: `2px solid ${theme.colors.border}`,
+                    background: selectedAmount === amount ? (theme.colors.text.accent || theme.colors.border) : theme.colors.paper,
+                    color: selectedAmount === amount ? '#FFFFFF' : theme.colors.text.primary,
                     fontSize: '14px',
                     fontWeight: 700,
-                    fontFamily: goOS.fonts.mono,
+                    fontFamily: theme.fonts.mono,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
@@ -214,11 +198,11 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
                   padding: '10px 12px',
                   marginBottom: '12px',
                   borderRadius: '6px',
-                  border: `2px solid ${customValue ? goOS.colors.border : goOS.colors.text.muted}`,
-                  background: goOS.colors.paper,
-                  color: goOS.colors.text.primary,
+                  border: `2px solid ${customValue ? (theme.colors.text.accent || theme.colors.border) : theme.colors.text.muted}`,
+                  background: theme.colors.paper,
+                  color: theme.colors.text.primary,
                   fontSize: '14px',
-                  fontFamily: goOS.fonts.mono,
+                  fontFamily: theme.fonts.mono,
                   outline: 'none',
                 }}
               />
@@ -232,12 +216,12 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
                 width: '100%',
                 padding: '12px 16px',
                 borderRadius: '6px',
-                border: `2px solid ${goOS.colors.border}`,
-                background: selectedAmount || customValue ? goOS.colors.border : goOS.colors.paper,
-                color: selectedAmount || customValue ? goOS.colors.paper : goOS.colors.text.muted,
+                border: `2px solid ${theme.colors.border}`,
+                background: selectedAmount || customValue ? (theme.colors.text.accent || theme.colors.border) : theme.colors.paper,
+                color: selectedAmount || customValue ? '#FFFFFF' : theme.colors.text.muted,
                 fontSize: '14px',
                 fontWeight: 700,
-                fontFamily: goOS.fonts.heading,
+                fontFamily: theme.fonts.heading,
                 cursor: selectedAmount || customValue ? 'pointer' : 'not-allowed',
                 opacity: isLoading ? 0.7 : 1,
                 display: 'flex',

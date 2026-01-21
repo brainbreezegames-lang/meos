@@ -5,24 +5,7 @@ import { Clock } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
-// goOS Design Tokens - Mediterranean Blue
-const goOS = {
-  colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
-    text: {
-      primary: '#2B4AE2',
-      secondary: '#2B4AE2',
-    },
-  },
-  shadows: {
-    solid: '4px 4px 0 #2B4AE2',
-  },
-  fonts: {
-    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
-  },
-};
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 interface ClockWidgetConfig {
   timezone: string;
@@ -63,6 +46,8 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
   const [time, setTime] = useState<Date>(new Date());
   const config: ClockWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ClockWidgetConfig>) };
 
+  const theme = useWidgetTheme();
+
   useEffect(() => {
     const interval = setInterval(() => {
       setTime(new Date());
@@ -99,10 +84,10 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
     >
       <div
         style={{
-          background: goOS.colors.paper,
-          border: `2px solid ${goOS.colors.border}`,
-          borderRadius: '8px',
-          boxShadow: goOS.shadows.solid,
+          background: theme.colors.paper,
+          border: `2px solid ${theme.colors.border}`,
+          borderRadius: theme.radii.card,
+          boxShadow: theme.shadows.solid,
           padding: '12px 16px',
           minWidth: '120px',
         }}
@@ -111,15 +96,15 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
           <Clock
             size={18}
             strokeWidth={2}
-            style={{ color: goOS.colors.text.primary }}
+            style={{ color: theme.colors.text.accent || theme.colors.text.primary }}
           />
           <div className="flex flex-col">
             <span
               style={{
                 fontSize: '18px',
                 fontWeight: 700,
-                color: goOS.colors.text.primary,
-                fontFamily: goOS.fonts.mono,
+                color: theme.colors.text.primary,
+                fontFamily: theme.fonts.mono,
                 letterSpacing: '0.02em',
                 lineHeight: 1,
               }}
@@ -131,8 +116,8 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                 style={{
                   fontSize: '10px',
                   fontWeight: 600,
-                  color: goOS.colors.text.secondary,
-                  fontFamily: goOS.fonts.heading,
+                  color: theme.colors.text.secondary,
+                  fontFamily: theme.fonts.heading,
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                   marginTop: '2px',

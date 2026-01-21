@@ -4,27 +4,7 @@ import React, { useState } from 'react';
 import { Mail, Send, X, Check } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
-
-// goOS Design Tokens - Mediterranean Blue
-const goOS = {
-  colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
-    text: {
-      primary: '#2B4AE2',
-      secondary: '#2B4AE2',
-      muted: '#6B7FE8',
-    },
-    success: '#22C55E',
-  },
-  shadows: {
-    solid: '4px 4px 0 #2B4AE2',
-  },
-  fonts: {
-    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
-  },
-};
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 interface ContactWidgetConfig {
   fields: ('name' | 'email' | 'message')[];
@@ -53,6 +33,7 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const theme = useWidgetTheme();
   const config: ContactWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ContactWidgetConfig>) };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,11 +65,11 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
     padding: '10px 12px',
     marginBottom: '8px',
     borderRadius: '6px',
-    border: `2px solid ${goOS.colors.border}`,
-    background: goOS.colors.paper,
-    color: goOS.colors.text.primary,
+    border: `2px solid ${theme.colors.border}`,
+    background: theme.colors.paper,
+    color: theme.colors.text.primary,
     fontSize: '13px',
-    fontFamily: goOS.fonts.heading,
+    fontFamily: theme.fonts.heading,
     outline: 'none',
   };
 
@@ -104,10 +85,10 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
         <button
           onDoubleClick={() => setIsExpanded(true)}
           style={{
-            background: goOS.colors.paper,
-            border: `2px solid ${goOS.colors.border}`,
-            borderRadius: '8px',
-            boxShadow: goOS.shadows.solid,
+            background: theme.colors.paper,
+            border: `2px solid ${theme.colors.border}`,
+            borderRadius: theme.radii.card,
+            boxShadow: theme.shadows.solid,
             padding: '10px 16px',
             cursor: 'pointer',
             display: 'flex',
@@ -117,24 +98,24 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
+            e.currentTarget.style.boxShadow = theme.shadows.hover;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translate(0, 0)';
-            e.currentTarget.style.boxShadow = goOS.shadows.solid;
+            e.currentTarget.style.boxShadow = theme.shadows.solid;
           }}
         >
           <Mail
             size={18}
             strokeWidth={2}
-            style={{ color: goOS.colors.text.primary }}
+            style={{ color: theme.colors.text.accent || theme.colors.text.primary }}
           />
           <span
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: goOS.colors.text.primary,
-              fontFamily: goOS.fonts.heading,
+              color: theme.colors.text.primary,
+              fontFamily: theme.fonts.heading,
               letterSpacing: '0.01em',
               whiteSpace: 'nowrap',
             }}
@@ -145,10 +126,10 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
       ) : (
         <div
           style={{
-            background: goOS.colors.paper,
-            border: `2px solid ${goOS.colors.border}`,
-            borderRadius: '8px',
-            boxShadow: goOS.shadows.solid,
+            background: theme.colors.paper,
+            border: `2px solid ${theme.colors.border}`,
+            borderRadius: theme.radii.card,
+            boxShadow: theme.shadows.solid,
             width: '260px',
             overflow: 'hidden',
           }}
@@ -168,7 +149,7 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  background: goOS.colors.success,
+                  background: theme.colors.success,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -180,8 +161,8 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                 style={{
                   fontSize: '14px',
                   fontWeight: 600,
-                  color: goOS.colors.text.primary,
-                  fontFamily: goOS.fonts.heading,
+                  color: theme.colors.text.primary,
+                  fontFamily: theme.fonts.heading,
                   textAlign: 'center',
                 }}
               >
@@ -194,20 +175,20 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
               <div
                 style={{
                   padding: '12px 14px',
-                  borderBottom: `2px solid ${goOS.colors.border}`,
+                  borderBottom: `2px solid ${theme.colors.border}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Mail size={16} strokeWidth={2} style={{ color: goOS.colors.text.primary }} />
+                  <Mail size={16} strokeWidth={2} style={{ color: theme.colors.text.accent || theme.colors.text.primary }} />
                   <span
                     style={{
                       fontSize: '13px',
                       fontWeight: 700,
-                      color: goOS.colors.text.primary,
-                      fontFamily: goOS.fonts.heading,
+                      color: theme.colors.text.primary,
+                      fontFamily: theme.fonts.heading,
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em',
                     }}
@@ -222,7 +203,7 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     background: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
-                    color: goOS.colors.text.primary,
+                    color: theme.colors.text.primary,
                   }}
                 >
                   <X size={16} strokeWidth={2} />
@@ -270,12 +251,12 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     width: '100%',
                     padding: '12px 16px',
                     borderRadius: '6px',
-                    border: `2px solid ${goOS.colors.border}`,
-                    background: formData.email && formData.message ? goOS.colors.border : goOS.colors.paper,
-                    color: formData.email && formData.message ? goOS.colors.paper : goOS.colors.text.muted,
+                    border: `2px solid ${theme.colors.border}`,
+                    background: formData.email && formData.message ? (theme.colors.text.accent || theme.colors.border) : theme.colors.paper,
+                    color: formData.email && formData.message ? '#FFFFFF' : theme.colors.text.muted,
                     fontSize: '14px',
                     fontWeight: 700,
-                    fontFamily: goOS.fonts.heading,
+                    fontFamily: theme.fonts.heading,
                     cursor: formData.email && formData.message ? 'pointer' : 'not-allowed',
                     opacity: isLoading ? 0.7 : 1,
                     display: 'flex',

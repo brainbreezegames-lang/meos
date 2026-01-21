@@ -5,25 +5,7 @@ import { Link2, ExternalLink, ChevronDown, Twitter, Github, Linkedin, Instagram,
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
-// goOS Design Tokens - Mediterranean Blue
-const goOS = {
-  colors: {
-    paper: '#FFFFFF',
-    border: '#2B4AE2',
-    text: {
-      primary: '#2B4AE2',
-      secondary: '#2B4AE2',
-      muted: '#6B7FE8',
-    },
-  },
-  shadows: {
-    solid: '4px 4px 0 #2B4AE2',
-  },
-  fonts: {
-    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
-  },
-};
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 interface LinkItem {
   name: string;
@@ -69,6 +51,7 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
   const [isExpanded, setIsExpanded] = useState(false);
   const config: LinksWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<LinksWidgetConfig>) };
 
+  const theme = useWidgetTheme();
   const hasLinks = config.links && config.links.length > 0;
 
   return (
@@ -83,10 +66,10 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
         <button
           onDoubleClick={() => setIsExpanded(true)}
           style={{
-            background: goOS.colors.paper,
-            border: `2px solid ${goOS.colors.border}`,
-            borderRadius: '8px',
-            boxShadow: goOS.shadows.solid,
+            background: theme.colors.paper,
+            border: `2px solid ${theme.colors.border}`,
+            borderRadius: theme.radii.card,
+            boxShadow: theme.shadows.solid,
             padding: '10px 16px',
             cursor: 'pointer',
             display: 'flex',
@@ -96,24 +79,24 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = '6px 6px 0 #2B4AE2';
+            e.currentTarget.style.boxShadow = theme.shadows.hover;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translate(0, 0)';
-            e.currentTarget.style.boxShadow = goOS.shadows.solid;
+            e.currentTarget.style.boxShadow = theme.shadows.solid;
           }}
         >
           <Link2
             size={18}
             strokeWidth={2}
-            style={{ color: goOS.colors.text.primary }}
+            style={{ color: theme.colors.text.accent || theme.colors.text.primary }}
           />
           <span
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: goOS.colors.text.primary,
-              fontFamily: goOS.fonts.heading,
+              color: theme.colors.text.primary,
+              fontFamily: theme.fonts.heading,
               letterSpacing: '0.01em',
               whiteSpace: 'nowrap',
             }}
@@ -123,16 +106,16 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
           <ChevronDown
             size={14}
             strokeWidth={2.5}
-            style={{ color: goOS.colors.text.primary, opacity: 0.7 }}
+            style={{ color: theme.colors.text.primary, opacity: 0.7 }}
           />
         </button>
       ) : (
         <div
           style={{
-            background: goOS.colors.paper,
-            border: `2px solid ${goOS.colors.border}`,
-            borderRadius: '8px',
-            boxShadow: goOS.shadows.solid,
+            background: theme.colors.paper,
+            border: `2px solid ${theme.colors.border}`,
+            borderRadius: theme.radii.card,
+            boxShadow: theme.shadows.solid,
             minWidth: '180px',
             overflow: 'hidden',
           }}
@@ -143,7 +126,7 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             style={{
               width: '100%',
               padding: '12px 14px',
-              borderBottom: `2px solid ${goOS.colors.border}`,
+              borderBottom: `2px solid ${theme.colors.border}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -153,13 +136,13 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Link2 size={16} strokeWidth={2} style={{ color: goOS.colors.text.primary }} />
+              <Link2 size={16} strokeWidth={2} style={{ color: theme.colors.text.accent || theme.colors.text.primary }} />
               <span
                 style={{
                   fontSize: '13px',
                   fontWeight: 700,
-                  color: goOS.colors.text.primary,
-                  fontFamily: goOS.fonts.heading,
+                  color: theme.colors.text.primary,
+                  fontFamily: theme.fonts.heading,
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                 }}
@@ -170,7 +153,7 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             <ChevronDown
               size={14}
               strokeWidth={2.5}
-              style={{ color: goOS.colors.text.primary, transform: 'rotate(180deg)' }}
+              style={{ color: theme.colors.text.primary, transform: 'rotate(180deg)' }}
             />
           </button>
 
@@ -181,9 +164,9 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                 style={{
                   padding: '16px 12px',
                   textAlign: 'center',
-                  color: goOS.colors.text.muted,
+                  color: theme.colors.text.muted,
                   fontSize: '13px',
-                  fontFamily: goOS.fonts.heading,
+                  fontFamily: theme.fonts.heading,
                 }}
               >
                 No links added yet
@@ -207,7 +190,7 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                       transition: 'background 0.15s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(43, 74, 226, 0.08)';
+                      e.currentTarget.style.background = theme.colors.text.accent ? `color-mix(in srgb, ${theme.colors.text.accent} 8%, transparent)` : 'rgba(43, 74, 226, 0.08)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'transparent';
@@ -216,14 +199,14 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                     <IconComponent
                       size={16}
                       strokeWidth={2}
-                      style={{ color: goOS.colors.text.primary, flexShrink: 0 }}
+                      style={{ color: theme.colors.text.primary, flexShrink: 0 }}
                     />
                     <span
                       style={{
                         fontSize: '14px',
                         fontWeight: 500,
-                        color: goOS.colors.text.primary,
-                        fontFamily: goOS.fonts.heading,
+                        color: theme.colors.text.primary,
+                        fontFamily: theme.fonts.heading,
                         flex: 1,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -235,7 +218,7 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                     <ExternalLink
                       size={12}
                       strokeWidth={2}
-                      style={{ color: goOS.colors.text.muted, flexShrink: 0 }}
+                      style={{ color: theme.colors.text.muted, flexShrink: 0 }}
                     />
                   </a>
                 );

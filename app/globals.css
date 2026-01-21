@@ -733,6 +733,8 @@ h6 {
     --brand-radius-small: 6px;
 
     /* System Overrides for Window Compatibility */
+    --blur-glass: none;
+    /* Disable blur */
     --bg-app: var(--brand-bg);
     --bg-glass-elevated: var(--brand-white);
     --bg-glass: var(--brand-bg-dark);
