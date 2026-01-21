@@ -35,6 +35,7 @@ export interface WidgetTheme {
     radii: {
         card: string;
         button: string;
+        pill: string;
     };
     fonts: {
         heading: string;
@@ -105,6 +106,7 @@ export const useWidgetTheme = (): WidgetTheme => {
         radii: {
             card: '8px',
             button: '6px',
+            pill: '9999px',
         },
         fonts: {
             heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
@@ -175,6 +177,7 @@ export const useWidgetTheme = (): WidgetTheme => {
         radii: {
             card: '12px',
             button: '8px',
+            pill: '12px',
         },
         fonts: {
             heading: 'var(--font-headline)', // Outfit
@@ -240,6 +243,7 @@ export const useWidgetTheme = (): WidgetTheme => {
         radii: {
             card: 'var(--radius-lg)',
             button: 'var(--radius-md)',
+            pill: '9999px',
         },
         fonts: {
             heading: 'var(--font-display)',
