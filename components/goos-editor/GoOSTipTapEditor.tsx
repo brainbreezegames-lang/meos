@@ -17,67 +17,73 @@ import { GoOSEditorToolbar } from './GoOSEditorToolbar';
 
 const lowlight = createLowlight(common);
 
-// goOS Design Tokens (unified) - Uses CSS variables from design-system.css
+// goOS Design Tokens - Aligned with design-system.css CSS variables
+// NOTE: These use the EXACT variable names from design-system.css
 export const goOSTokens = {
   colors: {
-    paper: 'var(--color-bg-base, #fbf9ef)',
-    cream: 'var(--color-bg-base, #fbf9ef)',
-    headerBg: 'var(--color-bg-subtle, #f2f0e7)',
-    windowBg: 'var(--color-bg-base, #fbf9ef)',
-    contentBg: 'var(--color-bg-white, #ffffff)',
-    border: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    borderStrong: 'var(--color-text-primary, #171412)',
+    // Backgrounds
+    paper: 'var(--color-bg-base)',
+    cream: 'var(--color-bg-base)',
+    headerBg: 'var(--color-bg-subtle)',
+    windowBg: 'var(--color-bg-base)',
+    contentBg: 'var(--color-bg-white)',
+    // Borders
+    border: 'var(--color-border-default)',
+    borderStrong: 'var(--color-border-strong)',
+    // Text
     text: {
-      primary: 'var(--color-text-primary, #171412)',
-      secondary: 'var(--color-text-secondary, #4a4744)',
-      muted: 'var(--color-text-muted, #8e827c)',
+      primary: 'var(--color-text-primary)',
+      secondary: 'var(--color-text-secondary)',
+      muted: 'var(--color-text-muted)',
     },
+    // Accent
     accent: {
-      primary: 'var(--color-accent-primary, #ff7722)',
-      primaryDark: 'var(--color-accent-primary-dark, #e56a1f)',
-      dark: 'var(--color-accent-primary-dark, #e56a1f)',
-      light: 'var(--color-accent-primary-light, #ff9955)',
-      pale: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.08))',
+      primary: 'var(--color-accent-primary)',
+      primaryDark: 'var(--color-accent-primary-hover)',
+      dark: 'var(--color-accent-primary-hover)',
+      light: 'var(--color-accent-primary)',
+      pale: 'var(--color-accent-primary-subtle)',
     },
-    // Status colors - consistent across all components
+    // Status colors
     status: {
-      success: 'var(--color-success, #10b981)',
-      successLight: 'var(--color-success-subtle, rgba(16, 185, 129, 0.1))',
-      successDark: 'var(--color-success-dark, #059669)',
-      error: 'var(--color-error, #ef4444)',
-      errorLight: 'var(--color-error-subtle, rgba(239, 68, 68, 0.1))',
-      errorDark: 'var(--color-error-dark, #dc2626)',
-      warning: 'var(--color-warning, #f59e0b)',
-      warningLight: 'var(--color-warning-subtle, rgba(245, 158, 11, 0.1))',
-      neutral: 'var(--color-text-muted, #8e827c)',
+      success: 'var(--color-success)',
+      successLight: 'var(--color-success-subtle)',
+      successDark: 'var(--color-success)',
+      error: 'var(--color-error)',
+      errorLight: 'var(--color-error-subtle)',
+      errorDark: 'var(--color-error)',
+      warning: 'var(--color-warning)',
+      warningLight: 'var(--color-warning-subtle)',
+      neutral: 'var(--color-text-muted)',
     },
-    // Traffic light colors (standard macOS)
+    // Traffic light colors (use CSS variables)
     traffic: {
-      close: '#ff5f57',
-      minimize: '#ffbd2e',
-      maximize: '#28ca41',
-      disabled: 'var(--color-border-default, rgba(23, 20, 18, 0.2))',
+      close: 'var(--color-traffic-close)',
+      minimize: 'var(--color-traffic-minimize)',
+      maximize: 'var(--color-traffic-maximize)',
+      disabled: 'var(--color-traffic-inactive)',
     },
   },
   shadows: {
-    solid: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
-    hover: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
-    sm: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
-    md: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
-    lg: 'var(--shadow-lg, 0 8px 32px rgba(23, 20, 18, 0.12))',
-    button: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
+    solid: 'var(--shadow-sm)',
+    hover: 'var(--shadow-md)',
+    sm: 'var(--shadow-sm)',
+    md: 'var(--shadow-md)',
+    lg: 'var(--shadow-lg)',
+    button: 'var(--shadow-sm)',
   },
   radii: {
-    sm: 'var(--radius-sm, 6px)',
-    md: 'var(--radius-md, 8px)',
-    lg: 'var(--radius-lg, 12px)',
-    full: 'var(--radius-full, 9999px)',
+    sm: 'var(--radius-sm)',
+    md: 'var(--radius-md)',
+    lg: 'var(--radius-lg)',
+    full: 'var(--radius-full)',
   },
   fonts: {
-    display: 'var(--font-headline, "Outfit", sans-serif)',
-    body: 'var(--font-body, "Inter", sans-serif)',
-    mono: 'var(--font-mono, "SF Mono", monospace)',
-    handwritten: 'var(--font-body, "Inter", sans-serif)',
+    // Use the CSS variable from design-system.css
+    display: 'var(--font-family)',
+    body: 'var(--font-family)',
+    mono: 'ui-monospace, "SF Mono", monospace',
+    handwritten: 'var(--font-family)',
   },
 };
 
