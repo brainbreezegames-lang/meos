@@ -8,61 +8,74 @@ import type { StatusWidget as StatusWidgetType, StatusType } from '@/types';
 interface StatusWidgetProps {
   statusWidget: StatusWidgetType | null;
   isOwner?: boolean;
+
+interface StatusWidgetProps {
+  statusWidget: StatusWidgetType | null;
+  isOwner?: boolean;
   onEdit?: () => void;
 }
 
-const STATUS_CONFIG: Record<StatusType, {
-  emoji: string;
-  gradient: string;
-  glow: string;
-  label: string;
-  color: string;
-  bgColor: string;
-}> = {
-  available: {
-    emoji: '✦',
-    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-    glow: '0 0 20px rgba(16, 185, 129, 0.4)',
-    label: 'Available',
-    color: '#10b981',
-    bgColor: 'rgba(16, 185, 129, 0.1)',
-  },
-  looking: {
-    emoji: '◈',
-    gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-    glow: '0 0 20px rgba(59, 130, 246, 0.4)',
-    label: 'Looking for',
-    color: '#3b82f6',
-    bgColor: 'rgba(59, 130, 246, 0.1)',
-  },
-  taking: {
-    emoji: '◇',
-    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-    glow: '0 0 20px rgba(245, 158, 11, 0.4)',
-    label: 'Taking',
-    color: '#f59e0b',
-    bgColor: 'rgba(245, 158, 11, 0.1)',
-  },
-  open: {
-    emoji: '○',
-    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-    glow: '0 0 20px rgba(139, 92, 246, 0.4)',
-    label: 'Open to',
-    color: '#8b5cf6',
-    bgColor: 'rgba(139, 92, 246, 0.1)',
-  },
-  consulting: {
-    emoji: '◎',
-    gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
-    glow: '0 0 20px rgba(6, 182, 212, 0.4)',
-    label: 'Consulting',
-    color: '#06b6d4',
-    bgColor: 'rgba(6, 182, 212, 0.1)',
-  },
-};
-
 export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWidgetProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { theme } = useThemeSafe() || {};
+  const isBrandAppart = theme === 'brand-appart';
+
+
+  const STATUS_CONFIG: Record<StatusType, {
+    emoji: string;
+    gradient: string;
+    glow: string;
+    label: string;
+    color: string;
+    bgColor: string;
+    borderColor?: string;
+  }> = {
+    available: {
+      emoji: '✦',
+      gradient: isBrandAppart ? '#3d2fa9' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      glow: isBrandAppart ? 'none' : '0 0 20px rgba(16, 185, 129, 0.4)',
+      label: 'Available',
+      color: isBrandAppart ? '#3d2fa9' : '#10b981',
+      bgColor: isBrandAppart ? '#f2f0e7' : 'rgba(16, 185, 129, 0.1)',
+      borderColor: isBrandAppart ? '#3d2fa9' : undefined,
+    },
+    looking: {
+      emoji: '◈',
+      gradient: isBrandAppart ? '#ff7722' : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+      glow: isBrandAppart ? 'none' : '0 0 20px rgba(59, 130, 246, 0.4)',
+      label: 'Looking for',
+      color: isBrandAppart ? '#ff7722' : '#3b82f6',
+      bgColor: isBrandAppart ? '#f2f0e7' : 'rgba(59, 130, 246, 0.1)',
+      borderColor: isBrandAppart ? '#ff7722' : undefined,
+    },
+    taking: {
+      emoji: '◇',
+      gradient: isBrandAppart ? '#ffc765' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+      glow: isBrandAppart ? 'none' : '0 0 20px rgba(245, 158, 11, 0.4)',
+      label: 'Taking',
+      color: isBrandAppart ? '#ffc765' : '#f59e0b',
+      bgColor: isBrandAppart ? '#f2f0e7' : 'rgba(245, 158, 11, 0.1)',
+      borderColor: isBrandAppart ? '#ffc765' : undefined,
+    },
+    open: {
+      emoji: '○',
+      gradient: isBrandAppart ? '#ff3c34' : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+      glow: isBrandAppart ? 'none' : '0 0 20px rgba(139, 92, 246, 0.4)',
+      label: 'Open to',
+      color: isBrandAppart ? '#ff3c34' : '#8b5cf6',
+      bgColor: isBrandAppart ? '#f2f0e7' : 'rgba(139, 92, 246, 0.1)',
+      borderColor: isBrandAppart ? '#ff3c34' : undefined,
+    },
+    consulting: {
+      emoji: '◎',
+      gradient: isBrandAppart ? '#8e827c' : 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+      glow: isBrandAppart ? 'none' : '0 0 20px rgba(6, 182, 212, 0.4)',
+      label: 'Consulting',
+      color: isBrandAppart ? '#8e827c' : '#06b6d4',
+      bgColor: isBrandAppart ? '#f2f0e7' : 'rgba(6, 182, 212, 0.1)',
+      borderColor: isBrandAppart ? '#8e827c' : undefined,
+    },
+  };
 
   if (!statusWidget || !statusWidget.isVisible) {
     if (isOwner) {
@@ -136,9 +149,11 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'var(--bg-glass-elevated, rgba(255,255,255,0.92))',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+            background: isBrandAppart ? 'var(--brand-white)' : 'var(--bg-glass-elevated, rgba(255,255,255,0.92))',
+            backdropFilter: isBrandAppart ? 'none' : 'blur(40px) saturate(180%)',
+            WebkitBackdropFilter: isBrandAppart ? 'none' : 'blur(40px) saturate(180%)',
+            border: isBrandAppart ? '2px solid var(--brand-base)' : 'none',
+            borderRadius: isBrandAppart ? '12px' : '24px',
           }}
         />
 
@@ -156,12 +171,12 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: config.gradient,
-              color: 'white',
-              fontSize: '12px',
-              fontWeight: 500,
-              boxShadow: isHovered ? config.glow : 'none',
+              boxShadow: isBrandAppart ? 'none' : (isHovered ? config.glow : 'none'),
               transition: 'box-shadow 0.2s ease',
+              border: isBrandAppart ? `1.5px solid ${config.borderColor || config.color}` : 'none',
+              color: isBrandAppart ? (config.borderColor || config.color) : 'white',
+              background: isBrandAppart ? 'transparent' : config.gradient,
+              opacity: 1,
             }}
           >
             {config.emoji}
@@ -319,5 +334,4 @@ export function StatusWidget({ statusWidget, isOwner = false, onEdit }: StatusWi
   );
 }
 
-export { STATUS_CONFIG };
 export type { StatusWidgetProps };
