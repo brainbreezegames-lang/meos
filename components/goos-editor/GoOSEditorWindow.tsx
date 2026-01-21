@@ -109,23 +109,7 @@ export function GoOSEditorWindow({
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
 
-  const { theme } = useThemeSafe() || {};
-  const isBrandAppart = theme === 'brand-appart';
-
-  // Theme colors
-  const themeColors = isBrandAppart ? {
-    border: '#1a1a1a',
-    bg: '#ffffff',
-    text: '#1a1a1a',
-    secondary: '#4a4a4a',
-    highlight: '#ff7722',
-  } : {
-    border: '#2B4AE2', // Sketch Blue default
-    bg: '#FFFFFF',
-    text: '#2B4AE2',
-    secondary: '#2B4AE2',
-    highlight: '#2B4AE2',
-  };
+  const theme = useWidgetTheme();
 
   return (
     <motion.div
@@ -144,12 +128,12 @@ export function GoOSEditorWindow({
         maxWidth: isMaximized ? '100%' : 900,
         height: isMaximized ? 'auto' : 'auto',
         maxHeight: isMaximized ? '100%' : '80vh',
-        background: themeColors.bg,
-        border: `2px solid ${themeColors.border}`,
-        borderRadius: isMaximized ? 0 : (isBrandAppart ? 16 : 8),
+        background: theme.colors.paper,
+        border: `2px solid ${theme.colors.border}`,
+        borderRadius: isMaximized ? 0 : theme.radii.card,
         boxShadow: isMaximized
           ? 'none'
-          : (isBrandAppart ? '8px 8px 0 rgba(0,0,0,0.1)' : `6px 6px 0 ${themeColors.border}`),
+          : theme.shadows.solid,
         zIndex,
         display: 'flex',
         flexDirection: 'column',
@@ -163,8 +147,8 @@ export function GoOSEditorWindow({
           display: 'flex',
           alignItems: 'center',
           padding: '10px 12px',
-          background: isBrandAppart ? '#fbf9ef' : '#FFFFFF',
-          borderBottom: `2px solid ${themeColors.border}`,
+          background: theme.colors.paper,
+          borderBottom: `2px solid ${theme.colors.border}`,
           gap: 12,
           cursor: isMaximized ? 'default' : 'grab',
         }}
