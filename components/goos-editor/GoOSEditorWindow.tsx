@@ -8,6 +8,7 @@ import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
 import { useThemeSafe } from '@/contexts/ThemeContext';
+import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 export interface GoOSFile {
   id: string;
@@ -177,8 +178,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: isBrandAppart ? '#ff5f57' : '#FFFFFF',
-              border: `1.5px solid ${themeColors.border}`,
+              background: theme.colors.traffic.close,
+              border: `1.5px solid ${theme.colors.traffic.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -187,9 +188,9 @@ export function GoOSEditorWindow({
             }}
             title="Close"
             aria-label="Close window"
-            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
+            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
           >
-            {isBrandAppart ? null : <X size={8} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
+            <X size={8} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
           </button>
           <button
             type="button"
@@ -198,8 +199,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: isBrandAppart ? '#f59e0b' : '#FFFFFF',
-              border: `1.5px solid ${themeColors.border}`,
+              background: theme.colors.traffic.minimize,
+              border: `1.5px solid ${theme.colors.traffic.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -208,9 +209,9 @@ export function GoOSEditorWindow({
             }}
             title="Minimize"
             aria-label="Minimize window"
-            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
+            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
           >
-            {isBrandAppart ? null : <Minus size={8} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
+            <Minus size={8} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
           </button>
           <button
             type="button"
@@ -219,8 +220,8 @@ export function GoOSEditorWindow({
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: isBrandAppart ? '#10b981' : '#FFFFFF',
-              border: `1.5px solid ${themeColors.border}`,
+              background: theme.colors.traffic.maximize,
+              border: `1.5px solid ${theme.colors.traffic.border}`,
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -229,9 +230,9 @@ export function GoOSEditorWindow({
             }}
             title={isMaximized ? 'Restore' : 'Maximize'}
             aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
-            className={`group hover:bg-[${themeColors.highlight}] transition-colors`}
+            className={`group hover:bg-[${theme.colors.text.accent}] transition-colors`}
           >
-            {isBrandAppart ? null : <Square size={6} strokeWidth={3} className={`text-[${themeColors.text}] group-hover:text-white`} />}
+            <Square size={6} strokeWidth={3} className={`text-[${theme.colors.traffic.border}] group-hover:text-white opacity-0 group-hover:opacity-100`} />
           </button>
         </div>
 
