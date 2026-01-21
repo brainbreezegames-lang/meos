@@ -119,12 +119,12 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isMaximized ? theme.radii.lg : theme.radii.window,
+            borderRadius: isMaximized ? '0px' : theme.radii.card,
             background: theme.colors.background,
             backdropFilter: theme.colors.blur,
             WebkitBackdropFilter: theme.colors.blur,
-            boxShadow: isActive ? theme.shadows.window.active : theme.shadows.window.inactive,
-            border: theme.colors.border,
+            boxShadow: isActive ? theme.shadows.hover : theme.shadows.solid,
+            border: isMaximized ? 'none' : `1px solid ${theme.colors.border}`,
             opacity: isActive ? 1 : 0.95,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
