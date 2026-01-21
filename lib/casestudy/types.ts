@@ -85,7 +85,7 @@ export const caseStudyTokens = {
   colors: {
     background: '#ffffff',     // Pure white
     surface: '#ffffff',        // Pure white for cards
-    text: '#1a1a1a',           // Near black
+    text: 'rgba(0, 0, 0, 0.85)',       // 85% opacity for softer reading
     textMuted: 'rgba(0, 0, 0, 0.4)',   // 40% opacity black
     textLight: 'rgba(0, 0, 0, 0.5)',   // 50% opacity
     accent: '#2B4AE2',         // goOS blue for links/emphasis
@@ -119,9 +119,9 @@ export const caseStudyTokens = {
     h3: { size: 24, weight: 500, letterSpacing: '0', lineHeight: 1.35 },
     // Section label (uppercase, wide letter-spacing)
     sectionLabel: { size: 12, weight: 500, letterSpacing: '0.15em', lineHeight: 1.5 },
-    // Body text
-    lead: { size: 20, weight: 400, letterSpacing: '0', lineHeight: 1.7 },
-    body: { size: 18, weight: 400, letterSpacing: '0', lineHeight: 1.7 },
+    // Body text - generous line height for readability
+    lead: { size: 20, weight: 400, letterSpacing: '0', lineHeight: 1.8 },
+    body: { size: 18, weight: 400, letterSpacing: '0', lineHeight: 1.75 },
     // Meta info
     metaName: { size: 16, weight: 600, letterSpacing: '0', lineHeight: 1.4 },
     metaTags: { size: 14, weight: 400, letterSpacing: '0', lineHeight: 1.4 },

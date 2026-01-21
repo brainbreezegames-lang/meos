@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { CaseStudyHero } from './CaseStudyHero';
 import { CaseStudySidebar } from './CaseStudySidebar';
 import { CaseStudyContent } from './CaseStudyContent';
@@ -14,7 +14,9 @@ export function CaseStudyPageView({
   relatedStudies = [],
   onClose,
 }: CaseStudyPageViewProps) {
-  const { colors, fonts } = caseStudyTokens;
+  const { colors } = caseStudyTokens;
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isPastHero, setIsPastHero] = useState(false);
 
   // Parse content into structured blocks
   const parsedContent = useMemo(() => {
@@ -29,6 +31,21 @@ export function CaseStudyPageView({
     return () => {
       document.body.style.overflow = originalOverflow;
     };
+  }, []);
+
+  // Track scroll position to show/hide sidebar
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      // Hero is 75vh, show sidebar after scrolling past 60%
+      const heroHeight = window.innerHeight * 0.6;
+      setIsPastHero(container.scrollTop > heroHeight);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Handle escape key to close
@@ -56,6 +73,7 @@ export function CaseStudyPageView({
 
   return (
     <div
+      ref={scrollContainerRef}
       style={{
         position: 'fixed',
         inset: 0,
@@ -79,11 +97,12 @@ export function CaseStudyPageView({
           title={note.title}
         />
 
-        {/* Sidebar navigation (fixed position) */}
+        {/* Sidebar navigation (fixed position, only visible after scrolling past hero) */}
         <CaseStudySidebar
           entries={parsedContent.tableOfContents}
           onBack={onClose}
           authorName={author.name}
+          isPastHero={isPastHero}
         />
 
         {/* Main content area */}
@@ -112,16 +131,8 @@ export function CaseStudyPageView({
         </main>
       </div>
 
-      {/* Google Fonts for Newsreader */}
+      {/* Global styles - using goOS design system fonts */}
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
-        /* Smooth scrolling */
-        html {
-          scroll-behavior: smooth;
-        }
-
         /* Custom scrollbar */
         ::-webkit-scrollbar {
           width: 8px;
@@ -142,10 +153,6 @@ export function CaseStudyPageView({
 
         /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
-          html {
-            scroll-behavior: auto;
-          }
-
           *, *::before, *::after {
             animation-duration: 0.01ms !important;
             animation-iteration-count: 1 !important;

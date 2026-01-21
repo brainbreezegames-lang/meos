@@ -9,6 +9,7 @@ interface CaseStudySidebarProps {
   entries: TableOfContentsEntry[];
   onBack: () => void;
   authorName?: string;
+  isPastHero?: boolean;
 }
 
 // Custom hook for scroll spy
@@ -52,34 +53,24 @@ export function CaseStudySidebar({
   entries,
   onBack,
   authorName = 'Desktop',
+  isPastHero = false,
 }: CaseStudySidebarProps) {
   const prefersReducedMotion = useReducedMotion();
-  const [isVisible, setIsVisible] = useState(false);
-  const [isPastHero, setIsPastHero] = useState(false);
+  const [isWideEnough, setIsWideEnough] = useState(false);
   const { colors, fonts, spacing, typography } = caseStudyTokens;
 
   const sectionIds = entries.map((e) => e.id);
   const activeSection = useScrollSpy(sectionIds);
 
-  // Hide sidebar below 1024px and only show after scrolling past hero
+  // Hide sidebar below 1024px
   useEffect(() => {
-    const checkVisibility = () => {
-      const isWideEnough = window.innerWidth > 1024;
-      // Hero is 75vh, show sidebar after scrolling past 60% of hero
-      const heroHeight = window.innerHeight * 0.6;
-      const scrolledPastHero = window.scrollY > heroHeight;
-
-      setIsVisible(isWideEnough);
-      setIsPastHero(scrolledPastHero);
+    const checkWidth = () => {
+      setIsWideEnough(window.innerWidth > 1024);
     };
 
-    checkVisibility();
-    window.addEventListener('resize', checkVisibility);
-    window.addEventListener('scroll', checkVisibility, { passive: true });
-    return () => {
-      window.removeEventListener('resize', checkVisibility);
-      window.removeEventListener('scroll', checkVisibility);
-    };
+    checkWidth();
+    window.addEventListener('resize', checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
   }, []);
 
   const scrollToSection = useCallback(
@@ -96,7 +87,7 @@ export function CaseStudySidebar({
   );
 
   // Don't render if screen is too narrow or haven't scrolled past hero
-  if (!isVisible || !isPastHero) return null;
+  if (!isWideEnough || !isPastHero) return null;
 
   return (
     <motion.nav
@@ -130,14 +121,14 @@ export function CaseStudySidebar({
           fontFamily: fonts.ui,
           fontSize: typography.sidebar.size,
           fontWeight: typography.sidebar.weight,
-          color: 'rgba(0, 0, 0, 0.4)', // 40% opacity
+          color: 'rgba(0, 0, 0, 0.35)', // 35% opacity - very muted
           transition: 'color 0.2s ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.color = 'rgba(0, 0, 0, 0.7)';
+          e.currentTarget.style.color = 'rgba(0, 0, 0, 0.6)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.color = 'rgba(0, 0, 0, 0.4)';
+          e.currentTarget.style.color = 'rgba(0, 0, 0, 0.35)';
         }}
       >
         <ArrowLeft size={16} strokeWidth={1.5} />
@@ -178,8 +169,8 @@ export function CaseStudySidebar({
                     fontWeight: isActive
                       ? typography.sidebarActive.weight
                       : typography.sidebar.weight,
-                    // Very muted (40%) when inactive, full black when active
-                    color: isActive ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 0.4)',
+                    // Very muted (35%) when inactive, 90% when active
+                    color: isActive ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.35)',
                     lineHeight: typography.sidebar.lineHeight,
                     transition: 'color 0.2s ease',
                     overflow: 'hidden',
@@ -188,12 +179,12 @@ export function CaseStudySidebar({
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.color = 'rgba(0, 0, 0, 0.7)';
+                      e.currentTarget.style.color = 'rgba(0, 0, 0, 0.6)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.color = 'rgba(0, 0, 0, 0.4)';
+                      e.currentTarget.style.color = 'rgba(0, 0, 0, 0.35)';
                     }
                   }}
                   aria-current={isActive ? 'true' : undefined}

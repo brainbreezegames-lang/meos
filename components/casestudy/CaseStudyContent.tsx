@@ -48,20 +48,18 @@ function ContentImage({ image }: { image: ImageData }) {
         padding: 0,
         ...(isFullWidth
           ? {
-              // Break out of content container but don't go full viewport
-              // Stay within a reasonable max-width to avoid sidebar overlap
-              width: 'calc(100% + 120px)',
-              maxWidth: 1000,
-              marginLeft: -60,
-              marginRight: -60,
-              marginTop: 48,
-              marginBottom: 48,
+              // Full-bleed images - break out to full viewport width
+              width: '100vw',
+              marginLeft: 'calc(-50vw + 50%)',
+              marginRight: 'calc(-50vw + 50%)',
+              marginTop: 56,
+              marginBottom: 56,
             }
           : {
               width: '100%',
               maxWidth: spacing.contentMaxWidth,
-              marginTop: 32,
-              marginBottom: 32,
+              marginTop: 40,
+              marginBottom: 40,
             }),
       }}
     >
@@ -83,11 +81,13 @@ function ContentImage({ image }: { image: ImageData }) {
       {image.caption && (
         <figcaption
           style={{
-            marginTop: 12,
+            marginTop: 16,
             fontFamily: caseStudyTokens.fonts.ui,
             fontSize: 14,
             color: caseStudyTokens.colors.textMuted,
             textAlign: 'center',
+            paddingLeft: isFullWidth ? 24 : 0,
+            paddingRight: isFullWidth ? 24 : 0,
           }}
         >
           {image.caption}
@@ -107,13 +107,13 @@ function ContentImageGrid({ images }: { images: ImageData[] }) {
         display: 'grid',
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
         gap: 16,
-        // Break out of content container but stay within bounds
-        width: 'calc(100% + 120px)',
-        maxWidth: 1000,
-        marginLeft: -60,
-        marginRight: -60,
-        marginTop: 48,
-        marginBottom: 48,
+        // Full-bleed image grid
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
+        marginRight: 'calc(-50vw + 50%)',
+        padding: '0 48px',
+        marginTop: 56,
+        marginBottom: 56,
       }}
     >
       {images.map((image, index) => (
@@ -151,8 +151,8 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             lineHeight: typography.sectionLabel.lineHeight,
             textTransform: 'uppercase',
             color: colors.textMuted,
-            marginTop: 72,
-            marginBottom: 20,
+            marginTop: 96,  // More spacing before section labels
+            marginBottom: 24,
           }}
         >
           {block.content as string}
@@ -189,8 +189,8 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             letterSpacing: typography.h2.letterSpacing,
             lineHeight: typography.h2.lineHeight,
             color: colors.text,
-            marginTop: 64,
-            marginBottom: 24,
+            marginTop: 80,  // More spacing before section headings
+            marginBottom: 32,
             maxWidth: 600,
             scrollMarginTop: 100,
           }}
@@ -224,9 +224,9 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             fontFamily: fonts.body,
             fontSize: block.isLead ? typography.lead.size : typography.body.size,
             fontWeight: typography.body.weight,
-            lineHeight: typography.body.lineHeight,
+            lineHeight: block.isLead ? typography.lead.lineHeight : typography.body.lineHeight,
             color: colors.text,
-            marginBottom: 24,
+            marginBottom: 28,  // More paragraph spacing
           }}
           dangerouslySetInnerHTML={{ __html: block.content as string }}
         />
@@ -342,7 +342,7 @@ export function CaseStudyContent({
             display: 'flex',
             alignItems: 'center',
             gap: 16,
-            marginBottom: 40,
+            marginBottom: 56,  // More spacing after meta
             marginTop: -40, // Pull up into curved wave area
           }}
         >
