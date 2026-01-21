@@ -59,24 +59,8 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
     };
   }, [handleKeyDown, handleClickOutside]);
 
-  // Derive display flags from theme properties
-  const showAmbientGlow = theme.colors.blur !== 'none';
-
   // Get blocks to render - either from active tab or direct blocks
   const getBlocksToRender = (): BlockData[] => {
-    if (!item) return [];
-
-    // ... code continues ...
-    // (I am only replacing the top part where vars were defined, but I need to be careful with the instruction range)
-    // Actually the logic is spread out. 
-    // I will replace line 24-27 with `const showAmbientGlow = theme.colors.blur !== 'none';`
-    // And then replace the render blocks that used the variables.
-
-    // Let's stick to smaller chunks.
-
-
-    // Get blocks to render - either from active tab or direct blocks
-    const getBlocksToRender = (): BlockData[] => {
       if (!item) return [];
 
       // New block system
