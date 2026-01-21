@@ -224,7 +224,7 @@ export function GoOSEditorWindow({
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <FileIcon
             size={16}
-            color={themeColors.text}
+            color={theme.colors.text.primary}
             strokeWidth={1.5}
           />
 
@@ -244,10 +244,10 @@ export function GoOSEditorWindow({
                 padding: '4px 8px',
                 fontSize: 14,
                 fontWeight: 600,
-                fontFamily: goOSTokens.fonts.body,
-                color: themeColors.text,
-                background: themeColors.bg,
-                border: `1.5px solid ${themeColors.border}`,
+                fontFamily: theme.fonts.heading,
+                color: theme.colors.text.primary,
+                background: theme.colors.paper,
+                border: `1.5px solid ${theme.colors.border}`,
                 borderRadius: 4,
                 outline: 'none',
               }}
@@ -258,8 +258,8 @@ export function GoOSEditorWindow({
               style={{
                 fontSize: 14,
                 fontWeight: 600,
-                fontFamily: goOSTokens.fonts.body,
-                color: themeColors.text,
+                fontFamily: theme.fonts.heading,
+                color: theme.colors.text.primary,
                 cursor: 'text',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -304,11 +304,11 @@ export function GoOSEditorWindow({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          borderTop: `2px solid ${themeColors.border}`,
-          background: themeColors.bg,
+          borderTop: `2px solid ${theme.colors.border}`,
+          background: theme.colors.paper,
           fontSize: 11,
-          fontFamily: goOSTokens.fonts.body,
-          color: themeColors.secondary,
+          fontFamily: theme.fonts.mono,
+          color: theme.colors.text.secondary,
         }}
       >
         <div style={{ display: 'flex', gap: 16 }}>
