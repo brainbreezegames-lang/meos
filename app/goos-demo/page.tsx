@@ -2269,44 +2269,71 @@ function GoOSDemoContent() {
                 </div>
             </header>
 
-            {/* PAGE VIEW MODE - Full screen, clean reading experience */}
-            {viewMode === 'page' && (
-                <div className="fixed inset-0 z-[9000] bg-white overflow-auto">
-                    {/* Back to Desktop button */}
-                    <button
-                        onClick={() => setViewMode('desktop')}
-                        style={{
-                            position: 'fixed',
-                            top: '24px',
-                            right: '24px',
-                            zIndex: 9001,
-                            padding: '8px 16px',
-                            background: '#2B4AE2',
-                            color: '#FFFFFF',
-                            border: 'none',
-                            borderRadius: '6px',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            fontFamily: '"SF Pro Text", -apple-system, sans-serif',
+            {/* PAGE VIEW MODE - Belle Duffner-style case study view */}
+            {viewMode === 'page' && (() => {
+                // Get the first published file to display
+                const publishedFiles = goosFiles.filter(f => f.status === 'published');
+                const firstFile = publishedFiles[0];
+
+                if (!firstFile) {
+                    return (
+                        <div className="fixed inset-0 z-[9000] bg-white flex items-center justify-center">
+                            <p style={{ color: '#666' }}>No published content yet</p>
+                            <button
+                                onClick={() => setViewMode('desktop')}
+                                style={{
+                                    position: 'fixed',
+                                    top: '24px',
+                                    right: '24px',
+                                    padding: '8px 16px',
+                                    background: '#2B4AE2',
+                                    color: '#FFFFFF',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    fontSize: '13px',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                ← Back to Desktop
+                            </button>
+                        </div>
+                    );
+                }
+
+                // Get related studies (other published files)
+                const relatedStudies = publishedFiles
+                    .filter(f => f.id !== firstFile.id)
+                    .slice(0, 2)
+                    .map(f => ({
+                        id: f.id,
+                        title: f.title,
+                        subtitle: null,
+                        headerImage: f.headerImage || null,
+                        fileType: f.type as 'note' | 'case-study',
+                    }));
+
+                return (
+                    <CaseStudyPageView
+                        note={{
+                            id: firstFile.id,
+                            title: firstFile.title,
+                            subtitle: null,
+                            content: firstFile.content,
+                            headerImage: firstFile.headerImage || null,
+                            publishedAt: firstFile.publishedAt ? new Date(firstFile.publishedAt) : null,
+                            fileType: firstFile.type as 'note' | 'case-study',
                         }}
-                    >
-                        ← Back to Desktop
-                    </button>
-                    <PageView
-                        items={goosFilesAsDesktopItems}
-                        isOwner={true}
                         author={{
-                            name: 'Demo User',
                             username: 'demo',
+                            name: 'Demo User',
+                            image: null,
                         }}
-                        onItemClick={(item) => {
-                            // Open case study view for the clicked item
-                            setCaseStudyFileId(item.id);
-                        }}
+                        relatedStudies={relatedStudies}
+                        onClose={() => setViewMode('desktop')}
                     />
-                </div>
-            )}
+                );
+            })()}
 
             {/* DESKTOP AREA */}
             <main className="pt-10 pb-20 min-h-screen relative">
