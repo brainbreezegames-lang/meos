@@ -73,240 +73,53 @@ interface ThemeColors {
   accent: string;
 }
 
-function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
-  switch (themeId) {
-    case 'dark':
-      return {
-        windowBg: 'linear-gradient(180deg, rgba(32,32,38,0.98) 0%, rgba(22,22,26,0.96) 100%)',
-        windowShadow: '0 35px 80px -20px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 0.5px 0 rgba(255,255,255,0.12)',
-        windowShadowInactive: '0 20px 50px -15px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.05)',
-        windowBorder: 'rgba(255,255,255,0.06)',
+// Unified design system - uses CSS variables from design-system.css
+function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
+  // ONE design system - Appart theme via CSS variables
+  return {
+    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
+    windowShadowInactive: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+    windowBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
 
-        titleBarBg: 'linear-gradient(180deg, rgba(40,40,48,1) 0%, rgba(32,32,38,1) 100%)',
-        titleBarBorder: 'rgba(255,255,255,0.06)',
-        titleText: '#F8F8FA',
-        iconBg: 'linear-gradient(135deg, #5BA0FF 0%, #4A8FEE 100%)',
-        iconColor: '#000000',
+    titleBarBg: 'var(--color-bg-base, #fbf9ef)',
+    titleBarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    titleText: 'var(--color-text-primary, #171412)',
+    iconBg: 'var(--color-accent-primary, #ff7722)',
+    iconColor: 'var(--color-bg-white, #ffffff)',
 
-        sidebarBg: 'linear-gradient(180deg, rgba(28,28,32,1) 0%, rgba(22,22,26,1) 100%)',
-        sidebarBorder: 'rgba(255,255,255,0.06)',
-        sectionHeader: '#56565C',
-        sectionItemBg: 'transparent',
-        sectionItemSelectedBg: 'linear-gradient(135deg, #5BA0FF 0%, #4A8FEE 100%)',
-        sectionItemText: '#E8E8EA',
-        sectionItemSelectedText: '#FFFFFF',
-        sectionNumber: '#56565C',
-        sectionNumberBg: 'rgba(255,255,255,0.06)',
-        sectionNumberSelectedBg: 'rgba(255,255,255,0.2)',
+    sidebarBg: 'var(--color-bg-subtle, #f2f0e7)',
+    sidebarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    sectionHeader: 'var(--color-text-muted, #8e827c)',
+    sectionItemBg: 'transparent',
+    sectionItemSelectedBg: 'var(--color-accent-primary, #ff7722)',
+    sectionItemText: 'var(--color-text-primary, #171412)',
+    sectionItemSelectedText: 'var(--color-bg-white, #ffffff)',
+    sectionNumber: 'var(--color-text-muted, #8e827c)',
+    sectionNumberBg: 'rgba(23, 20, 18, 0.04)',
+    sectionNumberSelectedBg: 'rgba(255, 255, 255, 0.2)',
 
-        contentBg: 'linear-gradient(180deg, rgba(22,22,26,1) 0%, rgba(18,18,22,1) 100%)',
-        contentText: '#E8E8EA',
-        contentTitle: '#F8F8FA',
-        contentSubtitle: '#94949C',
-        contentBorder: 'rgba(255,255,255,0.04)',
+    contentBg: 'var(--color-bg-base, #fbf9ef)',
+    contentText: 'var(--color-text-primary, #171412)',
+    contentTitle: 'var(--color-text-primary, #171412)',
+    contentSubtitle: 'var(--color-text-muted, #8e827c)',
+    contentBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
 
-        progressBg: 'rgba(255,255,255,0.06)',
-        progressFill: '#5BA0FF',
-        progressText: '#56565C',
+    progressBg: 'rgba(23, 20, 18, 0.04)',
+    progressFill: 'var(--color-accent-primary, #ff7722)',
+    progressText: 'var(--color-text-muted, #8e827c)',
 
-        buttonText: '#94949C',
-        buttonHoverBg: 'rgba(255,255,255,0.06)',
-        buttonDisabledText: '#3A3A3E',
+    buttonText: 'var(--color-text-muted, #8e827c)',
+    buttonHoverBg: 'rgba(255, 119, 34, 0.08)',
+    buttonDisabledText: 'rgba(23, 20, 18, 0.2)',
 
-        emptyBg: 'rgba(255,255,255,0.04)',
-        emptyIcon: '#56565C',
-        emptyTitle: '#94949C',
-        emptyText: '#56565C',
+    emptyBg: 'rgba(255, 119, 34, 0.06)',
+    emptyIcon: 'var(--color-text-muted, #8e827c)',
+    emptyTitle: 'var(--color-text-primary, #171412)',
+    emptyText: 'var(--color-text-muted, #8e827c)',
 
-        accent: '#5BA0FF',
-      };
-
-    case 'bluren':
-      return {
-        windowBg: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.96) 100%)',
-        windowShadow: '0 16px 48px -8px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.04)',
-        windowShadowInactive: '0 8px 32px -8px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.03)',
-        windowBorder: 'rgba(0,0,0,0.04)',
-
-        titleBarBg: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(252,252,254,1) 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.04)',
-        titleText: '#000000',
-        iconBg: 'linear-gradient(135deg, #0071E3 0%, #0066CC 100%)',
-        iconColor: '#FFFFFF',
-
-        sidebarBg: 'linear-gradient(180deg, rgba(252,252,254,1) 0%, rgba(250,250,252,1) 100%)',
-        sidebarBorder: 'rgba(0,0,0,0.04)',
-        sectionHeader: 'rgba(0,0,0,0.35)',
-        sectionItemBg: 'transparent',
-        sectionItemSelectedBg: 'linear-gradient(135deg, #0071E3 0%, #0066CC 100%)',
-        sectionItemText: 'rgba(0,0,0,0.85)',
-        sectionItemSelectedText: '#FFFFFF',
-        sectionNumber: 'rgba(0,0,0,0.35)',
-        sectionNumberBg: 'rgba(0,0,0,0.03)',
-        sectionNumberSelectedBg: 'rgba(255,255,255,0.2)',
-
-        contentBg: '#FFFFFF',
-        contentText: 'rgba(0,0,0,0.85)',
-        contentTitle: '#000000',
-        contentSubtitle: 'rgba(0,0,0,0.5)',
-        contentBorder: 'rgba(0,0,0,0.03)',
-
-        progressBg: 'rgba(0,0,0,0.04)',
-        progressFill: '#0071E3',
-        progressText: 'rgba(0,0,0,0.35)',
-
-        buttonText: 'rgba(0,0,0,0.45)',
-        buttonHoverBg: 'rgba(0,0,0,0.03)',
-        buttonDisabledText: 'rgba(0,0,0,0.2)',
-
-        emptyBg: 'rgba(0,0,0,0.02)',
-        emptyIcon: 'rgba(0,0,0,0.25)',
-        emptyTitle: 'rgba(0,0,0,0.5)',
-        emptyText: 'rgba(0,0,0,0.35)',
-
-        accent: '#0071E3',
-      };
-
-    case 'refined':
-      return {
-        windowBg: 'linear-gradient(180deg, rgba(28,28,28,0.98) 0%, rgba(21,21,21,0.96) 100%)',
-        windowShadow: '0 24px 64px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)',
-        windowShadowInactive: '0 16px 48px -16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-        windowBorder: 'rgba(255,255,255,0.05)',
-
-        titleBarBg: 'linear-gradient(180deg, rgba(32,32,32,1) 0%, rgba(24,24,24,1) 100%)',
-        titleBarBorder: 'rgba(255,255,255,0.05)',
-        titleText: '#f5f5f0',
-        iconBg: 'linear-gradient(135deg, #cae8bd 0%, #b8d9a8 100%)',
-        iconColor: '#0d0d0d',
-
-        sidebarBg: 'linear-gradient(180deg, rgba(24,24,24,1) 0%, rgba(18,18,18,1) 100%)',
-        sidebarBorder: 'rgba(255,255,255,0.05)',
-        sectionHeader: 'rgba(245,245,240,0.35)',
-        sectionItemBg: 'transparent',
-        sectionItemSelectedBg: 'linear-gradient(135deg, #cae8bd 0%, #b8d9a8 100%)',
-        sectionItemText: 'rgba(245,245,240,0.85)',
-        sectionItemSelectedText: '#0d0d0d',
-        sectionNumber: 'rgba(245,245,240,0.35)',
-        sectionNumberBg: 'rgba(255,255,255,0.04)',
-        sectionNumberSelectedBg: 'rgba(13,13,13,0.15)',
-
-        contentBg: 'linear-gradient(180deg, rgba(21,21,21,1) 0%, rgba(15,15,15,1) 100%)',
-        contentText: 'rgba(245,245,240,0.85)',
-        contentTitle: '#f5f5f0',
-        contentSubtitle: 'rgba(245,245,240,0.5)',
-        contentBorder: 'rgba(255,255,255,0.04)',
-
-        progressBg: 'rgba(255,255,255,0.04)',
-        progressFill: '#cae8bd',
-        progressText: 'rgba(245,245,240,0.35)',
-
-        buttonText: 'rgba(245,245,240,0.45)',
-        buttonHoverBg: 'rgba(255,255,255,0.04)',
-        buttonDisabledText: 'rgba(245,245,240,0.2)',
-
-        emptyBg: 'rgba(255,255,255,0.03)',
-        emptyIcon: 'rgba(245,245,240,0.25)',
-        emptyTitle: 'rgba(245,245,240,0.5)',
-        emptyText: 'rgba(245,245,240,0.35)',
-
-        accent: '#cae8bd',
-      };
-
-    case 'sketch':
-      // Sketch/goOS: Hand-drawn, playful, paper-like (Blueprint style)
-      return {
-        windowBg: '#FFFFFF',
-        windowShadow: '6px 6px 0 #2B4AE2',
-        windowShadowInactive: '4px 4px 0 #2B4AE2',
-        windowBorder: '#2B4AE2',
-
-        titleBarBg: '#FFFFFF',
-        titleBarBorder: '#2B4AE2',
-        titleText: '#2B4AE2',
-        iconBg: '#2B4AE2',
-        iconColor: '#FFFFFF',
-
-        sidebarBg: '#FFFFFF',
-        sidebarBorder: '#2B4AE2',
-        sectionHeader: '#2B4AE2',
-        sectionItemBg: 'transparent',
-        sectionItemSelectedBg: '#2B4AE2',
-        sectionItemText: '#2B4AE2',
-        sectionItemSelectedText: '#FFFFFF',
-        sectionNumber: '#2B4AE2',
-        sectionNumberBg: 'rgba(43, 74, 226, 0.08)',
-        sectionNumberSelectedBg: 'rgba(255, 255, 255, 0.3)',
-
-        contentBg: '#FFFFFF',
-        contentText: '#2B4AE2',
-        contentTitle: '#2B4AE2',
-        contentSubtitle: '#2B4AE2',
-        contentBorder: 'rgba(43, 74, 226, 0.15)',
-
-        progressBg: 'rgba(43, 74, 226, 0.1)',
-        progressFill: '#2B4AE2',
-        progressText: '#2B4AE2',
-
-        buttonText: '#2B4AE2',
-        buttonHoverBg: 'rgba(43, 74, 226, 0.08)',
-        buttonDisabledText: '#999999',
-
-        emptyBg: 'rgba(43, 74, 226, 0.04)',
-        emptyIcon: '#2B4AE2',
-        emptyTitle: '#2B4AE2',
-        emptyText: '#2B4AE2',
-
-        accent: '#2B4AE2',
-      };
-
-    case 'monterey':
-    default:
-      return {
-        windowBg: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,250,252,0.96) 100%)',
-        windowShadow: '0 32px 80px -20px rgba(0,0,0,0.35), 0 0 1px rgba(0,0,0,0.1), inset 0 0.5px 0 rgba(255,255,255,0.8)',
-        windowShadowInactive: '0 20px 50px -15px rgba(0,0,0,0.25), 0 0 1px rgba(0,0,0,0.08)',
-        windowBorder: 'rgba(255,255,255,0.3)',
-
-        titleBarBg: 'linear-gradient(180deg, rgba(253,253,253,1) 0%, rgba(247,247,250,1) 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.08)',
-        titleText: '#1D1D1F',
-        iconBg: 'linear-gradient(135deg, #FF9500 0%, #FF6B00 100%)',
-        iconColor: '#FFFFFF',
-
-        sidebarBg: 'linear-gradient(180deg, #F9F9FB 0%, #F4F4F6 100%)',
-        sidebarBorder: 'rgba(0,0,0,0.08)',
-        sectionHeader: '#86868B',
-        sectionItemBg: 'transparent',
-        sectionItemSelectedBg: 'linear-gradient(135deg, #FF9500 0%, #FF8C00 100%)',
-        sectionItemText: '#1D1D1F',
-        sectionItemSelectedText: '#FFFFFF',
-        sectionNumber: '#86868B',
-        sectionNumberBg: 'rgba(0,0,0,0.04)',
-        sectionNumberSelectedBg: 'rgba(255,255,255,0.2)',
-
-        contentBg: '#FFFFFF',
-        contentText: '#1D1D1F',
-        contentTitle: '#1D1D1F',
-        contentSubtitle: '#86868B',
-        contentBorder: 'rgba(0,0,0,0.06)',
-
-        progressBg: 'rgba(0,0,0,0.04)',
-        progressFill: '#FF9500',
-        progressText: '#86868B',
-
-        buttonText: '#86868B',
-        buttonHoverBg: 'rgba(0,0,0,0.04)',
-        buttonDisabledText: '#AEAEB2',
-
-        emptyBg: 'rgba(0,0,0,0.02)',
-        emptyIcon: '#AEAEB2',
-        emptyTitle: '#86868B',
-        emptyText: '#AEAEB2',
-
-        accent: '#FF9500',
-      };
-  }
+    accent: 'var(--color-accent-primary, #ff7722)',
+  };
 }
 
 export function PagesWindow({ window: windowInstance, item }: PagesWindowProps) {
@@ -324,9 +137,8 @@ export function PagesWindow({ window: windowInstance, item }: PagesWindowProps) 
   const isOwner = context?.isOwner ?? false;
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
-  const isSketch = themeContext?.theme === 'sketch';
 
-  // Get theme-specific colors
+  // Get theme-specific colors (unified design system)
   const colors = useMemo(() => getThemeColors(themeContext?.theme), [themeContext?.theme]);
 
   // Use tabs as document sections/chapters

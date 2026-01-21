@@ -92,334 +92,61 @@ interface ThemeColors {
   accent: string;
 }
 
-function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
-  switch (themeId) {
-    case 'dark':
-      return {
-        windowBg: '#1E1E1E',
-        windowShadow: '0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(255,255,255,0.1)',
-        windowShadowInactive: '0 20px 60px -15px rgba(0,0,0,0.6)',
+// Unified design system - uses CSS variables from design-system.css
+function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
+  // ONE design system - Appart theme via CSS variables
+  return {
+    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
+    windowShadowInactive: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
 
-        titleBarBg: 'linear-gradient(180deg, #3D3D3D 0%, #323232 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.3)',
-        titleText: '#FFFFFF',
+    titleBarBg: 'var(--color-bg-base, #fbf9ef)',
+    titleBarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    titleText: 'var(--color-text-primary, #171412)',
 
-        toolbarIconColor: 'rgba(255,255,255,0.7)',
-        toolbarIconHoverBg: 'rgba(255,255,255,0.1)',
-        toolbarIconDisabled: 'rgba(255,255,255,0.25)',
-        toolbarDivider: 'rgba(255,255,255,0.1)',
-        viewToggleBorder: 'rgba(255,255,255,0.15)',
-        viewToggleActiveBg: '#0A84FF',
-        viewToggleActiveText: '#FFFFFF',
+    toolbarIconColor: 'var(--color-text-muted, #8e827c)',
+    toolbarIconHoverBg: 'rgba(255, 119, 34, 0.08)',
+    toolbarIconDisabled: 'rgba(23, 20, 18, 0.2)',
+    toolbarDivider: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    viewToggleBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    viewToggleActiveBg: 'var(--color-accent-primary, #ff7722)',
+    viewToggleActiveText: 'var(--color-bg-white, #ffffff)',
 
-        sidebarBg: '#252526',
-        sidebarBorder: 'rgba(255,255,255,0.06)',
-        sidebarHeader: 'rgba(255,255,255,0.4)',
-        sidebarItemText: 'rgba(255,255,255,0.85)',
-        sidebarItemHover: 'rgba(255,255,255,0.08)',
-        tagRed: '#FF453A',
-        tagOrange: '#FF9F0A',
-        tagGreen: '#32D74B',
-        tagBlue: '#0A84FF',
+    sidebarBg: 'var(--color-bg-subtle, #f2f0e7)',
+    sidebarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    sidebarHeader: 'var(--color-text-muted, #8e827c)',
+    sidebarItemText: 'var(--color-text-primary, #171412)',
+    sidebarItemHover: 'rgba(255, 119, 34, 0.08)',
+    tagRed: '#ff3c34',
+    tagOrange: '#ffc765',
+    tagGreen: '#10b981',
+    tagBlue: 'var(--color-accent-primary, #ff7722)',
 
-        contentBg: '#1E1E1E',
-        fileText: '#FFFFFF',
-        fileSelectedBg: '#0A84FF',
-        fileSelectedText: '#FFFFFF',
-        fileHoverBg: 'rgba(255,255,255,0.06)',
-        listHeaderText: 'rgba(255,255,255,0.5)',
-        listRowBorder: 'rgba(255,255,255,0.04)',
+    contentBg: 'var(--color-bg-base, #fbf9ef)',
+    fileText: 'var(--color-text-primary, #171412)',
+    fileSelectedBg: 'var(--color-accent-primary, #ff7722)',
+    fileSelectedText: 'var(--color-bg-white, #ffffff)',
+    fileHoverBg: 'rgba(255, 119, 34, 0.06)',
+    listHeaderText: 'var(--color-text-muted, #8e827c)',
+    listRowBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
 
-        previewBg: '#252526',
-        previewBorder: 'rgba(255,255,255,0.06)',
-        previewText: '#FFFFFF',
-        previewLabelText: 'rgba(255,255,255,0.5)',
-        previewValueText: 'rgba(255,255,255,0.8)',
-        previewBlockBg: '#1E1E1E',
+    previewBg: 'var(--color-bg-subtle, #f2f0e7)',
+    previewBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    previewText: 'var(--color-text-primary, #171412)',
+    previewLabelText: 'var(--color-text-muted, #8e827c)',
+    previewValueText: 'var(--color-text-primary, #171412)',
+    previewBlockBg: 'var(--color-bg-base, #fbf9ef)',
 
-        statusBarBg: '#252526',
-        statusBarBorder: 'rgba(255,255,255,0.06)',
-        statusBarText: 'rgba(255,255,255,0.5)',
+    statusBarBg: 'var(--color-bg-subtle, #f2f0e7)',
+    statusBarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    statusBarText: 'var(--color-text-muted, #8e827c)',
 
-        emptyIcon: 'rgba(255,255,255,0.3)',
-        emptyTitle: 'rgba(255,255,255,0.9)',
-        emptyText: 'rgba(255,255,255,0.5)',
+    emptyIcon: 'var(--color-text-muted, #8e827c)',
+    emptyTitle: 'var(--color-text-primary, #171412)',
+    emptyText: 'var(--color-text-muted, #8e827c)',
 
-        accent: '#0A84FF',
-      };
-
-    case 'bluren':
-      return {
-        windowBg: '#FFFFFF',
-        windowShadow: '0 20px 60px -15px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.05)',
-        windowShadowInactive: '0 10px 40px -10px rgba(0,0,0,0.1)',
-
-        titleBarBg: 'linear-gradient(180deg, #FAFAFA 0%, #F2F2F2 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.08)',
-        titleText: '#000000',
-
-        toolbarIconColor: 'rgba(0,0,0,0.55)',
-        toolbarIconHoverBg: 'rgba(0,0,0,0.05)',
-        toolbarIconDisabled: 'rgba(0,0,0,0.2)',
-        toolbarDivider: 'rgba(0,0,0,0.08)',
-        viewToggleBorder: 'rgba(0,0,0,0.1)',
-        viewToggleActiveBg: '#0071E3',
-        viewToggleActiveText: '#FFFFFF',
-
-        sidebarBg: '#F5F5F7',
-        sidebarBorder: 'rgba(0,0,0,0.05)',
-        sidebarHeader: 'rgba(0,0,0,0.35)',
-        sidebarItemText: 'rgba(0,0,0,0.8)',
-        sidebarItemHover: 'rgba(0,0,0,0.04)',
-        tagRed: '#FF3B30',
-        tagOrange: '#FF9500',
-        tagGreen: '#34C759',
-        tagBlue: '#0071E3',
-
-        contentBg: '#FFFFFF',
-        fileText: '#1D1D1F',
-        fileSelectedBg: '#0071E3',
-        fileSelectedText: '#FFFFFF',
-        fileHoverBg: 'rgba(0,0,0,0.03)',
-        listHeaderText: 'rgba(0,0,0,0.4)',
-        listRowBorder: 'rgba(0,0,0,0.04)',
-
-        previewBg: '#F5F5F7',
-        previewBorder: 'rgba(0,0,0,0.05)',
-        previewText: '#1D1D1F',
-        previewLabelText: 'rgba(0,0,0,0.4)',
-        previewValueText: 'rgba(0,0,0,0.7)',
-        previewBlockBg: '#FFFFFF',
-
-        statusBarBg: '#F5F5F7',
-        statusBarBorder: 'rgba(0,0,0,0.05)',
-        statusBarText: 'rgba(0,0,0,0.4)',
-
-        emptyIcon: 'rgba(0,0,0,0.2)',
-        emptyTitle: 'rgba(0,0,0,0.8)',
-        emptyText: 'rgba(0,0,0,0.4)',
-
-        accent: '#0071E3',
-      };
-
-    case 'refined':
-      return {
-        windowBg: '#1A1A1A',
-        windowShadow: '0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)',
-        windowShadowInactive: '0 15px 50px -15px rgba(0,0,0,0.5)',
-
-        titleBarBg: 'linear-gradient(180deg, #2A2A2A 0%, #222222 100%)',
-        titleBarBorder: 'rgba(255,255,255,0.05)',
-        titleText: '#F5F5F0',
-
-        toolbarIconColor: 'rgba(245,245,240,0.6)',
-        toolbarIconHoverBg: 'rgba(255,255,255,0.06)',
-        toolbarIconDisabled: 'rgba(245,245,240,0.2)',
-        toolbarDivider: 'rgba(255,255,255,0.06)',
-        viewToggleBorder: 'rgba(255,255,255,0.08)',
-        viewToggleActiveBg: '#CAE8BD',
-        viewToggleActiveText: '#0D0D0D',
-
-        sidebarBg: '#1F1F1F',
-        sidebarBorder: 'rgba(255,255,255,0.04)',
-        sidebarHeader: 'rgba(245,245,240,0.35)',
-        sidebarItemText: 'rgba(245,245,240,0.8)',
-        sidebarItemHover: 'rgba(255,255,255,0.04)',
-        tagRed: '#E57373',
-        tagOrange: '#FFB74D',
-        tagGreen: '#CAE8BD',
-        tagBlue: '#81D4FA',
-
-        contentBg: '#1A1A1A',
-        fileText: '#F5F5F0',
-        fileSelectedBg: '#CAE8BD',
-        fileSelectedText: '#0D0D0D',
-        fileHoverBg: 'rgba(255,255,255,0.04)',
-        listHeaderText: 'rgba(245,245,240,0.4)',
-        listRowBorder: 'rgba(255,255,255,0.03)',
-
-        previewBg: '#1F1F1F',
-        previewBorder: 'rgba(255,255,255,0.04)',
-        previewText: '#F5F5F0',
-        previewLabelText: 'rgba(245,245,240,0.4)',
-        previewValueText: 'rgba(245,245,240,0.7)',
-        previewBlockBg: '#1A1A1A',
-
-        statusBarBg: '#1F1F1F',
-        statusBarBorder: 'rgba(255,255,255,0.04)',
-        statusBarText: 'rgba(245,245,240,0.4)',
-
-        emptyIcon: 'rgba(245,245,240,0.2)',
-        emptyTitle: 'rgba(245,245,240,0.85)',
-        emptyText: 'rgba(245,245,240,0.4)',
-
-        accent: '#CAE8BD',
-      };
-
-    case 'brand-appart':
-      return {
-        windowBg: '#fbf9ef',
-        windowShadow: '0 20px 60px rgba(0,0,0,0.15)',
-        windowShadowInactive: '0 10px 40px rgba(0,0,0,0.1)',
-
-        titleBarBg: '#fbf9ef',
-        titleBarBorder: 'rgba(23, 20, 18, 0.1)',
-        titleText: '#171412',
-
-        toolbarIconColor: '#8e827c',
-        toolbarIconHoverBg: '#ebe9df',
-        toolbarIconDisabled: 'rgba(23, 20, 18, 0.2)',
-        toolbarDivider: 'rgba(23, 20, 18, 0.1)',
-        viewToggleBorder: 'rgba(23, 20, 18, 0.1)',
-        viewToggleActiveBg: '#ff7722',
-        viewToggleActiveText: '#FFFFFF',
-
-        sidebarBg: '#f2f0e7',
-        sidebarBorder: 'rgba(23, 20, 18, 0.05)',
-        sidebarHeader: '#8e827c',
-        sidebarItemText: '#171412',
-        sidebarItemHover: 'rgba(23, 20, 18, 0.05)',
-        tagRed: '#ff3c34',
-        tagOrange: '#ffc765',
-        tagGreen: '#3d2fa9',
-        tagBlue: '#ff7722',
-
-        contentBg: '#fbf9ef',
-        fileText: '#171412',
-        fileSelectedBg: '#ff7722',
-        fileSelectedText: '#FFFFFF',
-        fileHoverBg: '#ebe9df',
-        listHeaderText: '#8e827c',
-        listRowBorder: 'rgba(23, 20, 18, 0.05)',
-
-        previewBg: '#f2f0e7',
-        previewBorder: 'rgba(23, 20, 18, 0.05)',
-        previewText: '#171412',
-        previewLabelText: '#8e827c',
-        previewValueText: '#171412',
-        previewBlockBg: '#fbf9ef',
-
-        statusBarBg: '#f2f0e7',
-        statusBarBorder: 'rgba(23, 20, 18, 0.05)',
-        statusBarText: '#8e827c',
-
-        emptyIcon: 'rgba(23, 20, 18, 0.2)',
-        emptyTitle: '#171412',
-        emptyText: '#8e827c',
-
-        accent: '#ff7722',
-      };
-
-    case 'sketch':
-      // Sketch/goOS: Hand-drawn, playful, paper-like (Blueprint style)
-      return {
-        windowBg: '#FFFFFF',
-        windowShadow: '6px 6px 0 #4A6CF7',
-        windowShadowInactive: '4px 4px 0 #4A6CF7',
-
-        titleBarBg: '#FFFFFF',
-        titleBarBorder: '#4A6CF7',
-        titleText: '#4A6CF7',
-
-        toolbarIconColor: '#4A6CF7',
-        toolbarIconHoverBg: 'rgba(74, 108, 247, 0.08)',
-        toolbarIconDisabled: '#999999',
-        toolbarDivider: 'rgba(74, 108, 247, 0.2)',
-        viewToggleBorder: '#4A6CF7',
-        viewToggleActiveBg: '#4A6CF7',
-        viewToggleActiveText: '#FFFFFF',
-
-        sidebarBg: '#FFFFFF',
-        sidebarBorder: '#4A6CF7',
-        sidebarHeader: '#4A6CF7',
-        sidebarItemText: '#4A6CF7',
-        sidebarItemHover: 'rgba(74, 108, 247, 0.08)',
-        tagRed: '#4A6CF7',
-        tagOrange: '#4A6CF7',
-        tagGreen: '#4A6CF7',
-        tagBlue: '#4A6CF7',
-
-        contentBg: '#FFFFFF',
-        fileText: '#4A6CF7',
-        fileSelectedBg: '#4A6CF7',
-        fileSelectedText: '#FFFFFF',
-        fileHoverBg: 'rgba(74, 108, 247, 0.06)',
-        listHeaderText: '#4A6CF7',
-        listRowBorder: 'rgba(74, 108, 247, 0.1)',
-
-        previewBg: '#FFFFFF',
-        previewBorder: '#4A6CF7',
-        previewText: '#4A6CF7',
-        previewLabelText: '#4A6CF7',
-        previewValueText: '#4A6CF7',
-        previewBlockBg: '#FFFFFF',
-
-        statusBarBg: '#FFFFFF',
-        statusBarBorder: '#4A6CF7',
-        statusBarText: '#4A6CF7',
-
-        emptyIcon: '#4A6CF7',
-        emptyTitle: '#4A6CF7',
-        emptyText: '#4A6CF7',
-
-        accent: '#4A6CF7',
-      };
-
-    case 'monterey':
-    default:
-      return {
-        windowBg: '#FFFFFF',
-        windowShadow: '0 35px 90px -20px rgba(0,0,0,0.35), 0 0 1px rgba(0,0,0,0.1)',
-        windowShadowInactive: '0 20px 50px -15px rgba(0,0,0,0.2)',
-
-        titleBarBg: 'linear-gradient(180deg, #E8E8E8 0%, #D4D4D4 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.15)',
-        titleText: '#1D1D1F',
-
-        toolbarIconColor: '#5E5E5E',
-        toolbarIconHoverBg: 'rgba(0,0,0,0.06)',
-        toolbarIconDisabled: '#AEAEB2',
-        toolbarDivider: 'rgba(0,0,0,0.1)',
-        viewToggleBorder: 'rgba(0,0,0,0.12)',
-        viewToggleActiveBg: '#007AFF',
-        viewToggleActiveText: '#FFFFFF',
-
-        sidebarBg: '#F6F6F6',
-        sidebarBorder: 'rgba(0,0,0,0.08)',
-        sidebarHeader: '#86868B',
-        sidebarItemText: '#1D1D1F',
-        sidebarItemHover: 'rgba(0,0,0,0.04)',
-        tagRed: '#FF3B30',
-        tagOrange: '#FF9500',
-        tagGreen: '#34C759',
-        tagBlue: '#007AFF',
-
-        contentBg: '#FFFFFF',
-        fileText: '#1D1D1F',
-        fileSelectedBg: '#007AFF',
-        fileSelectedText: '#FFFFFF',
-        fileHoverBg: 'rgba(0,0,0,0.03)',
-        listHeaderText: '#86868B',
-        listRowBorder: 'rgba(0,0,0,0.06)',
-
-        previewBg: '#F6F6F6',
-        previewBorder: 'rgba(0,0,0,0.08)',
-        previewText: '#1D1D1F',
-        previewLabelText: '#86868B',
-        previewValueText: '#3C3C43',
-        previewBlockBg: '#FFFFFF',
-
-        statusBarBg: '#F6F6F6',
-        statusBarBorder: 'rgba(0,0,0,0.08)',
-        statusBarText: '#86868B',
-
-        emptyIcon: '#AEAEB2',
-        emptyTitle: '#1D1D1F',
-        emptyText: '#86868B',
-
-        accent: '#007AFF',
-      };
-  }
+    accent: 'var(--color-accent-primary, #ff7722)',
+  };
 }
 
 export function FinderWindow({ window: windowInstance, item }: FinderWindowProps) {
@@ -436,7 +163,7 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
 
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
-  const isSketch = themeContext?.theme === 'sketch';
+  // Unified design system - no theme-specific checks needed
   const colors = useMemo(() => getThemeColors(themeContext?.theme), [themeContext?.theme]);
 
   // Convert tabs/blocks to file structure

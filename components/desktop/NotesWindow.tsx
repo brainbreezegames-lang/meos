@@ -92,405 +92,72 @@ interface ThemeColors {
   accentLight: string;
 }
 
-function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
-  switch (themeId) {
-    case 'dark':
-      // Dark theme: Sharp, neon blue accents, futuristic
-      return {
-        windowBg: 'linear-gradient(180deg, rgba(32,32,38,0.98) 0%, rgba(22,22,26,0.96) 100%)',
-        windowShadow: '0 35px 80px -20px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 0.5px 0 rgba(255,255,255,0.12)',
-        windowShadowInactive: '0 20px 50px -15px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.05)',
-        windowBorder: 'rgba(255,255,255,0.06)',
+// Unified design system - uses CSS variables from design-system.css
+function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
+  // ONE design system - Appart theme via CSS variables
+  return {
+    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
+    windowShadowInactive: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+    windowBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
 
-        titleBarBg: 'linear-gradient(180deg, rgba(40,40,48,1) 0%, rgba(32,32,38,1) 100%)',
-        titleBarBorder: 'rgba(255,255,255,0.06)',
-        titleText: '#F8F8FA',
-        iconColor: '#5BA0FF',
+    titleBarBg: 'var(--color-bg-base, #fbf9ef)',
+    titleBarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    titleText: 'var(--color-text-primary, #171412)',
+    iconColor: 'var(--color-accent-primary, #ff7722)',
 
-        sidebarBg: 'linear-gradient(180deg, rgba(28,28,32,1) 0%, rgba(22,22,26,1) 100%)',
-        sidebarBorder: 'rgba(255,255,255,0.06)',
-        searchBg: 'rgba(255,255,255,0.06)',
-        searchBgFocused: 'rgba(91,160,255,0.1)',
-        searchBorder: 'transparent',
-        searchBorderFocused: 'rgba(91,160,255,0.4)',
-        searchShadowFocused: '0 0 0 3px rgba(91,160,255,0.15)',
-        searchIcon: '#56565C',
-        searchIconFocused: '#5BA0FF',
-        searchText: '#F8F8FA',
+    sidebarBg: 'var(--color-bg-subtle, #f2f0e7)',
+    sidebarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    searchBg: 'var(--color-bg-white, #ffffff)',
+    searchBgFocused: 'var(--color-bg-white, #ffffff)',
+    searchBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    searchBorderFocused: 'var(--color-accent-primary, #ff7722)',
+    searchShadowFocused: '0 0 0 3px rgba(255, 119, 34, 0.15)',
+    searchIcon: 'var(--color-text-muted, #8e827c)',
+    searchIconFocused: 'var(--color-accent-primary, #ff7722)',
+    searchText: 'var(--color-text-primary, #171412)',
 
-        folderText: '#F8F8FA',
-        folderCount: '#56565C',
-        folderHoverBg: 'rgba(255,255,255,0.04)',
+    folderText: 'var(--color-text-primary, #171412)',
+    folderCount: 'var(--color-text-muted, #8e827c)',
+    folderHoverBg: 'rgba(255, 119, 34, 0.08)',
 
-        noteCardBg: 'rgba(255,255,255,0.04)',
-        noteCardShadow: '0 1px 3px rgba(0,0,0,0.3), inset 0 0.5px 0 rgba(255,255,255,0.05)',
-        noteCardHoverShadow: '0 4px 12px rgba(0,0,0,0.4), inset 0 0.5px 0 rgba(255,255,255,0.08)',
-        noteCardSelectedBg: 'linear-gradient(135deg, #5BA0FF 0%, #4A8FEE 100%)',
-        noteCardSelectedShadow: '0 4px 16px rgba(91,160,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
-        noteTitle: '#F8F8FA',
-        noteTitleSelected: '#FFFFFF',
-        noteDate: '#5BA0FF',
-        noteDateSelected: 'rgba(255,255,255,0.85)',
-        notePreview: '#94949C',
-        notePreviewSelected: 'rgba(255,255,255,0.7)',
-        noteDot: 'rgba(255,255,255,0.15)',
-        noteDotSelected: 'rgba(255,255,255,0.5)',
+    noteCardBg: 'var(--color-bg-white, #ffffff)',
+    noteCardShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
+    noteCardHoverShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+    noteCardSelectedBg: 'var(--color-accent-primary, #ff7722)',
+    noteCardSelectedShadow: '0 4px 16px rgba(255, 119, 34, 0.25)',
+    noteTitle: 'var(--color-text-primary, #171412)',
+    noteTitleSelected: 'var(--color-bg-white, #ffffff)',
+    noteDate: 'var(--color-accent-primary, #ff7722)',
+    noteDateSelected: 'rgba(255, 255, 255, 0.9)',
+    notePreview: 'var(--color-text-muted, #8e827c)',
+    notePreviewSelected: 'rgba(255, 255, 255, 0.8)',
+    noteDot: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    noteDotSelected: 'rgba(255, 255, 255, 0.5)',
 
-        contentBg: 'linear-gradient(180deg, rgba(22,22,26,1) 0%, rgba(18,18,22,1) 100%)',
-        contentHeaderBg: 'linear-gradient(180deg, rgba(30,30,36,0.5) 0%, transparent 100%)',
-        contentBorder: 'rgba(255,255,255,0.04)',
-        contentTitle: '#F8F8FA',
-        contentMeta: '#56565C',
-        contentText: '#E8E8EA',
+    contentBg: 'var(--color-bg-base, #fbf9ef)',
+    contentHeaderBg: 'transparent',
+    contentBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    contentTitle: 'var(--color-text-primary, #171412)',
+    contentMeta: 'var(--color-text-muted, #8e827c)',
+    contentText: 'var(--color-text-primary, #171412)',
 
-        emptyBg: 'linear-gradient(135deg, rgba(91,160,255,0.15) 0%, rgba(91,160,255,0.08) 100%)',
-        emptyShadow: '0 8px 24px rgba(91,160,255,0.1), inset 0 1px 0 rgba(255,255,255,0.1)',
-        emptyIconColor: '#5BA0FF',
-        emptyTitle: '#F8F8FA',
-        emptyText: '#56565C',
+    emptyBg: 'rgba(255, 119, 34, 0.06)',
+    emptyShadow: '0 8px 24px rgba(255, 119, 34, 0.08)',
+    emptyIconColor: 'var(--color-accent-primary, #ff7722)',
+    emptyTitle: 'var(--color-text-primary, #171412)',
+    emptyText: 'var(--color-text-muted, #8e827c)',
 
-        buttonText: '#56565C',
-        buttonHoverBg: 'rgba(255,255,255,0.06)',
-        buttonHoverText: '#F8F8FA',
-        primaryButtonBg: 'linear-gradient(135deg, #5BA0FF 0%, #4A8FEE 100%)',
-        primaryButtonText: '#000000',
-        primaryButtonShadow: '0 4px 12px rgba(91,160,255,0.4)',
+    buttonText: 'var(--color-text-muted, #8e827c)',
+    buttonHoverBg: 'rgba(255, 119, 34, 0.08)',
+    buttonHoverText: 'var(--color-text-primary, #171412)',
+    primaryButtonBg: 'var(--color-accent-primary, #ff7722)',
+    primaryButtonText: 'var(--color-bg-white, #ffffff)',
+    primaryButtonShadow: '0 4px 12px rgba(255, 119, 34, 0.25)',
 
-        accent: '#5BA0FF',
-        accentLight: 'rgba(91,160,255,0.15)',
-      };
-
-    case 'bluren':
-      // Bluren: Ultra-minimal, airy, Apple-pure
-      return {
-        windowBg: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.96) 100%)',
-        windowShadow: '0 16px 48px -8px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.04)',
-        windowShadowInactive: '0 8px 32px -8px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.03)',
-        windowBorder: 'rgba(0,0,0,0.04)',
-
-        titleBarBg: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(252,252,254,1) 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.04)',
-        titleText: '#000000',
-        iconColor: '#0071E3',
-
-        sidebarBg: 'linear-gradient(180deg, rgba(252,252,254,1) 0%, rgba(250,250,252,1) 100%)',
-        sidebarBorder: 'rgba(0,0,0,0.04)',
-        searchBg: 'rgba(0,0,0,0.02)',
-        searchBgFocused: 'rgba(0,113,227,0.04)',
-        searchBorder: 'transparent',
-        searchBorderFocused: 'rgba(0,113,227,0.3)',
-        searchShadowFocused: '0 0 0 3px rgba(0,113,227,0.1)',
-        searchIcon: 'rgba(0,0,0,0.25)',
-        searchIconFocused: '#0071E3',
-        searchText: '#000000',
-
-        folderText: '#000000',
-        folderCount: 'rgba(0,0,0,0.35)',
-        folderHoverBg: 'rgba(0,0,0,0.02)',
-
-        noteCardBg: 'rgba(255,255,255,0.9)',
-        noteCardShadow: '0 0.5px 2px rgba(0,0,0,0.04), 0 0 0 0.5px rgba(0,0,0,0.02)',
-        noteCardHoverShadow: '0 2px 6px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.03)',
-        noteCardSelectedBg: 'linear-gradient(135deg, #0071E3 0%, #0066CC 100%)',
-        noteCardSelectedShadow: '0 2px 8px rgba(0,113,227,0.25)',
-        noteTitle: '#000000',
-        noteTitleSelected: '#FFFFFF',
-        noteDate: '#0071E3',
-        noteDateSelected: 'rgba(255,255,255,0.85)',
-        notePreview: 'rgba(0,0,0,0.45)',
-        notePreviewSelected: 'rgba(255,255,255,0.7)',
-        noteDot: 'rgba(0,0,0,0.1)',
-        noteDotSelected: 'rgba(255,255,255,0.4)',
-
-        contentBg: 'linear-gradient(180deg, #FFFFFF 0%, #FEFEFE 100%)',
-        contentHeaderBg: 'transparent',
-        contentBorder: 'rgba(0,0,0,0.03)',
-        contentTitle: '#000000',
-        contentMeta: 'rgba(0,0,0,0.35)',
-        contentText: 'rgba(0,0,0,0.85)',
-
-        emptyBg: 'linear-gradient(135deg, rgba(0,113,227,0.06) 0%, rgba(0,113,227,0.02) 100%)',
-        emptyShadow: '0 4px 12px rgba(0,113,227,0.06)',
-        emptyIconColor: '#0071E3',
-        emptyTitle: '#000000',
-        emptyText: 'rgba(0,0,0,0.45)',
-
-        buttonText: 'rgba(0,0,0,0.45)',
-        buttonHoverBg: 'rgba(0,0,0,0.02)',
-        buttonHoverText: '#000000',
-        primaryButtonBg: 'linear-gradient(135deg, #0071E3 0%, #0066CC 100%)',
-        primaryButtonText: '#FFFFFF',
-        primaryButtonShadow: '0 2px 8px rgba(0,113,227,0.2)',
-
-        accent: '#0071E3',
-        accentLight: 'rgba(0,113,227,0.08)',
-      };
-
-    case 'refined':
-      // Refined: Editorial luxury, warm dark, sage accents
-      return {
-        windowBg: 'linear-gradient(180deg, rgba(28,28,28,0.98) 0%, rgba(21,21,21,0.96) 100%)',
-        windowShadow: '0 24px 64px -16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)',
-        windowShadowInactive: '0 16px 48px -16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-        windowBorder: 'rgba(255,255,255,0.05)',
-
-        titleBarBg: 'linear-gradient(180deg, rgba(32,32,32,1) 0%, rgba(24,24,24,1) 100%)',
-        titleBarBorder: 'rgba(255,255,255,0.05)',
-        titleText: '#f5f5f0',
-        iconColor: '#cae8bd',
-
-        sidebarBg: 'linear-gradient(180deg, rgba(24,24,24,1) 0%, rgba(18,18,18,1) 100%)',
-        sidebarBorder: 'rgba(255,255,255,0.05)',
-        searchBg: 'rgba(255,255,255,0.03)',
-        searchBgFocused: 'rgba(202,232,189,0.08)',
-        searchBorder: 'transparent',
-        searchBorderFocused: 'rgba(202,232,189,0.3)',
-        searchShadowFocused: '0 0 0 3px rgba(202,232,189,0.1)',
-        searchIcon: 'rgba(245,245,240,0.25)',
-        searchIconFocused: '#cae8bd',
-        searchText: '#f5f5f0',
-
-        folderText: '#f5f5f0',
-        folderCount: 'rgba(245,245,240,0.35)',
-        folderHoverBg: 'rgba(255,255,255,0.03)',
-
-        noteCardBg: 'rgba(255,255,255,0.03)',
-        noteCardShadow: '0 1px 3px rgba(0,0,0,0.2), inset 0 0.5px 0 rgba(255,255,255,0.03)',
-        noteCardHoverShadow: '0 3px 8px rgba(0,0,0,0.3), inset 0 0.5px 0 rgba(255,255,255,0.05)',
-        noteCardSelectedBg: 'linear-gradient(135deg, #cae8bd 0%, #b8d9a8 100%)',
-        noteCardSelectedShadow: '0 4px 16px rgba(202,232,189,0.25)',
-        noteTitle: '#f5f5f0',
-        noteTitleSelected: '#0d0d0d',
-        noteDate: '#cae8bd',
-        noteDateSelected: 'rgba(13,13,13,0.7)',
-        notePreview: 'rgba(245,245,240,0.45)',
-        notePreviewSelected: 'rgba(13,13,13,0.6)',
-        noteDot: 'rgba(255,255,255,0.1)',
-        noteDotSelected: 'rgba(13,13,13,0.3)',
-
-        contentBg: 'linear-gradient(180deg, rgba(21,21,21,1) 0%, rgba(15,15,15,1) 100%)',
-        contentHeaderBg: 'linear-gradient(180deg, rgba(202,232,189,0.03) 0%, transparent 100%)',
-        contentBorder: 'rgba(255,255,255,0.03)',
-        contentTitle: '#f5f5f0',
-        contentMeta: 'rgba(245,245,240,0.35)',
-        contentText: 'rgba(245,245,240,0.85)',
-
-        emptyBg: 'linear-gradient(135deg, rgba(202,232,189,0.1) 0%, rgba(202,232,189,0.04) 100%)',
-        emptyShadow: '0 8px 24px rgba(202,232,189,0.08)',
-        emptyIconColor: '#cae8bd',
-        emptyTitle: '#f5f5f0',
-        emptyText: 'rgba(245,245,240,0.45)',
-
-        buttonText: 'rgba(245,245,240,0.45)',
-        buttonHoverBg: 'rgba(255,255,255,0.04)',
-        buttonHoverText: '#f5f5f0',
-        primaryButtonBg: 'linear-gradient(135deg, #cae8bd 0%, #b8d9a8 100%)',
-        primaryButtonText: '#0d0d0d',
-        primaryButtonShadow: '0 4px 12px rgba(202,232,189,0.2)',
-
-        accent: '#cae8bd',
-        accentLight: 'rgba(202,232,189,0.1)',
-      };
-
-    case 'warm':
-      // Warm: Organic, stone, paper-like, editorial
-      return {
-        windowBg: '#FAFAF9',
-        windowShadow: '0 24px 60px -12px rgba(28,25,23,0.15), 0 0 0 1px rgba(28,25,23,0.05)',
-        windowShadowInactive: '0 12px 32px -8px rgba(28,25,23,0.1), 0 0 0 1px rgba(28,25,23,0.04)',
-        windowBorder: 'rgba(28,25,23,0.05)',
-
-        titleBarBg: '#F5F5F4',
-        titleBarBorder: 'rgba(28,25,23,0.06)',
-        titleText: '#1C1917',
-        iconColor: '#EA580C',
-
-        sidebarBg: '#F5F5F4',
-        sidebarBorder: 'rgba(28,25,23,0.06)',
-        searchBg: 'rgba(28,25,23,0.04)',
-        searchBgFocused: '#FFFFFF',
-        searchBorder: 'transparent',
-        searchBorderFocused: 'rgba(234,88,12,0.3)',
-        searchShadowFocused: '0 0 0 3px rgba(234,88,12,0.1)',
-        searchIcon: '#A8A29E',
-        searchIconFocused: '#EA580C',
-        searchText: '#1C1917',
-
-        folderText: '#44403C',
-        folderCount: '#A8A29E',
-        folderHoverBg: 'rgba(28,25,23,0.04)',
-
-        noteCardBg: '#FFFFFF',
-        noteCardShadow: '0 1px 2px rgba(28,25,23,0.06), 0 0 0 1px rgba(28,25,23,0.04)',
-        noteCardHoverShadow: '0 4px 12px rgba(28,25,23,0.08), 0 0 0 1px rgba(28,25,23,0.06)',
-        noteCardSelectedBg: '#FFFFFF',
-        noteCardSelectedShadow: '0 8px 20px -4px rgba(234,88,12,0.15), 0 0 0 1.5px #EA580C',
-        noteTitle: '#1C1917',
-        noteTitleSelected: '#EA580C',
-        noteDate: '#EA580C',
-        noteDateSelected: '#EA580C',
-        notePreview: '#78716C',
-        notePreviewSelected: '#78716C',
-        noteDot: 'rgba(28,25,23,0.1)',
-        noteDotSelected: '#EA580C',
-
-        contentBg: '#FAFAF9',
-        contentHeaderBg: 'linear-gradient(180deg, rgba(245,245,244,0.5) 0%, transparent 100%)',
-        contentBorder: 'rgba(28,25,23,0.04)',
-        contentTitle: '#1C1917',
-        contentMeta: '#78716C',
-        contentText: '#1C1917',
-
-        emptyBg: 'linear-gradient(135deg, rgba(234,88,12,0.08) 0%, rgba(234,88,12,0.03) 100%)',
-        emptyShadow: '0 8px 24px rgba(234,88,12,0.08)',
-        emptyIconColor: '#EA580C',
-        emptyTitle: '#1C1917',
-        emptyText: '#78716C',
-
-        buttonText: '#78716C',
-        buttonHoverBg: 'rgba(28,25,23,0.05)',
-        buttonHoverText: '#1C1917',
-        primaryButtonBg: '#EA580C',
-        primaryButtonText: '#FFFFFF',
-        primaryButtonShadow: '0 4px 12px rgba(234,88,12,0.3)',
-
-        accent: '#EA580C',
-        accentLight: 'rgba(234,88,12,0.1)',
-      };
-
-    case 'sketch':
-      // Sketch/goOS: Hand-drawn, playful, paper-like (Blueprint style)
-      return {
-        windowBg: '#FFFFFF',
-        windowShadow: '6px 6px 0 #2B4AE2',
-        windowShadowInactive: '4px 4px 0 #2B4AE2',
-        windowBorder: '#2B4AE2',
-
-        titleBarBg: '#FFFFFF',
-        titleBarBorder: '#2B4AE2',
-        titleText: '#2B4AE2',
-        iconColor: '#2B4AE2',
-
-        sidebarBg: '#FFFFFF',
-        sidebarBorder: '#2B4AE2',
-        searchBg: '#FFFFFF',
-        searchBgFocused: '#FFFFFF',
-        searchBorder: '#2B4AE2',
-        searchBorderFocused: '#2B4AE2',
-        searchShadowFocused: '3px 3px 0 #2B4AE2',
-        searchIcon: '#2B4AE2',
-        searchIconFocused: '#2B4AE2',
-        searchText: '#2B4AE2',
-
-        folderText: '#2B4AE2',
-        folderCount: '#2B4AE2',
-        folderHoverBg: 'rgba(43, 74, 226, 0.1)',
-
-        noteCardBg: '#FFFFFF',
-        noteCardShadow: '3px 3px 0 #2B4AE2',
-        noteCardHoverShadow: '4px 4px 0 #2B4AE2',
-        noteCardSelectedBg: '#2B4AE2',
-        noteCardSelectedShadow: '4px 4px 0 rgba(43, 74, 226, 0.4)',
-        noteTitle: '#2B4AE2',
-        noteTitleSelected: '#FFFFFF',
-        noteDate: '#2B4AE2',
-        noteDateSelected: '#FFFFFF',
-        notePreview: '#2B4AE2',
-        notePreviewSelected: '#FFFFFF',
-        noteDot: 'rgba(43, 74, 226, 0.4)',
-        noteDotSelected: '#FFFFFF',
-
-        contentBg: '#FFFFFF',
-        contentHeaderBg: 'transparent',
-        contentBorder: '#2B4AE2',
-        contentTitle: '#2B4AE2',
-        contentMeta: '#2B4AE2',
-        contentText: '#2B4AE2',
-
-        emptyBg: 'rgba(43, 74, 226, 0.05)',
-        emptyShadow: '4px 4px 0 #2B4AE2',
-        emptyIconColor: '#2B4AE2',
-        emptyTitle: '#2B4AE2',
-        emptyText: '#2B4AE2',
-
-        buttonText: '#2B4AE2',
-        buttonHoverBg: 'rgba(43, 74, 226, 0.1)',
-        buttonHoverText: '#2B4AE2',
-        primaryButtonBg: '#2B4AE2',
-        primaryButtonText: '#FFFFFF',
-        primaryButtonShadow: '3px 3px 0 rgba(43, 74, 226, 0.4)',
-
-        accent: '#2B4AE2',
-        accentLight: 'rgba(43, 74, 226, 0.1)',
-      };
-
-    case 'monterey':
-    default:
-      // Monterey: Classic macOS, warm orange Notes accent
-      return {
-        windowBg: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,250,252,0.96) 100%)',
-        windowShadow: '0 32px 80px -20px rgba(0,0,0,0.35), 0 0 1px rgba(0,0,0,0.1), inset 0 0.5px 0 rgba(255,255,255,0.8)',
-        windowShadowInactive: '0 20px 50px -15px rgba(0,0,0,0.25), 0 0 1px rgba(0,0,0,0.08)',
-        windowBorder: 'rgba(255,255,255,0.3)',
-
-        titleBarBg: 'linear-gradient(180deg, rgba(253,253,253,1) 0%, rgba(247,247,250,1) 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.08)',
-        titleText: '#1D1D1F',
-        iconColor: '#FF9500',
-
-        sidebarBg: 'linear-gradient(180deg, #F9F9FB 0%, #F4F4F6 100%)',
-        sidebarBorder: 'rgba(0,0,0,0.08)',
-        searchBg: 'rgba(0,0,0,0.04)',
-        searchBgFocused: 'white',
-        searchBorder: 'transparent',
-        searchBorderFocused: 'rgba(255,149,0,0.4)',
-        searchShadowFocused: '0 0 0 3px rgba(255,149,0,0.15), 0 1px 3px rgba(0,0,0,0.08)',
-        searchIcon: '#AEAEB2',
-        searchIconFocused: '#FF9500',
-        searchText: '#1D1D1F',
-
-        folderText: '#1D1D1F',
-        folderCount: '#86868B',
-        folderHoverBg: 'rgba(0,0,0,0.04)',
-
-        noteCardBg: 'white',
-        noteCardShadow: '0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04)',
-        noteCardHoverShadow: '0 2px 8px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.06)',
-        noteCardSelectedBg: 'linear-gradient(135deg, #FF9500 0%, #FF8C00 100%)',
-        noteCardSelectedShadow: '0 4px 12px rgba(255,149,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
-        noteTitle: '#1D1D1F',
-        noteTitleSelected: 'white',
-        noteDate: '#FF9500',
-        noteDateSelected: 'rgba(255,255,255,0.85)',
-        notePreview: '#86868B',
-        notePreviewSelected: 'rgba(255,255,255,0.8)',
-        noteDot: 'rgba(0,0,0,0.15)',
-        noteDotSelected: 'rgba(255,255,255,0.5)',
-
-        contentBg: 'linear-gradient(180deg, #FFFFFF 0%, #FEFEFE 100%)',
-        contentHeaderBg: 'linear-gradient(180deg, rgba(255,248,240,0.3) 0%, transparent 100%)',
-        contentBorder: 'rgba(0,0,0,0.04)',
-        contentTitle: '#1D1D1F',
-        contentMeta: '#86868B',
-        contentText: '#1D1D1F',
-
-        emptyBg: 'linear-gradient(135deg, #FFF5E6 0%, #FFE5CC 100%)',
-        emptyShadow: '0 8px 24px rgba(255,149,0,0.15), inset 0 2px 0 rgba(255,255,255,0.8)',
-        emptyIconColor: '#FF9500',
-        emptyTitle: '#1D1D1F',
-        emptyText: '#86868B',
-
-        buttonText: '#86868B',
-        buttonHoverBg: 'rgba(0,0,0,0.04)',
-        buttonHoverText: '#1D1D1F',
-        primaryButtonBg: 'linear-gradient(135deg, #FF9500 0%, #FF8C00 100%)',
-        primaryButtonText: 'white',
-        primaryButtonShadow: '0 4px 12px rgba(255,149,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
-
-        accent: '#FF9500',
-        accentLight: 'rgba(255,149,0,0.1)',
-      };
-  }
+    accent: 'var(--color-accent-primary, #ff7722)',
+    accentLight: 'rgba(255, 119, 34, 0.1)',
+  };
 }
 
 export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) {
@@ -510,10 +177,8 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
 
-  // Get theme-specific colors
+  // Get theme-specific colors (unified design system)
   const colors = useMemo(() => getThemeColors(themeContext?.theme), [themeContext?.theme]);
-  const isDark = themeContext?.isDark ?? false;
-  const isSketch = themeContext?.theme === 'sketch';
 
   // Use tabs as individual notes, or blocks as a single note
   const notes = item.useTabs && item.tabs?.length > 0
@@ -686,18 +351,10 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
               <button
                 onClick={() => windowContext.closeWindow(windowInstance.id)}
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
-                  borderRadius: '50%',
-                  marginRight: 4,
-                  display: 'block'
-                } : {
+                style={{
                   width: 12,
                   height: 12,
-                  background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
+                  background: '#ff5f57',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
@@ -705,27 +362,17 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
                 }}
                 aria-label="Close window"
               >
-                {isSketch ? null : (
-                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
-                  </svg>
-                )}
+                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                </svg>
               </button>
               <button
                 onClick={() => windowContext.minimizeWindow(windowInstance.id)}
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
-                  borderRadius: '50%',
-                  marginRight: 4,
-                  display: 'block'
-                } : {
+                style={{
                   width: 12,
                   height: 12,
-                  background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
+                  background: '#ffbd2e',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
@@ -733,26 +380,17 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
                 }}
                 aria-label="Minimize window"
               >
-                {isSketch ? null : (
-                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
-                  </svg>
-                )}
+                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                  <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                </svg>
               </button>
               <button
                 onClick={() => windowContext.maximizeWindow(windowInstance.id)}
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={isSketch ? {
-                  width: 10,
-                  height: 10,
-                  background: '#4A6CF7',
-                  border: 'none',
-                  borderRadius: '50%',
-                  display: 'block'
-                } : {
+                style={{
                   width: 12,
                   height: 12,
-                  background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
+                  background: '#28ca41',
                   boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
@@ -760,11 +398,9 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
                 }}
                 aria-label="Maximize window"
               >
-                {isSketch ? null : (
-                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                    <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                  </svg>
-                )}
+                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                </svg>
               </button>
             </div>
 

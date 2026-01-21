@@ -136,7 +136,6 @@ function ThemePreview({ themeId, isActive, onClick }: { themeId: ThemeId; isActi
 
 export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
   const { theme, setTheme, availableThemes } = useTheme();
-  const isSketch = theme === 'sketch';
 
   return (
     <AnimatePresence>
@@ -165,13 +164,9 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                 width: 520,
                 maxWidth: '90vw',
                 borderRadius: '14px',
-                background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated)',
-                backdropFilter: isSketch ? 'none' : 'blur(60px) saturate(200%)',
-                WebkitBackdropFilter: isSketch ? 'none' : 'blur(60px) saturate(200%)',
-                boxShadow: isSketch
-                  ? '6px 6px 0 #4A6CF7'
-                  : 'var(--shadow-window)',
-                border: isSketch ? '1.5px solid #4A6CF7' : '1px solid var(--border-glass-outer)',
+                background: 'var(--color-bg-base, #fbf9ef)',
+                boxShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
+                border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
               }}
               initial={{ opacity: 0, scale: 0.88, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -186,56 +181,42 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
               {/* Title Bar */}
               <div
                 className="flex items-center h-[52px] px-4 shrink-0 relative"
-                style={{ borderBottom: isSketch ? '1.5px solid #4A6CF7' : '1px solid var(--border-light)' }}
+                style={{ borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))' }}
               >
                 {/* Traffic Lights */}
                 <div className="flex items-center gap-2 group/traffic">
                   <button
                     onClick={onClose}
-                    className={isSketch ? "w-[10px] h-[10px] rounded-full flex items-center justify-center transition-all duration-150" : "w-[13px] h-[13px] rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-90 active:brightness-75"}
-                    style={isSketch ? {
-                      background: '#4A6CF7',
-                      border: 'none',
-                      borderRadius: '50%',
-                    } : {
-                      background: 'linear-gradient(180deg, #FF6058 0%, #FF4D44 100%)',
+                    className="w-[12px] h-[12px] rounded-full flex items-center justify-center transition-all duration-150"
+                    style={{
+                      background: '#ff5f57',
                       boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     }}
                   >
-                    {!isSketch && (
-                      <svg
-                        className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150"
-                        viewBox="0 0 8 8"
-                        fill="none"
-                      >
-                        <path
-                          d="M1 1L7 7M7 1L1 7"
-                          stroke="rgba(77, 0, 0, 0.7)"
-                          strokeWidth="1.2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    )}
+                    <svg
+                      className="w-[8px] h-[8px] opacity-0 group-hover/traffic:opacity-100 transition-opacity duration-150"
+                      viewBox="0 0 8 8"
+                      fill="none"
+                    >
+                      <path
+                        d="M1 1L7 7M7 1L1 7"
+                        stroke="rgba(77, 0, 0, 0.7)"
+                        strokeWidth="1.2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
                   </button>
                   <div
-                    className={isSketch ? "w-[10px] h-[10px] rounded-full" : "w-[13px] h-[13px] rounded-full"}
-                    style={isSketch ? {
-                      background: '#4A6CF7',
-                      border: 'none',
-                      borderRadius: '50%',
-                    } : {
-                      background: 'linear-gradient(180deg, #FFBE2E 0%, #FFB014 100%)',
+                    className="w-[12px] h-[12px] rounded-full"
+                    style={{
+                      background: '#ffbd2e',
                       boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     }}
                   />
                   <div
-                    className={isSketch ? "w-[10px] h-[10px] rounded-full" : "w-[13px] h-[13px] rounded-full"}
-                    style={isSketch ? {
-                      background: '#4A6CF7',
-                      border: 'none',
-                      borderRadius: '50%',
-                    } : {
-                      background: 'linear-gradient(180deg, #2ACB42 0%, #1DB934 100%)',
+                    className="w-[12px] h-[12px] rounded-full"
+                    style={{
+                      background: '#28ca41',
                       boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     }}
                   />
@@ -244,7 +225,7 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                 {/* Title */}
                 <span
                   className="absolute left-1/2 -translate-x-1/2 text-[13px] font-medium select-none"
-                  style={{ color: isSketch ? '#2B4AE2' : 'var(--text-secondary)' }}
+                  style={{ color: 'var(--color-text-primary, #171412)' }}
                 >
                   Settings
                 </span>

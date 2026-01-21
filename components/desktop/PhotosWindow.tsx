@@ -70,283 +70,46 @@ interface ThemeColors {
   favoriteColor: string;
 }
 
-function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
-  switch (themeId) {
-    case 'dark':
-      return {
-        windowBg: '#1C1C1E',
-        windowShadow: '0 40px 100px -20px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(255,255,255,0.1)',
-        windowShadowInactive: '0 20px 60px -15px rgba(0,0,0,0.6)',
+// Unified design system - uses CSS variables from design-system.css
+function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
+  // ONE design system - Appart theme via CSS variables
+  return {
+    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
+    windowShadowInactive: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
 
-        titleBarBg: 'linear-gradient(180deg, #2C2C2E 0%, #1C1C1E 100%)',
-        titleBarBorder: 'rgba(255,255,255,0.08)',
-        titleText: '#FFFFFF',
-        badgeBg: 'rgba(255,255,255,0.1)',
-        badgeText: 'rgba(255,255,255,0.7)',
+    titleBarBg: 'var(--color-bg-base, #fbf9ef)',
+    titleBarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    titleText: 'var(--color-text-primary, #171412)',
+    badgeBg: 'rgba(255, 119, 34, 0.1)',
+    badgeText: 'var(--color-accent-primary, #ff7722)',
 
-        toolbarBg: '#1C1C1E',
-        toolbarBorder: 'rgba(255,255,255,0.06)',
-        toolbarText: 'rgba(255,255,255,0.6)',
-        toolbarHoverBg: 'rgba(255,255,255,0.08)',
-        toolbarActiveBg: '#0A84FF',
-        toolbarActiveText: '#FFFFFF',
+    toolbarBg: 'var(--color-bg-subtle, #f2f0e7)',
+    toolbarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    toolbarText: 'var(--color-text-muted, #8e827c)',
+    toolbarHoverBg: 'rgba(255, 119, 34, 0.08)',
+    toolbarActiveBg: 'var(--color-accent-primary, #ff7722)',
+    toolbarActiveText: 'var(--color-bg-white, #ffffff)',
 
-        contentBg: '#000000',
-        photoCardBg: '#1C1C1E',
-        photoCardShadow: '0 2px 8px rgba(0,0,0,0.4)',
-        photoCardHoverShadow: '0 8px 24px rgba(0,0,0,0.6)',
-        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.8) 100%)',
+    contentBg: 'var(--color-bg-base, #fbf9ef)',
+    photoCardBg: 'var(--color-bg-white, #ffffff)',
+    photoCardShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
+    photoCardHoverShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+    photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(23, 20, 18, 0.6) 100%)',
 
-        emptyBg: 'rgba(255,255,255,0.05)',
-        emptyIcon: 'rgba(255,255,255,0.3)',
-        emptyTitle: 'rgba(255,255,255,0.9)',
-        emptyText: 'rgba(255,255,255,0.5)',
+    emptyBg: 'rgba(255, 119, 34, 0.06)',
+    emptyIcon: 'var(--color-text-muted, #8e827c)',
+    emptyTitle: 'var(--color-text-primary, #171412)',
+    emptyText: 'var(--color-text-muted, #8e827c)',
 
-        lightboxBg: 'rgba(0,0,0,0.95)',
-        lightboxText: 'rgba(255,255,255,0.8)',
-        lightboxButtonBg: 'rgba(255,255,255,0.1)',
-        lightboxButtonHoverBg: 'rgba(255,255,255,0.2)',
+    lightboxBg: 'rgba(251, 249, 239, 0.98)',
+    lightboxText: 'var(--color-text-primary, #171412)',
+    lightboxButtonBg: 'rgba(23, 20, 18, 0.08)',
+    lightboxButtonHoverBg: 'rgba(23, 20, 18, 0.15)',
 
-        accent: '#0A84FF',
-        favoriteColor: '#FF375F',
-      };
-
-    case 'bluren':
-      return {
-        windowBg: '#FFFFFF',
-        windowShadow: '0 20px 60px -15px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.05)',
-        windowShadowInactive: '0 10px 40px -10px rgba(0,0,0,0.1)',
-
-        titleBarBg: 'linear-gradient(180deg, #FAFAFA 0%, #F5F5F7 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.06)',
-        titleText: '#1D1D1F',
-        badgeBg: 'rgba(0,0,0,0.05)',
-        badgeText: 'rgba(0,0,0,0.5)',
-
-        toolbarBg: '#F5F5F7',
-        toolbarBorder: 'rgba(0,0,0,0.04)',
-        toolbarText: 'rgba(0,0,0,0.5)',
-        toolbarHoverBg: 'rgba(0,0,0,0.04)',
-        toolbarActiveBg: '#0071E3',
-        toolbarActiveText: '#FFFFFF',
-
-        contentBg: '#FAFAFA',
-        photoCardBg: '#FFFFFF',
-        photoCardShadow: '0 1px 4px rgba(0,0,0,0.06)',
-        photoCardHoverShadow: '0 4px 16px rgba(0,0,0,0.1)',
-        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.5) 100%)',
-
-        emptyBg: 'rgba(0,0,0,0.02)',
-        emptyIcon: 'rgba(0,0,0,0.2)',
-        emptyTitle: 'rgba(0,0,0,0.8)',
-        emptyText: 'rgba(0,0,0,0.4)',
-
-        lightboxBg: 'rgba(0,0,0,0.9)',
-        lightboxText: 'rgba(255,255,255,0.9)',
-        lightboxButtonBg: 'rgba(255,255,255,0.15)',
-        lightboxButtonHoverBg: 'rgba(255,255,255,0.25)',
-
-        accent: '#0071E3',
-        favoriteColor: '#FF2D55',
-      };
-
-    case 'refined':
-      return {
-        windowBg: '#1A1A1A',
-        windowShadow: '0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)',
-        windowShadowInactive: '0 15px 50px -15px rgba(0,0,0,0.5)',
-
-        titleBarBg: 'linear-gradient(180deg, #242424 0%, #1A1A1A 100%)',
-        titleBarBorder: 'rgba(255,255,255,0.06)',
-        titleText: '#F5F5F0',
-        badgeBg: 'rgba(202,232,189,0.15)',
-        badgeText: '#CAE8BD',
-
-        toolbarBg: '#1A1A1A',
-        toolbarBorder: 'rgba(255,255,255,0.05)',
-        toolbarText: 'rgba(245,245,240,0.5)',
-        toolbarHoverBg: 'rgba(255,255,255,0.06)',
-        toolbarActiveBg: '#CAE8BD',
-        toolbarActiveText: '#0D0D0D',
-
-        contentBg: '#0F0F0F',
-        photoCardBg: '#1A1A1A',
-        photoCardShadow: '0 2px 8px rgba(0,0,0,0.3)',
-        photoCardHoverShadow: '0 8px 24px rgba(0,0,0,0.5)',
-        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.7) 100%)',
-
-        emptyBg: 'rgba(255,255,255,0.03)',
-        emptyIcon: 'rgba(245,245,240,0.25)',
-        emptyTitle: 'rgba(245,245,240,0.85)',
-        emptyText: 'rgba(245,245,240,0.4)',
-
-        lightboxBg: 'rgba(0,0,0,0.95)',
-        lightboxText: 'rgba(245,245,240,0.9)',
-        lightboxButtonBg: 'rgba(255,255,255,0.08)',
-        lightboxButtonHoverBg: 'rgba(255,255,255,0.15)',
-
-        accent: '#CAE8BD',
-        favoriteColor: '#FF6B6B',
-      };
-
-    case 'sketch':
-      // Sketch/goOS: Hand-drawn, playful, paper-like (Blueprint style)
-      return {
-        windowBg: '#FFFFFF',
-        windowShadow: '6px 6px 0 #2B4AE2',
-        windowShadowInactive: '4px 4px 0 #2B4AE2',
-
-        titleBarBg: '#FFFFFF',
-        titleBarBorder: '#2B4AE2',
-        titleText: '#2B4AE2',
-        badgeBg: 'rgba(43, 74, 226, 0.12)',
-        badgeText: '#2B4AE2',
-
-        toolbarBg: '#FFFFFF',
-        toolbarBorder: '#2B4AE2',
-        toolbarText: '#2B4AE2',
-        toolbarHoverBg: 'rgba(43, 74, 226, 0.08)',
-        toolbarActiveBg: '#2B4AE2',
-        toolbarActiveText: '#FFFFFF',
-
-        contentBg: '#FFFFFF',
-        photoCardBg: '#FFFFFF',
-        photoCardShadow: '3px 3px 0 #2B4AE2',
-        photoCardHoverShadow: '5px 5px 0 #2B4AE2',
-        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(43, 74, 226, 0.6) 100%)',
-
-        emptyBg: 'rgba(43, 74, 226, 0.04)',
-        emptyIcon: '#2B4AE2',
-        emptyTitle: '#2B4AE2',
-        emptyText: '#2B4AE2',
-
-        lightboxBg: 'rgba(255, 255, 255, 0.95)',
-        lightboxText: '#2B4AE2',
-        lightboxButtonBg: 'rgba(43, 74, 226, 0.12)',
-        lightboxButtonHoverBg: 'rgba(43, 74, 226, 0.2)',
-
-        accent: '#2B4AE2',
-        favoriteColor: '#2B4AE2',
-      };
-
-    case 'warm':
-      return {
-        windowBg: '#FAFAF9',
-        windowShadow: '0 24px 60px -12px rgba(28,25,23,0.15), 0 0 0 1px rgba(28,25,23,0.05)',
-        windowShadowInactive: '0 12px 32px -8px rgba(28,25,23,0.1), 0 0 0 1px rgba(28,25,23,0.04)',
-
-        titleBarBg: '#F5F5F4',
-        titleBarBorder: 'rgba(28,25,23,0.06)',
-        titleText: '#1C1917',
-        badgeBg: 'rgba(28,25,23,0.06)',
-        badgeText: '#57534E',
-
-        toolbarBg: '#F5F5F4',
-        toolbarBorder: 'rgba(28,25,23,0.06)',
-        toolbarText: '#57534E',
-        toolbarHoverBg: 'rgba(28,25,23,0.05)',
-        toolbarActiveBg: '#EA580C',
-        toolbarActiveText: '#FFFFFF',
-
-        contentBg: '#FAFAF9',
-        photoCardBg: '#FFFFFF',
-        photoCardShadow: '0 1px 2px rgba(28,25,23,0.06), 0 0 0 1px rgba(28,25,23,0.04)',
-        photoCardHoverShadow: '0 4px 12px rgba(28,25,23,0.08), 0 0 0 1px rgba(28,25,23,0.06)',
-        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(28,25,23,0.6) 100%)',
-
-        emptyBg: 'rgba(28,25,23,0.04)',
-        emptyIcon: '#A8A29E',
-        emptyTitle: '#1C1917',
-        emptyText: '#57534E',
-
-        lightboxBg: 'rgba(250, 250, 249, 0.98)',
-        lightboxText: '#1C1917',
-        lightboxButtonBg: 'rgba(28,25,23,0.06)',
-        lightboxButtonHoverBg: 'rgba(28,25,23,0.1)',
-
-        accent: '#EA580C',
-        favoriteColor: '#EA580C',
-      };
-
-    case 'brand-appart':
-      return {
-        windowBg: '#fbf9ef',
-        windowShadow: '4px 4px 0 rgba(23, 20, 18, 0.1), 0 0 0 1px #171412',
-        windowShadowInactive: '3px 3px 0 rgba(23, 20, 18, 0.08)',
-
-        titleBarBg: '#fbf9ef',
-        titleBarBorder: '#171412',
-        titleText: '#171412',
-        badgeBg: 'rgba(23, 20, 18, 0.08)',
-        badgeText: '#8e827c',
-
-        toolbarBg: '#fbf9ef',
-        toolbarBorder: 'rgba(23, 20, 18, 0.15)',
-        toolbarText: '#8e827c',
-        toolbarHoverBg: 'rgba(23, 20, 18, 0.06)',
-        toolbarActiveBg: '#ff7722',
-        toolbarActiveText: '#FFFFFF',
-
-        contentBg: '#fbf9ef',
-        photoCardBg: '#FFFFFF',
-        photoCardShadow: '2px 2px 0 rgba(23, 20, 18, 0.08)',
-        photoCardHoverShadow: '4px 4px 0 rgba(23, 20, 18, 0.12)',
-        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(23, 20, 18, 0.6) 100%)',
-
-        emptyBg: 'rgba(23, 20, 18, 0.04)',
-        emptyIcon: '#8e827c',
-        emptyTitle: '#171412',
-        emptyText: '#8e827c',
-
-        lightboxBg: 'rgba(251, 249, 239, 0.98)',
-        lightboxText: '#171412',
-        lightboxButtonBg: 'rgba(23, 20, 18, 0.08)',
-        lightboxButtonHoverBg: 'rgba(23, 20, 18, 0.15)',
-
-        accent: '#ff7722',
-        favoriteColor: '#ff7722',
-      };
-
-    case 'monterey':
-    default:
-      return {
-        windowBg: '#FFFFFF',
-        windowShadow: '0 35px 90px -20px rgba(0,0,0,0.35), 0 0 1px rgba(0,0,0,0.1)',
-        windowShadowInactive: '0 20px 50px -15px rgba(0,0,0,0.2)',
-
-        titleBarBg: 'linear-gradient(180deg, #F6F6F6 0%, #EBEBEB 100%)',
-        titleBarBorder: 'rgba(0,0,0,0.1)',
-        titleText: '#1D1D1F',
-        badgeBg: 'rgba(0,0,0,0.06)',
-        badgeText: '#6E6E73',
-
-        toolbarBg: '#F5F5F7',
-        toolbarBorder: 'rgba(0,0,0,0.08)',
-        toolbarText: '#6E6E73',
-        toolbarHoverBg: 'rgba(0,0,0,0.05)',
-        toolbarActiveBg: '#007AFF',
-        toolbarActiveText: '#FFFFFF',
-
-        contentBg: '#F5F5F7',
-        photoCardBg: '#FFFFFF',
-        photoCardShadow: '0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
-        photoCardHoverShadow: '0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)',
-        photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.6) 100%)',
-
-        emptyBg: 'rgba(0,0,0,0.03)',
-        emptyIcon: '#AEAEB2',
-        emptyTitle: '#1D1D1F',
-        emptyText: '#86868B',
-
-        lightboxBg: 'rgba(0,0,0,0.92)',
-        lightboxText: 'rgba(255,255,255,0.9)',
-        lightboxButtonBg: 'rgba(255,255,255,0.12)',
-        lightboxButtonHoverBg: 'rgba(255,255,255,0.2)',
-
-        accent: '#007AFF',
-        favoriteColor: '#FF2D55',
-      };
-  }
+    accent: 'var(--color-accent-primary, #ff7722)',
+    favoriteColor: 'var(--color-accent-primary, #ff7722)',
+  };
 }
 
 export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps) {
@@ -362,8 +125,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
 
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
-  const isSketch = themeContext?.theme === 'sketch';
-  const isBrandAppart = themeContext?.theme === 'brand-appart';
+  // Unified design system - no theme-specific checks needed
 
   const colors = useMemo(() => getThemeColors(themeContext?.theme), [themeContext?.theme]);
 
@@ -515,23 +277,10 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                 <button
                   onClick={() => windowContext.closeWindow(windowInstance.id)}
                   className="rounded-full flex items-center justify-center transition-all duration-150"
-                  style={isSketch ? {
-                    width: 10,
-                    height: 10,
-                    background: '#4A6CF7',
-                    border: 'none',
-                    borderRadius: '50%',
-                    marginRight: 4,
-                  } : isBrandAppart ? {
+                  style={{
                     width: 12,
                     height: 12,
                     background: '#ff5f57',
-                    border: '1px solid #171412',
-                    borderRadius: '50%',
-                  } : {
-                    width: 12,
-                    height: 12,
-                    background: 'linear-gradient(180deg, #FF5F57 0%, #E0443E 100%)',
                     boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     display: 'flex',
                     alignItems: 'center',
@@ -539,32 +288,17 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                   }}
                   aria-label="Close"
                 >
-                  {isSketch ? null : (
-                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                      <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
-                    </svg>
-                  )}
+                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77,0,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
                 </button>
                 <button
                   onClick={() => windowContext.minimizeWindow(windowInstance.id)}
                   className="rounded-full flex items-center justify-center transition-all duration-150"
-                  style={isSketch ? {
-                    width: 10,
-                    height: 10,
-                    background: '#4A6CF7',
-                    border: 'none',
-                    borderRadius: '50%',
-                    marginRight: 4,
-                  } : isBrandAppart ? {
+                  style={{
                     width: 12,
                     height: 12,
-                    background: '#f59e0b',
-                    border: '1px solid #171412',
-                    borderRadius: '50%',
-                  } : {
-                    width: 12,
-                    height: 12,
-                    background: 'linear-gradient(180deg, #FFBD2E 0%, #DFA023 100%)',
+                    background: '#ffbd2e',
                     boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     display: 'flex',
                     alignItems: 'center',
@@ -572,31 +306,17 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                   }}
                   aria-label="Minimize"
                 >
-                  {isSketch ? null : (
-                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                      <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
-                    </svg>
-                  )}
+                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 4H7" stroke="rgba(100,65,0,0.7)" strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
                 </button>
                 <button
                   onClick={() => windowContext.maximizeWindow(windowInstance.id)}
                   className="rounded-full flex items-center justify-center transition-all duration-150"
-                  style={isSketch ? {
-                    width: 10,
-                    height: 10,
-                    background: '#4A6CF7',
-                    border: 'none',
-                    borderRadius: '50%',
-                  } : isBrandAppart ? {
+                  style={{
                     width: 12,
                     height: 12,
-                    background: '#10b981',
-                    border: '1px solid #171412',
-                    borderRadius: '50%',
-                  } : {
-                    width: 12,
-                    height: 12,
-                    background: 'linear-gradient(180deg, #28CA41 0%, #1AAD2E 100%)',
+                    background: '#28ca41',
                     boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
                     display: 'flex',
                     alignItems: 'center',
@@ -604,11 +324,9 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                   }}
                   aria-label="Maximize"
                 >
-                  {isSketch ? null : (
-                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                      <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                    </svg>
-                  )}
+                  <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
+                    <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0,70,0,0.7)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                  </svg>
                 </button>
               </div>
 

@@ -45,181 +45,29 @@ interface ThemeColors {
   imageShadow: string;
 }
 
-function getThemeColors(themeId: ThemeId | undefined): ThemeColors {
-  switch (themeId) {
-    case 'dark':
-      return {
-        windowBg: '#1C1C1E',
-        windowShadow: '0 40px 100px -20px rgba(0,0,0,0.8), 0 20px 40px -10px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08)',
-        windowBorder: '1px solid rgba(255,255,255,0.1)',
-        headerBg: 'linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%)',
-        headerBorder: '1px solid rgba(255,255,255,0.08)',
-        titleColor: '#FFFFFF',
-        subtitleColor: 'rgba(255,255,255,0.6)',
-        textPrimary: '#FFFFFF',
-        textSecondary: 'rgba(255,255,255,0.6)',
-        textTertiary: 'rgba(255,255,255,0.4)',
-        borderLight: 'rgba(255,255,255,0.08)',
-        borderMedium: 'rgba(255,255,255,0.12)',
-        tabActiveBg: 'rgba(90,160,255,0.15)',
-        tabActiveColor: '#5BA0FF',
-        tabInactiveColor: 'rgba(255,255,255,0.5)',
-        accentColor: '#5BA0FF',
-        buttonBg: 'rgba(255,255,255,0.06)',
-        imageShadow: '0 4px 12px rgba(0,0,0,0.5)',
-      };
-    case 'bluren':
-      return {
-        windowBg: '#FAFAFA',
-        windowShadow: '0 40px 100px -20px rgba(0,0,0,0.15), 0 20px 40px -10px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
-        windowBorder: '1px solid rgba(0,0,0,0.06)',
-        headerBg: 'linear-gradient(180deg, rgba(255,255,255,0.8) 0%, transparent 100%)',
-        headerBorder: '1px solid rgba(0,0,0,0.05)',
-        titleColor: '#1D1D1F',
-        subtitleColor: '#86868B',
-        textPrimary: '#1D1D1F',
-        textSecondary: '#86868B',
-        textTertiary: '#AEAEB2',
-        borderLight: 'rgba(0,0,0,0.04)',
-        borderMedium: 'rgba(0,0,0,0.08)',
-        tabActiveBg: 'rgba(0,113,227,0.08)',
-        tabActiveColor: '#0071E3',
-        tabInactiveColor: '#86868B',
-        accentColor: '#0071E3',
-        buttonBg: 'rgba(0,0,0,0.03)',
-        imageShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      };
-    case 'refined':
-      return {
-        windowBg: '#FAF9F7',
-        windowShadow: '0 40px 100px -20px rgba(90,70,50,0.2), 0 20px 40px -10px rgba(90,70,50,0.1), 0 0 0 1px rgba(90,70,50,0.05)',
-        windowBorder: '1px solid rgba(90,70,50,0.08)',
-        headerBg: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 100%)',
-        headerBorder: '1px solid rgba(90,70,50,0.08)',
-        titleColor: '#2D2A26',
-        subtitleColor: '#8B8178',
-        textPrimary: '#2D2A26',
-        textSecondary: '#8B8178',
-        textTertiary: '#B5AEA4',
-        borderLight: 'rgba(90,70,50,0.06)',
-        borderMedium: 'rgba(90,70,50,0.12)',
-        tabActiveBg: 'rgba(156,132,95,0.12)',
-        tabActiveColor: '#8B7355',
-        tabInactiveColor: '#8B8178',
-        accentColor: '#8B7355',
-        buttonBg: 'rgba(90,70,50,0.04)',
-        imageShadow: '0 4px 12px rgba(90,70,50,0.15)',
-      };
-    case 'warm':
-      return {
-        windowBg: '#FAFAF9',
-        windowShadow: '0 25px 50px -12px rgba(28,25,23,0.15), 0 10px 15px -3px rgba(28,25,23,0.05), 0 0 0 1px rgba(28,25,23,0.05)',
-        windowBorder: '1px solid rgba(28,25,23,0.06)',
-        headerBg: 'transparent',
-        headerBorder: '1px solid rgba(28,25,23,0.06)',
-        titleColor: '#1C1917',
-        subtitleColor: '#57534E',
-        textPrimary: '#1C1917',
-        textSecondary: '#57534E',
-        textTertiary: '#A8A29E',
-        borderLight: 'rgba(28,25,23,0.06)',
-        borderMedium: 'rgba(28,25,23,0.1)',
-        tabActiveBg: '#FFFFFF',
-        tabActiveColor: '#1C1917',
-        tabInactiveColor: '#78716C',
-        accentColor: '#EA580C',
-        buttonBg: 'rgba(28,25,23,0.04)',
-        imageShadow: '0 4px 12px rgba(28,25,23,0.1)',
-      };
-    case 'clay':
-      return {
-        windowBg: 'linear-gradient(165deg, #FFFDFB 0%, #F5F1EB 50%, #EDE8E1 100%)',
-        windowShadow: '0 0 0 1px rgba(255,255,255,0.5) inset, 0 -6px 20px rgba(255,255,255,0.6) inset, 8px 16px 24px rgba(107,114,128,0.04) inset, 0 32px 64px -16px rgba(107,114,128,0.2)',
-        windowBorder: 'none',
-        headerBg: 'linear-gradient(180deg, rgba(255,253,251,0.95) 0%, rgba(245,241,235,0.9) 100%)',
-        headerBorder: '1px solid rgba(107,114,128,0.06)',
-        titleColor: '#3D3D3D',
-        subtitleColor: '#5C5C5C',
-        textPrimary: '#3D3D3D',
-        textSecondary: '#5C5C5C',
-        textTertiary: '#8E8E8E',
-        borderLight: 'rgba(107,114,128,0.08)',
-        borderMedium: 'rgba(107,114,128,0.15)',
-        tabActiveBg: 'rgba(201,120,92,0.12)',
-        tabActiveColor: '#C9785C',
-        tabInactiveColor: '#8E8E8E',
-        accentColor: '#C9785C',
-        buttonBg: 'linear-gradient(145deg, #FFFDFB 0%, #EDE8E1 100%)',
-        imageShadow: '0 0 0 1px rgba(255,255,255,0.4) inset, 0 8px 24px -4px rgba(107,114,128,0.15)',
-      };
-    case 'sketch':
-      // Sketch now also uses CSS variables (same as Appart)
-      return {
-        windowBg: 'var(--color-bg-white)',
-        windowShadow: 'var(--shadow-window)',
-        windowBorder: '1.5px solid var(--color-text-primary)',
-        headerBg: 'var(--color-bg-white)',
-        headerBorder: '1.5px solid var(--color-text-primary)',
-        titleColor: 'var(--color-text-primary)',
-        subtitleColor: 'var(--color-text-secondary)',
-        textPrimary: 'var(--color-text-primary)',
-        textSecondary: 'var(--color-text-secondary)',
-        textTertiary: 'var(--color-text-muted)',
-        borderLight: 'var(--color-border-default)',
-        borderMedium: 'var(--color-text-primary)',
-        tabActiveBg: 'var(--color-bg-white)',
-        tabActiveColor: 'var(--color-text-primary)',
-        tabInactiveColor: 'var(--color-text-muted)',
-        accentColor: 'var(--color-accent-primary)',
-        buttonBg: 'var(--color-bg-white)',
-        imageShadow: 'var(--shadow-md)',
-      };
-    case 'brand-appart':
-    case 'appart':
-      return {
-        windowBg: 'var(--color-bg-base)',
-        windowShadow: 'var(--shadow-window)',
-        windowBorder: '1px solid var(--color-text-primary)',
-        headerBg: 'var(--color-bg-base)',
-        headerBorder: '1px solid var(--color-text-primary)',
-        titleColor: 'var(--color-text-primary)',
-        subtitleColor: 'var(--color-text-muted)',
-        textPrimary: 'var(--color-text-primary)',
-        textSecondary: 'var(--color-text-muted)',
-        textTertiary: 'var(--color-text-muted)',
-        borderLight: 'var(--color-border-default)',
-        borderMedium: 'var(--color-text-primary)',
-        tabActiveBg: 'var(--color-bg-white)',
-        tabActiveColor: 'var(--color-text-primary)',
-        tabInactiveColor: 'var(--color-text-muted)',
-        accentColor: 'var(--color-accent-primary)',
-        buttonBg: 'var(--color-bg-white)',
-        imageShadow: 'var(--shadow-md)',
-      };
-    case 'monterey':
-    default:
-      // Default uses CSS variables from design-system.css (Appart theme)
-      return {
-        windowBg: 'var(--color-bg-base)',
-        windowShadow: 'var(--shadow-window)',
-        windowBorder: '1px solid var(--color-text-primary)',
-        headerBg: 'var(--color-bg-base)',
-        headerBorder: '1px solid var(--color-text-primary)',
-        titleColor: 'var(--color-text-primary)',
-        subtitleColor: 'var(--color-text-muted)',
-        textPrimary: 'var(--color-text-primary)',
-        textSecondary: 'var(--color-text-muted)',
-        textTertiary: 'var(--color-text-muted)',
-        borderLight: 'var(--color-border-default)',
-        borderMedium: 'var(--color-text-primary)',
-        tabActiveBg: 'var(--color-bg-white)',
-        tabActiveColor: 'var(--color-text-primary)',
-        tabInactiveColor: 'var(--color-text-muted)',
-        accentColor: 'var(--color-accent-primary)',
-        buttonBg: 'var(--color-bg-white)',
-        imageShadow: 'var(--shadow-md)',
-      };
-  }
+// Unified design system - uses CSS variables from design-system.css
+function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
+  // ONE design system - Appart theme via CSS variables
+  return {
+    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
+    windowBorder: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    headerBg: 'var(--color-bg-base, #fbf9ef)',
+    headerBorder: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    titleColor: 'var(--color-text-primary, #171412)',
+    subtitleColor: 'var(--color-text-muted, #8e827c)',
+    textPrimary: 'var(--color-text-primary, #171412)',
+    textSecondary: 'var(--color-text-muted, #8e827c)',
+    textTertiary: 'var(--color-text-muted, #8e827c)',
+    borderLight: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    borderMedium: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    tabActiveBg: 'var(--color-bg-white, #ffffff)',
+    tabActiveColor: 'var(--color-text-primary, #171412)',
+    tabInactiveColor: 'var(--color-text-muted, #8e827c)',
+    accentColor: 'var(--color-accent-primary, #ff7722)',
+    buttonBg: 'var(--color-bg-white, #ffffff)',
+    imageShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+  };
 }
 
 interface MultiWindowProps {
@@ -414,8 +262,8 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
           className="overflow-hidden flex flex-col pointer-events-auto relative"
           onClick={handleWindowClick}
           drag={!isMaximized}
-          dragConstraints={{ top: -200, left: -300, right: 300, bottom: 200 }}
-          dragElastic={0.1}
+          dragConstraints={false}
+          dragElastic={0}
           dragMomentum={false}
           style={{
             zIndex: windowInstance.zIndex + 200,
