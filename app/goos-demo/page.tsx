@@ -54,6 +54,7 @@ import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
 import { WidgetRenderer, WIDGET_METADATA } from '@/components/widgets';
 import { ViewSwitcher, PageView, PresentView } from '@/components/views';
 import { PresentationView } from '@/components/presentation';
+import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType } from '@/types';
 
 // Lazy load heavy editor component (includes TipTap + all extensions)
@@ -1681,6 +1682,7 @@ function GoOSDemoContent() {
     // View mode state
     const [viewMode, setViewMode] = useState<ViewMode>('desktop');
     const [presentingFileId, setPresentingFileId] = useState<string | null>(null);
+    const [caseStudyFileId, setCaseStudyFileId] = useState<string | null>(null);
 
     // Widget context
     const widgetContext = useWidgets();
@@ -2232,6 +2234,10 @@ function GoOSDemoContent() {
                         author={{
                             name: 'Demo User',
                             username: 'demo',
+                        }}
+                        onItemClick={(item) => {
+                            // Open case study view for the clicked item
+                            setCaseStudyFileId(item.id);
                         }}
                     />
                 </div>
@@ -2872,6 +2878,45 @@ function GoOSDemoContent() {
                         }}
                         themeId="paper"
                         onClose={() => setPresentingFileId(null)}
+                    />
+                );
+            })()}
+
+            {/* Case Study Page View Overlay (Belle Duffner-style) */}
+            {caseStudyFileId && (() => {
+                const file = goosFiles.find(f => f.id === caseStudyFileId);
+                if (!file) return null;
+
+                // Get related studies (other published files)
+                const relatedStudies = goosFiles
+                    .filter(f => f.id !== caseStudyFileId && f.status === 'published')
+                    .slice(0, 2)
+                    .map(f => ({
+                        id: f.id,
+                        title: f.title,
+                        subtitle: null,
+                        headerImage: null,
+                        fileType: f.type as 'note' | 'case-study',
+                    }));
+
+                return (
+                    <CaseStudyPageView
+                        note={{
+                            id: file.id,
+                            title: file.title,
+                            subtitle: null,
+                            content: file.content,
+                            headerImage: null,
+                            publishedAt: file.publishedAt ? new Date(file.publishedAt) : null,
+                            fileType: file.type as 'note' | 'case-study',
+                        }}
+                        author={{
+                            username: 'demo',
+                            name: 'Demo User',
+                            image: null,
+                        }}
+                        relatedStudies={relatedStudies}
+                        onClose={() => setCaseStudyFileId(null)}
                     />
                 );
             })()}
