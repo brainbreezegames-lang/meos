@@ -12,6 +12,12 @@ export interface WidgetTheme {
             accent: string;
         };
         success: string;
+        traffic: {
+            close: string;
+            minimize: string;
+            maximize: string;
+            border: string;
+        };
     };
     shadows: {
         solid: string;
@@ -44,6 +50,12 @@ export const useWidgetTheme = (): WidgetTheme => {
                 accent: '#2B4AE2',
             },
             success: '#22C55E',
+            traffic: {
+                close: '#FFFFFF',
+                minimize: '#FFFFFF',
+                maximize: '#FFFFFF',
+                border: '#2B4AE2',
+            },
         },
         shadows: {
             solid: '4px 4px 0 #2B4AE2',
@@ -71,6 +83,12 @@ export const useWidgetTheme = (): WidgetTheme => {
                 accent: '#ff7722', // Brand orange
             },
             success: '#3d2fa9', // Brand purple
+            traffic: {
+                close: '#ff5f57',
+                minimize: '#f59e0b',
+                maximize: '#10b981',
+                border: '#171412',
+            },
         },
         shadows: {
             solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',
@@ -98,6 +116,12 @@ export const useWidgetTheme = (): WidgetTheme => {
                 accent: 'var(--accent-primary)',
             },
             success: 'var(--accent-success)',
+            traffic: {
+                close: '#FF5F57',
+                minimize: '#FFBD2E',
+                maximize: '#28CA41',
+                border: 'transparent',
+            },
         },
         shadows: {
             solid: 'var(--shadow-sm)',

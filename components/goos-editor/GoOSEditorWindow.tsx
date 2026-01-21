@@ -107,7 +107,7 @@ export function GoOSEditorWindow({
   // Reading time (average 200 words per minute)
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-  return (
+
   const { theme } = useThemeSafe() || {};
   const isBrandAppart = theme === 'brand-appart';
 
