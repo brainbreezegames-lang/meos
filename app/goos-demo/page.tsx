@@ -37,6 +37,7 @@ import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { WindowManager } from '@/components/desktop/MultiWindow';
+import { StatusWidget } from '@/components/desktop';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { type GuestbookEntry } from '@/components/desktop/Guestbook';
 import type { DesktopItem, Desktop, StatusWidget as StatusWidgetType } from '@/types';
@@ -3241,7 +3242,7 @@ function GoOSDemoContent() {
             </footer>
 
             {/* Status Widget */}
-            <GoOSStatusWidget statusWidget={DEMO_STATUS_WIDGET} />
+            <StatusWidget statusWidget={DEMO_STATUS_WIDGET} />
 
             {/* Made with badge */}
             <motion.a
@@ -3465,7 +3466,7 @@ function GoOSDemoContent() {
 // ============================================
 export default function GoOSDemoPage() {
     return (
-        <ThemeProvider initialTheme="sketch" forceTheme={true}>
+        <ThemeProvider initialTheme="brand-appart" forceTheme={true}>
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
                     <GoOSProvider viewMode="owner" localOnly={true} initialFiles={INITIAL_GOOS_FILES}>
