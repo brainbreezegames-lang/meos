@@ -21,6 +21,10 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
   const prefersReducedMotion = useReducedMotion();
   const theme = useWidgetTheme();
 
+  // Derive theme variants for conditional styling
+  const isSketch = theme.colors.border === '#2B4AE2';
+  const isBrandAppart = theme.colors.border === '#171412';
+
   // Reset active tab when item changes
   useEffect(() => {
     if (item?.useTabs && item.tabs?.length > 0) {
