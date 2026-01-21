@@ -2271,8 +2271,18 @@ function GoOSDemoContent() {
 
             {/* PAGE VIEW MODE - Belle Duffner-style case study view */}
             {viewMode === 'page' && (() => {
-                // Get the first published file to display
-                const publishedFiles = goosFiles.filter(f => f.status === 'published');
+                // Get the most recent published case study (or note) to display
+                const publishedFiles = goosFiles
+                    .filter(f => f.status === 'published')
+                    .sort((a, b) => {
+                        // Prioritize case studies over notes
+                        if (a.type === 'case-study' && b.type !== 'case-study') return -1;
+                        if (b.type === 'case-study' && a.type !== 'case-study') return 1;
+                        // Then sort by publishedAt (most recent first)
+                        const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+                        const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+                        return dateB - dateA;
+                    });
                 const firstFile = publishedFiles[0];
 
                 if (!firstFile) {
