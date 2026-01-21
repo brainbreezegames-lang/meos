@@ -237,7 +237,7 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         parentId: null,
-        position: { x: 40, y: 320 },
+        position: { x: 5, y: 35 },
     },
     {
         id: 'file-2',
@@ -312,7 +312,7 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         parentId: null,
-        position: { x: 140, y: 320 },
+        position: { x: 13, y: 35 },
     },
     {
         id: 'file-prompts',
@@ -325,7 +325,7 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now()),
         parentId: null,
-        position: { x: 240, y: 320 },
+        position: { x: 21, y: 35 },
     },
 ];
 
