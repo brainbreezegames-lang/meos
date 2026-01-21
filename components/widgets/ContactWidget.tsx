@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Send, X, Check } from 'lucide-react';
+import { Mail, Send, X, Check, ChevronDown } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
-import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 interface ContactWidgetConfig {
   fields: ('name' | 'email' | 'message')[];
@@ -33,7 +32,6 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const theme = useWidgetTheme();
   const config: ContactWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ContactWidgetConfig>) };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,18 +58,7 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
     }
   };
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '10px 12px',
-    marginBottom: '8px',
-    borderRadius: '6px',
-    border: `2px solid ${theme.colors.border}`,
-    background: theme.colors.paper,
-    color: theme.colors.text.primary,
-    fontSize: '13px',
-    fontFamily: theme.fonts.heading,
-    outline: 'none',
-  };
+  const isValid = formData.email && formData.message;
 
   return (
     <WidgetWrapper
@@ -82,62 +69,68 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
       onPositionChange={onPositionChange}
     >
       {!isExpanded ? (
+        // Collapsed state - friendly pill button
         <button
-          onDoubleClick={() => setIsExpanded(true)}
+          onClick={() => setIsExpanded(true)}
           style={{
-            background: theme.colors.paper,
-            border: `2px solid ${theme.colors.border}`,
-            borderRadius: theme.radii.card,
-            boxShadow: theme.shadows.solid,
+            background: 'var(--color-bg-base, #fbf9ef)',
+            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            borderRadius: 'var(--radius-full, 9999px)',
+            boxShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
             padding: '10px 16px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+            gap: '8px',
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = theme.shadows.hover;
+            e.currentTarget.style.boxShadow = 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))';
+            e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translate(0, 0)';
-            e.currentTarget.style.boxShadow = theme.shadows.solid;
+            e.currentTarget.style.boxShadow = 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))';
+            e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
           <Mail
-            size={18}
+            size={16}
             strokeWidth={2}
-            style={{ color: theme.colors.text.accent || theme.colors.text.primary }}
+            style={{ color: 'var(--color-accent-primary, #ff7722)' }}
           />
           <span
             style={{
-              fontSize: '14px',
+              fontSize: 13,
               fontWeight: 600,
-              color: theme.colors.text.primary,
-              fontFamily: theme.fonts.heading,
-              letterSpacing: '0.01em',
+              color: 'var(--color-text-primary, #171412)',
               whiteSpace: 'nowrap',
             }}
           >
             {widget.title || 'Get in Touch'}
           </span>
+          <ChevronDown
+            size={14}
+            strokeWidth={2}
+            style={{ color: 'var(--color-text-muted, #8e827c)' }}
+          />
         </button>
       ) : (
+        // Expanded state - contact form
         <div
           style={{
-            background: theme.colors.paper,
-            border: `2px solid ${theme.colors.border}`,
-            borderRadius: theme.radii.card,
-            boxShadow: theme.shadows.solid,
-            width: '260px',
+            background: 'var(--color-bg-base, #fbf9ef)',
+            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            borderRadius: 'var(--radius-lg, 12px)',
+            boxShadow: 'var(--shadow-lg, 0 8px 32px rgba(23, 20, 18, 0.12))',
+            width: '280px',
             overflow: 'hidden',
           }}
         >
           {isSuccess ? (
+            // Success state
             <div
               style={{
-                padding: '24px',
+                padding: '32px 24px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -146,23 +139,22 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
             >
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: theme.colors.success,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 'var(--radius-full, 9999px)',
+                  background: 'var(--color-success, #22c55e)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Check size={20} color="white" strokeWidth={3} />
+                <Check size={24} color="white" strokeWidth={2.5} />
               </div>
               <span
                 style={{
-                  fontSize: '14px',
+                  fontSize: 14,
                   fontWeight: 600,
-                  color: theme.colors.text.primary,
-                  fontFamily: theme.fonts.heading,
+                  color: 'var(--color-text-primary, #171412)',
                   textAlign: 'center',
                 }}
               >
@@ -175,22 +167,23 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
               <div
                 style={{
                   padding: '12px 14px',
-                  borderBottom: `2px solid ${theme.colors.border}`,
+                  borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Mail size={16} strokeWidth={2} style={{ color: theme.colors.text.accent || theme.colors.text.primary }} />
+                  <Mail
+                    size={16}
+                    strokeWidth={2}
+                    style={{ color: 'var(--color-accent-primary, #ff7722)' }}
+                  />
                   <span
                     style={{
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      color: theme.colors.text.primary,
-                      fontFamily: theme.fonts.heading,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--color-text-primary, #171412)',
                     }}
                   >
                     {widget.title || 'Contact'}
@@ -199,11 +192,15 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                 <button
                   onClick={() => setIsExpanded(false)}
                   style={{
-                    padding: '4px',
+                    padding: 4,
                     background: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
-                    color: theme.colors.text.primary,
+                    color: 'var(--color-text-muted, #8e827c)',
+                    borderRadius: 'var(--radius-sm, 6px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
                   <X size={16} strokeWidth={2} />
@@ -218,7 +215,24 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     placeholder="Your name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    style={inputStyle}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      marginBottom: 10,
+                      borderRadius: 'var(--radius-sm, 6px)',
+                      border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+                      background: 'var(--color-bg-white, #ffffff)',
+                      color: 'var(--color-text-primary, #171412)',
+                      fontSize: 13,
+                      outline: 'none',
+                      transition: 'border-color 0.15s ease',
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-accent-primary, #ff7722)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-border-default, rgba(23, 20, 18, 0.08))';
+                    }}
                   />
                 )}
 
@@ -229,7 +243,24 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    style={inputStyle}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      marginBottom: 10,
+                      borderRadius: 'var(--radius-sm, 6px)',
+                      border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+                      background: 'var(--color-bg-white, #ffffff)',
+                      color: 'var(--color-text-primary, #171412)',
+                      fontSize: 13,
+                      outline: 'none',
+                      transition: 'border-color 0.15s ease',
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-accent-primary, #ff7722)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-border-default, rgba(23, 20, 18, 0.08))';
+                    }}
                   />
                 )}
 
@@ -240,33 +271,54 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     rows={3}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    style={{ ...inputStyle, resize: 'none', marginBottom: '12px' }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      marginBottom: 14,
+                      borderRadius: 'var(--radius-sm, 6px)',
+                      border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+                      background: 'var(--color-bg-white, #ffffff)',
+                      color: 'var(--color-text-primary, #171412)',
+                      fontSize: 13,
+                      outline: 'none',
+                      resize: 'none',
+                      transition: 'border-color 0.15s ease',
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-accent-primary, #ff7722)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-border-default, rgba(23, 20, 18, 0.08))';
+                    }}
                   />
                 )}
 
                 <button
                   type="submit"
-                  disabled={isLoading || !formData.email || !formData.message}
+                  disabled={isLoading || !isValid}
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    borderRadius: '6px',
-                    border: `2px solid ${theme.colors.border}`,
-                    background: formData.email && formData.message ? (theme.colors.text.accent || theme.colors.border) : theme.colors.paper,
-                    color: formData.email && formData.message ? '#FFFFFF' : theme.colors.text.muted,
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    fontFamily: theme.fonts.heading,
-                    cursor: formData.email && formData.message ? 'pointer' : 'not-allowed',
+                    borderRadius: 'var(--radius-sm, 6px)',
+                    border: 'none',
+                    background: isValid
+                      ? 'var(--color-accent-primary, #ff7722)'
+                      : 'var(--color-bg-subtle, #f2f0e7)',
+                    color: isValid
+                      ? 'var(--color-text-on-accent, #ffffff)'
+                      : 'var(--color-text-muted, #8e827c)',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: isValid ? 'pointer' : 'not-allowed',
                     opacity: isLoading ? 0.7 : 1,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px',
+                    gap: 8,
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <Send size={14} strokeWidth={2.5} />
+                  <Send size={14} strokeWidth={2} />
                   <span>{isLoading ? 'Sending...' : 'Send Message'}</span>
                 </button>
               </form>

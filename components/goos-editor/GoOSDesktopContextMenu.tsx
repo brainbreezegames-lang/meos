@@ -2,8 +2,25 @@
 
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Presentation, FolderPlus, Clipboard, RefreshCw, LayoutGrid, Image, Link, Video, Download, ChevronRight, Plus } from 'lucide-react';
-import { goOSTokens } from './GoOSTipTapEditor';
+import {
+  FileText,
+  Presentation,
+  FolderPlus,
+  Clipboard,
+  RefreshCw,
+  LayoutGrid,
+  Image,
+  Link,
+  Video,
+  Download,
+  ChevronRight,
+  Clock,
+  BookOpen,
+  Coffee,
+  Mail,
+  MessageSquare,
+  Plus,
+} from 'lucide-react';
 
 interface ContextMenuItem {
   id: string;
@@ -11,9 +28,13 @@ interface ContextMenuItem {
   icon: React.ReactNode;
   shortcut?: string;
   onClick: () => void;
-  dividerAfter?: boolean;
   disabled?: boolean;
-  submenu?: ContextMenuItem[];
+}
+
+interface MenuSection {
+  id: string;
+  title?: string;
+  items: ContextMenuItem[];
 }
 
 interface GoOSDesktopContextMenuProps {
@@ -52,145 +73,142 @@ export function GoOSDesktopContextMenu({
   canPaste = false,
 }: GoOSDesktopContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const [focusedIndex, setFocusedIndex] = React.useState(0);
+  const [focusedIndex, setFocusedIndex] = useState(0);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
-  const submenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Delayed submenu close to allow moving between parent and submenu
-  const closeSubmenuDelayed = useCallback(() => {
-    submenuTimeoutRef.current = setTimeout(() => {
-      setActiveSubmenu(null);
-    }, 150);
-  }, []);
-
-  const cancelSubmenuClose = useCallback(() => {
-    if (submenuTimeoutRef.current) {
-      clearTimeout(submenuTimeoutRef.current);
-      submenuTimeoutRef.current = null;
-    }
-  }, []);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (submenuTimeoutRef.current) {
-        clearTimeout(submenuTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const items: ContextMenuItem[] = [
+  // Define menu sections for better organization
+  const sections: MenuSection[] = [
     {
-      id: 'new-note',
-      label: 'New Note',
-      icon: <FileText size={14} />,
-      shortcut: '⌘N',
-      onClick: onNewNote,
+      id: 'create',
+      title: 'Create',
+      items: [
+        {
+          id: 'new-note',
+          label: 'Note',
+          icon: <FileText size={15} strokeWidth={1.75} />,
+          shortcut: '⌘N',
+          onClick: onNewNote,
+        },
+        {
+          id: 'new-case-study',
+          label: 'Case Study',
+          icon: <Presentation size={15} strokeWidth={1.75} />,
+          shortcut: '⇧⌘N',
+          onClick: onNewCaseStudy,
+        },
+        {
+          id: 'new-folder',
+          label: 'Folder',
+          icon: <FolderPlus size={15} strokeWidth={1.75} />,
+          shortcut: '⇧⌘F',
+          onClick: onNewFolder,
+        },
+      ],
     },
     {
-      id: 'new-case-study',
-      label: 'New Case Study',
-      icon: <Presentation size={14} />,
-      shortcut: '⌘⇧N',
-      onClick: onNewCaseStudy,
+      id: 'media',
+      title: 'Add Media',
+      items: [
+        {
+          id: 'new-image',
+          label: 'Image',
+          icon: <Image size={15} strokeWidth={1.75} />,
+          onClick: () => onNewImage?.(),
+        },
+        {
+          id: 'new-link',
+          label: 'Link',
+          icon: <Link size={15} strokeWidth={1.75} />,
+          onClick: () => onNewLink?.(),
+        },
+        {
+          id: 'new-embed',
+          label: 'Embed',
+          icon: <Video size={15} strokeWidth={1.75} />,
+          onClick: () => onNewEmbed?.(),
+        },
+        {
+          id: 'new-download',
+          label: 'Download',
+          icon: <Download size={15} strokeWidth={1.75} />,
+          onClick: () => onNewDownload?.(),
+        },
+      ],
     },
     {
-      id: 'new-folder',
-      label: 'New Folder',
-      icon: <FolderPlus size={14} />,
-      shortcut: '⌘⇧F',
-      onClick: onNewFolder,
+      id: 'widgets',
+      title: 'Widgets',
+      items: [
+        {
+          id: 'widget-clock',
+          label: 'Clock',
+          icon: <Clock size={15} strokeWidth={1.75} />,
+          onClick: () => onAddWidget?.('clock'),
+        },
+        {
+          id: 'widget-book',
+          label: 'Booking',
+          icon: <BookOpen size={15} strokeWidth={1.75} />,
+          onClick: () => onAddWidget?.('book'),
+        },
+        {
+          id: 'widget-tipjar',
+          label: 'Tip Jar',
+          icon: <Coffee size={15} strokeWidth={1.75} />,
+          onClick: () => onAddWidget?.('tipjar'),
+        },
+        {
+          id: 'widget-contact',
+          label: 'Contact',
+          icon: <Mail size={15} strokeWidth={1.75} />,
+          onClick: () => onAddWidget?.('contact'),
+        },
+        {
+          id: 'widget-links',
+          label: 'Links',
+          icon: <Link size={15} strokeWidth={1.75} />,
+          onClick: () => onAddWidget?.('links'),
+        },
+        {
+          id: 'widget-feedback',
+          label: 'Feedback',
+          icon: <MessageSquare size={15} strokeWidth={1.75} />,
+          onClick: () => onAddWidget?.('feedback'),
+        },
+      ],
     },
     {
-      id: 'new-image',
-      label: 'New Image',
-      icon: <Image size={14} />,
-      onClick: () => onNewImage?.(),
-    },
-    {
-      id: 'new-link',
-      label: 'New Link',
-      icon: <Link size={14} />,
-      onClick: () => onNewLink?.(),
-    },
-    {
-      id: 'new-embed',
-      label: 'New Embed',
-      icon: <Video size={14} />,
-      onClick: () => onNewEmbed?.(),
-    },
-    {
-      id: 'new-download',
-      label: 'New Download',
-      icon: <Download size={14} />,
-      onClick: () => onNewDownload?.(),
-      dividerAfter: true,
-    },
-    // Widget items - direct menu items (no submenu)
-    {
-      id: 'widget-clock',
-      label: 'Add Clock Widget',
-      icon: <span style={{ fontSize: 14 }}>🕐</span>,
-      onClick: () => { console.log('[Widget] Clock clicked'); onAddWidget?.('clock'); },
-    },
-    {
-      id: 'widget-book',
-      label: 'Add Book Widget',
-      icon: <span style={{ fontSize: 14 }}>📅</span>,
-      onClick: () => { console.log('[Widget] Book clicked'); onAddWidget?.('book'); },
-    },
-    {
-      id: 'widget-tipjar',
-      label: 'Add Tip Jar Widget',
-      icon: <span style={{ fontSize: 14 }}>☕</span>,
-      onClick: () => { console.log('[Widget] TipJar clicked'); onAddWidget?.('tipjar'); },
-    },
-    {
-      id: 'widget-contact',
-      label: 'Add Contact Widget',
-      icon: <span style={{ fontSize: 14 }}>✉️</span>,
-      onClick: () => { console.log('[Widget] Contact clicked'); onAddWidget?.('contact'); },
-    },
-    {
-      id: 'widget-links',
-      label: 'Add Links Widget',
-      icon: <span style={{ fontSize: 14 }}>🔗</span>,
-      onClick: () => { console.log('[Widget] Links clicked'); onAddWidget?.('links'); },
-    },
-    {
-      id: 'widget-feedback',
-      label: 'Add Feedback Widget',
-      icon: <span style={{ fontSize: 14 }}>💬</span>,
-      onClick: () => { console.log('[Widget] Feedback clicked'); onAddWidget?.('feedback'); },
-      dividerAfter: true,
-    },
-    {
-      id: 'paste',
-      label: 'Paste',
-      icon: <Clipboard size={14} />,
-      shortcut: '⌘V',
-      onClick: () => onPaste?.(),
-      disabled: !canPaste,
-      dividerAfter: true,
-    },
-    {
-      id: 'arrange',
-      label: 'Arrange Icons',
-      icon: <LayoutGrid size={14} />,
-      onClick: () => onArrangeIcons?.(),
-    },
-    {
-      id: 'refresh',
-      label: 'Refresh',
-      icon: <RefreshCw size={14} />,
-      shortcut: '⌘R',
-      onClick: () => onRefresh?.(),
+      id: 'actions',
+      items: [
+        {
+          id: 'paste',
+          label: 'Paste',
+          icon: <Clipboard size={15} strokeWidth={1.75} />,
+          shortcut: '⌘V',
+          onClick: () => onPaste?.(),
+          disabled: !canPaste,
+        },
+        {
+          id: 'arrange',
+          label: 'Arrange Icons',
+          icon: <LayoutGrid size={15} strokeWidth={1.75} />,
+          onClick: () => onArrangeIcons?.(),
+        },
+        {
+          id: 'refresh',
+          label: 'Refresh',
+          icon: <RefreshCw size={15} strokeWidth={1.75} />,
+          shortcut: '⌘R',
+          onClick: () => onRefresh?.(),
+        },
+      ],
     },
   ];
 
-  const enabledItems = items.filter(item => !item.disabled);
+  // Flatten items for keyboard navigation
+  const allItems = sections.flatMap(s => s.items);
+  const enabledItems = allItems.filter(item => !item.disabled);
 
-  // Handle keyboard navigation
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isOpen) return;
 
@@ -201,17 +219,11 @@ export function GoOSDesktopContextMenu({
         break;
       case 'ArrowDown':
         e.preventDefault();
-        setFocusedIndex(prev => {
-          const next = (prev + 1) % enabledItems.length;
-          return next;
-        });
+        setFocusedIndex(prev => (prev + 1) % enabledItems.length);
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setFocusedIndex(prev => {
-          const next = prev - 1 < 0 ? enabledItems.length - 1 : prev - 1;
-          return next;
-        });
+        setFocusedIndex(prev => prev - 1 < 0 ? enabledItems.length - 1 : prev - 1);
         break;
       case 'Enter':
       case ' ':
@@ -225,7 +237,6 @@ export function GoOSDesktopContextMenu({
     }
   }, [isOpen, onClose, enabledItems, focusedIndex]);
 
-  // Focus management and event listeners
   useEffect(() => {
     if (isOpen) {
       setFocusedIndex(0);
@@ -237,8 +248,6 @@ export function GoOSDesktopContextMenu({
 
       document.addEventListener('click', handleClick);
       document.addEventListener('keydown', handleKeyDown);
-
-      // Focus the menu for keyboard navigation
       setTimeout(() => menuRef.current?.focus(), 0);
 
       return () => {
@@ -248,10 +257,28 @@ export function GoOSDesktopContextMenu({
     }
   }, [isOpen, onClose, handleKeyDown]);
 
-  // Get the index in enabled items for focus tracking
-  const getEnabledIndex = (item: ContextMenuItem) => {
-    return enabledItems.findIndex(i => i.id === item.id);
-  };
+  // Adjust menu position to stay within viewport
+  const [adjustedPosition, setAdjustedPosition] = useState(position);
+
+  useEffect(() => {
+    if (isOpen && menuRef.current) {
+      const menu = menuRef.current;
+      const rect = menu.getBoundingClientRect();
+      const padding = 12;
+
+      let x = position.x;
+      let y = position.y;
+
+      if (x + rect.width > window.innerWidth - padding) {
+        x = window.innerWidth - rect.width - padding;
+      }
+      if (y + rect.height > window.innerHeight - padding) {
+        y = window.innerHeight - rect.height - padding;
+      }
+
+      setAdjustedPosition({ x: Math.max(padding, x), y: Math.max(padding, y) });
+    }
+  }, [isOpen, position]);
 
   return (
     <AnimatePresence>
@@ -261,61 +288,65 @@ export function GoOSDesktopContextMenu({
           role="menu"
           aria-label="Desktop context menu"
           tabIndex={-1}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.1 }}
+          initial={{ opacity: 0, scale: 0.96, y: -4 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: -4 }}
+          transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
           style={{
             position: 'fixed',
-            top: position.y,
-            left: position.x,
+            top: adjustedPosition.y,
+            left: adjustedPosition.x,
             zIndex: 9999,
             minWidth: 200,
-            background: goOSTokens.colors.paper,
-            border: `2px solid ${goOSTokens.colors.border}`,
-            borderRadius: 6,
-            boxShadow: goOSTokens.shadows.solid,
-            padding: '4px 0',
+            maxWidth: 260,
+            background: 'var(--color-bg-base, #fbf9ef)',
+            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            borderRadius: 'var(--radius-lg, 12px)',
+            boxShadow: 'var(--shadow-dropdown, 0 8px 30px rgba(23, 20, 18, 0.15))',
+            padding: '6px',
             overflow: 'hidden',
             outline: 'none',
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {items.map((item) => {
-            const enabledIndex = getEnabledIndex(item);
-            const isFocused = enabledIndex === focusedIndex && !item.disabled;
-            const hasSubmenu = item.submenu && item.submenu.length > 0;
+          {sections.map((section, sectionIndex) => (
+            <div key={section.id}>
+              {/* Section title */}
+              {section.title && (
+                <div
+                  style={{
+                    padding: '6px 10px 4px',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: 'var(--color-text-muted, #8e827c)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    userSelect: 'none',
+                  }}
+                >
+                  {section.title}
+                </div>
+              )}
 
-            return (
-              <React.Fragment key={item.id}>
-                <div style={{ position: 'relative' }}>
+              {/* Section items */}
+              {section.items.map((item) => {
+                const globalIndex = enabledItems.findIndex(i => i.id === item.id);
+                const isFocused = globalIndex === focusedIndex && !item.disabled;
+
+                return (
                   <button
+                    key={item.id}
                     role="menuitem"
                     aria-disabled={item.disabled}
-                    aria-haspopup={hasSubmenu ? 'menu' : undefined}
-                    aria-expanded={hasSubmenu ? activeSubmenu === item.id : undefined}
                     onClick={() => {
-                      if (!item.disabled && !hasSubmenu) {
+                      if (!item.disabled) {
                         item.onClick();
                         onClose();
                       }
                     }}
                     onMouseEnter={() => {
-                      console.log('[Menu] MouseEnter on:', item.id, 'hasSubmenu:', hasSubmenu);
                       if (!item.disabled) {
-                        cancelSubmenuClose();
-                        setFocusedIndex(enabledIndex);
-                        if (hasSubmenu) {
-                          console.log('[Menu] Opening submenu for:', item.id);
-                          setActiveSubmenu(item.id);
-                        } else {
-                          setActiveSubmenu(null);
-                        }
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      if (hasSubmenu) {
-                        closeSubmenuDelayed();
+                        setFocusedIndex(globalIndex);
                       }
                     }}
                     disabled={item.disabled}
@@ -324,20 +355,35 @@ export function GoOSDesktopContextMenu({
                       display: 'flex',
                       alignItems: 'center',
                       gap: 10,
-                      padding: '8px 12px',
-                      background: isFocused || activeSubmenu === item.id ? goOSTokens.colors.headerBg : 'transparent',
+                      padding: '8px 10px',
+                      background: isFocused
+                        ? 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.1))'
+                        : 'transparent',
                       border: 'none',
+                      borderRadius: 'var(--radius-sm, 6px)',
                       cursor: item.disabled ? 'not-allowed' : 'pointer',
-                      fontFamily: goOSTokens.fonts.body,
+                      fontFamily: 'inherit',
                       fontSize: 13,
-                      color: item.disabled ? goOSTokens.colors.text.muted : goOSTokens.colors.text.primary,
+                      fontWeight: 500,
+                      color: item.disabled
+                        ? 'var(--color-text-muted, #8e827c)'
+                        : 'var(--color-text-primary, #171412)',
                       opacity: item.disabled ? 0.5 : 1,
                       textAlign: 'left',
-                      transition: 'background 0.1s',
+                      transition: 'background 0.1s ease',
                       outline: 'none',
                     }}
                   >
-                    <span style={{ color: goOSTokens.colors.text.secondary, display: 'flex' }} aria-hidden="true">
+                    <span
+                      style={{
+                        color: isFocused
+                          ? 'var(--color-accent-primary, #ff7722)'
+                          : 'var(--color-text-secondary, #4a4744)',
+                        display: 'flex',
+                        transition: 'color 0.1s ease',
+                      }}
+                      aria-hidden="true"
+                    >
                       {item.icon}
                     </span>
                     <span style={{ flex: 1 }}>{item.label}</span>
@@ -345,102 +391,31 @@ export function GoOSDesktopContextMenu({
                       <span
                         style={{
                           fontSize: 11,
-                          color: goOSTokens.colors.text.muted,
-                          fontFamily: 'SF Mono, monospace',
+                          color: 'var(--color-text-muted, #8e827c)',
+                          fontFamily: 'ui-monospace, SF Mono, monospace',
+                          fontWeight: 400,
                         }}
-                        aria-label={`Keyboard shortcut: ${item.shortcut}`}
                       >
                         {item.shortcut}
                       </span>
                     )}
-                    {hasSubmenu && (
-                      <ChevronRight size={12} style={{ color: goOSTokens.colors.text.muted }} />
-                    )}
                   </button>
+                );
+              })}
 
-                  {/* Submenu with bridge for smooth hover */}
-                  {hasSubmenu && activeSubmenu === item.id && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: '100%',
-                        top: -4,
-                        paddingLeft: 8, // Bridge area to prevent gap issues
-                      }}
-                      onMouseEnter={() => {
-                        console.log('[Submenu] Mouse entered submenu container');
-                        cancelSubmenuClose();
-                      }}
-                      onMouseLeave={() => {
-                        console.log('[Submenu] Mouse left submenu container');
-                        closeSubmenuDelayed();
-                      }}
-                    >
-                      {console.log('[Submenu] RENDERING submenu for:', item.id, 'with', item.submenu?.length, 'items')}
-                      <div
-                        style={{
-                          minWidth: 160,
-                          background: goOSTokens.colors.paper,
-                          border: `2px solid ${goOSTokens.colors.border}`,
-                          borderRadius: 6,
-                          boxShadow: goOSTokens.shadows.solid,
-                          padding: '4px 0',
-                          zIndex: 10000,
-                        }}
-                      >
-                        {item.submenu?.map((subitem) => (
-                          <button
-                            key={subitem.id}
-                            role="menuitem"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log('[Submenu] Clicked:', subitem.id);
-                              subitem.onClick();
-                              onClose();
-                            }}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 10,
-                              padding: '8px 12px',
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              fontFamily: goOSTokens.fonts.body,
-                              fontSize: 13,
-                              color: goOSTokens.colors.text.primary,
-                              textAlign: 'left',
-                              transition: 'background 0.1s',
-                            }}
-                            onMouseEnter={(e) => {
-                              (e.target as HTMLElement).style.background = goOSTokens.colors.headerBg;
-                            }}
-                            onMouseLeave={(e) => {
-                              (e.target as HTMLElement).style.background = 'transparent';
-                            }}
-                          >
-                            <span style={{ display: 'flex', width: 16 }}>{subitem.icon}</span>
-                            <span>{subitem.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {item.dividerAfter && (
-                  <div
-                    role="separator"
-                    style={{
-                      height: 1,
-                      background: goOSTokens.colors.border + '30',
-                      margin: '4px 8px',
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
+              {/* Separator after section (except last) */}
+              {sectionIndex < sections.length - 1 && (
+                <div
+                  role="separator"
+                  style={{
+                    height: 1,
+                    background: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
+                    margin: '6px 8px',
+                  }}
+                />
+              )}
+            </div>
+          ))}
         </motion.div>
       )}
     </AnimatePresence>

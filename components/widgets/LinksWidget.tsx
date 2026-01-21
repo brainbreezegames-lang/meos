@@ -1,11 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Link2, ExternalLink, ChevronDown, Twitter, Github, Linkedin, Instagram, Youtube, Globe, X } from 'lucide-react';
+import { Link2, ExternalLink, ChevronDown, ChevronUp, Twitter, Github, Linkedin, Instagram, Youtube, Globe, X } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
-
-import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 
 interface LinkItem {
   name: string;
@@ -51,7 +49,6 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
   const [isExpanded, setIsExpanded] = useState(false);
   const config: LinksWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<LinksWidgetConfig>) };
 
-  const theme = useWidgetTheme();
   const hasLinks = config.links && config.links.length > 0;
 
   return (
@@ -63,60 +60,75 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       onPositionChange={onPositionChange}
     >
       {!isExpanded ? (
+        // Collapsed state - compact pill button
         <button
-          onDoubleClick={() => setIsExpanded(true)}
+          onClick={() => setIsExpanded(true)}
           style={{
-            background: theme.colors.paper,
-            border: `2px solid ${theme.colors.border}`,
-            borderRadius: theme.radii.card,
-            boxShadow: theme.shadows.solid,
+            background: 'var(--color-bg-base, #fbf9ef)',
+            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            borderRadius: 'var(--radius-full, 9999px)',
+            boxShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
             padding: '10px 16px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+            gap: '8px',
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = theme.shadows.hover;
+            e.currentTarget.style.boxShadow = 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))';
+            e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translate(0, 0)';
-            e.currentTarget.style.boxShadow = theme.shadows.solid;
+            e.currentTarget.style.boxShadow = 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))';
+            e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
           <Link2
-            size={18}
+            size={16}
             strokeWidth={2}
-            style={{ color: theme.colors.text.accent || theme.colors.text.primary }}
+            style={{ color: 'var(--color-accent-primary, #ff7722)' }}
           />
           <span
             style={{
-              fontSize: '14px',
+              fontSize: 13,
               fontWeight: 600,
-              color: theme.colors.text.primary,
-              fontFamily: theme.fonts.heading,
-              letterSpacing: '0.01em',
+              color: 'var(--color-text-primary, #171412)',
               whiteSpace: 'nowrap',
             }}
           >
             {widget.title || 'Links'}
           </span>
+          {hasLinks && (
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 500,
+                color: 'var(--color-text-muted, #8e827c)',
+                background: 'var(--color-bg-subtle, #f2f0e7)',
+                padding: '2px 6px',
+                borderRadius: 'var(--radius-full, 9999px)',
+              }}
+            >
+              {config.links.length}
+            </span>
+          )}
           <ChevronDown
             size={14}
-            strokeWidth={2.5}
-            style={{ color: theme.colors.text.primary, opacity: 0.7 }}
+            strokeWidth={2}
+            style={{ color: 'var(--color-text-muted, #8e827c)' }}
           />
         </button>
       ) : (
+        // Expanded state - full links panel
         <div
           style={{
-            background: theme.colors.paper,
-            border: `2px solid ${theme.colors.border}`,
-            borderRadius: theme.radii.card,
-            boxShadow: theme.shadows.solid,
-            minWidth: '180px',
+            background: 'var(--color-bg-base, #fbf9ef)',
+            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            borderRadius: 'var(--radius-lg, 12px)',
+            boxShadow: 'var(--shadow-lg, 0 8px 32px rgba(23, 20, 18, 0.12))',
+            minWidth: '200px',
+            maxWidth: '280px',
             overflow: 'hidden',
           }}
         >
@@ -126,7 +138,7 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             style={{
               width: '100%',
               padding: '12px 14px',
-              borderBottom: `2px solid ${theme.colors.border}`,
+              borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -136,40 +148,45 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Link2 size={16} strokeWidth={2} style={{ color: theme.colors.text.accent || theme.colors.text.primary }} />
+              <Link2
+                size={16}
+                strokeWidth={2}
+                style={{ color: 'var(--color-accent-primary, #ff7722)' }}
+              />
               <span
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  color: theme.colors.text.primary,
-                  fontFamily: theme.fonts.heading,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--color-text-primary, #171412)',
                 }}
               >
                 {widget.title || 'Links'}
               </span>
             </div>
-            <ChevronDown
+            <ChevronUp
               size={14}
-              strokeWidth={2.5}
-              style={{ color: theme.colors.text.primary, transform: 'rotate(180deg)' }}
+              strokeWidth={2}
+              style={{ color: 'var(--color-text-muted, #8e827c)' }}
             />
           </button>
 
           {/* Links list */}
-          <div style={{ padding: '8px' }}>
+          <div style={{ padding: '6px' }}>
             {!hasLinks ? (
               <div
                 style={{
-                  padding: '16px 12px',
+                  padding: '20px 16px',
                   textAlign: 'center',
-                  color: theme.colors.text.muted,
-                  fontSize: '13px',
-                  fontFamily: theme.fonts.heading,
+                  color: 'var(--color-text-muted, #8e827c)',
+                  fontSize: 13,
                 }}
               >
-                No links added yet
+                <Link2
+                  size={24}
+                  strokeWidth={1.5}
+                  style={{ marginBottom: 8, opacity: 0.5 }}
+                />
+                <div>No links added yet</div>
               </div>
             ) : (
               config.links.map((link, index) => {
@@ -184,29 +201,41 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                       display: 'flex',
                       alignItems: 'center',
                       gap: '10px',
-                      padding: '10px 12px',
-                      borderRadius: '6px',
+                      padding: '10px 10px',
+                      borderRadius: 'var(--radius-sm, 6px)',
                       textDecoration: 'none',
                       transition: 'background 0.15s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = theme.colors.text.accent ? `color-mix(in srgb, ${theme.colors.text.accent} 8%, transparent)` : 'rgba(43, 74, 226, 0.08)';
+                      e.currentTarget.style.background = 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.1))';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'transparent';
                     }}
                   >
-                    <IconComponent
-                      size={16}
-                      strokeWidth={2}
-                      style={{ color: theme.colors.text.primary, flexShrink: 0 }}
-                    />
                     <span
                       style={{
-                        fontSize: '14px',
+                        width: 28,
+                        height: 28,
+                        borderRadius: 'var(--radius-sm, 6px)',
+                        background: 'var(--color-bg-subtle, #f2f0e7)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <IconComponent
+                        size={14}
+                        strokeWidth={2}
+                        style={{ color: 'var(--color-text-secondary, #4a4744)' }}
+                      />
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 13,
                         fontWeight: 500,
-                        color: theme.colors.text.primary,
-                        fontFamily: theme.fonts.heading,
+                        color: 'var(--color-text-primary, #171412)',
                         flex: 1,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -218,7 +247,7 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                     <ExternalLink
                       size={12}
                       strokeWidth={2}
-                      style={{ color: theme.colors.text.muted, flexShrink: 0 }}
+                      style={{ color: 'var(--color-text-muted, #8e827c)', flexShrink: 0 }}
                     />
                   </a>
                 );

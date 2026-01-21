@@ -46,9 +46,9 @@ export interface WidgetTheme {
 }
 
 export const useWidgetTheme = (): WidgetTheme => {
-    const { theme } = useThemeSafe() || { theme: 'light' };
+    const { theme } = useThemeSafe() || { theme: 'appart' };
     const isSketch = theme === 'sketch';
-    const isBrandAppart = theme === 'brand-appart';
+    const isBrandAppart = theme === 'brand-appart' || theme === 'appart';
 
     // Sketch Theme (Hardcoded Blueprint - Mediterranean Blue)
     const sketchTheme: WidgetTheme = {

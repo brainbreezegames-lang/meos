@@ -1,32 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MessageSquare, Send, X, Check } from 'lucide-react';
+import { MessageSquare, Send, X, Check, ChevronDown } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
-
-// goOS Design Tokens - Brand Appart (aligned with useWidgetTheme)
-const goOS = {
-  colors: {
-    paper: '#fbf9ef',       // Brand cream
-    border: '#171412',      // Brand base dark
-    text: {
-      primary: '#171412',   // Brand base
-      secondary: '#8e827c', // Brand grey
-      muted: '#8e827c',
-    },
-    accent: '#ff7722',      // Brand orange
-    success: '#3d2fa9',     // Brand purple
-  },
-  shadows: {
-    solid: '4px 4px 0 rgba(23, 20, 18, 0.1)',
-    hover: '6px 6px 0 rgba(23, 20, 18, 0.15)',
-  },
-  fonts: {
-    heading: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-    mono: '"SF Mono", "Monaco", "Inconsolata", monospace',
-  },
-};
 
 interface FeedbackWidgetConfig {
   prompt: string;
@@ -75,6 +52,8 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
     }
   };
 
+  const isValid = feedback.trim();
+
   return (
     <WidgetWrapper
       widget={widget}
@@ -84,62 +63,68 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
       onPositionChange={onPositionChange}
     >
       {!isExpanded ? (
+        // Collapsed state - friendly pill button
         <button
-          onDoubleClick={() => setIsExpanded(true)}
+          onClick={() => setIsExpanded(true)}
           style={{
-            background: goOS.colors.paper,
-            border: `2px solid ${goOS.colors.border}`,
-            borderRadius: '8px',
-            boxShadow: goOS.shadows.solid,
+            background: 'var(--color-bg-base, #fbf9ef)',
+            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            borderRadius: 'var(--radius-full, 9999px)',
+            boxShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
             padding: '10px 16px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+            gap: '8px',
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = goOS.shadows.hover;
+            e.currentTarget.style.boxShadow = 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))';
+            e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translate(0, 0)';
-            e.currentTarget.style.boxShadow = goOS.shadows.solid;
+            e.currentTarget.style.boxShadow = 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))';
+            e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
           <MessageSquare
-            size={18}
+            size={16}
             strokeWidth={2}
-            style={{ color: goOS.colors.text.primary }}
+            style={{ color: 'var(--color-accent-primary, #ff7722)' }}
           />
           <span
             style={{
-              fontSize: '14px',
+              fontSize: 13,
               fontWeight: 600,
-              color: goOS.colors.text.primary,
-              fontFamily: goOS.fonts.heading,
-              letterSpacing: '0.01em',
+              color: 'var(--color-text-primary, #171412)',
               whiteSpace: 'nowrap',
             }}
           >
             {widget.title || 'Feedback'}
           </span>
+          <ChevronDown
+            size={14}
+            strokeWidth={2}
+            style={{ color: 'var(--color-text-muted, #8e827c)' }}
+          />
         </button>
       ) : (
+        // Expanded state - feedback form
         <div
           style={{
-            background: goOS.colors.paper,
-            border: `2px solid ${goOS.colors.border}`,
-            borderRadius: '8px',
-            boxShadow: goOS.shadows.solid,
-            width: '260px',
+            background: 'var(--color-bg-base, #fbf9ef)',
+            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            borderRadius: 'var(--radius-lg, 12px)',
+            boxShadow: 'var(--shadow-lg, 0 8px 32px rgba(23, 20, 18, 0.12))',
+            width: '280px',
             overflow: 'hidden',
           }}
         >
           {isSuccess ? (
+            // Success state
             <div
               style={{
-                padding: '24px',
+                padding: '32px 24px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -148,23 +133,22 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
             >
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: goOS.colors.success,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 'var(--radius-full, 9999px)',
+                  background: 'var(--color-success, #22c55e)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Check size={20} color="white" strokeWidth={3} />
+                <Check size={24} color="white" strokeWidth={2.5} />
               </div>
               <span
                 style={{
-                  fontSize: '14px',
+                  fontSize: 14,
                   fontWeight: 600,
-                  color: goOS.colors.text.primary,
-                  fontFamily: goOS.fonts.heading,
+                  color: 'var(--color-text-primary, #171412)',
                   textAlign: 'center',
                 }}
               >
@@ -177,22 +161,23 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
               <div
                 style={{
                   padding: '12px 14px',
-                  borderBottom: `2px solid ${goOS.colors.border}`,
+                  borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <MessageSquare size={16} strokeWidth={2} style={{ color: goOS.colors.text.primary }} />
+                  <MessageSquare
+                    size={16}
+                    strokeWidth={2}
+                    style={{ color: 'var(--color-accent-primary, #ff7722)' }}
+                  />
                   <span
                     style={{
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      color: goOS.colors.text.primary,
-                      fontFamily: goOS.fonts.heading,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--color-text-primary, #171412)',
                     }}
                   >
                     Feedback
@@ -201,11 +186,15 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
                 <button
                   onClick={() => setIsExpanded(false)}
                   style={{
-                    padding: '4px',
+                    padding: 4,
                     background: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
-                    color: goOS.colors.text.primary,
+                    color: 'var(--color-text-muted, #8e827c)',
+                    borderRadius: 'var(--radius-sm, 6px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
                   <X size={16} strokeWidth={2} />
@@ -217,10 +206,9 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
                 {/* Prompt */}
                 <p
                   style={{
-                    fontSize: '13px',
-                    color: goOS.colors.text.primary,
-                    fontFamily: goOS.fonts.heading,
-                    marginBottom: '12px',
+                    fontSize: 13,
+                    color: 'var(--color-text-primary, #171412)',
+                    marginBottom: 12,
                     lineHeight: 1.5,
                   }}
                 >
@@ -235,15 +223,21 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    marginBottom: '8px',
-                    borderRadius: '6px',
-                    border: `2px solid ${goOS.colors.border}`,
-                    background: goOS.colors.paper,
-                    color: goOS.colors.text.primary,
-                    fontSize: '13px',
-                    fontFamily: goOS.fonts.heading,
+                    marginBottom: 10,
+                    borderRadius: 'var(--radius-sm, 6px)',
+                    border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+                    background: 'var(--color-bg-white, #ffffff)',
+                    color: 'var(--color-text-primary, #171412)',
+                    fontSize: 13,
                     outline: 'none',
                     resize: 'none',
+                    transition: 'border-color 0.15s ease',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-accent-primary, #ff7722)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border-default, rgba(23, 20, 18, 0.08))';
                   }}
                 />
 
@@ -251,13 +245,10 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
                 {config.anonymous && (
                   <p
                     style={{
-                      fontSize: '11px',
-                      color: goOS.colors.text.muted,
-                      fontFamily: goOS.fonts.heading,
-                      marginBottom: '12px',
+                      fontSize: 11,
+                      color: 'var(--color-text-muted, #8e827c)',
+                      marginBottom: 14,
                       textAlign: 'center',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
                     }}
                   >
                     Your feedback is anonymous
@@ -267,27 +258,30 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
                 {/* Submit button */}
                 <button
                   type="submit"
-                  disabled={isLoading || !feedback.trim()}
+                  disabled={isLoading || !isValid}
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    borderRadius: '6px',
-                    border: `2px solid ${goOS.colors.border}`,
-                    background: feedback.trim() ? goOS.colors.border : goOS.colors.paper,
-                    color: feedback.trim() ? goOS.colors.paper : goOS.colors.text.muted,
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    fontFamily: goOS.fonts.heading,
-                    cursor: feedback.trim() ? 'pointer' : 'not-allowed',
+                    borderRadius: 'var(--radius-sm, 6px)',
+                    border: 'none',
+                    background: isValid
+                      ? 'var(--color-accent-primary, #ff7722)'
+                      : 'var(--color-bg-subtle, #f2f0e7)',
+                    color: isValid
+                      ? 'var(--color-text-on-accent, #ffffff)'
+                      : 'var(--color-text-muted, #8e827c)',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: isValid ? 'pointer' : 'not-allowed',
                     opacity: isLoading ? 0.7 : 1,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px',
+                    gap: 8,
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <Send size={14} strokeWidth={2.5} />
+                  <Send size={14} strokeWidth={2} />
                   <span>{isLoading ? 'Sending...' : 'Send Feedback'}</span>
                 </button>
               </form>

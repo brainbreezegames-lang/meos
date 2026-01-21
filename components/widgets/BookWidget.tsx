@@ -5,8 +5,6 @@ import { Calendar, ArrowUpRight } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
-import { useWidgetTheme } from '@/hooks/useWidgetTheme';
-
 interface BookWidgetConfig {
   url: string;
   buttonText: string;
@@ -28,8 +26,6 @@ const DEFAULT_CONFIG: BookWidgetConfig = {
 export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange }: BookWidgetProps) {
   const config: BookWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<BookWidgetConfig>) };
 
-  const theme = useWidgetTheme();
-
   const handleClick = () => {
     if (config.url) {
       window.open(config.url, '_blank', 'noopener,noreferrer');
@@ -47,40 +43,38 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
       <button
         onClick={handleClick}
         style={{
-          background: theme.colors.paper,
-          border: `2px solid ${theme.colors.border}`,
-          borderRadius: theme.radii.card,
-          boxShadow: theme.shadows.solid,
+          background: 'var(--color-bg-base, #fbf9ef)',
+          border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+          borderRadius: 'var(--radius-full, 9999px)',
+          boxShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
           padding: '10px 16px',
           cursor: config.url ? 'pointer' : 'default',
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+          gap: '8px',
+          transition: 'all 0.2s ease',
         }}
         onMouseEnter={(e) => {
           if (config.url) {
-            e.currentTarget.style.transform = 'translate(-2px, -2px)';
-            e.currentTarget.style.boxShadow = theme.shadows.hover;
+            e.currentTarget.style.boxShadow = 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))';
+            e.currentTarget.style.transform = 'translateY(-1px)';
           }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translate(0, 0)';
-          e.currentTarget.style.boxShadow = theme.shadows.solid;
+          e.currentTarget.style.boxShadow = 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))';
+          e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
         <Calendar
-          size={18}
+          size={16}
           strokeWidth={2}
-          style={{ color: theme.colors.text.accent || theme.colors.text.primary }}
+          style={{ color: 'var(--color-accent-primary, #ff7722)' }}
         />
         <span
           style={{
-            fontSize: '14px',
+            fontSize: 13,
             fontWeight: 600,
-            color: theme.colors.text.primary,
-            fontFamily: theme.fonts.heading,
-            letterSpacing: '0.01em',
+            color: 'var(--color-text-primary, #171412)',
             whiteSpace: 'nowrap',
           }}
         >
@@ -88,8 +82,8 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
         </span>
         <ArrowUpRight
           size={14}
-          strokeWidth={2.5}
-          style={{ color: theme.colors.text.primary, opacity: 0.7 }}
+          strokeWidth={2}
+          style={{ color: 'var(--color-text-muted, #8e827c)' }}
         />
       </button>
     </WidgetWrapper>
