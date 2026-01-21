@@ -687,7 +687,7 @@ const DEMO_DESKTOP: Desktop = {
     backgroundUrl: null,
     backgroundPosition: 'cover',
     backgroundOverlay: null,
-    theme: 'light',
+    theme: 'brand-appart',
     title: 'goOS Demo',
     description: 'goOS themed portfolio demo',
     ogImageUrl: null,
@@ -858,34 +858,113 @@ const StickyNote = React.memo(({
 StickyNote.displayName = 'StickyNote';
 
 // ============================================
-// RUBBER DUCK
+// CONFETTI BURST - for celebrations
 // ============================================
+const ConfettiBurst = React.memo(({ isActive, onComplete }: { isActive: boolean; onComplete?: () => void }) => {
+    const confettiColors = ['#ff7722', '#3d2fa9', '#22c55e', '#f59e0b', '#ec4899', '#06b6d4'];
+    const particles = useMemo(() =>
+        Array.from({ length: 50 }, (_, i) => ({
+            id: i,
+            color: confettiColors[i % confettiColors.length],
+            x: (Math.random() - 0.5) * 400,
+            y: -(Math.random() * 300 + 100),
+            rotation: Math.random() * 360,
+            scale: 0.5 + Math.random() * 0.5,
+        })), []);
+
+    useEffect(() => {
+        if (isActive && onComplete) {
+            const timer = setTimeout(onComplete, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [isActive, onComplete]);
+
+    if (!isActive) return null;
+
+    return (
+        <div className="fixed inset-0 pointer-events-none z-[9999]" style={{ perspective: 1000 }}>
+            {particles.map((p) => (
+                <motion.div
+                    key={p.id}
+                    initial={{ x: '50vw', y: '50vh', scale: 0, rotate: 0, opacity: 1 }}
+                    animate={{
+                        x: `calc(50vw + ${p.x}px)`,
+                        y: `calc(50vh + ${p.y}px)`,
+                        scale: p.scale,
+                        rotate: p.rotation,
+                        opacity: [1, 1, 0],
+                    }}
+                    transition={{ duration: 1.5 + Math.random() * 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                    style={{
+                        position: 'absolute',
+                        width: 10,
+                        height: 10,
+                        borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+                        background: p.color,
+                    }}
+                />
+            ))}
+        </div>
+    );
+});
+ConfettiBurst.displayName = 'ConfettiBurst';
+
+// ============================================
+// RUBBER DUCK - Enhanced with more personality
+// ============================================
+const DUCK_SAYINGS = [
+    'Quack!',
+    'Have you tried turning it off and on?',
+    'Rubber duck debugging! 🐛',
+    'You got this! 💪',
+    'Ship it! 🚀',
+    '*happy duck noises*',
+    'Honk? Wait, wrong bird.',
+    '10/10 would quack again',
+];
+
 const RubberDuck = React.memo(({ onClick }: { onClick?: () => void }) => {
     const [isQuacking, setIsQuacking] = useState(false);
+    const [quackCount, setQuackCount] = useState(0);
+    const [saying, setSaying] = useState(DUCK_SAYINGS[0]);
 
     const handleClick = () => {
         setIsQuacking(true);
+        setQuackCount(prev => prev + 1);
+        // Rotate through sayings, with special ones for milestones
+        if (quackCount === 9) {
+            setSaying('🎉 10 quacks! You really like me!');
+        } else if (quackCount === 49) {
+            setSaying('🏆 50 quacks! Duck enthusiast!');
+        } else if (quackCount === 99) {
+            setSaying('👑 100 quacks! Duck royalty!');
+        } else {
+            setSaying(DUCK_SAYINGS[Math.floor(Math.random() * DUCK_SAYINGS.length)]);
+        }
         onClick?.();
-        setTimeout(() => setIsQuacking(false), 600);
+        setTimeout(() => setIsQuacking(false), 1200);
     };
 
     return (
         <motion.button
             onClick={handleClick}
             className="relative flex items-center justify-center focus:outline-none w-10 h-10"
-            whileHover={{ y: -6 }}
-            transition={goOS.springs.gentle}
+            whileHover={{ y: -8, scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            transition={goOS.springs.bouncy}
+            title={`Click me! (${quackCount} quacks)`}
         >
             <motion.span
-                className="text-2xl"
+                className="text-2xl select-none"
                 animate={isQuacking ? {
-                    rotate: [0, -15, 15, -10, 10, 0],
-                    y: [0, -4, 0]
+                    rotate: [0, -20, 20, -15, 15, -10, 10, 0],
+                    y: [0, -8, 0, -4, 0],
+                    scale: [1, 1.2, 1, 1.1, 1],
                 } : {
-                    rotate: [0, 2, 0, -2, 0],
-                    y: [0, -1, 0]
+                    rotate: [0, 3, 0, -3, 0],
+                    y: [0, -2, 0],
                 }}
-                transition={isQuacking ? { duration: 0.5 } : { duration: 3, repeat: Infinity }}
+                transition={isQuacking ? { duration: 0.8 } : { duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             >
                 🦆
             </motion.span>
@@ -893,13 +972,18 @@ const RubberDuck = React.memo(({ onClick }: { onClick?: () => void }) => {
                 {isQuacking && (
                     <motion.div
                         initial={{ scale: 0, opacity: 0, y: 10 }}
-                        animate={{ scale: 1, opacity: 1, y: -30 }}
-                        exit={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1, y: -40 }}
+                        exit={{ scale: 0.8, opacity: 0, y: -50 }}
                         transition={goOS.springs.snappy}
-                        className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white border-2 rounded-full px-2 py-0.5 text-xs whitespace-nowrap z-50"
-                        style={{ borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 bg-white rounded-lg px-3 py-1.5 text-xs whitespace-nowrap z-50 font-medium"
+                        style={{
+                            borderColor: goOS.colors.border,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            color: goOS.colors.text.primary,
+                            maxWidth: 180,
+                        }}
                     >
-                        Quack!
+                        {saying}
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -910,7 +994,7 @@ const RubberDuck = React.memo(({ onClick }: { onClick?: () => void }) => {
 RubberDuck.displayName = 'RubberDuck';
 
 // ============================================
-// DOCK ICON
+// DOCK ICON - Enhanced with bounce and tooltip
 // ============================================
 const DockIcon = React.memo(({
     icon,
@@ -924,40 +1008,86 @@ const DockIcon = React.memo(({
     isActive?: boolean;
     badge?: number;
     label?: string;
-}) => (
-    <motion.button
-        onClick={onClick}
-        whileHover={{ y: -8 }}
-        whileTap={{ scale: 0.95 }}
-        transition={goOS.springs.gentle}
-        className="relative flex flex-col items-center focus:outline-none"
-        title={label}
-    >
-        <div
-            className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${isActive ? 'bg-white' : 'hover:bg-black/5'
-                }`}
-            style={{ border: isActive ? `1.5px solid ${goOS.colors.border}` : 'none' }}
+}) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [justClicked, setJustClicked] = useState(false);
+
+    const handleClick = () => {
+        setJustClicked(true);
+        onClick();
+        setTimeout(() => setJustClicked(false), 400);
+    };
+
+    return (
+        <motion.button
+            onClick={handleClick}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
+            animate={{
+                y: isHovered ? -12 : 0,
+                scale: justClicked ? [1, 0.9, 1.05, 1] : 1,
+            }}
+            transition={goOS.springs.bouncy}
+            className="relative flex flex-col items-center focus:outline-none"
         >
-            {icon}
-        </div>
-        {badge !== undefined && badge > 0 && (
-            <span
-                className="absolute -top-1 -right-1 min-w-[14px] h-3.5 flex items-center justify-center rounded-full text-white text-[9px] font-bold px-0.5 z-10"
-                style={{ background: goOS.colors.accent.primary }}
-            >
-                {badge}
-            </span>
-        )}
-        {isActive && (
+            {/* Tooltip label */}
+            <AnimatePresence>
+                {isHovered && label && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 4, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 4, scale: 0.9 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap z-50"
+                        style={{
+                            background: goOS.colors.text.primary,
+                            color: goOS.colors.paper,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        }}
+                    >
+                        {label}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="w-1 h-1 rounded-full mt-1"
-                style={{ background: goOS.colors.border }}
-            />
-        )}
-    </motion.button>
-));
+                className={`w-11 h-11 flex items-center justify-center rounded-xl transition-colors ${isActive ? 'bg-white' : 'hover:bg-black/5'}`}
+                style={{
+                    border: isActive ? `1.5px solid ${goOS.colors.border}` : 'none',
+                    boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                }}
+                animate={{
+                    scale: isHovered && !justClicked ? 1.1 : 1,
+                }}
+                transition={goOS.springs.gentle}
+            >
+                {icon}
+            </motion.div>
+
+            {/* Badge with bounce animation */}
+            {badge !== undefined && badge > 0 && (
+                <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
+                    style={{ background: goOS.colors.accent.primary }}
+                >
+                    {badge}
+                </motion.span>
+            )}
+
+            {/* Active indicator dot */}
+            {isActive && (
+                <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="w-1.5 h-1.5 rounded-full mt-1"
+                    style={{ background: goOS.colors.accent.primary }}
+                />
+            )}
+        </motion.button>
+    );
+});
 
 DockIcon.displayName = 'DockIcon';
 
@@ -1637,6 +1767,12 @@ function GoOSDemoContent() {
     const [topZIndex, setTopZIndex] = useState(100);
     const [logoClicks, setLogoClicks] = useState(0);
     const [showEasterEgg, setShowEasterEgg] = useState(false);
+    const [showConfetti, setShowConfetti] = useState(false);
+
+    // Celebration helper
+    const celebrate = useCallback(() => {
+        setShowConfetti(true);
+    }, []);
 
     // goOS app windows
     const [appWindows, setAppWindows] = useState<Record<string, boolean>>({
@@ -2134,18 +2270,50 @@ function GoOSDemoContent() {
     }, []);
 
     useEffect(() => {
+        // Playful greetings that rotate and vary by time
+        const morningGreetings = [
+            "Rise and shine! ☀️",
+            "Ready to create? ✨",
+            "Good morning! ☕",
+            "Let's make something cool!",
+            "Fresh start, fresh ideas 🌱",
+        ];
+        const afternoonGreetings = [
+            "Productivity time! 🚀",
+            "Keep crushing it! 💪",
+            "Good afternoon! 🌤",
+            "Making magic happen ✨",
+            "You're doing great!",
+        ];
+        const eveningGreetings = [
+            "Evening vibes 🌅",
+            "Winding down? 🌙",
+            "Golden hour energy ✨",
+            "Almost there! 💫",
+            "Cozy coding time 🧸",
+        ];
+        const nightGreetings = [
+            "Night owl mode 🦉",
+            "Burning the midnight oil? 🕯️",
+            "Late night magic ✨",
+            "The city sleeps... you create 🌃",
+            "Best ideas come at night 💡",
+        ];
+
         const updateTime = () => {
             const now = new Date();
             setTime(now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
             const hour = now.getHours();
-            if (hour < 5) setGreeting("Night owl? 🦉");
-            else if (hour < 12) setGreeting("Good morning! ☀️");
-            else if (hour < 17) setGreeting("Good afternoon! 🌤");
-            else if (hour < 21) setGreeting("Good evening! 🌅");
-            else setGreeting("Night owl? 🦉");
+            let greetings: string[];
+            if (hour < 5) greetings = nightGreetings;
+            else if (hour < 12) greetings = morningGreetings;
+            else if (hour < 17) greetings = afternoonGreetings;
+            else if (hour < 21) greetings = eveningGreetings;
+            else greetings = nightGreetings;
+            setGreeting(greetings[Math.floor(Math.random() * greetings.length)]);
         };
         updateTime();
-        const interval = setInterval(updateTime, 30000);
+        const interval = setInterval(updateTime, 60000); // Update every minute for variety
         return () => clearInterval(interval);
     }, []);
 
@@ -2206,6 +2374,9 @@ function GoOSDemoContent() {
                 }
             }}
         >
+            {/* CONFETTI CELEBRATION */}
+            <ConfettiBurst isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
+
             {/* MENU BAR */}
             <header
                 className="h-10 flex items-center justify-between px-5 fixed top-0 left-0 right-0 z-[2000] select-none"
@@ -2361,395 +2532,396 @@ function GoOSDemoContent() {
                 {/* Desktop View Mode - only show when viewMode is 'desktop' */}
                 {viewMode === 'desktop' && (
                     <>
-                {/* Sticky Notes (Left side) */}
-                <div className="fixed top-16 left-4 z-[30] flex flex-col gap-3">
-                    <StickyNote color="blue" rotation={-3}>
-                        <span className="text-lg" style={{ color: goOS.colors.text.primary }}>goOS Demo</span>
-                    </StickyNote>
-                </div>
-
-                {/* Decorative Plant (Right side) */}
-                <motion.div
-                    className="fixed top-16 right-6 z-[30] text-4xl select-none"
-                    animate={{ rotate: [-2, 2, -2] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    style={{ transformOrigin: 'bottom center' }}
-                >
-                    🪴
-                </motion.div>
-
-                {/* Portfolio Desktop Icons - goOS style */}
-                <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-4xl px-8 pt-8">
-                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4 place-items-center">
-                        {items.map((item) => (
-                            <GoOSDesktopIcon
-                                key={item.id}
-                                label={item.label}
-                                thumbnailUrl={item.thumbnailUrl}
-                                onClick={() => windowContext.openWindow(item.id)}
-                                isActive={windowContext.isItemOpen(item.id)}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Portfolio Windows */}
-                <WindowManager items={items} />
-
-                {/* goOS File Icons (desktop - root level only) */}
-                <AnimatePresence mode="sync" initial={false}>
-                    {filesOnDesktop.map((file) => {
-                        // Ensure file has a valid position
-                        const filePosition = file.position || { x: 40, y: 320 };
-                        return (
-                            <GoOSFileIcon
-                                key={file.id}
-                                id={file.id}
-                                type={file.type}
-                                title={file.title}
-                                status={file.status}
-                                accessLevel={file.accessLevel}
-                                isSelected={selectedFileId === file.id}
-                                isRenaming={renamingFileId === file.id}
-                                position={filePosition}
-                                isDraggedOver={dragOverFolderId === file.id}
-                                onDragStart={handleDragStart}
-                                onDrag={checkFolderHit}
-                                onPositionChange={handlePositionChange}
-                                onClick={handleFileClick}
-                                onDoubleClick={() => openFile(file.id)}
-                                onContextMenu={(e) => handleFileContextMenu(e, file.id)}
-                                onRename={(newTitle) => renameFile(file.id, newTitle)}
-                            />
-                        );
-                    })}
-                </AnimatePresence>
-
-                {/* goOS Widgets - fully functional */}
-                <WidgetRenderer
-                    widgets={widgets}
-                    isOwner={true}
-                    onWidgetEdit={(widget) => {
-                        console.log('Edit widget:', widget);
-                    }}
-                    onWidgetPositionChange={(id, x, y) => {
-                        updateWidget(id, { positionX: x, positionY: y });
-                    }}
-                    onContact={async (data) => {
-                        // Send contact form via API
-                        try {
-                            const response = await fetch('/api/contact', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(data),
-                            });
-                            if (!response.ok) throw new Error('Failed to send');
-                            showGoOSToast('Message sent successfully!', 'success');
-                        } catch {
-                            // Fallback to mailto
-                            const subject = encodeURIComponent(`Contact from ${data.name || 'Website Visitor'}`);
-                            const body = encodeURIComponent(`${data.message}\n\nFrom: ${data.name || 'Anonymous'}\nEmail: ${data.email}`);
-                            window.location.href = `mailto:hello@example.com?subject=${subject}&body=${body}`;
-                        }
-                    }}
-                    onTip={async (amount) => {
-                        // For now, show appreciation - Stripe integration needed for real payments
-                        showGoOSToast(`Thank you for the $${amount} tip! 💙`, 'success');
-                        // TODO: Integrate Stripe checkout
-                        // window.open(`https://buy.stripe.com/your-link?amount=${amount * 100}`, '_blank');
-                    }}
-                    onFeedback={async (feedback) => {
-                        try {
-                            const response = await fetch('/api/feedback', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ feedback, timestamp: new Date().toISOString() }),
-                            });
-                            if (!response.ok) throw new Error('Failed to send');
-                            showGoOSToast('Feedback received, thank you!', 'success');
-                        } catch {
-                            // Store locally as fallback
-                            const feedbacks = JSON.parse(localStorage.getItem('goos-feedback') || '[]');
-                            feedbacks.push({ feedback, timestamp: new Date().toISOString() });
-                            localStorage.setItem('goos-feedback', JSON.stringify(feedbacks));
-                            showGoOSToast('Feedback saved, thank you!', 'success');
-                        }
-                    }}
-                />
-
-                {/* goOS Editor Windows */}
-                <AnimatePresence>
-                    {openEditors.map((fileId) => {
-                        const file = goosFiles.find(f => f.id === fileId);
-                        if (!file) return null;
-                        return (
-                            <GoOSEditorWindow
-                                key={file.id}
-                                file={file}
-                                onClose={() => closeEditor(file.id)}
-                                onUpdate={(updates) => {
-                                    // Use auto-save for content/title changes (debounced)
-                                    if (updates.content !== undefined || updates.title !== undefined) {
-                                        goosAutoSave(file.id, updates.content ?? file.content, updates.title);
-                                    }
-                                    // Use immediate update for status changes
-                                    if (updates.status !== undefined) {
-                                        if (updates.status === 'published') {
-                                            publishGoOSFile(file.id);
-                                        } else {
-                                            unpublishGoOSFile(file.id);
-                                        }
-                                    }
-                                }}
-                                isActive={activeEditorId === file.id}
-                                zIndex={windowZ[`editor-${file.id}`] || topZIndex}
-                            />
-                        );
-                    })}
-                </AnimatePresence>
-
-                {/* goOS Folder Windows */}
-                <AnimatePresence>
-                    {openFolders.map((folderId) => {
-                        const folder = goosFiles.find(f => f.id === folderId);
-                        if (!folder || folder.type !== 'folder') return null;
-                        return (
-                            <GoOSFolderWindow
-                                key={folder.id}
-                                folder={folder}
-                                files={goosFiles}
-                                onClose={() => closeFolder(folder.id)}
-                                onFileDoubleClick={openFile}
-                                onFileClick={handleFileClick}
-                                selectedFileId={selectedFileId}
-                                isActive={activeFolderId === folder.id}
-                                zIndex={windowZ[`folder-${folder.id}`] || topZIndex}
-                                onFocus={() => {
-                                    setActiveFolderId(folder.id);
-                                    setWindowZ(prev => ({ ...prev, [`folder-${folder.id}`]: topZIndex + 1 }));
-                                    setTopZIndex(prev => prev + 1);
-                                }}
-                            />
-                        );
-                    })}
-                </AnimatePresence>
-
-                {/* goOS App Windows */}
-                <AnimatePresence>
-                    <SketchWindow
-                        id="quackmail"
-                        title="Quackmail"
-                        icon={<Mail size={14} />}
-                        isOpen={appWindows.quackmail}
-                        zIndex={windowZ.quackmail}
-                        defaultX={getWindowX(500)}
-                        defaultY={120}
-                        width={360}
-                        height={260}
-                        onClose={() => closeApp('quackmail')}
-                        onFocus={() => focusApp('quackmail')}
-                    >
-                        <div className="p-4">
-                            <div className="flex items-center justify-between pb-3 mb-4" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs uppercase" style={{ color: goOS.colors.text.muted }}>From</span>
-                                    <span className="text-sm font-bold" style={{ color: goOS.colors.text.primary }}>David</span>
-                                    <span className="text-xs" style={{ color: goOS.colors.text.muted }}>12:05 PM</span>
-                                </div>
-                                <Heart size={18} style={{ color: goOS.colors.accent.primary }} fill={goOS.colors.accent.primary} />
-                            </div>
-                            <p className="text-lg font-bold mb-2" style={{ color: goOS.colors.text.primary }}>Hey there! 👋</p>
-                            <p className="text-sm" style={{ color: goOS.colors.text.secondary }}>Welcome to goOS Demo! Click the portfolio items to explore.</p>
+                        {/* Sticky Notes (Left side) */}
+                        <div className="fixed top-16 left-4 z-[30] flex flex-col gap-3">
+                            <StickyNote color="blue" rotation={-3}>
+                                <span className="text-lg" style={{ color: goOS.colors.text.primary }}>goOS Demo</span>
+                            </StickyNote>
                         </div>
-                    </SketchWindow>
 
-                    <SketchWindow
-                        id="notes"
-                        title="Notes"
-                        icon={<StickyNoteIcon size={14} />}
-                        isOpen={appWindows.notes}
-                        zIndex={windowZ.notes}
-                        defaultX={150}
-                        defaultY={200}
-                        width={280}
-                        height={300}
-                        onClose={() => closeApp('notes')}
-                        onFocus={() => focusApp('notes')}
-                    >
-                        <div className="p-4 h-full" style={{ background: '#FFFACD' }}>
-                            <h3 className="text-base font-bold mb-3 pb-2" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>📝 Todo List</h3>
-                            <ul className="space-y-2">
-                                <CelebratoryCheckbox defaultChecked={false} label="Explore the portfolio" />
-                                <CelebratoryCheckbox defaultChecked={true} label="Check out goOS design" />
-                                <CelebratoryCheckbox defaultChecked={false} label="HONK!!! 🦆" isHot />
-                                <CelebratoryCheckbox defaultChecked={true} label="Have fun!" />
-                            </ul>
-                        </div>
-                    </SketchWindow>
+                        {/* Decorative Plant (Right side) */}
+                        <motion.div
+                            className="fixed top-16 right-6 z-[30] text-4xl select-none"
+                            animate={{ rotate: [-2, 2, -2] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            style={{ transformOrigin: 'bottom center' }}
+                        >
+                            🪴
+                        </motion.div>
 
-                    <SketchWindow
-                        id="chat"
-                        title="Chat"
-                        icon={<MessageCircle size={14} />}
-                        isOpen={appWindows.chat}
-                        zIndex={windowZ.chat}
-                        defaultX={getWindowX(600)}
-                        defaultY={150}
-                        width={340}
-                        height={400}
-                        onClose={() => closeApp('chat')}
-                        onFocus={() => focusApp('chat')}
-                    >
-                        <div className="flex flex-col h-full">
-                            <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-                                <div className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.light, border: `2px solid ${goOS.colors.border}` }}>🦆</div>
-                                    <div className="bg-white border-2 rounded-xl rounded-tl-none px-4 py-2.5" style={{ borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
-                                        <span className="text-sm" style={{ color: goOS.colors.text.secondary }}>Welcome to goOS Demo! 🦆</span>
-                                    </div>
-                                </div>
-                                <div className="flex gap-3 justify-end">
-                                    <div className="border-2 rounded-xl rounded-tr-none px-4 py-2.5" style={{ background: goOS.colors.accent.pale, borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
-                                        <span className="text-sm" style={{ color: goOS.colors.text.primary }}>This looks amazing!</span>
-                                    </div>
-                                </div>
-                                <TypingIndicator />
-                            </div>
-                            <div className="p-3" style={{ background: goOS.colors.windowBg, borderTop: `2px solid ${goOS.colors.border}` }}>
-                                <input
-                                    type="text"
-                                    placeholder="Type a message..."
-                                    className="w-full px-4 py-2 bg-white border-2 rounded-lg text-sm focus:outline-none"
-                                    style={{ borderColor: goOS.colors.border }}
-                                />
-                            </div>
-                        </div>
-                    </SketchWindow>
-
-                    <SketchWindow
-                        id="shell"
-                        title="Shell"
-                        icon={<Terminal size={14} />}
-                        isOpen={appWindows.shell}
-                        zIndex={windowZ.shell}
-                        defaultX={200}
-                        defaultY={140}
-                        width={480}
-                        height={300}
-                        onClose={() => closeApp('shell')}
-                        onFocus={() => focusApp('shell')}
-                    >
-                        <div className="h-full p-4 bg-[#0d0d0d] text-sm font-mono leading-relaxed">
-                            <div className="text-[#666] text-xs mb-2">goOS Kernel v1.0.4-quack</div>
-                            <div className="text-[#4ade80]">$ duck --status-check</div>
-                            <div className="text-[#a3a3a3] pl-4">[OK] Quack levels nominal</div>
-                            <div className="text-[#a3a3a3] pl-4">[OK] Portfolio loaded</div>
-                            <div className="mt-3 text-[#facc15]">$ portfolio --show</div>
-                            <div className="pl-4 mt-1" style={{ color: goOS.colors.accent.primary }}>READY... [████████████] 100%</div>
-                            <div className="text-[#4ade80] animate-pulse mt-4">$ _</div>
-                        </div>
-                    </SketchWindow>
-
-                    <SketchWindow
-                        id="nest"
-                        title="Nest"
-                        icon={<Folder size={14} />}
-                        isOpen={appWindows.nest}
-                        zIndex={windowZ.nest}
-                        defaultX={100}
-                        defaultY={100}
-                        width={420}
-                        height={340}
-                        onClose={() => closeApp('nest')}
-                        onFocus={() => focusApp('nest')}
-                    >
-                        <div className="p-6">
-                            <div className="grid grid-cols-3 gap-4">
-                                {['Docs', 'Photos', 'Projects', 'Music', 'About', 'Contact'].map(name => (
-                                    <button key={name} className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-black/5 transition-colors">
-                                        <Folder size={36} fill={goOS.colors.accent.light} stroke={goOS.colors.border} strokeWidth={1.5} />
-                                        <span className="text-sm" style={{ color: goOS.colors.text.primary }}>{name}</span>
-                                    </button>
+                        {/* Portfolio Desktop Icons - goOS style */}
+                        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-4xl px-8 pt-8">
+                            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4 place-items-center">
+                                {items.map((item) => (
+                                    <GoOSDesktopIcon
+                                        key={item.id}
+                                        label={item.label}
+                                        thumbnailUrl={item.thumbnailUrl}
+                                        onClick={() => windowContext.openWindow(item.id)}
+                                        isActive={windowContext.isItemOpen(item.id)}
+                                    />
                                 ))}
                             </div>
                         </div>
-                    </SketchWindow>
 
-                    <SketchWindow
-                        id="settings"
-                        title="Settings"
-                        icon={<Settings size={14} />}
-                        isOpen={appWindows.settings}
-                        zIndex={windowZ.settings}
-                        defaultX={350}
-                        defaultY={180}
-                        width={380}
-                        height={280}
-                        onClose={() => closeApp('settings')}
-                        onFocus={() => focusApp('settings')}
-                    >
-                        <div className="p-5 space-y-4">
-                            <div>
-                                <h4 className="text-sm font-bold mb-3 pb-2" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>Appearance</h4>
-                                <div className="flex items-center justify-between p-3 bg-white border-2 rounded-lg" style={{ borderColor: goOS.colors.border }}>
-                                    <span className="text-sm">Dark Mode</span>
-                                    <div className="w-10 h-5 rounded-full relative cursor-pointer" style={{ background: goOS.colors.border }}>
-                                        <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-bold mb-3 pb-2" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>About</h4>
-                                <p className="text-sm" style={{ color: goOS.colors.text.secondary }}>goOS Demo — A playful portfolio experience</p>
-                            </div>
-                        </div>
-                    </SketchWindow>
+                        {/* Portfolio Windows */}
+                        <WindowManager items={items} />
 
-                    {/* Guestbook Window */}
-                    <SketchWindow
-                        id="guestbook"
-                        title="Guestbook"
-                        icon={<BookOpen size={14} />}
-                        isOpen={appWindows.guestbook}
-                        zIndex={windowZ.guestbook}
-                        defaultX={getWindowX(450)}
-                        defaultY={100}
-                        width={380}
-                        height={520}
-                        onClose={() => closeApp('guestbook')}
-                        onFocus={() => focusApp('guestbook')}
-                    >
-                        <GoOSGuestbook
-                            entries={guestbookEntries}
-                            onSubmit={(entry) => {
-                                const newEntry: GuestbookEntry = {
-                                    ...entry,
-                                    id: `gb-${Date.now()}`,
-                                    createdAt: new Date(),
-                                    isPublic: true,
-                                };
-                                setGuestbookEntries(prev => [newEntry, ...prev]);
+                        {/* goOS File Icons (desktop - root level only) */}
+                        <AnimatePresence mode="sync" initial={false}>
+                            {filesOnDesktop.map((file) => {
+                                // Ensure file has a valid position
+                                const filePosition = file.position || { x: 40, y: 320 };
+                                return (
+                                    <GoOSFileIcon
+                                        key={file.id}
+                                        id={file.id}
+                                        type={file.type}
+                                        title={file.title}
+                                        status={file.status}
+                                        accessLevel={file.accessLevel}
+                                        isSelected={selectedFileId === file.id}
+                                        isRenaming={renamingFileId === file.id}
+                                        position={filePosition}
+                                        isDraggedOver={dragOverFolderId === file.id}
+                                        onDragStart={handleDragStart}
+                                        onDrag={checkFolderHit}
+                                        onPositionChange={handlePositionChange}
+                                        onClick={handleFileClick}
+                                        onDoubleClick={() => openFile(file.id)}
+                                        onContextMenu={(e) => handleFileContextMenu(e, file.id)}
+                                        onRename={(newTitle) => renameFile(file.id, newTitle)}
+                                    />
+                                );
+                            })}
+                        </AnimatePresence>
+
+                        {/* goOS Widgets - fully functional */}
+                        <WidgetRenderer
+                            widgets={widgets}
+                            isOwner={true}
+                            onWidgetEdit={(widget) => {
+                                console.log('Edit widget:', widget);
+                            }}
+                            onWidgetPositionChange={(id, x, y) => {
+                                updateWidget(id, { positionX: x, positionY: y });
+                            }}
+                            onContact={async (data) => {
+                                // Send contact form via API
+                                try {
+                                    const response = await fetch('/api/contact', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(data),
+                                    });
+                                    if (!response.ok) throw new Error('Failed to send');
+                                    showGoOSToast('Message sent successfully!', 'success');
+                                } catch {
+                                    // Fallback to mailto
+                                    const subject = encodeURIComponent(`Contact from ${data.name || 'Website Visitor'}`);
+                                    const body = encodeURIComponent(`${data.message}\n\nFrom: ${data.name || 'Anonymous'}\nEmail: ${data.email}`);
+                                    window.location.href = `mailto:hello@example.com?subject=${subject}&body=${body}`;
+                                }
+                            }}
+                            onTip={async (amount) => {
+                                // For now, show appreciation - Stripe integration needed for real payments
+                                showGoOSToast(`Thank you for the $${amount} tip! 💙`, 'success');
+                                // TODO: Integrate Stripe checkout
+                                // window.open(`https://buy.stripe.com/your-link?amount=${amount * 100}`, '_blank');
+                            }}
+                            onFeedback={async (feedback) => {
+                                try {
+                                    const response = await fetch('/api/feedback', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ feedback, timestamp: new Date().toISOString() }),
+                                    });
+                                    if (!response.ok) throw new Error('Failed to send');
+                                    showGoOSToast('Feedback received, thank you!', 'success');
+                                } catch {
+                                    // Store locally as fallback
+                                    const feedbacks = JSON.parse(localStorage.getItem('goos-feedback') || '[]');
+                                    feedbacks.push({ feedback, timestamp: new Date().toISOString() });
+                                    localStorage.setItem('goos-feedback', JSON.stringify(feedbacks));
+                                    showGoOSToast('Feedback saved, thank you!', 'success');
+                                }
                             }}
                         />
-                    </SketchWindow>
 
-                    {/* Analytics Window */}
-                    <SketchWindow
-                        id="analytics"
-                        title="Analytics"
-                        icon={<BarChart3 size={14} />}
-                        isOpen={appWindows.analytics}
-                        zIndex={windowZ.analytics}
-                        defaultX={getWindowX(80)}
-                        defaultY={60}
-                        width={440}
-                        height={580}
-                        onClose={() => closeApp('analytics')}
-                        onFocus={() => focusApp('analytics')}
-                    >
-                        <GoOSAnalytics data={DEMO_ANALYTICS_DATA} />
-                    </SketchWindow>
-                </AnimatePresence>
+                        {/* goOS Editor Windows */}
+                        <AnimatePresence>
+                            {openEditors.map((fileId) => {
+                                const file = goosFiles.find(f => f.id === fileId);
+                                if (!file) return null;
+                                return (
+                                    <GoOSEditorWindow
+                                        key={file.id}
+                                        file={file}
+                                        onClose={() => closeEditor(file.id)}
+                                        onUpdate={(updates) => {
+                                            // Use auto-save for content/title changes (debounced)
+                                            if (updates.content !== undefined || updates.title !== undefined) {
+                                                goosAutoSave(file.id, updates.content ?? file.content, updates.title);
+                                            }
+                                            // Use immediate update for status changes
+                                            if (updates.status !== undefined) {
+                                                if (updates.status === 'published') {
+                                                    publishGoOSFile(file.id);
+                                                    celebrate(); // 🎉 Celebrate publishing!
+                                                } else {
+                                                    unpublishGoOSFile(file.id);
+                                                }
+                                            }
+                                        }}
+                                        isActive={activeEditorId === file.id}
+                                        zIndex={windowZ[`editor-${file.id}`] || topZIndex}
+                                    />
+                                );
+                            })}
+                        </AnimatePresence>
+
+                        {/* goOS Folder Windows */}
+                        <AnimatePresence>
+                            {openFolders.map((folderId) => {
+                                const folder = goosFiles.find(f => f.id === folderId);
+                                if (!folder || folder.type !== 'folder') return null;
+                                return (
+                                    <GoOSFolderWindow
+                                        key={folder.id}
+                                        folder={folder}
+                                        files={goosFiles}
+                                        onClose={() => closeFolder(folder.id)}
+                                        onFileDoubleClick={openFile}
+                                        onFileClick={handleFileClick}
+                                        selectedFileId={selectedFileId}
+                                        isActive={activeFolderId === folder.id}
+                                        zIndex={windowZ[`folder-${folder.id}`] || topZIndex}
+                                        onFocus={() => {
+                                            setActiveFolderId(folder.id);
+                                            setWindowZ(prev => ({ ...prev, [`folder-${folder.id}`]: topZIndex + 1 }));
+                                            setTopZIndex(prev => prev + 1);
+                                        }}
+                                    />
+                                );
+                            })}
+                        </AnimatePresence>
+
+                        {/* goOS App Windows */}
+                        <AnimatePresence>
+                            <SketchWindow
+                                id="quackmail"
+                                title="Quackmail"
+                                icon={<Mail size={14} />}
+                                isOpen={appWindows.quackmail}
+                                zIndex={windowZ.quackmail}
+                                defaultX={getWindowX(500)}
+                                defaultY={120}
+                                width={360}
+                                height={260}
+                                onClose={() => closeApp('quackmail')}
+                                onFocus={() => focusApp('quackmail')}
+                            >
+                                <div className="p-4">
+                                    <div className="flex items-center justify-between pb-3 mb-4" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs uppercase" style={{ color: goOS.colors.text.muted }}>From</span>
+                                            <span className="text-sm font-bold" style={{ color: goOS.colors.text.primary }}>David</span>
+                                            <span className="text-xs" style={{ color: goOS.colors.text.muted }}>12:05 PM</span>
+                                        </div>
+                                        <Heart size={18} style={{ color: goOS.colors.accent.primary }} fill={goOS.colors.accent.primary} />
+                                    </div>
+                                    <p className="text-lg font-bold mb-2" style={{ color: goOS.colors.text.primary }}>Hey there! 👋</p>
+                                    <p className="text-sm" style={{ color: goOS.colors.text.secondary }}>Welcome to goOS Demo! Click the portfolio items to explore.</p>
+                                </div>
+                            </SketchWindow>
+
+                            <SketchWindow
+                                id="notes"
+                                title="Notes"
+                                icon={<StickyNoteIcon size={14} />}
+                                isOpen={appWindows.notes}
+                                zIndex={windowZ.notes}
+                                defaultX={150}
+                                defaultY={200}
+                                width={280}
+                                height={300}
+                                onClose={() => closeApp('notes')}
+                                onFocus={() => focusApp('notes')}
+                            >
+                                <div className="p-4 h-full" style={{ background: '#FFFACD' }}>
+                                    <h3 className="text-base font-bold mb-3 pb-2" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>📝 Todo List</h3>
+                                    <ul className="space-y-2">
+                                        <CelebratoryCheckbox defaultChecked={false} label="Explore the portfolio" />
+                                        <CelebratoryCheckbox defaultChecked={true} label="Check out goOS design" />
+                                        <CelebratoryCheckbox defaultChecked={false} label="HONK!!! 🦆" isHot />
+                                        <CelebratoryCheckbox defaultChecked={true} label="Have fun!" />
+                                    </ul>
+                                </div>
+                            </SketchWindow>
+
+                            <SketchWindow
+                                id="chat"
+                                title="Chat"
+                                icon={<MessageCircle size={14} />}
+                                isOpen={appWindows.chat}
+                                zIndex={windowZ.chat}
+                                defaultX={getWindowX(600)}
+                                defaultY={150}
+                                width={340}
+                                height={400}
+                                onClose={() => closeApp('chat')}
+                                onFocus={() => focusApp('chat')}
+                            >
+                                <div className="flex flex-col h-full">
+                                    <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+                                        <div className="flex gap-3">
+                                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.light, border: `2px solid ${goOS.colors.border}` }}>🦆</div>
+                                            <div className="bg-white border-2 rounded-xl rounded-tl-none px-4 py-2.5" style={{ borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
+                                                <span className="text-sm" style={{ color: goOS.colors.text.secondary }}>Welcome to goOS Demo! 🦆</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3 justify-end">
+                                            <div className="border-2 rounded-xl rounded-tr-none px-4 py-2.5" style={{ background: goOS.colors.accent.pale, borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
+                                                <span className="text-sm" style={{ color: goOS.colors.text.primary }}>This looks amazing!</span>
+                                            </div>
+                                        </div>
+                                        <TypingIndicator />
+                                    </div>
+                                    <div className="p-3" style={{ background: goOS.colors.windowBg, borderTop: `2px solid ${goOS.colors.border}` }}>
+                                        <input
+                                            type="text"
+                                            placeholder="Type a message..."
+                                            className="w-full px-4 py-2 bg-white border-2 rounded-lg text-sm focus:outline-none"
+                                            style={{ borderColor: goOS.colors.border }}
+                                        />
+                                    </div>
+                                </div>
+                            </SketchWindow>
+
+                            <SketchWindow
+                                id="shell"
+                                title="Shell"
+                                icon={<Terminal size={14} />}
+                                isOpen={appWindows.shell}
+                                zIndex={windowZ.shell}
+                                defaultX={200}
+                                defaultY={140}
+                                width={480}
+                                height={300}
+                                onClose={() => closeApp('shell')}
+                                onFocus={() => focusApp('shell')}
+                            >
+                                <div className="h-full p-4 bg-[#0d0d0d] text-sm font-mono leading-relaxed">
+                                    <div className="text-[#666] text-xs mb-2">goOS Kernel v1.0.4-quack</div>
+                                    <div className="text-[#4ade80]">$ duck --status-check</div>
+                                    <div className="text-[#a3a3a3] pl-4">[OK] Quack levels nominal</div>
+                                    <div className="text-[#a3a3a3] pl-4">[OK] Portfolio loaded</div>
+                                    <div className="mt-3 text-[#facc15]">$ portfolio --show</div>
+                                    <div className="pl-4 mt-1" style={{ color: goOS.colors.accent.primary }}>READY... [████████████] 100%</div>
+                                    <div className="text-[#4ade80] animate-pulse mt-4">$ _</div>
+                                </div>
+                            </SketchWindow>
+
+                            <SketchWindow
+                                id="nest"
+                                title="Nest"
+                                icon={<Folder size={14} />}
+                                isOpen={appWindows.nest}
+                                zIndex={windowZ.nest}
+                                defaultX={100}
+                                defaultY={100}
+                                width={420}
+                                height={340}
+                                onClose={() => closeApp('nest')}
+                                onFocus={() => focusApp('nest')}
+                            >
+                                <div className="p-6">
+                                    <div className="grid grid-cols-3 gap-4">
+                                        {['Docs', 'Photos', 'Projects', 'Music', 'About', 'Contact'].map(name => (
+                                            <button key={name} className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-black/5 transition-colors">
+                                                <Folder size={36} fill={goOS.colors.accent.light} stroke={goOS.colors.border} strokeWidth={1.5} />
+                                                <span className="text-sm" style={{ color: goOS.colors.text.primary }}>{name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </SketchWindow>
+
+                            <SketchWindow
+                                id="settings"
+                                title="Settings"
+                                icon={<Settings size={14} />}
+                                isOpen={appWindows.settings}
+                                zIndex={windowZ.settings}
+                                defaultX={350}
+                                defaultY={180}
+                                width={380}
+                                height={280}
+                                onClose={() => closeApp('settings')}
+                                onFocus={() => focusApp('settings')}
+                            >
+                                <div className="p-5 space-y-4">
+                                    <div>
+                                        <h4 className="text-sm font-bold mb-3 pb-2" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>Appearance</h4>
+                                        <div className="flex items-center justify-between p-3 bg-white border-2 rounded-lg" style={{ borderColor: goOS.colors.border }}>
+                                            <span className="text-sm">Dark Mode</span>
+                                            <div className="w-10 h-5 rounded-full relative cursor-pointer" style={{ background: goOS.colors.border }}>
+                                                <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold mb-3 pb-2" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>About</h4>
+                                        <p className="text-sm" style={{ color: goOS.colors.text.secondary }}>goOS Demo — A playful portfolio experience</p>
+                                    </div>
+                                </div>
+                            </SketchWindow>
+
+                            {/* Guestbook Window */}
+                            <SketchWindow
+                                id="guestbook"
+                                title="Guestbook"
+                                icon={<BookOpen size={14} />}
+                                isOpen={appWindows.guestbook}
+                                zIndex={windowZ.guestbook}
+                                defaultX={getWindowX(450)}
+                                defaultY={100}
+                                width={380}
+                                height={520}
+                                onClose={() => closeApp('guestbook')}
+                                onFocus={() => focusApp('guestbook')}
+                            >
+                                <GoOSGuestbook
+                                    entries={guestbookEntries}
+                                    onSubmit={(entry) => {
+                                        const newEntry: GuestbookEntry = {
+                                            ...entry,
+                                            id: `gb-${Date.now()}`,
+                                            createdAt: new Date(),
+                                            isPublic: true,
+                                        };
+                                        setGuestbookEntries(prev => [newEntry, ...prev]);
+                                    }}
+                                />
+                            </SketchWindow>
+
+                            {/* Analytics Window */}
+                            <SketchWindow
+                                id="analytics"
+                                title="Analytics"
+                                icon={<BarChart3 size={14} />}
+                                isOpen={appWindows.analytics}
+                                zIndex={windowZ.analytics}
+                                defaultX={getWindowX(80)}
+                                defaultY={60}
+                                width={440}
+                                height={580}
+                                onClose={() => closeApp('analytics')}
+                                onFocus={() => focusApp('analytics')}
+                            >
+                                <GoOSAnalytics data={DEMO_ANALYTICS_DATA} />
+                            </SketchWindow>
+                        </AnimatePresence>
                     </>
                 )}
             </main>

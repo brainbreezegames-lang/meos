@@ -723,7 +723,7 @@ h6 {
 
     /* Typography */
     --font-headline: var(--font-outfit), 'Satoshi', sans-serif;
-    --font-body: var(--font-inter), 'PP Neue Montreal', sans-serif;
+    --font-body: var(--font-instrument), 'PP Neue Montreal', sans-serif;
     --font-mono: 'IBM Plex Mono', monospace;
 
     /* Measurements */
@@ -731,6 +731,48 @@ h6 {
     --brand-padding: 32px;
     --brand-radius: 12px;
     --brand-radius-small: 6px;
+
+    /* System Overrides for Window Compatibility */
+    --bg-app: var(--brand-bg);
+    --bg-glass-elevated: var(--brand-white);
+    --bg-glass: var(--brand-bg-dark);
+    /* Card bg */
+    --bg-active: var(--brand-bg-darker);
+
+    --text-primary: var(--brand-base);
+    --text-secondary: var(--brand-grey);
+    --text-tertiary: rgba(23, 20, 18, 0.4);
+
+    /* Window Borders & Shadows */
+    --border-glass-outer: var(--brand-base);
+    /* Bold dark border */
+    --border-glass-inner: transparent;
+    --border-light: rgba(23, 20, 18, 0.1);
+    --border-medium: rgba(23, 20, 18, 0.2);
+
+    --shadow-window: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --shadow-sm: 0 4px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 12px 24px rgba(0, 0, 0, 0.1);
+
+    --radius-window: 16px;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+
+    /* Traffic Lights - Custom Brand Colors */
+    --traffic-red: var(--brand-red);
+    --traffic-red-hover: #d32f2f;
+    --traffic-yellow: var(--brand-yellow);
+    --traffic-yellow-hover: #f57c00;
+    --traffic-green: var(--brand-purple);
+    /* Using purple as 'safe' state */
+    --traffic-green-hover: #311b92;
+    --traffic-size: 12px;
+
+    /* Font overrides */
+    --font-display: var(--font-headline);
+    --font-sans: var(--font-body);
+    --font-body: var(--font-body);
 
     /* Base Applied Styles */
     background-color: var(--brand-bg);

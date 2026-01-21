@@ -3,7 +3,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 // Theme IDs
-export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay' | 'posthog' | 'sketch';
+// Theme IDs
+export type ThemeId = 'monterey' | 'dark' | 'bluren' | 'refined' | 'warm' | 'clay' | 'posthog' | 'sketch' | 'brand-appart';
 
 // Theme metadata
 export interface ThemeInfo {
@@ -69,6 +70,13 @@ export const THEMES: Record<ThemeId, ThemeInfo> = {
     isDark: false,
     fontFamily: 'Gochi',
   },
+  'brand-appart': {
+    id: 'brand-appart',
+    name: 'Brand Appart',
+    description: 'Bold modern branding',
+    isDark: false,
+    fontFamily: 'Outfit',
+  },
 };
 
 interface ThemeContextType {
@@ -123,7 +131,7 @@ export function ThemeProvider({
     // Remove all existing theme classes first
     document.documentElement.classList.remove(
       'theme-monterey', 'theme-dark', 'theme-bluren', 'theme-refined',
-      'theme-warm', 'theme-clay', 'theme-posthog', 'theme-sketch'
+      'theme-warm', 'theme-clay', 'theme-posthog', 'theme-sketch', 'theme-brand-appart'
     );
     document.documentElement.classList.add(`theme-${themeId}`);
 
@@ -134,6 +142,19 @@ export function ThemeProvider({
   // Load special fonts for theme
   const loadThemeFonts = useCallback((themeId: ThemeId) => {
     const themeInfo = THEMES[themeId];
+
+    if (themeInfo.fontFamily === 'Outfit') {
+      const existingLink = document.querySelector('link[data-theme-font="outfit"]');
+      if (!existingLink) {
+        // Outfit (Display) and Instrument Sans (Body) already loaded in layout,
+        // but ensuring we have the right weights here if dynamic loading is preferred.
+        // Actually layout.tsx handles it via next/font, so this might be redundant 
+        // if we just use the variable. But let's keep consistent.
+        // Since we are using next/font variables, we might not need this unless
+        // for client-side dynamic switching where layout isn't re-rendering.
+        // We'll leave it empty as next/font injects variables globally.
+      }
+    }
 
     if (themeInfo.fontFamily === 'Halant') {
       const existingLink = document.querySelector('link[data-theme-font="halant"]');

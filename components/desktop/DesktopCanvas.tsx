@@ -35,6 +35,7 @@ export function DesktopCanvas({
   const [windowPosition, setWindowPosition] = useState<{ x: number; y: number } | undefined>();
   const themeContext = useThemeSafe();
   const isSketch = themeContext?.theme === 'sketch';
+  const isBrandAppart = themeContext?.theme === 'brand-appart';
 
   const handleItemClick = (item: DesktopItemType, event: React.MouseEvent) => {
     if (isEditing) return;
@@ -83,14 +84,14 @@ export function DesktopCanvas({
 
   return (
     <motion.div
-      className={`fixed inset-0 pt-[28px] ${isSketch ? 'goos-bg' : ''}`}
-      style={isSketch ? {} : backgroundStyle}
+      className={`fixed inset-0 pt-[28px] ${isSketch ? 'goos-bg' : ''} ${isBrandAppart ? 'theme-brand-appart' : ''}`}
+      style={(isSketch || isBrandAppart) ? {} : backgroundStyle}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Default gradient background if no image - Hidden in Sketch theme */}
-      {!hasBackground && !isSketch && (
+      {/* Default gradient background if no image - Hidden in Sketch & Brand Appart themes */}
+      {!hasBackground && !isSketch && !isBrandAppart && (
         <div
           className="absolute inset-0 -z-10"
           style={{
@@ -108,8 +109,8 @@ export function DesktopCanvas({
         />
       )}
 
-      {/* Ambient lighting overlay - Hidden in Sketch theme */}
-      {!isSketch && (
+      {/* Ambient lighting overlay - Hidden in Sketch & Brand Appart */}
+      {!isSketch && !isBrandAppart && (
         <div
           className="absolute inset-0 pointer-events-none -z-5"
           style={{
@@ -143,7 +144,7 @@ export function DesktopCanvas({
       )}
 
       {/* Vignette effect - Hidden in Sketch theme */}
-      {!isSketch && (
+      {!isSketch && !isBrandAppart && (
         <div
           className="absolute inset-0 pointer-events-none"
           style={{

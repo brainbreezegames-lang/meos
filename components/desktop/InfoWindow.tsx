@@ -21,6 +21,7 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
   const prefersReducedMotion = useReducedMotion();
   const themeContext = useThemeSafe();
   const isSketch = themeContext?.theme === 'sketch';
+  const isBrandAppart = themeContext?.theme === 'brand-appart';
 
   // Reset active tab when item changes
   useEffect(() => {
@@ -167,8 +168,8 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
                 maxHeight: 'calc(100vh - 120px)',
                 borderRadius: '14px',
                 background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated)',
-                backdropFilter: isSketch ? 'none' : 'blur(60px) saturate(200%)',
-                WebkitBackdropFilter: isSketch ? 'none' : 'blur(60px) saturate(200%)',
+                backdropFilter: (isSketch || isBrandAppart) ? 'none' : 'blur(60px) saturate(200%)',
+                WebkitBackdropFilter: (isSketch || isBrandAppart) ? 'none' : 'blur(60px) saturate(200%)',
                 boxShadow: isSketch ? '6px 6px 0 #2B4AE2' : 'var(--shadow-window)',
                 border: isSketch ? '1px solid #2B4AE2' : '1px solid var(--border-glass-outer)',
               }}
