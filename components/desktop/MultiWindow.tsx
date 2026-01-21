@@ -238,6 +238,8 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
   const isMaximized = windowInstance.state === 'maximized';
   const isMinimized = windowInstance.state === 'minimized';
   const colors = getThemeColors(themeContext?.theme);
+  const isSketch = themeContext?.theme === 'sketch';
+  const isBrandAppart = themeContext?.theme === 'brand-appart';
 
   // Reset active tab when item changes
   useEffect(() => {
@@ -418,10 +420,10 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: themeContext?.theme === 'sketch' ? 4 : (isMaximized ? 12 : 14),
+            borderRadius: isSketch ? 4 : (isMaximized ? 12 : 14),
             background: colors.windowBg,
-            backdropFilter: themeContext?.theme === 'sketch' ? 'none' : 'blur(20px)',
-            WebkitBackdropFilter: themeContext?.theme === 'sketch' ? 'none' : 'blur(20px)',
+            backdropFilter: (isSketch || isBrandAppart) ? 'none' : 'blur(20px)',
+            WebkitBackdropFilter: (isSketch || isBrandAppart) ? 'none' : 'blur(20px)',
             boxShadow: colors.windowShadow,
             border: colors.windowBorder,
             opacity: isActive ? 1 : 0.95,
@@ -451,13 +453,21 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleClose}
                 aria-label="Close window"
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={themeContext?.theme === 'sketch' ? {
+                style={isSketch ? {
                   width: 10,
                   height: 10,
                   background: '#4A6CF7',
                   border: 'none',
                   borderRadius: '50%',
                   marginRight: 4,
+                  display: 'block'
+                } : isBrandAppart ? {
+                  width: 12,
+                  height: 12,
+                  background: '#ff5f57',
+                  border: '1px solid #171412',
+                  borderRadius: '50%',
+                  marginRight: 6,
                   display: 'block'
                 } : {
                   width: 12,
@@ -479,13 +489,21 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleMinimize}
                 aria-label="Minimize window"
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={themeContext?.theme === 'sketch' ? {
+                style={isSketch ? {
                   width: 10,
                   height: 10,
                   background: '#4A6CF7',
                   border: 'none',
                   borderRadius: '50%',
                   marginRight: 4,
+                  display: 'block'
+                } : isBrandAppart ? {
+                  width: 12,
+                  height: 12,
+                  background: '#f59e0b',
+                  border: '1px solid #171412',
+                  borderRadius: '50%',
+                  marginRight: 6,
                   display: 'block'
                 } : {
                   width: 12,
@@ -507,11 +525,18 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
                 onClick={handleMaximize}
                 aria-label={isMaximized ? "Restore window" : "Maximize window"}
                 className="rounded-full flex items-center justify-center transition-all duration-150"
-                style={themeContext?.theme === 'sketch' ? {
+                style={isSketch ? {
                   width: 10,
                   height: 10,
                   background: '#4A6CF7',
                   border: 'none',
+                  borderRadius: '50%',
+                  display: 'block'
+                } : isBrandAppart ? {
+                  width: 12,
+                  height: 12,
+                  background: '#10b981',
+                  border: '1px solid #171412',
                   borderRadius: '50%',
                   display: 'block'
                 } : {
