@@ -316,7 +316,7 @@ export function GoOSDesktopContextMenu({
                         submenuCloseTimeoutRef.current = setTimeout(() => {
                           setHoveredId(null);
                           setActiveSubmenu(null);
-                        }, 300);
+                        }, 500);
                       }
                     }}
                   >
@@ -404,15 +404,18 @@ export function GoOSDesktopContextMenu({
                       )}
                     </motion.button>
 
-                    {/* Submenu - rendered inline with hover bridge */}
+                    {/* Submenu - positioned to OVERLAP with parent for continuous hover */}
                     {item.hasSubmenu && isSubmenuActive && item.submenuItems && (
                       <div
                         style={{
                           position: 'absolute',
-                          top: -4,
-                          left: '100%',
-                          paddingLeft: 0,
-                          paddingTop: 4,
+                          top: -PADDING,
+                          // Start 20px INSIDE the parent so mouse never leaves parent bounds
+                          left: `calc(100% - 20px)`,
+                          // Pad left to create visual gap while maintaining hover
+                          paddingLeft: 24,
+                          paddingTop: PADDING,
+                          paddingBottom: PADDING,
                         }}
                         onMouseEnter={() => {
                           // Clear any pending close timeout
@@ -428,20 +431,9 @@ export function GoOSDesktopContextMenu({
                           submenuCloseTimeoutRef.current = setTimeout(() => {
                             setHoveredId(null);
                             setActiveSubmenu(null);
-                          }, 300);
+                          }, 500);
                         }}
                       >
-                        {/* Invisible hover bridge to prevent gap issues */}
-                        <div
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: -12,
-                            width: 16,
-                            height: '100%',
-                            background: 'transparent',
-                          }}
-                        />
                         <motion.div
                           initial={{ opacity: 0, x: -4 }}
                           animate={{ opacity: 1, x: 0 }}
