@@ -35,7 +35,7 @@ export function MenuBar({ appName = 'goOS', rightContent }: MenuBarProps) {
         WebkitBackdropFilter: 'blur(var(--blur-medium, 20px))',
         borderBottom: '1px solid var(--color-border-subtle)',
         zIndex: 'var(--z-menubar, 400)',
-        fontFamily: 'var(--font-family)',
+        fontFamily: 'var(--font-body)',
         fontSize: 'var(--font-size-sm, 12px)',
         color: 'var(--color-text-primary)',
         userSelect: 'none',

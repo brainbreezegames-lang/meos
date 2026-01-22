@@ -64,7 +64,7 @@ export function StatusWidget({ status, label, sublabel }: StatusWidgetProps) {
           style={{
             fontSize: 'var(--font-size-xs, 10px)',
             fontWeight: 'var(--font-weight-semibold, 600)',
-            fontFamily: 'var(--font-family)',
+            fontFamily: 'var(--font-body)',
             color: 'var(--color-text-secondary)',
             textTransform: 'uppercase',
             letterSpacing: 'var(--letter-spacing-wide, 0.05em)',
@@ -76,7 +76,7 @@ export function StatusWidget({ status, label, sublabel }: StatusWidgetProps) {
           style={{
             fontSize: 'var(--font-size-sm, 12px)',
             fontWeight: 'var(--font-weight-medium, 500)',
-            fontFamily: 'var(--font-family)',
+            fontFamily: 'var(--font-body)',
             color: 'var(--color-text-primary)',
           }}
         >
@@ -86,7 +86,7 @@ export function StatusWidget({ status, label, sublabel }: StatusWidgetProps) {
           <span
             style={{
               fontSize: 'var(--font-size-xs, 10px)',
-              fontFamily: 'var(--font-family)',
+              fontFamily: 'var(--font-body)',
               color: 'var(--color-text-muted)',
             }}
           >

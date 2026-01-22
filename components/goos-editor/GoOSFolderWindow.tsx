@@ -104,7 +104,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             style={{
               fontSize: 'var(--font-size-md, 14px)',
               fontWeight: 'var(--font-weight-semibold, 600)',
-              fontFamily: 'var(--font-family)',
+              fontFamily: 'var(--font-body)',
               color: 'var(--color-text-primary)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -116,7 +116,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           <span
             style={{
               fontSize: 'var(--font-size-xs, 10px)',
-              fontFamily: 'ui-monospace, "SF Mono", monospace',
+              fontFamily: 'var(--font-mono)',
               color: 'var(--color-text-muted)',
             }}
           >
@@ -145,7 +145,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
               justifyContent: 'center',
               height: '100%',
               color: 'var(--color-text-muted)',
-              fontFamily: 'var(--font-family)',
+              fontFamily: 'var(--font-body)',
               textAlign: 'center',
               gap: 12,
             }}
@@ -198,7 +198,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           borderTop: '1px solid var(--color-border-subtle)',
           background: 'var(--color-bg-subtle)',
           fontSize: 'var(--font-size-xs, 10px)',
-          fontFamily: 'ui-monospace, "SF Mono", monospace',
+          fontFamily: 'var(--font-mono)',
           color: 'var(--color-text-muted)',
           flexShrink: 0,
         }}

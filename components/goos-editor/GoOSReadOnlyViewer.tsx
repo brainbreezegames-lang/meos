@@ -106,7 +106,7 @@ export function GoOSReadOnlyViewer({
             style={{
               fontSize: 'var(--font-size-md, 14px)',
               fontWeight: 'var(--font-weight-semibold, 600)',
-              fontFamily: 'var(--font-family)',
+              fontFamily: 'var(--font-body)',
               color: 'var(--color-text-primary)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -121,7 +121,7 @@ export function GoOSReadOnlyViewer({
         <span
           style={{
             fontSize: 'var(--font-size-xs, 10px)',
-            fontFamily: 'var(--font-family)',
+            fontFamily: 'var(--font-body)',
             color: 'var(--color-text-muted)',
           }}
         >
@@ -149,7 +149,7 @@ export function GoOSReadOnlyViewer({
           <div
             className="goos-content prose prose-sm max-w-none"
             style={{
-              fontFamily: 'var(--font-family)',
+              fontFamily: 'var(--font-body)',
               fontSize: 'var(--font-size-lg, 16px)',
               lineHeight: 1.7,
               color: 'var(--color-text-primary)',
@@ -169,7 +169,7 @@ export function GoOSReadOnlyViewer({
           borderTop: '1px solid var(--color-border-subtle)',
           background: 'var(--color-bg-subtle)',
           fontSize: 'var(--font-size-xs, 10px)',
-          fontFamily: 'ui-monospace, "SF Mono", monospace',
+          fontFamily: 'var(--font-mono)',
           color: 'var(--color-text-muted)',
           flexShrink: 0,
         }}

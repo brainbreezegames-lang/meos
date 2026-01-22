@@ -218,7 +218,7 @@ export function GoOSDesktopContextMenu({
                     padding: '6px 10px 4px',
                     fontSize: '10px',
                     fontWeight: 600,
-                    fontFamily: 'var(--font-family)',
+                    fontFamily: 'var(--font-body)',
                     color: 'var(--color-text-muted)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
@@ -264,7 +264,7 @@ export function GoOSDesktopContextMenu({
                       border: 'none',
                       borderRadius: '6px',
                       cursor: item.disabled ? 'default' : 'pointer',
-                      fontFamily: 'var(--font-family)',
+                      fontFamily: 'var(--font-body)',
                       fontSize: '12px',
                       fontWeight: 500,
                       color: isPressed
@@ -301,7 +301,7 @@ export function GoOSDesktopContextMenu({
                           fontSize: '10px',
                           fontWeight: 500,
                           color: 'var(--color-text-muted)',
-                          fontFamily: 'ui-monospace, "SF Mono", monospace',
+                          fontFamily: 'var(--font-mono)',
                         }}
                       >
                         {item.shortcut}

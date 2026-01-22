@@ -79,11 +79,11 @@ export const goOSTokens = {
     full: 'var(--radius-full)',
   },
   fonts: {
-    // Use the CSS variable from design-system.css
-    display: 'var(--font-family)',
-    body: 'var(--font-family)',
-    mono: 'ui-monospace, "SF Mono", monospace',
-    handwritten: 'var(--font-family)',
+    // Use the CSS variables from design-system.css
+    display: 'var(--font-display)',  // Averia Serif Libre for headings
+    heading: 'var(--font-display)',  // Alias for display (backwards compat)
+    body: 'var(--font-body)',        // Instrument Sans for body text
+    mono: 'var(--font-mono)',        // System monospace
   },
 };
 
@@ -515,8 +515,8 @@ export function GoOSTipTapEditor({
           outline: none;
           min-height: 100%;
           font-family: ${goOSTokens.fonts.body};
-          font-size: 15px;
-          line-height: 1.7;
+          font-size: var(--font-size-base);
+          line-height: var(--line-height-relaxed);
           color: ${goOSTokens.colors.text.primary};
         }
 
@@ -535,9 +535,10 @@ export function GoOSTipTapEditor({
 
         .goos-editor-content h1 {
           font-family: ${goOSTokens.fonts.display};
-          font-size: 28px;
-          font-weight: 700;
-          line-height: 1.2;
+          font-size: var(--font-size-3xl);
+          font-weight: var(--font-weight-bold);
+          line-height: var(--line-height-tight);
+          letter-spacing: var(--letter-spacing-tight);
           color: ${goOSTokens.colors.text.primary};
           margin-top: 1.5em;
           margin-bottom: 0.5em;
@@ -549,9 +550,10 @@ export function GoOSTipTapEditor({
 
         .goos-editor-content h2 {
           font-family: ${goOSTokens.fonts.display};
-          font-size: 22px;
-          font-weight: 600;
-          line-height: 1.3;
+          font-size: var(--font-size-2xl);
+          font-weight: var(--font-weight-semibold);
+          line-height: var(--line-height-snug);
+          letter-spacing: var(--letter-spacing-tight);
           color: ${goOSTokens.colors.text.primary};
           margin-top: 1.3em;
           margin-bottom: 0.4em;
@@ -559,9 +561,9 @@ export function GoOSTipTapEditor({
 
         .goos-editor-content h3 {
           font-family: ${goOSTokens.fonts.display};
-          font-size: 18px;
-          font-weight: 600;
-          line-height: 1.4;
+          font-size: var(--font-size-xl);
+          font-weight: var(--font-weight-semibold);
+          line-height: var(--line-height-snug);
           color: ${goOSTokens.colors.text.secondary};
           margin-top: 1.2em;
           margin-bottom: 0.3em;
@@ -650,9 +652,9 @@ export function GoOSTipTapEditor({
           border: 2px solid ${goOSTokens.colors.border};
           border-radius: 4px;
           padding: 16px;
-          font-family: 'SF Mono', 'Fira Code', monospace;
-          font-size: 13px;
-          line-height: 1.5;
+          font-family: ${goOSTokens.fonts.mono};
+          font-size: var(--font-size-sm);
+          line-height: var(--line-height-normal);
           overflow-x: auto;
           margin: 1em 0;
           box-shadow: ${goOSTokens.shadows.sm};
@@ -668,7 +670,7 @@ export function GoOSTipTapEditor({
           background: ${goOSTokens.colors.accent.pale}40;
           padding: 2px 6px;
           border-radius: 3px;
-          font-family: 'SF Mono', 'Fira Code', monospace;
+          font-family: ${goOSTokens.fonts.mono};
           font-size: 0.9em;
           color: ${goOSTokens.colors.accent.dark};
         }

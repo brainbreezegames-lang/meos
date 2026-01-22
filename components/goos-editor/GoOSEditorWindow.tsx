@@ -210,7 +210,7 @@ export function GoOSEditorWindow({
                   padding: '4px 8px',
                   fontSize: 'var(--font-size-md, 14px)',
                   fontWeight: 'var(--font-weight-semibold, 600)',
-                  fontFamily: 'var(--font-family)',
+                  fontFamily: 'var(--font-body)',
                   color: 'var(--color-text-primary)',
                   background: 'var(--color-bg-base)',
                   border: '1.5px solid var(--color-accent-primary)',
@@ -224,7 +224,7 @@ export function GoOSEditorWindow({
                 style={{
                   fontSize: 'var(--font-size-md, 14px)',
                   fontWeight: 'var(--font-weight-semibold, 600)',
-                  fontFamily: 'var(--font-family)',
+                  fontFamily: 'var(--font-body)',
                   color: 'var(--color-text-primary)',
                   cursor: 'text',
                   overflow: 'hidden',
@@ -292,7 +292,7 @@ export function GoOSEditorWindow({
             borderTop: '1px solid var(--color-border-subtle)',
             background: 'var(--color-bg-subtle)',
             fontSize: 'var(--font-size-xs, 10px)',
-            fontFamily: 'ui-monospace, "SF Mono", monospace',
+            fontFamily: 'var(--font-mono)',
             color: 'var(--color-text-muted)',
             flexShrink: 0,
           }}

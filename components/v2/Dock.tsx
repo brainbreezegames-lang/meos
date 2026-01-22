@@ -122,7 +122,7 @@ function DockIcon({ item }: { item: DockItem }) {
             padding: '0 4px',
             fontSize: 'var(--font-size-xs, 10px)',
             fontWeight: 'var(--font-weight-bold, 700)',
-            fontFamily: 'var(--font-family)',
+            fontFamily: 'var(--font-body)',
             color: 'var(--color-text-on-accent)',
             background: 'var(--color-accent-primary)',
             borderRadius: 'var(--radius-full)',

@@ -985,7 +985,7 @@ const StickyNote = React.memo(({
                         : '4px 4px 8px rgba(0,0,0,0.06)',
             }}
         >
-            <div className="relative z-10" style={{ fontFamily: 'var(--font-gochi, cursive)' }}>
+            <div className="relative z-10" style={{ fontFamily: 'var(--font-display)' }}>
                 {children}
             </div>
             <div
@@ -1601,7 +1601,7 @@ const GoOSGuestbook = React.memo(({
     const noteColors = [goOS.colors.white];
 
     return (
-        <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-instrument, system-ui)' }}>
+        <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-body)' }}>
             {/* Header */}
             <div
                 className="px-5 py-4"
@@ -1612,7 +1612,7 @@ const GoOSGuestbook = React.memo(({
             >
                 <h3
                     className="text-lg font-bold mb-1"
-                    style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-averia, Georgia)' }}
+                    style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-display)' }}
                 >
                     📝 Leave a Note
                 </h3>
@@ -1634,7 +1634,7 @@ const GoOSGuestbook = React.memo(({
                         borderRadius: '4px',
                         color: goOS.colors.text.primary,
                         fontSize: '14px',
-                        fontFamily: 'var(--font-gochi, cursive)',
+                        fontFamily: 'var(--font-display)',
                         boxShadow: goOS.shadows.sm,
                     }}
                     maxLength={280}
@@ -1728,7 +1728,7 @@ const GoOSGuestbook = React.memo(({
                                         className="text-sm leading-relaxed mb-2"
                                         style={{
                                             color: goOS.colors.text.primary,
-                                            fontFamily: 'var(--font-gochi, cursive)',
+                                            fontFamily: 'var(--font-display)',
                                         }}
                                     >
                                         &ldquo;{entry.message}&rdquo;
@@ -1790,7 +1790,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
             <span className="text-lg block mb-1">{icon}</span>
             <div
                 className="text-2xl font-bold"
-                style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-averia, Georgia)' }}
+                style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-display)' }}
             >
                 {value}
             </div>
@@ -1807,7 +1807,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
     );
 
     return (
-        <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-instrument, system-ui)' }}>
+        <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-body)' }}>
             {/* Header */}
             <div
                 className="px-5 py-3 flex items-center justify-between"
@@ -1818,7 +1818,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
             >
                 <div className="flex items-center gap-2">
                     <span className="text-lg">📊</span>
-                    <h3 className="font-bold" style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-averia, Georgia)' }}>
+                    <h3 className="font-bold" style={{ color: goOS.colors.text.primary, fontFamily: 'var(--font-display)' }}>
                         Portfolio Analytics
                     </h3>
                 </div>
@@ -3770,7 +3770,7 @@ export default function GoOSDemoPage() {
                 // Override any inherited styles from globals.css
                 background: 'var(--color-bg-base)',
                 color: 'var(--color-text-primary)',
-                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontFamily: 'var(--font-body)',
                 minHeight: '100vh',
                 position: 'relative',
             }}

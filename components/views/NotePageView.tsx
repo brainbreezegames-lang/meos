@@ -32,8 +32,8 @@ const tokens = {
     accent: '#ff7722',        // Brand orange
   },
   fonts: {
-    display: '"Playfair Display", Georgia, "Times New Roman", serif',
-    body: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+    display: 'var(--font-display)',
+    body: 'var(--font-body)',
   },
   spacing: {
     contentMaxWidth: '680px',
