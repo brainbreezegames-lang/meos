@@ -52,6 +52,7 @@ import {
 } from '@/components/goos-editor';
 import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext';
 import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
+import { SpaceProvider, useSpaces } from '@/contexts/SpaceContext';
 import { WidgetRenderer, WIDGET_METADATA, WidgetContextMenu } from '@/components/widgets';
 import type { Widget } from '@/types';
 import { ViewSwitcher, PageView, PresentView } from '@/components/views';
@@ -60,15 +61,6 @@ import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
 import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
 
-// ============================================
-// DEMO SPACES (for SpaceSwitcher demo)
-// ============================================
-const DEMO_SPACES: SpaceSummary[] = [
-    { id: 'space-1', name: 'Portfolio', icon: '🎨', slug: null, isPrimary: true, isPublic: true, order: 0, fileCount: 12 },
-    { id: 'space-2', name: 'Writing', icon: '✍️', slug: 'writing', isPrimary: false, isPublic: true, order: 1, fileCount: 8 },
-    { id: 'space-3', name: 'Photography', icon: '📸', slug: 'photos', isPrimary: false, isPublic: true, order: 2, fileCount: 24 },
-    { id: 'space-4', name: 'Personal', icon: '🔐', slug: null, isPrimary: false, isPublic: false, order: 3, fileCount: 5 },
-];
 
 // ============================================
 // PLAYFUL LOADING MESSAGES
@@ -2043,8 +2035,17 @@ function GoOSDemoContent() {
     const [showConfetti, setShowConfetti] = useState(false);
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
-    // Spaces state (demo mode - will be replaced by SpaceContext)
-    const [activeSpaceId, setActiveSpaceId] = useState('space-1');
+    // Spaces (from context)
+    const {
+        spaces,
+        activeSpaceId,
+        switchSpace,
+        createSpace,
+        updateSpace,
+        deleteSpace,
+        setAsPrimary,
+        reorderSpaces,
+    } = useSpaces();
     const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
     const [showManageSpacesDialog, setShowManageSpacesDialog] = useState(false);
 
@@ -2859,15 +2860,9 @@ function GoOSDemoContent() {
 
                     {/* Space Switcher */}
                     <SpaceSwitcher
-                        spaces={DEMO_SPACES}
-                        activeSpaceId={activeSpaceId}
-                        onSwitchSpace={(spaceId) => {
-                            setActiveSpaceId(spaceId);
-                            const space = DEMO_SPACES.find(s => s.id === spaceId);
-                            if (space) {
-                                showGoOSToast(`Switched to ${space.name}`, 'success');
-                            }
-                        }}
+                        spaces={spaces}
+                        activeSpaceId={activeSpaceId || spaces[0]?.id || ''}
+                        onSwitchSpace={switchSpace}
                         onCreateSpace={() => setShowCreateSpaceModal(true)}
                         onManageSpaces={() => setShowManageSpacesDialog(true)}
                     />
@@ -3986,37 +3981,31 @@ function GoOSDemoContent() {
             <CreateSpaceModal
                 isOpen={showCreateSpaceModal}
                 onClose={() => setShowCreateSpaceModal(false)}
-                onCreate={(data) => {
-                    console.log('Create space:', data);
-                    showGoOSToast(`Created space "${data.name}"`, 'success');
+                onCreate={async (data) => {
+                    const newSpace = await createSpace({
+                        name: data.name,
+                        icon: data.icon,
+                        isPublic: data.isPublic,
+                        slug: data.slug,
+                        copyFromSpaceId: data.copyFromSpaceId,
+                    });
+                    if (newSpace) {
+                        setShowCreateSpaceModal(false);
+                    }
                 }}
-                existingSpaces={DEMO_SPACES}
-                existingSlugs={DEMO_SPACES.filter(s => s.slug).map(s => s.slug as string)}
+                existingSpaces={spaces}
+                existingSlugs={spaces.filter(s => s.slug).map(s => s.slug as string)}
             />
 
             {/* Manage Spaces Dialog */}
             <ManageSpacesDialog
                 isOpen={showManageSpacesDialog}
                 onClose={() => setShowManageSpacesDialog(false)}
-                spaces={DEMO_SPACES}
-                onReorder={(orderedIds) => {
-                    console.log('Reorder spaces:', orderedIds);
-                    showGoOSToast('Spaces reordered', 'success');
-                }}
-                onUpdateSpace={(id, updates) => {
-                    console.log('Update space:', id, updates);
-                    showGoOSToast('Space updated', 'success');
-                }}
-                onSetPrimary={(id) => {
-                    const space = DEMO_SPACES.find(s => s.id === id);
-                    console.log('Set primary:', id);
-                    showGoOSToast(`${space?.name} is now your main space`, 'success');
-                }}
-                onDeleteSpace={(id) => {
-                    const space = DEMO_SPACES.find(s => s.id === id);
-                    console.log('Delete space:', id);
-                    showGoOSToast(`Deleted "${space?.name}"`, 'success');
-                }}
+                spaces={spaces}
+                onReorder={reorderSpaces}
+                onUpdateSpace={updateSpace}
+                onSetPrimary={setAsPrimary}
+                onDeleteSpace={deleteSpace}
             />
         </div>
     );
@@ -4040,11 +4029,13 @@ export default function GoOSDemoPage() {
         >
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
-                    <GoOSProvider viewMode="owner" localOnly={true} initialFiles={INITIAL_GOOS_FILES}>
-                        <WidgetProvider localOnly={true} isOwner={true} initialWidgets={INITIAL_DEMO_WIDGETS}>
-                            <GoOSDemoContent />
-                        </WidgetProvider>
-                    </GoOSProvider>
+                    <SpaceProvider localOnly={true}>
+                        <GoOSProvider viewMode="owner" localOnly={true} initialFiles={INITIAL_GOOS_FILES}>
+                            <WidgetProvider localOnly={true} isOwner={true} initialWidgets={INITIAL_DEMO_WIDGETS}>
+                                <GoOSDemoContent />
+                            </WidgetProvider>
+                        </GoOSProvider>
+                    </SpaceProvider>
                 </WindowProvider>
             </EditProvider>
         </div>
