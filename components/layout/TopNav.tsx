@@ -18,72 +18,102 @@ export default function TopNav() {
         return () => document.removeEventListener('keydown', down);
     }, []);
     return (
-        <nav className="fixed top-0 left-0 right-0 h-14 bg-[var(--bg-glass-heavy)] backdrop-blur-xl border-b border-[var(--border-subtle)] flex items-center justify-between px-6 z-[1000]">
+        <nav
+            className="fixed top-0 left-0 right-0 h-12 flex items-center justify-between px-5 z-[1000]"
+            style={{
+                background: 'rgba(251, 249, 239, 0.72)',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                borderBottom: '1px solid rgba(23, 20, 18, 0.04)',
+            }}
+        >
             {/* Left Side */}
-            <div className="flex items-center gap-4">
-                <Link href="/" className="mr-2 group">
-                    {/* Logo Placeholder */}
-                    <div className="w-8 h-8 bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)] rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
-                        PH
+            <div className="flex items-center gap-5">
+                <Link href="/" className="group">
+                    {/* Minimal Logo */}
+                    <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-semibold transition-all duration-200"
+                        style={{
+                            background: 'rgba(23, 20, 18, 0.06)',
+                            color: 'var(--color-text-secondary, #706a63)',
+                        }}
+                    >
+                        me
                     </div>
                 </Link>
 
-                <nav className="hidden md:flex items-center gap-1">
-                    {['Product OS', 'Pricing', 'Docs', 'Community', 'Company'].map((item) => (
+                <nav className="hidden md:flex items-center gap-0.5">
+                    {['Features', 'Pricing', 'Docs'].map((item) => (
                         <Link
                             key={item}
                             href="#"
-                            className="text-[13px] font-medium text-[var(--text-secondary)] px-3 py-1.5 rounded-lg hover:bg-[var(--bg-highlight)] hover:text-[var(--text-primary)] transition-all"
+                            className="text-[13px] text-[var(--color-text-tertiary,#9a938a)] px-2.5 py-1 rounded-md hover:text-[var(--color-text-primary,#171412)] transition-colors duration-150"
                         >
                             {item}
                         </Link>
                     ))}
-                    <button className="text-[13px] font-medium text-[var(--text-secondary)] px-3 py-1.5 rounded-lg hover:bg-[var(--bg-highlight)] hover:text-[var(--text-primary)] transition-all">
-                        More
-                    </button>
                 </nav>
             </div>
 
             {/* Right Side */}
-            <div className="flex items-center gap-3">
-                <Link
-                    href="/signup"
-                    className="bg-[var(--text-primary)] text-[var(--bg-app)] text-[13px] font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity active:scale-95"
-                >
-                    Get started
-                </Link>
-
-                <div className="hidden md:flex relative group">
+            <div className="flex items-center gap-2">
+                <div className="hidden md:flex">
                     <button
                         onClick={() => setIsSearchOpen(true)}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-secondary)] w-48 hover:border-[var(--border-medium)] transition-colors text-[13px]"
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[var(--color-text-tertiary,#9a938a)] hover:text-[var(--color-text-secondary,#706a63)] transition-colors duration-150 text-[13px]"
                     >
-                        <Search size={14} />
-                        <span>Search docs...</span>
-                        <span className="ml-auto text-[10px] opacity-60">⌘K</span>
+                        <Search size={14} strokeWidth={1.5} />
+                        <span className="text-[11px] opacity-60">⌘K</span>
                     </button>
                 </div>
 
                 {isSearchOpen && (
                     <div className="fixed inset-0 z-[2000] flex items-start justify-center pt-[20vh] px-4">
-                        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setIsSearchOpen(false)} />
-                        <div className="relative w-full max-w-lg bg-[var(--bg-app)] rounded-xl shadow-2xl border border-[var(--border-subtle)] overflow-hidden animate-in fade-in zoom-in-95 duration-100 p-2">
-                            <div className="flex items-center gap-3 px-3 py-2 border-b border-[var(--border-light)] mb-2">
-                                <Search size={16} className="text-[var(--text-tertiary)]" />
+                        <div
+                            className="absolute inset-0"
+                            style={{ background: 'rgba(251, 249, 239, 0.6)', backdropFilter: 'blur(8px)' }}
+                            onClick={() => setIsSearchOpen(false)}
+                        />
+                        <div
+                            className="relative w-full max-w-md overflow-hidden p-1.5"
+                            style={{
+                                background: 'rgba(251, 249, 239, 0.95)',
+                                backdropFilter: 'blur(24px) saturate(180%)',
+                                borderRadius: '16px',
+                                border: '1px solid rgba(23, 20, 18, 0.06)',
+                                boxShadow: '0 24px 48px -12px rgba(23, 20, 18, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.5) inset',
+                            }}
+                        >
+                            <div className="flex items-center gap-2.5 px-3 py-2">
+                                <Search size={15} strokeWidth={1.5} className="text-[var(--color-text-tertiary,#9a938a)]" />
                                 <input
                                     autoFocus
                                     placeholder="Search..."
-                                    className="flex-1 bg-transparent border-none outline-none text-[14px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]"
+                                    className="flex-1 bg-transparent border-none outline-none text-[14px] text-[var(--color-text-primary,#171412)] placeholder:text-[var(--color-text-tertiary,#9a938a)]"
                                 />
-                                <button onClick={() => setIsSearchOpen(false)} className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--border-light)] text-[var(--text-tertiary)]">ESC</button>
+                                <button
+                                    onClick={() => setIsSearchOpen(false)}
+                                    className="text-[10px] px-1.5 py-0.5 rounded text-[var(--color-text-tertiary,#9a938a)]"
+                                    style={{ background: 'rgba(23, 20, 18, 0.04)' }}
+                                >
+                                    esc
+                                </button>
                             </div>
-                            <div className="space-y-1">
-                                {['Documentation', 'Getting Started', 'Components', 'API Reference'].map((item, i) => (
-                                    <button key={i} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--bg-highlight)] text-left group">
-                                        <div className="p-1 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] group-hover:bg-white group-hover:text-[var(--brand-primary)] transition-colors">
-                                            <Search size={14} />
-                                        </div>
-                                        <span className="text-[13px] text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{item}</span>
+                            <div
+                                className="mx-3 mb-2"
+                                style={{ height: '1px', background: 'rgba(23, 20, 18, 0.04)' }}
+                            />
+                            <div className="space-y-0.5 px-1.5 pb-1">
+                                {['Documentation', 'Getting Started', 'Components'].map((item, i) => (
+                                    <button
+                                        key={i}
+                                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors duration-150"
+                                        style={{ background: 'transparent' }}
+                                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(23, 20, 18, 0.03)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <Search size={13} strokeWidth={1.5} className="text-[var(--color-text-tertiary,#9a938a)]" />
+                                        <span className="text-[13px] text-[var(--color-text-secondary,#706a63)]">{item}</span>
                                     </button>
                                 ))}
                             </div>
@@ -91,14 +121,26 @@ export default function TopNav() {
                     </div>
                 )}
 
-                <div className="h-6 w-[1px] bg-[var(--border-light)] mx-1" />
+                <button className="md:hidden p-1.5 rounded-md text-[var(--color-text-tertiary,#9a938a)] hover:text-[var(--color-text-secondary,#706a63)] transition-colors duration-150">
+                    <Search size={16} strokeWidth={1.5} />
+                </button>
 
-                <button className="md:hidden p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-highlight)] hover:text-[var(--text-primary)] transition-colors">
-                    <Search size={18} />
+                <button className="p-1.5 rounded-md text-[var(--color-text-tertiary,#9a938a)] hover:text-[var(--color-text-secondary,#706a63)] transition-colors duration-150">
+                    <User size={16} strokeWidth={1.5} />
                 </button>
-                <button className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-highlight)] hover:text-[var(--text-primary)] transition-colors">
-                    <User size={18} />
-                </button>
+
+                <Link
+                    href="/signup"
+                    className="text-[12px] font-medium px-3 py-1.5 rounded-lg transition-all duration-150 active:scale-[0.98]"
+                    style={{
+                        background: 'rgba(23, 20, 18, 0.06)',
+                        color: 'var(--color-text-primary, #171412)',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(23, 20, 18, 0.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(23, 20, 18, 0.06)'}
+                >
+                    Sign in
+                </Link>
             </div>
         </nav>
     );
