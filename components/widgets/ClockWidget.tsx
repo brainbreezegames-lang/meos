@@ -95,8 +95,8 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       <div
         style={{
           background: 'var(--color-bg-base, #fbf9ef)',
-          border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-          borderRadius: 'var(--radius-lg, 12px)',
+          border: '2px solid var(--color-text-primary, #171412)',
+          borderRadius: '12px',
           boxShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
           padding: '14px 18px',
           minWidth: '140px',

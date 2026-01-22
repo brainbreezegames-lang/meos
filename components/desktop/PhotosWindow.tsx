@@ -247,6 +247,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
             borderRadius: isMaximized ? '0' : '12px',
             background: colors.windowBg,
             boxShadow: isActive ? colors.windowShadow : colors.windowShadowInactive,
+            border: isMaximized ? 'none' : '2px solid var(--color-text-primary, #171412)',
             opacity: isActive ? 1 : 0.96,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 20 }}
@@ -264,7 +265,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
             className="flex items-center justify-between h-[52px] px-4 shrink-0 select-none"
             style={{
               background: colors.titleBarBg,
-              borderBottom: `1px solid ${colors.titleBarBorder}`,
+              borderBottom: '2px solid var(--color-text-primary, #171412)',
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
@@ -433,7 +434,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                               className="w-4 h-4"
                               fill={favorites.has(photo.id) ? colors.favoriteColor : 'none'}
                               viewBox="0 0 24 24"
-                              stroke={favorites.has(photo.id) ? colors.favoriteColor : 'white'}
+                              stroke={favorites.has(photo.id) ? colors.favoriteColor : 'var(--color-bg-base, #fbf9ef)'}
                               strokeWidth={2}
                             >
                               <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -441,7 +442,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                           </button>
                           {/* Caption on hover */}
                           <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <p className="text-white text-xs font-medium truncate">{photo.alt}</p>
+                            <p className="text-xs font-medium truncate" style={{ color: 'var(--color-bg-base, #fbf9ef)' }}>{photo.alt}</p>
                           </div>
                         </>
                       ) : (

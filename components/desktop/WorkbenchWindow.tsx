@@ -29,7 +29,6 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
   const isOwner = context?.isOwner ?? false;
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
-  const isSketch = themeContext?.theme === 'sketch';
 
   // Get workbench entries from desktop context
   const allEntries = context?.desktop?.workbenchEntries || [];
@@ -118,14 +117,12 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 120px)',
             minHeight: 400,
-            borderRadius: isSketch ? (isMaximized ? '0' : '12px') : (isMaximized ? '0' : 'var(--radius-window, 12px)'),
-            background: isSketch ? '#FFFFFF' : 'var(--bg-glass-elevated, rgba(255,255,255,0.95))',
-            backdropFilter: isSketch ? 'none' : 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: isSketch ? 'none' : 'blur(40px) saturate(180%)',
-            boxShadow: isSketch
-              ? '6px 6px 0 #4A6CF7'
-              : (isActive ? 'var(--shadow-window, 0 24px 80px -12px rgba(0,0,0,0.25))' : 'var(--shadow-window-inactive, 0 12px 40px -8px rgba(0,0,0,0.15))'),
-            border: isSketch ? '1.5px solid #4A6CF7' : '1px solid var(--border-glass-outer, rgba(255,255,255,0.2))',
+            borderRadius: isMaximized ? '0' : '12px',
+            background: 'var(--color-bg-base, #fbf9ef)',
+            boxShadow: isActive
+              ? 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))'
+              : 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+            border: isMaximized ? 'none' : '2px solid var(--color-text-primary, #171412)',
             opacity: isActive ? 1 : 0.96,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 16 }}
@@ -141,8 +138,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
           <div
             className="flex items-center h-[52px] px-4 shrink-0 relative select-none"
             style={{
-              background: isSketch ? '#FFFFFF' : 'var(--bg-titlebar, linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(250,250,252,0.85) 100%))',
-              borderBottom: isSketch ? '1.5px solid #4A6CF7' : '1px solid var(--border-light, rgba(0,0,0,0.06))',
+              background: 'var(--color-bg-base, #fbf9ef)',
+              borderBottom: '2px solid var(--color-text-primary, #171412)',
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
@@ -207,13 +204,13 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
 
             {/* Title */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-              <Sparkles size={14} style={{ color: isSketch ? '#4A6CF7' : 'var(--accent-primary, #8b5cf6)' }} />
+              <Sparkles size={14} style={{ color: 'var(--color-accent-primary, #ff7722)' }} />
               <span
                 style={{
                   fontSize: '13px',
                   fontWeight: 500,
-                  color: isSketch ? '#4A6CF7' : 'var(--text-primary, #1a1a1a)',
-                  fontFamily: 'var(--font-body, system-ui)',
+                  color: 'var(--color-text-primary, #171412)',
+                  fontFamily: 'var(--font-family)',
                 }}
               >
                 {item.windowTitle || 'Now Working On'}
@@ -226,7 +223,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                 onClick={() => setShowArchived(!showArchived)}
                 className="p-1.5 rounded-md transition-all duration-150"
                 style={{
-                  color: showArchived ? 'var(--accent-primary, #8b5cf6)' : 'var(--text-tertiary, #888)',
+                  color: showArchived ? 'var(--accent-primary, #ff7722)' : 'var(--text-tertiary, #888)',
                   background: showArchived ? 'var(--accent-light, rgba(139,92,246,0.1))' : 'transparent',
                 }}
               >
@@ -237,8 +234,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                   onClick={() => setIsAddingEntry(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150"
                   style={{
-                    background: 'var(--accent-primary, #8b5cf6)',
-                    color: 'white',
+                    background: 'var(--accent-primary, #ff7722)',
+                    color: 'var(--color-text-on-accent, #fbf9ef)',
                   }}
                 >
                   <Plus size={13} />
@@ -251,7 +248,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
           {/* Content */}
           <div
             className="flex-1 overflow-y-auto"
-            style={{ background: isSketch ? '#FFFFFF' : 'var(--bg-secondary, #fafafa)' }}
+            style={{ background: 'var(--color-bg-base, #fbf9ef)' }}
           >
             {/* Add Entry Form */}
             <AnimatePresence>
@@ -330,8 +327,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                           disabled={!newEntry.title.trim()}
                           className="px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all disabled:opacity-40"
                           style={{
-                            background: 'var(--accent-primary, #8b5cf6)',
-                            color: 'white',
+                            background: 'var(--accent-primary, #ff7722)',
+                            color: 'var(--color-text-on-accent, #fbf9ef)',
                           }}
                         >
                           Add
@@ -368,7 +365,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                           className="absolute left-0 top-3 w-6 h-6 rounded-full flex items-center justify-center"
                           style={{
                             background: selectedEntryId === entry.id
-                              ? 'var(--accent-primary, #8b5cf6)'
+                              ? 'var(--accent-primary, #ff7722)'
                               : 'var(--bg-elevated, white)',
                             border: selectedEntryId === entry.id
                               ? 'none'
@@ -386,7 +383,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                           className="rounded-xl cursor-pointer transition-all duration-200"
                           style={{
                             background: 'var(--bg-elevated, white)',
-                            border: `1px solid ${selectedEntryId === entry.id ? 'var(--accent-primary, #8b5cf6)' : 'var(--border-light, rgba(0,0,0,0.06))'}`,
+                            border: `1px solid ${selectedEntryId === entry.id ? 'var(--accent-primary, #ff7722)' : 'var(--border-light, rgba(0,0,0,0.06))'}`,
                             boxShadow: selectedEntryId === entry.id
                               ? '0 4px 12px rgba(139,92,246,0.15)'
                               : '0 1px 3px rgba(0,0,0,0.04)',
@@ -464,7 +461,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                                   className="p-3 rounded-lg"
                                   style={{
                                     background: 'var(--bg-secondary, #fafafa)',
-                                    borderLeft: '3px solid var(--accent-primary, #8b5cf6)',
+                                    borderLeft: '3px solid var(--accent-primary, #ff7722)',
                                   }}
                                 >
                                   <p
@@ -533,7 +530,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                     background: 'linear-gradient(135deg, var(--accent-light, rgba(139,92,246,0.1)) 0%, var(--accent-light, rgba(139,92,246,0.05)) 100%)',
                   }}
                 >
-                  <Sparkles size={24} style={{ color: 'var(--accent-primary, #8b5cf6)' }} />
+                  <Sparkles size={24} style={{ color: 'var(--accent-primary, #ff7722)' }} />
                 </div>
                 <h3
                   style={{
@@ -565,8 +562,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                     onClick={() => setIsAddingEntry(true)}
                     className="mt-5 flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium"
                     style={{
-                      background: 'var(--accent-primary, #8b5cf6)',
-                      color: 'white',
+                      background: 'var(--accent-primary, #ff7722)',
+                      color: 'var(--color-text-on-accent, #fbf9ef)',
                     }}
                   >
                     <Plus size={15} />

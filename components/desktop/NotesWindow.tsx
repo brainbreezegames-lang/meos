@@ -320,6 +320,7 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
             borderRadius: isMaximized ? '0' : '12px',
             background: colors.windowBg,
             boxShadow: isActive ? colors.windowShadow : colors.windowShadowInactive,
+            border: isMaximized ? 'none' : '2px solid var(--color-text-primary, #171412)',
             opacity: isActive ? 1 : 0.96,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 20 }}
@@ -339,7 +340,7 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
             className="flex items-center h-[52px] px-4 shrink-0 relative select-none"
             style={{
               background: colors.titleBarBg,
-              borderBottom: `1px solid ${colors.titleBarBorder}`,
+              borderBottom: '2px solid var(--color-text-primary, #171412)',
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
@@ -504,7 +505,7 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
                         >
                           <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
                             <circle cx="6" cy="6" r="6" fill="currentColor" fillOpacity="0.3" />
-                            <path d="M4 4L8 8M8 4L4 8" stroke={isDark ? 'black' : 'white'} strokeWidth="1.2" strokeLinecap="round" />
+                            <path d="M4 4L8 8M8 4L4 8" stroke="var(--color-bg-white, #ffffff)" strokeWidth="1.2" strokeLinecap="round" />
                           </svg>
                         </button>
                       )}

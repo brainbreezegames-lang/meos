@@ -349,7 +349,7 @@ export function GoOSTipTapEditor({
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(250, 248, 240, 0.9)',
+            background: 'var(--color-bg-overlay, rgba(251, 249, 239, 0.9))',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -759,7 +759,7 @@ export function GoOSTipTapEditor({
 
         .goos-bubble-menu button.is-active {
           background: ${goOSTokens.colors.accent.primary};
-          color: white;
+          color: var(--color-text-on-accent, #fbf9ef);
         }
 
         /* Floating Menu */

@@ -124,7 +124,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             backdropFilter: theme.colors.blur,
             WebkitBackdropFilter: theme.colors.blur,
             boxShadow: isActive ? theme.shadows.hover : theme.shadows.solid,
-            border: isMaximized ? 'none' : `1px solid ${theme.colors.border}`,
+            border: isMaximized ? 'none' : `2px solid ${theme.colors.border}`,
             opacity: isActive ? 1 : 0.95,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
@@ -446,7 +446,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap"
                             style={{
                               background: blockPickerCategory === cat.id ? 'var(--accent-primary)' : 'transparent',
-                              color: blockPickerCategory === cat.id ? 'white' : 'var(--text-secondary)',
+                              color: blockPickerCategory === cat.id ? 'var(--color-text-on-accent, #fbf9ef)' : 'var(--text-secondary)',
                             }}
                           >
                             <span>{cat.icon}</span>

@@ -2790,8 +2790,8 @@ function GoOSDemoContent() {
                                 >
                                     📝
                                 </motion.span>
-                                <p className="text-lg font-medium mb-2" style={{ color: '#1a1a1a' }}>No published content yet</p>
-                                <p className="text-sm" style={{ color: '#6b6b6b' }}>Switch to Desktop to create and publish your first piece</p>
+                                <p className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>No published content yet</p>
+                                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Switch to Desktop to create and publish your first piece</p>
                             </motion.div>
                             <motion.button
                                 initial={{ opacity: 0, y: 10 }}

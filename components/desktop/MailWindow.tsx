@@ -208,7 +208,7 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
               style={{
                 fontSize: '12px',
                 background: formData.message.trim() ? 'var(--accent-primary)' : 'var(--border-light)',
-                color: formData.message.trim() ? 'white' : 'var(--text-tertiary)',
+                color: formData.message.trim() ? 'var(--color-text-on-accent, #fbf9ef)' : 'var(--text-tertiary)',
                 boxShadow: formData.message.trim() ? 'var(--shadow-button)' : 'none',
               }}
               whileHover={formData.message.trim() ? { scale: 1.02 } : {}}

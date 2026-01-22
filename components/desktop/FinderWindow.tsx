@@ -328,6 +328,7 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
             borderRadius: isMaximized ? '0' : '12px',
             background: colors.windowBg,
             boxShadow: isActive ? colors.windowShadow : colors.windowShadowInactive,
+            border: isMaximized ? 'none' : '2px solid var(--color-text-primary, #171412)',
             opacity: isActive ? 1 : 0.96,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 20 }}
@@ -345,7 +346,7 @@ export function FinderWindow({ window: windowInstance, item }: FinderWindowProps
             className="flex items-center justify-between h-[52px] px-3 shrink-0 select-none"
             style={{
               background: colors.titleBarBg,
-              borderBottom: `1px solid ${colors.titleBarBorder}`,
+              borderBottom: '2px solid var(--color-text-primary, #171412)',
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >

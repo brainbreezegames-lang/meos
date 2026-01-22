@@ -255,16 +255,17 @@ export function GoOSEditorWindow({
             overflow: 'hidden',
             display: 'flex',
             justifyContent: 'center',
-            background: 'var(--color-bg-white)',
+            background: 'var(--color-bg-base)',
           }}
         >
           <div
             style={{
               width: '100%',
-              maxWidth: isMaximized ? '800px' : '100%',
+              maxWidth: isMaximized ? '720px' : '100%',
               height: '100%',
-              margin: isMaximized ? '0 auto' : 0,
-              padding: isMaximized ? '0 24px' : 0,
+              margin: '0 auto',
+              padding: isMaximized ? '32px 24px' : '0',
+              background: 'var(--color-bg-base)',
             }}
           >
             <GoOSTipTapEditor

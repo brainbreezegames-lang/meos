@@ -240,6 +240,7 @@ export function PagesWindow({ window: windowInstance, item }: PagesWindowProps) 
             borderRadius: isMaximized ? '0' : '12px',
             background: colors.windowBg,
             boxShadow: isActive ? colors.windowShadow : colors.windowShadowInactive,
+            border: isMaximized ? 'none' : '2px solid var(--color-text-primary, #171412)',
             opacity: isActive ? 1 : 0.96,
           }}
           initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 20 }}
@@ -257,7 +258,7 @@ export function PagesWindow({ window: windowInstance, item }: PagesWindowProps) 
             className="flex items-center h-[52px] px-4 shrink-0 relative select-none"
             style={{
               background: colors.titleBarBg,
-              borderBottom: `1px solid ${colors.titleBarBorder}`,
+              borderBottom: '2px solid var(--color-text-primary, #171412)',
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
