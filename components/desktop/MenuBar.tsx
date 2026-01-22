@@ -20,17 +20,15 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
 
   return (
     <motion.header
-      className="menubar fixed top-0 left-0 right-0 z-[100] h-[28px] flex items-center justify-between px-4"
+      className="menubar fixed top-0 left-0 right-0 z-[100] h-[32px] flex items-center justify-between px-5"
       style={{
-        background: 'var(--bg-menubar)',
-        backdropFilter: 'blur(40px) saturate(200%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(200%)',
-        boxShadow: `
-          0 0.5px 0 var(--border-light),
-          inset 0 -0.5px 0 var(--border-light)
-        `,
+        background: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
+        backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+        WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+        borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+        boxShadow: 'var(--shadow-xs, 0 1px 3px rgba(23, 20, 18, 0.04))',
       }}
-      initial={{ y: -28, opacity: 0 }}
+      initial={{ y: -32, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{
         type: 'spring',
@@ -40,13 +38,13 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
     >
       {/* Left side - Logo & Title */}
       <div className="flex items-center gap-5">
-        {/* Apple-style logo */}
-        <div className="flex items-center gap-1.5">
+        {/* Logo */}
+        <div className="flex items-center gap-2">
           <div
-            className="menubar-logo w-4 h-4 rounded-[4px] flex items-center justify-center"
+            className="menubar-logo w-[18px] h-[18px] rounded-md flex items-center justify-center"
             style={{
-              background: 'var(--text-primary)',
-              boxShadow: 'var(--shadow-sm)',
+              background: 'var(--color-accent-primary, #ff7722)',
+              boxShadow: '0 1px 2px rgba(255, 119, 34, 0.2)',
             }}
           >
             <svg
@@ -59,49 +57,49 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
                 y="1"
                 width="4"
                 height="4"
-                rx="0.8"
-                fill="var(--bg-elevated)"
-                opacity="0.9"
+                rx="1"
+                fill="white"
+                opacity="0.95"
               />
               <rect
                 x="7"
                 y="1"
                 width="4"
                 height="4"
-                rx="0.8"
-                fill="var(--bg-elevated)"
-                opacity="0.7"
+                rx="1"
+                fill="white"
+                opacity="0.75"
               />
               <rect
                 x="1"
                 y="7"
                 width="4"
                 height="4"
-                rx="0.8"
-                fill="var(--bg-elevated)"
-                opacity="0.7"
+                rx="1"
+                fill="white"
+                opacity="0.75"
               />
               <rect
                 x="7"
                 y="7"
                 width="4"
                 height="4"
-                rx="0.8"
-                fill="var(--bg-elevated)"
-                opacity="0.5"
+                rx="1"
+                fill="white"
+                opacity="0.55"
               />
             </svg>
           </div>
           <span
             className="menubar-title text-[13px] font-semibold tracking-tight select-none"
-            style={{ color: 'var(--text-primary)' }}
+            style={{ color: 'var(--color-text-primary, #171412)' }}
           >
             {title}
           </span>
         </div>
       </div>
 
-      {/* Right side - Date & Time */}
+      {/* Right side - Status Icons & Time */}
       <div className="flex items-center gap-4">
         {/* Custom right content (like persona toggle) */}
         {rightContent}
@@ -110,8 +108,17 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
         {onSettingsClick && (
           <button
             onClick={onSettingsClick}
-            className="menubar-item w-[18px] h-[18px] flex items-center justify-center rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-            style={{ color: 'var(--text-secondary)' }}
+            className="menubar-item w-[22px] h-[22px] flex items-center justify-center rounded-md transition-colors"
+            style={{
+              color: 'var(--color-text-secondary, #4a4744)',
+              background: 'transparent',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--color-bg-subtle, rgba(23, 20, 18, 0.05))';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
             title="Settings"
           >
             <svg className="w-[14px] h-[14px]" viewBox="0 0 20 20" fill="currentColor">
@@ -120,12 +127,12 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
           </button>
         )}
 
-        {/* WiFi icon placeholder */}
+        {/* WiFi icon */}
         <svg
-          className="menubar-item w-[15px] h-[15px]"
+          className="menubar-item w-[14px] h-[14px]"
           viewBox="0 0 24 24"
           fill="none"
-          style={{ color: 'var(--text-secondary)' }}
+          style={{ color: 'var(--color-text-muted, #8e827c)' }}
         >
           <path
             d="M12 18.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5z"
@@ -134,28 +141,28 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
           <path
             d="M12 14c2.21 0 4 1.79 4 4h-1.5c0-1.38-1.12-2.5-2.5-2.5s-2.5 1.12-2.5 2.5H8c0-2.21 1.79-4 4-4z"
             fill="currentColor"
-            opacity="0.8"
+            opacity="0.85"
           />
           <path
             d="M12 10c3.87 0 7 3.13 7 7h-1.5c0-3.04-2.46-5.5-5.5-5.5S6.5 13.96 6.5 17H5c0-3.87 3.13-7 7-7z"
             fill="currentColor"
-            opacity="0.6"
+            opacity="0.65"
           />
           <path
             d="M12 6c5.52 0 10 4.48 10 10h-1.5c0-4.69-3.81-8.5-8.5-8.5S3.5 11.31 3.5 16H2c0-5.52 4.48-10 10-10z"
             fill="currentColor"
-            opacity="0.4"
+            opacity="0.45"
           />
         </svg>
 
-        {/* Battery icon placeholder */}
-        <div className="menubar-item flex items-center gap-0.5" style={{ color: 'var(--text-secondary)' }}>
+        {/* Battery icon */}
+        <div className="menubar-item flex items-center gap-0.5" style={{ color: 'var(--color-text-muted, #8e827c)' }}>
           <div
-            className="w-[22px] h-[10px] rounded-[3px] border flex items-center p-[1.5px]"
-            style={{ borderColor: 'currentColor' }}
+            className="w-[20px] h-[9px] rounded-[2.5px] border flex items-center p-[1.5px]"
+            style={{ borderColor: 'currentColor', borderWidth: '1.5px' }}
           >
             <div
-              className="h-full rounded-[1.5px]"
+              className="h-full rounded-[1px]"
               style={{ width: '80%', background: 'currentColor' }}
             />
           </div>
@@ -165,15 +172,18 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
           />
         </div>
 
+        {/* Date */}
         <span
-          className="menubar-clock text-[13px] font-medium select-none"
-          style={{ color: 'var(--text-secondary)' }}
+          className="menubar-clock text-[12px] font-medium select-none"
+          style={{ color: 'var(--color-text-secondary, #4a4744)' }}
         >
           {formatDate(currentTime)}
         </span>
+
+        {/* Time */}
         <span
-          className="menubar-clock text-[13px] font-semibold tabular-nums select-none min-w-[52px] text-right"
-          style={{ color: 'var(--text-primary)' }}
+          className="menubar-clock text-[12px] font-semibold tabular-nums select-none min-w-[50px] text-right"
+          style={{ color: 'var(--color-text-primary, #171412)' }}
         >
           {formatTime(currentTime)}
         </span>
