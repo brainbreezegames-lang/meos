@@ -94,6 +94,7 @@ interface GoOSTipTapEditorProps {
   placeholder?: string;
   editable?: boolean;
   autoFocus?: boolean;
+  hideToolbar?: boolean;
 }
 
 // Upload image to API
@@ -127,8 +128,10 @@ export function GoOSTipTapEditor({
   placeholder = 'Start writing...',
   editable = true,
   autoFocus = false,
+  hideToolbar = false,
 }: GoOSTipTapEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const editor = useEditor({
@@ -259,6 +262,16 @@ export function GoOSTipTapEditor({
     }
   }, [content, editor]);
 
+  // Scroll to top when editor first mounts
+  useEffect(() => {
+    if (editor && scrollContainerRef.current) {
+      // Small delay to ensure content is rendered
+      requestAnimationFrame(() => {
+        scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+      });
+    }
+  }, [editor]);
+
   // Handle file input change for image upload
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -373,14 +386,16 @@ export function GoOSTipTapEditor({
         </div>
       )}
 
-      {/* Toolbar */}
-      <GoOSEditorToolbar
-        editor={editor}
-        onAddImage={addImage}
-        onAddImageFromUrl={addImageFromUrl}
-        onAddVideo={addVideo}
-        onSetLink={setLink}
-      />
+      {/* Toolbar - hidden in zen mode */}
+      {!hideToolbar && (
+        <GoOSEditorToolbar
+          editor={editor}
+          onAddImage={addImage}
+          onAddImageFromUrl={addImageFromUrl}
+          onAddVideo={addVideo}
+          onSetLink={setLink}
+        />
+      )}
 
       {/* Bubble Menu for selections */}
       <BubbleMenu
@@ -491,7 +506,7 @@ export function GoOSTipTapEditor({
       </FloatingMenu>
 
       {/* Editor Content */}
-      <div className="goos-editor-container">
+      <div ref={scrollContainerRef} className="goos-editor-container">
         <EditorContent editor={editor} />
       </div>
 

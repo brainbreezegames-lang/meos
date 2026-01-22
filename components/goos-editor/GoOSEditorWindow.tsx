@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, useDragControls, useReducedMotion } from 'framer-motion';
-import { FileText, Presentation } from 'lucide-react';
+import { motion, useDragControls, useReducedMotion, AnimatePresence } from 'framer-motion';
+import { FileText, Presentation, Check, Loader2 } from 'lucide-react';
 import { GoOSTipTapEditor, goOSTokens } from './GoOSTipTapEditor';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
@@ -51,10 +51,27 @@ export function GoOSEditorWindow({
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [lastSaved, setLastSaved] = useState<Date | undefined>(file.updatedAt);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [showZenControls, setShowZenControls] = useState(true);
+  const [showZenStats, setShowZenStats] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const zenControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dragControls = useDragControls();
   const prefersReducedMotion = useReducedMotion();
+
+  // Auto-hide zen controls after 3 seconds of no mouse movement in header area
+  useEffect(() => {
+    if (isZenMode && showZenControls) {
+      zenControlsTimeoutRef.current = setTimeout(() => {
+        setShowZenControls(false);
+      }, 3000);
+    }
+    return () => {
+      if (zenControlsTimeoutRef.current) {
+        clearTimeout(zenControlsTimeoutRef.current);
+      }
+    };
+  }, [isZenMode, showZenControls]);
 
   // Auto-save with debounce
   const triggerSave = useCallback(() => {
@@ -119,6 +136,239 @@ export function GoOSEditorWindow({
     }
   };
 
+  // Zen mode: completely different, distraction-free UI
+  if (isZenMode) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'var(--color-bg-base)',
+          zIndex,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Zen Mode: Floating controls that appear on hover */}
+        <div
+          onMouseEnter={() => setShowZenControls(true)}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 80,
+            zIndex: 10,
+          }}
+        >
+          <AnimatePresence>
+            {showZenControls && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                  position: 'absolute',
+                  top: 16,
+                  left: 20,
+                  right: 20,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                {/* Left: Traffic lights + Save status */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <TrafficLights
+                    onClose={onClose}
+                    onMinimize={onMinimize}
+                    onMaximize={onMaximize}
+                    isMaximized={isMaximized}
+                  />
+
+                  {/* Minimal save indicator */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    color: 'var(--color-text-muted)',
+                    fontSize: 12,
+                    fontFamily: 'var(--font-body)',
+                  }}>
+                    {saveStatus === 'saving' && (
+                      <>
+                        <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
+                        <span>Saving...</span>
+                      </>
+                    )}
+                    {saveStatus === 'saved' && (
+                      <>
+                        <Check size={12} style={{ color: 'var(--color-success)' }} />
+                        <span style={{ color: 'var(--color-success)' }}>Saved</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right: Publish toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <GoOSPublishBadge status={file.status} />
+                  <GoOSPublishToggle
+                    status={file.status}
+                    onChange={handlePublishChange}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Zen Mode: Full-focus editor area */}
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            paddingTop: 60,
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 680,
+              height: '100%',
+              padding: '40px 24px 80px',
+              overflow: 'auto',
+            }}
+          >
+            {/* Editable title in zen mode */}
+            <div style={{ marginBottom: 32 }}>
+              {isEditingTitle ? (
+                <input
+                  ref={titleInputRef}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  onBlur={() => setIsEditingTitle(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === 'Escape') {
+                      setIsEditingTitle(false);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: 0,
+                    fontSize: 'clamp(28px, 4vw, 36px)',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-display)',
+                    color: 'var(--color-text-primary)',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '2px solid var(--color-accent-primary)',
+                    outline: 'none',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.2,
+                  }}
+                  placeholder="Untitled"
+                  autoFocus
+                />
+              ) : (
+                <h1
+                  onClick={() => setIsEditingTitle(true)}
+                  style={{
+                    margin: 0,
+                    fontSize: 'clamp(28px, 4vw, 36px)',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-display)',
+                    color: title ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                    cursor: 'text',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {title || 'Untitled'}
+                </h1>
+              )}
+            </div>
+
+            {/* Editor without toolbar in zen mode */}
+            <GoOSTipTapEditor
+              content={content}
+              onChange={setContent}
+              onSave={triggerSave}
+              placeholder={file.type === 'case-study'
+                ? 'Start writing your case study...'
+                : 'Start writing...'}
+              autoFocus
+              hideToolbar
+            />
+          </div>
+        </div>
+
+        {/* Zen Mode: Subtle stats on hover at bottom */}
+        <div
+          onMouseEnter={() => setShowZenStats(true)}
+          onMouseLeave={() => setShowZenStats(false)}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 40,
+            zIndex: 10,
+          }}
+        >
+          <AnimatePresence>
+            {showZenStats && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.15 }}
+                style={{
+                  position: 'absolute',
+                  bottom: 12,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  display: 'flex',
+                  gap: 20,
+                  padding: '8px 16px',
+                  background: 'var(--color-bg-base)',
+                  borderRadius: 20,
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  border: '1px solid var(--color-border-subtle)',
+                  fontSize: 11,
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text-muted)',
+                }}
+              >
+                <span>{wordCount} words</span>
+                <span>·</span>
+                <span>{charCount} characters</span>
+                <span>·</span>
+                <span>{readingTime} min read</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Keyframes for spinner */}
+        <style jsx global>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </motion.div>
+    );
+  }
+
+  // Normal mode: standard windowed UI
   return (
     <>
       <motion.div
@@ -134,20 +384,16 @@ export function GoOSEditorWindow({
         transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
         style={{
           position: 'fixed',
-          // In zen mode, start from top of viewport; otherwise respect menubar
-          top: isZenMode ? 0 : (isMaximized ? 'var(--menubar-height, 40px)' : '10%'),
+          top: isMaximized ? 'var(--menubar-height, 40px)' : '10%',
           left: isMaximized ? 0 : '50%',
           x: isMaximized ? 0 : '-50%',
           width: isMaximized ? '100%' : 'min(900px, 90vw)',
-          // In zen mode, full viewport height
-          height: isZenMode ? '100vh' : (isMaximized ? 'calc(100vh - var(--menubar-height, 40px) - var(--zen-dock-offset, 80px))' : 'min(80vh, 700px)'),
+          height: isMaximized ? 'calc(100vh - var(--menubar-height, 40px) - var(--zen-dock-offset, 80px))' : 'min(80vh, 700px)',
           minWidth: 400,
           background: WINDOW.background,
-          // No border in zen mode for distraction-free experience
-          border: isZenMode ? 'none' : (isMaximized ? WINDOW.borderMaximized : WINDOW.border),
-          borderRadius: isZenMode ? 0 : (isMaximized ? WINDOW.borderRadiusMaximized : WINDOW.borderRadius),
-          // No shadow in zen mode
-          boxShadow: isZenMode ? 'none' : (isMaximized ? WINDOW.shadowMaximized : WINDOW.shadow),
+          border: isMaximized ? WINDOW.borderMaximized : WINDOW.border,
+          borderRadius: isMaximized ? WINDOW.borderRadiusMaximized : WINDOW.borderRadius,
+          boxShadow: isMaximized ? WINDOW.shadowMaximized : WINDOW.shadow,
           zIndex,
           display: 'flex',
           flexDirection: 'column',
@@ -155,16 +401,16 @@ export function GoOSEditorWindow({
           opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
         }}
       >
-        {/* Title Bar - Minimal in zen mode, full in normal mode */}
+        {/* Title Bar */}
         <div
           onPointerDown={startDrag}
           style={{
             display: 'flex',
             alignItems: 'center',
-            padding: isZenMode ? '0 20px' : `0 ${TITLE_BAR.paddingX}px`,
-            height: isZenMode ? 48 : TITLE_BAR.height,
-            background: isZenMode ? 'transparent' : TITLE_BAR.background,
-            borderBottom: isZenMode ? 'none' : TITLE_BAR.borderBottom,
+            padding: `0 ${TITLE_BAR.paddingX}px`,
+            height: TITLE_BAR.height,
+            background: TITLE_BAR.background,
+            borderBottom: TITLE_BAR.borderBottom,
             gap: 12,
             cursor: isMaximized ? 'default' : 'grab',
             flexShrink: 0,
