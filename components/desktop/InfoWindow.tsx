@@ -164,8 +164,8 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
                 // Use backdrop filter only if strictly needed by theme (standard), otherwise none
                 backdropFilter: theme.colors.paper.startsWith('#') ? 'none' : 'blur(60px) saturate(200%)',
                 WebkitBackdropFilter: theme.colors.paper.startsWith('#') ? 'none' : 'blur(60px) saturate(200%)',
-                boxShadow: theme.shadows.solid,
-                border: `2px solid ${theme.colors.border}`,
+                boxShadow: 'var(--shadow-window)',
+                border: `1px solid ${theme.colors.border}`,
               }}
               initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.75, y: 40 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
@@ -181,7 +181,7 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
               <div
                 className="window-title-bar flex items-center h-[52px] px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
                 style={{
-                  borderBottom: `2px solid ${theme.colors.border}`,
+                  borderBottom: `1px solid ${theme.colors.border}`,
                   background: theme.colors.paper,
                 }}
                 onPointerDown={startDrag}

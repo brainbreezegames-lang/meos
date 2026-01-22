@@ -234,7 +234,7 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                 className="flex items-center px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
                 style={{
                   height: 'var(--window-header-height)',
-                  borderBottom: `2px solid ${theme.colors.border}`,
+                  borderBottom: `1px solid ${theme.colors.border}`,
                   background: theme.colors.paper,
                 }}
                 onPointerDown={startDrag}

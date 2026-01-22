@@ -48,13 +48,13 @@ export interface WidgetTheme {
 }
 
 // ONE unified theme using CSS variables - EXACT variable names from design-system.css
-// Border uses color-text-primary for bolder "dock app" style (2px solid dark border)
+// Border uses color-border-default for calm-tech 2025 style (1px solid subtle border)
 const unifiedTheme: WidgetTheme = {
   colors: {
     paper: 'var(--color-bg-base)',
     background: 'var(--color-bg-base)',
     blur: 'none',
-    border: 'var(--color-text-primary)',
+    border: 'var(--color-border-default)',
     text: {
       primary: 'var(--color-text-primary)',
       secondary: 'var(--color-text-secondary)',

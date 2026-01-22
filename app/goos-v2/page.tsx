@@ -558,7 +558,7 @@ const GoOSCVWindow = dynamic(
 );
 
 // ============================================
-// GOOS DESIGN TOKENS - Using CSS Variables from design-system.css
+// GOOS DESIGN TOKENS - Calm-Tech 2025 Design System
 // Note: icon.* values are hex for SVG attributes, colors.* are CSS vars for styles
 // ============================================
 const goOS = {
@@ -566,11 +566,11 @@ const goOS = {
     colors: {
         paper: 'var(--color-bg-base)',
         cream: 'var(--color-bg-base)',
-        headerBg: 'var(--color-bg-base)',
+        headerBg: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
         windowBg: 'var(--color-bg-base)',
         white: 'var(--color-bg-white)',
-        border: 'var(--color-text-primary)',
-        borderSubtle: 'var(--color-border-default)',
+        border: 'var(--color-border-default)',
+        borderSubtle: 'var(--color-border-subtle)',
         text: {
             primary: 'var(--color-text-primary)',
             secondary: 'var(--color-text-secondary)',
@@ -1263,7 +1263,7 @@ const GoOSDesktopIcon = React.memo(({
                 className="relative w-14 h-14 flex items-center justify-center rounded-lg overflow-hidden"
                 style={{
                     background: goOS.colors.cream,
-                    border: `2px solid ${goOS.colors.border}`,
+                    border: `1px solid ${goOS.colors.border}`,
                     boxShadow: isActive ? goOS.shadows.hover : goOS.shadows.sm,
                 }}
                 animate={{
@@ -2002,7 +2002,7 @@ const GoOSGuestbook = React.memo(({
                 className="px-5 py-4"
                 style={{
                     background: goOS.colors.windowBg,
-                    borderBottom: `2px solid ${goOS.colors.border}`,
+                    borderBottom: `1px solid ${goOS.colors.border}`,
                 }}
             >
                 <h3
@@ -2017,7 +2017,7 @@ const GoOSGuestbook = React.memo(({
             </div>
 
             {/* Form */}
-            <div className="px-5 py-4 space-y-3" style={{ borderBottom: `2px solid ${goOS.colors.border}` }}>
+            <div className="px-5 py-4 space-y-3" style={{ borderBottom: `1px solid ${goOS.colors.border}` }}>
                 <textarea
                     value={message}
                     onChange={(e) => setMessage(e.target.value.slice(0, 280))}
@@ -2025,7 +2025,7 @@ const GoOSGuestbook = React.memo(({
                     className="w-full h-20 px-3 py-2.5 resize-none focus:outline-none"
                     style={{
                         background: goOS.colors.white,
-                        border: `2px solid ${goOS.colors.border}`,
+                        border: `1px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         color: goOS.colors.text.primary,
                         fontSize: '14px',
@@ -2057,7 +2057,7 @@ const GoOSGuestbook = React.memo(({
                         className="w-full px-3 py-2 focus:outline-none"
                         style={{
                             background: goOS.colors.cream,
-                            border: `2px solid ${goOS.colors.border}`,
+                            border: `1px solid ${goOS.colors.border}`,
                             borderRadius: '4px',
                             color: goOS.colors.text.primary,
                             fontSize: '14px',
@@ -2074,7 +2074,7 @@ const GoOSGuestbook = React.memo(({
                     style={{
                         background: goOS.colors.accent.primary,
                         color: 'white',
-                        border: `2px solid ${goOS.colors.border}`,
+                        border: `1px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         boxShadow: goOS.shadows.button,
                     }}
@@ -2177,7 +2177,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
             className="p-3 text-center"
             style={{
                 background: goOS.colors.cream,
-                border: `2px solid ${goOS.colors.border}`,
+                border: `1px solid ${goOS.colors.border}`,
                 borderRadius: '4px',
                 boxShadow: goOS.shadows.sm,
             }}
@@ -2208,7 +2208,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                 className="px-5 py-3 flex items-center justify-between"
                 style={{
                     background: goOS.colors.windowBg,
-                    borderBottom: `2px solid ${goOS.colors.border}`,
+                    borderBottom: `1px solid ${goOS.colors.border}`,
                 }}
             >
                 <div className="flex items-center gap-2">
@@ -2250,7 +2250,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                     className="flex items-center justify-between px-3 py-2"
                     style={{
                         background: goOS.colors.white,
-                        border: `2px solid ${goOS.colors.border}`,
+                        border: `1px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                     }}
                 >
@@ -2275,7 +2275,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                     className="p-4"
                     style={{
                         background: goOS.colors.cream,
-                        border: `2px solid ${goOS.colors.border}`,
+                        border: `1px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         boxShadow: goOS.shadows.sm,
                     }}
@@ -2306,7 +2306,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                     className="p-4"
                     style={{
                         background: goOS.colors.cream,
-                        border: `2px solid ${goOS.colors.border}`,
+                        border: `1px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         boxShadow: goOS.shadows.sm,
                     }}
@@ -2351,7 +2351,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                     className="p-4"
                     style={{
                         background: goOS.colors.white,
-                        border: `2px solid ${goOS.colors.border}`,
+                        border: `1px solid ${goOS.colors.border}`,
                         borderRadius: '4px',
                         boxShadow: goOS.shadows.sm,
                     }}
@@ -2376,7 +2376,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                                             width: '100%',
                                             height: `${height}px`,
                                             background: goOS.colors.accent.primary,
-                                            border: `2px solid ${goOS.colors.border}`,
+                                            border: `1px solid ${goOS.colors.border}`,
                                             borderRadius: '4px 4px 0 0',
                                         }}
                                         initial={{ height: 0 }}
@@ -2402,7 +2402,7 @@ GoOSAnalytics.displayName = 'GoOSAnalytics';
 // ============================================
 const TypingIndicator = () => (
     <div className="flex gap-3">
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.light, border: `2px solid ${goOS.colors.border}` }}>🦆</div>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.light, border: `1px solid ${goOS.colors.border}` }}>🦆</div>
         <div className="bg-white border-2 rounded-xl rounded-tl-none px-4 py-2.5" style={{ borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
             <div className="flex gap-1 items-center h-5">
                 {[0, 1, 2].map(i => (
@@ -3220,10 +3220,13 @@ function GoOSDemoContent() {
                             stiffness: 300,
                             damping: 30,
                         }}
-                        className="h-11 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
+                        className="h-9 flex items-center justify-between px-5 fixed top-0 left-0 right-0 z-[2000] select-none"
                         style={{
                             background: goOS.colors.headerBg,
-                            borderBottom: `2px solid ${goOS.colors.border}`,
+                            backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+                            WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+                            borderBottom: `1px solid ${goOS.colors.borderSubtle}`,
+                            boxShadow: 'var(--shadow-xs, 0 1px 3px rgba(23, 20, 18, 0.04))',
                         }}
                     >
                 {/* Left: Logo + Widgets Menu */}
@@ -3308,9 +3311,11 @@ function GoOSDemoContent() {
                                         transition={{ duration: 0.15 }}
                                         className="absolute top-full left-0 mt-1 z-[2001] py-1"
                                         style={{
-                                            background: goOS.colors.paper,
-                                            border: `2px solid ${goOS.colors.border}`,
-                                            borderRadius: '10px',
+                                            background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+                                            backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+                                            WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+                                            border: `1px solid ${goOS.colors.border}`,
+                                            borderRadius: 'var(--radius-md, 12px)',
                                             boxShadow: 'var(--shadow-lg)',
                                             minWidth: '160px',
                                         }}
@@ -3763,7 +3768,7 @@ function GoOSDemoContent() {
                                 <div className="flex flex-col h-full">
                                     <div className="flex-1 p-4 space-y-4 overflow-y-auto">
                                         <div className="flex gap-3">
-                                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.light, border: `2px solid ${goOS.colors.border}` }}>🦆</div>
+                                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: goOS.colors.accent.light, border: `1px solid ${goOS.colors.border}` }}>🦆</div>
                                             <div className="bg-white border-2 rounded-xl rounded-tl-none px-4 py-2.5" style={{ borderColor: goOS.colors.border, boxShadow: goOS.shadows.sm }}>
                                                 <span className="text-sm" style={{ color: goOS.colors.text.secondary }}>Welcome to goOS Demo! 🦆</span>
                                             </div>
@@ -3775,7 +3780,7 @@ function GoOSDemoContent() {
                                         </div>
                                         <TypingIndicator />
                                     </div>
-                                    <div className="p-3" style={{ background: goOS.colors.windowBg, borderTop: `2px solid ${goOS.colors.border}` }}>
+                                    <div className="p-3" style={{ background: goOS.colors.windowBg, borderTop: `1px solid ${goOS.colors.border}` }}>
                                         <input
                                             type="text"
                                             placeholder="Type a message..."
@@ -4025,7 +4030,7 @@ function GoOSDemoContent() {
                                     data-wallpaper-picker
                                     style={{
                                         background: goOS.colors.cream,
-                                        border: `2px solid ${goOS.colors.border}`,
+                                        border: `1px solid ${goOS.colors.border}`,
                                         boxShadow: goOS.shadows.solid,
                                         zIndex: 5000,
                                     }}
@@ -4132,7 +4137,7 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 right-4 z-50 px-3 py-1.5 rounded-full text-[10px] font-medium"
                         style={{
                             background: goOS.colors.headerBg,
-                            border: `2px solid ${goOS.colors.border}`,
+                            border: `1px solid ${goOS.colors.border}`,
                             color: goOS.colors.text.primary,
                             boxShadow: goOS.shadows.sm,
                         }}
@@ -4378,7 +4383,7 @@ function GoOSDemoContent() {
                             padding: '12px 24px',
                             borderRadius: '8px',
                             background: goOS.colors.white,
-                            border: `2px solid ${goOS.colors.border}`,
+                            border: `1px solid ${goOS.colors.border}`,
                             color: goOS.colors.text.primary,
                             fontWeight: 500,
                             fontSize: '14px',
