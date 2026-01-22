@@ -6,11 +6,10 @@ import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
-import { useThemeSafe } from '@/contexts/ThemeContext';
-import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
 import { BLOCK_DEFINITIONS, BLOCK_CATEGORIES } from '@/types/blocks';
+import { WINDOW, TITLE_BAR, TRAFFIC, ANIMATION, getWindowStyle, getAnimationProps } from './windowStyles';
 
 interface BrowserWindowProps {
   window: WindowInstance;
@@ -20,7 +19,6 @@ interface BrowserWindowProps {
 export function BrowserWindow({ window: windowInstance, item }: BrowserWindowProps) {
   const context = useEditContextSafe();
   const windowContext = useWindowContext();
-  const theme = useWidgetTheme();
   const windowRef = useRef<HTMLDivElement>(null);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [showBlockPicker, setShowBlockPicker] = useState(false);
@@ -30,6 +28,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
   const prefersReducedMotion = useReducedMotion();
+  const animationProps = getAnimationProps(prefersReducedMotion);
 
   // Browser tabs - use item tabs if available, otherwise create a single tab
   const browserTabs = item.useTabs && item.tabs?.length > 0
@@ -119,39 +118,22 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isMaximized ? 0 : '12px',
-            background: theme.colors.background,
-            backdropFilter: theme.colors.blur,
-            WebkitBackdropFilter: theme.colors.blur,
-            boxShadow: isActive ? theme.shadows.hover : theme.shadows.solid,
-            border: isMaximized ? 'none' : `2px solid ${theme.colors.border}`,
-            opacity: isActive ? 1 : 0.95,
+            ...getWindowStyle(isMaximized, isActive),
           }}
-          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.85, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 10 }}
-          transition={prefersReducedMotion
-            ? { duration: 0.15 }
-            : {
-                type: 'spring',
-                stiffness: 350,
-                damping: 25,
-                mass: 0.8,
-              }
-          }
+          {...animationProps}
         >
           {/* Browser Chrome - Tab Bar */}
           <div
             className="flex items-end shrink-0 select-none"
             style={{
-              background: 'var(--color-bg-base, #fbf9ef)',
-              borderBottom: '2px solid var(--color-text-primary, #171412)',
+              background: TITLE_BAR.background,
+              borderBottom: TITLE_BAR.borderBottom,
             }}
           >
             {/* Traffic Lights - unified 12px design */}
             <div
               className="flex items-center px-3 py-3 group/traffic"
-              style={{ gap: 'var(--window-traffic-gap, 8px)' }}
+              style={{ gap: TRAFFIC.gap }}
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
@@ -159,17 +141,17 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                 aria-label="Close window"
                 className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
+                  width: TRAFFIC.size,
+                  height: TRAFFIC.size,
                   borderRadius: '50%',
-                  background: 'var(--color-traffic-close, #ff5f57)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  background: TRAFFIC.close,
+                  boxShadow: TRAFFIC.shadow,
                   border: 'none',
                   cursor: 'pointer',
                 }}
               >
                 <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                  <path d="M1 1L7 7M7 1L1 7" stroke={TRAFFIC.closeIcon} strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
               </button>
               <button
@@ -177,17 +159,17 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                 aria-label="Minimize window"
                 className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
+                  width: TRAFFIC.size,
+                  height: TRAFFIC.size,
                   borderRadius: '50%',
-                  background: 'var(--color-traffic-minimize, #ffbd2e)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  background: TRAFFIC.minimize,
+                  boxShadow: TRAFFIC.shadow,
                   border: 'none',
                   cursor: 'pointer',
                 }}
               >
                 <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
+                  <path d="M1 4H7" stroke={TRAFFIC.minimizeIcon} strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
               </button>
               <button
@@ -195,17 +177,17 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                 aria-label="Maximize window"
                 className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
                 style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
+                  width: TRAFFIC.size,
+                  height: TRAFFIC.size,
                   borderRadius: '50%',
-                  background: 'var(--color-traffic-maximize, #28c840)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                  background: TRAFFIC.maximize,
+                  boxShadow: TRAFFIC.shadow,
                   border: 'none',
                   cursor: 'pointer',
                 }}
               >
                 <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
+                  <path d="M1 2.5L4 5.5L7 2.5" stroke={TRAFFIC.maximizeIcon} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
                 </svg>
               </button>
             </div>

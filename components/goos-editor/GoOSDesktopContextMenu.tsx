@@ -20,7 +20,7 @@ import {
   Blocks,
 } from 'lucide-react';
 
-// Menu dimensions for smart positioning
+// Menu dimensions
 const MENU_WIDTH = 200;
 const SUBMENU_WIDTH = 180;
 const MENU_ITEM_HEIGHT = 32;
@@ -83,10 +83,7 @@ export function GoOSDesktopContextMenu({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [pressedId, setPressedId] = useState<string | null>(null);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
-  const [submenuPosition, setSubmenuPosition] = useState({ x: 0, y: 0 });
   const [adjustedPosition, setAdjustedPosition] = useState(position);
-  const submenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const submenuTriggerRef = useRef<HTMLDivElement | null>(null);
 
   // Widget submenu items
   const widgetItems: ContextMenuItem[] = useMemo(() => [
@@ -98,7 +95,7 @@ export function GoOSDesktopContextMenu({
     { id: 'widget-feedback', label: 'Feedback', icon: <MessageSquare size={14} strokeWidth={1.5} />, onClick: () => onAddWidget?.('feedback') },
   ], [onAddWidget]);
 
-  // Define compact menu sections
+  // Define menu sections
   const sections: MenuSection[] = useMemo(() => [
     {
       id: 'create',
@@ -127,7 +124,7 @@ export function GoOSDesktopContextMenu({
     },
   ], [onNewNote, onNewCaseStudy, onNewFolder, onNewImage, onNewLink, widgetItems, onPaste, onArrangeIcons, onRefresh, canPaste]);
 
-  // Calculate menu height for positioning
+  // Calculate menu height
   const estimatedHeight = useMemo(() => {
     let height = PADDING * 2;
     sections.forEach((section, idx) => {
@@ -138,7 +135,7 @@ export function GoOSDesktopContextMenu({
     return height;
   }, [sections]);
 
-  // macOS-style viewport-aware positioning
+  // Position menu within viewport
   useEffect(() => {
     if (!isOpen) return;
 
@@ -162,7 +159,7 @@ export function GoOSDesktopContextMenu({
     setAdjustedPosition({ x, y });
   }, [isOpen, position, estimatedHeight]);
 
-  // Handle keyboard navigation
+  // Keyboard navigation
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isOpen) return;
     if (e.key === 'Escape') {
@@ -199,44 +196,21 @@ export function GoOSDesktopContextMenu({
         clearTimeout(timer);
         document.removeEventListener('mousedown', handleClickOutside);
         document.removeEventListener('keydown', handleKeyDown);
-        if (submenuTimeoutRef.current) clearTimeout(submenuTimeoutRef.current);
       };
     }
   }, [isOpen, onClose, handleKeyDown]);
 
   const handleItemClick = (item: ContextMenuItem) => {
-    if (item.disabled || item.hasSubmenu) return;
+    if (item.disabled) return;
+    if (item.hasSubmenu) {
+      setActiveSubmenu(activeSubmenu === item.id ? null : item.id);
+      return;
+    }
     setPressedId(item.id);
     setTimeout(() => {
       item.onClick?.();
       onClose();
     }, 60);
-  };
-
-  const handleItemHover = (item: ContextMenuItem, e: React.MouseEvent) => {
-    if (item.disabled) return;
-    setHoveredId(item.id);
-
-    if (submenuTimeoutRef.current) {
-      clearTimeout(submenuTimeoutRef.current);
-    }
-
-    if (item.hasSubmenu) {
-      // Calculate submenu position based on the trigger element
-      const target = e.currentTarget as HTMLElement;
-      const rect = target.getBoundingClientRect();
-      setSubmenuPosition({
-        x: rect.right + 4,
-        y: rect.top - PADDING,
-      });
-      submenuTimeoutRef.current = setTimeout(() => {
-        setActiveSubmenu(item.id);
-      }, 100);
-    } else {
-      submenuTimeoutRef.current = setTimeout(() => {
-        setActiveSubmenu(null);
-      }, 100);
-    }
   };
 
   const handleSubmenuItemClick = (item: ContextMenuItem) => {
@@ -249,10 +223,8 @@ export function GoOSDesktopContextMenu({
   };
 
   const menuStyle: React.CSSProperties = {
-    position: 'fixed',
-    zIndex: 9999,
-    background: 'var(--color-bg-base)',
-    border: '2px solid var(--color-text-primary)',
+    background: 'var(--color-bg-base, #fbf9ef)',
+    border: '2px solid var(--color-text-primary, #171412)',
     borderRadius: '10px',
     boxShadow: 'var(--shadow-lg)',
     padding: `${PADDING}px`,
@@ -273,6 +245,8 @@ export function GoOSDesktopContextMenu({
           transition={{ duration: 0.1, ease: [0.2, 0, 0, 1] }}
           style={{
             ...menuStyle,
+            position: 'fixed',
+            zIndex: 9999,
             top: adjustedPosition.y,
             left: adjustedPosition.x,
             width: MENU_WIDTH,
@@ -305,15 +279,27 @@ export function GoOSDesktopContextMenu({
                 const isSubmenuActive = activeSubmenu === item.id;
 
                 return (
-                  <div key={item.id} style={{ position: 'relative' }}>
+                  <div
+                    key={item.id}
+                    style={{ position: 'relative' }}
+                    onMouseEnter={() => {
+                      setHoveredId(item.id);
+                      if (item.hasSubmenu) {
+                        setActiveSubmenu(item.id);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (!item.hasSubmenu) {
+                        setHoveredId(null);
+                      }
+                    }}
+                  >
                     <motion.button
                       role="menuitem"
                       aria-disabled={item.disabled}
                       aria-haspopup={item.hasSubmenu ? 'menu' : undefined}
                       aria-expanded={item.hasSubmenu ? isSubmenuActive : undefined}
                       onClick={() => handleItemClick(item)}
-                      onMouseEnter={(e) => handleItemHover(item, e)}
-                      onMouseLeave={() => !item.hasSubmenu && setHoveredId(null)}
                       onMouseDown={() => !item.disabled && !item.hasSubmenu && setPressedId(item.id)}
                       onMouseUp={() => setPressedId(null)}
                       disabled={item.disabled}
@@ -392,9 +378,24 @@ export function GoOSDesktopContextMenu({
                       )}
                     </motion.button>
 
-                    {/* Submenu */}
-                    <AnimatePresence>
-                      {item.hasSubmenu && isSubmenuActive && item.submenuItems && (
+                    {/* Submenu - rendered inline with hover bridge */}
+                    {item.hasSubmenu && isSubmenuActive && item.submenuItems && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: '100%',
+                          paddingLeft: 4,
+                        }}
+                        onMouseEnter={() => {
+                          setHoveredId(item.id);
+                          setActiveSubmenu(item.id);
+                        }}
+                        onMouseLeave={() => {
+                          setHoveredId(null);
+                          setActiveSubmenu(null);
+                        }}
+                      >
                         <motion.div
                           initial={{ opacity: 0, x: -4 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -402,16 +403,7 @@ export function GoOSDesktopContextMenu({
                           transition={{ duration: 0.1 }}
                           style={{
                             ...menuStyle,
-                            position: 'fixed',
-                            top: submenuPosition.y,
-                            left: submenuPosition.x,
                             width: SUBMENU_WIDTH,
-                            zIndex: 10000,
-                          }}
-                          onMouseEnter={() => setActiveSubmenu(item.id)}
-                          onMouseLeave={() => {
-                            setActiveSubmenu(null);
-                            setHoveredId(null);
                           }}
                         >
                           {item.submenuItems.map((subItem) => {
@@ -424,7 +416,7 @@ export function GoOSDesktopContextMenu({
                                 role="menuitem"
                                 onClick={() => handleSubmenuItemClick(subItem)}
                                 onMouseEnter={() => setHoveredId(subItem.id)}
-                                onMouseLeave={() => setHoveredId(null)}
+                                onMouseLeave={() => setHoveredId(item.id)}
                                 onMouseDown={() => setPressedId(subItem.id)}
                                 onMouseUp={() => setPressedId(null)}
                                 animate={{
@@ -477,8 +469,8 @@ export function GoOSDesktopContextMenu({
                             );
                           })}
                         </motion.div>
-                      )}
-                    </AnimatePresence>
+                      </div>
+                    )}
                   </div>
                 );
               })}
