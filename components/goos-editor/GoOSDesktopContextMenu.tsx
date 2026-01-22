@@ -298,6 +298,11 @@ export function GoOSDesktopContextMenu({
                     key={item.id}
                     style={{ position: 'relative' }}
                     onMouseEnter={() => {
+                      // Clear any pending close timeout when re-entering
+                      if (submenuCloseTimeoutRef.current) {
+                        clearTimeout(submenuCloseTimeoutRef.current);
+                        submenuCloseTimeoutRef.current = null;
+                      }
                       setHoveredId(item.id);
                       if (item.hasSubmenu) {
                         setActiveSubmenu(item.id);
@@ -306,6 +311,12 @@ export function GoOSDesktopContextMenu({
                     onMouseLeave={() => {
                       if (!item.hasSubmenu) {
                         setHoveredId(null);
+                      } else {
+                        // For submenu items, use delayed close so user can move to submenu
+                        submenuCloseTimeoutRef.current = setTimeout(() => {
+                          setHoveredId(null);
+                          setActiveSubmenu(null);
+                        }, 300);
                       }
                     }}
                   >
@@ -398,9 +409,10 @@ export function GoOSDesktopContextMenu({
                       <div
                         style={{
                           position: 'absolute',
-                          top: 0,
+                          top: -4,
                           left: '100%',
-                          paddingLeft: 4,
+                          paddingLeft: 0,
+                          paddingTop: 4,
                         }}
                         onMouseEnter={() => {
                           // Clear any pending close timeout
@@ -416,9 +428,20 @@ export function GoOSDesktopContextMenu({
                           submenuCloseTimeoutRef.current = setTimeout(() => {
                             setHoveredId(null);
                             setActiveSubmenu(null);
-                          }, 150);
+                          }, 300);
                         }}
                       >
+                        {/* Invisible hover bridge to prevent gap issues */}
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: -12,
+                            width: 16,
+                            height: '100%',
+                            background: 'transparent',
+                          }}
+                        />
                         <motion.div
                           initial={{ opacity: 0, x: -4 }}
                           animate={{ opacity: 1, x: 0 }}
