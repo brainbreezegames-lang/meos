@@ -270,7 +270,7 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isMaximized ? 12 : 'var(--radius-lg, 12px)',
+            borderRadius: isMaximized ? 0 : '12px',
             background: colors.windowBg,
             boxShadow: colors.windowShadow,
             border: colors.windowBorder,

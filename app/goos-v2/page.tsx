@@ -3397,9 +3397,22 @@ function GoOSDemoContent() {
                 isOpen={desktopContextMenu.isOpen}
                 position={{ x: desktopContextMenu.x, y: desktopContextMenu.y }}
                 onClose={() => setDesktopContextMenu(prev => ({ ...prev, isOpen: false }))}
-                onNewNote={() => createFile('note', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
-                onNewCaseStudy={() => createFile('case-study', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
-                onNewFolder={() => createFile('folder', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
+                onNewNote={() => {
+                    // Convert pixel coordinates to percentages
+                    const x = (desktopContextMenu.x / window.innerWidth) * 100;
+                    const y = (desktopContextMenu.y / window.innerHeight) * 100;
+                    createFile('note', null, { x, y });
+                }}
+                onNewCaseStudy={() => {
+                    const x = (desktopContextMenu.x / window.innerWidth) * 100;
+                    const y = (desktopContextMenu.y / window.innerHeight) * 100;
+                    createFile('case-study', null, { x, y });
+                }}
+                onNewFolder={() => {
+                    const x = (desktopContextMenu.x / window.innerWidth) * 100;
+                    const y = (desktopContextMenu.y / window.innerHeight) * 100;
+                    createFile('folder', null, { x, y });
+                }}
                 onNewImage={() => handleOpenCreateFileDialog('image', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewEmbed={() => handleOpenCreateFileDialog('embed', { x: desktopContextMenu.x, y: desktopContextMenu.y })}

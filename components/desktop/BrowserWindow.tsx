@@ -119,7 +119,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isMaximized ? '0px' : theme.radii.card,
+            borderRadius: isMaximized ? 0 : '12px',
             background: theme.colors.background,
             backdropFilter: theme.colors.blur,
             WebkitBackdropFilter: theme.colors.blur,
@@ -137,7 +137,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             className="flex items-end shrink-0 select-none"
             style={{
               background: 'var(--color-bg-base, #fbf9ef)',
-              borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+              borderBottom: '2px solid var(--color-text-primary, #171412)',
             }}
           >
             {/* Traffic Lights - unified 12px design */}
