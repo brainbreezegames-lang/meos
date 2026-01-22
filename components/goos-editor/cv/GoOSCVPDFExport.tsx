@@ -13,18 +13,51 @@ import {
 } from '@react-pdf/renderer';
 import type { CVContent, CVExperience, CVSkillCategory, CVEducation } from '@/lib/validations/goos';
 
-// Register fonts - use system fonts that work well in PDF
-// Helvetica for body (similar to Instrument Sans)
-// Times-Roman for headings (similar to Averia Serif Libre - serif)
-Font.registerHyphenationCallback((word) => [word]); // Disable hyphenation
+// Register custom fonts from Google Fonts
+// Averia Serif Libre - for headings (serif, matches screen design)
+Font.register({
+  family: 'Averia Serif Libre',
+  fonts: [
+    {
+      src: 'https://fonts.gstatic.com/s/averiaseriflibre/v18/neIWzD2ms4wxr6GvjeD0X88SHPyX2xY-pQGOyYw2fw.ttf',
+      fontWeight: 400,
+    },
+    {
+      src: 'https://fonts.gstatic.com/s/averiaseriflibre/v18/neIbzD2ms4wxr6GvjeD0X88SHPyX2xYGCSmqwacqdrKvbQ.ttf',
+      fontWeight: 700,
+    },
+  ],
+});
 
-// PDF Styles matching the screen design
+// Instrument Sans - for body text (sans-serif, matches screen design)
+Font.register({
+  family: 'Instrument Sans',
+  fonts: [
+    {
+      src: 'https://fonts.gstatic.com/s/instrumentsans/v1/pximypc9vsFDm051Ber6z0qXluN18_95moKpq6xdPQ.ttf',
+      fontWeight: 400,
+    },
+    {
+      src: 'https://fonts.gstatic.com/s/instrumentsans/v1/pximypc9vsFDm051Ber6z0qXluN18_95moKpBqtdPQ.ttf',
+      fontWeight: 500,
+    },
+    {
+      src: 'https://fonts.gstatic.com/s/instrumentsans/v1/pximypc9vsFDm051Ber6z0qXluN18_95moKp2qxdPQ.ttf',
+      fontWeight: 600,
+    },
+  ],
+});
+
+// Disable hyphenation for cleaner text
+Font.registerHyphenationCallback((word) => [word]);
+
+// PDF Styles matching the screen design exactly
 const styles = StyleSheet.create({
   page: {
     paddingTop: 48,
     paddingBottom: 48,
     paddingHorizontal: 56,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Instrument Sans',
     fontSize: 11,
     color: '#1a1a1a',
     backgroundColor: '#ffffff',
@@ -36,9 +69,9 @@ const styles = StyleSheet.create({
     paddingBottom: 18,
   },
   headerTitle: {
-    fontFamily: 'Times-Roman',
+    fontFamily: 'Averia Serif Libre',
     fontSize: 26,
-    fontWeight: 'normal',
+    fontWeight: 400,
     color: '#1a1a1a',
     lineHeight: 1.2,
   },
@@ -59,8 +92,9 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontFamily: 'Times-Roman',
+    fontFamily: 'Averia Serif Libre',
     fontSize: 10,
+    fontWeight: 400,
     color: '#1a1a1a',
     marginBottom: 12,
     textTransform: 'uppercase',
@@ -71,15 +105,18 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   skillCategoryName: {
-    fontFamily: 'Helvetica-Bold',
+    fontFamily: 'Instrument Sans',
     fontSize: 9,
+    fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
     marginBottom: 3,
     color: '#1a1a1a',
   },
   skillItems: {
+    fontFamily: 'Instrument Sans',
     fontSize: 10,
+    fontWeight: 400,
     lineHeight: 1.5,
     color: '#1a1a1a',
   },
@@ -88,23 +125,30 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   educationDegree: {
+    fontFamily: 'Instrument Sans',
     fontSize: 10,
-    fontFamily: 'Helvetica-Bold',
+    fontWeight: 500,
     color: '#1a1a1a',
     marginBottom: 2,
   },
   educationDates: {
+    fontFamily: 'Instrument Sans',
     fontSize: 9,
+    fontWeight: 400,
     color: '#666666',
     marginBottom: 2,
   },
   educationInstitution: {
+    fontFamily: 'Instrument Sans',
     fontSize: 10,
+    fontWeight: 400,
     color: '#1a1a1a',
   },
   // Contact styles
   contactItem: {
+    fontFamily: 'Instrument Sans',
     fontSize: 10,
+    fontWeight: 400,
     marginBottom: 4,
     lineHeight: 1.7,
     color: '#1a1a1a',
@@ -120,7 +164,9 @@ const styles = StyleSheet.create({
   },
   // About styles
   aboutText: {
+    fontFamily: 'Instrument Sans',
     fontSize: 11,
+    fontWeight: 400,
     lineHeight: 1.65,
     color: '#1a1a1a',
   },
@@ -129,15 +175,18 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   experienceRole: {
-    fontFamily: 'Helvetica-Bold',
+    fontFamily: 'Instrument Sans',
     fontSize: 10,
+    fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 5,
     color: '#1a1a1a',
   },
   experienceCompanyLine: {
+    fontFamily: 'Instrument Sans',
     fontSize: 11,
+    fontWeight: 400,
     marginBottom: 5,
     color: '#1a1a1a',
   },
@@ -145,14 +194,18 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   experienceDescription: {
+    fontFamily: 'Instrument Sans',
     fontSize: 10,
+    fontWeight: 400,
     fontStyle: 'italic',
     color: '#666666',
     marginBottom: 8,
     lineHeight: 1.5,
   },
   experienceResponsibilities: {
+    fontFamily: 'Instrument Sans',
     fontSize: 11,
+    fontWeight: 400,
     lineHeight: 1.6,
     color: '#1a1a1a',
   },
