@@ -1,6 +1,7 @@
-import React, { useRef, useEffect } from 'react';
-import { motion, useDragControls } from 'framer-motion';
-import { X, Minus, Maximize2 } from 'lucide-react';
+import React, { useRef } from 'react';
+import { motion, useDragControls, useReducedMotion } from 'framer-motion';
+import { TrafficLights } from './TrafficLights';
+import { WINDOW, TITLE_BAR, ANIMATION } from './windowStyles';
 
 interface WindowProps {
     id: string;
@@ -30,7 +31,7 @@ export default function Window({
     height = "auto",
 }: WindowProps) {
     const dragControls = useDragControls();
-    const constraintsRef = useRef(null);
+    const prefersReducedMotion = useReducedMotion();
 
     if (!isOpen) return null;
 
@@ -40,38 +41,53 @@ export default function Window({
             dragControls={dragControls}
             dragMomentum={false}
             dragElastic={0.05}
-            initial={{ opacity: 0, scale: 0.95, y: 20, x: initialPosition.x, top: initialPosition.y }}
-            animate={{ opacity: 1, scale: 1, y: 0, x: initialPosition.x, top: initialPosition.y }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className={`absolute flex flex-col window-glass rounded-xl overflow-hidden shadow-2xl ${className}`}
+            initial={prefersReducedMotion ? ANIMATION.reducedInitial : { ...ANIMATION.initial, x: initialPosition.x, top: initialPosition.y }}
+            animate={prefersReducedMotion ? ANIMATION.reducedAnimate : { ...ANIMATION.animate, x: initialPosition.x, top: initialPosition.y }}
+            exit={prefersReducedMotion ? ANIMATION.reducedExit : ANIMATION.exit}
+            transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
+            className={`absolute flex flex-col overflow-hidden ${className}`}
             style={{
                 zIndex,
                 width,
                 height: typeof height === 'number' ? height : undefined,
-                minHeight: typeof height === 'string' ? height : undefined
+                minHeight: typeof height === 'string' ? height : undefined,
+                borderRadius: WINDOW.borderRadius,
+                background: WINDOW.background,
+                boxShadow: WINDOW.shadow,
+                border: WINDOW.border,
             }}
             onPointerDown={onFocus}
         >
             {/* Title Bar - Draggable Area */}
             <div
-                className="h-10 bg-white/50 border-b border-stone-100 flex items-center px-4 justify-between select-none cursor-default"
+                className="flex items-center justify-between select-none"
+                style={{
+                    height: TITLE_BAR.height,
+                    paddingLeft: TITLE_BAR.paddingX,
+                    paddingRight: TITLE_BAR.paddingX,
+                    background: TITLE_BAR.background,
+                    borderBottom: TITLE_BAR.borderBottom,
+                    cursor: 'grab',
+                }}
                 onPointerDown={(e) => dragControls.start(e)}
             >
-                <div className="flex gap-2 group">
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onClose(); }}
-                        className="flex items-center justify-center w-3 h-3 rounded-full bg-[#FF5F57] hover:bg-[#FF3B30] text-transparent hover:text-white transition-colors border border-black/10"
-                    >
-                        <X size={8} strokeWidth={3} />
-                    </button>
-                    <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-black/10"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#28CA41] border border-black/10"></div>
-                </div>
-                <span className="text-sm font-serif font-medium text-stone-500 tracking-wide pointer-events-none">
+                <TrafficLights
+                    onClose={onClose}
+                    showAll={false}
+                />
+                <span
+                    className="font-medium pointer-events-none select-none"
+                    style={{
+                        fontSize: TITLE_BAR.titleFontSize,
+                        fontWeight: TITLE_BAR.titleFontWeight,
+                        color: TITLE_BAR.titleColor,
+                        letterSpacing: TITLE_BAR.titleLetterSpacing,
+                        opacity: TITLE_BAR.titleOpacityActive,
+                    }}
+                >
                     {title}
                 </span>
-                <div className="w-10"></div> {/* Spacer for centering */}
+                <div style={{ width: 28 }}></div> {/* Spacer for centering */}
             </div>
 
             {/* Content */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { Widget, WidgetType } from '@/types';
 
 export interface WidgetContextType {
@@ -43,6 +43,7 @@ interface WidgetProviderProps {
   initialWidgets?: Widget[];
   isOwner?: boolean;
   localOnly?: boolean;
+  spaceId?: string | null;
 }
 
 // Default positions for new widgets
@@ -60,6 +61,7 @@ export function WidgetProvider({
   initialWidgets = [],
   isOwner = false,
   localOnly = false,
+  spaceId,
 }: WidgetProviderProps) {
   const [widgets, setWidgets] = useState<Widget[]>(initialWidgets);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +82,12 @@ export function WidgetProvider({
     setError(null);
 
     try {
-      const response = await fetch('/api/widgets');
+      const params = new URLSearchParams();
+      if (spaceId) params.set('spaceId', spaceId);
+      const queryString = params.toString();
+      const url = `/api/widgets${queryString ? `?${queryString}` : ''}`;
+
+      const response = await fetch(url);
       const result = await response.json();
 
       if (!result.success) {
@@ -95,7 +102,14 @@ export function WidgetProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [localOnly, showToast]);
+  }, [localOnly, spaceId, showToast]);
+
+  // Refetch widgets when spaceId changes
+  useEffect(() => {
+    if (!localOnly && spaceId) {
+      refreshWidgets();
+    }
+  }, [spaceId, localOnly, refreshWidgets]);
 
   // Create new widget
   const createWidget = useCallback(async (
@@ -110,7 +124,7 @@ export function WidgetProvider({
     const newId = localOnly ? `local-widget-${Date.now()}` : `temp-widget-${Date.now()}`;
     const newWidget: Widget = {
       id: newId,
-      desktopId: '',
+      spaceId: spaceId || '',
       widgetType: type,
       positionX: position.x,
       positionY: position.y,
@@ -139,6 +153,7 @@ export function WidgetProvider({
         body: JSON.stringify({
           type,
           position,
+          spaceId,
         }),
       });
 
@@ -159,7 +174,7 @@ export function WidgetProvider({
       showToast(message, 'error');
       return null;
     }
-  }, [isOwner, localOnly, widgets.length, showToast]);
+  }, [isOwner, localOnly, spaceId, widgets.length, showToast]);
 
   // Update widget
   const updateWidget = useCallback(async (id: string, updates: Partial<Widget>) => {

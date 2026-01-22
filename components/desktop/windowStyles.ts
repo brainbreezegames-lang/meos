@@ -3,7 +3,7 @@
  * ALL windows in the app MUST use these exact values
  * NO hardcoded values allowed in individual window components
  *
- * Design: Calm-tech 2025 - soft, premium, minimal
+ * Design: Calm-tech 2025 - soft, premium, warm cream aesthetic
  */
 
 import React from 'react';
@@ -33,7 +33,7 @@ export const WINDOW = {
 } as const;
 
 // ============================================================================
-// TITLE BAR STYLES
+// LIGHT TITLE BAR - For info windows, modals, widgets
 // ============================================================================
 export const TITLE_BAR = {
   height: 48,
@@ -51,7 +51,45 @@ export const TITLE_BAR = {
 } as const;
 
 // ============================================================================
-// WINDOW CONTROLS - Calm-tech minimal icon buttons
+// DARK TITLE BAR - For document/editor windows (CV, notes, case studies)
+// ============================================================================
+export const TITLE_BAR_DARK = {
+  height: 48,
+  background: 'var(--color-bg-dark, #2d2926)',
+  borderBottom: 'none',
+  borderRadius: '20px 20px 0 0',
+  paddingX: 16,
+
+  // Title text - white on dark
+  titleFontSize: 14,
+  titleFontWeight: 500,
+  titleColor: '#ffffff',
+  titleLetterSpacing: '-0.01em',
+  titleOpacityActive: 0.9,
+  titleOpacityInactive: 0.6,
+} as const;
+
+// ============================================================================
+// TRAFFIC LIGHTS - macOS style (for dark title bar windows)
+// ============================================================================
+export const TRAFFIC = {
+  size: 12,
+  gap: 8,
+  shadow: '0 1px 2px rgba(0, 0, 0, 0.1), inset 0 0.5px 0 rgba(255, 255, 255, 0.2)',
+
+  // Colors - classic macOS
+  close: '#ff5f57',
+  minimize: '#ffbd2e',
+  maximize: '#28c840',
+
+  // Icon colors (shown on hover)
+  closeIcon: 'rgba(77, 0, 0, 0.8)',
+  minimizeIcon: 'rgba(100, 65, 0, 0.8)',
+  maximizeIcon: 'rgba(0, 70, 0, 0.8)',
+} as const;
+
+// ============================================================================
+// MINIMAL CONTROLS - For light title bar windows (info windows, modals)
 // ============================================================================
 export const CONTROLS = {
   size: 28,
@@ -69,9 +107,6 @@ export const CONTROLS = {
   closeHover: 'rgba(239, 68, 68, 0.08)',
   closeIconHover: 'rgb(239, 68, 68)',
 } as const;
-
-// Legacy alias for backwards compatibility
-export const TRAFFIC = CONTROLS;
 
 // ============================================================================
 // ANIMATION - Spring bounce
@@ -139,17 +174,18 @@ export function getWindowStyle(isMaximized: boolean, isActive: boolean): React.C
 /**
  * Get title bar styles
  */
-export function getTitleBarStyle(isMaximized: boolean): React.CSSProperties {
+export function getTitleBarStyle(isMaximized: boolean, variant: 'light' | 'dark' = 'light'): React.CSSProperties {
+  const bar = variant === 'dark' ? TITLE_BAR_DARK : TITLE_BAR;
   return {
-    height: TITLE_BAR.height,
-    background: TITLE_BAR.background,
-    borderBottom: TITLE_BAR.borderBottom,
+    height: bar.height,
+    background: bar.background,
+    borderBottom: bar.borderBottom,
     cursor: isMaximized ? 'default' : 'grab',
   };
 }
 
 /**
- * Get traffic light button style
+ * Get traffic light button style (macOS style)
  */
 export function getTrafficStyle(color: string): React.CSSProperties {
   return {

@@ -3,28 +3,38 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getGoOSViewContext } from '@/lib/goos/viewContext';
-import { GoOSPublicDesktop } from './GoOSPublicDesktop';
+import { GoOSPublicDesktop } from '../GoOSPublicDesktop';
 
 interface PageProps {
-  params: Promise<{ username: string }>;
+  params: Promise<{ username: string; spaceSlug: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const { username } = await params;
+  const { username, spaceSlug } = await params;
 
   const user = await prisma.user.findUnique({
     where: { username },
-    select: { name: true, username: true, image: true },
+    select: { id: true, name: true, username: true, image: true },
   });
 
   if (!user) {
     return { title: 'Not Found' };
   }
 
+  const space = await prisma.space.findFirst({
+    where: { userId: user.id, slug: spaceSlug },
+    select: { name: true, title: true, description: true, ogImageUrl: true },
+  });
+
+  if (!space) {
+    return { title: 'Not Found' };
+  }
+
   const displayName = user.name || user.username;
-  const title = `${displayName}'s goOS`;
-  const description = `Explore ${displayName}'s digital workspace on goOS`;
-  const url = `https://goos.io/${username}`;
+  const spaceName = space.name;
+  const title = space.title || `${spaceName} - ${displayName}'s goOS`;
+  const description = space.description || `Explore ${displayName}'s ${spaceName} on goOS`;
+  const url = `https://goos.io/${username}/${spaceSlug}`;
 
   return {
     title,
@@ -35,12 +45,19 @@ export async function generateMetadata({ params }: PageProps) {
       url,
       siteName: 'goOS',
       type: 'website',
-      images: [
+      images: space.ogImageUrl ? [
         {
-          url: `/api/og/${username}`,
+          url: space.ogImageUrl,
           width: 1200,
           height: 630,
-          alt: `${displayName}'s goOS desktop`,
+          alt: `${displayName}'s ${spaceName}`,
+        },
+      ] : [
+        {
+          url: `/api/og/${username}/${spaceSlug}`,
+          width: 1200,
+          height: 630,
+          alt: `${displayName}'s ${spaceName}`,
         },
       ],
     },
@@ -48,37 +65,34 @@ export async function generateMetadata({ params }: PageProps) {
       card: 'summary_large_image',
       title,
       description,
-      images: [`/api/og/${username}`],
+      images: [space.ogImageUrl || `/api/og/${username}/${spaceSlug}`],
     },
   };
 }
 
-export default async function PublicGoOSPage({ params }: PageProps) {
-  const { username } = await params;
+export default async function PublicSpacePage({ params }: PageProps) {
+  const { username, spaceSlug } = await params;
   const session = await getServerSession(authOptions);
   const viewContext = getGoOSViewContext(username, session);
 
-  // Fetch user with their primary space
+  // Fetch user
   const user = await prisma.user.findUnique({
     where: { username },
-    include: {
-      spaces: {
-        where: { isPrimary: true },
-        take: 1,
-      },
+  });
+
+  if (!user) {
+    notFound();
+  }
+
+  // Fetch the specific space by slug
+  const space = await prisma.space.findFirst({
+    where: {
+      userId: user.id,
+      slug: spaceSlug,
     },
   });
 
-  // If no primary space, try to get any space
-  let space = user?.spaces[0];
-  if (!space && user) {
-    space = await prisma.space.findFirst({
-      where: { userId: user.id },
-      orderBy: { order: 'asc' },
-    }) ?? undefined;
-  }
-
-  if (!user || !space) {
+  if (!space) {
     notFound();
   }
 
@@ -131,6 +145,8 @@ export default async function PublicGoOSPage({ params }: PageProps) {
     theme: space.theme,
     backgroundUrl: space.backgroundUrl,
     isPublic: space.isPublic,
+    spaceName: space.name,
+    spaceIcon: space.icon,
   };
 
   return (

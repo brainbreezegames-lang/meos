@@ -12,10 +12,40 @@ const createWidgetSchema = z.object({
   }).optional(),
   title: z.string().max(100).optional(),
   config: z.record(z.unknown()).optional(),
+  spaceId: z.string().optional(),
 });
 
-// GET - Fetch all widgets for current user's desktop
-export async function GET() {
+// Helper to get or create primary space for user
+async function getOrCreatePrimarySpace(userId: string) {
+  let space = await prisma.space.findFirst({
+    where: { userId, isPrimary: true },
+  });
+
+  if (!space) {
+    space = await prisma.space.findFirst({
+      where: { userId },
+      orderBy: { order: 'asc' },
+    });
+
+    if (!space) {
+      space = await prisma.space.create({
+        data: {
+          userId,
+          name: 'My Space',
+          icon: '🏠',
+          isPrimary: true,
+          isPublic: true,
+          order: 0,
+        },
+      });
+    }
+  }
+
+  return space;
+}
+
+// GET - Fetch all widgets for a space
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -26,19 +56,39 @@ export async function GET() {
       );
     }
 
-    const desktop = await prisma.desktop.findUnique({
-      where: { userId: session.user.id },
-      include: { widgets: { orderBy: { order: 'asc' } } },
-    });
+    // Parse query params
+    const { searchParams } = new URL(request.url);
+    const spaceId = searchParams.get('spaceId');
 
-    if (!desktop) {
+    // Get space - either specified or primary
+    let space;
+    if (spaceId) {
+      space = await prisma.space.findFirst({
+        where: { id: spaceId, userId: session.user.id },
+        include: { widgets: { orderBy: { order: 'asc' } } },
+      });
+      if (!space) {
+        return NextResponse.json(
+          { success: false, error: { code: 'NOT_FOUND', message: 'Space not found' } },
+          { status: 404 }
+        );
+      }
+    } else {
+      const primarySpace = await getOrCreatePrimarySpace(session.user.id);
+      space = await prisma.space.findUnique({
+        where: { id: primarySpace.id },
+        include: { widgets: { orderBy: { order: 'asc' } } },
+      });
+    }
+
+    if (!space) {
       return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Desktop not found' } },
+        { success: false, error: { code: 'NOT_FOUND', message: 'Space not found' } },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, data: desktop.widgets });
+    return NextResponse.json({ success: true, data: space.widgets });
   } catch (error) {
     console.error('Get widgets error:', error);
     return NextResponse.json(
@@ -63,21 +113,36 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = createWidgetSchema.parse(body);
 
-    // Get user's desktop
-    const desktop = await prisma.desktop.findUnique({
-      where: { userId: session.user.id },
-      include: { widgets: true },
-    });
+    // Get space - either specified or primary
+    let space;
+    if (data.spaceId) {
+      space = await prisma.space.findFirst({
+        where: { id: data.spaceId, userId: session.user.id },
+        include: { widgets: true },
+      });
+      if (!space) {
+        return NextResponse.json(
+          { success: false, error: { code: 'NOT_FOUND', message: 'Space not found' } },
+          { status: 404 }
+        );
+      }
+    } else {
+      const primarySpace = await getOrCreatePrimarySpace(session.user.id);
+      space = await prisma.space.findUnique({
+        where: { id: primarySpace.id },
+        include: { widgets: true },
+      });
+    }
 
-    if (!desktop) {
+    if (!space) {
       return NextResponse.json(
-        { success: false, error: { code: 'NOT_FOUND', message: 'Desktop not found' } },
+        { success: false, error: { code: 'NOT_FOUND', message: 'Space not found' } },
         { status: 404 }
       );
     }
 
     // Check if widget of this type already exists (some types might be unique)
-    const existingWidget = desktop.widgets.find(w => w.widgetType === data.type);
+    const existingWidget = space.widgets.find(w => w.widgetType === data.type);
     if (existingWidget && ['clock'].includes(data.type)) {
       return NextResponse.json(
         { success: false, error: { code: 'DUPLICATE', message: `Only one ${data.type} widget allowed` } },
@@ -99,13 +164,13 @@ export async function POST(request: NextRequest) {
 
     const widget = await prisma.widget.create({
       data: {
-        desktopId: desktop.id,
+        spaceId: space.id,
         widgetType: data.type,
         positionX: position.x,
         positionY: position.y,
         title: data.title || null,
         config: data.config || {},
-        order: desktop.widgets.length,
+        order: space.widgets.length,
       },
     });
 

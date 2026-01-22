@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
-import { useWidgetTheme } from '@/hooks/useWidgetTheme';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { EditableText, EditableImage } from '@/components/editing/Editable';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
 import { InlineBlockPicker, useInlineBlockPicker } from '@/components/editing/InlineBlockPicker';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { BLOCK_DEFINITIONS } from '@/types/blocks';
+import { TrafficLights } from './TrafficLights';
+import { WINDOW, TITLE_BAR, CONTENT, ANIMATION } from './windowStyles';
 
 interface EditableInfoWindowProps {
   item: DesktopItem | null;
@@ -18,12 +19,12 @@ interface EditableInfoWindowProps {
   position?: { x: number; y: number };
 }
 
-export function EditableInfoWindow({ item, onClose, position }: EditableInfoWindowProps) {
+export function EditableInfoWindow({ item, onClose }: EditableInfoWindowProps) {
   const context = useEditContextSafe();
-  const theme = useWidgetTheme();
   const windowRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const dragControls = useDragControls();
+  const prefersReducedMotion = useReducedMotion();
   const blockPicker = useInlineBlockPicker();
   const addBlockButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -184,9 +185,9 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
           <motion.div
             className="fixed inset-0 z-[199]"
             style={{
-              background: 'rgba(0, 0, 0, 0.3)',
-              backdropFilter: 'blur(2px)',
-              WebkitBackdropFilter: 'blur(2px)',
+              background: 'rgba(0, 0, 0, 0.2)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -199,7 +200,7 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
             className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none"
             style={{ padding: '40px' }}
           >
-            {/* Window - Uses CSS variables for theming */}
+            {/* Window - Uses unified windowStyles */}
             <motion.div
               ref={windowRef}
               className="max-w-[92vw] overflow-hidden flex flex-col pointer-events-auto"
@@ -212,81 +213,43 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
               style={{
                 width: item.windowWidth || 440,
                 maxHeight: 'calc(100vh - 120px)',
-                borderRadius: theme.radii.card,
-                background: theme.colors.background,
-                backdropFilter: theme.colors.blur,
-                WebkitBackdropFilter: theme.colors.blur,
-                boxShadow: theme.shadows.solid,
-                border: `1px solid ${theme.colors.border}`,
+                borderRadius: WINDOW.borderRadius,
+                background: WINDOW.background,
+                boxShadow: WINDOW.shadow,
+                border: WINDOW.border,
               }}
-              initial={{ opacity: 0, scale: 0.88, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 10 }}
-              transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 30,
-                mass: 0.8
-              }}
+              initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
+              animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}
+              exit={prefersReducedMotion ? ANIMATION.reducedExit : ANIMATION.exit}
+              transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
             >
-              {/* Title Bar - Uses CSS variable for height */}
+              {/* Title Bar - Uses unified TITLE_BAR */}
               <div
-                className="flex items-center px-4 shrink-0 relative cursor-grab active:cursor-grabbing"
+                className="flex items-center shrink-0 relative cursor-grab active:cursor-grabbing"
                 style={{
-                  height: 'var(--window-header-height)',
-                  borderBottom: `1px solid ${theme.colors.border}`,
-                  background: theme.colors.paper,
+                  height: TITLE_BAR.height,
+                  paddingLeft: TITLE_BAR.paddingX,
+                  paddingRight: TITLE_BAR.paddingX,
+                  borderBottom: TITLE_BAR.borderBottom,
+                  background: TITLE_BAR.background,
                 }}
                 onPointerDown={startDrag}
               >
-                {/* Traffic Lights - unified 12px design */}
-                <div className="flex items-center group/traffic" style={{ gap: 'var(--window-traffic-gap, 8px)' }} onPointerDown={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={onClose}
-                    className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                    style={{
-                      width: 'var(--window-traffic-size, 12px)',
-                      height: 'var(--window-traffic-size, 12px)',
-                      borderRadius: '50%',
-                      background: 'var(--color-traffic-close, #ff5f57)',
-                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                      <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                    </svg>
-                  </button>
-                  <div
-                    style={{
-                      width: 'var(--window-traffic-size, 12px)',
-                      height: 'var(--window-traffic-size, 12px)',
-                      borderRadius: '50%',
-                      background: 'var(--color-traffic-minimize, #ffbd2e)',
-                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: 'var(--window-traffic-size, 12px)',
-                      height: 'var(--window-traffic-size, 12px)',
-                      borderRadius: '50%',
-                      background: 'var(--color-traffic-maximize, #28c840)',
-                      boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                    }}
-                  />
-                </div>
+                {/* Window Controls - unified TrafficLights component */}
+                <TrafficLights
+                  onClose={onClose}
+                  showAll={false}
+                />
 
                 {/* Title */}
                 <span
                   className="absolute left-1/2 -translate-x-1/2 font-medium truncate max-w-[55%] select-none"
                   style={{
-                    fontSize: '13px',
-                    color: theme.colors.text.primary,
-                    opacity: 0.85,
-                    fontFamily: theme.fonts.heading,
-                    letterSpacing: 'var(--letter-spacing-tight)',
+                    fontSize: TITLE_BAR.titleFontSize,
+                    fontWeight: TITLE_BAR.titleFontWeight,
+                    color: TITLE_BAR.titleColor,
+                    letterSpacing: TITLE_BAR.titleLetterSpacing,
+                    opacity: TITLE_BAR.titleOpacityActive,
                   }}
                 >
                   {item.windowTitle}
@@ -301,10 +264,14 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                   overscrollBehavior: 'contain',
                 }}
               >
-                {/* Header Section - Uses CSS variables for padding and radii */}
+                {/* Header Section */}
                 <div
-                  className="flex items-start gap-4"
-                  style={{ padding: `calc(var(--spacing-window-padding) * 0.75) var(--spacing-window-padding)` }}
+                  className="flex items-start"
+                  style={{
+                    gap: CONTENT.gap,
+                    padding: CONTENT.padding,
+                    paddingBottom: CONTENT.padding * 0.75,
+                  }}
                 >
                   {/* Header Image */}
                   {isOwner ? (
@@ -314,10 +281,12 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                       onChange={handleHeaderImageChange}
                     >
                       <div
-                        className="relative w-16 h-16 overflow-hidden shrink-0"
+                        className="relative overflow-hidden shrink-0"
                         style={{
-                          borderRadius: 'var(--radius-md)',
-                          boxShadow: 'var(--shadow-sm)',
+                          width: CONTENT.headerImageSize,
+                          height: CONTENT.headerImageSize,
+                          borderRadius: CONTENT.headerImageRadius,
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                         }}
                       >
                         <Image
@@ -331,10 +300,12 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                     </EditableImage>
                   ) : (
                     <div
-                      className="relative w-16 h-16 overflow-hidden shrink-0"
+                      className="relative overflow-hidden shrink-0"
                       style={{
-                        borderRadius: 'var(--radius-md)',
-                        boxShadow: 'var(--shadow-sm)',
+                        width: CONTENT.headerImageSize,
+                        height: CONTENT.headerImageSize,
+                        borderRadius: CONTENT.headerImageRadius,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                       }}
                     >
                       <Image
@@ -360,10 +331,10 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                           <h2
                             className="font-semibold truncate leading-tight info-window-title"
                             style={{
-                              fontSize: '17px',
-                              color: 'var(--text-primary)',
-                              fontFamily: 'var(--font-display)',
-                              letterSpacing: 'var(--letter-spacing-tight)',
+                              fontSize: CONTENT.titleFontSize,
+                              fontWeight: CONTENT.titleFontWeight,
+                              color: CONTENT.titleColor,
+                              letterSpacing: CONTENT.titleLetterSpacing,
                             }}
                           >
                             {item.windowTitle}
@@ -378,9 +349,8 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                           <p
                             className="mt-0.5 truncate"
                             style={{
-                              fontSize: '13px',
-                              color: 'var(--text-secondary)',
-                              fontFamily: 'var(--font-body)',
+                              fontSize: CONTENT.subtitleFontSize,
+                              color: CONTENT.subtitleColor,
                             }}
                           >
                             {item.windowSubtitle || (isOwner && <span className="opacity-40">Add subtitle...</span>)}
@@ -392,10 +362,10 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                         <h2
                           className="font-semibold truncate leading-tight info-window-title"
                           style={{
-                            fontSize: '17px',
-                            color: 'var(--text-primary)',
-                            fontFamily: 'var(--font-display)',
-                            letterSpacing: 'var(--letter-spacing-tight)',
+                            fontSize: CONTENT.titleFontSize,
+                            fontWeight: CONTENT.titleFontWeight,
+                            color: CONTENT.titleColor,
+                            letterSpacing: CONTENT.titleLetterSpacing,
                           }}
                         >
                           {item.windowTitle}
@@ -404,9 +374,8 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                           <p
                             className="mt-0.5 truncate"
                             style={{
-                              fontSize: '13px',
-                              color: 'var(--text-secondary)',
-                              fontFamily: 'var(--font-body)',
+                              fontSize: CONTENT.subtitleFontSize,
+                              color: CONTENT.subtitleColor,
                             }}
                           >
                             {item.windowSubtitle}
@@ -417,26 +386,24 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                   </div>
                 </div>
 
-                {/* Tabs - Uses CSS variables for styling */}
+                {/* Tabs */}
                 {item.useTabs && sortedTabs.length > 0 && (
                   <div
                     className="flex gap-1"
                     style={{
-                      padding: `0 var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)`,
-                      borderBottom: 'var(--border-width) solid var(--border-light)',
+                      padding: `0 ${CONTENT.padding}px 12px`,
+                      borderBottom: `1px solid ${CONTENT.borderColor}`,
                     }}
                   >
                     {sortedTabs.map((tab) => (
                       <button
                         key={tab.id}
                         onClick={() => setActiveTabId(tab.id)}
-                        className="px-3 py-1.5 font-medium transition-all"
+                        className="px-3 py-1.5 font-medium transition-all rounded-md"
                         style={{
-                          fontSize: '12px',
-                          borderRadius: 'var(--radius-sm)',
-                          background: activeTabId === tab.id ? 'color-mix(in srgb, var(--accent-primary) 10%, transparent)' : 'transparent',
-                          color: activeTabId === tab.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                          fontFamily: 'var(--font-body)',
+                          fontSize: 12,
+                          background: activeTabId === tab.id ? 'rgba(0,0,0,0.04)' : 'transparent',
+                          color: activeTabId === tab.id ? CONTENT.titleColor : CONTENT.mutedColor,
                         }}
                       >
                         {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
@@ -451,16 +418,16 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeTabId || 'main'}
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -5 }}
+                      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 5 }}
+                      animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                      exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -5 }}
                       transition={{ duration: 0.15 }}
                     >
                       {sortedBlocks.map((block, index) => (
                         <div
                           key={block.id}
                           style={{
-                            borderTop: index > 0 ? '1px solid var(--border-light)' : undefined,
+                            borderTop: index > 0 ? `1px solid ${CONTENT.borderColor}` : undefined,
                           }}
                         >
                           {isOwner ? (
@@ -478,28 +445,25 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
 
                       {/* Add block button (owner only) */}
                       {isOwner && (
-                        <div style={{ padding: `var(--spacing-window-padding) var(--spacing-window-padding) calc(var(--spacing-window-padding) * 0.5)` }}>
+                        <div style={{ padding: `${CONTENT.padding}px ${CONTENT.padding}px ${CONTENT.padding * 0.5}px` }}>
                           <button
                             ref={addBlockButtonRef}
                             onClick={openBlockPicker}
                             className="w-full py-2.5 border border-dashed flex items-center justify-center gap-2 font-medium transition-all"
                             style={{
-                              fontSize: '13px',
-                              borderRadius: 'var(--radius-button)',
-                              borderColor: 'var(--border-medium)',
-                              color: 'var(--text-tertiary)',
+                              fontSize: 13,
+                              borderRadius: 8,
+                              borderColor: CONTENT.borderColor,
+                              color: CONTENT.mutedColor,
                               background: 'transparent',
-                              fontFamily: 'var(--font-body)',
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'var(--border-light)';
-                              e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                              e.currentTarget.style.color = 'var(--accent-primary)';
+                              e.currentTarget.style.background = 'rgba(0,0,0,0.02)';
+                              e.currentTarget.style.color = CONTENT.titleColor;
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = 'transparent';
-                              e.currentTarget.style.borderColor = 'var(--border-medium)';
-                              e.currentTarget.style.color = 'var(--text-tertiary)';
+                              e.currentTarget.style.color = CONTENT.mutedColor;
                             }}
                           >
                             <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -509,8 +473,8 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
                             <span
                               className="text-[10px] px-1 py-0.5 rounded ml-1"
                               style={{
-                                background: 'var(--border-light)',
-                                color: 'var(--text-tertiary)',
+                                background: 'rgba(0,0,0,0.04)',
+                                color: CONTENT.mutedColor,
                               }}
                             >
                               /
@@ -534,8 +498,7 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
             onClose={blockPicker.close}
           />
         </>
-      )
-      }
-    </AnimatePresence >
+      )}
+    </AnimatePresence>
   );
 }

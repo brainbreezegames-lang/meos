@@ -32,7 +32,7 @@ export async function GET(
 
     const widget = await prisma.widget.findUnique({
       where: { id },
-      include: { desktop: true },
+      include: { space: true },
     });
 
     if (!widget) {
@@ -43,7 +43,7 @@ export async function GET(
     }
 
     // Verify ownership
-    if (widget.desktop.userId !== session.user.id) {
+    if (widget.space.userId !== session.user.id) {
       return NextResponse.json(
         { success: false, error: { code: 'FORBIDDEN', message: 'Not your widget' } },
         { status: 403 }
@@ -82,7 +82,7 @@ export async function PUT(
     // Get widget and verify ownership
     const widget = await prisma.widget.findUnique({
       where: { id },
-      include: { desktop: true },
+      include: { space: true },
     });
 
     if (!widget) {
@@ -92,7 +92,7 @@ export async function PUT(
       );
     }
 
-    if (widget.desktop.userId !== session.user.id) {
+    if (widget.space.userId !== session.user.id) {
       return NextResponse.json(
         { success: false, error: { code: 'FORBIDDEN', message: 'Not your widget' } },
         { status: 403 }
@@ -150,7 +150,7 @@ export async function DELETE(
     // Get widget and verify ownership
     const widget = await prisma.widget.findUnique({
       where: { id },
-      include: { desktop: true },
+      include: { space: true },
     });
 
     if (!widget) {
@@ -160,7 +160,7 @@ export async function DELETE(
       );
     }
 
-    if (widget.desktop.userId !== session.user.id) {
+    if (widget.space.userId !== session.user.id) {
       return NextResponse.json(
         { success: false, error: { code: 'FORBIDDEN', message: 'Not your widget' } },
         { status: 403 }
