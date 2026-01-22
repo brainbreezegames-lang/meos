@@ -116,8 +116,9 @@ const unifiedTheme: WidgetTheme = {
     pill: 'var(--radius-full)',
   },
   fonts: {
-    heading: 'var(--font-family)',
-    mono: 'ui-monospace, "SF Mono", monospace',
+    heading: 'var(--font-display)',
+    body: 'var(--font-body)',
+    mono: 'var(--font-mono)',
   },
 };
 

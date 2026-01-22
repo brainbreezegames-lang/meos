@@ -124,6 +124,7 @@ export function WidgetWrapper({
         userSelect: 'none',
         WebkitUserSelect: 'none',
         pointerEvents: 'auto',
+        fontFamily: 'var(--font-body)',
       }}
       onMouseDown={handleMouseDown}
     >

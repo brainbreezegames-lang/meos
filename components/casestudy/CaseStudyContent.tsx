@@ -257,7 +257,7 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
       return (
         <pre
           style={{
-            fontFamily: 'SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+            fontFamily: 'var(--font-mono)',
             fontSize: 14,
             lineHeight: 1.65,
             color: colors.text,

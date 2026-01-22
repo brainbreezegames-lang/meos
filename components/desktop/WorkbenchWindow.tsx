@@ -156,7 +156,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                   fontSize: '13px',
                   fontWeight: 500,
                   color: 'var(--color-text-primary, #171412)',
-                  fontFamily: 'var(--font-family)',
+                  fontFamily: 'var(--font-body)',
                 }}
               >
                 {item.windowTitle || 'Now Working On'}

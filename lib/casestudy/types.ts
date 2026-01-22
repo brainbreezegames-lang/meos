@@ -104,11 +104,11 @@ export const caseStudyTokens = {
     watermark: 'rgba(0, 0, 0, 0.06)',
   },
   fonts: {
-    // Bold chunky sans-serif for headlines
-    display: 'var(--font-instrument), "Instrument Sans", system-ui, sans-serif',
-    // Clean body font
-    body: 'var(--font-instrument), "Instrument Sans", system-ui, sans-serif',
-    ui: 'var(--font-instrument), "Instrument Sans", system-ui, sans-serif',
+    // Warm serif for headings
+    display: 'var(--font-display)',
+    // Clean sans-serif for body
+    body: 'var(--font-body)',
+    ui: 'var(--font-body)',
   },
   spacing: {
     sectionGap: 80,
