@@ -58,7 +58,7 @@ import { ViewSwitcher, PageView, PresentView } from '@/components/views';
 import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
-import { SpaceSwitcher } from '@/components/spaces';
+import { SpaceSwitcher, CreateSpaceModal } from '@/components/spaces';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -3975,6 +3975,18 @@ function GoOSDemoContent() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Create Space Modal */}
+            <CreateSpaceModal
+                isOpen={showCreateSpaceModal}
+                onClose={() => setShowCreateSpaceModal(false)}
+                onCreate={(data) => {
+                    console.log('Create space:', data);
+                    showGoOSToast(`Created space "${data.name}"`, 'success');
+                }}
+                existingSpaces={DEMO_SPACES}
+                existingSlugs={DEMO_SPACES.filter(s => s.slug).map(s => s.slug as string)}
+            />
         </div>
     );
 }
