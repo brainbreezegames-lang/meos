@@ -298,26 +298,25 @@ export function GoOSDesktopContextMenu({
                     key={item.id}
                     style={{ position: 'relative' }}
                     onMouseEnter={() => {
-                      // Clear any pending close timeout when re-entering
+                      // Clear any pending close timeout
                       if (submenuCloseTimeoutRef.current) {
                         clearTimeout(submenuCloseTimeoutRef.current);
                         submenuCloseTimeoutRef.current = null;
                       }
                       setHoveredId(item.id);
                       if (item.hasSubmenu) {
+                        // Open this submenu
                         setActiveSubmenu(item.id);
+                      } else {
+                        // Close any open submenu when hovering non-submenu items
+                        setActiveSubmenu(null);
                       }
                     }}
                     onMouseLeave={() => {
                       if (!item.hasSubmenu) {
                         setHoveredId(null);
-                      } else {
-                        // For submenu items, use delayed close so user can move to submenu
-                        submenuCloseTimeoutRef.current = setTimeout(() => {
-                          setHoveredId(null);
-                          setActiveSubmenu(null);
-                        }, 500);
                       }
+                      // DON'T close submenu on mouse leave - let it stay open
                     }}
                   >
                     <motion.button
@@ -404,34 +403,23 @@ export function GoOSDesktopContextMenu({
                       )}
                     </motion.button>
 
-                    {/* Submenu - positioned to OVERLAP with parent for continuous hover */}
+                    {/* Submenu - positioned next to parent */}
                     {item.hasSubmenu && isSubmenuActive && item.submenuItems && (
                       <div
                         style={{
                           position: 'absolute',
                           top: -PADDING,
-                          // Start 20px INSIDE the parent so mouse never leaves parent bounds
-                          left: `calc(100% - 20px)`,
-                          // Pad left to create visual gap while maintaining hover
-                          paddingLeft: 24,
+                          left: '100%',
+                          paddingLeft: 4,
                           paddingTop: PADDING,
                           paddingBottom: PADDING,
                         }}
                         onMouseEnter={() => {
-                          // Clear any pending close timeout
+                          // Keep submenu open when hovering it
                           if (submenuCloseTimeoutRef.current) {
                             clearTimeout(submenuCloseTimeoutRef.current);
                             submenuCloseTimeoutRef.current = null;
                           }
-                          setHoveredId(item.id);
-                          setActiveSubmenu(item.id);
-                        }}
-                        onMouseLeave={() => {
-                          // Delay closing to allow click events to register
-                          submenuCloseTimeoutRef.current = setTimeout(() => {
-                            setHoveredId(null);
-                            setActiveSubmenu(null);
-                          }, 500);
                         }}
                       >
                         <motion.div
