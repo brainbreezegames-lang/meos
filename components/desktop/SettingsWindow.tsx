@@ -163,10 +163,10 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
               style={{
                 width: 520,
                 maxWidth: '90vw',
-                borderRadius: '14px',
+                borderRadius: 'var(--radius-lg, 18px)',
                 background: 'var(--color-bg-base, #fbf9ef)',
-                boxShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
-                border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+                boxShadow: 'var(--shadow-window)',
+                border: 'var(--window-border, 1px solid var(--color-border-default, rgba(23, 20, 18, 0.08)))',
               }}
               initial={{ opacity: 0, scale: 0.88, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
