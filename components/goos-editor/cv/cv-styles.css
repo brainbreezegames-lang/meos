@@ -32,7 +32,7 @@
 }
 
 .cv-name {
-  font-family: var(--font-averia), 'Averia Serif Libre', Georgia, serif;
+  font-family: 'Averia Serif Libre', Georgia, serif !important;
   font-size: 32px;
   font-weight: 400;
   color: #1a1a1a;
@@ -75,7 +75,7 @@
 }
 
 .cv-section-title {
-  font-family: var(--font-averia), 'Averia Serif Libre', Georgia, serif;
+  font-family: 'Averia Serif Libre', Georgia, serif !important;
   font-size: 13px;
   font-weight: 400;
   color: #1a1a1a;

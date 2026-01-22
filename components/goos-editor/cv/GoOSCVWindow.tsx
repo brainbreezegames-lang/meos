@@ -217,11 +217,16 @@ export function GoOSCVWindow({
     }
   }, [hasUnsavedChanges, onClose]);
 
-  // Export to PDF (placeholder for now)
+  // Export to PDF
   const handleExportPDF = useCallback(async () => {
-    // Dynamic import to avoid SSR issues
-    const { exportCVToPDF } = await import('./GoOSCVPDFExport');
-    await exportCVToPDF(localContent, file.title || 'CV');
+    try {
+      // Dynamic import to avoid SSR issues
+      const { exportCVToPDF } = await import('./GoOSCVPDFExport');
+      await exportCVToPDF(localContent, file.title || 'CV');
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      alert('Failed to export PDF. Check console for details.');
+    }
   }, [localContent, file.title]);
 
   // Start drag from title bar
