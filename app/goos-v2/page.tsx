@@ -2815,8 +2815,10 @@ function GoOSDemoContent() {
                         }}
                         className="h-11 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
                         style={{
-                            background: goOS.colors.headerBg,
-                            borderBottom: `2px solid ${goOS.colors.border}`,
+                            background: 'rgba(251, 249, 239, 0.8)',
+                            backdropFilter: 'blur(20px) saturate(180%)',
+                            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                            borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
                         }}
                     >
                 {/* Left: Logo + Widgets Menu */}
@@ -3523,11 +3525,13 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
+                            className="flex items-center gap-2 px-5 py-3 rounded-2xl"
                             style={{
-                                background: goOS.colors.cream,
-                                border: `2px solid ${goOS.colors.border}`,
-                                boxShadow: goOS.shadows.solid
+                                background: 'rgba(255, 255, 255, 0.75)',
+                                backdropFilter: 'blur(24px) saturate(180%)',
+                                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                                border: '1px solid rgba(255, 255, 255, 0.5)',
+                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6)'
                             }}
                         >
                     <RubberDuck />
