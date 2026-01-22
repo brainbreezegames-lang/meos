@@ -68,23 +68,25 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
         <button
           onClick={() => setIsExpanded(true)}
           style={{
-            background: 'var(--color-bg-base, #fbf9ef)',
-            border: '2px solid var(--color-text-primary, #171412)',
-            borderRadius: 'var(--radius-full, 9999px)',
-            boxShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
-            padding: '10px 16px',
+            background: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
+            backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+            WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+            border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+            borderRadius: 'var(--radius-xl, 20px)',
+            boxShadow: 'var(--shadow-sm)',
+            padding: '12px 18px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '10px',
             transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))';
+            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))';
+            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
@@ -127,10 +129,12 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
         // Expanded state - full links panel
         <div
           style={{
-            background: 'var(--color-bg-base, #fbf9ef)',
-            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-            borderRadius: 'var(--radius-lg, 12px)',
-            boxShadow: 'var(--shadow-lg, 0 8px 32px rgba(23, 20, 18, 0.12))',
+            background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+            backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+            WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+            border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+            borderRadius: 'var(--radius-lg, 18px)',
+            boxShadow: 'var(--shadow-lg)',
             minWidth: '200px',
             maxWidth: '280px',
             overflow: 'hidden',
@@ -206,12 +210,12 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                       alignItems: 'center',
                       gap: '10px',
                       padding: '10px 10px',
-                      borderRadius: 'var(--radius-sm, 6px)',
+                      borderRadius: 'var(--radius-sm, 10px)',
                       textDecoration: 'none',
                       transition: 'background 0.15s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.1))';
+                      e.currentTarget.style.background = 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.08))';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'transparent';
@@ -221,7 +225,7 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                       style={{
                         width: 28,
                         height: 28,
-                        borderRadius: 'var(--radius-sm, 6px)',
+                        borderRadius: 'var(--radius-xs, 8px)',
                         background: 'var(--color-bg-subtle, #f2f0e7)',
                         display: 'flex',
                         alignItems: 'center',

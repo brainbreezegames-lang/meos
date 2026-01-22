@@ -84,13 +84,13 @@ export function StatusWidget({
         <motion.div
           className="relative cursor-pointer"
           style={{
-            borderRadius: '24px',
+            borderRadius: 'var(--radius-xl, 22px)',
             overflow: 'hidden',
           }}
           animate={{
             boxShadow: isHovered
-              ? `0 8px 32px rgba(0,0,0,0.12), ${statusTheme.glow}`
-              : '0 4px 20px rgba(0,0,0,0.08)',
+              ? `var(--shadow-md), ${statusTheme.glow}`
+              : 'var(--shadow-sm)',
           }}
           transition={{ duration: 0.2 }}
         >
@@ -99,9 +99,11 @@ export function StatusWidget({
             style={{
               position: 'absolute',
               inset: 0,
-              background: theme.colors.paper,
-              border: `2px solid ${statusTheme.borderColor || 'transparent'}`,
-              borderRadius: theme.radii.pill,
+              background: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
+              backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+              WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+              border: statusTheme.borderColor ? `1px solid ${statusTheme.borderColor}` : '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+              borderRadius: 'var(--radius-xl, 22px)',
             }}
           />
 

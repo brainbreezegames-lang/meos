@@ -183,11 +183,13 @@ export function GoOSDesktopContextMenu({
   };
 
   const menuStyle: React.CSSProperties = {
-    background: 'var(--color-bg-base, #fbf9ef)',
-    border: '2px solid var(--color-text-primary, #171412)',
-    borderRadius: '10px',
+    background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+    backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+    WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+    border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+    borderRadius: 'var(--radius-md, 14px)',
     boxShadow: 'var(--shadow-lg)',
-    padding: `${PADDING}px`,
+    padding: `${PADDING + 2}px`,
     outline: 'none',
   };
 
@@ -266,7 +268,7 @@ export function GoOSDesktopContextMenu({
                       padding: '0 10px',
                       background: 'transparent',
                       border: 'none',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       cursor: item.disabled ? 'default' : 'pointer',
                       fontFamily: 'var(--font-body)',
                       fontSize: '12px',
@@ -320,8 +322,8 @@ export function GoOSDesktopContextMenu({
                   role="separator"
                   style={{
                     height: 1,
-                    background: 'var(--color-border-default)',
-                    margin: '4px 6px',
+                    background: 'var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+                    margin: '6px 8px',
                   }}
                 />
               )}

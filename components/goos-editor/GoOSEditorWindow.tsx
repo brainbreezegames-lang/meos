@@ -451,21 +451,21 @@ export function GoOSEditorWindow({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '8px 16px',
-            borderTop: '1px solid var(--color-border-subtle)',
-            background: 'var(--color-bg-subtle)',
+            padding: '10px 20px',
+            borderTop: '1px solid rgba(23, 20, 18, 0.06)',
+            background: 'rgba(23, 20, 18, 0.02)',
             fontSize: 'var(--font-size-xs, 10px)',
             fontFamily: 'var(--font-mono)',
             color: 'var(--color-text-muted)',
             flexShrink: 0,
           }}
         >
-          <div style={{ display: 'flex', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 20 }}>
             <span>{wordCount} words</span>
             <span>{charCount} characters</span>
             <span>{readingTime} min read</span>
           </div>
-          <span style={{ fontSize: 11 }}>goOS Editor</span>
+          <span style={{ fontSize: 11, opacity: 0.6 }}>goOS Editor</span>
         </div>
       </motion.div>
     </>

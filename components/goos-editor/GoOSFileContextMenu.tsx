@@ -259,16 +259,13 @@ export function GoOSFileContextMenu({
             left: adjustedPosition.x,
             zIndex: 9999,
             width: MENU_WIDTH,
-            background: goOSTokens.colors.paper,
-            backdropFilter: 'blur(20px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-            borderRadius: 8,
-            boxShadow: `
-              0 0 0 1px ${goOSTokens.colors.border},
-              0 8px 30px rgba(23, 20, 18, 0.12),
-              0 2px 8px rgba(23, 20, 18, 0.08)
-            `,
-            padding: `${MENU_PADDING}px 0`,
+            background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+            backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+            WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+            borderRadius: 'var(--radius-md, 14px)',
+            boxShadow: 'var(--shadow-lg)',
+            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            padding: `${MENU_PADDING + 2}px 0`,
             overflow: 'hidden',
             outline: 'none',
             transformOrigin: 'top left',
@@ -312,7 +309,7 @@ export function GoOSFileContextMenu({
                     padding: '0 8px',
                     background: 'transparent',
                     border: 'none',
-                    borderRadius: 5,
+                    borderRadius: 8,
                     cursor: item.disabled ? 'default' : 'pointer',
                     fontFamily: goOSTokens.fonts.body,
                     fontSize: 13,
@@ -365,8 +362,8 @@ export function GoOSFileContextMenu({
                     role="separator"
                     style={{
                       height: 1,
-                      background: goOSTokens.colors.border,
-                      margin: '4px 12px',
+                      background: 'var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+                      margin: '6px 12px',
                     }}
                   />
                 )}

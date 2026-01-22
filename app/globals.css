@@ -240,6 +240,45 @@ html.theme-sketch {
     --color-error: #ff3c34;
     --color-info: #ff7722;
 
+    /* ========== CALM-TECH 2025 DESIGN SYSTEM ========== */
+    /* Unified color tokens used by all components */
+    --color-bg-base: #fbf9ef;
+    --color-bg-subtle: rgba(23, 20, 18, 0.02);
+    --color-bg-white: rgba(255, 255, 255, 0.8);
+    --color-bg-glass: rgba(251, 249, 239, 0.92);
+    --color-bg-glass-heavy: rgba(251, 249, 239, 0.95);
+
+    --color-text-primary: #171412;
+    --color-text-secondary: #4a4744;
+    --color-text-muted: #8e827c;
+    --color-text-on-accent: #ffffff;
+
+    --color-accent-primary: #ff7722;
+    --color-accent-primary-subtle: rgba(255, 119, 34, 0.08);
+
+    --color-border-default: rgba(23, 20, 18, 0.08);
+    --color-border-subtle: rgba(23, 20, 18, 0.06);
+    --color-border-strong: rgba(23, 20, 18, 0.12);
+
+    /* Calm-tech shadows - ultra-soft, diffuse, cloud-like */
+    --shadow-xs: 0 1px 3px rgba(23, 20, 18, 0.02), 0 2px 6px rgba(23, 20, 18, 0.03);
+    --shadow-sm: 0 2px 8px rgba(23, 20, 18, 0.03), 0 8px 24px rgba(23, 20, 18, 0.05);
+    --shadow-md: 0 4px 16px rgba(23, 20, 18, 0.05), 0 12px 40px rgba(23, 20, 18, 0.08);
+    --shadow-lg: 0 4px 16px rgba(23, 20, 18, 0.06), 0 12px 40px rgba(23, 20, 18, 0.08), 0 24px 60px rgba(23, 20, 18, 0.04);
+    --shadow-window: 0 2px 8px rgba(23, 20, 18, 0.03), 0 8px 24px rgba(23, 20, 18, 0.06), 0 24px 48px rgba(23, 20, 18, 0.08), 0 48px 80px rgba(23, 20, 18, 0.04);
+
+    /* Calm-tech radii - larger, softer corners */
+    --radius-xs: 6px;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 22px;
+    --radius-pill: 9999px;
+
+    /* Glass effects */
+    --blur-glass: blur(20px) saturate(180%);
+    --blur-glass-heavy: blur(24px) saturate(180%);
+
     /* Window Controls - Standard colors */
     --traffic-red: #ff5f57;
     --traffic-yellow: #ffbd2e;

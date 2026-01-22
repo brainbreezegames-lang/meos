@@ -10,24 +10,24 @@ import React from 'react';
 // WINDOW CONTAINER STYLES
 // ============================================================================
 export const WINDOW = {
-  // Border - 2px solid dark (dock app style)
-  border: '2px solid var(--color-text-primary, #171412)',
+  // Border - uses CSS variable for calm-tech aesthetic
+  border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
   borderMaximized: 'none',
 
-  // Border radius - 12px everywhere
-  borderRadius: '12px',
+  // Border radius - uses CSS variable
+  borderRadius: 'var(--radius-lg, 18px)',
   borderRadiusMaximized: '0',
 
   // Background - warm cream
   background: 'var(--color-bg-base, #fbf9ef)',
 
-  // Shadows
-  shadow: '0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08)',
+  // Shadows - uses CSS variable
+  shadow: 'var(--shadow-window, 0 2px 8px rgba(23, 20, 18, 0.03), 0 8px 24px rgba(23, 20, 18, 0.06), 0 24px 48px rgba(23, 20, 18, 0.08), 0 48px 80px rgba(23, 20, 18, 0.04))',
   shadowMaximized: 'none',
 
   // Opacity
   opacityActive: 1,
-  opacityInactive: 0.95,
+  opacityInactive: 0.97,
 } as const;
 
 // ============================================================================
@@ -36,8 +36,8 @@ export const WINDOW = {
 export const TITLE_BAR = {
   height: 52,
   background: 'var(--color-bg-base, #fbf9ef)',
-  borderBottom: '2px solid var(--color-text-primary, #171412)',
-  paddingX: 16,
+  borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+  paddingX: 20,
 
   // Title text
   titleFontSize: 13,
@@ -54,7 +54,7 @@ export const TITLE_BAR = {
 export const TRAFFIC = {
   size: 12,
   gap: 8,
-  shadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+  shadow: '0 1px 2px rgba(0, 0, 0, 0.08), inset 0 0 0 0.5px rgba(0, 0, 0, 0.04)',
 
   // Colors
   close: 'var(--color-traffic-close, #ff5f57)',
@@ -91,10 +91,10 @@ export const ANIMATION = {
 // CONTENT STYLES
 // ============================================================================
 export const CONTENT = {
-  padding: 20,
-  gap: 16,
+  padding: 24,
+  gap: 20,
   headerImageSize: 64,
-  headerImageRadius: 12,
+  headerImageRadius: 14,
 
   // Typography
   titleFontSize: 17,

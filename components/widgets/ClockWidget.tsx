@@ -98,11 +98,13 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
     >
       <div
         style={{
-          background: 'var(--color-bg-base, #fbf9ef)',
-          border: '2px solid var(--color-text-primary, #171412)',
-          borderRadius: '12px',
-          boxShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
-          padding: '14px 18px',
+          background: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
+          backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+          WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+          border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+          borderRadius: 'var(--radius-lg, 18px)',
+          boxShadow: 'var(--shadow-sm)',
+          padding: '16px 22px',
           minWidth: '140px',
           position: 'relative',
           overflow: 'hidden',
@@ -115,10 +117,11 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             top: 0,
             left: '50%',
             transform: 'translateX(-50%)',
-            width: '40%',
-            height: 2,
-            background: 'var(--color-accent-primary, #ff7722)',
-            borderRadius: '0 0 2px 2px',
+            width: '30%',
+            height: 3,
+            background: 'linear-gradient(90deg, transparent, var(--color-accent-primary, #ff7722), transparent)',
+            borderRadius: '0 0 3px 3px',
+            opacity: 0.7,
           }}
         />
 

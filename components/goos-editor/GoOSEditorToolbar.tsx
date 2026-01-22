@@ -23,22 +23,22 @@ function ToolbarButton({ onClick, isActive, disabled, title, children }: Toolbar
       className="toolbar-btn"
       data-active={isActive || undefined}
       style={{
-        padding: '4px 8px',
+        padding: '5px 10px',
         fontSize: 13,
         fontWeight: 500,
         fontFamily: 'var(--font-body)',
         background: isActive ? 'var(--color-text-primary)' : 'transparent',
         color: isActive ? 'var(--color-bg-base)' : 'var(--color-text-secondary)',
         border: 'none',
-        borderRadius: 4,
+        borderRadius: 8,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.3 : 1,
-        transition: 'all 0.1s ease',
+        transition: 'all 0.15s ease',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        minWidth: 28,
-        height: 28,
+        minWidth: 30,
+        height: 30,
       }}
     >
       {children}
@@ -85,9 +85,9 @@ export function GoOSEditorToolbar({ editor, onAddImage, onAddImageFromUrl, onAdd
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
-          padding: '8px 16px',
-          borderBottom: '1px solid var(--color-border-subtle)',
+          gap: 6,
+          padding: '10px 20px',
+          borderBottom: '1px solid rgba(23, 20, 18, 0.06)',
           background: 'transparent',
           flexWrap: 'wrap',
         }}
