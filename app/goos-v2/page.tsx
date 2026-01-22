@@ -70,6 +70,30 @@ const DEMO_SPACES: SpaceSummary[] = [
     { id: 'space-4', name: 'Personal', icon: '🔐', slug: null, isPrimary: false, isPublic: false, order: 3, fileCount: 5 },
 ];
 
+// Space-specific themes/backgrounds
+const SPACE_THEMES: Record<string, { gradient: string; accent: string; label: string }> = {
+    'space-1': {
+        gradient: 'linear-gradient(135deg, #fbf9ef 0%, #f5e6d3 100%)',
+        accent: '#e07a3a',
+        label: 'Portfolio'
+    },
+    'space-2': {
+        gradient: 'linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)',
+        accent: '#3a7ae0',
+        label: 'Writing'
+    },
+    'space-3': {
+        gradient: 'linear-gradient(135deg, #f8f0f4 0%, #ecd9e2 100%)',
+        accent: '#9a3ae0',
+        label: 'Photography'
+    },
+    'space-4': {
+        gradient: 'linear-gradient(135deg, #f4f8f0 0%, #d9ecd9 100%)',
+        accent: '#3ae07a',
+        label: 'Personal'
+    },
+};
+
 // ============================================
 // PLAYFUL LOADING MESSAGES
 // ============================================
@@ -2800,6 +2824,76 @@ function GoOSDemoContent() {
 
             {/* CONFETTI CELEBRATION */}
             <ConfettiBurst isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
+
+            {/* SPACE INDICATOR - Shows which space is active */}
+            {(() => {
+                const activeSpace = DEMO_SPACES.find(s => s.id === activeSpaceId);
+                const theme = SPACE_THEMES[activeSpaceId] || SPACE_THEMES['space-1'];
+                return (
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            background: theme.gradient,
+                            zIndex: 0,
+                            transition: 'background 0.5s ease-in-out',
+                        }}
+                    >
+                        {/* Large space icon watermark */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                bottom: 100,
+                                right: 40,
+                                fontSize: 200,
+                                opacity: 0.08,
+                                transform: 'rotate(-15deg)',
+                                transition: 'all 0.5s ease-in-out',
+                                pointerEvents: 'none',
+                                userSelect: 'none',
+                            }}
+                        >
+                            {activeSpace?.icon}
+                        </div>
+                        {/* Space name label */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                bottom: 100,
+                                left: 40,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 4,
+                                transition: 'all 0.5s ease-in-out',
+                            }}
+                        >
+                            <span
+                                style={{
+                                    fontSize: 48,
+                                    fontWeight: 700,
+                                    color: theme.accent,
+                                    opacity: 0.15,
+                                    letterSpacing: '-0.02em',
+                                    fontFamily: 'var(--font-heading)',
+                                }}
+                            >
+                                {activeSpace?.name}
+                            </span>
+                            <span
+                                style={{
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    color: theme.accent,
+                                    opacity: 0.3,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em',
+                                }}
+                            >
+                                {activeSpace?.isPublic ? 'Public Space' : 'Private Space'}
+                            </span>
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* MENU BAR - Completely hidden in zen mode for distraction-free focus */}
             <AnimatePresence>
