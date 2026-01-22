@@ -84,6 +84,7 @@ export function GoOSDesktopContextMenu({
   const [pressedId, setPressedId] = useState<string | null>(null);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [adjustedPosition, setAdjustedPosition] = useState(position);
+  const submenuCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Widget submenu items
   const widgetItems: ContextMenuItem[] = useMemo(() => [
@@ -196,6 +197,11 @@ export function GoOSDesktopContextMenu({
         clearTimeout(timer);
         document.removeEventListener('mousedown', handleClickOutside);
         document.removeEventListener('keydown', handleKeyDown);
+        // Clear submenu close timeout
+        if (submenuCloseTimeoutRef.current) {
+          clearTimeout(submenuCloseTimeoutRef.current);
+          submenuCloseTimeoutRef.current = null;
+        }
       };
     }
   }, [isOpen, onClose, handleKeyDown]);
@@ -214,12 +220,21 @@ export function GoOSDesktopContextMenu({
   };
 
   const handleSubmenuItemClick = (item: ContextMenuItem) => {
+    console.log('[ContextMenu] Submenu item clicked:', item.id, item.label);
     if (item.disabled) return;
+
+    // Clear any pending close timeout
+    if (submenuCloseTimeoutRef.current) {
+      clearTimeout(submenuCloseTimeoutRef.current);
+      submenuCloseTimeoutRef.current = null;
+    }
+
     setPressedId(item.id);
+    // Execute immediately to ensure the click registers
+    item.onClick?.();
     setTimeout(() => {
-      item.onClick?.();
       onClose();
-    }, 60);
+    }, 100);
   };
 
   const menuStyle: React.CSSProperties = {
@@ -388,12 +403,20 @@ export function GoOSDesktopContextMenu({
                           paddingLeft: 4,
                         }}
                         onMouseEnter={() => {
+                          // Clear any pending close timeout
+                          if (submenuCloseTimeoutRef.current) {
+                            clearTimeout(submenuCloseTimeoutRef.current);
+                            submenuCloseTimeoutRef.current = null;
+                          }
                           setHoveredId(item.id);
                           setActiveSubmenu(item.id);
                         }}
                         onMouseLeave={() => {
-                          setHoveredId(null);
-                          setActiveSubmenu(null);
+                          // Delay closing to allow click events to register
+                          submenuCloseTimeoutRef.current = setTimeout(() => {
+                            setHoveredId(null);
+                            setActiveSubmenu(null);
+                          }, 150);
                         }}
                       >
                         <motion.div

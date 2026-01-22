@@ -10,6 +10,8 @@ import { useThemeSafe, ThemeId } from '@/contexts/ThemeContext';
 import BlockRenderer from '@/components/blocks/BlockRenderer';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
 import { haptic } from '@/components/ui/Delight';
+import { TrafficLights } from './TrafficLights';
+import { WINDOW, TITLE_BAR, ANIMATION } from './windowStyles';
 
 interface PagesWindowProps {
   window: WindowInstance;
@@ -237,92 +239,34 @@ export function PagesWindow({ window: windowInstance, item }: PagesWindowProps) 
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 120px)',
             minHeight: 520,
-            borderRadius: isMaximized ? '0' : '12px',
-            background: colors.windowBg,
-            boxShadow: isActive ? colors.windowShadow : colors.windowShadowInactive,
-            border: isMaximized ? 'none' : '2px solid var(--color-text-primary, #171412)',
-            opacity: isActive ? 1 : 0.96,
+            borderRadius: isMaximized ? WINDOW.borderRadiusMaximized : WINDOW.borderRadius,
+            background: WINDOW.background,
+            boxShadow: isMaximized ? WINDOW.shadowMaximized : WINDOW.shadow,
+            border: isMaximized ? WINDOW.borderMaximized : WINDOW.border,
+            opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
           }}
-          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 20 }}
-          animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10 }}
-          transition={prefersReducedMotion ? { duration: 0.15 } : {
-            type: 'spring',
-            stiffness: 400,
-            damping: 30,
-            mass: 0.8
-          }}
+          initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
+          animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}
+          exit={prefersReducedMotion ? ANIMATION.reducedExit : ANIMATION.exit}
+          transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
         >
           {/* Title Bar */}
           <div
-            className="flex items-center h-[52px] px-4 shrink-0 relative select-none"
+            className="flex items-center px-4 shrink-0 relative select-none"
             style={{
-              background: colors.titleBarBg,
-              borderBottom: '2px solid var(--color-text-primary, #171412)',
+              height: TITLE_BAR.height,
+              background: TITLE_BAR.background,
+              borderBottom: TITLE_BAR.borderBottom,
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
-            {/* Traffic Lights - unified 12px design */}
-            <div
-              className="flex items-center group/traffic"
-              style={{ gap: 'var(--window-traffic-gap, 8px)' }}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => windowContext.closeWindow(windowInstance.id)}
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-close, #ff5f57)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-                aria-label="Close window"
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-              </button>
-              <button
-                onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-minimize, #ffbd2e)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-                aria-label="Minimize window"
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-              </button>
-              <button
-                onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-maximize, #28c840)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-                aria-label="Maximize window"
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                </svg>
-              </button>
-            </div>
+            {/* Traffic Lights */}
+            <TrafficLights
+              onClose={() => windowContext.closeWindow(windowInstance.id)}
+              onMinimize={() => windowContext.minimizeWindow(windowInstance.id)}
+              onMaximize={() => windowContext.maximizeWindow(windowInstance.id)}
+              isMaximized={isMaximized}
+            />
 
             {/* Document Icon & Title */}
             <div className="flex items-center gap-2.5 ml-4">
