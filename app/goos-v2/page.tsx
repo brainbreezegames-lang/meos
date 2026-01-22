@@ -1280,30 +1280,36 @@ const DockIcon = React.memo(({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.85 }}
                         transition={{ type: 'spring', damping: 20, stiffness: 400 }}
-                        className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap z-50"
+                        className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
                         style={{
-                            background: goOS.colors.text.primary,
-                            color: goOS.colors.paper,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                            border: `1px solid rgba(255,255,255,0.1)`,
+                            background: 'rgba(250, 248, 243, 0.95)',
+                            color: '#1a1816',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+                            backdropFilter: 'blur(12px)',
                         }}
                     >
                         {label}
                         {/* Tooltip arrow */}
                         <div
                             className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45"
-                            style={{ background: goOS.colors.text.primary }}
+                            style={{ background: 'rgba(250, 248, 243, 0.95)' }}
                         />
                     </motion.div>
                 )}
             </AnimatePresence>
 
             <motion.div
-                className={`w-11 h-11 flex items-center justify-center rounded-xl ${isActive ? '' : ''}`}
+                className="w-12 h-12 flex items-center justify-center rounded-[14px]"
                 style={{
-                    background: isActive ? goOS.colors.white : isHovered ? 'rgba(0,0,0,0.04)' : 'transparent',
-                    border: isActive ? `2px solid ${goOS.colors.border}` : '2px solid transparent',
-                    boxShadow: isActive ? goOS.shadows.sm : 'none',
+                    background: isActive
+                        ? 'rgba(255, 255, 255, 0.18)'
+                        : isHovered
+                            ? 'rgba(255, 255, 255, 0.12)'
+                            : 'rgba(255, 255, 255, 0.06)',
+                    border: 'none',
+                    boxShadow: isActive
+                        ? 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.2)'
+                        : 'inset 0 1px 0 rgba(255,255,255,0.08)',
                 }}
                 animate={{
                     scale: isHovered && !justClicked ? 1.12 : 1,
@@ -1323,10 +1329,10 @@ const DockIcon = React.memo(({
                     initial={{ scale: 0, rotate: -20 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={goOS.springs.bouncy}
-                    className="absolute -top-1 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
+                    className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-white text-[9px] font-semibold px-1 z-10"
                     style={{
-                        background: goOS.colors.accent.primary,
-                        boxShadow: '0 2px 6px rgba(255, 119, 34, 0.4)',
+                        background: '#f47a3e',
+                        boxShadow: '0 2px 8px rgba(244, 122, 62, 0.5)',
                     }}
                 >
                     {badge}
@@ -1339,8 +1345,8 @@ const DockIcon = React.memo(({
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={goOS.springs.gentle}
-                    className="w-1.5 h-1.5 rounded-full mt-1"
-                    style={{ background: goOS.colors.accent.primary }}
+                    className="w-1 h-1 rounded-full mt-1.5"
+                    style={{ background: '#ffffff' }}
                 />
             )}
         </motion.button>
@@ -2877,6 +2883,51 @@ function GoOSDemoContent() {
             {/* CONFETTI CELEBRATION */}
             <ConfettiBurst isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
 
+            {/* SPACE INDICATOR BADGE - Always visible floating badge */}
+            <motion.div
+                key={activeSpaceId}
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                style={{
+                    position: 'fixed',
+                    bottom: 100,
+                    left: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '10px 16px',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(12px)',
+                    border: `2px solid ${SPACE_THEMES[activeSpaceId]?.accent || '#333'}`,
+                    borderRadius: 12,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                    zIndex: 100,
+                }}
+            >
+                <span style={{ fontSize: 24 }}>
+                    {DEMO_SPACES.find(s => s.id === activeSpaceId)?.icon || '🎨'}
+                </span>
+                <div>
+                    <div style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: SPACE_THEMES[activeSpaceId]?.accent || '#666',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                    }}>
+                        Current Space
+                    </div>
+                    <div style={{
+                        fontSize: 15,
+                        fontWeight: 700,
+                        color: '#1a1a1a',
+                    }}>
+                        {DEMO_SPACES.find(s => s.id === activeSpaceId)?.name || 'Portfolio'}
+                    </div>
+                </div>
+            </motion.div>
+
             {/* MENU BAR - Completely hidden in zen mode for distraction-free focus */}
             <AnimatePresence>
                 {!isZenMode && (
@@ -3610,25 +3661,25 @@ function GoOSDemoContent() {
                         >
                     <RubberDuck />
                     <DockIcon
-                        icon={<Folder size={24} fill={goOS.icon.fill} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<Folder size={22} fill="rgba(255,255,255,0.15)" stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => toggleApp('nest')}
                         isActive={appWindows.nest}
                         label="Nest"
                     />
                     <DockIcon
-                        icon={<div className="w-6 h-6 flex items-center justify-center rounded bg-white text-xs font-bold" style={{ border: `2px solid ${goOS.colors.border}` }}>23</div>}
+                        icon={<div className="w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-bold text-white/90" style={{ background: 'rgba(255,255,255,0.1)' }}>23</div>}
                         onClick={() => { }}
                         label="Calendar"
                     />
                     <DockIcon
-                        icon={<Mail size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<Mail size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => toggleApp('quackmail')}
                         isActive={appWindows.quackmail}
                         badge={3}
                         label="Mail"
                     />
                     <DockIcon
-                        icon={<Camera size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<Camera size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => {
                             const photoItem = items.find(i => i.label === 'Photography');
                             if (photoItem) windowContext.openWindow(photoItem.id);
@@ -3636,49 +3687,49 @@ function GoOSDemoContent() {
                         label="Photos"
                     />
                     <DockIcon
-                        icon={<FileText size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<FileText size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => toggleApp('notes')}
                         isActive={appWindows.notes}
                         label="Notes"
                     />
-                    <div className="w-px h-8 bg-black/10 mx-1" />
+                    <div className="w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
-                        icon={<MessageCircle size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<MessageCircle size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => toggleApp('chat')}
                         isActive={appWindows.chat}
                         label="Chat"
                     />
                     <DockIcon
-                        icon={<Terminal size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<Terminal size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => toggleApp('shell')}
                         isActive={appWindows.shell}
                         label="Shell"
                     />
                     <DockIcon
-                        icon={<Settings size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<Settings size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => toggleApp('settings')}
                         isActive={appWindows.settings}
                         label="Settings"
                     />
-                    <div className="w-px h-8 bg-black/10 mx-1" />
+                    <div className="w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
-                        icon={<BookOpen size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<BookOpen size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => toggleApp('guestbook')}
                         isActive={appWindows.guestbook}
                         badge={guestbookEntries.length}
                         label="Guestbook"
                     />
                     <DockIcon
-                        icon={<BarChart3 size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                        icon={<BarChart3 size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
                         onClick={() => toggleApp('analytics')}
                         isActive={appWindows.analytics}
                         label="Analytics"
                     />
-                    <div className="w-px h-8 bg-black/10 mx-1" />
+                    <div className="w-px h-6 bg-white/10 mx-1" />
                     {/* Wallpaper Picker */}
                     <div className="relative" data-wallpaper-picker>
                         <DockIcon
-                            icon={<ImageIcon size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                            icon={<ImageIcon size={22} stroke="#f47a3e" strokeWidth={1.5} />}
                             onClick={() => setShowWallpaperPicker(!showWallpaperPicker)}
                             isActive={showWallpaperPicker}
                             label="Wallpaper"
