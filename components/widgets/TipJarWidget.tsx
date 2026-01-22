@@ -17,6 +17,8 @@ interface TipJarWidgetProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  isHighlighted?: boolean;
   onTip?: (amount: number) => Promise<void>;
 }
 
@@ -26,7 +28,7 @@ const DEFAULT_CONFIG: TipJarWidgetConfig = {
   message: 'Buy me a coffee',
 };
 
-export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onTip }: TipJarWidgetProps) {
+export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted, onTip }: TipJarWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customValue, setCustomValue] = useState('');
@@ -58,6 +60,8 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
       onEdit={onEdit}
       onDelete={onDelete}
       onPositionChange={onPositionChange}
+      onContextMenu={onContextMenu}
+      isHighlighted={isHighlighted}
     >
       {!isExpanded ? (
         // Collapsed state - friendly pill button

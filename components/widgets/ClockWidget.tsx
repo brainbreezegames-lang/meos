@@ -16,6 +16,8 @@ interface ClockWidgetProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  isHighlighted?: boolean;
 }
 
 const DEFAULT_CONFIG: ClockWidgetConfig = {
@@ -39,7 +41,7 @@ function getTimezoneAbbreviation(timezone: string): string {
   }
 }
 
-export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChange }: ClockWidgetProps) {
+export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted }: ClockWidgetProps) {
   const [time, setTime] = useState<Date>(new Date());
   const config: ClockWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ClockWidgetConfig>) };
 
@@ -91,6 +93,8 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       onEdit={onEdit}
       onDelete={onDelete}
       onPositionChange={onPositionChange}
+      onContextMenu={onContextMenu}
+      isHighlighted={isHighlighted}
     >
       <div
         style={{

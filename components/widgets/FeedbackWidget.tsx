@@ -16,6 +16,8 @@ interface FeedbackWidgetProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  isHighlighted?: boolean;
   onSubmit?: (feedback: string) => Promise<void>;
 }
 
@@ -24,7 +26,7 @@ const DEFAULT_CONFIG: FeedbackWidgetConfig = {
   anonymous: true,
 };
 
-export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onSubmit }: FeedbackWidgetProps) {
+export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted, onSubmit }: FeedbackWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -61,6 +63,8 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
       onEdit={onEdit}
       onDelete={onDelete}
       onPositionChange={onPositionChange}
+      onContextMenu={onContextMenu}
+      isHighlighted={isHighlighted}
     >
       {!isExpanded ? (
         // Collapsed state - friendly pill button

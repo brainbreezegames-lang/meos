@@ -2359,7 +2359,7 @@ function GoOSDemoContent() {
                 setOpenEditors(prev => [...prev, newFile.id]);
                 setActiveEditorId(newFile.id);
             }
-            setRenamingFileId(newFile.id);
+            // Don't auto-rename - user can right-click > Rename if needed
         }
     }, [createGoOSFile]);
 

@@ -17,6 +17,8 @@ interface ContactWidgetProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  isHighlighted?: boolean;
   onSubmit?: (data: { name?: string; email: string; message: string }) => Promise<void>;
 }
 
@@ -26,7 +28,7 @@ const DEFAULT_CONFIG: ContactWidgetConfig = {
   successMessage: 'Thanks for reaching out!',
 };
 
-export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onSubmit }: ContactWidgetProps) {
+export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted, onSubmit }: ContactWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isLoading, setIsLoading] = useState(false);
@@ -67,6 +69,8 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
       onEdit={onEdit}
       onDelete={onDelete}
       onPositionChange={onPositionChange}
+      onContextMenu={onContextMenu}
+      isHighlighted={isHighlighted}
     >
       {!isExpanded ? (
         // Collapsed state - friendly pill button

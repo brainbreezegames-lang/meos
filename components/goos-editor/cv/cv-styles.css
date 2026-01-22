@@ -4,6 +4,9 @@
    Typography: Averia Serif Libre (headings) + Instrument Sans (body)
    ========================================================================== */
 
+/* Fallback font import for CV document (ensures fonts load even if Next.js vars fail) */
+@import url('https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@400;700&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
 /* Document Container */
 .cv-document {
   width: 100%;
@@ -29,7 +32,7 @@
 }
 
 .cv-name {
-  font-family: var(--font-averia, 'Averia Serif Libre'), 'Averia Serif Libre', Georgia, serif !important;
+  font-family: var(--font-averia), 'Averia Serif Libre', Georgia, serif;
   font-size: 32px;
   font-weight: 400;
   color: #1a1a1a;

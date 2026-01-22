@@ -21,6 +21,8 @@ interface LinksWidgetProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  isHighlighted?: boolean;
 }
 
 const DEFAULT_CONFIG: LinksWidgetConfig = {
@@ -45,7 +47,7 @@ function getIcon(iconName?: string) {
   return ICON_MAP[lowerName] || ExternalLink;
 }
 
-export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChange }: LinksWidgetProps) {
+export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted }: LinksWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const config: LinksWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<LinksWidgetConfig>) };
 
@@ -58,6 +60,8 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       onEdit={onEdit}
       onDelete={onDelete}
       onPositionChange={onPositionChange}
+      onContextMenu={onContextMenu}
+      isHighlighted={isHighlighted}
     >
       {!isExpanded ? (
         // Collapsed state - compact pill button

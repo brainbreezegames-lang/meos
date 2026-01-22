@@ -16,6 +16,8 @@ interface BookWidgetProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  isHighlighted?: boolean;
 }
 
 const DEFAULT_CONFIG: BookWidgetConfig = {
@@ -23,7 +25,7 @@ const DEFAULT_CONFIG: BookWidgetConfig = {
   buttonText: 'Book a Call',
 };
 
-export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange }: BookWidgetProps) {
+export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted }: BookWidgetProps) {
   const config: BookWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<BookWidgetConfig>) };
 
   const handleClick = () => {
@@ -39,6 +41,8 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
       onEdit={onEdit}
       onDelete={onDelete}
       onPositionChange={onPositionChange}
+      onContextMenu={onContextMenu}
+      isHighlighted={isHighlighted}
     >
       <button
         onClick={handleClick}
