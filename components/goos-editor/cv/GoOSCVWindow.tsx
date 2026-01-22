@@ -30,6 +30,7 @@ interface GoOSCVWindowProps {
   isActive?: boolean;
   zIndex?: number;
   isMaximized?: boolean;
+  isZenMode?: boolean;
   isOwner?: boolean;
 }
 
@@ -55,6 +56,7 @@ export function GoOSCVWindow({
   isActive = true,
   zIndex = 100,
   isMaximized = false,
+  isZenMode = false,
   isOwner = true,
 }: GoOSCVWindowProps) {
   // Parse initial content
@@ -328,17 +330,20 @@ export function GoOSCVWindow({
         transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
         style={{
           position: 'fixed',
-          top: isMaximized ? 'var(--menubar-height, 40px)' : '10%',
+          // In zen mode, start from top of viewport
+          top: isZenMode ? 0 : (isMaximized ? 'var(--menubar-height, 40px)' : '10%'),
           left: isMaximized ? 0 : '50%',
           x: isMaximized ? 0 : '-50%',
           width: isMaximized ? '100%' : 'min(900px, 90vw)',
-          // In zen mode (--zen-dock-offset: 0px), window takes full height minus just the menubar
-          height: isMaximized ? 'calc(100vh - var(--menubar-height, 40px) - var(--zen-dock-offset, 80px))' : 'min(85vh, 800px)',
+          // In zen mode, full viewport height
+          height: isZenMode ? '100vh' : (isMaximized ? 'calc(100vh - var(--menubar-height, 40px) - var(--zen-dock-offset, 80px))' : 'min(85vh, 800px)'),
           minWidth: 400,
           background: WINDOW.background,
-          border: isMaximized ? WINDOW.borderMaximized : WINDOW.border,
-          borderRadius: isMaximized ? WINDOW.borderRadiusMaximized : WINDOW.borderRadius,
-          boxShadow: isMaximized ? WINDOW.shadowMaximized : WINDOW.shadow,
+          // No border in zen mode
+          border: isZenMode ? 'none' : (isMaximized ? WINDOW.borderMaximized : WINDOW.border),
+          borderRadius: isZenMode ? 0 : (isMaximized ? WINDOW.borderRadiusMaximized : WINDOW.borderRadius),
+          // No shadow in zen mode
+          boxShadow: isZenMode ? 'none' : (isMaximized ? WINDOW.shadowMaximized : WINDOW.shadow),
           zIndex,
           display: 'flex',
           flexDirection: 'column',
@@ -346,16 +351,16 @@ export function GoOSCVWindow({
           opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
         }}
       >
-        {/* Title Bar */}
+        {/* Title Bar - Minimal in zen mode */}
         <div
           onPointerDown={startDrag}
           style={{
             display: 'flex',
             alignItems: 'center',
-            padding: `0 ${TITLE_BAR.paddingX}px`,
-            height: TITLE_BAR.height,
-            background: TITLE_BAR.background,
-            borderBottom: TITLE_BAR.borderBottom,
+            padding: isZenMode ? '0 20px' : `0 ${TITLE_BAR.paddingX}px`,
+            height: isZenMode ? 48 : TITLE_BAR.height,
+            background: isZenMode ? 'transparent' : TITLE_BAR.background,
+            borderBottom: isZenMode ? 'none' : TITLE_BAR.borderBottom,
             gap: 12,
             cursor: isMaximized ? 'default' : 'grab',
             flexShrink: 0,

@@ -5,6 +5,7 @@ export { TipJarWidget, TIPJAR_WIDGET_DEFAULT_CONFIG } from './TipJarWidget';
 export { ContactWidget, CONTACT_WIDGET_DEFAULT_CONFIG } from './ContactWidget';
 export { LinksWidget, LINKS_WIDGET_DEFAULT_CONFIG } from './LinksWidget';
 export { FeedbackWidget, FEEDBACK_WIDGET_DEFAULT_CONFIG } from './FeedbackWidget';
+export { StatusWidget, STATUS_WIDGET_DEFAULT_CONFIG } from './StatusWidget';
 export { WidgetRenderer } from './WidgetRenderer';
 export { WidgetContextMenu } from './WidgetContextMenu';
 
@@ -16,6 +17,7 @@ import { TipJarWidget } from './TipJarWidget';
 import { ContactWidget } from './ContactWidget';
 import { LinksWidget } from './LinksWidget';
 import { FeedbackWidget } from './FeedbackWidget';
+import { StatusWidget } from './StatusWidget';
 
 export const WIDGET_COMPONENTS: Record<WidgetType, React.ComponentType<{
   widget: Widget;
@@ -29,6 +31,7 @@ export const WIDGET_COMPONENTS: Record<WidgetType, React.ComponentType<{
   contact: ContactWidget,
   links: LinksWidget,
   feedback: FeedbackWidget,
+  status: StatusWidget,
 };
 
 // Widget metadata for UI
@@ -66,5 +69,10 @@ export const WIDGET_METADATA: Record<WidgetType, {
     label: 'Feedback',
     icon: '💬',
     description: 'Collect anonymous feedback',
+  },
+  status: {
+    label: 'Availability',
+    icon: '✦',
+    description: 'Show your availability status',
   },
 };

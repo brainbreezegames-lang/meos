@@ -38,10 +38,9 @@ import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
 // ThemeProvider removed - using only Appart theme via data-theme attribute
 import { WindowManager } from '@/components/desktop/MultiWindow';
-import { StatusWidget } from '@/components/desktop';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
 import { type GuestbookEntry } from '@/components/desktop/Guestbook';
-import type { DesktopItem, Desktop, StatusWidget as StatusWidgetType } from '@/types';
+import type { DesktopItem, Desktop } from '@/types';
 import {
     GoOSFileIcon,
     GoOSDesktopContextMenu,
@@ -322,21 +321,6 @@ const DEMO_ANALYTICS_DATA = {
 };
 
 // ============================================
-// DEMO STATUS WIDGET
-// ============================================
-const DEMO_STATUS_WIDGET: StatusWidgetType = {
-    id: 'status-demo',
-    desktopId: 'goos-demo',
-    statusType: 'available',
-    title: 'Open for work',
-    description: 'Looking for exciting projects',
-    ctaUrl: '#contact',
-    ctaLabel: 'Get in touch',
-    isVisible: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-};
-
 // ============================================
 // DEMO FILES (goOS Editor)
 // ============================================
@@ -2035,94 +2019,6 @@ const TypingIndicator = () => (
 );
 
 // ============================================
-// GOOS STATUS WIDGET (Sketch style)
-// ============================================
-const GoOSStatusWidget = React.memo(({ statusWidget }: { statusWidget: StatusWidgetType | null }) => {
-    const [isHovered, setIsHovered] = useState(false);
-
-    if (!statusWidget || !statusWidget.isVisible) return null;
-
-    const statusColors: Record<string, { bg: string; dot: string; text: string }> = {
-        available: { bg: goOS.colors.white, dot: 'var(--color-success)', text: goOS.colors.text.primary },
-        looking: { bg: goOS.colors.white, dot: goOS.colors.accent.primary, text: goOS.colors.text.primary },
-        taking: { bg: goOS.colors.white, dot: goOS.colors.text.muted, text: goOS.colors.text.primary },
-        open: { bg: goOS.colors.white, dot: 'var(--color-accent-secondary)', text: goOS.colors.text.primary },
-        consulting: { bg: goOS.colors.white, dot: goOS.colors.accent.primary, text: goOS.colors.text.primary },
-    };
-
-    const colors = statusColors[statusWidget.statusType] || statusColors.available;
-
-    return (
-        <motion.div
-            className="fixed z-[2500] cursor-pointer"
-            style={{ bottom: '80px', right: '20px' }}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            onHoverStart={() => setIsHovered(true)}
-            onHoverEnd={() => setIsHovered(false)}
-        >
-            <motion.div
-                className="flex items-center gap-3 px-4 py-3 rounded-lg"
-                style={{
-                    background: goOS.colors.cream,
-                    border: `2px solid ${goOS.colors.border}`,
-                    boxShadow: isHovered ? goOS.shadows.hover : goOS.shadows.solid,
-                }}
-                animate={{ y: isHovered ? -2 : 0 }}
-                transition={goOS.springs.gentle}
-            >
-                {/* Status dot */}
-                <motion.div
-                    className="w-3 h-3 rounded-full"
-                    style={{ background: colors.dot }}
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                />
-
-                {/* Content */}
-                <div className="flex flex-col">
-                    <span
-                        className="text-sm font-bold"
-                        style={{ color: goOS.colors.text.primary }}
-                    >
-                        {statusWidget.title}
-                    </span>
-                    {statusWidget.description && (
-                        <span
-                            className="text-xs"
-                            style={{ color: goOS.colors.text.muted }}
-                        >
-                            {statusWidget.description}
-                        </span>
-                    )}
-                </div>
-
-                {/* CTA Arrow */}
-                {statusWidget.ctaUrl && (
-                    <motion.a
-                        href={statusWidget.ctaUrl}
-                        className="ml-2 w-6 h-6 flex items-center justify-center rounded-full"
-                        style={{
-                            background: goOS.colors.accent.primary,
-                            color: 'white',
-                        }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                            <path d="M3.5 3a.5.5 0 0 0 0 1h3.793L3.146 8.146a.5.5 0 1 0 .708.708L8 4.707V8.5a.5.5 0 0 0 1 0v-5a.5.5 0 0 0-.5-.5h-5Z" />
-                        </svg>
-                    </motion.a>
-                )}
-            </motion.div>
-        </motion.div>
-    );
-});
-
-GoOSStatusWidget.displayName = 'GoOSStatusWidget';
-
-// ============================================
 // MAIN CONTENT
 // ============================================
 function GoOSDemoContent() {
@@ -2257,8 +2153,8 @@ function GoOSDemoContent() {
     const [presentingFileId, setPresentingFileId] = useState<string | null>(null);
     const [caseStudyFileId, setCaseStudyFileId] = useState<string | null>(null);
 
-    // Zen focus mode - true when any window is maximized
-    const isZenMode = maximizedEditors.size > 0;
+    // Zen focus mode - true when any window is maximized OR in page/present view
+    const isZenMode = maximizedEditors.size > 0 || viewMode === 'page' || viewMode === 'present';
 
     // Widget context
     const widgetContext = useWidgets();
@@ -2842,25 +2738,24 @@ function GoOSDemoContent() {
             {/* CONFETTI CELEBRATION */}
             <ConfettiBurst isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
 
-            {/* MENU BAR - Fades to minimal presence in zen mode */}
-            <motion.header
-                animate={{
-                    opacity: isZenMode ? 0.4 : 1,
-                    y: isZenMode ? -4 : 0,
-                }}
-                whileHover={isZenMode ? { opacity: 0.9, y: 0 } : {}}
-                transition={{
-                    duration: 0.4,
-                    ease: [0.25, 0.1, 0.25, 1],
-                }}
-                className="h-11 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
-                style={{
-                    background: isZenMode ? 'transparent' : goOS.colors.headerBg,
-                    borderBottom: isZenMode ? 'none' : `2px solid ${goOS.colors.border}`,
-                    backdropFilter: isZenMode ? 'none' : undefined,
-                    pointerEvents: isZenMode ? 'none' : 'auto',
-                }}
-            >
+            {/* MENU BAR - Completely hidden in zen mode for distraction-free focus */}
+            <AnimatePresence>
+                {!isZenMode && (
+                    <motion.header
+                        initial={{ y: -50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -50, opacity: 0 }}
+                        transition={{
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 30,
+                        }}
+                        className="h-11 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
+                        style={{
+                            background: goOS.colors.headerBg,
+                            borderBottom: `2px solid ${goOS.colors.border}`,
+                        }}
+                    >
                 {/* Left: Logo + Widgets Menu */}
                 <div className="flex items-center gap-3 min-w-[180px]">
                     <motion.button
@@ -2976,7 +2871,9 @@ function GoOSDemoContent() {
                 <div className="flex items-center gap-3 text-sm min-w-[100px] justify-end" style={{ color: goOS.colors.text.secondary }}>
                     <span className="font-medium text-xs" style={{ color: goOS.colors.text.primary }}>{time}</span>
                 </div>
-            </motion.header>
+                    </motion.header>
+                )}
+            </AnimatePresence>
 
             {/* PAGE VIEW MODE - Belle Duffner-style case study view */}
             {viewMode === 'page' && (() => {
@@ -3231,6 +3128,7 @@ function GoOSDemoContent() {
                                             onMinimize={() => minimizeEditor(file.id)}
                                             onMaximize={() => toggleMaximizeEditor(file.id)}
                                             isMaximized={maximizedEditors.has(file.id)}
+                                            isZenMode={isZenMode && maximizedEditors.has(file.id)}
                                             onUpdate={(updates) => {
                                                 // Use auto-save for content changes
                                                 if (updates.content !== undefined) {
@@ -3262,6 +3160,7 @@ function GoOSDemoContent() {
                                         onMinimize={() => minimizeEditor(file.id)}
                                         onMaximize={() => toggleMaximizeEditor(file.id)}
                                         isMaximized={maximizedEditors.has(file.id)}
+                                        isZenMode={isZenMode && maximizedEditors.has(file.id)}
                                         onUpdate={(updates) => {
                                             // Use auto-save for content/title changes (debounced)
                                             if (updates.content !== undefined || updates.title !== undefined) {
@@ -3650,11 +3549,6 @@ function GoOSDemoContent() {
                 </div>
                     </motion.footer>
                 )}
-            </AnimatePresence>
-
-            {/* Status Widget - Hidden in zen mode */}
-            <AnimatePresence>
-                {!isZenMode && <StatusWidget statusWidget={DEMO_STATUS_WIDGET} />}
             </AnimatePresence>
 
             {/* Made with badge - Hidden in zen mode */}

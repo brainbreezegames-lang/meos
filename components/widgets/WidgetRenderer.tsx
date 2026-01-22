@@ -8,6 +8,7 @@ import { TipJarWidget } from './TipJarWidget';
 import { ContactWidget } from './ContactWidget';
 import { LinksWidget } from './LinksWidget';
 import { FeedbackWidget } from './FeedbackWidget';
+import { StatusWidget } from './StatusWidget';
 
 interface WidgetRendererProps {
   widgets: Widget[];
@@ -66,6 +67,8 @@ export function WidgetRenderer({
             return <LinksWidget key={widget.id} {...commonProps} />;
           case 'feedback':
             return <FeedbackWidget key={widget.id} {...commonProps} onSubmit={onFeedback} />;
+          case 'status':
+            return <StatusWidget key={widget.id} {...commonProps} />;
           default:
             return null;
         }
