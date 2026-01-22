@@ -51,27 +51,11 @@ export function GoOSEditorWindow({
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [lastSaved, setLastSaved] = useState<Date | undefined>(file.updatedAt);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [showZenControls, setShowZenControls] = useState(true);
   const [showZenStats, setShowZenStats] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const zenControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dragControls = useDragControls();
   const prefersReducedMotion = useReducedMotion();
-
-  // Auto-hide zen controls after 3 seconds of no mouse movement in header area
-  useEffect(() => {
-    if (isZenMode && showZenControls) {
-      zenControlsTimeoutRef.current = setTimeout(() => {
-        setShowZenControls(false);
-      }, 3000);
-    }
-    return () => {
-      if (zenControlsTimeoutRef.current) {
-        clearTimeout(zenControlsTimeoutRef.current);
-      }
-    };
-  }, [isZenMode, showZenControls]);
 
   // Auto-save with debounce
   const triggerSave = useCallback(() => {
@@ -136,7 +120,7 @@ export function GoOSEditorWindow({
     }
   };
 
-  // Zen mode: completely different, distraction-free UI
+  // Zen mode: clean, Substack-inspired distraction-free UI
   if (isZenMode) {
     return (
       <motion.div
@@ -153,79 +137,59 @@ export function GoOSEditorWindow({
           flexDirection: 'column',
         }}
       >
-        {/* Zen Mode: Floating controls that appear on hover */}
+        {/* Zen Mode: Always visible minimal header */}
         <div
-          onMouseEnter={() => setShowZenControls(true)}
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 80,
-            zIndex: 10,
+            padding: '12px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid var(--color-border-subtle)',
+            background: 'var(--color-bg-base)',
+            flexShrink: 0,
           }}
         >
-          <AnimatePresence>
-            {showZenControls && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                style={{
-                  position: 'absolute',
-                  top: 16,
-                  left: 20,
-                  right: 20,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                {/* Left: Traffic lights + Save status */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <TrafficLights
-                    onClose={onClose}
-                    onMinimize={onMinimize}
-                    onMaximize={onMaximize}
-                    isMaximized={isMaximized}
-                  />
+          {/* Left: Traffic lights + Save status */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <TrafficLights
+              onClose={onClose}
+              onMinimize={onMinimize}
+              onMaximize={onMaximize}
+              isMaximized={isMaximized}
+            />
 
-                  {/* Minimal save indicator */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    color: 'var(--color-text-muted)',
-                    fontSize: 12,
-                    fontFamily: 'var(--font-body)',
-                  }}>
-                    {saveStatus === 'saving' && (
-                      <>
-                        <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
-                        <span>Saving...</span>
-                      </>
-                    )}
-                    {saveStatus === 'saved' && (
-                      <>
-                        <Check size={12} style={{ color: 'var(--color-success)' }} />
-                        <span style={{ color: 'var(--color-success)' }}>Saved</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+            {/* Minimal save indicator */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              color: 'var(--color-text-muted)',
+              fontSize: 12,
+              fontFamily: 'var(--font-body)',
+            }}>
+              {saveStatus === 'saving' && (
+                <>
+                  <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
+                  <span>Saving...</span>
+                </>
+              )}
+              {saveStatus === 'saved' && (
+                <>
+                  <Check size={12} style={{ color: 'var(--color-success)' }} />
+                  <span style={{ color: 'var(--color-success)' }}>Saved</span>
+                </>
+              )}
+            </div>
+          </div>
 
-                {/* Right: Publish toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <GoOSPublishBadge status={file.status} />
-                  <GoOSPublishToggle
-                    status={file.status}
-                    onChange={handlePublishChange}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Right: Publish toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <GoOSPublishBadge status={file.status} />
+            <GoOSPublishToggle
+              status={file.status}
+              onChange={handlePublishChange}
+            />
+          </div>
         </div>
 
         {/* Zen Mode: Full-focus editor area */}
@@ -235,20 +199,19 @@ export function GoOSEditorWindow({
             display: 'flex',
             justifyContent: 'center',
             overflow: 'hidden',
-            paddingTop: 60,
           }}
         >
           <div
             style={{
               width: '100%',
-              maxWidth: 680,
+              maxWidth: 720,
               height: '100%',
-              padding: '40px 24px 80px',
-              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             {/* Editable title in zen mode */}
-            <div style={{ marginBottom: 32 }}>
+            <div style={{ padding: '32px 24px 0' }}>
               {isEditingTitle ? (
                 <input
                   ref={titleInputRef}
@@ -296,17 +259,18 @@ export function GoOSEditorWindow({
               )}
             </div>
 
-            {/* Editor without toolbar in zen mode */}
-            <GoOSTipTapEditor
-              content={content}
-              onChange={setContent}
-              onSave={triggerSave}
-              placeholder={file.type === 'case-study'
-                ? 'Start writing your case study...'
-                : 'Start writing...'}
-              autoFocus
-              hideToolbar
-            />
+            {/* Editor with toolbar in zen mode */}
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              <GoOSTipTapEditor
+                content={content}
+                onChange={setContent}
+                onSave={triggerSave}
+                placeholder={file.type === 'case-study'
+                  ? 'Start writing your case study...'
+                  : 'Start writing...'}
+                autoFocus
+              />
+            </div>
           </div>
         </div>
 

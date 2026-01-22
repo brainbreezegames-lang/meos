@@ -262,13 +262,24 @@ export function GoOSTipTapEditor({
     }
   }, [content, editor]);
 
-  // Scroll to top when editor first mounts
+  // Scroll to top when editor first mounts - use multiple attempts to ensure it works
   useEffect(() => {
     if (editor && scrollContainerRef.current) {
-      // Small delay to ensure content is rendered
-      requestAnimationFrame(() => {
-        scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
-      });
+      // Immediate scroll
+      scrollContainerRef.current.scrollTop = 0;
+
+      // Also scroll after content renders
+      const scrollToTop = () => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = 0;
+        }
+      };
+
+      // Multiple attempts to catch different timing scenarios
+      requestAnimationFrame(scrollToTop);
+      setTimeout(scrollToTop, 0);
+      setTimeout(scrollToTop, 50);
+      setTimeout(scrollToTop, 100);
     }
   }, [editor]);
 
@@ -626,7 +637,8 @@ export function GoOSTipTapEditor({
         }
 
         .goos-editor-content mark {
-          background: ${goOSTokens.colors.accent.pale};
+          background: #fef08a;
+          color: #1a1a1a;
           padding: 0 2px;
           border-radius: 2px;
         }
