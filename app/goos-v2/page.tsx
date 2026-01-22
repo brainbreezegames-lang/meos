@@ -52,7 +52,6 @@ import {
 } from '@/components/goos-editor';
 import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext';
 import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
-import { SpaceProvider, useSpaces } from '@/contexts/SpaceContext';
 import { WidgetRenderer, WIDGET_METADATA, WidgetContextMenu } from '@/components/widgets';
 import type { Widget } from '@/types';
 import { ViewSwitcher, PageView, PresentView } from '@/components/views';
@@ -61,6 +60,15 @@ import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
 import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
 
+// ============================================
+// DEMO SPACES (for SpaceSwitcher demo)
+// ============================================
+const DEMO_SPACES: SpaceSummary[] = [
+    { id: 'space-1', name: 'Portfolio', icon: '🎨', slug: null, isPrimary: true, isPublic: true, order: 0, fileCount: 12 },
+    { id: 'space-2', name: 'Writing', icon: '✍️', slug: 'writing', isPrimary: false, isPublic: true, order: 1, fileCount: 8 },
+    { id: 'space-3', name: 'Photography', icon: '📸', slug: 'photos', isPrimary: false, isPublic: true, order: 2, fileCount: 24 },
+    { id: 'space-4', name: 'Personal', icon: '🔐', slug: null, isPrimary: false, isPublic: false, order: 3, fileCount: 5 },
+];
 
 // ============================================
 // PLAYFUL LOADING MESSAGES
@@ -199,19 +207,19 @@ const goOS = {
             border: 'var(--color-text-primary)',
         },
         sticky: {
-            yellow: '#fef9e3',
-            blue: '#eef6fc',
-            pink: '#fceef3',
-            green: '#eefcee',
-            orange: '#fef3ea',
-            purple: '#f3eefb',
+            yellow: '#fff9db',
+            blue: '#e8f4fd',
+            pink: '#fde8f0',
+            green: '#e8fde8',
+            orange: '#fff0e6',
+            purple: '#f0e8fd',
         }
     },
     // Hex values for SVG stroke/fill (CSS vars don't work in SVG attributes)
     icon: {
-        stroke: '#1a1816',
-        fill: 'rgba(244, 122, 62, 0.08)',
-        accent: '#f47a3e',
+        stroke: '#171412',
+        fill: 'rgba(255, 119, 34, 0.1)',
+        accent: '#ff7722',
     },
     shadows: {
         solid: 'var(--shadow-md)',
@@ -1246,19 +1254,19 @@ const DockIcon = React.memo(({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.85 }}
                         transition={{ type: 'spring', damping: 20, stiffness: 400 }}
-                        className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
+                        className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap z-50"
                         style={{
-                            background: 'rgba(26, 24, 22, 0.88)',
-                            color: '#fefefe',
-                            boxShadow: '0 4px 16px rgba(30, 50, 70, 0.2)',
-                            backdropFilter: 'blur(8px)',
+                            background: goOS.colors.text.primary,
+                            color: goOS.colors.paper,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                            border: `1px solid rgba(255,255,255,0.1)`,
                         }}
                     >
                         {label}
                         {/* Tooltip arrow */}
                         <div
                             className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45"
-                            style={{ background: 'rgba(26, 24, 22, 0.88)' }}
+                            style={{ background: goOS.colors.text.primary }}
                         />
                     </motion.div>
                 )}
@@ -1267,9 +1275,9 @@ const DockIcon = React.memo(({
             <motion.div
                 className={`w-11 h-11 flex items-center justify-center rounded-xl ${isActive ? '' : ''}`}
                 style={{
-                    background: isActive ? 'rgba(255, 255, 255, 0.95)' : isHovered ? 'rgba(0,0,0,0.03)' : 'transparent',
-                    border: isActive ? '1px solid rgba(26, 24, 22, 0.08)' : '1px solid transparent',
-                    boxShadow: isActive ? '0 2px 8px rgba(30, 50, 70, 0.08)' : 'none',
+                    background: isActive ? goOS.colors.white : isHovered ? 'rgba(0,0,0,0.04)' : 'transparent',
+                    border: isActive ? `2px solid ${goOS.colors.border}` : '2px solid transparent',
+                    boxShadow: isActive ? goOS.shadows.sm : 'none',
                 }}
                 animate={{
                     scale: isHovered && !justClicked ? 1.12 : 1,
@@ -2035,17 +2043,8 @@ function GoOSDemoContent() {
     const [showConfetti, setShowConfetti] = useState(false);
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
-    // Spaces (from context)
-    const {
-        spaces,
-        activeSpaceId,
-        switchSpace,
-        createSpace,
-        updateSpace,
-        deleteSpace,
-        setAsPrimary,
-        reorderSpaces,
-    } = useSpaces();
+    // Spaces state (demo mode - will be replaced by SpaceContext)
+    const [activeSpaceId, setActiveSpaceId] = useState('space-1');
     const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
     const [showManageSpacesDialog, setShowManageSpacesDialog] = useState(false);
 
@@ -2792,8 +2791,8 @@ function GoOSDemoContent() {
                 <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                        backgroundImage: 'radial-gradient(rgba(30, 50, 70, 0.035) 1px, transparent 1px)',
-                        backgroundSize: '28px 28px',
+                        backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
+                        backgroundSize: '24px 24px',
                         zIndex: 0,
                     }}
                 />
@@ -2816,11 +2815,8 @@ function GoOSDemoContent() {
                         }}
                         className="h-11 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
                         style={{
-                            background: 'rgba(250, 248, 243, 0.88)',
-                            backdropFilter: 'blur(20px) saturate(180%)',
-                            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                            borderBottom: '1px solid rgba(26, 24, 22, 0.08)',
-                            boxShadow: '0 1px 3px rgba(30, 50, 70, 0.04)',
+                            background: goOS.colors.headerBg,
+                            borderBottom: `2px solid ${goOS.colors.border}`,
                         }}
                     >
                 {/* Left: Logo + Widgets Menu */}
@@ -2863,9 +2859,15 @@ function GoOSDemoContent() {
 
                     {/* Space Switcher */}
                     <SpaceSwitcher
-                        spaces={spaces}
-                        activeSpaceId={activeSpaceId || spaces[0]?.id || ''}
-                        onSwitchSpace={switchSpace}
+                        spaces={DEMO_SPACES}
+                        activeSpaceId={activeSpaceId}
+                        onSwitchSpace={(spaceId) => {
+                            setActiveSpaceId(spaceId);
+                            const space = DEMO_SPACES.find(s => s.id === spaceId);
+                            if (space) {
+                                showGoOSToast(`Switched to ${space.name}`, 'success');
+                            }
+                        }}
                         onCreateSpace={() => setShowCreateSpaceModal(true)}
                         onManageSpaces={() => setShowManageSpacesDialog(true)}
                     />
@@ -3521,13 +3523,11 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="flex items-center gap-2 px-5 py-3 rounded-2xl"
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
                             style={{
-                                background: 'rgba(255, 255, 255, 0.85)',
-                                backdropFilter: 'blur(20px) saturate(180%)',
-                                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                                border: '1px solid rgba(255, 255, 255, 0.6)',
-                                boxShadow: '0 8px 32px rgba(30, 50, 70, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                                background: goOS.colors.cream,
+                                border: `2px solid ${goOS.colors.border}`,
+                                boxShadow: goOS.shadows.solid
                             }}
                         >
                     <RubberDuck />
@@ -3563,7 +3563,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.notes}
                         label="Notes"
                     />
-                    <div className="w-px h-7 bg-black/6 mx-1.5" />
+                    <div className="w-px h-8 bg-black/10 mx-1" />
                     <DockIcon
                         icon={<MessageCircle size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
                         onClick={() => toggleApp('chat')}
@@ -3582,7 +3582,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.settings}
                         label="Settings"
                     />
-                    <div className="w-px h-7 bg-black/6 mx-1.5" />
+                    <div className="w-px h-8 bg-black/10 mx-1" />
                     <DockIcon
                         icon={<BookOpen size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
                         onClick={() => toggleApp('guestbook')}
@@ -3596,7 +3596,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.analytics}
                         label="Analytics"
                     />
-                    <div className="w-px h-7 bg-black/6 mx-1.5" />
+                    <div className="w-px h-8 bg-black/10 mx-1" />
                     {/* Wallpaper Picker */}
                     <div className="relative" data-wallpaper-picker>
                         <DockIcon
@@ -3615,11 +3615,9 @@ function GoOSDemoContent() {
                                     className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 rounded-xl"
                                     data-wallpaper-picker
                                     style={{
-                                        background: 'rgba(255, 255, 255, 0.92)',
-                                        backdropFilter: 'blur(24px) saturate(180%)',
-                                        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                                        border: '1px solid rgba(255, 255, 255, 0.6)',
-                                        boxShadow: '0 12px 40px rgba(30, 50, 70, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05)',
+                                        background: goOS.colors.cream,
+                                        border: `2px solid ${goOS.colors.border}`,
+                                        boxShadow: goOS.shadows.solid,
                                         zIndex: 5000,
                                     }}
                                     onClick={(e) => e.stopPropagation()}
@@ -3693,7 +3691,7 @@ function GoOSDemoContent() {
                     {/* Minimized Editors */}
                     {minimizedEditors.size > 0 && (
                         <>
-                            <div className="w-px h-7 bg-black/6 mx-1.5" />
+                            <div className="w-px h-8 bg-black/10 mx-1" />
                             {Array.from(minimizedEditors).map(fileId => {
                                 const file = goosFiles.find(f => f.id === fileId);
                                 if (!file) return null;
@@ -3988,31 +3986,37 @@ function GoOSDemoContent() {
             <CreateSpaceModal
                 isOpen={showCreateSpaceModal}
                 onClose={() => setShowCreateSpaceModal(false)}
-                onCreate={async (data) => {
-                    const newSpace = await createSpace({
-                        name: data.name,
-                        icon: data.icon,
-                        isPublic: data.isPublic,
-                        slug: data.slug,
-                        copyFromSpaceId: data.copyFromSpaceId,
-                    });
-                    if (newSpace) {
-                        setShowCreateSpaceModal(false);
-                    }
+                onCreate={(data) => {
+                    console.log('Create space:', data);
+                    showGoOSToast(`Created space "${data.name}"`, 'success');
                 }}
-                existingSpaces={spaces}
-                existingSlugs={spaces.filter(s => s.slug).map(s => s.slug as string)}
+                existingSpaces={DEMO_SPACES}
+                existingSlugs={DEMO_SPACES.filter(s => s.slug).map(s => s.slug as string)}
             />
 
             {/* Manage Spaces Dialog */}
             <ManageSpacesDialog
                 isOpen={showManageSpacesDialog}
                 onClose={() => setShowManageSpacesDialog(false)}
-                spaces={spaces}
-                onReorder={reorderSpaces}
-                onUpdateSpace={updateSpace}
-                onSetPrimary={setAsPrimary}
-                onDeleteSpace={deleteSpace}
+                spaces={DEMO_SPACES}
+                onReorder={(orderedIds) => {
+                    console.log('Reorder spaces:', orderedIds);
+                    showGoOSToast('Spaces reordered', 'success');
+                }}
+                onUpdateSpace={(id, updates) => {
+                    console.log('Update space:', id, updates);
+                    showGoOSToast('Space updated', 'success');
+                }}
+                onSetPrimary={(id) => {
+                    const space = DEMO_SPACES.find(s => s.id === id);
+                    console.log('Set primary:', id);
+                    showGoOSToast(`${space?.name} is now your main space`, 'success');
+                }}
+                onDeleteSpace={(id) => {
+                    const space = DEMO_SPACES.find(s => s.id === id);
+                    console.log('Delete space:', id);
+                    showGoOSToast(`Deleted "${space?.name}"`, 'success');
+                }}
             />
         </div>
     );
@@ -4036,16 +4040,13 @@ export default function GoOSDemoPage() {
         >
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
-                    <SpaceProvider localOnly={true}>
-                        <GoOSProvider viewMode="owner" localOnly={true} initialFiles={INITIAL_GOOS_FILES}>
-                            <WidgetProvider localOnly={true} isOwner={true} initialWidgets={INITIAL_DEMO_WIDGETS}>
-                                <GoOSDemoContent />
-                            </WidgetProvider>
-                        </GoOSProvider>
-                    </SpaceProvider>
+                    <GoOSProvider viewMode="owner" localOnly={true} initialFiles={INITIAL_GOOS_FILES}>
+                        <WidgetProvider localOnly={true} isOwner={true} initialWidgets={INITIAL_DEMO_WIDGETS}>
+                            <GoOSDemoContent />
+                        </WidgetProvider>
+                    </GoOSProvider>
                 </WindowProvider>
             </EditProvider>
         </div>
     );
 }
-// Force redeploy calm-tech Thu Jan 22 16:28:46 CET 2026

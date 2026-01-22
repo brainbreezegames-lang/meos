@@ -210,34 +210,29 @@ html.theme-sketch {
     --tracking-wide: 0.02em;
 
     /* ========== COLORS ========== */
-    /* Backgrounds - Calm-Tech Warm Cream with Atmospheric Depth */
-    --bg-canvas: #faf8f3;
-    /* Soft warm cream */
-    --bg-surface: #faf8f3;
-    /* Soft warm cream */
+    /* Backgrounds - Warm Cream */
+    --bg-canvas: #fbf9ef;
+    /* Warm cream */
+    --bg-surface: #fbf9ef;
+    /* Warm cream */
     --bg-elevated: #ffffff;
     /* White elevated */
-    --bg-muted: #f5f3ed;
-    /* Subtle cream with warmth */
-    --bg-overlay: rgba(255, 136, 68, 0.08);
-    /* Softer overlay */
+    --bg-muted: #f2f0e7;
+    /* Subtle cream */
+    --bg-overlay: rgba(255, 119, 34, 0.1);
 
-    /* Text Colors - Warm Black with Softness */
-    --text-primary: #1a1816;
-    /* Slightly softened black */
-    --text-secondary: #5a5550;
-    /* Warmer secondary */
-    --text-tertiary: #9a908a;
-    /* Muted, calm */
-    --text-disabled: rgba(26, 24, 22, 0.4);
-    --text-inverse: #fefefe;
+    /* Text Colors - Warm Black */
+    --text-primary: #171412;
+    --text-secondary: #4a4744;
+    --text-tertiary: #8e827c;
+    --text-disabled: rgba(23, 20, 18, 0.5);
+    --text-inverse: #ffffff;
 
-    /* Brand/Accent Colors - Warm Coral-Orange */
-    --accent-primary: #f47a3e;
-    /* Softer, warmer orange */
-    --accent-dark: #e06a2e;
-    --accent-light: #ff8f55;
-    --accent-pale: #faf8f3;
+    /* Brand/Accent Colors - Orange */
+    --accent-primary: #ff7722;
+    --accent-dark: #e5691e;
+    --accent-light: #ff7722;
+    --accent-pale: #fbf9ef;
 
     /* Semantic Colors */
     --color-success: #22c55e;
@@ -251,10 +246,10 @@ html.theme-sketch {
     --traffic-green: #28c840;
     --traffic-border: #171412;
 
-    /* Border Colors - Softer, calmer */
-    --border-strong: rgba(26, 24, 22, 0.12);
-    --border-medium: rgba(26, 24, 22, 0.06);
-    --border-subtle: rgba(26, 24, 22, 0.03);
+    /* Border Colors */
+    --border-strong: rgba(23, 20, 18, 0.15);
+    --border-medium: rgba(23, 20, 18, 0.08);
+    --border-subtle: rgba(23, 20, 18, 0.05);
 
     /* ========== SPACING ========== */
     --space-0: 0;
@@ -279,14 +274,14 @@ html.theme-sketch {
     --border-width: 2px;
     --border-width-thin: 1.5px;
 
-    /* ========== SHADOWS (Calm-Tech Atmospheric) ========== */
-    /* Soft, diffuse shadows with subtle cool tint for depth */
-    --shadow-sm: 0 2px 8px rgba(30, 40, 50, 0.05), 0 1px 3px rgba(23, 20, 18, 0.04);
-    --shadow-md: 0 4px 24px rgba(30, 45, 60, 0.07), 0 2px 8px rgba(23, 20, 18, 0.04);
-    --shadow-lg: 0 12px 40px rgba(30, 50, 70, 0.09), 0 4px 12px rgba(23, 20, 18, 0.05);
-    --shadow-solid: 0 20px 60px rgba(30, 50, 70, 0.12), 0 8px 24px rgba(23, 20, 18, 0.06);
-    --shadow-button: 0 2px 6px rgba(30, 40, 50, 0.06);
-    --shadow-button-active: 0 1px 3px rgba(30, 40, 50, 0.08);
+    /* ========== SHADOWS (Soft Warm) ========== */
+    /* Warm shadows using warm black */
+    --shadow-sm: 0 2px 8px rgba(23, 20, 18, 0.06);
+    --shadow-md: 0 4px 20px rgba(23, 20, 18, 0.08);
+    --shadow-lg: 0 8px 32px rgba(23, 20, 18, 0.12);
+    --shadow-solid: 0 16px 48px rgba(23, 20, 18, 0.15);
+    --shadow-button: 0 2px 8px rgba(23, 20, 18, 0.06);
+    --shadow-button-active: 0 1px 4px rgba(23, 20, 18, 0.1);
 
     /* ========== TRANSITIONS ========== */
     --transition-fast: 150ms ease;
@@ -325,9 +320,9 @@ html.theme-sketch {
     --traffic-green: #28c840;
     --traffic-green-hover: #1aad2e;
 
-    /* Window shadows - calm-tech atmospheric depth */
-    --shadow-window: 0 2px 4px rgba(30, 40, 50, 0.03), 0 16px 40px rgba(30, 50, 70, 0.10), 0 32px 80px rgba(40, 60, 80, 0.08);
-    --shadow-dock: 0 -4px 20px rgba(30, 50, 70, 0.06), 0 12px 40px rgba(30, 50, 70, 0.12);
+    /* Window shadows - soft warm style */
+    --shadow-window: 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08);
+    --shadow-dock: 0 8px 32px rgba(23, 20, 18, 0.12);
 
     /* Dock styling */
     --bg-dock: #FFFFFF;
