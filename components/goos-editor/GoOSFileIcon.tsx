@@ -1,10 +1,206 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect, memo, useMemo } from 'react';
-import { FileText, Presentation, Folder, Lock, FileUser } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
+
+// ============================================================================
+// BEAUTIFUL FILE ICONS - macOS Big Sur inspired with goOS warmth
+// ============================================================================
+
+// Note icon - Paper with folded corner, warm cream gradient
+function NoteIcon() {
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Paper shadow */}
+      <path
+        d="M10 8C10 6.34315 11.3431 5 13 5H27L34 12V36C34 37.6569 32.6569 39 31 39H13C11.3431 39 10 37.6569 10 36V8Z"
+        fill="rgba(23, 20, 18, 0.08)"
+        transform="translate(1, 1)"
+      />
+      {/* Paper body */}
+      <path
+        d="M10 8C10 6.34315 11.3431 5 13 5H27L34 12V36C34 37.6569 32.6569 39 31 39H13C11.3431 39 10 37.6569 10 36V8Z"
+        fill="url(#noteGradient)"
+      />
+      {/* Folded corner */}
+      <path
+        d="M27 5V10C27 11.1046 27.8954 12 29 12H34L27 5Z"
+        fill="url(#foldGradient)"
+      />
+      {/* Corner fold shadow */}
+      <path
+        d="M27 5L34 12L27 12V5Z"
+        fill="rgba(23, 20, 18, 0.06)"
+      />
+      {/* Text lines */}
+      <rect x="14" y="17" width="16" height="2" rx="1" fill="rgba(23, 20, 18, 0.12)" />
+      <rect x="14" y="22" width="12" height="2" rx="1" fill="rgba(23, 20, 18, 0.08)" />
+      <rect x="14" y="27" width="14" height="2" rx="1" fill="rgba(23, 20, 18, 0.08)" />
+      <rect x="14" y="32" width="8" height="2" rx="1" fill="rgba(23, 20, 18, 0.06)" />
+      {/* Border */}
+      <path
+        d="M10 8C10 6.34315 11.3431 5 13 5H27L34 12V36C34 37.6569 32.6569 39 31 39H13C11.3431 39 10 37.6569 10 36V8Z"
+        stroke="rgba(23, 20, 18, 0.15)"
+        strokeWidth="1"
+        fill="none"
+      />
+      <defs>
+        <linearGradient id="noteGradient" x1="10" y1="5" x2="34" y2="39" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFFDF7" />
+          <stop offset="1" stopColor="#F5F0E4" />
+        </linearGradient>
+        <linearGradient id="foldGradient" x1="27" y1="5" x2="34" y2="12" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F0EBE0" />
+          <stop offset="1" stopColor="#E8E3D8" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+// Case Study icon - Presentation with chart, purple accent
+function CaseStudyIcon() {
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Board shadow */}
+      <rect x="7" y="7" width="30" height="24" rx="3" fill="rgba(23, 20, 18, 0.08)" transform="translate(1, 1)" />
+      {/* Board body */}
+      <rect x="7" y="6" width="30" height="24" rx="3" fill="url(#caseGradient)" />
+      {/* Screen area */}
+      <rect x="10" y="9" width="24" height="15" rx="2" fill="url(#screenGradient)" />
+      {/* Chart bars */}
+      <rect x="13" y="18" width="4" height="4" rx="0.5" fill="#3d2fa9" opacity="0.9" />
+      <rect x="19" y="14" width="4" height="8" rx="0.5" fill="#ff7722" opacity="0.9" />
+      <rect x="25" y="16" width="4" height="6" rx="0.5" fill="#3d2fa9" opacity="0.7" />
+      {/* Chart line overlay */}
+      <path d="M13 17L17 15L23 13L29 14" stroke="#ff7722" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
+      {/* Stand */}
+      <path d="M22 30V36" stroke="rgba(23, 20, 18, 0.25)" strokeWidth="2" strokeLinecap="round" />
+      <ellipse cx="22" cy="37" rx="6" ry="2" fill="rgba(23, 20, 18, 0.1)" />
+      {/* Border */}
+      <rect x="7" y="6" width="30" height="24" rx="3" stroke="rgba(23, 20, 18, 0.15)" strokeWidth="1" fill="none" />
+      <defs>
+        <linearGradient id="caseGradient" x1="7" y1="6" x2="37" y2="30" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FDFCF8" />
+          <stop offset="1" stopColor="#F3EFE5" />
+        </linearGradient>
+        <linearGradient id="screenGradient" x1="10" y1="9" x2="34" y2="24" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FAFAF8" />
+          <stop offset="1" stopColor="#F5F3ED" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+// CV icon - Professional document with avatar, green accent
+function CVIcon() {
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Document shadow */}
+      <path
+        d="M9 7C9 5.34315 10.3431 4 12 4H32C33.6569 4 35 5.34315 35 7V37C35 38.6569 33.6569 40 32 40H12C10.3431 40 9 38.6569 9 37V7Z"
+        fill="rgba(23, 20, 18, 0.08)"
+        transform="translate(1, 1)"
+      />
+      {/* Document body */}
+      <path
+        d="M9 7C9 5.34315 10.3431 4 12 4H32C33.6569 4 35 5.34315 35 7V37C35 38.6569 33.6569 40 32 40H12C10.3431 40 9 38.6569 9 37V7Z"
+        fill="url(#cvGradient)"
+      />
+      {/* Top accent bar */}
+      <rect x="9" y="4" width="26" height="6" rx="2" fill="url(#cvAccentGradient)" />
+      {/* Avatar circle */}
+      <circle cx="17" cy="17" r="5" fill="url(#avatarGradient)" />
+      {/* Avatar silhouette */}
+      <circle cx="17" cy="15.5" r="2" fill="rgba(255, 255, 255, 0.9)" />
+      <ellipse cx="17" cy="20" rx="3" ry="2" fill="rgba(255, 255, 255, 0.9)" />
+      {/* Name placeholder */}
+      <rect x="25" y="14" width="7" height="2.5" rx="1" fill="rgba(23, 20, 18, 0.15)" />
+      <rect x="25" y="18" width="5" height="1.5" rx="0.75" fill="rgba(23, 20, 18, 0.08)" />
+      {/* Content lines */}
+      <rect x="13" y="26" width="18" height="2" rx="1" fill="rgba(23, 20, 18, 0.1)" />
+      <rect x="13" y="30" width="14" height="2" rx="1" fill="rgba(23, 20, 18, 0.07)" />
+      <rect x="13" y="34" width="16" height="2" rx="1" fill="rgba(23, 20, 18, 0.07)" />
+      {/* Border */}
+      <path
+        d="M9 7C9 5.34315 10.3431 4 12 4H32C33.6569 4 35 5.34315 35 7V37C35 38.6569 33.6569 40 32 40H12C10.3431 40 9 38.6569 9 37V7Z"
+        stroke="rgba(23, 20, 18, 0.15)"
+        strokeWidth="1"
+        fill="none"
+      />
+      <defs>
+        <linearGradient id="cvGradient" x1="9" y1="4" x2="35" y2="40" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFFEFA" />
+          <stop offset="1" stopColor="#F5F2E8" />
+        </linearGradient>
+        <linearGradient id="cvAccentGradient" x1="9" y1="4" x2="35" y2="10" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#22c55e" />
+          <stop offset="1" stopColor="#16a34a" />
+        </linearGradient>
+        <linearGradient id="avatarGradient" x1="12" y1="12" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#a3e635" />
+          <stop offset="1" stopColor="#22c55e" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+// Folder icon - Classic folder with depth and warmth
+function FolderIcon() {
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Folder shadow */}
+      <path
+        d="M5 14C5 12.3431 6.34315 11 8 11H17L20 8H36C37.6569 8 39 9.34315 39 11V32C39 33.6569 37.6569 35 36 35H8C6.34315 35 5 33.6569 5 32V14Z"
+        fill="rgba(23, 20, 18, 0.1)"
+        transform="translate(1, 1)"
+      />
+      {/* Back folder tab */}
+      <path
+        d="M8 11H16L19 8H36C37.6569 8 39 9.34315 39 11V14H5V14C5 12.3431 6.34315 11 8 11Z"
+        fill="url(#folderTabGradient)"
+      />
+      {/* Main folder body */}
+      <path
+        d="M5 14H39V32C39 33.6569 37.6569 35 36 35H8C6.34315 35 5 33.6569 5 32V14Z"
+        fill="url(#folderGradient)"
+      />
+      {/* Folder front flap highlight */}
+      <path
+        d="M5 16C5 14.8954 5.89543 14 7 14H37C38.1046 14 39 14.8954 39 16V17H5V16Z"
+        fill="rgba(255, 255, 255, 0.3)"
+      />
+      {/* Inner shadow */}
+      <path
+        d="M7 18H37V31C37 32.1046 36.1046 33 35 33H9C7.89543 33 7 32.1046 7 31V18Z"
+        fill="rgba(23, 20, 18, 0.03)"
+      />
+      {/* Border */}
+      <path
+        d="M8 11H16L19 8H36C37.6569 8 39 9.34315 39 11V32C39 33.6569 37.6569 35 36 35H8C6.34315 35 5 33.6569 5 32V14C5 12.3431 6.34315 11 8 11Z"
+        stroke="rgba(23, 20, 18, 0.18)"
+        strokeWidth="1"
+        fill="none"
+      />
+      <defs>
+        <linearGradient id="folderGradient" x1="5" y1="14" x2="39" y2="35" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFD699" />
+          <stop offset="0.5" stopColor="#FFCC80" />
+          <stop offset="1" stopColor="#FFB84D" />
+        </linearGradient>
+        <linearGradient id="folderTabGradient" x1="5" y1="8" x2="39" y2="14" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFE0B2" />
+          <stop offset="1" stopColor="#FFD180" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
 
 // Throttle function for performance
 function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
@@ -69,6 +265,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
   const dragStartRef = useRef<{ mouseX: number; mouseY: number; elemX: number; elemY: number } | null>(null);
   const hasDragged = useRef(false);
+  // Track current position during drag to avoid stale closure
+  const currentPositionRef = useRef({ x: position.x, y: position.y });
 
   // Refs for callbacks to avoid stale closures
   const onPositionChangeRef = useRef(onPositionChange);
@@ -84,6 +282,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   useEffect(() => {
     if (!isDragging) {
       setLocalPosition({ x: position.x, y: position.y });
+      currentPositionRef.current = { x: position.x, y: position.y };
     }
   }, [position.x, position.y, isDragging]);
 
@@ -102,19 +301,14 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   const getIcon = () => {
     switch (type) {
       case 'case-study':
-        return <Presentation size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} />;
+        return <CaseStudyIcon />;
       case 'folder':
-        return <Folder size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} fill={goOSTokens.colors.accent.pale} />;
+        return <FolderIcon />;
       case 'cv':
-        return <FileUser size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} />;
+        return <CVIcon />;
       default:
-        return <FileText size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} />;
+        return <NoteIcon />;
     }
-  };
-
-  const getIconBg = () => {
-    // Unified design - all file types use the same background
-    return goOSTokens.colors.contentBg;
   };
 
   const handleRenameSubmit = () => {
@@ -136,11 +330,12 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     const parent = (e.target as HTMLElement).closest('[data-goos-desktop]') || document.body;
     const parentRect = parent.getBoundingClientRect();
 
+    // Use ref to get current position to avoid stale closure
     dragStartRef.current = {
       mouseX: e.clientX,
       mouseY: e.clientY,
-      elemX: localPosition.x,
-      elemY: localPosition.y,
+      elemX: currentPositionRef.current.x,
+      elemY: currentPositionRef.current.y,
     };
     hasDragged.current = false;
 
@@ -171,7 +366,9 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       const clampedX = Math.max(0, Math.min(95, newX));
       const clampedY = Math.max(0, Math.min(90, newY));
 
+      // Update both state and ref (ref is used in mouseUp to avoid stale closure)
       setLocalPosition({ x: clampedX, y: clampedY });
+      currentPositionRef.current = { x: clampedX, y: clampedY };
 
       // Notify for folder hit-testing
       throttledOnDrag?.({ x: clampedX, y: clampedY }, id);
@@ -185,8 +382,9 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       setIsDragging(false);
 
       // Save the final position if we actually dragged
+      // Use currentPositionRef instead of localPosition to avoid stale closure
       if (wasActualDrag && dragStartRef.current) {
-        onPositionChangeRef.current?.(localPosition, id);
+        onPositionChangeRef.current?.(currentPositionRef.current, id);
       }
 
       dragStartRef.current = null;
@@ -194,7 +392,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [id, isRenaming, localPosition, throttledOnDrag]);
+  }, [id, isRenaming, throttledOnDrag]);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     // If we dragged, don't trigger click
@@ -256,35 +454,34 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         outline: 'none',
       }}
     >
-      {/* Icon */}
+      {/* Icon - Beautiful macOS-style SVG icons */}
       <div
         style={{
           width: 52,
           height: 52,
-          borderRadius: goOSTokens.radii.lg,
-          background: getIconBg(),
-          border: `1px solid ${goOSTokens.colors.border}`,
-          boxShadow: goOSTokens.shadows.sm,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
+          filter: isDragging ? 'drop-shadow(0 8px 16px rgba(23, 20, 18, 0.2))' : 'drop-shadow(0 2px 4px rgba(23, 20, 18, 0.08))',
+          transition: 'filter 0.15s ease',
         }}
       >
         {getIcon()}
 
-        {/* Draft indicator for files */}
+        {/* Draft indicator - orange dot */}
         {type !== 'folder' && status === 'draft' && (
           <div
             style={{
               position: 'absolute',
-              top: -4,
-              right: -4,
-              width: 12,
-              height: 12,
+              top: 0,
+              right: 0,
+              width: 10,
+              height: 10,
               borderRadius: '50%',
-              background: goOSTokens.colors.accent.primary,
-              border: `1.5px solid ${goOSTokens.colors.border}`,
+              background: 'linear-gradient(135deg, #ff9500 0%, #ff7722 100%)',
+              border: '1.5px solid #fff',
+              boxShadow: '0 1px 3px rgba(255, 119, 34, 0.4)',
             }}
             title="Draft"
           />
@@ -295,13 +492,14 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
           <div
             style={{
               position: 'absolute',
-              bottom: -4,
-              right: -4,
+              bottom: 0,
+              right: 0,
               width: 16,
               height: 16,
               borderRadius: '50%',
-              background: goOSTokens.colors.text.muted,
-              border: `1.5px solid ${goOSTokens.colors.border}`,
+              background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+              border: '1.5px solid #fff',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -329,14 +527,16 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
           }}
           style={{
             width: '100%',
-            padding: '2px 4px',
+            padding: '3px 6px',
             fontSize: 11,
             fontFamily: goOSTokens.fonts.body,
+            fontWeight: 500,
             textAlign: 'center',
-            background: goOSTokens.colors.paper,
-            border: `1.5px solid ${goOSTokens.colors.accent.primary}`,
-            borderRadius: 3,
+            background: '#fff',
+            border: '2px solid var(--color-accent-primary, #ff7722)',
+            borderRadius: 6,
             outline: 'none',
+            boxShadow: '0 2px 8px rgba(255, 119, 34, 0.2)',
           }}
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
@@ -347,15 +547,21 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             fontSize: 11,
             fontFamily: goOSTokens.fonts.body,
             fontWeight: 500,
-            color: goOSTokens.colors.text.primary,
+            color: 'var(--color-text-primary, #171412)',
             textAlign: 'center',
             maxWidth: '100%',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            padding: '2px 4px',
-            borderRadius: 3,
-            background: isSelected ? goOSTokens.colors.accent.pale : 'transparent',
+            padding: '3px 6px',
+            borderRadius: 6,
+            background: isSelected
+              ? 'var(--color-accent-primary, #ff7722)'
+              : 'rgba(251, 249, 239, 0.85)',
+            backdropFilter: isSelected ? 'none' : 'blur(8px)',
+            WebkitBackdropFilter: isSelected ? 'none' : 'blur(8px)',
+            boxShadow: '0 1px 3px rgba(23, 20, 18, 0.08)',
+            ...(isSelected && { color: '#fff' }),
           }}
           title={title}
         >

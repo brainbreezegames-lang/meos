@@ -2553,6 +2553,27 @@ function GoOSDemoContent() {
         updateGoOSFile(fileId, { position });
     }, [updateGoOSFile]);
 
+    // Arrange all desktop icons in a clean grid
+    const arrangeIcons = useCallback(() => {
+        const files = filesOnDesktop;
+        if (files.length === 0) return;
+
+        // Grid settings (percentages) - icons arranged from top-left
+        const startX = 3; // Start 3% from left
+        const startY = 5; // Start 5% from top
+        const iconWidth = 8; // Each icon takes ~8% width
+        const iconHeight = 12; // Each icon takes ~12% height
+        const columns = Math.floor((100 - startX * 2) / iconWidth); // Calculate how many columns fit
+
+        files.forEach((file, index) => {
+            const col = index % columns;
+            const row = Math.floor(index / columns);
+            const x = startX + col * iconWidth;
+            const y = startY + row * iconHeight;
+            updateGoOSFile(file.id, { position: { x, y } });
+        });
+    }, [filesOnDesktop, updateGoOSFile]);
+
     const copyFile = useCallback((fileId: string) => {
         const file = goosFiles.find(f => f.id === fileId);
         if (file) setClipboard({ files: [file], operation: 'copy' });
@@ -3101,6 +3122,9 @@ function GoOSDemoContent() {
                             onWidgetEdit={(widget) => {
                                 console.log('Edit widget:', widget);
                             }}
+                            onWidgetDelete={(id) => {
+                                deleteWidget(id);
+                            }}
                             onWidgetPositionChange={(id, x, y) => {
                                 updateWidget(id, { positionX: x, positionY: y });
                             }}
@@ -3622,6 +3646,7 @@ function GoOSDemoContent() {
                 onNewEmbed={() => handleOpenCreateFileDialog('embed', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewDownload={() => handleOpenCreateFileDialog('download', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onPaste={pasteFile}
+                onArrangeIcons={arrangeIcons}
                 canPaste={!!clipboard}
             />
 

@@ -13,6 +13,7 @@ interface WidgetRendererProps {
   widgets: Widget[];
   isOwner?: boolean;
   onWidgetEdit?: (widget: Widget) => void;
+  onWidgetDelete?: (id: string) => void;
   onWidgetPositionChange?: (id: string, x: number, y: number) => void;
   onTip?: (amount: number) => Promise<void>;
   onContact?: (data: { name?: string; email: string; message: string }) => Promise<void>;
@@ -23,6 +24,7 @@ export function WidgetRenderer({
   widgets,
   isOwner = false,
   onWidgetEdit,
+  onWidgetDelete,
   onWidgetPositionChange,
   onTip,
   onContact,
@@ -40,6 +42,7 @@ export function WidgetRenderer({
           widget,
           isOwner,
           onEdit: () => onWidgetEdit?.(widget),
+          onDelete: () => onWidgetDelete?.(widget.id),
           onPositionChange: (x: number, y: number) =>
             onWidgetPositionChange?.(widget.id, x, y),
         };
