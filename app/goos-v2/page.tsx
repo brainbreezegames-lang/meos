@@ -199,19 +199,19 @@ const goOS = {
             border: 'var(--color-text-primary)',
         },
         sticky: {
-            yellow: '#fff9db',
-            blue: '#e8f4fd',
-            pink: '#fde8f0',
-            green: '#e8fde8',
-            orange: '#fff0e6',
-            purple: '#f0e8fd',
+            yellow: '#fef9e3',
+            blue: '#eef6fc',
+            pink: '#fceef3',
+            green: '#eefcee',
+            orange: '#fef3ea',
+            purple: '#f3eefb',
         }
     },
     // Hex values for SVG stroke/fill (CSS vars don't work in SVG attributes)
     icon: {
-        stroke: '#171412',
-        fill: 'rgba(255, 119, 34, 0.1)',
-        accent: '#ff7722',
+        stroke: '#1a1816',
+        fill: 'rgba(244, 122, 62, 0.08)',
+        accent: '#f47a3e',
     },
     shadows: {
         solid: 'var(--shadow-md)',
@@ -1246,19 +1246,19 @@ const DockIcon = React.memo(({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.85 }}
                         transition={{ type: 'spring', damping: 20, stiffness: 400 }}
-                        className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap z-50"
+                        className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
                         style={{
-                            background: goOS.colors.text.primary,
-                            color: goOS.colors.paper,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                            border: `1px solid rgba(255,255,255,0.1)`,
+                            background: 'rgba(26, 24, 22, 0.88)',
+                            color: '#fefefe',
+                            boxShadow: '0 4px 16px rgba(30, 50, 70, 0.2)',
+                            backdropFilter: 'blur(8px)',
                         }}
                     >
                         {label}
                         {/* Tooltip arrow */}
                         <div
                             className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45"
-                            style={{ background: goOS.colors.text.primary }}
+                            style={{ background: 'rgba(26, 24, 22, 0.88)' }}
                         />
                     </motion.div>
                 )}
@@ -1267,9 +1267,9 @@ const DockIcon = React.memo(({
             <motion.div
                 className={`w-11 h-11 flex items-center justify-center rounded-xl ${isActive ? '' : ''}`}
                 style={{
-                    background: isActive ? goOS.colors.white : isHovered ? 'rgba(0,0,0,0.04)' : 'transparent',
-                    border: isActive ? `2px solid ${goOS.colors.border}` : '2px solid transparent',
-                    boxShadow: isActive ? goOS.shadows.sm : 'none',
+                    background: isActive ? 'rgba(255, 255, 255, 0.95)' : isHovered ? 'rgba(0,0,0,0.03)' : 'transparent',
+                    border: isActive ? '1px solid rgba(26, 24, 22, 0.08)' : '1px solid transparent',
+                    boxShadow: isActive ? '0 2px 8px rgba(30, 50, 70, 0.08)' : 'none',
                 }}
                 animate={{
                     scale: isHovered && !justClicked ? 1.12 : 1,
@@ -2792,8 +2792,8 @@ function GoOSDemoContent() {
                 <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                        backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
-                        backgroundSize: '24px 24px',
+                        backgroundImage: 'radial-gradient(rgba(30, 50, 70, 0.035) 1px, transparent 1px)',
+                        backgroundSize: '28px 28px',
                         zIndex: 0,
                     }}
                 />
@@ -2816,8 +2816,11 @@ function GoOSDemoContent() {
                         }}
                         className="h-11 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
                         style={{
-                            background: goOS.colors.headerBg,
-                            borderBottom: `2px solid ${goOS.colors.border}`,
+                            background: 'rgba(250, 248, 243, 0.88)',
+                            backdropFilter: 'blur(20px) saturate(180%)',
+                            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                            borderBottom: '1px solid rgba(26, 24, 22, 0.08)',
+                            boxShadow: '0 1px 3px rgba(30, 50, 70, 0.04)',
                         }}
                     >
                 {/* Left: Logo + Widgets Menu */}
@@ -3518,11 +3521,13 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
+                            className="flex items-center gap-2 px-5 py-3 rounded-2xl"
                             style={{
-                                background: goOS.colors.cream,
-                                border: `2px solid ${goOS.colors.border}`,
-                                boxShadow: goOS.shadows.solid
+                                background: 'rgba(255, 255, 255, 0.85)',
+                                backdropFilter: 'blur(20px) saturate(180%)',
+                                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                                border: '1px solid rgba(255, 255, 255, 0.6)',
+                                boxShadow: '0 8px 32px rgba(30, 50, 70, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
                             }}
                         >
                     <RubberDuck />
@@ -3558,7 +3563,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.notes}
                         label="Notes"
                     />
-                    <div className="w-px h-8 bg-black/10 mx-1" />
+                    <div className="w-px h-7 bg-black/6 mx-1.5" />
                     <DockIcon
                         icon={<MessageCircle size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
                         onClick={() => toggleApp('chat')}
@@ -3577,7 +3582,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.settings}
                         label="Settings"
                     />
-                    <div className="w-px h-8 bg-black/10 mx-1" />
+                    <div className="w-px h-7 bg-black/6 mx-1.5" />
                     <DockIcon
                         icon={<BookOpen size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
                         onClick={() => toggleApp('guestbook')}
@@ -3591,7 +3596,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.analytics}
                         label="Analytics"
                     />
-                    <div className="w-px h-8 bg-black/10 mx-1" />
+                    <div className="w-px h-7 bg-black/6 mx-1.5" />
                     {/* Wallpaper Picker */}
                     <div className="relative" data-wallpaper-picker>
                         <DockIcon
@@ -3610,9 +3615,11 @@ function GoOSDemoContent() {
                                     className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 rounded-xl"
                                     data-wallpaper-picker
                                     style={{
-                                        background: goOS.colors.cream,
-                                        border: `2px solid ${goOS.colors.border}`,
-                                        boxShadow: goOS.shadows.solid,
+                                        background: 'rgba(255, 255, 255, 0.92)',
+                                        backdropFilter: 'blur(24px) saturate(180%)',
+                                        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                                        border: '1px solid rgba(255, 255, 255, 0.6)',
+                                        boxShadow: '0 12px 40px rgba(30, 50, 70, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05)',
                                         zIndex: 5000,
                                     }}
                                     onClick={(e) => e.stopPropagation()}
@@ -3686,7 +3693,7 @@ function GoOSDemoContent() {
                     {/* Minimized Editors */}
                     {minimizedEditors.size > 0 && (
                         <>
-                            <div className="w-px h-8 bg-black/10 mx-1" />
+                            <div className="w-px h-7 bg-black/6 mx-1.5" />
                             {Array.from(minimizedEditors).map(fileId => {
                                 const file = goosFiles.find(f => f.id === fileId);
                                 if (!file) return null;

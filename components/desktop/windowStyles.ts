@@ -10,41 +10,41 @@ import React from 'react';
 // WINDOW CONTAINER STYLES
 // ============================================================================
 export const WINDOW = {
-  // Border - 2px solid dark (dock app style)
-  border: '2px solid var(--color-text-primary, #171412)',
+  // Border - Softer, calmer aesthetic
+  border: '1px solid rgba(26, 24, 22, 0.10)',
   borderMaximized: 'none',
 
-  // Border radius - 12px everywhere
-  borderRadius: '12px',
+  // Border radius - Softer 14px
+  borderRadius: '14px',
   borderRadiusMaximized: '0',
 
-  // Background - warm cream
-  background: 'var(--color-bg-base, #fbf9ef)',
+  // Background - Soft warm cream with slight transparency
+  background: 'rgba(250, 248, 243, 0.95)',
 
-  // Shadows
-  shadow: '0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08)',
+  // Shadows - Atmospheric with cool depth
+  shadow: '0 2px 4px rgba(30, 40, 50, 0.03), 0 16px 40px rgba(30, 50, 70, 0.10), 0 32px 80px rgba(40, 60, 80, 0.06)',
   shadowMaximized: 'none',
 
   // Opacity
   opacityActive: 1,
-  opacityInactive: 0.95,
+  opacityInactive: 0.92,
 } as const;
 
 // ============================================================================
 // TITLE BAR STYLES
 // ============================================================================
 export const TITLE_BAR = {
-  height: 52,
-  background: 'var(--color-bg-base, #fbf9ef)',
-  borderBottom: '2px solid var(--color-text-primary, #171412)',
+  height: 50,
+  background: 'rgba(250, 248, 243, 0.98)',
+  borderBottom: '1px solid rgba(26, 24, 22, 0.06)',
   paddingX: 16,
 
   // Title text
   titleFontSize: 13,
   titleFontWeight: 500,
-  titleColor: 'var(--color-text-primary, #171412)',
+  titleColor: 'var(--color-text-primary, #1a1816)',
   titleLetterSpacing: '-0.01em',
-  titleOpacityActive: 0.85,
+  titleOpacityActive: 0.9,
   titleOpacityInactive: 0.6,
 } as const;
 
@@ -54,17 +54,17 @@ export const TITLE_BAR = {
 export const TRAFFIC = {
   size: 12,
   gap: 8,
-  shadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+  shadow: '0 0.5px 2px rgba(0, 0, 0, 0.08), inset 0 0.5px 0 rgba(255, 255, 255, 0.3)',
 
-  // Colors
-  close: 'var(--color-traffic-close, #ff5f57)',
-  minimize: 'var(--color-traffic-minimize, #ffbd2e)',
-  maximize: 'var(--color-traffic-maximize, #28c840)',
+  // Colors - Slightly muted for calmer feel
+  close: 'var(--color-traffic-close, #ff6259)',
+  minimize: 'var(--color-traffic-minimize, #ffbe30)',
+  maximize: 'var(--color-traffic-maximize, #2bcb43)',
 
   // Icon colors (shown on hover)
-  closeIcon: 'rgba(77, 0, 0, 0.7)',
-  minimizeIcon: 'rgba(100, 65, 0, 0.7)',
-  maximizeIcon: 'rgba(0, 70, 0, 0.7)',
+  closeIcon: 'rgba(80, 10, 10, 0.65)',
+  minimizeIcon: 'rgba(100, 65, 0, 0.65)',
+  maximizeIcon: 'rgba(0, 65, 0, 0.65)',
 } as const;
 
 // ============================================================================
