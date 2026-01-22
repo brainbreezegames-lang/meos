@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Globe, Lock, ChevronDown, Sparkles, Copy } from 'lucide-react';
 import type { SpaceSummary } from '@/types';
+import { goOSTokens } from '@/components/goos-editor/GoOSTipTapEditor';
 
 // ============================================
 // TYPES
@@ -12,6 +13,7 @@ import type { SpaceSummary } from '@/types';
 export interface CreateSpaceData {
   name: string;
   icon: string;
+  isPublic: boolean;
   slug: string | null;
   copyFromSpaceId?: string;
 }
@@ -52,7 +54,6 @@ const EMOJI_CATEGORIES = [
 ];
 
 const MAX_NAME_LENGTH = 30;
-const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 // ============================================
 // HELPERS
@@ -187,6 +188,7 @@ export function CreateSpaceModal({
     onCreate({
       name: name.trim(),
       icon,
+      isPublic,
       slug: isPublic ? slug : null,
       copyFromSpaceId: copyFromSpaceId || undefined,
     });
@@ -202,7 +204,6 @@ export function CreateSpaceModal({
 
   const handleCustomEmojiSubmit = () => {
     if (customEmoji.trim()) {
-      // Try to extract first emoji from input
       const emojiMatch = customEmoji.match(/\p{Emoji}/u);
       if (emojiMatch) {
         setIcon(emojiMatch[0]);
@@ -225,616 +226,544 @@ export function CreateSpaceModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
             onClick={onClose}
             style={{
               position: 'fixed',
               inset: 0,
-              background: 'rgba(23, 20, 18, 0.4)',
-              backdropFilter: 'blur(4px)',
-              WebkitBackdropFilter: 'blur(4px)',
+              background: 'rgba(0, 0, 0, 0.3)',
               zIndex: 9998,
             }}
           />
 
-          {/* Modal */}
+          {/* Dialog */}
           <motion.div
             ref={modalRef}
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 5 }}
-            transition={{
-              type: 'spring',
-              damping: 30,
-              stiffness: 400,
-              mass: 0.8,
-            }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             style={{
               position: 'fixed',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '100%',
-              maxWidth: 400,
+              width: 400,
+              maxWidth: '90vw',
+              background: goOSTokens.colors.paper,
+              border: `2px solid ${goOSTokens.colors.border}`,
+              borderRadius: 8,
+              boxShadow: goOSTokens.shadows.solid,
               zIndex: 9999,
+              overflow: 'hidden',
             }}
           >
+            {/* Header */}
             <div
               style={{
-                background: 'var(--color-bg-base)',
-                border: '2px solid var(--color-text-primary)',
-                borderRadius: 12,
-                boxShadow: `
-                  0 4px 6px -1px rgba(23, 20, 18, 0.1),
-                  0 10px 24px -3px rgba(23, 20, 18, 0.2),
-                  0 30px 60px -6px rgba(23, 20, 18, 0.15)
-                `,
-                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 16px',
+                borderBottom: `1px solid ${goOSTokens.colors.border}30`,
+                background: goOSTokens.colors.headerBg,
               }}
             >
-              {/* Header */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '14px 16px',
-                  borderBottom: '2px solid var(--color-text-primary)',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Sparkles
-                    size={16}
-                    strokeWidth={2}
-                    style={{ color: 'var(--color-accent-primary)' }}
-                  />
-                  <span
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: 'var(--color-text-primary)',
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    Create New Space
-                  </span>
-                </div>
-                <motion.button
-                  onClick={onClose}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Sparkles size={16} style={{ color: goOSTokens.colors.text.secondary }} />
+                <h2
                   style={{
-                    padding: 4,
-                    borderRadius: 6,
-                    background: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    color: 'var(--color-text-muted)',
+                    margin: 0,
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: goOSTokens.colors.text.primary,
+                    fontFamily: goOSTokens.fonts.heading,
                   }}
                 >
-                  <X size={16} strokeWidth={2.5} />
-                </motion.button>
+                  Create New Space
+                </h2>
               </div>
+              <button
+                onClick={onClose}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 4,
+                  display: 'flex',
+                  color: goOSTokens.colors.text.muted,
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} style={{ padding: 20 }}>
-                {/* Icon + Name Row */}
-                <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-                  {/* Icon Picker */}
-                  <div style={{ position: 'relative' }} ref={emojiPickerRef}>
-                    <motion.button
-                      type="button"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      style={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: 12,
-                        background: 'var(--color-bg-subtle)',
-                        border: '2px solid var(--color-text-primary)',
-                        cursor: 'pointer',
-                        fontSize: 28,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: 'var(--shadow-sm)',
-                      }}
-                    >
-                      {icon}
-                    </motion.button>
+            {/* Form */}
+            <form onSubmit={handleSubmit} style={{ padding: 16 }}>
+              {/* Icon + Name Row */}
+              <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+                {/* Icon Picker */}
+                <div style={{ position: 'relative' }} ref={emojiPickerRef}>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: 6,
+                      background: goOSTokens.colors.paper,
+                      border: `2px solid ${goOSTokens.colors.border}`,
+                      cursor: 'pointer',
+                      fontSize: 24,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {icon}
+                  </button>
 
-                    {/* Emoji Picker Dropdown */}
-                    <AnimatePresence>
-                      {showEmojiPicker && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                          transition={{ duration: 0.15 }}
-                          style={{
-                            position: 'absolute',
-                            top: 'calc(100% + 8px)',
-                            left: 0,
-                            width: 280,
-                            background: 'var(--color-bg-base)',
-                            border: '2px solid var(--color-text-primary)',
-                            borderRadius: 12,
-                            boxShadow: `
-                              0 4px 12px rgba(23, 20, 18, 0.1),
-                              0 16px 32px rgba(23, 20, 18, 0.15)
-                            `,
-                            zIndex: 10,
-                            overflow: 'hidden',
-                          }}
-                        >
-                          {/* Custom emoji input */}
-                          <div
-                            style={{
-                              padding: '12px 12px 8px',
-                              borderBottom: '1px solid var(--color-border-default)',
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                gap: 8,
-                                alignItems: 'center',
-                              }}
-                            >
-                              <input
-                                type="text"
-                                value={customEmoji}
-                                onChange={(e) => setCustomEmoji(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    handleCustomEmojiSubmit();
-                                  }
-                                }}
-                                placeholder="Type any emoji..."
-                                style={{
-                                  flex: 1,
-                                  padding: '8px 10px',
-                                  fontSize: 13,
-                                  border: '1.5px solid var(--color-border-strong)',
-                                  borderRadius: 8,
-                                  background: 'var(--color-bg-white)',
-                                  color: 'var(--color-text-primary)',
-                                  outline: 'none',
-                                }}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Emoji grid */}
-                          <div
-                            style={{
-                              maxHeight: 240,
-                              overflowY: 'auto',
-                              padding: 8,
-                            }}
-                          >
-                            {EMOJI_CATEGORIES.map((category) => (
-                              <div key={category.name} style={{ marginBottom: 8 }}>
-                                <div
-                                  style={{
-                                    fontSize: 10,
-                                    fontWeight: 600,
-                                    color: 'var(--color-text-muted)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em',
-                                    padding: '4px 4px 6px',
-                                  }}
-                                >
-                                  {category.name}
-                                </div>
-                                <div
-                                  style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(6, 1fr)',
-                                    gap: 2,
-                                  }}
-                                >
-                                  {category.emojis.map((emoji) => (
-                                    <motion.button
-                                      key={emoji}
-                                      type="button"
-                                      onClick={() => {
-                                        setIcon(emoji);
-                                        setShowEmojiPicker(false);
-                                      }}
-                                      whileHover={{ scale: 1.2, backgroundColor: 'var(--color-bg-subtle)' }}
-                                      whileTap={{ scale: 0.9 }}
-                                      style={{
-                                        width: 36,
-                                        height: 36,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: 20,
-                                        background: icon === emoji ? 'var(--color-accent-primary-subtle)' : 'transparent',
-                                        border: 'none',
-                                        borderRadius: 8,
-                                        cursor: 'pointer',
-                                      }}
-                                    >
-                                      {emoji}
-                                    </motion.button>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Name Input */}
-                  <div style={{ flex: 1 }}>
-                    <label
-                      style={{
-                        display: 'block',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: 'var(--color-text-muted)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        marginBottom: 6,
-                      }}
-                    >
-                      Name
-                    </label>
-                    <input
-                      ref={nameInputRef}
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && isValid) {
-                          handleSubmit();
-                        }
-                      }}
-                      placeholder="My Space"
-                      maxLength={MAX_NAME_LENGTH + 5}
-                      style={{
-                        width: '100%',
-                        padding: '12px 14px',
-                        fontSize: 15,
-                        fontWeight: 500,
-                        border: `2px solid ${nameError ? 'var(--color-error)' : 'var(--color-text-primary)'}`,
-                        borderRadius: 10,
-                        background: 'var(--color-bg-white)',
-                        color: 'var(--color-text-primary)',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                      }}
-                    />
-                    {nameError && (
-                      <div
+                  {/* Emoji Picker Dropdown */}
+                  <AnimatePresence>
+                    {showEmojiPicker && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.15 }}
                         style={{
-                          fontSize: 11,
-                          color: 'var(--color-error)',
-                          marginTop: 4,
+                          position: 'absolute',
+                          top: 'calc(100% + 8px)',
+                          left: 0,
+                          width: 260,
+                          background: goOSTokens.colors.paper,
+                          border: `2px solid ${goOSTokens.colors.border}`,
+                          borderRadius: 6,
+                          boxShadow: goOSTokens.shadows.solid,
+                          zIndex: 10,
+                          overflow: 'hidden',
                         }}
                       >
-                        {nameError}
-                      </div>
+                        {/* Custom emoji input */}
+                        <div style={{ padding: '10px 10px 8px', borderBottom: `1px solid ${goOSTokens.colors.border}30` }}>
+                          <input
+                            type="text"
+                            value={customEmoji}
+                            onChange={(e) => setCustomEmoji(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleCustomEmojiSubmit();
+                              }
+                            }}
+                            placeholder="Type any emoji..."
+                            style={{
+                              width: '100%',
+                              padding: '8px 10px',
+                              fontSize: 13,
+                              border: `2px solid ${goOSTokens.colors.border}`,
+                              borderRadius: 6,
+                              background: goOSTokens.colors.paper,
+                              color: goOSTokens.colors.text.primary,
+                              outline: 'none',
+                              boxSizing: 'border-box',
+                            }}
+                          />
+                        </div>
+
+                        {/* Emoji grid */}
+                        <div style={{ maxHeight: 200, overflowY: 'auto', padding: 8 }}>
+                          {EMOJI_CATEGORIES.map((category) => (
+                            <div key={category.name} style={{ marginBottom: 8 }}>
+                              <div
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 600,
+                                  color: goOSTokens.colors.text.muted,
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.05em',
+                                  padding: '4px 4px 6px',
+                                  fontFamily: goOSTokens.fonts.body,
+                                }}
+                              >
+                                {category.name}
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 2 }}>
+                                {category.emojis.map((emoji) => (
+                                  <button
+                                    key={emoji}
+                                    type="button"
+                                    onClick={() => {
+                                      setIcon(emoji);
+                                      setShowEmojiPicker(false);
+                                    }}
+                                    style={{
+                                      width: 34,
+                                      height: 34,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      fontSize: 18,
+                                      background: icon === emoji ? goOSTokens.colors.headerBg : 'transparent',
+                                      border: 'none',
+                                      borderRadius: 6,
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
                     )}
-                  </div>
+                  </AnimatePresence>
                 </div>
 
-                {/* Visibility Toggle */}
-                <div style={{ marginBottom: 16 }}>
+                {/* Name Input */}
+                <div style={{ flex: 1 }}>
                   <label
                     style={{
                       display: 'block',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: 'var(--color-text-muted)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      marginBottom: 8,
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: goOSTokens.colors.text.secondary,
+                      marginBottom: 6,
+                      fontFamily: goOSTokens.fonts.body,
                     }}
                   >
-                    Visibility
+                    Name
                   </label>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <motion.button
-                      type="button"
-                      onClick={() => setIsPublic(true)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 6,
-                        padding: '10px 14px',
-                        fontSize: 13,
-                        fontWeight: 500,
-                        border: `2px solid ${isPublic ? 'var(--color-accent-primary)' : 'var(--color-border-strong)'}`,
-                        borderRadius: 10,
-                        background: isPublic ? 'var(--color-accent-primary-subtle)' : 'var(--color-bg-white)',
-                        color: isPublic ? 'var(--color-accent-primary)' : 'var(--color-text-secondary)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <Globe size={14} strokeWidth={2.5} />
-                      Public
-                    </motion.button>
-                    <motion.button
-                      type="button"
-                      onClick={() => setIsPublic(false)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 6,
-                        padding: '10px 14px',
-                        fontSize: 13,
-                        fontWeight: 500,
-                        border: `2px solid ${!isPublic ? 'var(--color-accent-primary)' : 'var(--color-border-strong)'}`,
-                        borderRadius: 10,
-                        background: !isPublic ? 'var(--color-accent-primary-subtle)' : 'var(--color-bg-white)',
-                        color: !isPublic ? 'var(--color-accent-primary)' : 'var(--color-text-secondary)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <Lock size={14} strokeWidth={2.5} />
-                      Private
-                    </motion.button>
-                  </div>
-                </div>
-
-                {/* Slug Input (only if public) */}
-                <AnimatePresence>
-                  {isPublic && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      style={{ marginBottom: 16, overflow: 'hidden' }}
-                    >
-                      <label
-                        style={{
-                          display: 'block',
-                          fontSize: 11,
-                          fontWeight: 600,
-                          color: 'var(--color-text-muted)',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                          marginBottom: 6,
-                        }}
-                      >
-                        URL
-                      </label>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '10px 12px',
-                          fontSize: 13,
-                          border: `2px solid ${slugError ? 'var(--color-error)' : 'var(--color-text-primary)'}`,
-                          borderRadius: 10,
-                          background: 'var(--color-bg-white)',
-                        }}
-                      >
-                        <span style={{ color: 'var(--color-text-muted)', marginRight: 2 }}>
-                          you.goos.app/
-                        </span>
-                        <input
-                          type="text"
-                          value={slug}
-                          onChange={(e) => handleSlugChange(e.target.value)}
-                          placeholder="my-space"
-                          style={{
-                            flex: 1,
-                            border: 'none',
-                            background: 'transparent',
-                            color: 'var(--color-text-primary)',
-                            fontWeight: 500,
-                            outline: 'none',
-                            fontSize: 13,
-                          }}
-                        />
-                      </div>
-                      {slugError && (
-                        <div
-                          style={{
-                            fontSize: 11,
-                            color: 'var(--color-error)',
-                            marginTop: 4,
-                          }}
-                        >
-                          {slugError}
-                        </div>
-                      )}
-                    </motion.div>
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && isValid) {
+                        handleSubmit();
+                      }
+                    }}
+                    placeholder="My Space"
+                    maxLength={MAX_NAME_LENGTH + 5}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      fontSize: 14,
+                      fontFamily: goOSTokens.fonts.body,
+                      border: `2px solid ${nameError ? goOSTokens.colors.status.error : goOSTokens.colors.border}`,
+                      borderRadius: 6,
+                      background: goOSTokens.colors.paper,
+                      color: goOSTokens.colors.text.primary,
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  {nameError && (
+                    <div style={{ fontSize: 11, color: goOSTokens.colors.status.error, marginTop: 4, fontFamily: goOSTokens.fonts.body }}>
+                      {nameError}
+                    </div>
                   )}
-                </AnimatePresence>
+                </div>
+              </div>
 
-                {/* Copy from Space */}
-                {existingSpaces.length > 0 && (
-                  <div style={{ marginBottom: 20, position: 'relative' }} ref={copyDropdownRef}>
+              {/* Visibility Toggle */}
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: goOSTokens.colors.text.secondary,
+                    marginBottom: 8,
+                    fontFamily: goOSTokens.fonts.body,
+                  }}
+                >
+                  Visibility
+                </label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsPublic(true)}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      padding: '10px 14px',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      fontFamily: goOSTokens.fonts.body,
+                      border: `2px solid ${goOSTokens.colors.border}`,
+                      borderRadius: 6,
+                      background: isPublic ? goOSTokens.colors.headerBg : goOSTokens.colors.paper,
+                      color: goOSTokens.colors.text.primary,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Globe size={14} />
+                    Public
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsPublic(false)}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                      padding: '10px 14px',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      fontFamily: goOSTokens.fonts.body,
+                      border: `2px solid ${goOSTokens.colors.border}`,
+                      borderRadius: 6,
+                      background: !isPublic ? goOSTokens.colors.headerBg : goOSTokens.colors.paper,
+                      color: goOSTokens.colors.text.primary,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Lock size={14} />
+                    Private
+                  </button>
+                </div>
+              </div>
+
+              {/* Slug Input (only if public) */}
+              <AnimatePresence>
+                {isPublic && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ marginBottom: 16, overflow: 'hidden' }}
+                  >
                     <label
                       style={{
                         display: 'block',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: 'var(--color-text-muted)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: goOSTokens.colors.text.secondary,
                         marginBottom: 6,
+                        fontFamily: goOSTokens.fonts.body,
                       }}
                     >
-                      Start with
+                      URL
                     </label>
-                    <motion.button
-                      type="button"
-                      onClick={() => setShowCopyDropdown(!showCopyDropdown)}
-                      whileHover={{ scale: 1.01 }}
+                    <div
                       style={{
-                        width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
                         padding: '10px 12px',
                         fontSize: 13,
-                        fontWeight: 500,
-                        border: '2px solid var(--color-border-strong)',
-                        borderRadius: 10,
-                        background: 'var(--color-bg-white)',
-                        color: copyFromSpace ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-                        cursor: 'pointer',
+                        fontFamily: goOSTokens.fonts.body,
+                        border: `2px solid ${slugError ? goOSTokens.colors.status.error : goOSTokens.colors.border}`,
+                        borderRadius: 6,
+                        background: goOSTokens.colors.paper,
                       }}
                     >
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        {copyFromSpace ? (
-                          <>
-                            <Copy size={14} strokeWidth={2} style={{ color: 'var(--color-text-muted)' }} />
-                            <span style={{ fontSize: 16 }}>{copyFromSpace.icon}</span>
-                            Copy from {copyFromSpace.name}
-                          </>
-                        ) : (
-                          'Empty space'
-                        )}
+                      <span style={{ color: goOSTokens.colors.text.muted, marginRight: 2 }}>
+                        you.goos.app/
                       </span>
-                      <ChevronDown
-                        size={14}
-                        strokeWidth={2.5}
+                      <input
+                        type="text"
+                        value={slug}
+                        onChange={(e) => handleSlugChange(e.target.value)}
+                        placeholder="my-space"
                         style={{
-                          color: 'var(--color-text-muted)',
-                          transform: showCopyDropdown ? 'rotate(180deg)' : 'none',
-                          transition: 'transform 0.2s',
+                          flex: 1,
+                          border: 'none',
+                          background: 'transparent',
+                          color: goOSTokens.colors.text.primary,
+                          fontWeight: 500,
+                          outline: 'none',
+                          fontSize: 13,
+                          fontFamily: goOSTokens.fonts.body,
                         }}
                       />
-                    </motion.button>
+                    </div>
+                    {slugError && (
+                      <div style={{ fontSize: 11, color: goOSTokens.colors.status.error, marginTop: 4, fontFamily: goOSTokens.fonts.body }}>
+                        {slugError}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-                    <AnimatePresence>
-                      {showCopyDropdown && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -4 }}
-                          transition={{ duration: 0.15 }}
+              {/* Copy from Space */}
+              {existingSpaces.length > 0 && (
+                <div style={{ marginBottom: 16, position: 'relative' }} ref={copyDropdownRef}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: goOSTokens.colors.text.secondary,
+                      marginBottom: 6,
+                      fontFamily: goOSTokens.fonts.body,
+                    }}
+                  >
+                    Start with
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowCopyDropdown(!showCopyDropdown)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px 12px',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      fontFamily: goOSTokens.fonts.body,
+                      border: `2px solid ${goOSTokens.colors.border}`,
+                      borderRadius: 6,
+                      background: goOSTokens.colors.paper,
+                      color: copyFromSpace ? goOSTokens.colors.text.primary : goOSTokens.colors.text.muted,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {copyFromSpace ? (
+                        <>
+                          <Copy size={14} style={{ color: goOSTokens.colors.text.muted }} />
+                          <span style={{ fontSize: 16 }}>{copyFromSpace.icon}</span>
+                          Copy from {copyFromSpace.name}
+                        </>
+                      ) : (
+                        'Empty space'
+                      )}
+                    </span>
+                    <ChevronDown
+                      size={14}
+                      style={{
+                        color: goOSTokens.colors.text.muted,
+                        transform: showCopyDropdown ? 'rotate(180deg)' : 'none',
+                        transition: 'transform 0.2s',
+                      }}
+                    />
+                  </button>
+
+                  <AnimatePresence>
+                    {showCopyDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.15 }}
+                        style={{
+                          position: 'absolute',
+                          top: 'calc(100% + 4px)',
+                          left: 0,
+                          right: 0,
+                          background: goOSTokens.colors.paper,
+                          border: `2px solid ${goOSTokens.colors.border}`,
+                          borderRadius: 6,
+                          boxShadow: goOSTokens.shadows.solid,
+                          zIndex: 10,
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCopyFromSpaceId(null);
+                            setShowCopyDropdown(false);
+                          }}
                           style={{
-                            position: 'absolute',
-                            top: 'calc(100% + 4px)',
-                            left: 0,
-                            right: 0,
-                            background: 'var(--color-bg-base)',
-                            border: '2px solid var(--color-text-primary)',
-                            borderRadius: 10,
-                            boxShadow: '0 8px 24px rgba(23, 20, 18, 0.15)',
-                            zIndex: 10,
-                            overflow: 'hidden',
+                            width: '100%',
+                            padding: '10px 12px',
+                            fontSize: 13,
+                            fontWeight: 500,
+                            fontFamily: goOSTokens.fonts.body,
+                            border: 'none',
+                            background: !copyFromSpaceId ? goOSTokens.colors.headerBg : 'transparent',
+                            color: goOSTokens.colors.text.primary,
+                            cursor: 'pointer',
+                            textAlign: 'left',
                           }}
                         >
+                          Empty space
+                        </button>
+                        {existingSpaces.map((space) => (
                           <button
+                            key={space.id}
                             type="button"
                             onClick={() => {
-                              setCopyFromSpaceId(null);
+                              setCopyFromSpaceId(space.id);
                               setShowCopyDropdown(false);
                             }}
                             style={{
                               width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 8,
                               padding: '10px 12px',
                               fontSize: 13,
                               fontWeight: 500,
+                              fontFamily: goOSTokens.fonts.body,
                               border: 'none',
-                              background: !copyFromSpaceId ? 'var(--color-bg-subtle)' : 'transparent',
-                              color: 'var(--color-text-primary)',
+                              background: copyFromSpaceId === space.id ? goOSTokens.colors.headerBg : 'transparent',
+                              color: goOSTokens.colors.text.primary,
                               cursor: 'pointer',
                               textAlign: 'left',
                             }}
                           >
-                            Empty space
+                            <span style={{ fontSize: 16 }}>{space.icon}</span>
+                            Copy from {space.name}
                           </button>
-                          {existingSpaces.map((space) => (
-                            <button
-                              key={space.id}
-                              type="button"
-                              onClick={() => {
-                                setCopyFromSpaceId(space.id);
-                                setShowCopyDropdown(false);
-                              }}
-                              style={{
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
-                                padding: '10px 12px',
-                                fontSize: 13,
-                                fontWeight: 500,
-                                border: 'none',
-                                background: copyFromSpaceId === space.id ? 'var(--color-bg-subtle)' : 'transparent',
-                                color: 'var(--color-text-primary)',
-                                cursor: 'pointer',
-                                textAlign: 'left',
-                              }}
-                            >
-                              <span style={{ fontSize: 16 }}>{space.icon}</span>
-                              Copy from {space.name}
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <motion.button
-                    type="button"
-                    onClick={onClose}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    style={{
-                      flex: 1,
-                      padding: '12px 16px',
-                      fontSize: 13,
-                      fontWeight: 600,
-                      border: '2px solid var(--color-border-strong)',
-                      borderRadius: 10,
-                      background: 'var(--color-bg-white)',
-                      color: 'var(--color-text-primary)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Cancel
-                  </motion.button>
-                  <motion.button
-                    type="submit"
-                    disabled={!isValid}
-                    whileHover={isValid ? { scale: 1.02 } : {}}
-                    whileTap={isValid ? { scale: 0.98 } : {}}
-                    style={{
-                      flex: 1,
-                      padding: '12px 16px',
-                      fontSize: 13,
-                      fontWeight: 600,
-                      border: '2px solid var(--color-text-primary)',
-                      borderRadius: 10,
-                      background: isValid ? 'var(--color-accent-primary)' : 'var(--color-bg-subtle)',
-                      color: isValid ? 'white' : 'var(--color-text-muted)',
-                      cursor: isValid ? 'pointer' : 'not-allowed',
-                      boxShadow: isValid ? 'var(--shadow-sm)' : 'none',
-                    }}
-                  >
-                    Create Space
-                  </motion.button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </form>
-            </div>
+              )}
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    fontFamily: goOSTokens.fonts.body,
+                    border: `2px solid ${goOSTokens.colors.border}`,
+                    borderRadius: 6,
+                    background: goOSTokens.colors.paper,
+                    color: goOSTokens.colors.text.primary,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!isValid}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    fontFamily: goOSTokens.fonts.body,
+                    border: `2px solid ${goOSTokens.colors.border}`,
+                    borderRadius: 6,
+                    background: isValid ? goOSTokens.colors.border : goOSTokens.colors.headerBg,
+                    color: isValid ? goOSTokens.colors.paper : goOSTokens.colors.text.muted,
+                    cursor: isValid ? 'pointer' : 'not-allowed',
+                    opacity: isValid ? 1 : 0.6,
+                  }}
+                >
+                  Create Space
+                </button>
+              </div>
+            </form>
           </motion.div>
         </>
       )}
