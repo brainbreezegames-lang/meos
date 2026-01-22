@@ -441,17 +441,21 @@ function getSpaceFiles(spaceId: string, allFiles: GoOSFileData[]): GoOSFileData[
     const prefixes = SPACE_FILE_PREFIXES[spaceId];
     if (!prefixes) return [];
 
-    // For space-1 (Portfolio), use the main demo files
+    // Get dynamically created files (local- or temp- prefix) from allFiles
+    const dynamicFiles = allFiles.filter(f => f.id.startsWith('local-') || f.id.startsWith('temp-'));
+
+    // For space-1 (Portfolio), use the main demo files + dynamic files
     if (spaceId === 'space-1') {
-        return allFiles.filter(f => prefixes.some(prefix => f.id.startsWith(prefix)));
+        const demoFiles = allFiles.filter(f => prefixes.some(prefix => f.id.startsWith(prefix)));
+        return [...demoFiles, ...dynamicFiles];
     }
 
-    // For other spaces, return their specific demo files
-    if (spaceId === 'space-2') return WRITING_SPACE_FILES;
-    if (spaceId === 'space-3') return PHOTOGRAPHY_SPACE_FILES;
-    if (spaceId === 'space-4') return PERSONAL_SPACE_FILES;
+    // For other spaces, return their specific demo files + dynamic files
+    if (spaceId === 'space-2') return [...WRITING_SPACE_FILES, ...dynamicFiles];
+    if (spaceId === 'space-3') return [...PHOTOGRAPHY_SPACE_FILES, ...dynamicFiles];
+    if (spaceId === 'space-4') return [...PERSONAL_SPACE_FILES, ...dynamicFiles];
 
-    return [];
+    return dynamicFiles;
 }
 
 // ============================================
@@ -4157,25 +4161,16 @@ function GoOSDemoContent() {
                 position={{ x: desktopContextMenu.x, y: desktopContextMenu.y }}
                 onClose={() => setDesktopContextMenu(prev => ({ ...prev, isOpen: false }))}
                 onNewNote={() => {
-                    // Convert pixel coordinates to percentages
-                    const x = (desktopContextMenu.x / window.innerWidth) * 100;
-                    const y = (desktopContextMenu.y / window.innerHeight) * 100;
-                    createFile('note', null, { x, y });
+                    createFile('note', { x: desktopContextMenu.x, y: desktopContextMenu.y });
                 }}
                 onNewCaseStudy={() => {
-                    const x = (desktopContextMenu.x / window.innerWidth) * 100;
-                    const y = (desktopContextMenu.y / window.innerHeight) * 100;
-                    createFile('case-study', null, { x, y });
+                    createFile('case-study', { x: desktopContextMenu.x, y: desktopContextMenu.y });
                 }}
                 onNewFolder={() => {
-                    const x = (desktopContextMenu.x / window.innerWidth) * 100;
-                    const y = (desktopContextMenu.y / window.innerHeight) * 100;
-                    createFile('folder', null, { x, y });
+                    createFile('folder', { x: desktopContextMenu.x, y: desktopContextMenu.y });
                 }}
                 onNewCV={() => {
-                    const x = (desktopContextMenu.x / window.innerWidth) * 100;
-                    const y = (desktopContextMenu.y / window.innerHeight) * 100;
-                    createFile('cv', null, { x, y });
+                    createFile('cv', { x: desktopContextMenu.x, y: desktopContextMenu.y });
                 }}
                 onNewImage={() => handleOpenCreateFileDialog('image', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
