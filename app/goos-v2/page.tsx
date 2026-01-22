@@ -97,6 +97,173 @@ const SPACE_THEMES: Record<string, { gradient: string; pattern: string; accent: 
 };
 
 // ============================================
+// SPACE-SPECIFIC FILE PREFIXES - Files are filtered by space
+// Files with IDs starting with these prefixes belong to that space
+// ============================================
+const SPACE_FILE_PREFIXES: Record<string, string[]> = {
+    'space-1': ['file-1', 'file-2', 'file-3', 'file-4', 'file-5', 'file-6', 'file-prompts'], // Portfolio - existing demo files
+    'space-2': ['writing-'], // Writing space
+    'space-3': ['photo-'], // Photography space
+    'space-4': ['personal-'], // Personal space
+};
+
+// Demo files for Writing space (space-2)
+const WRITING_SPACE_FILES: GoOSFileData[] = [
+    {
+        id: 'writing-1',
+        type: 'note',
+        title: 'My Writing Process',
+        content: '<h1>My Writing Process</h1><p>Writing is rewriting. Here are some thoughts on my creative process...</p><p>Every piece starts with a messy first draft. I don\'t edit as I go - I just let the words flow.</p>',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 5, y: 35 },
+    },
+    {
+        id: 'writing-2',
+        type: 'note',
+        title: 'Essay: On Creativity',
+        content: '<h1>On Creativity</h1><p>Creativity isn\'t about waiting for inspiration. It\'s about showing up every day.</p><p>The muse visits those who are already working...</p>',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 21, y: 35 },
+    },
+    {
+        id: 'writing-3',
+        type: 'folder',
+        title: 'Blog Posts',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 37, y: 35 },
+    },
+];
+
+// Demo files for Photography space (space-3)
+const PHOTOGRAPHY_SPACE_FILES: GoOSFileData[] = [
+    {
+        id: 'photo-1',
+        type: 'image',
+        title: 'Golden Hour',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now()),
+        parentId: null,
+        position: { x: 5, y: 35 },
+        imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&h=800&fit=crop',
+        imageCaption: 'Sunset over the mountains',
+        imageAlt: 'Mountain landscape at golden hour',
+    },
+    {
+        id: 'photo-2',
+        type: 'image',
+        title: 'Urban Geometry',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 21, y: 35 },
+        imageUrl: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&h=800&fit=crop',
+        imageCaption: 'Architecture study',
+        imageAlt: 'Modern building with geometric patterns',
+    },
+    {
+        id: 'photo-3',
+        type: 'folder',
+        title: 'Street Photography',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 37, y: 35 },
+    },
+    {
+        id: 'photo-4',
+        type: 'image',
+        title: 'Portrait Study',
+        content: '',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now()),
+        parentId: null,
+        position: { x: 53, y: 35 },
+        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=800&fit=crop',
+        imageCaption: 'Work in progress',
+        imageAlt: 'Portrait photograph',
+    },
+];
+
+// Demo files for Personal space (space-4)
+const PERSONAL_SPACE_FILES: GoOSFileData[] = [
+    {
+        id: 'personal-1',
+        type: 'note',
+        title: 'Journal Entry',
+        content: '<h1>Private Thoughts</h1><p>This is my personal space where I keep private notes and ideas that aren\'t ready to share yet.</p>',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now()),
+        parentId: null,
+        position: { x: 5, y: 35 },
+    },
+    {
+        id: 'personal-2',
+        type: 'folder',
+        title: 'Ideas',
+        content: '',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 21, y: 35 },
+    },
+];
+
+// Get files for a specific space
+function getSpaceFiles(spaceId: string, allFiles: GoOSFileData[]): GoOSFileData[] {
+    const prefixes = SPACE_FILE_PREFIXES[spaceId];
+    if (!prefixes) return [];
+
+    // For space-1 (Portfolio), use the main demo files
+    if (spaceId === 'space-1') {
+        return allFiles.filter(f => prefixes.some(prefix => f.id.startsWith(prefix)));
+    }
+
+    // For other spaces, return their specific demo files
+    if (spaceId === 'space-2') return WRITING_SPACE_FILES;
+    if (spaceId === 'space-3') return PHOTOGRAPHY_SPACE_FILES;
+    if (spaceId === 'space-4') return PERSONAL_SPACE_FILES;
+
+    return [];
+}
+
+// ============================================
 // PLAYFUL LOADING MESSAGES
 // ============================================
 const LOADING_MESSAGES = [
@@ -2152,8 +2319,12 @@ function GoOSDemoContent() {
         showToast: showGoOSToast,
     } = goosContext;
 
-    // Transform context files to component format
-    const goosFiles: GoOSFile[] = useMemo(() => goosFilesRaw.map(f => ({
+    // Transform context files to component format - FILTERED BY ACTIVE SPACE
+    const spaceFilteredFiles = useMemo(() => {
+        return getSpaceFiles(activeSpaceId, goosFilesRaw);
+    }, [activeSpaceId, goosFilesRaw]);
+
+    const goosFiles: GoOSFile[] = useMemo(() => spaceFilteredFiles.map(f => ({
         id: f.id,
         type: f.type as FileType,
         title: f.title,
@@ -2164,10 +2335,10 @@ function GoOSDemoContent() {
         updatedAt: new Date(f.updatedAt),
         parentFolderId: f.parentId || undefined,
         position: f.position,
-    })), [goosFilesRaw]);
+    })), [spaceFilteredFiles]);
 
     // Convert goosFiles to DesktopItem format for PageView/PresentView
-    const goosFilesAsDesktopItems: DesktopItem[] = useMemo(() => goosFilesRaw.map((f, index) => ({
+    const goosFilesAsDesktopItems: DesktopItem[] = useMemo(() => spaceFilteredFiles.map((f, index) => ({
         id: f.id,
         desktopId: '',
         label: f.title,
@@ -2197,7 +2368,7 @@ function GoOSDemoContent() {
         parentItemId: f.parentId || null,
         createdAt: new Date(f.createdAt),
         updatedAt: new Date(f.updatedAt),
-    })), [goosFilesRaw]);
+    })), [spaceFilteredFiles]);
 
     // goOS Editor UI state (local only)
     const [openEditors, setOpenEditors] = useState<string[]>([]);
