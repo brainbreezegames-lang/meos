@@ -112,10 +112,15 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
             border: `2px solid ${theme.colors.border}`,
             opacity: isActive ? 1 : 0.95,
           }}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+          initial={{ opacity: 0, scale: 0.85, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          transition={{
+            type: 'spring',
+            stiffness: 350,
+            damping: 25,
+            mass: 0.8,
+          }}
         >
           {/* Mail Header */}
           <div
@@ -251,14 +256,14 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
                     exit={{ scale: 0.8, y: -20 }}
                   >
                     <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center"
+                      className="w-16 h-16 rounded-full flex items-center justify-center success-checkmark-circle"
                       style={{
-                        background: 'var(--accent-success)',
-                        boxShadow: '0 4px 20px var(--accent-success)',
+                        background: 'var(--color-success, #22c55e)',
+                        boxShadow: '0 4px 20px rgba(34, 197, 94, 0.4)',
                       }}
                     >
                       <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                        <path d="M5 12l5 5L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                        <path className="success-checkmark-stroke" d="M5 12l5 5L19 7" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <p
@@ -357,11 +362,12 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
                 value={formData.subject}
                 onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
                 placeholder="What's this about?"
-                className="flex-1 bg-transparent outline-none"
+                className="flex-1 bg-transparent outline-none input-glow px-2 py-1 -mx-2 rounded-md transition-all"
                 style={{
                   fontSize: '13px',
                   color: 'var(--text-primary)',
                   fontFamily: 'var(--font-body)',
+                  border: '1px solid transparent',
                 }}
               />
             </div>
@@ -372,12 +378,13 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
                 value={formData.message}
                 onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                 placeholder="Write your message here..."
-                className="w-full h-full resize-none bg-transparent outline-none"
+                className="w-full h-full resize-none bg-transparent outline-none input-glow p-2 -m-2 rounded-lg transition-all"
                 style={{
                   fontSize: '14px',
                   color: 'var(--text-primary)',
                   fontFamily: 'var(--font-body)',
                   lineHeight: 'var(--line-height-normal)',
+                  border: '1px solid transparent',
                 }}
               />
             </div>

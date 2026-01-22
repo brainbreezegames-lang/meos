@@ -1,0 +1,427 @@
+/**
+ * goOS Delight System
+ * Micro-interactions, animations, and visual feedback
+ */
+
+/* =============================================================================
+   WINDOW ANIMATIONS
+   ============================================================================= */
+
+/* Window opening bounce keyframes */
+@keyframes windowOpen {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-5px);
+  }
+  75% {
+    transform: scale(0.99) translateY(2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes windowClose {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+}
+
+/* =============================================================================
+   BUTTON PRESS DEPTH EFFECT
+   ============================================================================= */
+
+.btn-depth {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+}
+
+.btn-depth:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 8px rgba(23, 20, 18, 0.1),
+    0 1px 2px rgba(23, 20, 18, 0.06);
+}
+
+.btn-depth:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 2px rgba(23, 20, 18, 0.08),
+    inset 0 1px 2px rgba(23, 20, 18, 0.05);
+}
+
+/* Primary button with depth */
+.btn-primary-depth {
+  position: relative;
+  transform-style: preserve-3d;
+  box-shadow:
+    0 2px 4px rgba(255, 119, 34, 0.2),
+    0 4px 8px rgba(255, 119, 34, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.15s var(--ease-out);
+}
+
+.btn-primary-depth:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 12px rgba(255, 119, 34, 0.3),
+    0 8px 20px rgba(255, 119, 34, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary-depth:active {
+  transform: translateY(0);
+  box-shadow:
+    0 1px 2px rgba(255, 119, 34, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* =============================================================================
+   INPUT FOCUS GLOW
+   ============================================================================= */
+
+.input-glow {
+  transition:
+    border-color 0.2s var(--ease-out),
+    box-shadow 0.2s var(--ease-out),
+    background 0.2s var(--ease-out);
+}
+
+.input-glow:focus {
+  outline: none;
+  border-color: var(--color-accent-primary);
+  box-shadow:
+    0 0 0 3px var(--color-accent-primary-subtle),
+    0 0 20px -5px var(--color-accent-primary-glow);
+}
+
+.input-glow:focus:not(:focus-visible) {
+  box-shadow: none;
+  border-color: var(--color-border-default);
+}
+
+.input-glow:focus-visible {
+  outline: none;
+  border-color: var(--color-accent-primary);
+  box-shadow:
+    0 0 0 3px var(--color-accent-primary-subtle),
+    0 0 20px -5px var(--color-accent-primary-glow);
+}
+
+/* =============================================================================
+   CARD HOVER LIFT
+   ============================================================================= */
+
+.card-lift {
+  transition:
+    transform 0.25s var(--ease-out),
+    box-shadow 0.25s var(--ease-out);
+}
+
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 28px rgba(23, 20, 18, 0.12),
+    0 4px 10px rgba(23, 20, 18, 0.06);
+}
+
+/* =============================================================================
+   SUCCESS CHECKMARK ANIMATION
+   ============================================================================= */
+
+@keyframes checkmarkStroke {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes checkmarkCircle {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-checkmark-circle {
+  animation: checkmarkCircle 0.4s var(--ease-bounce) forwards;
+}
+
+.success-checkmark-stroke {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: checkmarkStroke 0.3s 0.15s ease-out forwards;
+}
+
+/* =============================================================================
+   ERROR SHAKE ANIMATION
+   ============================================================================= */
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.error-shake {
+  animation: shake 0.5s ease-out;
+}
+
+/* =============================================================================
+   PULSE ANIMATIONS
+   ============================================================================= */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--color-accent-primary-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* =============================================================================
+   TRAFFIC LIGHT HOVER EFFECTS
+   ============================================================================= */
+
+.traffic-light {
+  transition: transform 0.15s var(--ease-out), filter 0.15s var(--ease-out);
+}
+
+.traffic-light:hover {
+  transform: scale(1.15);
+  filter: brightness(1.1);
+}
+
+.traffic-light:active {
+  transform: scale(0.9);
+  filter: brightness(0.95);
+}
+
+/* =============================================================================
+   TAB SWITCH ANIMATION
+   ============================================================================= */
+
+@keyframes tabSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.tab-slide-in {
+  animation: tabSlideIn 0.2s ease-out;
+}
+
+/* =============================================================================
+   TOOLTIP ENTRANCE
+   ============================================================================= */
+
+@keyframes tooltipEnter {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.tooltip-enter {
+  animation: tooltipEnter 0.2s var(--ease-bounce);
+}
+
+/* =============================================================================
+   BADGE BOUNCE
+   ============================================================================= */
+
+@keyframes badgeBounce {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  25% { transform: translateX(-50%) scale(1.2); }
+  50% { transform: translateX(-50%) scale(0.95); }
+  75% { transform: translateX(-50%) scale(1.05); }
+}
+
+.badge-bounce {
+  animation: badgeBounce 0.4s var(--ease-bounce);
+}
+
+/* =============================================================================
+   LINK HOVER UNDERLINE
+   ============================================================================= */
+
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s var(--ease-out);
+}
+
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* =============================================================================
+   MENU ITEM HOVER
+   ============================================================================= */
+
+.menu-item-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-item-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg-subtle-hover);
+  transform: translateX(-100%);
+  transition: transform 0.2s var(--ease-out);
+  z-index: -1;
+}
+
+.menu-item-hover:hover::before {
+  transform: translateX(0);
+}
+
+/* =============================================================================
+   ICON SPIN ON CLICK
+   ============================================================================= */
+
+@keyframes iconSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.icon-spin-click:active {
+  animation: iconSpin 0.5s var(--ease-out);
+}
+
+/* =============================================================================
+   FADE IN STAGGER (for lists)
+   ============================================================================= */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-item {
+  opacity: 0;
+  animation: fadeInUp 0.3s ease-out forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.05s; }
+.stagger-item:nth-child(2) { animation-delay: 0.1s; }
+.stagger-item:nth-child(3) { animation-delay: 0.15s; }
+.stagger-item:nth-child(4) { animation-delay: 0.2s; }
+.stagger-item:nth-child(5) { animation-delay: 0.25s; }
+.stagger-item:nth-child(6) { animation-delay: 0.3s; }
+.stagger-item:nth-child(7) { animation-delay: 0.35s; }
+.stagger-item:nth-child(8) { animation-delay: 0.4s; }
+
+/* =============================================================================
+   IMAGE LOAD FADE
+   ============================================================================= */
+
+@keyframes imageFadeIn {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.image-fade-in {
+  animation: imageFadeIn 0.4s ease-out;
+}
+
+/* =============================================================================
+   REDUCED MOTION SUPPORT
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-depth,
+  .btn-primary-depth,
+  .card-lift,
+  .traffic-light,
+  .menu-item-hover::before,
+  .link-underline::after {
+    transition: none;
+  }
+
+  .success-checkmark-circle,
+  .success-checkmark-stroke,
+  .error-shake,
+  .pulse,
+  .pulse-glow,
+  .tab-slide-in,
+  .tooltip-enter,
+  .badge-bounce,
+  .icon-spin-click:active,
+  .stagger-item,
+  .image-fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

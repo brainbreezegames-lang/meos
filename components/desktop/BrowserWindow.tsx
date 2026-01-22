@@ -127,10 +127,18 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
             border: isMaximized ? 'none' : `2px solid ${theme.colors.border}`,
             opacity: isActive ? 1 : 0.95,
           }}
-          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-          transition={prefersReducedMotion ? { duration: 0.15 } : { duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.85, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 10 }}
+          transition={prefersReducedMotion
+            ? { duration: 0.15 }
+            : {
+                type: 'spring',
+                stiffness: 350,
+                damping: 25,
+                mass: 0.8,
+              }
+          }
         >
           {/* Browser Chrome - Tab Bar */}
           <div

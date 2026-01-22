@@ -135,12 +135,12 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
 
           {/* Colon with pulse animation */}
           <span
+            className="pulse"
             style={{
               fontSize: 28,
               fontWeight: 500,
               color: 'var(--color-accent-primary, #ff7722)',
               lineHeight: 1,
-              animation: 'pulse 2s ease-in-out infinite',
             }}
           >
             :
@@ -202,14 +202,6 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
           </div>
         )}
       </div>
-
-      {/* Keyframe animation for colon pulse */}
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-      `}</style>
     </WidgetWrapper>
   );
 }
