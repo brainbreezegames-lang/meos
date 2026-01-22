@@ -68,7 +68,7 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
           onClick={() => setIsExpanded(true)}
           style={{
             background: 'var(--color-bg-base, #fbf9ef)',
-            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+            border: '2px solid var(--color-text-primary, #171412)',
             borderRadius: 'var(--radius-full, 9999px)',
             boxShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
             padding: '10px 16px',
