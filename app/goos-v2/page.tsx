@@ -451,6 +451,44 @@ const DEMO_FILES: GoOSFile[] = INITIAL_GOOS_FILES.map(f => ({
 }));
 
 // ============================================
+// DEMO WIDGETS - Initial widgets for the demo
+// ============================================
+const INITIAL_DEMO_WIDGETS = [
+    {
+        id: 'demo-widget-clock',
+        desktopId: 'goos-demo',
+        widgetType: 'clock' as const,
+        positionX: 85,
+        positionY: 15,
+        title: null,
+        isVisible: true,
+        config: { timezone: 'America/New_York', format: '12h', showTimezoneName: true },
+        order: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        id: 'demo-widget-links',
+        desktopId: 'goos-demo',
+        widgetType: 'links' as const,
+        positionX: 85,
+        positionY: 35,
+        title: null,
+        isVisible: true,
+        config: {
+            links: [
+                { id: '1', label: 'Portfolio', url: 'https://example.com', icon: 'globe' },
+                { id: '2', label: 'GitHub', url: 'https://github.com', icon: 'github' },
+                { id: '3', label: 'Twitter', url: 'https://twitter.com', icon: 'twitter' },
+            ]
+        },
+        order: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+];
+
+// ============================================
 // DEMO ITEMS
 // ============================================
 const DEMO_ITEMS: DesktopItem[] = [
@@ -3676,7 +3714,7 @@ export default function GoOSDemoPage() {
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
                     <GoOSProvider viewMode="owner" localOnly={true} initialFiles={INITIAL_GOOS_FILES}>
-                        <WidgetProvider localOnly={true} isOwner={true}>
+                        <WidgetProvider localOnly={true} isOwner={true} initialWidgets={INITIAL_DEMO_WIDGETS}>
                             <GoOSDemoContent />
                         </WidgetProvider>
                     </GoOSProvider>
