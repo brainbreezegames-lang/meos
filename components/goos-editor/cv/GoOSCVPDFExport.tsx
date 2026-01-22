@@ -9,131 +9,152 @@ import {
   StyleSheet,
   pdf,
   Link,
+  Font,
 } from '@react-pdf/renderer';
 import type { CVContent, CVExperience, CVSkillCategory, CVEducation } from '@/lib/validations/goos';
+
+// Register fonts - use system fonts that work well in PDF
+// Helvetica for body (similar to Instrument Sans)
+// Times-Roman for headings (similar to Averia Serif Libre - serif)
+Font.registerHyphenationCallback((word) => [word]); // Disable hyphenation
 
 // PDF Styles matching the screen design
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    paddingTop: 48,
+    paddingBottom: 48,
+    paddingHorizontal: 56,
     fontFamily: 'Helvetica',
-    fontSize: 10,
+    fontSize: 11,
     color: '#1a1a1a',
     backgroundColor: '#ffffff',
   },
   header: {
-    marginBottom: 20,
+    marginBottom: 28,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
-    paddingBottom: 12,
+    borderBottomColor: '#e0e0e0',
+    paddingBottom: 18,
   },
   headerTitle: {
-    fontSize: 24,
+    fontFamily: 'Times-Roman',
+    fontSize: 26,
     fontWeight: 'normal',
     color: '#1a1a1a',
     lineHeight: 1.2,
   },
-  headerTitleDash: {
-    color: '#555555',
+  headerSeparator: {
+    color: '#666666',
   },
   twoColumn: {
     flexDirection: 'row',
-    gap: 24,
+    gap: 36,
   },
   leftColumn: {
-    width: '30%',
-    paddingRight: 12,
+    width: '28%',
   },
   rightColumn: {
-    width: '70%',
+    width: '72%',
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 9,
-    fontWeight: 'bold',
+    fontFamily: 'Times-Roman',
+    fontSize: 10,
     color: '#1a1a1a',
-    marginBottom: 10,
+    marginBottom: 12,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   // Skills styles
   skillCategory: {
-    marginBottom: 12,
+    marginBottom: 14,
   },
   skillCategoryName: {
-    fontSize: 8,
-    fontWeight: 'bold',
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 9,
     textTransform: 'uppercase',
-    letterSpacing: 0.3,
+    letterSpacing: 0.4,
     marginBottom: 3,
+    color: '#1a1a1a',
   },
   skillItems: {
-    fontSize: 9,
+    fontSize: 10,
     lineHeight: 1.5,
     color: '#1a1a1a',
   },
   // Education styles
   educationItem: {
-    marginBottom: 10,
+    marginBottom: 12,
   },
   educationDegree: {
-    fontSize: 9,
-    fontWeight: 'medium',
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: '#1a1a1a',
+    marginBottom: 2,
   },
   educationDates: {
     fontSize: 9,
-    color: '#555555',
+    color: '#666666',
+    marginBottom: 2,
   },
   educationInstitution: {
-    fontSize: 9,
+    fontSize: 10,
+    color: '#1a1a1a',
   },
   // Contact styles
   contactItem: {
-    fontSize: 9,
-    marginBottom: 3,
-    lineHeight: 1.6,
+    fontSize: 10,
+    marginBottom: 4,
+    lineHeight: 1.7,
+    color: '#1a1a1a',
   },
   contactLink: {
     color: '#1a1a1a',
     textDecoration: 'none',
   },
   contactTagline: {
-    marginTop: 6,
+    marginTop: 10,
     fontStyle: 'italic',
-    color: '#555555',
+    color: '#666666',
   },
   // About styles
   aboutText: {
-    fontSize: 10,
-    lineHeight: 1.6,
+    fontSize: 11,
+    lineHeight: 1.65,
+    color: '#1a1a1a',
   },
   // Experience styles
   experienceItem: {
-    marginBottom: 16,
+    marginBottom: 22,
   },
   experienceRole: {
+    fontFamily: 'Helvetica-Bold',
     fontSize: 10,
-    fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 3,
+    marginBottom: 5,
+    color: '#1a1a1a',
   },
-  experienceMeta: {
-    fontSize: 10,
-    marginBottom: 3,
+  experienceCompanyLine: {
+    fontSize: 11,
+    marginBottom: 5,
+    color: '#1a1a1a',
+  },
+  experienceSeparator: {
+    color: '#666666',
   },
   experienceDescription: {
     fontSize: 10,
     fontStyle: 'italic',
-    color: '#555555',
-    marginBottom: 6,
-    lineHeight: 1.4,
+    color: '#666666',
+    marginBottom: 8,
+    lineHeight: 1.5,
   },
   experienceResponsibilities: {
-    fontSize: 10,
+    fontSize: 11,
     lineHeight: 1.6,
+    color: '#1a1a1a',
   },
 });
 
@@ -142,10 +163,10 @@ function PDFExperienceItem({ experience }: { experience: CVExperience }) {
   return (
     <View style={styles.experienceItem}>
       <Text style={styles.experienceRole}>{experience.role}</Text>
-      <Text style={styles.experienceMeta}>
+      <Text style={styles.experienceCompanyLine}>
         {experience.company}
         {experience.location && ` (${experience.location})`}
-        {' \u2022 '}
+        <Text style={styles.experienceSeparator}> • </Text>
         {experience.startDate} — {experience.endDate || 'Present'}
       </Text>
       {experience.description && (
@@ -188,7 +209,7 @@ function CVDocument({ content }: { content: CVContent }) {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
             {content.name}
-            <Text style={styles.headerTitleDash}> — </Text>
+            <Text style={styles.headerSeparator}> — </Text>
             {content.title}
           </Text>
         </View>
@@ -198,20 +219,24 @@ function CVDocument({ content }: { content: CVContent }) {
           {/* Left Column */}
           <View style={styles.leftColumn}>
             {/* Skills Section */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Skills</Text>
-              {content.skills.map((skill) => (
-                <PDFSkillCategory key={skill.id} skill={skill} />
-              ))}
-            </View>
+            {content.skills.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Skills</Text>
+                {content.skills.map((skill) => (
+                  <PDFSkillCategory key={skill.id} skill={skill} />
+                ))}
+              </View>
+            )}
 
             {/* Education Section */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Education</Text>
-              {content.education.map((edu) => (
-                <PDFEducationItem key={edu.id} education={edu} />
-              ))}
-            </View>
+            {content.education.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Education</Text>
+                {content.education.map((edu) => (
+                  <PDFEducationItem key={edu.id} education={edu} />
+                ))}
+              </View>
+            )}
 
             {/* Contact Section */}
             <View style={styles.section}>
@@ -252,18 +277,22 @@ function CVDocument({ content }: { content: CVContent }) {
           {/* Right Column */}
           <View style={styles.rightColumn}>
             {/* About Section */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>About me</Text>
-              <Text style={styles.aboutText}>{content.about}</Text>
-            </View>
+            {content.about && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>About me</Text>
+                <Text style={styles.aboutText}>{content.about}</Text>
+              </View>
+            )}
 
             {/* Experience Section */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Experience</Text>
-              {content.experience.map((exp) => (
-                <PDFExperienceItem key={exp.id} experience={exp} />
-              ))}
-            </View>
+            {content.experience.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Experience</Text>
+                {content.experience.map((exp) => (
+                  <PDFExperienceItem key={exp.id} experience={exp} />
+                ))}
+              </View>
+            )}
           </View>
         </View>
       </Page>

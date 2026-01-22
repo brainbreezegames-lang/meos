@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { motion, useDragControls, useReducedMotion } from 'framer-motion';
 import { FileUser, Download } from 'lucide-react';
 import { TrafficLights } from '../../desktop/TrafficLights';
@@ -66,7 +66,6 @@ export function GoOSCVWindow({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
 
-  const constraintsRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
   const prefersReducedMotion = useReducedMotion();
 
@@ -234,19 +233,6 @@ export function GoOSCVWindow({
 
   return (
     <>
-      {/* Drag constraints container */}
-      <div
-        ref={constraintsRef}
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          top: 'var(--menubar-height, 40px)',
-          bottom: '80px',
-          left: '20px',
-          right: '20px',
-          zIndex: zIndex - 1,
-        }}
-      />
-
       {/* Unsaved changes modal */}
       {showUnsavedModal && (
         <div
@@ -328,8 +314,8 @@ export function GoOSCVWindow({
         drag={!isMaximized}
         dragControls={dragControls}
         dragListener={false}
-        dragConstraints={constraintsRef}
-        dragElastic={0.05}
+        dragConstraints={false}
+        dragElastic={0}
         dragMomentum={false}
         initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
         animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}

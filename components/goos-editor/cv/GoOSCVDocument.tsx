@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { CVContent, CVExperience, CVSkillCategory, CVEducation } from '@/lib/validations/goos';
+import './cv-styles.css';
 
 interface GoOSCVDocumentProps {
   content: CVContent;
@@ -28,7 +29,6 @@ function EditableText({
   onFieldChange,
   onFieldBlur,
   className,
-  style,
   multiline = false,
   placeholder = 'Click to edit...',
 }: {
@@ -40,13 +40,13 @@ function EditableText({
   onFieldChange?: (field: string, value: string) => void;
   onFieldBlur?: () => void;
   className?: string;
-  style?: React.CSSProperties;
   multiline?: boolean;
   placeholder?: string;
 }) {
   const isActive = editingField === field;
 
   if (isEditing && isActive) {
+    const baseClass = `cv-editable-input ${className || ''}`;
     if (multiline) {
       return (
         <textarea
@@ -57,19 +57,7 @@ function EditableText({
           onKeyDown={(e) => {
             if (e.key === 'Escape') onFieldBlur?.();
           }}
-          className={className}
-          style={{
-            ...style,
-            background: 'rgba(59, 130, 246, 0.1)',
-            outline: '2px solid rgba(59, 130, 246, 0.5)',
-            outlineOffset: 2,
-            borderRadius: 2,
-            resize: 'none',
-            minHeight: 60,
-            width: '100%',
-            border: 'none',
-            padding: 4,
-          }}
+          className={`${baseClass} cv-editable-textarea`}
           placeholder={placeholder}
         />
       );
@@ -84,17 +72,7 @@ function EditableText({
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === 'Escape') onFieldBlur?.();
         }}
-        className={className}
-        style={{
-          ...style,
-          background: 'rgba(59, 130, 246, 0.1)',
-          outline: '2px solid rgba(59, 130, 246, 0.5)',
-          outlineOffset: 2,
-          borderRadius: 2,
-          border: 'none',
-          padding: '2px 4px',
-          width: '100%',
-        }}
+        className={baseClass}
         placeholder={placeholder}
       />
     );
@@ -103,28 +81,9 @@ function EditableText({
   return (
     <span
       onClick={() => isEditing && onFieldClick?.(field)}
-      className={className}
-      style={{
-        ...style,
-        cursor: isEditing ? 'text' : 'default',
-        borderRadius: 2,
-        transition: 'background 0.15s',
-        ...(isEditing && {
-          ':hover': { background: 'rgba(59, 130, 246, 0.05)' },
-        }),
-      }}
-      onMouseEnter={(e) => {
-        if (isEditing) {
-          (e.target as HTMLElement).style.background = 'rgba(59, 130, 246, 0.05)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (isEditing) {
-          (e.target as HTMLElement).style.background = 'transparent';
-        }
-      }}
+      className={`cv-editable-text ${isEditing ? 'cv-editable-hover' : ''} ${className || ''}`}
     >
-      {value || <span style={{ opacity: 0.4 }}>{placeholder}</span>}
+      {value || <span className="cv-placeholder">{placeholder}</span>}
     </span>
   );
 }
@@ -152,43 +111,17 @@ function ExperienceItem({
   const prefix = `experience.${index}`;
 
   return (
-    <div className="cv-experience-item" style={{ marginBottom: 20, position: 'relative' }}>
+    <div className="cv-experience-item">
       {isEditing && onDelete && (
-        <button
-          onClick={onDelete}
-          style={{
-            position: 'absolute',
-            right: -24,
-            top: 0,
-            width: 20,
-            height: 20,
-            borderRadius: '50%',
-            border: 'none',
-            background: '#ef4444',
-            color: 'white',
-            fontSize: 12,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: 0.7,
-          }}
-          title="Delete"
-        >
-          x
+        <button onClick={onDelete} className="cv-delete-btn" title="Delete">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
       )}
 
-      {/* Role Title */}
-      <div style={{
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 11,
-        fontWeight: 600,
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        color: '#1a1a1a',
-        marginBottom: 4,
-      }}>
+      {/* Role Title - UPPERCASE, SEMIBOLD */}
+      <h4 className="cv-role-title">
         <EditableText
           value={experience.role}
           field={`${prefix}.role`}
@@ -199,15 +132,10 @@ function ExperienceItem({
           onFieldBlur={onFieldBlur}
           placeholder="Role Title"
         />
-      </div>
+      </h4>
 
       {/* Company + Location + Dates */}
-      <div style={{
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 11,
-        color: '#1a1a1a',
-        marginBottom: 4,
-      }}>
+      <p className="cv-company-line">
         <EditableText
           value={experience.company}
           field={`${prefix}.company`}
@@ -217,12 +145,13 @@ function ExperienceItem({
           onFieldChange={onFieldChange}
           onFieldBlur={onFieldBlur}
           placeholder="Company Name"
+          className="cv-company-name"
         />
-        {experience.location && (
+        {(experience.location || isEditing) && (
           <>
             {' ('}
             <EditableText
-              value={experience.location}
+              value={experience.location || ''}
               field={`${prefix}.location`}
               isEditing={isEditing}
               editingField={editingField}
@@ -234,7 +163,7 @@ function ExperienceItem({
             {')'}
           </>
         )}
-        {' \u2022 '}
+        <span className="cv-date-separator"> &bull; </span>
         <EditableText
           value={experience.startDate}
           field={`${prefix}.startDate`}
@@ -245,7 +174,7 @@ function ExperienceItem({
           onFieldBlur={onFieldBlur}
           placeholder="Start Date"
         />
-        {' \u2014 '}
+        <span> &mdash; </span>
         <EditableText
           value={experience.endDate || 'Present'}
           field={`${prefix}.endDate`}
@@ -256,18 +185,11 @@ function ExperienceItem({
           onFieldBlur={onFieldBlur}
           placeholder="End Date"
         />
-      </div>
+      </p>
 
       {/* Company Description (italic) */}
       {(experience.description || isEditing) && (
-        <div style={{
-          fontFamily: "'Instrument Sans', sans-serif",
-          fontSize: 11,
-          fontStyle: 'italic',
-          color: '#555555',
-          marginBottom: 8,
-          lineHeight: 1.5,
-        }}>
+        <p className="cv-company-description">
           <EditableText
             value={experience.description || ''}
             field={`${prefix}.description`}
@@ -278,16 +200,11 @@ function ExperienceItem({
             onFieldBlur={onFieldBlur}
             placeholder="Brief company description"
           />
-        </div>
+        </p>
       )}
 
       {/* Responsibilities */}
-      <div style={{
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 11,
-        color: '#1a1a1a',
-        lineHeight: 1.6,
-      }}>
+      <div className="cv-responsibilities">
         <EditableText
           value={experience.responsibilities || ''}
           field={`${prefix}.responsibilities`}
@@ -327,43 +244,17 @@ function SkillCategoryItem({
   const prefix = `skills.${index}`;
 
   return (
-    <div style={{ marginBottom: 16, position: 'relative' }}>
+    <div className="cv-skill-category">
       {isEditing && onDelete && (
-        <button
-          onClick={onDelete}
-          style={{
-            position: 'absolute',
-            right: -20,
-            top: 0,
-            width: 16,
-            height: 16,
-            borderRadius: '50%',
-            border: 'none',
-            background: '#ef4444',
-            color: 'white',
-            fontSize: 10,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: 0.7,
-          }}
-          title="Delete"
-        >
-          x
+        <button onClick={onDelete} className="cv-delete-btn cv-delete-btn-small" title="Delete">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
       )}
 
       {/* Category Name */}
-      <div style={{
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 10,
-        fontWeight: 600,
-        textTransform: 'uppercase',
-        letterSpacing: '0.03em',
-        color: '#1a1a1a',
-        marginBottom: 4,
-      }}>
+      <h5 className="cv-skill-category-name">
         <EditableText
           value={skill.category}
           field={`${prefix}.category`}
@@ -374,15 +265,10 @@ function SkillCategoryItem({
           onFieldBlur={onFieldBlur}
           placeholder="Category Name"
         />
-      </div>
+      </h5>
 
       {/* Items */}
-      <div style={{
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 10,
-        color: '#1a1a1a',
-        lineHeight: 1.5,
-      }}>
+      <p className="cv-skill-items">
         <EditableText
           value={skill.items.join(', ')}
           field={`${prefix}.items`}
@@ -395,7 +281,7 @@ function SkillCategoryItem({
           onFieldBlur={onFieldBlur}
           placeholder="Skill 1, Skill 2, Skill 3"
         />
-      </div>
+      </p>
     </div>
   );
 }
@@ -423,39 +309,16 @@ function EducationItem({
   const prefix = `education.${index}`;
 
   return (
-    <div style={{ marginBottom: 12, position: 'relative' }}>
+    <div className="cv-education-item">
       {isEditing && onDelete && (
-        <button
-          onClick={onDelete}
-          style={{
-            position: 'absolute',
-            right: -20,
-            top: 0,
-            width: 16,
-            height: 16,
-            borderRadius: '50%',
-            border: 'none',
-            background: '#ef4444',
-            color: 'white',
-            fontSize: 10,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: 0.7,
-          }}
-          title="Delete"
-        >
-          x
+        <button onClick={onDelete} className="cv-delete-btn cv-delete-btn-small" title="Delete">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
       )}
 
-      <div style={{
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 10,
-        fontWeight: 500,
-        color: '#1a1a1a',
-      }}>
+      <p className="cv-education-degree">
         <EditableText
           value={education.degree}
           field={`${prefix}.degree`}
@@ -466,12 +329,8 @@ function EducationItem({
           onFieldBlur={onFieldBlur}
           placeholder="Degree Name"
         />
-      </div>
-      <div style={{
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 10,
-        color: '#555555',
-      }}>
+      </p>
+      <p className="cv-education-dates">
         <EditableText
           value={education.dates}
           field={`${prefix}.dates`}
@@ -482,12 +341,8 @@ function EducationItem({
           onFieldBlur={onFieldBlur}
           placeholder="Year - Year"
         />
-      </div>
-      <div style={{
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 10,
-        color: '#1a1a1a',
-      }}>
+      </p>
+      <p className="cv-education-institution">
         <EditableText
           value={education.institution}
           field={`${prefix}.institution`}
@@ -498,7 +353,7 @@ function EducationItem({
           onFieldBlur={onFieldBlur}
           placeholder="Institution Name"
         />
-      </div>
+      </p>
     </div>
   );
 }
@@ -506,33 +361,8 @@ function EducationItem({
 // Add button component
 function AddButton({ onClick, label }: { onClick?: () => void; label: string }) {
   return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '6px 12px',
-        background: 'transparent',
-        border: '1px dashed #ccc',
-        borderRadius: 4,
-        cursor: 'pointer',
-        fontFamily: "'Instrument Sans', sans-serif",
-        fontSize: 10,
-        color: '#666',
-        marginTop: 8,
-        transition: 'all 0.15s',
-      }}
-      onMouseEnter={(e) => {
-        (e.target as HTMLElement).style.borderColor = '#3b82f6';
-        (e.target as HTMLElement).style.color = '#3b82f6';
-      }}
-      onMouseLeave={(e) => {
-        (e.target as HTMLElement).style.borderColor = '#ccc';
-        (e.target as HTMLElement).style.color = '#666';
-      }}
-    >
-      <span style={{ fontSize: 14 }}>+</span> {label}
+    <button onClick={onClick} className="cv-add-btn">
+      <span className="cv-add-btn-icon">+</span> {label}
     </button>
   );
 }
@@ -552,29 +382,10 @@ export function GoOSCVDocument({
   onDeleteEducation,
 }: GoOSCVDocumentProps) {
   return (
-    <div
-      className="cv-document"
-      style={{
-        width: '100%',
-        maxWidth: 800,
-        margin: '0 auto',
-        padding: 48,
-        background: '#ffffff',
-        fontFamily: "'Instrument Sans', sans-serif",
-        color: '#1a1a1a',
-        minHeight: '100%',
-      }}
-    >
+    <div className="cv-document">
       {/* Header - Name and Title */}
-      <div style={{ marginBottom: 24, borderBottom: '1px solid #e5e5e5', paddingBottom: 16 }}>
-        <h1 style={{
-          fontFamily: "'Averia Serif Libre', serif",
-          fontSize: 28,
-          fontWeight: 400,
-          margin: 0,
-          color: '#1a1a1a',
-          lineHeight: 1.2,
-        }}>
+      <header className="cv-header">
+        <h1 className="cv-name">
           <EditableText
             value={content.name}
             field="name"
@@ -585,7 +396,7 @@ export function GoOSCVDocument({
             onFieldBlur={onFieldBlur}
             placeholder="Your Name"
           />
-          <span style={{ color: '#555' }}> — </span>
+          <span className="cv-name-separator"> &mdash; </span>
           <EditableText
             value={content.title}
             field="title"
@@ -597,29 +408,15 @@ export function GoOSCVDocument({
             placeholder="Your Title"
           />
         </h1>
-      </div>
+      </header>
 
       {/* Two Column Layout */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '30% 70%',
-        gap: 32,
-      }}>
+      <div className="cv-columns">
         {/* Left Column - Skills, Education, Contact */}
-        <div style={{ paddingRight: 16 }}>
+        <aside className="cv-sidebar">
           {/* Skills Section */}
-          <section style={{ marginBottom: 28 }}>
-            <h2 style={{
-              fontFamily: "'Averia Serif Libre', serif",
-              fontSize: 11,
-              fontWeight: 400,
-              color: '#1a1a1a',
-              marginBottom: 12,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}>
-              Skills
-            </h2>
+          <section className="cv-section">
+            <h2 className="cv-section-title">Skills</h2>
             {content.skills.map((skill, index) => (
               <SkillCategoryItem
                 key={skill.id}
@@ -637,18 +434,8 @@ export function GoOSCVDocument({
           </section>
 
           {/* Education Section */}
-          <section style={{ marginBottom: 28 }}>
-            <h2 style={{
-              fontFamily: "'Averia Serif Libre', serif",
-              fontSize: 11,
-              fontWeight: 400,
-              color: '#1a1a1a',
-              marginBottom: 12,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}>
-              Education
-            </h2>
+          <section className="cv-section">
+            <h2 className="cv-section-title">Education</h2>
             {content.education.map((edu, index) => (
               <EducationItem
                 key={edu.id}
@@ -666,26 +453,11 @@ export function GoOSCVDocument({
           </section>
 
           {/* Contact Section */}
-          <section>
-            <h2 style={{
-              fontFamily: "'Averia Serif Libre', serif",
-              fontSize: 11,
-              fontWeight: 400,
-              color: '#1a1a1a',
-              marginBottom: 12,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}>
-              Contact
-            </h2>
-            <div style={{
-              fontFamily: "'Instrument Sans', sans-serif",
-              fontSize: 10,
-              color: '#1a1a1a',
-              lineHeight: 1.8,
-            }}>
+          <section className="cv-section">
+            <h2 className="cv-section-title">Contact</h2>
+            <div className="cv-contact">
               {(content.contact.location || isEditing) && (
-                <div>
+                <p className="cv-contact-item">
                   <EditableText
                     value={content.contact.location || ''}
                     field="contact.location"
@@ -696,10 +468,10 @@ export function GoOSCVDocument({
                     onFieldBlur={onFieldBlur}
                     placeholder="Location"
                   />
-                </div>
+                </p>
               )}
               {(content.contact.phone || isEditing) && (
-                <div>
+                <p className="cv-contact-item">
                   <EditableText
                     value={content.contact.phone || ''}
                     field="contact.phone"
@@ -710,10 +482,10 @@ export function GoOSCVDocument({
                     onFieldBlur={onFieldBlur}
                     placeholder="Phone"
                   />
-                </div>
+                </p>
               )}
               {(content.contact.email || isEditing) && (
-                <div>
+                <p className="cv-contact-item">
                   {isEditing ? (
                     <EditableText
                       value={content.contact.email || ''}
@@ -726,14 +498,14 @@ export function GoOSCVDocument({
                       placeholder="Email"
                     />
                   ) : (
-                    <a href={`mailto:${content.contact.email}`} style={{ color: '#1a1a1a', textDecoration: 'none' }}>
+                    <a href={`mailto:${content.contact.email}`} className="cv-link">
                       {content.contact.email}
                     </a>
                   )}
-                </div>
+                </p>
               )}
               {(content.contact.linkedin || isEditing) && (
-                <div>
+                <p className="cv-contact-item">
                   {isEditing ? (
                     <EditableText
                       value={content.contact.linkedin || ''}
@@ -746,14 +518,14 @@ export function GoOSCVDocument({
                       placeholder="LinkedIn URL"
                     />
                   ) : (
-                    <a href={content.contact.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#1a1a1a', textDecoration: 'none' }}>
+                    <a href={content.contact.linkedin} target="_blank" rel="noopener noreferrer" className="cv-link">
                       {content.contact.linkedin?.replace('https://', '').replace('www.', '')}
                     </a>
                   )}
-                </div>
+                </p>
               )}
               {(content.contact.website || isEditing) && (
-                <div>
+                <p className="cv-contact-item">
                   {isEditing ? (
                     <EditableText
                       value={content.contact.website || ''}
@@ -766,14 +538,14 @@ export function GoOSCVDocument({
                       placeholder="Website URL"
                     />
                   ) : (
-                    <a href={content.contact.website} target="_blank" rel="noopener noreferrer" style={{ color: '#1a1a1a', textDecoration: 'none' }}>
+                    <a href={content.contact.website} target="_blank" rel="noopener noreferrer" className="cv-link">
                       {content.contact.website?.replace('https://', '').replace('www.', '')}
                     </a>
                   )}
-                </div>
+                </p>
               )}
               {(content.contact.tagline || isEditing) && (
-                <div style={{ marginTop: 8, fontStyle: 'italic', color: '#555' }}>
+                <p className="cv-contact-tagline">
                   <EditableText
                     value={content.contact.tagline || ''}
                     field="contact.tagline"
@@ -784,33 +556,18 @@ export function GoOSCVDocument({
                     onFieldBlur={onFieldBlur}
                     placeholder="Tagline or motto"
                   />
-                </div>
+                </p>
               )}
             </div>
           </section>
-        </div>
+        </aside>
 
         {/* Right Column - About, Experience */}
-        <div>
+        <main className="cv-main">
           {/* About Section */}
-          <section style={{ marginBottom: 28 }}>
-            <h2 style={{
-              fontFamily: "'Averia Serif Libre', serif",
-              fontSize: 11,
-              fontWeight: 400,
-              color: '#1a1a1a',
-              marginBottom: 12,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}>
-              About me
-            </h2>
-            <div style={{
-              fontFamily: "'Instrument Sans', sans-serif",
-              fontSize: 11,
-              color: '#1a1a1a',
-              lineHeight: 1.6,
-            }}>
+          <section className="cv-section">
+            <h2 className="cv-section-title">About me</h2>
+            <div className="cv-about">
               <EditableText
                 value={content.about}
                 field="about"
@@ -826,18 +583,8 @@ export function GoOSCVDocument({
           </section>
 
           {/* Experience Section */}
-          <section>
-            <h2 style={{
-              fontFamily: "'Averia Serif Libre', serif",
-              fontSize: 11,
-              fontWeight: 400,
-              color: '#1a1a1a',
-              marginBottom: 16,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}>
-              Experience
-            </h2>
+          <section className="cv-section">
+            <h2 className="cv-section-title">Experience</h2>
             {content.experience.map((exp, index) => (
               <ExperienceItem
                 key={exp.id}
@@ -853,7 +600,7 @@ export function GoOSCVDocument({
             ))}
             {isEditing && <AddButton onClick={onAddExperience} label="Add Role" />}
           </section>
-        </div>
+        </main>
       </div>
     </div>
   );

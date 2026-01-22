@@ -22,7 +22,6 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
   const context = useEditContextSafe();
   const theme = useWidgetTheme();
   const windowRef = useRef<HTMLDivElement>(null);
-  const constraintsRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const dragControls = useDragControls();
   const blockPicker = useInlineBlockPicker();
@@ -195,13 +194,6 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
             transition={{ duration: 0.2 }}
           />
 
-          {/* Drag constraints */}
-          <div
-            ref={constraintsRef}
-            className="fixed inset-0 z-[200] pointer-events-none"
-            style={{ padding: '40px' }}
-          />
-
           {/* Centering wrapper */}
           <div
             className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none"
@@ -214,8 +206,8 @@ export function EditableInfoWindow({ item, onClose, position }: EditableInfoWind
               drag
               dragControls={dragControls}
               dragListener={false}
-              dragConstraints={constraintsRef}
-              dragElastic={0.05}
+              dragConstraints={false}
+              dragElastic={0}
               dragMomentum={false}
               style={{
                 width: item.windowWidth || 440,

@@ -119,7 +119,6 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
   const windowContext = useWindowContext();
   const themeContext = useThemeSafe();
   const windowRef = useRef<HTMLDivElement>(null);
-  const constraintsRef = useRef<HTMLDivElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -222,12 +221,6 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
   return (
     <>
       <div
-        ref={constraintsRef}
-        className="fixed inset-0 z-[199] pointer-events-none"
-        style={{ padding: isMaximized ? '28px 0 0 0' : '40px' }}
-      />
-
-      <div
         className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center"
         style={{ padding: isMaximized ? '28px 0 0 0' : '40px' }}
       >
@@ -236,8 +229,8 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
           className="overflow-hidden flex flex-col pointer-events-auto"
           onClick={handleWindowClick}
           drag={!isMaximized}
-          dragConstraints={constraintsRef}
-          dragElastic={0.05}
+          dragConstraints={false}
+          dragElastic={0}
           dragMomentum={false}
           style={{
             zIndex: windowInstance.zIndex + 200,

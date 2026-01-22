@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { TrafficLights } from '../desktop/TrafficLights';
 import { WINDOW, TITLE_BAR, ANIMATION } from '../desktop/windowStyles';
@@ -39,7 +39,6 @@ export function Window({
   const prefersReducedMotion = useReducedMotion();
   const [isMaximized, setIsMaximized] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const constraintsRef = useRef<HTMLDivElement>(null);
 
   const handleClose = useCallback(() => {
     onClose?.();
@@ -59,25 +58,13 @@ export function Window({
 
   return (
     <>
-      {/* Drag constraints container */}
-      <div
-        ref={constraintsRef}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          padding: isMaximized ? 0 : 40,
-          pointerEvents: 'none',
-          zIndex: zIndex - 1,
-        }}
-      />
-
       <AnimatePresence>
         <motion.div
           data-window-id={id}
           onClick={onFocus}
           drag={!isMaximized}
-          dragConstraints={constraintsRef}
-          dragElastic={0.05}
+          dragConstraints={false}
+          dragElastic={0}
           dragMomentum={false}
           initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
           animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}

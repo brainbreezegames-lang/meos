@@ -2129,7 +2129,7 @@ function GoOSDemoContent() {
     const windowContext = useWindowContext();
     const [time, setTime] = useState('00:00');
     const [greeting, setGreeting] = useState('');
-    const [topZIndex, setTopZIndex] = useState(100);
+    const [topZIndex, setTopZIndex] = useState(600); // Start above widgets/dock/menubar
     const [logoClicks, setLogoClicks] = useState(0);
     const [showEasterEgg, setShowEasterEgg] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -2153,14 +2153,14 @@ function GoOSDemoContent() {
     });
 
     const [windowZ, setWindowZ] = useState<Record<string, number>>({
-        quackmail: 50,
-        notes: 51,
-        chat: 52,
-        settings: 53,
-        nest: 54,
-        shell: 55,
-        guestbook: 56,
-        analytics: 57,
+        quackmail: 600,
+        notes: 601,
+        chat: 602,
+        settings: 603,
+        nest: 604,
+        shell: 605,
+        guestbook: 606,
+        analytics: 607,
     });
 
     // Guestbook state

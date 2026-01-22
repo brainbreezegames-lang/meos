@@ -51,7 +51,6 @@ export function GoOSEditorWindow({
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const constraintsRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
   const prefersReducedMotion = useReducedMotion();
 
@@ -120,24 +119,12 @@ export function GoOSEditorWindow({
 
   return (
     <>
-      {/* Drag constraints container - covers entire screen minus margins */}
-      <div
-        ref={constraintsRef}
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          top: 'var(--menubar-height, 40px)',
-          bottom: '80px',
-          left: '20px',
-          right: '20px',
-          zIndex: zIndex - 1
-        }}
-      />
       <motion.div
         drag={!isMaximized}
         dragControls={dragControls}
         dragListener={false}
-        dragConstraints={constraintsRef}
-        dragElastic={0.05}
+        dragConstraints={false}
+        dragElastic={0}
         dragMomentum={false}
         initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
         animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}

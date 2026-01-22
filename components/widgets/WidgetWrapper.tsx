@@ -118,7 +118,7 @@ export function WidgetWrapper({
         left: `${position.x}%`,
         top: `${position.y}%`,
         transform: 'translate(-50%, -50%)',
-        zIndex: isDragging ? 9999 : 500,
+        zIndex: isDragging ? 9999 : 50, // Below windows (100+), above desktop icons (10)
         cursor: isOwner ? (isDragging ? 'grabbing' : 'grab') : 'default',
         opacity: widget.isVisible ? 1 : 0.5,
         userSelect: 'none',
