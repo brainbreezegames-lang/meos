@@ -546,6 +546,23 @@ export function GoOSTipTapEditor({
           color: ${goOSTokens.colors.text.primary};
         }
 
+        /* Text selection - always visible with warm accent */
+        .goos-editor-content ::selection {
+          background: rgba(255, 119, 34, 0.25);
+          color: #171412;
+        }
+
+        .goos-editor-content ::-moz-selection {
+          background: rgba(255, 119, 34, 0.25);
+          color: #171412;
+        }
+
+        /* ProseMirror selection state */
+        .ProseMirror-selectednode {
+          outline: 2px solid ${goOSTokens.colors.accent.primary};
+          outline-offset: 2px;
+        }
+
         .goos-editor-content.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
           float: left;
@@ -757,59 +774,76 @@ export function GoOSTipTapEditor({
           color: #22863a;
         }
 
-        /* Bubble Menu */
+        /* Bubble Menu - calm-tech glass style */
         .goos-bubble-menu {
           display: flex;
           gap: 4px;
-          padding: 6px 8px;
-          background: ${goOSTokens.colors.paper};
-          border: 2px solid ${goOSTokens.colors.border};
-          border-radius: 4px;
-          box-shadow: ${goOSTokens.shadows.button};
+          padding: 8px 10px;
+          background: var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95));
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06));
+          border-radius: var(--radius-md, 12px);
+          box-shadow: var(--shadow-lg);
+          animation: menuPopIn 0.15s ease-out;
+        }
+
+        @keyframes menuPopIn {
+          0% { opacity: 0; transform: scale(0.95) translateY(4px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .goos-bubble-menu button {
-          padding: 4px 8px;
+          padding: 6px 10px;
           font-size: 12px;
           font-weight: 600;
           font-family: ${goOSTokens.fonts.body};
           background: transparent;
           border: none;
-          border-radius: 3px;
+          border-radius: var(--radius-sm, 8px);
           cursor: pointer;
           color: ${goOSTokens.colors.text.secondary};
           transition: all 0.15s ease;
         }
 
         .goos-bubble-menu button:hover {
-          background: ${goOSTokens.colors.headerBg};
+          background: var(--color-bg-subtle, rgba(23, 20, 18, 0.04));
           color: ${goOSTokens.colors.text.primary};
+          transform: translateY(-1px);
+        }
+
+        .goos-bubble-menu button:active {
+          transform: translateY(0) scale(0.98);
         }
 
         .goos-bubble-menu button.is-active {
           background: ${goOSTokens.colors.accent.primary};
           color: var(--color-text-on-accent, #fbf9ef);
+          box-shadow: 0 2px 8px rgba(255, 119, 34, 0.3);
         }
 
-        /* Floating Menu */
+        /* Floating Menu - calm-tech glass style */
         .goos-floating-menu {
           display: flex;
           gap: 4px;
-          padding: 6px 8px;
-          background: ${goOSTokens.colors.paper};
-          border: 2px solid ${goOSTokens.colors.border};
-          border-radius: 4px;
-          box-shadow: ${goOSTokens.shadows.button};
+          padding: 8px 10px;
+          background: var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95));
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06));
+          border-radius: var(--radius-md, 12px);
+          box-shadow: var(--shadow-lg);
+          animation: menuPopIn 0.15s ease-out;
         }
 
         .goos-floating-menu button {
-          padding: 4px 8px;
+          padding: 6px 10px;
           font-size: 11px;
           font-weight: 500;
           font-family: ${goOSTokens.fonts.body};
-          background: ${goOSTokens.colors.headerBg};
-          border: 1px solid ${goOSTokens.colors.border}40;
-          border-radius: 3px;
+          background: var(--color-bg-subtle, rgba(23, 20, 18, 0.04));
+          border: 1px solid transparent;
+          border-radius: var(--radius-sm, 8px);
           cursor: pointer;
           color: ${goOSTokens.colors.text.secondary};
           transition: all 0.15s ease;
@@ -817,8 +851,25 @@ export function GoOSTipTapEditor({
 
         .goos-floating-menu button:hover {
           background: ${goOSTokens.colors.accent.pale};
-          border-color: ${goOSTokens.colors.accent.primary};
+          border-color: rgba(255, 119, 34, 0.2);
           color: ${goOSTokens.colors.accent.dark};
+          transform: translateY(-1px);
+        }
+
+        .goos-floating-menu button:active {
+          transform: translateY(0) scale(0.98);
+        }
+
+        /* Focus states for accessibility */
+        .goos-bubble-menu button:focus-visible,
+        .goos-floating-menu button:focus-visible {
+          outline: 2px solid ${goOSTokens.colors.accent.primary};
+          outline-offset: 2px;
+        }
+
+        /* Cursor feedback while typing */
+        .ProseMirror-focused {
+          caret-color: ${goOSTokens.colors.accent.primary};
         }
       `}</style>
     </div>

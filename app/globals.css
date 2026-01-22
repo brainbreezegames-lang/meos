@@ -668,10 +668,15 @@ body {
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Selection */
+/* Selection - warm accent highlight with dark text for visibility */
 ::selection {
-    background: rgba(139, 92, 246, 0.3);
-    color: #fff;
+    background: var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.25));
+    color: var(--color-text-primary, #171412);
+}
+
+::-moz-selection {
+    background: var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.25));
+    color: var(--color-text-primary, #171412);
 }
 
 /* Utility Classes */

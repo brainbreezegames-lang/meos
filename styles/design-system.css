@@ -302,7 +302,13 @@
    ============================================================================= */
 
 ::selection {
-   background: var(--color-accent-primary-subtle);
+   background: var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.25));
+   color: var(--color-text-primary, #171412);
+}
+
+::-moz-selection {
+   background: var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.25));
+   color: var(--color-text-primary, #171412);
 }
 
 /* Drag selection box */

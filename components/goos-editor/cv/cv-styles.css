@@ -21,6 +21,17 @@
   min-height: 100%;
 }
 
+/* Text Selection - warm accent with visible dark text */
+.cv-document ::selection {
+  background: rgba(255, 119, 34, 0.25);
+  color: #1a1a1a;
+}
+
+.cv-document ::-moz-selection {
+  background: rgba(255, 119, 34, 0.25);
+  color: #1a1a1a;
+}
+
 /* ==========================================================================
    HEADER - Name & Title
    ========================================================================== */
