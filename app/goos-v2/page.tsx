@@ -57,7 +57,18 @@ import type { Widget } from '@/types';
 import { ViewSwitcher, PageView, PresentView } from '@/components/views';
 import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
-import type { ViewMode, WidgetType } from '@/types';
+import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
+import { SpaceSwitcher } from '@/components/spaces';
+
+// ============================================
+// DEMO SPACES (for SpaceSwitcher demo)
+// ============================================
+const DEMO_SPACES: SpaceSummary[] = [
+    { id: 'space-1', name: 'Portfolio', icon: '🎨', slug: null, isPrimary: true, isPublic: true, order: 0, fileCount: 12 },
+    { id: 'space-2', name: 'Writing', icon: '✍️', slug: 'writing', isPrimary: false, isPublic: true, order: 1, fileCount: 8 },
+    { id: 'space-3', name: 'Photography', icon: '📸', slug: 'photos', isPrimary: false, isPublic: true, order: 2, fileCount: 24 },
+    { id: 'space-4', name: 'Personal', icon: '🔐', slug: null, isPrimary: false, isPublic: false, order: 3, fileCount: 5 },
+];
 
 // ============================================
 // PLAYFUL LOADING MESSAGES
@@ -2032,6 +2043,11 @@ function GoOSDemoContent() {
     const [showConfetti, setShowConfetti] = useState(false);
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
+    // Spaces state (demo mode - will be replaced by SpaceContext)
+    const [activeSpaceId, setActiveSpaceId] = useState('space-1');
+    const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
+    const [showManageSpacesDialog, setShowManageSpacesDialog] = useState(false);
+
     // Celebration helper
     const celebrate = useCallback(() => {
         setShowConfetti(true);
@@ -2794,6 +2810,21 @@ function GoOSDemoContent() {
                         </AnimatePresence>
                     </motion.button>
 
+                    {/* Space Switcher */}
+                    <SpaceSwitcher
+                        spaces={DEMO_SPACES}
+                        activeSpaceId={activeSpaceId}
+                        onSwitchSpace={(spaceId) => {
+                            setActiveSpaceId(spaceId);
+                            const space = DEMO_SPACES.find(s => s.id === spaceId);
+                            if (space) {
+                                showGoOSToast(`Switched to ${space.name}`, 'success');
+                            }
+                        }}
+                        onCreateSpace={() => setShowCreateSpaceModal(true)}
+                        onManageSpaces={() => setShowManageSpacesDialog(true)}
+                    />
+
                     {/* Widgets Dropdown Menu */}
                     <div className="relative">
                         <motion.button
@@ -3433,16 +3464,16 @@ function GoOSDemoContent() {
             <AnimatePresence>
                 {!isZenMode && (
                     <motion.footer
-                        initial={{ y: 100, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 100, opacity: 0 }}
+                        initial={{ y: 100, x: '-50%', opacity: 0 }}
+                        animate={{ y: 0, x: '-50%', opacity: 1 }}
+                        exit={{ y: 100, x: '-50%', opacity: 0 }}
                         transition={{
                             type: 'spring',
                             stiffness: 300,
                             damping: 30,
                             mass: 0.8
                         }}
-                        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[3000]"
+                        className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
                             className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"

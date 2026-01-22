@@ -1,5 +1,44 @@
 export * from './blocks';
 
+// === Space Types (Multi-desktop support) ===
+export interface Space {
+  id: string;
+  userId: string;
+  name: string;
+  icon: string;
+  slug: string | null;
+  isPrimary: boolean;
+  order: number;
+  backgroundUrl: string | null;
+  backgroundPosition: string;
+  backgroundOverlay: string | null;
+  theme: string;
+  title: string | null;
+  description: string | null;
+  ogImageUrl: string | null;
+  isPublic: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  // Populated relations
+  items?: DesktopItem[];
+  dockItems?: DockItem[];
+  statusWidget?: StatusWidget | null;
+  widgets?: Widget[];
+  view?: DesktopView | null;
+  workbenchEntries?: WorkbenchEntry[];
+}
+
+export interface SpaceSummary {
+  id: string;
+  name: string;
+  icon: string;
+  slug: string | null;
+  isPrimary: boolean;
+  isPublic: boolean;
+  order: number;
+  fileCount?: number;
+}
+
 export interface User {
   id: string;
   email: string;
