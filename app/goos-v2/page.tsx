@@ -2757,9 +2757,12 @@ function GoOSDemoContent() {
                 // Close context menus
                 setDesktopContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
                 setFileContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
-                setShowWallpaperPicker(false);
-                // Deselect files when clicking on desktop background (not on files or windows)
+                // Close wallpaper picker only if not clicking on it
                 const target = e.target as HTMLElement;
+                if (!target.closest('[data-wallpaper-picker]')) {
+                    setShowWallpaperPicker(false);
+                }
+                // Deselect files when clicking on desktop background (not on files or windows)
                 if (!target.closest('[data-file-id]') && !target.closest('[data-window]')) {
                     setSelectedFileId(null);
                 }
@@ -3589,7 +3592,7 @@ function GoOSDemoContent() {
                     />
                     <div className="w-px h-8 bg-black/10 mx-1" />
                     {/* Wallpaper Picker */}
-                    <div className="relative">
+                    <div className="relative" data-wallpaper-picker>
                         <DockIcon
                             icon={<ImageIcon size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
                             onClick={() => setShowWallpaperPicker(!showWallpaperPicker)}
@@ -3604,6 +3607,7 @@ function GoOSDemoContent() {
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                     transition={{ duration: 0.15 }}
                                     className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 rounded-xl"
+                                    data-wallpaper-picker
                                     style={{
                                         background: goOS.colors.cream,
                                         border: `2px solid ${goOS.colors.border}`,
