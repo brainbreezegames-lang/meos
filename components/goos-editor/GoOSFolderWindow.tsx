@@ -56,7 +56,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         left: isMaximized ? 0 : '50%',
         transform: isMaximized ? 'none' : 'translateX(-50%)',
         width: isMaximized ? '100%' : 'min(600px, 90vw)',
-        height: isMaximized ? 'calc(100vh - var(--menubar-height, 36px) - 80px)' : 'min(500px, 70vh)',
+        // In zen mode (--zen-dock-offset: 0px), window takes full height minus just the menubar
+        height: isMaximized ? 'calc(100vh - var(--menubar-height, 36px) - var(--zen-dock-offset, 80px))' : 'min(500px, 70vh)',
         minWidth: 320,
         minHeight: 280,
         background: WINDOW.background,

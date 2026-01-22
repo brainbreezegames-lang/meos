@@ -2257,6 +2257,9 @@ function GoOSDemoContent() {
     const [presentingFileId, setPresentingFileId] = useState<string | null>(null);
     const [caseStudyFileId, setCaseStudyFileId] = useState<string | null>(null);
 
+    // Zen focus mode - true when any window is maximized
+    const isZenMode = maximizedEditors.size > 0;
+
     // Widget context
     const widgetContext = useWidgets();
     const { widgets, createWidget, updateWidget, deleteWidget } = widgetContext;
@@ -2815,12 +2818,15 @@ function GoOSDemoContent() {
         <div
             id="goos-desktop-area"
             data-goos-desktop
+            data-zen-mode={isZenMode ? 'true' : undefined}
             className="min-h-screen w-full relative overflow-hidden theme-sketch"
             style={{
                 backgroundColor: goOS.colors.paper,
                 backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
                 backgroundSize: '24px 24px',
-            }}
+                // CSS variable for zen mode - windows use this for full-height
+                '--zen-dock-offset': isZenMode ? '0px' : '80px',
+            } as React.CSSProperties}
             onContextMenu={handleDesktopContextMenu}
             onClick={(e) => {
                 // Close context menus
@@ -2836,12 +2842,23 @@ function GoOSDemoContent() {
             {/* CONFETTI CELEBRATION */}
             <ConfettiBurst isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
 
-            {/* MENU BAR - Clean, minimal design with centered toggle */}
-            <header
+            {/* MENU BAR - Fades to minimal presence in zen mode */}
+            <motion.header
+                animate={{
+                    opacity: isZenMode ? 0.4 : 1,
+                    y: isZenMode ? -4 : 0,
+                }}
+                whileHover={isZenMode ? { opacity: 0.9, y: 0 } : {}}
+                transition={{
+                    duration: 0.4,
+                    ease: [0.25, 0.1, 0.25, 1],
+                }}
                 className="h-11 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
                 style={{
-                    background: goOS.colors.headerBg,
-                    borderBottom: `2px solid ${goOS.colors.border}`,
+                    background: isZenMode ? 'transparent' : goOS.colors.headerBg,
+                    borderBottom: isZenMode ? 'none' : `2px solid ${goOS.colors.border}`,
+                    backdropFilter: isZenMode ? 'none' : undefined,
+                    pointerEvents: isZenMode ? 'none' : 'auto',
                 }}
             >
                 {/* Left: Logo + Widgets Menu */}
@@ -2959,7 +2976,7 @@ function GoOSDemoContent() {
                 <div className="flex items-center gap-3 text-sm min-w-[100px] justify-end" style={{ color: goOS.colors.text.secondary }}>
                     <span className="font-medium text-xs" style={{ color: goOS.colors.text.primary }}>{time}</span>
                 </div>
-            </header>
+            </motion.header>
 
             {/* PAGE VIEW MODE - Belle Duffner-style case study view */}
             {viewMode === 'page' && (() => {
@@ -3513,16 +3530,29 @@ function GoOSDemoContent() {
                 )}
             </main>
 
-            {/* DOCK */}
-            <footer className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[3000]">
-                <div
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
-                    style={{
-                        background: goOS.colors.cream,
-                        border: `2px solid ${goOS.colors.border}`,
-                        boxShadow: goOS.shadows.solid
-                    }}
-                >
+            {/* DOCK - Hides in zen mode for distraction-free experience */}
+            <AnimatePresence>
+                {!isZenMode && (
+                    <motion.footer
+                        initial={{ y: 100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 100, opacity: 0 }}
+                        transition={{
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 30,
+                            mass: 0.8
+                        }}
+                        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[3000]"
+                    >
+                        <div
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
+                            style={{
+                                background: goOS.colors.cream,
+                                border: `2px solid ${goOS.colors.border}`,
+                                boxShadow: goOS.shadows.solid
+                            }}
+                        >
                     <RubberDuck />
                     <DockIcon
                         icon={<Folder size={24} fill={goOS.icon.fill} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
@@ -3618,28 +3648,37 @@ function GoOSDemoContent() {
                         </>
                     )}
                 </div>
-            </footer>
+                    </motion.footer>
+                )}
+            </AnimatePresence>
 
-            {/* Status Widget */}
-            <StatusWidget statusWidget={DEMO_STATUS_WIDGET} />
+            {/* Status Widget - Hidden in zen mode */}
+            <AnimatePresence>
+                {!isZenMode && <StatusWidget statusWidget={DEMO_STATUS_WIDGET} />}
+            </AnimatePresence>
 
-            {/* Made with badge */}
-            <motion.a
-                href="/"
-                className="fixed bottom-4 right-4 z-50 px-3 py-1.5 rounded-full text-[10px] font-medium"
-                style={{
-                    background: goOS.colors.headerBg,
-                    border: `2px solid ${goOS.colors.border}`,
-                    color: goOS.colors.text.primary,
-                    boxShadow: goOS.shadows.sm,
-                }}
-                whileHover={{ scale: 1.05 }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-            >
-                Made with goOS
-            </motion.a>
+            {/* Made with badge - Hidden in zen mode */}
+            <AnimatePresence>
+                {!isZenMode && (
+                    <motion.a
+                        href="/"
+                        className="fixed bottom-4 right-4 z-50 px-3 py-1.5 rounded-full text-[10px] font-medium"
+                        style={{
+                            background: goOS.colors.headerBg,
+                            border: `2px solid ${goOS.colors.border}`,
+                            color: goOS.colors.text.primary,
+                            boxShadow: goOS.shadows.sm,
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        Made with goOS
+                    </motion.a>
+                )}
+            </AnimatePresence>
 
             {/* Desktop Context Menu */}
             <GoOSDesktopContextMenu

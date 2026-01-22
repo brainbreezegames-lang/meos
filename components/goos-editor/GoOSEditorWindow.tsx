@@ -136,7 +136,8 @@ export function GoOSEditorWindow({
           left: isMaximized ? 0 : '50%',
           x: isMaximized ? 0 : '-50%',
           width: isMaximized ? '100%' : 'min(900px, 90vw)',
-          height: isMaximized ? 'calc(100vh - var(--menubar-height, 40px) - 80px)' : 'min(80vh, 700px)',
+          // In zen mode (--zen-dock-offset: 0px), window takes full height minus just the menubar
+          height: isMaximized ? 'calc(100vh - var(--menubar-height, 40px) - var(--zen-dock-offset, 80px))' : 'min(80vh, 700px)',
           minWidth: 400,
           background: WINDOW.background,
           border: isMaximized ? WINDOW.borderMaximized : WINDOW.border,
