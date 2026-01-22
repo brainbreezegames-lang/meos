@@ -109,6 +109,7 @@ interface GoOSProviderProps {
   viewMode?: GoOSViewMode;
   username?: string; // For visitor view
   localOnly?: boolean; // Skip API calls, use local state only (for demo/unauthenticated)
+  spaceId?: string | null; // Which space to load files from
 }
 
 export function GoOSProvider({
@@ -117,6 +118,7 @@ export function GoOSProvider({
   viewMode = 'owner',
   username,
   localOnly = false,
+  spaceId,
 }: GoOSProviderProps) {
   const [files, setFiles] = useState<GoOSFileData[]>(initialFiles);
   const [isLoading, setIsLoading] = useState(false);
@@ -152,9 +154,15 @@ export function GoOSProvider({
     setError(null);
 
     try {
+      // Build query params
+      const params = new URLSearchParams();
+      if (parentId !== undefined) params.set('parentId', parentId ?? 'null');
+      if (spaceId) params.set('spaceId', spaceId);
+      const queryString = params.toString() ? `?${params.toString()}` : '';
+
       const endpoint = viewMode === 'visitor' && username
-        ? `/api/goos/public/${username}${parentId !== undefined ? `?parentId=${parentId}` : ''}`
-        : `/api/goos/files${parentId !== undefined ? `?parentId=${parentId}` : ''}`;
+        ? `/api/goos/public/${username}${queryString}`
+        : `/api/goos/files${queryString}`;
 
       const response = await fetch(endpoint);
       const result = await response.json();
@@ -178,7 +186,7 @@ export function GoOSProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [localOnly, viewMode, username, showToast]);
+  }, [localOnly, viewMode, username, spaceId, showToast]);
 
   // Find non-overlapping position for a new file
   const findNonOverlappingPosition = useCallback((basePos: { x: number; y: number }, parentId?: string | null): { x: number; y: number } => {
@@ -287,6 +295,7 @@ export function GoOSProvider({
           title,
           parentId: parentId || null,
           position,
+          spaceId: spaceId || undefined,
         }),
       });
 
@@ -310,7 +319,7 @@ export function GoOSProvider({
       showToast(message, 'error');
       return null;
     }
-  }, [localOnly, viewMode, getNextPosition, findNonOverlappingPosition, showToast]);
+  }, [localOnly, viewMode, spaceId, getNextPosition, findNonOverlappingPosition, showToast]);
 
   // Update file
   // Use functional updates to always get current state (avoids stale closure for newly created files)
@@ -804,6 +813,7 @@ export function GoOSProvider({
           imageUrl: url,
           imageAlt: options?.alt || '',
           imageCaption: options?.caption || '',
+          spaceId: spaceId || undefined,
         }),
       });
 
@@ -820,7 +830,7 @@ export function GoOSProvider({
       showToast(err instanceof Error ? err.message : 'Failed to create image', 'error');
       return null;
     }
-  }, [localOnly, viewMode, getNextPosition, showToast]);
+  }, [localOnly, viewMode, spaceId, getNextPosition, showToast]);
 
   // Create link file
   const createLinkFile = useCallback(async (
@@ -871,6 +881,7 @@ export function GoOSProvider({
           linkUrl: url,
           linkTitle: options?.title || '',
           linkDescription: options?.description || '',
+          spaceId: spaceId || undefined,
         }),
       });
 
@@ -887,7 +898,7 @@ export function GoOSProvider({
       showToast(err instanceof Error ? err.message : 'Failed to create link', 'error');
       return null;
     }
-  }, [localOnly, viewMode, getNextPosition, showToast]);
+  }, [localOnly, viewMode, spaceId, getNextPosition, showToast]);
 
   // Create embed file
   const createEmbedFile = useCallback(async (
@@ -937,6 +948,7 @@ export function GoOSProvider({
           position,
           embedUrl: url,
           embedType,
+          spaceId: spaceId || undefined,
         }),
       });
 
@@ -953,7 +965,7 @@ export function GoOSProvider({
       showToast(err instanceof Error ? err.message : 'Failed to create embed', 'error');
       return null;
     }
-  }, [localOnly, viewMode, getNextPosition, showToast]);
+  }, [localOnly, viewMode, spaceId, getNextPosition, showToast]);
 
   // Create download file
   const createDownloadFile = useCallback(async (
@@ -1007,6 +1019,7 @@ export function GoOSProvider({
           downloadName: fileName,
           downloadSize: options?.fileSize,
           downloadType: options?.fileType,
+          spaceId: spaceId || undefined,
         }),
       });
 
@@ -1023,7 +1036,7 @@ export function GoOSProvider({
       showToast(err instanceof Error ? err.message : 'Failed to create download', 'error');
       return null;
     }
-  }, [localOnly, viewMode, getNextPosition, showToast]);
+  }, [localOnly, viewMode, spaceId, getNextPosition, showToast]);
 
   // Set access level
   const setAccessLevel = useCallback(async (id: string, level: AccessLevel, price?: number) => {
@@ -1061,6 +1074,13 @@ export function GoOSProvider({
       showToast(err instanceof Error ? err.message : 'Failed to set access level', 'error');
     }
   }, [localOnly, viewMode, files, showToast]);
+
+  // Refetch files when spaceId changes
+  useEffect(() => {
+    if (!localOnly && spaceId) {
+      refreshFiles();
+    }
+  }, [spaceId, localOnly, refreshFiles]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {

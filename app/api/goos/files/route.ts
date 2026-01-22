@@ -3,7 +3,38 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { createGoOSFileSchema, listFilesQuerySchema } from '@/lib/validations/goos';
+import { createGoOSFileSchema } from '@/lib/validations/goos';
+
+// Helper to get or create primary space for user
+async function getOrCreatePrimarySpace(userId: string) {
+  let space = await prisma.space.findFirst({
+    where: { userId, isPrimary: true },
+  });
+
+  if (!space) {
+    // Check if user has any spaces
+    space = await prisma.space.findFirst({
+      where: { userId },
+      orderBy: { order: 'asc' },
+    });
+
+    if (!space) {
+      // Create default space
+      space = await prisma.space.create({
+        data: {
+          userId,
+          name: 'My Space',
+          icon: '🏠',
+          isPrimary: true,
+          isPublic: true,
+          order: 0,
+        },
+      });
+    }
+  }
+
+  return space;
+}
 
 // GET - List goOS files for authenticated user
 export async function GET(request: NextRequest) {
@@ -17,25 +48,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let desktop = await prisma.desktop.findUnique({
-      where: { userId: session.user.id },
-    });
-
-    // Create desktop if doesn't exist
-    if (!desktop) {
-      desktop = await prisma.desktop.create({
-        data: { userId: session.user.id },
-      });
-    }
-
     // Parse query params
     const { searchParams } = new URL(request.url);
+    const spaceId = searchParams.get('spaceId');
     const parentIdParam = searchParams.get('parentId');
     const parentId = parentIdParam === 'null' ? null : parentIdParam;
 
+    // Get space - either specified or primary
+    let space;
+    if (spaceId) {
+      space = await prisma.space.findFirst({
+        where: { id: spaceId, userId: session.user.id },
+      });
+      if (!space) {
+        return NextResponse.json(
+          { success: false, error: { code: 'NOT_FOUND', message: 'Space not found' } },
+          { status: 404 }
+        );
+      }
+    } else {
+      space = await getOrCreatePrimarySpace(session.user.id);
+    }
+
     // Build filter
     const whereClause: Record<string, unknown> = {
-      desktopId: desktop.id,
+      spaceId: space.id,
       itemVariant: 'goos-file',
     };
 
@@ -68,6 +105,17 @@ export async function GET(request: NextRequest) {
       parentId: item.parentItemId,
       position: { x: item.positionX, y: item.positionY },
       childCount: item._count.children,
+      // Image fields
+      imageUrl: item.goosImageUrl,
+      imageAlt: item.goosImageAlt,
+      imageCaption: item.goosImageCaption,
+      // Link fields
+      linkUrl: item.goosLinkUrl,
+      linkTitle: item.goosLinkTitle,
+      linkDescription: item.goosLinkDescription,
+      // Embed fields
+      embedUrl: item.goosEmbedUrl,
+      embedType: item.goosEmbedType,
     }));
 
     return NextResponse.json({ success: true, data: files });
@@ -92,19 +140,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let desktop = await prisma.desktop.findUnique({
-      where: { userId: session.user.id },
-      include: {
-        items: {
-          where: { itemVariant: 'goos-file' },
-        },
-      },
-    });
+    const body = await request.json();
+    const { spaceId: requestSpaceId, ...fileData } = body;
 
-    // Create desktop if doesn't exist
-    if (!desktop) {
-      desktop = await prisma.desktop.create({
-        data: { userId: session.user.id },
+    // Get space - either specified or primary
+    let space;
+    if (requestSpaceId) {
+      space = await prisma.space.findFirst({
+        where: { id: requestSpaceId, userId: session.user.id },
+        include: {
+          items: {
+            where: { itemVariant: 'goos-file' },
+          },
+        },
+      });
+      if (!space) {
+        return NextResponse.json(
+          { success: false, error: { code: 'NOT_FOUND', message: 'Space not found' } },
+          { status: 404 }
+        );
+      }
+    } else {
+      const primarySpace = await getOrCreatePrimarySpace(session.user.id);
+      space = await prisma.space.findUnique({
+        where: { id: primarySpace.id },
         include: {
           items: {
             where: { itemVariant: 'goos-file' },
@@ -113,23 +172,29 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Check file limit (100 for now)
-    if (desktop.items.length >= 100) {
+    if (!space) {
       return NextResponse.json(
-        { success: false, error: { code: 'LIMIT_REACHED', message: 'Maximum 100 goOS files allowed' } },
+        { success: false, error: { code: 'SERVER_ERROR', message: 'Failed to get space' } },
+        { status: 500 }
+      );
+    }
+
+    // Check file limit (100 per space)
+    if (space.items.length >= 100) {
+      return NextResponse.json(
+        { success: false, error: { code: 'LIMIT_REACHED', message: 'Maximum 100 goOS files allowed per space' } },
         { status: 400 }
       );
     }
 
-    const body = await request.json();
-    const validatedData = createGoOSFileSchema.parse(body);
+    const validatedData = createGoOSFileSchema.parse(fileData);
 
-    // If parentId is provided, verify it exists and is a folder
+    // If parentId is provided, verify it exists and is a folder in this space
     if (validatedData.parentId) {
       const parentFolder = await prisma.desktopItem.findFirst({
         where: {
           id: validatedData.parentId,
-          desktopId: desktop.id,
+          spaceId: space.id,
           itemVariant: 'goos-file',
           goosFileType: 'folder',
         },
@@ -146,7 +211,7 @@ export async function POST(request: NextRequest) {
     // Create the file
     const item = await prisma.desktopItem.create({
       data: {
-        desktopId: desktop.id,
+        spaceId: space.id,
         itemVariant: 'goos-file',
         goosFileType: validatedData.type,
         goosContent: validatedData.content || '',

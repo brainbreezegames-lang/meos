@@ -80,7 +80,7 @@ export type ViewMode = 'desktop' | 'page' | 'present';
 // goOS Widget
 export interface Widget {
   id: string;
-  desktopId: string;
+  spaceId: string;
   widgetType: WidgetType;
   positionX: number;
   positionY: number;
@@ -95,7 +95,7 @@ export interface Widget {
 // goOS Desktop View settings
 export interface DesktopView {
   id: string;
-  desktopId: string;
+  spaceId: string;
   activeMode: ViewMode;
   pageOrder: string[];
   presentOrder: string[];
@@ -110,7 +110,7 @@ export type StatusType = 'available' | 'looking' | 'taking' | 'open' | 'consulti
 
 export interface StatusWidget {
   id: string;
-  desktopId: string;
+  spaceId: string;
   statusType: StatusType;
   title: string;
   description: string | null;
@@ -124,7 +124,7 @@ export interface StatusWidget {
 // Workbench types
 export interface WorkbenchEntry {
   id: string;
-  desktopId: string;
+  spaceId: string;
   title: string;
   description: string | null;
   imageUrl: string | null;
@@ -164,7 +164,7 @@ export interface Comment {
 
 export interface DesktopItem {
   id: string;
-  desktopId: string;
+  spaceId: string;
   positionX: number;
   positionY: number;
   thumbnailUrl: string;
@@ -243,7 +243,7 @@ export interface BlockData {
 
 export interface DockItem {
   id: string;
-  desktopId: string;
+  spaceId: string;
   icon: string;
   label: string;
   actionType: 'url' | 'email' | 'download' | 'app';

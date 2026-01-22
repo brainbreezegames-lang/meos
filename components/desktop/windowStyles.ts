@@ -2,6 +2,8 @@
  * UNIFIED WINDOW STYLES - Single source of truth
  * ALL windows in the app MUST use these exact values
  * NO hardcoded values allowed in individual window components
+ *
+ * Design: Calm-tech 2025 - soft, premium, minimal
  */
 
 import React from 'react';
@@ -10,62 +12,66 @@ import React from 'react';
 // WINDOW CONTAINER STYLES
 // ============================================================================
 export const WINDOW = {
-  // Border - uses CSS variable for calm-tech aesthetic
-  border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+  // Border - subtle, barely visible
+  border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.06))',
   borderMaximized: 'none',
 
-  // Border radius - uses CSS variable
-  borderRadius: 'var(--radius-lg, 18px)',
+  // Border radius - large for soft feel
+  borderRadius: 'var(--radius-lg, 20px)',
   borderRadiusMaximized: '0',
 
   // Background - warm cream
-  background: 'var(--color-bg-base, #fbf9ef)',
+  background: 'var(--color-bg-base, #faf8f2)',
 
-  // Shadows - uses CSS variable
-  shadow: 'var(--shadow-window, 0 2px 8px rgba(23, 20, 18, 0.03), 0 8px 24px rgba(23, 20, 18, 0.06), 0 24px 48px rgba(23, 20, 18, 0.08), 0 48px 80px rgba(23, 20, 18, 0.04))',
+  // Shadows - ultra-soft, cloud-like diffuse
+  shadow: '0 4px 16px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.06), 0 24px 64px rgba(23, 20, 18, 0.04)',
   shadowMaximized: 'none',
 
   // Opacity
   opacityActive: 1,
-  opacityInactive: 0.97,
+  opacityInactive: 0.96,
 } as const;
 
 // ============================================================================
 // TITLE BAR STYLES
 // ============================================================================
 export const TITLE_BAR = {
-  height: 52,
-  background: 'var(--color-bg-base, #fbf9ef)',
-  borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-  paddingX: 20,
+  height: 48,
+  background: 'var(--color-bg-base, #faf8f2)',
+  borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.04))',
+  paddingX: 16,
 
   // Title text
   titleFontSize: 13,
   titleFontWeight: 500,
   titleColor: 'var(--color-text-primary, #171412)',
   titleLetterSpacing: '-0.01em',
-  titleOpacityActive: 0.85,
-  titleOpacityInactive: 0.6,
+  titleOpacityActive: 0.7,
+  titleOpacityInactive: 0.5,
 } as const;
 
 // ============================================================================
-// TRAFFIC LIGHTS (Window Controls) - macOS style
+// WINDOW CONTROLS - Calm-tech minimal icon buttons
 // ============================================================================
-export const TRAFFIC = {
-  size: 12,
-  gap: 8,
-  shadow: '0 1px 2px rgba(0, 0, 0, 0.08), inset 0 0 0 0.5px rgba(0, 0, 0, 0.04)',
+export const CONTROLS = {
+  size: 28,
+  iconSize: 14,
+  gap: 4,
+  borderRadius: 8,
 
-  // Colors
-  close: 'var(--color-traffic-close, #ff5f57)',
-  minimize: 'var(--color-traffic-minimize, #ffbd2e)',
-  maximize: 'var(--color-traffic-maximize, #28c840)',
+  // Colors - subtle, muted
+  background: 'transparent',
+  backgroundHover: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.04))',
+  iconColor: 'var(--color-text-muted, rgba(23, 20, 18, 0.4))',
+  iconColorHover: 'var(--color-text-secondary, rgba(23, 20, 18, 0.6))',
 
-  // Icon colors (shown on hover)
-  closeIcon: 'rgba(77, 0, 0, 0.7)',
-  minimizeIcon: 'rgba(100, 65, 0, 0.7)',
-  maximizeIcon: 'rgba(0, 70, 0, 0.7)',
+  // Close button gets subtle red on hover
+  closeHover: 'rgba(239, 68, 68, 0.08)',
+  closeIconHover: 'rgb(239, 68, 68)',
 } as const;
+
+// Legacy alias for backwards compatibility
+export const TRAFFIC = CONTROLS;
 
 // ============================================================================
 // ANIMATION - Spring bounce

@@ -18,7 +18,8 @@ model User {
   emailVerified DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  desktop       Desktop?
+  // Multiple spaces per user (replaces single desktop)
+  spaces        Space[]
   accounts      Account[]
   sessions      Session[]
 }
@@ -57,48 +58,68 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Desktop {
+// Space - Independent workspace (replaces Desktop)
+// Each user can have multiple spaces with different content and visibility
+model Space {
   id                 String   @id @default(cuid())
-  userId             String   @unique
+  userId             String
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Space identity
+  name               String   @default("My Space")
+  icon               String   @default("🏠")
+  slug               String?                    // null = private, set = public URL path
+  isPrimary          Boolean  @default(false)   // Main space shown at root URL
+  order              Int      @default(0)       // Display order in switcher
+
+  // Desktop appearance (moved from Desktop)
   backgroundUrl      String?
   backgroundPosition String   @default("cover")
   backgroundOverlay  String?
   theme              String   @default("monterey")
+
+  // SEO / Public page settings
   title              String?
   description        String?
   ogImageUrl         String?
   isPublic           Boolean  @default(true)
+
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  // Relations (moved from Desktop)
   items              DesktopItem[]
   dockItems          DockItem[]
   statusWidget       StatusWidget?
   workbenchEntries   WorkbenchEntry[]
   emailCaptures      EmailCapture[]
-  // goOS additions
   widgets            Widget[]
   view               DesktopView?
+
+  @@unique([userId, slug])
+  @@index([userId])
+  @@index([userId, order])
+  @@index([userId, isPrimary])
 }
 
 // Email captures for gated content
 model EmailCapture {
   id           String   @id @default(cuid())
   email        String
-  desktopId    String
-  desktop      Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  spaceId      String
+  space        Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   sourceFileId String?  // The file that triggered the capture
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@unique([email, desktopId])
-  @@index([desktopId])
+  @@unique([email, spaceId])
+  @@index([spaceId])
 }
 
 model DesktopItem {
   id                 String   @id @default(cuid())
-  desktopId          String
-  desktop            Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  spaceId            String
+  space              Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   positionX          Float
   positionY          Float
   thumbnailUrl       String
@@ -170,8 +191,8 @@ model DesktopItem {
   goosDownloadType   String?
 
   @@index([parentItemId])
-  @@index([desktopId, publishStatus])
-  @@index([desktopId, itemVariant])
+  @@index([spaceId, publishStatus])
+  @@index([spaceId, itemVariant])
 }
 
 model Tab {
@@ -202,8 +223,8 @@ model Block {
 
 model DockItem {
   id          String   @id @default(cuid())
-  desktopId   String
-  desktop     Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  spaceId     String
+  space       Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   icon        String
   label       String
   actionType  String
@@ -216,8 +237,8 @@ model DockItem {
 // Status Widget - "Available for" floating indicator
 model StatusWidget {
   id          String   @id @default(cuid())
-  desktopId   String   @unique
-  desktop     Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  spaceId     String   @unique
+  space       Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   statusType  String   @default("available") // available, looking, taking, open, consulting
   title       String   @default("Available for work")
   description String?  @db.Text
@@ -232,8 +253,8 @@ model StatusWidget {
 // Types: status (legacy), clock, book, tipjar, contact, links, feedback
 model Widget {
   id          String   @id @default(cuid())
-  desktopId   String
-  desktop     Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  spaceId     String
+  space       Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   widgetType  String   // 'clock' | 'book' | 'tipjar' | 'contact' | 'links' | 'feedback'
   positionX   Float
   positionY   Float
@@ -244,15 +265,15 @@ model Widget {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([desktopId])
+  @@index([spaceId])
 }
 
 // goOS Desktop View - Controls how desktop is displayed
 // Modes: desktop (default), page (scrollable), present (slideshow)
 model DesktopView {
   id           String   @id @default(cuid())
-  desktopId    String   @unique
-  desktop      Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  spaceId      String   @unique
+  space        Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   activeMode   String   @default("desktop") // 'desktop' | 'page' | 'present'
   pageOrder    Json     @default("[]")      // Array of item IDs for page view order
   presentOrder Json     @default("[]")      // Array of item IDs for presentation order
@@ -265,8 +286,8 @@ model DesktopView {
 // Workbench - Work-in-progress timeline entries
 model WorkbenchEntry {
   id          String   @id @default(cuid())
-  desktopId   String
-  desktop     Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  spaceId     String
+  space       Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   title       String
   description String?  @db.Text
   imageUrl    String?
