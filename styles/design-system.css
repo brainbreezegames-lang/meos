@@ -179,8 +179,8 @@
    --desktop-icon-gap: 6px;
 
    /* Windows */
-   --window-titlebar-height: 44px;
-   --window-radius: 14px;
+   --window-titlebar-height: 52px;
+   --window-radius: 12px;
    --window-traffic-size: 12px;
    --window-traffic-gap: 8px;
 
