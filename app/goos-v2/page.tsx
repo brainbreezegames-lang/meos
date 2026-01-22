@@ -53,7 +53,8 @@ import {
 } from '@/components/goos-editor';
 import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext';
 import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
-import { WidgetRenderer, WIDGET_METADATA } from '@/components/widgets';
+import { WidgetRenderer, WIDGET_METADATA, WidgetContextMenu } from '@/components/widgets';
+import type { Widget } from '@/types';
 import { ViewSwitcher, PageView, PresentView } from '@/components/views';
 import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
@@ -2243,6 +2244,7 @@ function GoOSDemoContent() {
     const [clipboard, setClipboard] = useState<{ files: GoOSFile[]; operation: 'copy' | 'cut' } | null>(null);
     const [desktopContextMenu, setDesktopContextMenu] = useState<{ isOpen: boolean; x: number; y: number }>({ isOpen: false, x: 0, y: 0 });
     const [fileContextMenu, setFileContextMenu] = useState<{ isOpen: boolean; x: number; y: number; fileId: string | null }>({ isOpen: false, x: 0, y: 0, fileId: null });
+    const [widgetContextMenu, setWidgetContextMenu] = useState<{ isOpen: boolean; x: number; y: number; widget: Widget | null }>({ isOpen: false, x: 0, y: 0, widget: null });
     const [openFolders, setOpenFolders] = useState<string[]>([]); // Folder windows
     const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
 
@@ -2692,6 +2694,9 @@ function GoOSDemoContent() {
             return;
         }
         e.preventDefault();
+        // Close other context menus
+        setFileContextMenu(prev => ({ ...prev, isOpen: false }));
+        setWidgetContextMenu({ isOpen: false, x: 0, y: 0, widget: null });
         setDesktopContextMenu({ isOpen: true, x: e.clientX, y: e.clientY });
         setSelectedFileId(null);
     }, []);
@@ -2700,8 +2705,27 @@ function GoOSDemoContent() {
     const handleFileContextMenu = useCallback((e: React.MouseEvent, fileId: string) => {
         e.preventDefault();
         e.stopPropagation();
+        // Close other context menus
+        setDesktopContextMenu(prev => ({ ...prev, isOpen: false }));
+        setWidgetContextMenu({ isOpen: false, x: 0, y: 0, widget: null });
         setFileContextMenu({ isOpen: true, x: e.clientX, y: e.clientY, fileId });
         setSelectedFileId(fileId);
+    }, []);
+
+    // Widget right-click handler
+    const handleWidgetContextMenu = useCallback((e: React.MouseEvent, widget: Widget) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Close other context menus
+        setDesktopContextMenu(prev => ({ ...prev, isOpen: false }));
+        setFileContextMenu(prev => ({ ...prev, isOpen: false }));
+        // Open widget context menu
+        setWidgetContextMenu({ isOpen: true, x: e.clientX, y: e.clientY, widget });
+    }, []);
+
+    // Close widget context menu
+    const closeWidgetContextMenu = useCallback(() => {
+        setWidgetContextMenu({ isOpen: false, x: 0, y: 0, widget: null });
     }, []);
 
     useEffect(() => {
@@ -3128,6 +3152,8 @@ function GoOSDemoContent() {
                             onWidgetPositionChange={(id, x, y) => {
                                 updateWidget(id, { positionX: x, positionY: y });
                             }}
+                            onWidgetContextMenu={handleWidgetContextMenu}
+                            highlightedWidgetId={widgetContextMenu.isOpen ? widgetContextMenu.widget?.id : null}
                             onContact={async (data) => {
                                 // Send contact form via API
                                 try {
@@ -3735,6 +3761,36 @@ function GoOSDemoContent() {
                     canPaste={!!clipboard}
                 />
             )}
+
+            {/* Widget Context Menu */}
+            <WidgetContextMenu
+                isOpen={widgetContextMenu.isOpen}
+                position={{ x: widgetContextMenu.x, y: widgetContextMenu.y }}
+                widget={widgetContextMenu.widget}
+                onClose={closeWidgetContextMenu}
+                onDelete={() => {
+                    if (widgetContextMenu.widget) {
+                        deleteWidget(widgetContextMenu.widget.id);
+                    }
+                }}
+                onEdit={() => {
+                    if (widgetContextMenu.widget) {
+                        console.log('Edit widget:', widgetContextMenu.widget);
+                        // TODO: Open widget edit modal
+                    }
+                }}
+                onToggleVisibility={() => {
+                    if (widgetContextMenu.widget) {
+                        updateWidget(widgetContextMenu.widget.id, {
+                            isVisible: !widgetContextMenu.widget.isVisible
+                        });
+                    }
+                }}
+                onBringToFront={() => {
+                    // TODO: Implement z-index management for widgets
+                    console.log('Bring to front:', widgetContextMenu.widget);
+                }}
+            />
 
             {/* Single Note Presentation Overlay */}
             {presentingFileId && (() => {

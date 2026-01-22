@@ -9,6 +9,8 @@ interface WidgetWrapperProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onPositionChange?: (x: number, y: number) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  isHighlighted?: boolean;
   children: React.ReactNode;
   className?: string;
 }
@@ -19,6 +21,8 @@ export function WidgetWrapper({
   onEdit,
   onDelete,
   onPositionChange,
+  onContextMenu,
+  isHighlighted = false,
   children,
   className = '',
 }: WidgetWrapperProps) {
@@ -98,6 +102,20 @@ export function WidgetWrapper({
         onPositionChange(currentPositionRef.current.x, currentPositionRef.current.y);
       }
 
+      // Prevent click events immediately after drag by blocking for a short time
+      if (wasActualDrag) {
+        // Use a capture phase listener to block the click
+        const blockClick = (e: MouseEvent) => {
+          e.stopPropagation();
+          e.preventDefault();
+        };
+        window.addEventListener('click', blockClick, { capture: true, once: true });
+        // Safety cleanup in case click doesn't fire
+        setTimeout(() => {
+          window.removeEventListener('click', blockClick, { capture: true });
+        }, 100);
+      }
+
       dragStartRef.current = null;
     };
 
@@ -109,6 +127,14 @@ export function WidgetWrapper({
     return null;
   }
 
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    if (isOwner && onContextMenu) {
+      e.preventDefault();
+      e.stopPropagation();
+      onContextMenu(e);
+    }
+  }, [isOwner, onContextMenu]);
+
   return (
     <div
       ref={elementRef}
@@ -118,7 +144,7 @@ export function WidgetWrapper({
         left: `${position.x}%`,
         top: `${position.y}%`,
         transform: 'translate(-50%, -50%)',
-        zIndex: isDragging ? 9999 : 50, // Below windows (100+), above desktop icons (10)
+        zIndex: isDragging ? 9999 : isHighlighted ? 9998 : 50, // Below windows (100+), above desktop icons (10)
         cursor: isOwner ? (isDragging ? 'grabbing' : 'grab') : 'default',
         opacity: widget.isVisible ? 1 : 0.5,
         userSelect: 'none',
@@ -127,7 +153,23 @@ export function WidgetWrapper({
         fontFamily: 'var(--font-body)',
       }}
       onMouseDown={handleMouseDown}
+      onContextMenu={handleContextMenu}
     >
+      {/* Highlight ring when context menu is open */}
+      {isHighlighted && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: -4,
+            borderRadius: 'inherit',
+            border: '2px solid var(--color-accent-primary, #ff7722)',
+            boxShadow: '0 0 0 4px rgba(255, 119, 34, 0.15), 0 0 20px rgba(255, 119, 34, 0.2)',
+            pointerEvents: 'none',
+            zIndex: -1,
+          }}
+        />
+      )}
+
       {children}
 
       {/* Owner controls - show on hover */}

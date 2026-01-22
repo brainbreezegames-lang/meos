@@ -14,16 +14,17 @@ import {
 import type { CVContent, CVExperience, CVSkillCategory, CVEducation } from '@/lib/validations/goos';
 
 // Register custom fonts from Google Fonts
+// Using direct download URLs from Google Fonts API
 // Averia Serif Libre - for headings (serif, matches screen design)
 Font.register({
   family: 'Averia Serif Libre',
   fonts: [
     {
-      src: 'https://fonts.gstatic.com/s/averiaseriflibre/v18/neIWzD2ms4wxr6GvjeD0X88SHPyX2xY-pQGOyYw2fw.ttf',
+      src: '/fonts/AveriaSerifLibre-Regular.ttf',
       fontWeight: 400,
     },
     {
-      src: 'https://fonts.gstatic.com/s/averiaseriflibre/v18/neIbzD2ms4wxr6GvjeD0X88SHPyX2xYGCSmqwacqdrKvbQ.ttf',
+      src: '/fonts/AveriaSerifLibre-Bold.ttf',
       fontWeight: 700,
     },
   ],
@@ -34,15 +35,15 @@ Font.register({
   family: 'Instrument Sans',
   fonts: [
     {
-      src: 'https://fonts.gstatic.com/s/instrumentsans/v1/pximypc9vsFDm051Ber6z0qXluN18_95moKpq6xdPQ.ttf',
+      src: '/fonts/InstrumentSans-Regular.ttf',
       fontWeight: 400,
     },
     {
-      src: 'https://fonts.gstatic.com/s/instrumentsans/v1/pximypc9vsFDm051Ber6z0qXluN18_95moKpBqtdPQ.ttf',
+      src: '/fonts/InstrumentSans-Medium.ttf',
       fontWeight: 500,
     },
     {
-      src: 'https://fonts.gstatic.com/s/instrumentsans/v1/pximypc9vsFDm051Ber6z0qXluN18_95moKp2qxdPQ.ttf',
+      src: '/fonts/InstrumentSans-SemiBold.ttf',
       fontWeight: 600,
     },
   ],

@@ -15,6 +15,8 @@ interface WidgetRendererProps {
   onWidgetEdit?: (widget: Widget) => void;
   onWidgetDelete?: (id: string) => void;
   onWidgetPositionChange?: (id: string, x: number, y: number) => void;
+  onWidgetContextMenu?: (e: React.MouseEvent, widget: Widget) => void;
+  highlightedWidgetId?: string | null;
   onTip?: (amount: number) => Promise<void>;
   onContact?: (data: { name?: string; email: string; message: string }) => Promise<void>;
   onFeedback?: (feedback: string) => Promise<void>;
@@ -26,6 +28,8 @@ export function WidgetRenderer({
   onWidgetEdit,
   onWidgetDelete,
   onWidgetPositionChange,
+  onWidgetContextMenu,
+  highlightedWidgetId,
   onTip,
   onContact,
   onFeedback,
@@ -45,6 +49,8 @@ export function WidgetRenderer({
           onDelete: () => onWidgetDelete?.(widget.id),
           onPositionChange: (x: number, y: number) =>
             onWidgetPositionChange?.(widget.id, x, y),
+          onContextMenu: (e: React.MouseEvent) => onWidgetContextMenu?.(e, widget),
+          isHighlighted: highlightedWidgetId === widget.id,
         };
 
         switch (widget.widgetType) {

@@ -6,6 +6,7 @@ export { ContactWidget, CONTACT_WIDGET_DEFAULT_CONFIG } from './ContactWidget';
 export { LinksWidget, LINKS_WIDGET_DEFAULT_CONFIG } from './LinksWidget';
 export { FeedbackWidget, FEEDBACK_WIDGET_DEFAULT_CONFIG } from './FeedbackWidget';
 export { WidgetRenderer } from './WidgetRenderer';
+export { WidgetContextMenu } from './WidgetContextMenu';
 
 // Widget type to component mapping
 import type { WidgetType, Widget } from '@/types';
