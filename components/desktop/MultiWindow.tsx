@@ -2,13 +2,11 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Square } from 'lucide-react';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
 
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
-import { useThemeSafe, type ThemeId } from '@/contexts/ThemeContext';
 import { EditableText, EditableImage } from '@/components/editing/Editable';
 import { EditableBlockRenderer } from '@/components/editing/EditableBlockRenderer';
 import { InlineBlockPicker, useInlineBlockPicker } from '@/components/editing/InlineBlockPicker';
@@ -22,54 +20,23 @@ import { PhotosWindow } from './PhotosWindow';
 import { FinderWindow } from './FinderWindow';
 import { WorkbenchWindow } from './WorkbenchWindow';
 import { CommentSection } from './CommentSection';
+import { TrafficLights } from './TrafficLights';
+import { WINDOW, TITLE_BAR, CONTENT, ANIMATION, getWindowStyle } from './windowStyles';
 
-// Theme-aware colors for MultiWindow
-interface ThemeColors {
-  windowBg: string;
-  windowShadow: string;
-  windowBorder: string;
-  headerBg: string;
-  headerBorder: string;
-  titleColor: string;
-  subtitleColor: string;
-  textPrimary: string;
-  textSecondary: string;
-  textTertiary: string;
-  borderLight: string;
-  borderMedium: string;
-  tabActiveBg: string;
-  tabActiveColor: string;
-  tabInactiveColor: string;
-  accentColor: string;
-  buttonBg: string;
-  imageShadow: string;
-}
-
-// Unified design system - uses CSS variables from design-system.css
-// Now matching the bolder "dock app" style: 2px solid dark border, clean shadow
-function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
-  // ONE design system - Appart theme via CSS variables
-  return {
-    windowBg: 'var(--color-bg-base, #fbf9ef)',
-    windowShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
-    windowBorder: '2px solid var(--color-text-primary, #171412)',
-    headerBg: 'var(--color-bg-base, #fbf9ef)',
-    headerBorder: '2px solid var(--color-text-primary, #171412)',
-    titleColor: 'var(--color-text-primary, #171412)',
-    subtitleColor: 'var(--color-text-muted, #8e827c)',
-    textPrimary: 'var(--color-text-primary, #171412)',
-    textSecondary: 'var(--color-text-muted, #8e827c)',
-    textTertiary: 'var(--color-text-muted, #8e827c)',
-    borderLight: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    borderMedium: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    tabActiveBg: 'var(--color-bg-white, #ffffff)',
-    tabActiveColor: 'var(--color-text-primary, #171412)',
-    tabInactiveColor: 'var(--color-text-muted, #8e827c)',
-    accentColor: 'var(--color-accent-primary, #ff7722)',
-    buttonBg: 'var(--color-bg-white, #ffffff)',
-    imageShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
-  };
-}
+// Content colors - derived from unified windowStyles
+const colors = {
+  textPrimary: CONTENT.titleColor,
+  textSecondary: CONTENT.mutedColor,
+  textTertiary: CONTENT.mutedColor,
+  borderLight: CONTENT.borderColor,
+  borderMedium: CONTENT.borderColor,
+  tabActiveBg: 'var(--color-bg-white, #ffffff)',
+  tabActiveColor: CONTENT.titleColor,
+  tabInactiveColor: CONTENT.mutedColor,
+  accentColor: 'var(--color-accent-primary, #ff7722)',
+  buttonBg: 'var(--color-bg-white, #ffffff)',
+  imageShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
+};
 
 interface MultiWindowProps {
   window: WindowInstance;
@@ -79,7 +46,6 @@ interface MultiWindowProps {
 export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) {
   const context = useEditContextSafe();
   const windowContext = useWindowContext();
-  const themeContext = useThemeSafe();
   const windowRef = useRef<HTMLDivElement>(null);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const blockPicker = useInlineBlockPicker();
@@ -89,7 +55,6 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
   const isActive = windowContext.activeWindowId === windowInstance.id;
   const isMaximized = windowInstance.state === 'maximized';
   const isMinimized = windowInstance.state === 'minimized';
-  const colors = getThemeColors(themeContext?.theme);
 
   // Reset active tab when item changes
   useEffect(() => {
@@ -270,112 +235,44 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isMaximized ? 0 : '12px',
-            background: colors.windowBg,
-            boxShadow: colors.windowShadow,
-            border: colors.windowBorder,
-            opacity: isActive ? 1 : 0.95,
+            ...getWindowStyle(isMaximized, isActive),
           }}
-          initial={{ opacity: 0, scale: 0.85, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{
-            type: 'spring',
-            stiffness: 350,
-            damping: 25,
-            mass: 0.8,
-          }}
+          initial={ANIMATION.initial}
+          animate={ANIMATION.animate}
+          exit={ANIMATION.exit}
+          transition={ANIMATION.transition}
         >
           {/* Title Bar */}
           <div
             className="flex items-center px-4 shrink-0 relative select-none"
             style={{
-              height: 52,
-              borderBottom: colors.headerBorder,
-              background: colors.headerBg,
+              height: TITLE_BAR.height,
+              borderBottom: TITLE_BAR.borderBottom,
+              background: TITLE_BAR.background,
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
-            {/* Traffic Lights - unified 12px design */}
-            <div
-              className="flex items-center group/traffic"
-              style={{ gap: 'var(--window-traffic-gap, 8px)' }}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              {/* Close */}
-              <button
-                onClick={handleClose}
-                aria-label="Close window"
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-close, #ff5f57)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-              </button>
-
-              {/* Minimize */}
-              <button
-                onClick={handleMinimize}
-                aria-label="Minimize window"
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-minimize, #ffbd2e)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-              </button>
-
-              {/* Maximize */}
-              <button
-                onClick={handleMaximize}
-                aria-label={isMaximized ? "Restore window" : "Maximize window"}
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-maximize, #28c840)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                </svg>
-              </button>
-            </div>
+            {/* Traffic Lights */}
+            <TrafficLights
+              onClose={handleClose}
+              onMinimize={handleMinimize}
+              onMaximize={handleMaximize}
+              isMaximized={isMaximized}
+            />
 
             {/* Title */}
             <span
               className="absolute left-1/2 -translate-x-1/2 font-medium truncate max-w-[55%]"
               style={{
-                fontSize: 13,
-                color: colors.titleColor,
-                opacity: isActive ? 0.85 : 0.6,
-                letterSpacing: '-0.01em',
+                fontSize: TITLE_BAR.titleFontSize,
+                color: TITLE_BAR.titleColor,
+                opacity: isActive ? TITLE_BAR.titleOpacityActive : TITLE_BAR.titleOpacityInactive,
+                letterSpacing: TITLE_BAR.titleLetterSpacing,
               }}
             >
               {item.windowTitle}
             </span>
-          </div >
+          </div>
 
           {/* Content */}
           < div
