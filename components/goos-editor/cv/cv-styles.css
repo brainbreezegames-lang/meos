@@ -252,6 +252,11 @@
   cursor: default;
   border-radius: 2px;
   transition: background-color 0.15s;
+  font-family: inherit !important;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
 }
 
 .cv-editable-hover {
