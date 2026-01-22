@@ -71,32 +71,6 @@ const DEMO_SPACES: SpaceSummary[] = [
 ];
 
 // ============================================
-// SPACE VISUAL THEMES - Different backgrounds for each space
-// ============================================
-const SPACE_THEMES: Record<string, { gradient: string; pattern: string; accent: string }> = {
-    'space-1': {
-        gradient: 'linear-gradient(145deg, #fef9f3 0%, #fdf2e9 30%, #fce7d6 70%, #f8d9c4 100%)',
-        pattern: 'radial-gradient(circle at 20% 80%, rgba(224, 122, 58, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(224, 122, 58, 0.05) 0%, transparent 40%)',
-        accent: '#e07a3a',
-    },
-    'space-2': {
-        gradient: 'linear-gradient(145deg, #f5f8fc 0%, #e8f0f8 30%, #d4e4f4 70%, #c2d8f0 100%)',
-        pattern: 'radial-gradient(circle at 30% 70%, rgba(58, 122, 224, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(58, 122, 224, 0.05) 0%, transparent 40%)',
-        accent: '#3a7ae0',
-    },
-    'space-3': {
-        gradient: 'linear-gradient(145deg, #fdf5f8 0%, #f8e8f0 30%, #f0d4e4 70%, #e8c2d8 100%)',
-        pattern: 'radial-gradient(circle at 25% 75%, rgba(154, 58, 224, 0.08) 0%, transparent 50%), radial-gradient(circle at 75% 25%, rgba(154, 58, 224, 0.05) 0%, transparent 40%)',
-        accent: '#9a3ae0',
-    },
-    'space-4': {
-        gradient: 'linear-gradient(145deg, #f5fcf5 0%, #e8f8e8 30%, #d4f0d4 70%, #c2e8c2 100%)',
-        pattern: 'radial-gradient(circle at 35% 65%, rgba(58, 224, 122, 0.08) 0%, transparent 50%), radial-gradient(circle at 65% 35%, rgba(58, 224, 122, 0.05) 0%, transparent 40%)',
-        accent: '#3ae07a',
-    },
-};
-
-// ============================================
 // SPACE-SPECIFIC FILE PREFIXES - Files are filtered by space
 // Files with IDs starting with these prefixes belong to that space
 // ============================================
@@ -107,141 +81,358 @@ const SPACE_FILE_PREFIXES: Record<string, string[]> = {
     'space-4': ['personal-'], // Personal space
 };
 
-// Demo files for Writing space (space-2)
+// Demo files for Writing space (space-2) - A writer's workspace
 const WRITING_SPACE_FILES: GoOSFileData[] = [
     {
         id: 'writing-1',
         type: 'note',
-        title: 'My Writing Process',
-        content: '<h1>My Writing Process</h1><p>Writing is rewriting. Here are some thoughts on my creative process...</p><p>Every piece starts with a messy first draft. I don\'t edit as I go - I just let the words flow.</p>',
+        title: 'Newsletter #47: On Simplicity',
+        content: '<h1>Newsletter #47: On Simplicity</h1><p>This week I\'ve been thinking about what we leave out. The art of omission...</p><p>Every great piece of writing is defined as much by what it excludes as what it includes.</p>',
         status: 'published',
         accessLevel: 'free',
         publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
         parentId: null,
-        position: { x: 5, y: 35 },
+        position: { x: 5, y: 25 },
     },
     {
         id: 'writing-2',
-        type: 'note',
-        title: 'Essay: On Creativity',
-        content: '<h1>On Creativity</h1><p>Creativity isn\'t about waiting for inspiration. It\'s about showing up every day.</p><p>The muse visits those who are already working...</p>',
-        status: 'draft',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 21, y: 35 },
-    },
-    {
-        id: 'writing-3',
         type: 'folder',
-        title: 'Blog Posts',
+        title: 'Essays',
         content: '',
         status: 'published',
         accessLevel: 'free',
         publishedAt: null,
-        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 22, y: 25 },
+    },
+    {
+        id: 'writing-3',
+        type: 'note',
+        title: 'Draft: Why I Write',
+        content: '<h1>Why I Write</h1><p>I write to think. The act of putting words on paper forces clarity...</p><p>There\'s something about the blank page that demands honesty.</p>',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         parentId: null,
-        position: { x: 37, y: 35 },
+        position: { x: 39, y: 25 },
+    },
+    {
+        id: 'writing-4',
+        type: 'link',
+        title: 'Substack',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 56, y: 25 },
+        linkUrl: 'https://substack.com',
+        linkTitle: 'My Newsletter',
+    },
+    {
+        id: 'writing-5',
+        type: 'folder',
+        title: 'Book Notes',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 5, y: 50 },
+    },
+    {
+        id: 'writing-6',
+        type: 'note',
+        title: 'Interview Questions',
+        content: '<h1>Interview Prep</h1><ul><li>What inspired your latest piece?</li><li>Your writing process?</li><li>Advice for aspiring writers?</li></ul>',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now()),
+        parentId: null,
+        position: { x: 22, y: 50 },
+    },
+    {
+        id: 'writing-7',
+        type: 'note',
+        title: 'Reading List 2024',
+        content: '<h1>Reading List</h1><ul><li>✓ Bird by Bird - Anne Lamott</li><li>✓ On Writing - Stephen King</li><li>○ The War of Art</li><li>○ Zen in the Art of Writing</li></ul>',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 39, y: 50 },
+    },
+    {
+        id: 'writing-8',
+        type: 'folder',
+        title: 'Archive',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 56, y: 50 },
     },
 ];
 
-// Demo files for Photography space (space-3)
+// Demo files for Photography space (space-3) - A photographer's gallery
 const PHOTOGRAPHY_SPACE_FILES: GoOSFileData[] = [
     {
         id: 'photo-1',
         type: 'image',
-        title: 'Golden Hour',
+        title: 'Tokyo Nights',
         content: '',
         status: 'published',
         accessLevel: 'free',
         publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now()),
+        createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         parentId: null,
-        position: { x: 5, y: 35 },
-        imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&h=800&fit=crop',
-        imageCaption: 'Sunset over the mountains',
-        imageAlt: 'Mountain landscape at golden hour',
+        position: { x: 5, y: 25 },
+        imageUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&h=800&fit=crop',
+        imageCaption: 'Shibuya crossing at midnight',
+        imageAlt: 'Tokyo cityscape at night with neon lights',
     },
     {
         id: 'photo-2',
-        type: 'image',
-        title: 'Urban Geometry',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 21, y: 35 },
-        imageUrl: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&h=800&fit=crop',
-        imageCaption: 'Architecture study',
-        imageAlt: 'Modern building with geometric patterns',
-    },
-    {
-        id: 'photo-3',
         type: 'folder',
-        title: 'Street Photography',
+        title: 'Japan 2024',
         content: '',
         status: 'published',
         accessLevel: 'free',
         publishedAt: null,
-        createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         parentId: null,
-        position: { x: 37, y: 35 },
+        position: { x: 22, y: 25 },
+    },
+    {
+        id: 'photo-3',
+        type: 'image',
+        title: 'Morning Fog',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 39, y: 25 },
+        imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop',
+        imageCaption: 'Dolomites at dawn',
+        imageAlt: 'Mountain peaks emerging from fog',
     },
     {
         id: 'photo-4',
         type: 'image',
-        title: 'Portrait Study',
+        title: 'Street Portrait #12',
         content: '',
         status: 'draft',
         accessLevel: 'free',
         publishedAt: null,
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now()),
         parentId: null,
-        position: { x: 53, y: 35 },
+        position: { x: 56, y: 25 },
         imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=800&fit=crop',
         imageCaption: 'Work in progress',
-        imageAlt: 'Portrait photograph',
+        imageAlt: 'Portrait study',
+    },
+    {
+        id: 'photo-5',
+        type: 'folder',
+        title: 'Landscapes',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 5, y: 50 },
+    },
+    {
+        id: 'photo-6',
+        type: 'link',
+        title: 'Instagram',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 22, y: 50 },
+        linkUrl: 'https://instagram.com',
+        linkTitle: '@photographer',
+    },
+    {
+        id: 'photo-7',
+        type: 'image',
+        title: 'Abstract #7',
+        content: '',
+        status: 'published',
+        accessLevel: 'premium',
+        publishedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 39, y: 50 },
+        imageUrl: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=1200&h=800&fit=crop',
+        imageCaption: 'Light and shadow study',
+        imageAlt: 'Abstract architectural photograph',
+    },
+    {
+        id: 'photo-8',
+        type: 'folder',
+        title: 'Client Work',
+        content: '',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 56, y: 50 },
+    },
+    {
+        id: 'photo-9',
+        type: 'note',
+        title: 'Gear List',
+        content: '<h1>Current Kit</h1><ul><li>Sony A7IV</li><li>24-70mm f/2.8 GM</li><li>85mm f/1.4 GM</li><li>Peak Design bag</li></ul>',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 73, y: 25 },
+    },
+    {
+        id: 'photo-10',
+        type: 'folder',
+        title: 'Portraits',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 73, y: 50 },
     },
 ];
 
-// Demo files for Personal space (space-4)
+// Demo files for Personal space (space-4) - Private notes and ideas
 const PERSONAL_SPACE_FILES: GoOSFileData[] = [
     {
         id: 'personal-1',
         type: 'note',
-        title: 'Journal Entry',
-        content: '<h1>Private Thoughts</h1><p>This is my personal space where I keep private notes and ideas that aren\'t ready to share yet.</p>',
+        title: 'Goals 2024',
+        content: '<h1>2024 Goals</h1><ul><li>☑ Launch portfolio site</li><li>☐ Write 12 newsletters</li><li>☐ Learn Blender</li><li>☐ Take a proper vacation</li></ul>',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 300 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 5, y: 25 },
+    },
+    {
+        id: 'personal-2',
+        type: 'folder',
+        title: 'Finances',
+        content: '',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 22, y: 25 },
+    },
+    {
+        id: 'personal-3',
+        type: 'note',
+        title: 'App Ideas',
+        content: '<h1>Ideas to explore</h1><ul><li>Habit tracker with streaks</li><li>Recipe organizer</li><li>Mood journal</li></ul><p>Maybe start with the habit tracker?</p>',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 39, y: 25 },
+    },
+    {
+        id: 'personal-4',
+        type: 'link',
+        title: 'Bank',
+        content: '',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 500 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 56, y: 25 },
+        linkUrl: 'https://example-bank.com',
+        linkTitle: 'Online Banking',
+    },
+    {
+        id: 'personal-5',
+        type: 'folder',
+        title: 'Receipts',
+        content: '',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 5, y: 50 },
+    },
+    {
+        id: 'personal-6',
+        type: 'note',
+        title: 'Passwords (encrypted)',
+        content: '<h1>Important Accounts</h1><p>This is a placeholder - use a real password manager!</p>',
+        status: 'draft',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 600 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 22, y: 50 },
+    },
+    {
+        id: 'personal-7',
+        type: 'note',
+        title: 'Journal - Dec 15',
+        content: '<p>Good day today. Finally finished that project I\'d been putting off. Sometimes you just need to start.</p>',
         status: 'draft',
         accessLevel: 'free',
         publishedAt: null,
         createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now()),
         parentId: null,
-        position: { x: 5, y: 35 },
-    },
-    {
-        id: 'personal-2',
-        type: 'folder',
-        title: 'Ideas',
-        content: '',
-        status: 'draft',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 21, y: 35 },
+        position: { x: 39, y: 50 },
     },
 ];
 
@@ -3002,102 +3193,20 @@ function GoOSDemoContent() {
                     draggable={false}
                 />
             ) : (
-                <>
-                    {/* Space-specific gradient background */}
-                    <div
-                        className="absolute inset-0 pointer-events-none transition-all duration-700"
-                        style={{
-                            background: SPACE_THEMES[activeSpaceId]?.gradient || SPACE_THEMES['space-1'].gradient,
-                            zIndex: 0,
-                        }}
-                    />
-                    {/* Space-specific accent pattern */}
-                    <div
-                        className="absolute inset-0 pointer-events-none transition-all duration-700"
-                        style={{
-                            background: SPACE_THEMES[activeSpaceId]?.pattern || SPACE_THEMES['space-1'].pattern,
-                            zIndex: 0,
-                        }}
-                    />
-                    {/* Dot pattern overlay */}
-                    <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                            backgroundImage: 'radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)',
-                            backgroundSize: '24px 24px',
-                            zIndex: 0,
-                        }}
-                    />
-                    {/* Space indicator watermark */}
-                    <div
-                        className="absolute bottom-24 right-8 pointer-events-none select-none transition-all duration-500"
-                        style={{ zIndex: 1, opacity: 0.12 }}
-                    >
-                        <div style={{ fontSize: '180px', lineHeight: 1 }}>
-                            {DEMO_SPACES.find(s => s.id === activeSpaceId)?.icon || '🎨'}
-                        </div>
-                        <div
-                            style={{
-                                fontSize: '32px',
-                                fontWeight: 700,
-                                textAlign: 'right',
-                                marginTop: '-20px',
-                                color: SPACE_THEMES[activeSpaceId]?.accent || '#333',
-                            }}
-                        >
-                            {DEMO_SPACES.find(s => s.id === activeSpaceId)?.name || 'Portfolio'}
-                        </div>
-                    </div>
-                </>
+                /* Simple dot pattern background when no image */
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        background: 'var(--color-bg-base, #fbf9ef)',
+                        backgroundImage: 'radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)',
+                        backgroundSize: '24px 24px',
+                        zIndex: 0,
+                    }}
+                />
             )}
 
             {/* CONFETTI CELEBRATION */}
             <ConfettiBurst isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
-
-            {/* SPACE INDICATOR BADGE - Always visible floating badge */}
-            <motion.div
-                key={activeSpaceId}
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                style={{
-                    position: 'fixed',
-                    bottom: 100,
-                    left: 20,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: '10px 16px',
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(12px)',
-                    border: `2px solid ${SPACE_THEMES[activeSpaceId]?.accent || '#333'}`,
-                    borderRadius: 12,
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                    zIndex: 100,
-                }}
-            >
-                <span style={{ fontSize: 24 }}>
-                    {DEMO_SPACES.find(s => s.id === activeSpaceId)?.icon || '🎨'}
-                </span>
-                <div>
-                    <div style={{
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: SPACE_THEMES[activeSpaceId]?.accent || '#666',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                    }}>
-                        Current Space
-                    </div>
-                    <div style={{
-                        fontSize: 15,
-                        fontWeight: 700,
-                        color: '#1a1a1a',
-                    }}>
-                        {DEMO_SPACES.find(s => s.id === activeSpaceId)?.name || 'Portfolio'}
-                    </div>
-                </div>
-            </motion.div>
 
             {/* MENU BAR - Completely hidden in zen mode for distraction-free focus */}
             <AnimatePresence>
