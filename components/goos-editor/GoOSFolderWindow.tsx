@@ -1,10 +1,11 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Folder, FolderOpen } from 'lucide-react';
 import { GoOSFileIcon } from './GoOSFileIcon';
-import { GoOSTrafficLights } from './GoOSTrafficLights';
+import { TrafficLights } from '../desktop/TrafficLights';
+import { WINDOW, TITLE_BAR, ANIMATION } from '../desktop/windowStyles';
 import type { GoOSFile } from './GoOSEditorWindow';
 
 interface GoOSFolderWindowProps {
@@ -36,6 +37,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
   isMaximized = false,
   onFocus,
 }: GoOSFolderWindowProps) {
+  const prefersReducedMotion = useReducedMotion();
   const filesInFolder = files.filter(f => f.parentFolderId === folder.id);
 
   return (
@@ -43,10 +45,10 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
       role="dialog"
       aria-label={`${folder.title} folder`}
       aria-modal="false"
-      initial={{ opacity: 0, scale: 0.95, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: 20 }}
-      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
+      animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}
+      exit={prefersReducedMotion ? ANIMATION.reducedExit : ANIMATION.exit}
+      transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
       onMouseDown={onFocus}
       style={{
         position: 'fixed',
@@ -57,15 +59,15 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         height: isMaximized ? 'calc(100vh - var(--menubar-height, 36px) - 80px)' : 'min(500px, 70vh)',
         minWidth: 320,
         minHeight: 280,
-        background: 'var(--color-bg-base)',
-        border: isMaximized ? 'none' : '2px solid var(--color-border-default)',
-        borderRadius: isMaximized ? 0 : 'var(--window-radius, 14px)',
-        boxShadow: isMaximized ? 'none' : 'var(--shadow-window)',
+        background: WINDOW.background,
+        border: isMaximized ? WINDOW.borderMaximized : WINDOW.border,
+        borderRadius: isMaximized ? WINDOW.borderRadiusMaximized : WINDOW.borderRadius,
+        boxShadow: isMaximized ? WINDOW.shadowMaximized : WINDOW.shadow,
         zIndex,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        opacity: isActive ? 1 : 0.95,
+        opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
       }}
     >
       {/* Title Bar */}
@@ -73,16 +75,17 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: '10px 14px',
-          background: 'var(--color-bg-subtle)',
-          borderBottom: '1px solid var(--color-border-subtle)',
+          padding: `0 ${TITLE_BAR.paddingX}px`,
+          height: TITLE_BAR.height,
+          background: TITLE_BAR.background,
+          borderBottom: TITLE_BAR.borderBottom,
           gap: 12,
           cursor: isMaximized ? 'default' : 'grab',
           flexShrink: 0,
         }}
       >
         {/* Traffic Lights */}
-        <GoOSTrafficLights
+        <TrafficLights
           onClose={onClose}
           onMinimize={onMinimize}
           onMaximize={onMaximize}
