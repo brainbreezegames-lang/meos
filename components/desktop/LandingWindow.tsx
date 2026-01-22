@@ -74,6 +74,7 @@ export default function Window({
                 <TrafficLights
                     onClose={onClose}
                     showAll={false}
+                    variant="minimal"
                 />
                 <span
                     className="font-medium pointer-events-none select-none"

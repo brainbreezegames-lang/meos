@@ -235,10 +235,11 @@ export function EditableInfoWindow({ item, onClose }: EditableInfoWindowProps) {
                 }}
                 onPointerDown={startDrag}
               >
-                {/* Window Controls - unified TrafficLights component */}
+                {/* Window Controls - minimal style for info windows */}
                 <TrafficLights
                   onClose={onClose}
                   showAll={false}
+                  variant="minimal"
                 />
 
                 {/* Title */}

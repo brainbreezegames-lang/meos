@@ -7,7 +7,7 @@ import { GoOSTipTapEditor, goOSTokens } from './GoOSTipTapEditor';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
 import { TrafficLights } from '../desktop/TrafficLights';
-import { WINDOW, TITLE_BAR, ANIMATION } from '../desktop/windowStyles';
+import { WINDOW, TITLE_BAR_DARK, ANIMATION } from '../desktop/windowStyles';
 import { AccessLevel } from '@/contexts/GoOSContext';
 
 export interface GoOSFile {
@@ -338,35 +338,37 @@ export function GoOSEditorWindow({
           opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
         }}
       >
-        {/* Title Bar */}
+        {/* Title Bar - Dark variant for editor windows */}
         <div
           onPointerDown={startDrag}
           style={{
             display: 'flex',
             alignItems: 'center',
-            padding: `0 ${TITLE_BAR.paddingX}px`,
-            height: TITLE_BAR.height,
-            background: TITLE_BAR.background,
-            borderBottom: TITLE_BAR.borderBottom,
+            padding: `0 ${TITLE_BAR_DARK.paddingX}px`,
+            height: TITLE_BAR_DARK.height,
+            background: TITLE_BAR_DARK.background,
+            borderBottom: TITLE_BAR_DARK.borderBottom,
+            borderRadius: isMaximized ? 0 : TITLE_BAR_DARK.borderRadius,
             gap: 12,
             cursor: isMaximized ? 'default' : 'grab',
             flexShrink: 0,
             touchAction: 'none',
           }}
         >
-          {/* Traffic Lights */}
+          {/* Traffic Lights - macOS style for editor windows */}
           <TrafficLights
             onClose={onClose}
             onMinimize={onMinimize}
             onMaximize={onMaximize}
             isMaximized={isMaximized}
+            variant="macos"
           />
 
-          {/* File Icon + Title */}
+          {/* File Icon + Title - white on dark */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
             <FileIcon
               size={16}
-              color="var(--color-text-secondary)"
+              color="rgba(255, 255, 255, 0.7)"
               strokeWidth={1.5}
             />
 
@@ -398,10 +400,11 @@ export function GoOSEditorWindow({
               <span
                 onClick={() => setIsEditingTitle(true)}
                 style={{
-                  fontSize: 'var(--font-size-md, 14px)',
-                  fontWeight: 'var(--font-weight-semibold, 600)',
+                  fontSize: TITLE_BAR_DARK.titleFontSize,
+                  fontWeight: TITLE_BAR_DARK.titleFontWeight,
                   fontFamily: 'var(--font-body)',
-                  color: 'var(--color-text-primary)',
+                  color: TITLE_BAR_DARK.titleColor,
+                  opacity: TITLE_BAR_DARK.titleOpacityActive,
                   cursor: 'text',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',

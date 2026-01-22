@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Folder, FolderOpen } from 'lucide-react';
 import { GoOSFileIcon } from './GoOSFileIcon';
 import { TrafficLights } from '../desktop/TrafficLights';
-import { WINDOW, TITLE_BAR, ANIMATION } from '../desktop/windowStyles';
+import { WINDOW, TITLE_BAR_DARK, ANIMATION } from '../desktop/windowStyles';
 import type { GoOSFile } from './GoOSEditorWindow';
 
 interface GoOSFolderWindowProps {
@@ -71,42 +71,45 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
         opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
       }}
     >
-      {/* Title Bar */}
+      {/* Title Bar - Dark variant for folder windows */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: `0 ${TITLE_BAR.paddingX}px`,
-          height: TITLE_BAR.height,
-          background: TITLE_BAR.background,
-          borderBottom: TITLE_BAR.borderBottom,
+          padding: `0 ${TITLE_BAR_DARK.paddingX}px`,
+          height: TITLE_BAR_DARK.height,
+          background: TITLE_BAR_DARK.background,
+          borderBottom: TITLE_BAR_DARK.borderBottom,
+          borderRadius: isMaximized ? 0 : TITLE_BAR_DARK.borderRadius,
           gap: 12,
           cursor: isMaximized ? 'default' : 'grab',
           flexShrink: 0,
         }}
       >
-        {/* Traffic Lights */}
+        {/* Traffic Lights - macOS style */}
         <TrafficLights
           onClose={onClose}
           onMinimize={onMinimize}
           onMaximize={onMaximize}
           isMaximized={isMaximized}
+          variant="macos"
         />
 
-        {/* Folder Icon + Title */}
+        {/* Folder Icon + Title - white on dark */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
           <FolderOpen
             size={18}
-            fill="var(--color-accent-primary-subtle)"
-            color="var(--color-text-secondary)"
+            fill="rgba(255, 255, 255, 0.2)"
+            color="rgba(255, 255, 255, 0.8)"
             strokeWidth={1.5}
           />
           <span
             style={{
-              fontSize: 'var(--font-size-md, 14px)',
-              fontWeight: 'var(--font-weight-semibold, 600)',
+              fontSize: TITLE_BAR_DARK.titleFontSize,
+              fontWeight: TITLE_BAR_DARK.titleFontWeight,
               fontFamily: 'var(--font-body)',
-              color: 'var(--color-text-primary)',
+              color: TITLE_BAR_DARK.titleColor,
+              opacity: TITLE_BAR_DARK.titleOpacityActive,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -118,7 +121,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
             style={{
               fontSize: 'var(--font-size-xs, 10px)',
               fontFamily: 'var(--font-mono)',
-              color: 'var(--color-text-muted)',
+              color: 'rgba(255, 255, 255, 0.5)',
             }}
           >
             {filesInFolder.length} {filesInFolder.length === 1 ? 'item' : 'items'}

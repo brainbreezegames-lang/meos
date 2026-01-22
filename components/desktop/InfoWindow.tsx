@@ -178,10 +178,11 @@ export function InfoWindow({ item, onClose }: InfoWindowProps) {
                 }}
                 onPointerDown={startDrag}
               >
-                {/* Window Controls - unified TrafficLights component */}
+                {/* Window Controls - minimal style for info windows */}
                 <TrafficLights
                   onClose={onClose}
                   showAll={false}
+                  variant="minimal"
                 />
 
                 {/* Centered Title */}
