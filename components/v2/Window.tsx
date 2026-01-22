@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { TrafficLights } from './TrafficLights';
+import { TrafficLights } from '../desktop/TrafficLights';
+import { WINDOW, TITLE_BAR, ANIMATION } from '../desktop/windowStyles';
 
 interface WindowProps {
   id: string;
@@ -78,15 +79,10 @@ export function Window({
           dragConstraints={constraintsRef}
           dragElastic={0.05}
           dragMomentum={false}
-          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 10 }}
-          animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 10 }}
-          transition={{
-            type: 'spring',
-            stiffness: 400,
-            damping: 30,
-            mass: 0.8,
-          }}
+          initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
+          animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}
+          exit={prefersReducedMotion ? ANIMATION.reducedExit : ANIMATION.exit}
+          transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
           style={{
             position: 'fixed',
             top: isMaximized ? 'var(--menubar-height, 36px)' : initialPosition.y,
@@ -98,28 +94,29 @@ export function Window({
             zIndex: isActive ? zIndex + 100 : zIndex,
             display: 'flex',
             flexDirection: 'column',
-            background: 'var(--color-bg-base)',
-            border: '2px solid var(--color-border-default)',
-            borderRadius: isMaximized ? 0 : 'var(--window-radius, 14px)',
-            boxShadow: isActive ? 'var(--shadow-window)' : 'var(--shadow-md)',
+            background: WINDOW.background,
+            border: isMaximized ? WINDOW.borderMaximized : WINDOW.border,
+            borderRadius: isMaximized ? WINDOW.borderRadiusMaximized : WINDOW.borderRadius,
+            boxShadow: isMaximized ? WINDOW.shadowMaximized : WINDOW.shadow,
             overflow: 'hidden',
             cursor: isMaximized ? 'default' : 'grab',
-            opacity: isActive ? 1 : 0.95,
+            opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
           }}
           whileDrag={{
             cursor: 'grabbing',
             boxShadow: 'var(--shadow-xl)',
           }}
         >
-          {/* Title Bar */}
+          {/* Title Bar - Unified 52px height */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 12,
-              padding: '10px 14px',
-              background: 'var(--color-bg-subtle)',
-              borderBottom: '1px solid var(--color-border-subtle)',
+              padding: `0 ${TITLE_BAR.paddingX}px`,
+              height: TITLE_BAR.height,
+              background: TITLE_BAR.background,
+              borderBottom: TITLE_BAR.borderBottom,
               userSelect: 'none',
               WebkitUserSelect: 'none',
               flexShrink: 0,
@@ -149,11 +146,11 @@ export function Window({
               )}
               <span
                 style={{
-                  fontSize: 'var(--font-size-base, 13px)',
-                  fontWeight: 'var(--font-weight-medium, 500)',
-                  fontFamily: 'var(--font-family)',
-                  color: 'var(--color-text-primary)',
-                  letterSpacing: 'var(--letter-spacing-tight, -0.02em)',
+                  fontSize: TITLE_BAR.titleFontSize,
+                  fontWeight: TITLE_BAR.titleFontWeight,
+                  color: TITLE_BAR.titleColor,
+                  letterSpacing: TITLE_BAR.titleLetterSpacing,
+                  opacity: isActive ? TITLE_BAR.titleOpacityActive : TITLE_BAR.titleOpacityInactive,
                 }}
               >
                 {title}
