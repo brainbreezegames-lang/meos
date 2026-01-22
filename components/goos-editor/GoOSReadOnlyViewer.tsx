@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { FileText, Presentation } from 'lucide-react';
-import { GoOSTrafficLights } from './GoOSTrafficLights';
+import { TrafficLights } from '../desktop/TrafficLights';
+import { WINDOW, TITLE_BAR, ANIMATION } from '../desktop/windowStyles';
 import type { PublishStatus } from './GoOSPublishToggle';
 
 interface GoOSFile {
@@ -36,6 +37,7 @@ export function GoOSReadOnlyViewer({
   isMaximized = false,
   zIndex = 100,
 }: GoOSReadOnlyViewerProps) {
+  const prefersReducedMotion = useReducedMotion();
   const FileIcon = file.type === 'case-study' ? Presentation : FileText;
 
   // Word count
@@ -49,10 +51,10 @@ export function GoOSReadOnlyViewer({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: 20 }}
-      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
+      animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}
+      exit={prefersReducedMotion ? ANIMATION.reducedExit : ANIMATION.exit}
+      transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
       style={{
         position: 'fixed',
         top: isMaximized ? 'var(--menubar-height, 36px)' : '10%',
@@ -61,34 +63,35 @@ export function GoOSReadOnlyViewer({
         width: isMaximized ? '100%' : 'min(900px, 90vw)',
         height: isMaximized ? 'calc(100vh - var(--menubar-height, 36px) - 80px)' : 'min(80vh, 700px)',
         minWidth: 400,
-        background: 'var(--color-bg-base)',
-        border: isMaximized ? 'none' : '2px solid var(--color-border-default)',
-        borderRadius: isMaximized ? 0 : 'var(--window-radius, 14px)',
-        boxShadow: isMaximized ? 'none' : 'var(--shadow-window)',
+        background: WINDOW.background,
+        border: isMaximized ? WINDOW.borderMaximized : WINDOW.border,
+        borderRadius: isMaximized ? WINDOW.borderRadiusMaximized : WINDOW.borderRadius,
+        boxShadow: isMaximized ? WINDOW.shadowMaximized : WINDOW.shadow,
         zIndex,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        opacity: isActive ? 1 : 0.95,
+        opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
       }}
     >
-      {/* Title Bar */}
+      {/* Title Bar - Unified 52px height */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: '10px 14px',
-          background: 'var(--color-bg-subtle)',
-          borderBottom: '1px solid var(--color-border-subtle)',
+          padding: `0 ${TITLE_BAR.paddingX}px`,
+          height: TITLE_BAR.height,
+          background: TITLE_BAR.background,
+          borderBottom: TITLE_BAR.borderBottom,
           gap: 12,
           flexShrink: 0,
         }}
       >
         {/* Traffic Lights */}
-        <GoOSTrafficLights
+        <TrafficLights
           onClose={onClose}
-          onMinimize={onMinimize}
-          onMaximize={onMaximize}
+          onMinimize={onMinimize || (() => {})}
+          onMaximize={onMaximize || (() => {})}
           isMaximized={isMaximized}
         />
 
