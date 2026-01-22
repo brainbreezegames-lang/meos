@@ -58,7 +58,7 @@ import { ViewSwitcher, PageView, PresentView } from '@/components/views';
 import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
-import { SpaceSwitcher, CreateSpaceModal } from '@/components/spaces';
+import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -3992,6 +3992,31 @@ function GoOSDemoContent() {
                 }}
                 existingSpaces={DEMO_SPACES}
                 existingSlugs={DEMO_SPACES.filter(s => s.slug).map(s => s.slug as string)}
+            />
+
+            {/* Manage Spaces Dialog */}
+            <ManageSpacesDialog
+                isOpen={showManageSpacesDialog}
+                onClose={() => setShowManageSpacesDialog(false)}
+                spaces={DEMO_SPACES}
+                onReorder={(orderedIds) => {
+                    console.log('Reorder spaces:', orderedIds);
+                    showGoOSToast('Spaces reordered', 'success');
+                }}
+                onUpdateSpace={(id, updates) => {
+                    console.log('Update space:', id, updates);
+                    showGoOSToast('Space updated', 'success');
+                }}
+                onSetPrimary={(id) => {
+                    const space = DEMO_SPACES.find(s => s.id === id);
+                    console.log('Set primary:', id);
+                    showGoOSToast(`${space?.name} is now your main space`, 'success');
+                }}
+                onDeleteSpace={(id) => {
+                    const space = DEMO_SPACES.find(s => s.id === id);
+                    console.log('Delete space:', id);
+                    showGoOSToast(`Deleted "${space?.name}"`, 'success');
+                }}
             />
         </div>
     );
