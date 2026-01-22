@@ -39,6 +39,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { WindowManager } from '@/components/desktop/MultiWindow';
 import { StatusWidget } from '@/components/desktop';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
+import { SparkleEffect, haptic } from '@/components/ui/Delight';
 import { type GuestbookEntry } from '@/components/desktop/Guestbook';
 import type { DesktopItem, Desktop, StatusWidget as StatusWidgetType } from '@/types';
 import {
@@ -3448,29 +3449,91 @@ function GoOSDemoContent() {
             <SaveIndicator />
             <Toast />
 
-            {/* goOS Toast */}
+            {/* goOS Toast - Enhanced with delight */}
             <AnimatePresence>
                 {goosToast && (
                     <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        onAnimationStart={() => {
+                            if (goosToast.type === 'success') haptic('success');
+                            else if (goosToast.type === 'error') haptic('error');
+                        }}
                         style={{
                             position: 'fixed',
-                            bottom: 20,
+                            bottom: 24,
                             left: '50%',
                             transform: 'translateX(-50%)',
-                            padding: '12px 24px',
-                            borderRadius: '8px',
-                            background: '#FFFFFF',
-                            border: `2px solid ${goOS.colors.border}`,
-                            color: goOS.colors.text.primary,
+                            padding: '14px 20px',
+                            borderRadius: 'var(--radius-lg, 16px)',
+                            background: goosToast.type === 'success'
+                                ? 'rgba(34, 197, 94, 0.95)'
+                                : goosToast.type === 'error'
+                                    ? 'rgba(239, 68, 68, 0.95)'
+                                    : 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+                            backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+                            WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+                            border: goosToast.type === 'success' || goosToast.type === 'error'
+                                ? 'none'
+                                : '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+                            color: goosToast.type === 'success' || goosToast.type === 'error'
+                                ? '#ffffff'
+                                : 'var(--color-text-primary, #171412)',
                             fontWeight: 500,
-                            fontSize: '14px',
+                            fontSize: '13px',
                             zIndex: 9999,
-                            boxShadow: '4px 4px 0 rgba(0,0,0,0.08)',
+                            boxShadow: goosToast.type === 'success'
+                                ? '0 8px 32px rgba(34, 197, 94, 0.3)'
+                                : goosToast.type === 'error'
+                                    ? '0 8px 32px rgba(239, 68, 68, 0.3)'
+                                    : 'var(--shadow-lg)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
                         }}
                     >
+                        {/* Success sparkle effect */}
+                        {goosToast.type === 'success' && (
+                            <SparkleEffect
+                                trigger={true}
+                                config={{
+                                    count: 8,
+                                    spread: 40,
+                                    colors: ['#22c55e', '#4ade80', '#86efac', '#fbbf24'],
+                                }}
+                            />
+                        )}
+                        {/* Icon */}
+                        {goosToast.type === 'success' && (
+                            <motion.svg
+                                width={16}
+                                height={16}
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                initial={{ scale: 0, rotate: -45 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                            >
+                                <motion.path
+                                    d="M3 8l4 4 6-7"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    initial={{ pathLength: 0 }}
+                                    animate={{ pathLength: 1 }}
+                                    transition={{ duration: 0.3, delay: 0.1 }}
+                                />
+                            </motion.svg>
+                        )}
+                        {goosToast.type === 'error' && (
+                            <svg width={16} height={16} viewBox="0 0 16 16" fill="none">
+                                <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" />
+                                <path d="M8 5v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                <circle cx="8" cy="11" r="0.75" fill="currentColor" />
+                            </svg>
+                        )}
                         {goosToast.message}
                     </motion.div>
                 )}
