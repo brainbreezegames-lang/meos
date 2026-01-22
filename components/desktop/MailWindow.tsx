@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem } from '@/types';
 import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
-import { useWidgetTheme } from '@/hooks/useWidgetTheme';
+import { TrafficLights } from './TrafficLights';
+import { WINDOW, TITLE_BAR, ANIMATION, getWindowStyle } from './windowStyles';
 
 interface MailWindowProps {
   window: WindowInstance;
@@ -14,7 +15,6 @@ interface MailWindowProps {
 
 export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
   const windowContext = useWindowContext();
-  const theme = useWidgetTheme();
   const windowRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
@@ -106,100 +106,39 @@ export function MailWindow({ window: windowInstance, item }: MailWindowProps) {
             maxWidth: isMaximized ? '100%' : '90vw',
             height: isMaximized ? '100%' : 'auto',
             maxHeight: isMaximized ? '100%' : 'calc(100vh - 180px)',
-            borderRadius: isMaximized ? '0' : theme.radii.card,
-            background: theme.colors.paper,
-            boxShadow: isMaximized ? 'none' : theme.shadows.solid,
-            border: `2px solid ${theme.colors.border}`,
-            opacity: isActive ? 1 : 0.95,
+            ...getWindowStyle(isMaximized, isActive),
           }}
-          initial={{ opacity: 0, scale: 0.85, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{
-            type: 'spring',
-            stiffness: 350,
-            damping: 25,
-            mass: 0.8,
-          }}
+          initial={ANIMATION.initial}
+          animate={ANIMATION.animate}
+          exit={ANIMATION.exit}
+          transition={ANIMATION.transition}
         >
           {/* Mail Header */}
           <div
             className="flex items-center justify-between px-4 shrink-0 select-none"
             style={{
-              height: 'var(--window-header-height)',
-              borderBottom: `2px solid ${theme.colors.border}`,
-              background: theme.colors.paper,
+              height: TITLE_BAR.height,
+              borderBottom: TITLE_BAR.borderBottom,
+              background: TITLE_BAR.background,
               cursor: isMaximized ? 'default' : 'grab',
             }}
           >
-            {/* Traffic Lights - unified 12px design */}
-            <div
-              className="flex items-center group/traffic"
-              style={{ gap: 'var(--window-traffic-gap, 8px)' }}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => windowContext.closeWindow(windowInstance.id)}
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-close, #ff5f57)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 1L7 7M7 1L1 7" stroke="rgba(77, 0, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-              </button>
-              <button
-                onClick={() => windowContext.minimizeWindow(windowInstance.id)}
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-minimize, #ffbd2e)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 4H7" stroke="rgba(100, 65, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" />
-                </svg>
-              </button>
-              <button
-                onClick={() => windowContext.maximizeWindow(windowInstance.id)}
-                className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-                style={{
-                  width: 'var(--window-traffic-size, 12px)',
-                  height: 'var(--window-traffic-size, 12px)',
-                  borderRadius: '50%',
-                  background: 'var(--color-traffic-maximize, #28c840)',
-                  boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <svg className="w-2 h-2 opacity-0 group-hover/traffic:opacity-100 transition-opacity" viewBox="0 0 8 8" fill="none">
-                  <path d="M1 2.5L4 5.5L7 2.5" stroke="rgba(0, 70, 0, 0.7)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" transform="rotate(45 4 4)" />
-                </svg>
-              </button>
-            </div>
+            {/* Traffic Lights */}
+            <TrafficLights
+              onClose={() => windowContext.closeWindow(windowInstance.id)}
+              onMinimize={() => windowContext.minimizeWindow(windowInstance.id)}
+              onMaximize={() => windowContext.maximizeWindow(windowInstance.id)}
+              isMaximized={isMaximized}
+            />
 
             {/* Title */}
             <span
               className="absolute left-1/2 -translate-x-1/2 font-medium"
               style={{
-                fontSize: '13px',
-                color: 'var(--text-primary)',
-                opacity: isActive ? 0.85 : 0.6,
-                fontFamily: 'var(--font-display)',
-                letterSpacing: 'var(--letter-spacing-tight)',
+                fontSize: TITLE_BAR.titleFontSize,
+                color: TITLE_BAR.titleColor,
+                opacity: isActive ? TITLE_BAR.titleOpacityActive : TITLE_BAR.titleOpacityInactive,
+                letterSpacing: TITLE_BAR.titleLetterSpacing,
               }}
             >
               New Message
