@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import type { GoOSFile, GoOSFileType, PublishStatus } from '@/lib/validations/goos';
+import { getDefaultCVContent } from '@/lib/validations/goos';
 
 // Types
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -244,7 +245,10 @@ export function GoOSProvider({
     const position = customPosition
       ? findNonOverlappingPosition(basePosition, parentId)
       : basePosition; // getNextPosition already calls findNonOverlappingPosition
-    const title = type === 'folder' ? 'New Folder' : `Untitled ${type}`;
+    const title = type === 'folder' ? 'New Folder' : type === 'cv' ? 'My CV' : `Untitled ${type}`;
+
+    // Set default content for CV files
+    const content = type === 'cv' ? JSON.stringify(getDefaultCVContent()) : '';
 
     // Create file object
     const newId = localOnly ? `local-${Date.now()}` : `temp-${Date.now()}`;
@@ -252,7 +256,7 @@ export function GoOSProvider({
       id: newId,
       type,
       title,
-      content: '',
+      content,
       status: 'draft',
       accessLevel: 'public',
       publishedAt: null,

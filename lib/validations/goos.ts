@@ -9,8 +9,98 @@ export const goosFileTypeSchema = z.enum([
   'link',        // External URL with favicon
   'embed',       // YouTube, Vimeo, Spotify, Figma, etc.
   'download',    // Downloadable file
+  'cv',          // Resume/CV document
 ]);
 export type GoOSFileType = z.infer<typeof goosFileTypeSchema>;
+
+// === CV Schemas ===
+
+// CV Contact Info
+export const cvContactSchema = z.object({
+  location: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+  linkedin: z.string().optional(),
+  website: z.string().optional(),
+  tagline: z.string().max(200).optional(),
+});
+export type CVContact = z.infer<typeof cvContactSchema>;
+
+// CV Experience Entry
+export const cvExperienceSchema = z.object({
+  id: z.string(),
+  role: z.string(),
+  company: z.string(),
+  location: z.string().optional(),
+  startDate: z.string(),
+  endDate: z.string().nullable(), // null = "Present"
+  description: z.string().optional(), // Italic company description
+  responsibilities: z.string().optional(), // Rich text
+});
+export type CVExperience = z.infer<typeof cvExperienceSchema>;
+
+// CV Skill Category
+export const cvSkillCategorySchema = z.object({
+  id: z.string(),
+  category: z.string(),
+  items: z.array(z.string()),
+});
+export type CVSkillCategory = z.infer<typeof cvSkillCategorySchema>;
+
+// CV Education Entry
+export const cvEducationSchema = z.object({
+  id: z.string(),
+  degree: z.string(),
+  institution: z.string(),
+  dates: z.string(),
+});
+export type CVEducation = z.infer<typeof cvEducationSchema>;
+
+// Full CV Content Schema
+export const cvContentSchema = z.object({
+  name: z.string(),
+  title: z.string(),
+  about: z.string(), // Rich text (HTML)
+  contact: cvContactSchema,
+  experience: z.array(cvExperienceSchema),
+  skills: z.array(cvSkillCategorySchema),
+  education: z.array(cvEducationSchema),
+});
+export type CVContent = z.infer<typeof cvContentSchema>;
+
+// Default CV content for new files
+export function getDefaultCVContent(): CVContent {
+  return {
+    name: 'Your Name',
+    title: 'Your Title',
+    about: 'Write a brief introduction about yourself, your experience, and what you\'re passionate about.',
+    contact: {
+      location: 'City, Country',
+      email: 'email@example.com',
+    },
+    experience: [{
+      id: crypto.randomUUID(),
+      role: 'Role Title',
+      company: 'Company Name',
+      location: 'Location',
+      startDate: 'Month Year',
+      endDate: null,
+      description: 'Brief company description',
+      responsibilities: 'What you did, what you achieved, what skills you used',
+    }],
+    skills: [{
+      id: crypto.randomUUID(),
+      category: 'Category',
+      items: ['Skill 1', 'Skill 2', 'Skill 3'],
+    }],
+    education: [{
+      id: crypto.randomUUID(),
+      degree: 'Degree Name',
+      institution: 'Institution Name',
+      dates: 'Year — Year',
+    }],
+  };
+}
 
 // Publish status
 export const publishStatusSchema = z.enum(['draft', 'published']);

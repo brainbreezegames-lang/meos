@@ -153,6 +153,15 @@ const GoOSEditorWindow = dynamic(
     }
 );
 
+// Lazy load CV window component
+const GoOSCVWindow = dynamic(
+    () => import('@/components/goos-editor/cv/GoOSCVWindow').then(mod => ({ default: mod.GoOSCVWindow })),
+    {
+        loading: () => <PlayfulLoader />,
+        ssr: false
+    }
+);
+
 // ============================================
 // GOOS DESIGN TOKENS - Using CSS Variables from design-system.css
 // Note: icon.* values are hex for SVG attributes, colors.* are CSS vars for styles
@@ -3144,6 +3153,40 @@ function GoOSDemoContent() {
                                 .map((fileId) => {
                                 const file = goosFiles.find(f => f.id === fileId);
                                 if (!file) return null;
+
+                                // Render CV Window for CV files
+                                if (file.type === 'cv') {
+                                    return (
+                                        <GoOSCVWindow
+                                            key={file.id}
+                                            file={file as Parameters<typeof GoOSCVWindow>[0]['file']}
+                                            onClose={() => closeEditor(file.id)}
+                                            onMinimize={() => minimizeEditor(file.id)}
+                                            onMaximize={() => toggleMaximizeEditor(file.id)}
+                                            isMaximized={maximizedEditors.has(file.id)}
+                                            onUpdate={(updates) => {
+                                                // Use auto-save for content changes
+                                                if (updates.content !== undefined) {
+                                                    goosAutoSave(file.id, updates.content, file.title);
+                                                }
+                                                // Use immediate update for status changes
+                                                if (updates.status !== undefined) {
+                                                    if (updates.status === 'published') {
+                                                        publishGoOSFile(file.id);
+                                                        celebrate();
+                                                    } else {
+                                                        unpublishGoOSFile(file.id);
+                                                    }
+                                                }
+                                            }}
+                                            isActive={activeEditorId === file.id}
+                                            zIndex={windowZ[`editor-${file.id}`] || topZIndex}
+                                            isOwner={true}
+                                        />
+                                    );
+                                }
+
+                                // Render Editor Window for other file types
                                 return (
                                     <GoOSEditorWindow
                                         key={file.id}
@@ -3568,6 +3611,11 @@ function GoOSDemoContent() {
                     const x = (desktopContextMenu.x / window.innerWidth) * 100;
                     const y = (desktopContextMenu.y / window.innerHeight) * 100;
                     createFile('folder', null, { x, y });
+                }}
+                onNewCV={() => {
+                    const x = (desktopContextMenu.x / window.innerWidth) * 100;
+                    const y = (desktopContextMenu.y / window.innerHeight) * 100;
+                    createFile('cv', null, { x, y });
                 }}
                 onNewImage={() => handleOpenCreateFileDialog('image', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}

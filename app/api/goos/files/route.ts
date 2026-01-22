@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     // Transform to GoOSFile format
     const files = items.map((item) => ({
       id: item.id,
-      type: item.goosFileType as 'note' | 'case-study' | 'folder',
+      type: item.goosFileType as 'note' | 'case-study' | 'folder' | 'cv',
       title: item.label,
       content: item.goosContent || '',
       status: item.publishStatus as 'draft' | 'published',
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
 
     const file = {
       id: item.id,
-      type: item.goosFileType as 'note' | 'case-study' | 'folder',
+      type: item.goosFileType as 'note' | 'case-study' | 'folder' | 'cv',
       title: item.label,
       content: item.goosContent || '',
       status: item.publishStatus as 'draft' | 'published',

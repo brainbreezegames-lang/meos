@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect, memo, useMemo } from 'react';
-import { FileText, Presentation, Folder, Lock } from 'lucide-react';
+import { FileText, Presentation, Folder, Lock, FileUser } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
@@ -21,7 +21,7 @@ function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   }) as T;
 }
 
-export type FileType = 'note' | 'case-study' | 'folder';
+export type FileType = 'note' | 'case-study' | 'folder' | 'cv';
 
 interface GoOSFileIconProps {
   id: string;
@@ -105,6 +105,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         return <Presentation size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} />;
       case 'folder':
         return <Folder size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} fill={goOSTokens.colors.accent.pale} />;
+      case 'cv':
+        return <FileUser size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} />;
       default:
         return <FileText size={32} stroke={goOSTokens.colors.border} strokeWidth={1.5} />;
     }
@@ -207,7 +209,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     <div
       role="button"
       tabIndex={0}
-      aria-label={`${title} ${type === 'folder' ? 'folder' : type === 'case-study' ? 'case study' : 'note'}${isSelected ? ', selected' : ''}`}
+      aria-label={`${title} ${type === 'folder' ? 'folder' : type === 'case-study' ? 'case study' : type === 'cv' ? 'CV' : 'note'}${isSelected ? ', selected' : ''}`}
       aria-selected={isSelected}
       data-file-id={id}
       data-file-type={type}

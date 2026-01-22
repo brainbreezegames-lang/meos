@@ -11,6 +11,7 @@ import {
   LayoutGrid,
   Image,
   Link,
+  FileUser,
 } from 'lucide-react';
 
 // Menu dimensions
@@ -43,6 +44,7 @@ interface GoOSDesktopContextMenuProps {
   onNewNote: () => void;
   onNewCaseStudy: () => void;
   onNewFolder: () => void;
+  onNewCV?: () => void;
   onNewImage?: () => void;
   onNewLink?: () => void;
   onPaste?: () => void;
@@ -58,6 +60,7 @@ export function GoOSDesktopContextMenu({
   onNewNote,
   onNewCaseStudy,
   onNewFolder,
+  onNewCV,
   onNewImage,
   onNewLink,
   onPaste,
@@ -78,6 +81,7 @@ export function GoOSDesktopContextMenu({
       items: [
         { id: 'new-note', label: 'Note', icon: <FileText size={14} strokeWidth={1.5} />, shortcut: '⌘N', onClick: onNewNote },
         { id: 'new-case-study', label: 'Case Study', icon: <Presentation size={14} strokeWidth={1.5} />, onClick: onNewCaseStudy },
+        { id: 'new-cv', label: 'CV', icon: <FileUser size={14} strokeWidth={1.5} />, onClick: () => onNewCV?.() },
         { id: 'new-folder', label: 'Folder', icon: <FolderPlus size={14} strokeWidth={1.5} />, onClick: onNewFolder },
       ],
     },
@@ -96,7 +100,7 @@ export function GoOSDesktopContextMenu({
         { id: 'refresh', label: 'Refresh', icon: <RefreshCw size={14} strokeWidth={1.5} />, shortcut: '⌘R', onClick: () => onRefresh?.() },
       ],
     },
-  ], [onNewNote, onNewCaseStudy, onNewFolder, onNewImage, onNewLink, onPaste, onArrangeIcons, onRefresh, canPaste]);
+  ], [onNewNote, onNewCaseStudy, onNewFolder, onNewCV, onNewImage, onNewLink, onPaste, onArrangeIcons, onRefresh, canPaste]);
 
   // Calculate menu height
   const estimatedHeight = useMemo(() => {
