@@ -2061,6 +2061,12 @@ function GoOSDemoContent() {
         { id: 'bg06', label: 'Gradient 6', preview: '/bg06.png' },
         { id: 'bg07', label: 'Gradient 7', preview: '/bg07.png' },
         { id: 'bg08', label: 'Gradient 8', preview: '/bg08.png' },
+        { id: 'bg09', label: 'Gradient 9', preview: '/bg09.png' },
+        { id: 'bg10', label: 'Gradient 10', preview: '/bg10.png' },
+        { id: 'bg11', label: 'Gradient 11', preview: '/bg11.png' },
+        { id: 'bg12', label: 'Gradient 12', preview: '/bg12.png' },
+        { id: 'bg13', label: 'Gradient 13', preview: '/bg13.png' },
+        { id: 'bg14', label: 'Gradient 14', preview: '/bg14.png' },
     ];
 
     // Celebration helper
