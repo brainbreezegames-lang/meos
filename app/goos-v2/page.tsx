@@ -1786,7 +1786,6 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
     const handleClose = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsClosing(true);
-        // Wait for animation to complete before actually closing
         setTimeout(() => {
             onClose();
             setIsClosing(false);
@@ -1795,7 +1794,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
 
     if (!isOpen) return null;
 
-    // Unified window styles - 12px radius, 2px solid border, 52px title bar
+    // Using unified windowStyles values - calm-tech 2025
     return (
         <motion.div
             drag
@@ -1818,25 +1817,25 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 width,
                 height,
                 zIndex,
-                background: 'var(--color-bg-base, #fbf9ef)',
-                border: '2px solid var(--color-text-primary, #171412)',
-                borderRadius: '12px',
-                boxShadow: '0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08)'
+                background: 'var(--color-bg-base, #faf8f2)',
+                border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.06))',
+                borderRadius: 'var(--radius-lg, 20px)',
+                boxShadow: '0 4px 16px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.06), 0 24px 64px rgba(23, 20, 18, 0.04)'
             }}
         >
-            {/* Unified Title Bar - 52px height, 2px bottom border */}
+            {/* Title Bar - unified 48px height, subtle border */}
             <div
                 className="flex items-center justify-between px-4 select-none cursor-move flex-shrink-0"
                 style={{
-                    height: 52,
-                    background: 'var(--color-bg-base, #fbf9ef)',
-                    borderBottom: '2px solid var(--color-text-primary, #171412)'
+                    height: 48,
+                    background: 'var(--color-bg-base, #faf8f2)',
+                    borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.04))'
                 }}
                 onMouseEnter={() => setIsHoveredTraffic(true)}
                 onMouseLeave={() => setIsHoveredTraffic(false)}
             >
-                {/* Unified Traffic Lights - 12px size, 8px gap */}
-                <div className="flex items-center" style={{ gap: 8 }}>
+                {/* Traffic Lights - macOS style 12px circles */}
+                <div className="flex items-center group/traffic" style={{ gap: 8 }}>
                     <motion.button
                         onClick={handleClose}
                         title="Close"
@@ -1847,14 +1846,14 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                             width: 12,
                             height: 12,
                             borderRadius: '50%',
-                            background: 'var(--color-traffic-close, #ff5f57)',
-                            boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                            background: '#ff5f57',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1), inset 0 0.5px 0 rgba(255, 255, 255, 0.2)',
                             border: 'none',
                             cursor: 'pointer',
                         }}
                     >
                         {isHoveredTraffic && (
-                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(77, 0, 0, 0.7)' }}>×</span>
+                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(77, 0, 0, 0.8)' }}>×</span>
                         )}
                     </motion.button>
                     <motion.button
@@ -1866,14 +1865,14 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                             width: 12,
                             height: 12,
                             borderRadius: '50%',
-                            background: 'var(--color-traffic-minimize, #ffbd2e)',
-                            boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                            background: '#ffbd2e',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1), inset 0 0.5px 0 rgba(255, 255, 255, 0.2)',
                             border: 'none',
                             cursor: 'pointer',
                         }}
                     >
                         {isHoveredTraffic && (
-                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(100, 65, 0, 0.7)' }}>−</span>
+                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(100, 65, 0, 0.8)' }}>−</span>
                         )}
                     </motion.button>
                     <motion.button
@@ -1885,14 +1884,14 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                             width: 12,
                             height: 12,
                             borderRadius: '50%',
-                            background: 'var(--color-traffic-maximize, #28c840)',
-                            boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                            background: '#28c840',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1), inset 0 0.5px 0 rgba(255, 255, 255, 0.2)',
                             border: 'none',
                             cursor: 'pointer',
                         }}
                     >
                         {isHoveredTraffic && (
-                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(0, 70, 0, 0.7)' }}>+</span>
+                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(0, 70, 0, 0.8)' }}>+</span>
                         )}
                     </motion.button>
                 </div>
@@ -1904,7 +1903,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                         fontWeight: 500,
                         color: 'var(--color-text-primary, #171412)',
                         letterSpacing: '-0.01em',
-                        opacity: 0.85
+                        opacity: 0.7
                     }}>{title}</span>
                 </div>
             </div>
