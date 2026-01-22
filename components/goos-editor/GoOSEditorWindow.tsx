@@ -120,7 +120,7 @@ export function GoOSEditorWindow({
     }
   };
 
-  // Zen mode: clean, Substack-inspired distraction-free UI
+  // Zen mode: clean, full-width distraction-free UI
   if (isZenMode) {
     return (
       <motion.div
@@ -137,7 +137,7 @@ export function GoOSEditorWindow({
           flexDirection: 'column',
         }}
       >
-        {/* Zen Mode: Always visible minimal header */}
+        {/* Zen Mode: Minimal header - always visible */}
         <div
           style={{
             padding: '12px 20px',
@@ -149,7 +149,7 @@ export function GoOSEditorWindow({
             flexShrink: 0,
           }}
         >
-          {/* Left: Traffic lights + Save status */}
+          {/* Left: Traffic lights + Title + Save status */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <TrafficLights
               onClose={onClose}
@@ -158,7 +158,49 @@ export function GoOSEditorWindow({
               isMaximized={isMaximized}
             />
 
-            {/* Minimal save indicator */}
+            {/* Editable title in header */}
+            {isEditingTitle ? (
+              <input
+                ref={titleInputRef}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onBlur={() => setIsEditingTitle(false)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === 'Escape') {
+                    setIsEditingTitle(false);
+                  }
+                }}
+                style={{
+                  padding: '4px 8px',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text-primary)',
+                  background: 'var(--color-bg-base)',
+                  border: '1px solid var(--color-accent-primary)',
+                  borderRadius: 4,
+                  outline: 'none',
+                  minWidth: 200,
+                }}
+                placeholder="Untitled"
+                autoFocus
+              />
+            ) : (
+              <span
+                onClick={() => setIsEditingTitle(true)}
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-body)',
+                  color: title ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                  cursor: 'text',
+                }}
+              >
+                {title || 'Untitled'}
+              </span>
+            )}
+
+            {/* Save indicator */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -192,89 +234,20 @@ export function GoOSEditorWindow({
           </div>
         </div>
 
-        {/* Zen Mode: Full-focus editor area */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              width: '100%',
-              maxWidth: 720,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            {/* Editable title in zen mode */}
-            <div style={{ padding: '32px 24px 0' }}>
-              {isEditingTitle ? (
-                <input
-                  ref={titleInputRef}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  onBlur={() => setIsEditingTitle(false)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === 'Escape') {
-                      setIsEditingTitle(false);
-                    }
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: 0,
-                    fontSize: 'clamp(28px, 4vw, 36px)',
-                    fontWeight: 700,
-                    fontFamily: 'var(--font-display)',
-                    color: 'var(--color-text-primary)',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: '2px solid var(--color-accent-primary)',
-                    outline: 'none',
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1.2,
-                  }}
-                  placeholder="Untitled"
-                  autoFocus
-                />
-              ) : (
-                <h1
-                  onClick={() => setIsEditingTitle(true)}
-                  style={{
-                    margin: 0,
-                    fontSize: 'clamp(28px, 4vw, 36px)',
-                    fontWeight: 700,
-                    fontFamily: 'var(--font-display)',
-                    color: title ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
-                    cursor: 'text',
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {title || 'Untitled'}
-                </h1>
-              )}
-            </div>
-
-            {/* Editor with toolbar in zen mode */}
-            <div style={{ flex: 1, overflow: 'hidden' }}>
-              <GoOSTipTapEditor
-                content={content}
-                onChange={setContent}
-                onSave={triggerSave}
-                placeholder={file.type === 'case-study'
-                  ? 'Start writing your case study...'
-                  : 'Start writing...'}
-                autoFocus
-              />
-            </div>
-          </div>
+        {/* Zen Mode: Full width editor - scrollbar at window edge */}
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <GoOSTipTapEditor
+            content={content}
+            onChange={setContent}
+            onSave={triggerSave}
+            placeholder={file.type === 'case-study'
+              ? 'Start writing your case study...'
+              : 'Start writing...'}
+            autoFocus
+          />
         </div>
 
-        {/* Zen Mode: Subtle stats on hover at bottom */}
+        {/* Zen Mode: Stats on hover at bottom */}
         <div
           onMouseEnter={() => setShowZenStats(true)}
           onMouseLeave={() => setShowZenStats(false)}
@@ -453,36 +426,23 @@ export function GoOSEditorWindow({
           />
         </div>
 
-        {/* Editor - responsive container */}
+        {/* Editor - full width */}
         <div
           style={{
             flex: 1,
             overflow: 'hidden',
-            display: 'flex',
-            justifyContent: 'center',
             background: 'var(--color-bg-base)',
           }}
         >
-          <div
-            style={{
-              width: '100%',
-              maxWidth: isMaximized ? '720px' : '100%',
-              height: '100%',
-              margin: '0 auto',
-              padding: isMaximized ? '32px 24px' : '0',
-              background: 'var(--color-bg-base)',
-            }}
-          >
-            <GoOSTipTapEditor
-              content={content}
-              onChange={setContent}
-              onSave={triggerSave}
-              placeholder={file.type === 'case-study'
-                ? 'Start writing your case study...'
-                : 'Start writing...'}
-              autoFocus
-            />
-          </div>
+          <GoOSTipTapEditor
+            content={content}
+            onChange={setContent}
+            onSave={triggerSave}
+            placeholder={file.type === 'case-study'
+              ? 'Start writing your case study...'
+              : 'Start writing...'}
+            autoFocus
+          />
         </div>
 
         {/* Footer with stats */}

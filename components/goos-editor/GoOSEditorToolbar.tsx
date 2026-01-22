@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Editor } from '@tiptap/react';
-import { goOSTokens } from './GoOSTipTapEditor';
 
 interface ToolbarButtonProps {
   onClick: () => void;
@@ -21,35 +20,25 @@ function ToolbarButton({ onClick, isActive, disabled, title, children }: Toolbar
       title={title}
       aria-label={title}
       aria-pressed={isActive}
+      className="toolbar-btn"
+      data-active={isActive || undefined}
       style={{
-        padding: '6px 8px',
+        padding: '4px 8px',
         fontSize: 13,
-        fontWeight: 600,
-        fontFamily: goOSTokens.fonts.body,
-        background: isActive ? goOSTokens.colors.accent.primary : 'transparent',
-        color: isActive ? 'white' : goOSTokens.colors.text.secondary,
+        fontWeight: 500,
+        fontFamily: 'var(--font-body)',
+        background: isActive ? 'var(--color-text-primary)' : 'transparent',
+        color: isActive ? 'var(--color-bg-base)' : 'var(--color-text-secondary)',
         border: 'none',
-        borderRadius: 3,
+        borderRadius: 4,
         cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'all 0.15s ease',
+        opacity: disabled ? 0.3 : 1,
+        transition: 'all 0.1s ease',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         minWidth: 28,
         height: 28,
-      }}
-      onMouseEnter={(e) => {
-        if (!disabled && !isActive) {
-          e.currentTarget.style.background = goOSTokens.colors.headerBg;
-          e.currentTarget.style.color = goOSTokens.colors.text.primary;
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.background = 'transparent';
-          e.currentTarget.style.color = goOSTokens.colors.text.secondary;
-        }
       }}
     >
       {children}
@@ -62,9 +51,9 @@ function ToolbarDivider() {
     <div
       style={{
         width: 1,
-        height: 20,
-        background: goOSTokens.colors.border + '30',
-        margin: '0 6px',
+        height: 16,
+        background: 'var(--color-border-subtle)',
+        margin: '0 8px',
       }}
     />
   );
@@ -85,376 +74,294 @@ export function GoOSEditorToolbar({ editor, onAddImage, onAddImageFromUrl, onAdd
     if (editor.isActive('heading', { level: 1 })) return 'H1';
     if (editor.isActive('heading', { level: 2 })) return 'H2';
     if (editor.isActive('heading', { level: 3 })) return 'H3';
-    return 'P';
+    return 'Text';
   };
 
   return (
-    <div
-      role="toolbar"
-      aria-label="Text formatting"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        padding: '8px 12px',
-        borderBottom: `2px solid ${goOSTokens.colors.border}`,
-        background: goOSTokens.colors.headerBg,
-        flexWrap: 'wrap',
-      }}
-    >
-      {/* Heading Dropdown */}
-      <div style={{ position: 'relative' }}>
-        <button
-          type="button"
-          onClick={() => setShowHeadingDropdown(!showHeadingDropdown)}
-          aria-label="Text style"
-          aria-haspopup="listbox"
-          aria-expanded={showHeadingDropdown}
-          style={{
-            padding: '6px 10px',
-            fontSize: 13,
-            fontWeight: 600,
-            fontFamily: goOSTokens.fonts.body,
-            background: goOSTokens.colors.paper,
-            color: goOSTokens.colors.text.primary,
-            border: `1px solid ${goOSTokens.colors.border}40`,
-            borderRadius: 3,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            minWidth: 60,
-          }}
-        >
-          {getActiveHeading()}
-          <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-            <path d="M1 1L5 5L9 1" stroke={goOSTokens.colors.text.muted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-
-        {showHeadingDropdown && (
-          <div
-            role="listbox"
-            aria-label="Text styles"
+    <>
+      <div
+        role="toolbar"
+        aria-label="Text formatting"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          padding: '8px 16px',
+          borderBottom: '1px solid var(--color-border-subtle)',
+          background: 'transparent',
+          flexWrap: 'wrap',
+        }}
+      >
+        {/* Heading Dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button
+            type="button"
+            onClick={() => setShowHeadingDropdown(!showHeadingDropdown)}
+            aria-label="Text style"
+            aria-haspopup="listbox"
+            aria-expanded={showHeadingDropdown}
             style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              marginTop: 4,
-              background: goOSTokens.colors.paper,
-              border: `2px solid ${goOSTokens.colors.border}`,
+              padding: '4px 10px',
+              fontSize: 13,
+              fontWeight: 500,
+              fontFamily: 'var(--font-body)',
+              background: 'transparent',
+              color: 'var(--color-text-primary)',
+              border: '1px solid var(--color-border-subtle)',
               borderRadius: 4,
-              boxShadow: goOSTokens.shadows.button,
-              zIndex: 100,
-              minWidth: 120,
-              overflow: 'hidden',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              height: 28,
             }}
-            onClick={() => setShowHeadingDropdown(false)}
           >
-            <button
-              type="button"
-              role="option"
-              aria-selected={!editor.isActive('heading')}
-              onClick={() => editor.chain().focus().setParagraph().run()}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                fontSize: 14,
-                fontFamily: goOSTokens.fonts.body,
-                background: !editor.isActive('heading') ? goOSTokens.colors.headerBg : 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                color: goOSTokens.colors.text.primary,
-              }}
-            >
-              Paragraph
-            </button>
-            <button
-              type="button"
-              role="option"
-              aria-selected={editor.isActive('heading', { level: 1 })}
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                fontSize: 18,
-                fontWeight: 700,
-                fontFamily: goOSTokens.fonts.display,
-                background: editor.isActive('heading', { level: 1 }) ? goOSTokens.colors.headerBg : 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                color: goOSTokens.colors.text.primary,
-              }}
-            >
-              Heading 1
-            </button>
-            <button
-              type="button"
-              role="option"
-              aria-selected={editor.isActive('heading', { level: 2 })}
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                fontSize: 16,
-                fontWeight: 600,
-                fontFamily: goOSTokens.fonts.display,
-                background: editor.isActive('heading', { level: 2 }) ? goOSTokens.colors.headerBg : 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                color: goOSTokens.colors.text.primary,
-              }}
-            >
-              Heading 2
-            </button>
-            <button
-              type="button"
-              role="option"
-              aria-selected={editor.isActive('heading', { level: 3 })}
-              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                fontSize: 14,
-                fontWeight: 600,
-                fontFamily: goOSTokens.fonts.display,
-                background: editor.isActive('heading', { level: 3 }) ? goOSTokens.colors.headerBg : 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                color: goOSTokens.colors.text.secondary,
-              }}
-            >
-              Heading 3
-            </button>
-          </div>
-        )}
+            {getActiveHeading()}
+            <svg width="8" height="5" viewBox="0 0 8 5" fill="none">
+              <path d="M1 1l3 3 3-3" stroke="var(--color-text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
+          {showHeadingDropdown && (
+            <>
+              <div
+                style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+                onClick={() => setShowHeadingDropdown(false)}
+              />
+              <div
+                role="listbox"
+                aria-label="Text styles"
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  marginTop: 4,
+                  background: 'var(--color-bg-base)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 6,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  zIndex: 100,
+                  minWidth: 140,
+                  overflow: 'hidden',
+                  padding: 4,
+                }}
+              >
+                {[
+                  { label: 'Text', action: () => editor.chain().focus().setParagraph().run(), active: !editor.isActive('heading'), style: {} },
+                  { label: 'Heading 1', action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(), active: editor.isActive('heading', { level: 1 }), style: { fontSize: 16, fontWeight: 600 } },
+                  { label: 'Heading 2', action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(), active: editor.isActive('heading', { level: 2 }), style: { fontSize: 14, fontWeight: 600 } },
+                  { label: 'Heading 3', action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(), active: editor.isActive('heading', { level: 3 }), style: { fontSize: 13, fontWeight: 500 } },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    role="option"
+                    aria-selected={item.active}
+                    onClick={() => { item.action(); setShowHeadingDropdown(false); }}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      fontFamily: 'var(--font-body)',
+                      background: item.active ? 'var(--color-bg-subtle)' : 'transparent',
+                      border: 'none',
+                      borderRadius: 4,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      color: 'var(--color-text-primary)',
+                      ...item.style,
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <ToolbarDivider />
+
+        {/* Text Formatting - using text labels for clarity */}
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          isActive={editor.isActive('bold')}
+          title="Bold (Cmd+B)"
+        >
+          <span style={{ fontWeight: 700 }}>B</span>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          isActive={editor.isActive('italic')}
+          title="Italic (Cmd+I)"
+        >
+          <span style={{ fontStyle: 'italic', fontWeight: 500 }}>I</span>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          isActive={editor.isActive('underline')}
+          title="Underline (Cmd+U)"
+        >
+          <span style={{ textDecoration: 'underline', fontWeight: 500 }}>U</span>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+          isActive={editor.isActive('strike')}
+          title="Strikethrough"
+        >
+          <span style={{ textDecoration: 'line-through', fontWeight: 500 }}>S</span>
+        </ToolbarButton>
+
+        <ToolbarDivider />
+
+        {/* Link */}
+        <ToolbarButton
+          onClick={() => onSetLink?.()}
+          isActive={editor.isActive('link')}
+          title="Add link (Cmd+K)"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M6.5 9.5l3-3M5.5 8L4 9.5a2.12 2.12 0 003 3L8.5 11m2.5-3l1.5-1.5a2.12 2.12 0 00-3-3L8 5" strokeLinecap="round"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleHighlight().run()}
+          isActive={editor.isActive('highlight')}
+          title="Highlight"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="10" width="12" height="4" rx="1" fill="#fef08a"/>
+            <path d="M4 10V5a1 1 0 011-1h6a1 1 0 011 1v5" stroke="currentColor" strokeWidth="1.5"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarDivider />
+
+        {/* Lists */}
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          isActive={editor.isActive('bulletList')}
+          title="Bullet list"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <circle cx="3" cy="4" r="1.5"/>
+            <circle cx="3" cy="8" r="1.5"/>
+            <circle cx="3" cy="12" r="1.5"/>
+            <rect x="6" y="3" width="8" height="2" rx="1"/>
+            <rect x="6" y="7" width="8" height="2" rx="1"/>
+            <rect x="6" y="11" width="8" height="2" rx="1"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          isActive={editor.isActive('orderedList')}
+          title="Numbered list"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <text x="1.5" y="5.5" fontSize="5" fontWeight="600" fontFamily="var(--font-body)">1</text>
+            <text x="1.5" y="9.5" fontSize="5" fontWeight="600" fontFamily="var(--font-body)">2</text>
+            <text x="1.5" y="13.5" fontSize="5" fontWeight="600" fontFamily="var(--font-body)">3</text>
+            <rect x="6" y="3" width="8" height="2" rx="1"/>
+            <rect x="6" y="7" width="8" height="2" rx="1"/>
+            <rect x="6" y="11" width="8" height="2" rx="1"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarDivider />
+
+        {/* Block Elements */}
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          isActive={editor.isActive('blockquote')}
+          title="Quote"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" opacity="0.8">
+            <path d="M4 5v2.5c0 .28.22.5.5.5H6v1c0 .83-.67 1.5-1.5 1.5H4v1h.5C6.43 11.5 8 9.93 8 8V5H4zm6 0v2.5c0 .28.22.5.5.5H12v1c0 .83-.67 1.5-1.5 1.5H10v1h.5c1.93 0 3.5-1.57 3.5-3.5V5h-4z"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          isActive={editor.isActive('codeBlock')}
+          title="Code block"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M5 4.5L2 8l3 3.5m6-7l3 3.5-3 3.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarDivider />
+
+        {/* Media */}
+        <ToolbarButton
+          onClick={() => onAddImage?.()}
+          title="Add image"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="2" y="3" width="12" height="10" rx="1.5"/>
+            <circle cx="5.5" cy="6.5" r="1.25"/>
+            <path d="M2 11l3.5-3.5 2 2 3-3L14 10" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => onAddVideo?.()}
+          title="Add video"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="4" width="12" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M6.5 6.5v3l3-1.5-3-1.5z" fill="currentColor"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+          title="Divider"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="2" y="7" width="12" height="2" rx="1"/>
+          </svg>
+        </ToolbarButton>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Undo/Redo */}
+        <ToolbarButton
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+          title="Undo (Cmd+Z)"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M4 6h6a3 3 0 110 6H7" strokeLinecap="round"/>
+            <path d="M6.5 3.5L4 6l2.5 2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+          title="Redo (Cmd+Shift+Z)"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M12 6H6a3 3 0 100 6h3" strokeLinecap="round"/>
+            <path d="M9.5 3.5L12 6l-2.5 2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </ToolbarButton>
       </div>
 
-      <ToolbarDivider />
-
-      {/* Text Formatting */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        isActive={editor.isActive('bold')}
-        title="Bold (Cmd+B)"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <path d="M3 2.5h4.5c1.38 0 2.5 1.12 2.5 2.5 0 .88-.46 1.65-1.15 2.09.97.44 1.65 1.41 1.65 2.54 0 1.54-1.25 2.87-2.79 2.87H3V2.5zm2 3.75h2.25c.41 0 .75-.34.75-.75s-.34-.75-.75-.75H5v1.5zm2.5 4.25c.55 0 1-.45 1-1s-.45-1-1-1H5v2h2.5z"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        isActive={editor.isActive('italic')}
-        title="Italic (Cmd+I)"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <path d="M5.5 3h5l-.5 1.5H8.5l-2 5H8l-.5 1.5h-5l.5-1.5H4.5l2-5H5l.5-1.5z"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        isActive={editor.isActive('underline')}
-        title="Underline (Cmd+U)"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <path d="M3 12h8v1H3v-1zm4-1c-2.21 0-4-1.79-4-4V1h1.5v6c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V1H11v6c0 2.21-1.79 4-4 4z"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-        isActive={editor.isActive('strike')}
-        title="Strikethrough"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <path d="M7 3c1.1 0 2.08.36 2.83.93l-1.06 1.06C8.34 4.69 7.71 4.5 7 4.5c-1.38 0-2.5 1.12-2.5 2.5h-1.5c0-2.21 1.79-4 4-4zm3 4.5v1.5h-1.5v1.5h-3V9.5H4V8h6v-.5zM5 6.5h4c.28 0 .5.22.5.5s-.22.5-.5.5H5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5z"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleHighlight().run()}
-        isActive={editor.isActive('highlight')}
-        title="Highlight"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <rect x="2" y="9" width="10" height="3" rx="1" fill={goOSTokens.colors.accent.pale}/>
-          <path d="M4 8V4c0-.55.45-1 1-1h4c.55 0 1 .45 1 1v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarDivider />
-
-      {/* Link */}
-      <ToolbarButton
-        onClick={() => onSetLink?.()}
-        isActive={editor.isActive('link')}
-        title="Add link"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M6 8l2-2m-3 1l-1.5 1.5a2.12 2.12 0 003 3L8 10m2-4l1.5-1.5a2.12 2.12 0 00-3-3L7 3" strokeLinecap="round"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarDivider />
-
-      {/* Lists */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        isActive={editor.isActive('bulletList')}
-        title="Bullet list"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <circle cx="2.5" cy="3" r="1.5"/>
-          <circle cx="2.5" cy="7" r="1.5"/>
-          <circle cx="2.5" cy="11" r="1.5"/>
-          <rect x="5.5" y="2" width="7" height="2" rx="0.5"/>
-          <rect x="5.5" y="6" width="7" height="2" rx="0.5"/>
-          <rect x="5.5" y="10" width="7" height="2" rx="0.5"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        isActive={editor.isActive('orderedList')}
-        title="Numbered list"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <text x="1" y="4" fontSize="4" fontWeight="600">1</text>
-          <text x="1" y="8" fontSize="4" fontWeight="600">2</text>
-          <text x="1" y="12" fontSize="4" fontWeight="600">3</text>
-          <rect x="5.5" y="2" width="7" height="2" rx="0.5"/>
-          <rect x="5.5" y="6" width="7" height="2" rx="0.5"/>
-          <rect x="5.5" y="10" width="7" height="2" rx="0.5"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarDivider />
-
-      {/* Block Elements */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        isActive={editor.isActive('blockquote')}
-        title="Quote"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <path d="M3 4v3c0 .55.45 1 1 1h2v1c0 1.1-.9 2-2 2H3v1h1c1.66 0 3-1.34 3-3V4H3zm6 0v3c0 .55.45 1 1 1h2v1c0 1.1-.9 2-2 2H9v1h1c1.66 0 3-1.34 3-3V4H9z"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        isActive={editor.isActive('codeBlock')}
-        title="Code block"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M4.5 4L1.5 7l3 3m5-6l3 3-3 3" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => onAddImage?.()}
-        title="Upload image"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <rect x="1.5" y="2.5" width="11" height="9" rx="1"/>
-          <circle cx="4.5" cy="5.5" r="1"/>
-          <path d="M1.5 9.5l3-3 2 2 3-3 3 3" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => onAddVideo?.()}
-        title="Add YouTube video"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <rect x="1" y="3" width="12" height="8" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-          <path d="M5.5 5.5l3.5 1.5-3.5 1.5v-3z" fill="currentColor"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setHorizontalRule().run()}
-        title="Horizontal rule"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <rect x="1" y="6" width="12" height="2" rx="1"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarDivider />
-
-      {/* Text Alignment */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setTextAlign('left').run()}
-        isActive={editor.isActive({ textAlign: 'left' })}
-        title="Align left"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <rect x="1" y="2" width="12" height="1.5" rx="0.5"/>
-          <rect x="1" y="5" width="8" height="1.5" rx="0.5"/>
-          <rect x="1" y="8" width="10" height="1.5" rx="0.5"/>
-          <rect x="1" y="11" width="6" height="1.5" rx="0.5"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setTextAlign('center').run()}
-        isActive={editor.isActive({ textAlign: 'center' })}
-        title="Align center"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <rect x="1" y="2" width="12" height="1.5" rx="0.5"/>
-          <rect x="3" y="5" width="8" height="1.5" rx="0.5"/>
-          <rect x="2" y="8" width="10" height="1.5" rx="0.5"/>
-          <rect x="4" y="11" width="6" height="1.5" rx="0.5"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().setTextAlign('right').run()}
-        isActive={editor.isActive({ textAlign: 'right' })}
-        title="Align right"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <rect x="1" y="2" width="12" height="1.5" rx="0.5"/>
-          <rect x="5" y="5" width="8" height="1.5" rx="0.5"/>
-          <rect x="3" y="8" width="10" height="1.5" rx="0.5"/>
-          <rect x="7" y="11" width="6" height="1.5" rx="0.5"/>
-        </svg>
-      </ToolbarButton>
-
-      {/* Spacer */}
-      <div style={{ flex: 1 }} />
-
-      {/* Undo/Redo */}
-      <ToolbarButton
-        onClick={() => editor.chain().focus().undo().run()}
-        disabled={!editor.can().undo()}
-        title="Undo (Cmd+Z)"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M3 5.5h5.5a3 3 0 010 6H6" strokeLinecap="round"/>
-          <path d="M5.5 3L3 5.5 5.5 8" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </ToolbarButton>
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().redo().run()}
-        disabled={!editor.can().redo()}
-        title="Redo (Cmd+Shift+Z)"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M11 5.5H5.5a3 3 0 000 6H8" strokeLinecap="round"/>
-          <path d="M8.5 3L11 5.5 8.5 8" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </ToolbarButton>
-    </div>
+      {/* Hover styles */}
+      <style jsx global>{`
+        .toolbar-btn:hover:not([data-active]):not(:disabled) {
+          background: var(--color-bg-subtle) !important;
+          color: var(--color-text-primary) !important;
+        }
+      `}</style>
+    </>
   );
 }
 
