@@ -3625,7 +3625,7 @@ function GoOSDemoContent() {
                                     <div className="text-xs font-semibold mb-2" style={{ color: goOS.colors.text.primary }}>
                                         Choose Wallpaper
                                     </div>
-                                    <div className="grid grid-cols-3 gap-2" style={{ width: 240 }}>
+                                    <div className="grid grid-cols-3 gap-2" style={{ width: 240, maxHeight: 280, overflowY: 'auto' }}>
                                         {WALLPAPERS.map((wp) => (
                                             <button
                                                 key={wp.id || 'none'}
