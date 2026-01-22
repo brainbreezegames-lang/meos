@@ -2048,6 +2048,21 @@ function GoOSDemoContent() {
     const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
     const [showManageSpacesDialog, setShowManageSpacesDialog] = useState(false);
 
+    // Wallpaper state
+    const [wallpaper, setWallpaper] = useState<string | null>(null); // null = no wallpaper (default pattern)
+    const [showWallpaperPicker, setShowWallpaperPicker] = useState(false);
+    const WALLPAPERS = [
+        { id: null, label: 'None', preview: null },
+        { id: 'bg01', label: 'Gradient 1', preview: '/bg01.png' },
+        { id: 'bg02', label: 'Gradient 2', preview: '/bg02.png' },
+        { id: 'bg03', label: 'Gradient 3', preview: '/bg03.png' },
+        { id: 'bg04', label: 'Gradient 4', preview: '/bg04.png' },
+        { id: 'bg05', label: 'Gradient 5', preview: '/bg05.png' },
+        { id: 'bg06', label: 'Gradient 6', preview: '/bg06.png' },
+        { id: 'bg07', label: 'Gradient 7', preview: '/bg07.png' },
+        { id: 'bg08', label: 'Gradient 8', preview: '/bg08.png' },
+    ];
+
     // Celebration helper
     const celebrate = useCallback(() => {
         setShowConfetti(true);
@@ -2734,8 +2749,6 @@ function GoOSDemoContent() {
             className="min-h-screen w-full relative overflow-hidden theme-sketch"
             style={{
                 backgroundColor: goOS.colors.paper,
-                backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
-                backgroundSize: '24px 24px',
                 // CSS variable for zen mode - windows use this for full-height
                 '--zen-dock-offset': isZenMode ? '0px' : '80px',
             } as React.CSSProperties}
@@ -2744,6 +2757,7 @@ function GoOSDemoContent() {
                 // Close context menus
                 setDesktopContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
                 setFileContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
+                setShowWallpaperPicker(false);
                 // Deselect files when clicking on desktop background (not on files or windows)
                 const target = e.target as HTMLElement;
                 if (!target.closest('[data-file-id]') && !target.closest('[data-window]')) {
@@ -2751,6 +2765,30 @@ function GoOSDemoContent() {
                 }
             }}
         >
+            {/* WALLPAPER BACKGROUND */}
+            {wallpaper ? (
+                <img
+                    src={`/${wallpaper}.png`}
+                    alt=""
+                    className="absolute inset-0 w-full h-full pointer-events-none select-none"
+                    style={{
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                        zIndex: 0,
+                    }}
+                    draggable={false}
+                />
+            ) : (
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
+                        backgroundSize: '24px 24px',
+                        zIndex: 0,
+                    }}
+                />
+            )}
+
             {/* CONFETTI CELEBRATION */}
             <ConfettiBurst isActive={showConfetti} onComplete={() => setShowConfetti(false)} />
 
@@ -3550,6 +3588,91 @@ function GoOSDemoContent() {
                         label="Analytics"
                     />
                     <div className="w-px h-8 bg-black/10 mx-1" />
+                    {/* Wallpaper Picker */}
+                    <div className="relative">
+                        <DockIcon
+                            icon={<ImageIcon size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />}
+                            onClick={() => setShowWallpaperPicker(!showWallpaperPicker)}
+                            isActive={showWallpaperPicker}
+                            label="Wallpaper"
+                        />
+                        <AnimatePresence>
+                            {showWallpaperPicker && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 rounded-xl"
+                                    style={{
+                                        background: goOS.colors.cream,
+                                        border: `2px solid ${goOS.colors.border}`,
+                                        boxShadow: goOS.shadows.solid,
+                                        zIndex: 5000,
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <div className="text-xs font-semibold mb-2" style={{ color: goOS.colors.text.primary }}>
+                                        Choose Wallpaper
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2" style={{ width: 240 }}>
+                                        {WALLPAPERS.map((wp) => (
+                                            <button
+                                                key={wp.id || 'none'}
+                                                onClick={() => {
+                                                    setWallpaper(wp.id);
+                                                    setShowWallpaperPicker(false);
+                                                }}
+                                                className="relative rounded-lg overflow-hidden transition-all"
+                                                style={{
+                                                    width: 72,
+                                                    height: 48,
+                                                    border: wallpaper === wp.id
+                                                        ? `2px solid ${goOS.colors.accent.primary}`
+                                                        : `1px solid ${goOS.colors.border}`,
+                                                    background: wp.preview ? 'transparent' : goOS.colors.paper,
+                                                }}
+                                            >
+                                                {wp.preview ? (
+                                                    <img
+                                                        src={wp.preview}
+                                                        alt={wp.label}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        className="w-full h-full flex items-center justify-center text-xs"
+                                                        style={{
+                                                            backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
+                                                            backgroundSize: '8px 8px',
+                                                            color: goOS.colors.text.muted,
+                                                        }}
+                                                    >
+                                                        None
+                                                    </div>
+                                                )}
+                                                {wallpaper === wp.id && (
+                                                    <div
+                                                        className="absolute inset-0 flex items-center justify-center"
+                                                        style={{ background: 'rgba(0,0,0,0.3)' }}
+                                                    >
+                                                        <div
+                                                            className="w-4 h-4 rounded-full flex items-center justify-center"
+                                                            style={{ background: goOS.colors.accent.primary }}
+                                                        >
+                                                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                                                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                     <DockIcon
                         icon={<PenLine size={24} stroke={goOS.icon.accent} strokeWidth={1.5} />}
                         onClick={() => createFile('note')}
