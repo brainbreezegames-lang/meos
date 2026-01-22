@@ -71,6 +71,32 @@ const DEMO_SPACES: SpaceSummary[] = [
 ];
 
 // ============================================
+// SPACE VISUAL THEMES - Different backgrounds for each space
+// ============================================
+const SPACE_THEMES: Record<string, { gradient: string; pattern: string; accent: string }> = {
+    'space-1': {
+        gradient: 'linear-gradient(145deg, #fef9f3 0%, #fdf2e9 30%, #fce7d6 70%, #f8d9c4 100%)',
+        pattern: 'radial-gradient(circle at 20% 80%, rgba(224, 122, 58, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(224, 122, 58, 0.05) 0%, transparent 40%)',
+        accent: '#e07a3a',
+    },
+    'space-2': {
+        gradient: 'linear-gradient(145deg, #f5f8fc 0%, #e8f0f8 30%, #d4e4f4 70%, #c2d8f0 100%)',
+        pattern: 'radial-gradient(circle at 30% 70%, rgba(58, 122, 224, 0.08) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(58, 122, 224, 0.05) 0%, transparent 40%)',
+        accent: '#3a7ae0',
+    },
+    'space-3': {
+        gradient: 'linear-gradient(145deg, #fdf5f8 0%, #f8e8f0 30%, #f0d4e4 70%, #e8c2d8 100%)',
+        pattern: 'radial-gradient(circle at 25% 75%, rgba(154, 58, 224, 0.08) 0%, transparent 50%), radial-gradient(circle at 75% 25%, rgba(154, 58, 224, 0.05) 0%, transparent 40%)',
+        accent: '#9a3ae0',
+    },
+    'space-4': {
+        gradient: 'linear-gradient(145deg, #f5fcf5 0%, #e8f8e8 30%, #d4f0d4 70%, #c2e8c2 100%)',
+        pattern: 'radial-gradient(circle at 35% 65%, rgba(58, 224, 122, 0.08) 0%, transparent 50%), radial-gradient(circle at 65% 35%, rgba(58, 224, 122, 0.05) 0%, transparent 40%)',
+        accent: '#3ae07a',
+    },
+};
+
+// ============================================
 // PLAYFUL LOADING MESSAGES
 // ============================================
 const LOADING_MESSAGES = [
@@ -2616,11 +2642,22 @@ function GoOSDemoContent() {
                 setDesktopContextMenu(prev => ({ ...prev, isOpen: false }));
                 setFileContextMenu(prev => ({ ...prev, isOpen: false }));
             }
+
+            // Cmd+1/2/3/4: Switch spaces
+            if (modKey && ['1', '2', '3', '4'].includes(e.key)) {
+                e.preventDefault();
+                const spaceIndex = parseInt(e.key) - 1;
+                const space = DEMO_SPACES[spaceIndex];
+                if (space) {
+                    setActiveSpaceId(space.id);
+                    showGoOSToast(`Switched to ${space.name}`, 'success');
+                }
+            }
         };
 
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [createFile, selectedFileId, duplicateFile, copyFile, cutFile, clipboard, pasteFile, deleteFile, openFile, goosFiles, renamingFileId]);
+    }, [createFile, selectedFileId, duplicateFile, copyFile, cutFile, clipboard, pasteFile, deleteFile, openFile, goosFiles, renamingFileId, showGoOSToast]);
 
     // Desktop right-click handler
     const handleDesktopContextMenu = useCallback((e: React.MouseEvent) => {
@@ -2774,7 +2811,7 @@ function GoOSDemoContent() {
                 }
             }}
         >
-            {/* WALLPAPER BACKGROUND */}
+            {/* WALLPAPER BACKGROUND - With Space Theme Support */}
             {wallpaper ? (
                 <img
                     src={`/${wallpaper}.png`}
@@ -2788,14 +2825,53 @@ function GoOSDemoContent() {
                     draggable={false}
                 />
             ) : (
-                <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                        backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
-                        backgroundSize: '24px 24px',
-                        zIndex: 0,
-                    }}
-                />
+                <>
+                    {/* Space-specific gradient background */}
+                    <div
+                        className="absolute inset-0 pointer-events-none transition-all duration-700"
+                        style={{
+                            background: SPACE_THEMES[activeSpaceId]?.gradient || SPACE_THEMES['space-1'].gradient,
+                            zIndex: 0,
+                        }}
+                    />
+                    {/* Space-specific accent pattern */}
+                    <div
+                        className="absolute inset-0 pointer-events-none transition-all duration-700"
+                        style={{
+                            background: SPACE_THEMES[activeSpaceId]?.pattern || SPACE_THEMES['space-1'].pattern,
+                            zIndex: 0,
+                        }}
+                    />
+                    {/* Dot pattern overlay */}
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            backgroundImage: 'radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)',
+                            backgroundSize: '24px 24px',
+                            zIndex: 0,
+                        }}
+                    />
+                    {/* Space indicator watermark */}
+                    <div
+                        className="absolute bottom-24 right-8 pointer-events-none select-none transition-all duration-500"
+                        style={{ zIndex: 1, opacity: 0.12 }}
+                    >
+                        <div style={{ fontSize: '180px', lineHeight: 1 }}>
+                            {DEMO_SPACES.find(s => s.id === activeSpaceId)?.icon || '🎨'}
+                        </div>
+                        <div
+                            style={{
+                                fontSize: '32px',
+                                fontWeight: 700,
+                                textAlign: 'right',
+                                marginTop: '-20px',
+                                color: SPACE_THEMES[activeSpaceId]?.accent || '#333',
+                            }}
+                        >
+                            {DEMO_SPACES.find(s => s.id === activeSpaceId)?.name || 'Portfolio'}
+                        </div>
+                    </div>
+                </>
             )}
 
             {/* CONFETTI CELEBRATION */}
@@ -3523,11 +3599,13 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl"
+                            className="flex items-center gap-3 px-4 py-3 rounded-[22px]"
                             style={{
-                                background: goOS.colors.cream,
-                                border: `2px solid ${goOS.colors.border}`,
-                                boxShadow: goOS.shadows.solid
+                                background: 'rgba(28, 28, 30, 0.88)',
+                                backdropFilter: 'blur(40px) saturate(180%)',
+                                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+                                border: '1px solid rgba(255, 255, 255, 0.06)',
+                                boxShadow: '0 25px 70px rgba(0, 0, 0, 0.35), 0 10px 30px rgba(0, 0, 0, 0.22)'
                             }}
                         >
                     <RubberDuck />
