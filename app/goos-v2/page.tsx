@@ -1348,6 +1348,7 @@ const TrafficLightButton = ({
 
 function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, height, onClose, onFocus, children }: SketchWindowProps) {
     const [isClosing, setIsClosing] = useState(false);
+    const [isHoveredTraffic, setIsHoveredTraffic] = useState(false);
 
     const handleClose = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -1361,19 +1362,20 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
 
     if (!isOpen) return null;
 
+    // Unified window styles - 12px radius, 2px solid border, 52px title bar
     return (
         <motion.div
             drag
             dragMomentum={false}
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.85, y: 20 }}
             animate={isClosing
                 ? { opacity: 0, scale: 0.8, y: -10, rotate: -2 }
                 : { opacity: 1, scale: 1, y: 0, rotate: 0 }
             }
-            exit={{ opacity: 0, scale: 0.8, y: -10 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={isClosing
                 ? { duration: 0.2, ease: [0.4, 0, 1, 1] }
-                : goOS.springs.gentle
+                : { type: 'spring', stiffness: 350, damping: 25, mass: 0.8 }
             }
             onMouseDown={onFocus}
             className="fixed flex flex-col overflow-hidden"
@@ -1383,43 +1385,94 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 width,
                 height,
                 zIndex,
-                background: goOS.colors.windowBg,
-                border: `2px solid ${goOS.colors.border}`,
-                borderRadius: goOS.radii.card,
-                boxShadow: goOS.shadows.solid
+                background: 'var(--color-bg-base, #fbf9ef)',
+                border: '2px solid var(--color-text-primary, #171412)',
+                borderRadius: '12px',
+                boxShadow: '0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08)'
             }}
         >
+            {/* Unified Title Bar - 52px height, 2px bottom border */}
             <div
-                className="h-10 flex items-center justify-between px-3 select-none cursor-move flex-shrink-0 group"
-                style={{ background: goOS.colors.cream, borderBottom: `2px solid ${goOS.colors.border}`, borderRadius: '10px 10px 0 0' }}
+                className="flex items-center justify-between px-4 select-none cursor-move flex-shrink-0"
+                style={{
+                    height: 52,
+                    background: 'var(--color-bg-base, #fbf9ef)',
+                    borderBottom: '2px solid var(--color-text-primary, #171412)'
+                }}
+                onMouseEnter={() => setIsHoveredTraffic(true)}
+                onMouseLeave={() => setIsHoveredTraffic(false)}
             >
-                <div className="flex items-center gap-2">
-                    <TrafficLightButton
-                        color={goOS.colors.traffic.close}
-                        hoverColor="#ff3b30"
-                        borderColor={goOS.colors.traffic.border}
-                        icon="×"
+                {/* Unified Traffic Lights - 12px size, 8px gap */}
+                <div className="flex items-center" style={{ gap: 8 }}>
+                    <motion.button
                         onClick={handleClose}
                         title="Close"
-                    />
-                    <TrafficLightButton
-                        color={goOS.colors.traffic.minimize}
-                        hoverColor="#ffcc00"
-                        borderColor={goOS.colors.traffic.border}
-                        icon="−"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="flex items-center justify-center"
+                        style={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            background: 'var(--color-traffic-close, #ff5f57)',
+                            boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                            border: 'none',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        {isHoveredTraffic && (
+                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(77, 0, 0, 0.7)' }}>×</span>
+                        )}
+                    </motion.button>
+                    <motion.button
                         title="Minimize"
-                    />
-                    <TrafficLightButton
-                        color={goOS.colors.traffic.maximize}
-                        hoverColor="#34c759"
-                        borderColor={goOS.colors.traffic.border}
-                        icon="+"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="flex items-center justify-center"
+                        style={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            background: 'var(--color-traffic-minimize, #ffbd2e)',
+                            boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                            border: 'none',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        {isHoveredTraffic && (
+                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(100, 65, 0, 0.7)' }}>−</span>
+                        )}
+                    </motion.button>
+                    <motion.button
                         title="Maximize"
-                    />
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="flex items-center justify-center"
+                        style={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            background: 'var(--color-traffic-maximize, #28c840)',
+                            boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.12), inset 0 0 0 0.5px rgba(0, 0, 0, 0.06)',
+                            border: 'none',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        {isHoveredTraffic && (
+                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(0, 70, 0, 0.7)' }}>+</span>
+                        )}
+                    </motion.button>
                 </div>
+                {/* Title */}
                 <div className="flex items-center gap-2 pointer-events-none">
-                    {icon && <span className="opacity-60">{icon}</span>}
-                    <span className="text-sm font-bold" style={{ color: goOS.colors.text.primary }}>{title}</span>
+                    {icon && <span style={{ opacity: 0.6 }}>{icon}</span>}
+                    <span style={{
+                        fontSize: 13,
+                        fontWeight: 500,
+                        color: 'var(--color-text-primary, #171412)',
+                        letterSpacing: '-0.01em',
+                        opacity: 0.85
+                    }}>{title}</span>
                 </div>
             </div>
             <div className="flex-1 overflow-auto">{children}</div>
