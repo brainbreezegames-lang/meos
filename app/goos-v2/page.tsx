@@ -2775,7 +2775,7 @@ function GoOSDemoContent() {
                     alt=""
                     className="absolute inset-0 w-full h-full pointer-events-none select-none"
                     style={{
-                        objectFit: 'contain',
+                        objectFit: 'cover',
                         objectPosition: 'center',
                         zIndex: 0,
                     }}
