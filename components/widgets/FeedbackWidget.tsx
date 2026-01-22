@@ -67,27 +67,29 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
       isHighlighted={isHighlighted}
     >
       {!isExpanded ? (
-        // Collapsed state - friendly pill button
+        // Collapsed state - calm-tech 2025 glass pill
         <button
           onClick={() => setIsExpanded(true)}
           style={{
-            background: 'var(--color-bg-base, #fbf9ef)',
-            border: '2px solid var(--color-text-primary, #171412)',
-            borderRadius: 'var(--radius-full, 9999px)',
-            boxShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
-            padding: '10px 16px',
+            background: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
+            backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+            WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+            border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+            borderRadius: 'var(--radius-xl, 20px)',
+            boxShadow: 'var(--shadow-sm)',
+            padding: '12px 18px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '10px',
             transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))';
+            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))';
+            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
@@ -113,13 +115,15 @@ export function FeedbackWidget({ widget, isOwner, onEdit, onDelete, onPositionCh
           />
         </button>
       ) : (
-        // Expanded state - feedback form
+        // Expanded state - calm-tech 2025 glass panel
         <div
           style={{
-            background: 'var(--color-bg-base, #fbf9ef)',
-            border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-            borderRadius: 'var(--radius-lg, 12px)',
-            boxShadow: 'var(--shadow-lg, 0 8px 32px rgba(23, 20, 18, 0.12))',
+            background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+            backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+            WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+            border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+            borderRadius: 'var(--radius-lg, 18px)',
+            boxShadow: 'var(--shadow-lg)',
             width: '280px',
             overflow: 'hidden',
           }}

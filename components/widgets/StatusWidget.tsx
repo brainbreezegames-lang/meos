@@ -208,21 +208,21 @@ export function StatusWidget({
             >
               <div
                 style={{
-                  background: 'var(--bg-glass-elevated, rgba(255,255,255,0.95))',
-                  backdropFilter: 'blur(40px)',
-                  WebkitBackdropFilter: 'blur(40px)',
-                  borderRadius: '12px',
+                  background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+                  backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+                  WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+                  borderRadius: 'var(--radius-md, 14px)',
                   padding: '12px 14px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                  border: '1px solid var(--border-light, rgba(0,0,0,0.06))',
+                  boxShadow: 'var(--shadow-lg)',
+                  border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
                 }}
               >
                 <p
                   style={{
                     fontSize: '12px',
                     lineHeight: 1.5,
-                    color: 'var(--text-secondary, #666)',
-                    fontFamily: 'var(--font-body, system-ui)',
+                    color: 'var(--color-text-secondary, #4a4744)',
+                    fontFamily: 'var(--font-body)',
                     margin: 0,
                   }}
                 >
@@ -231,14 +231,14 @@ export function StatusWidget({
                 {config.ctaLabel && config.ctaUrl && (
                   <div
                     className="mt-2 pt-2"
-                    style={{ borderTop: '1px solid var(--border-light, rgba(0,0,0,0.06))' }}
+                    style={{ borderTop: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))' }}
                   >
                     <span
                       style={{
                         fontSize: '11px',
                         fontWeight: 500,
-                        color: 'var(--accent-primary, #3b82f6)',
-                        fontFamily: 'var(--font-body, system-ui)',
+                        color: 'var(--color-accent-primary, #ff7722)',
+                        fontFamily: 'var(--font-body)',
                       }}
                     >
                       {config.ctaLabel} →

@@ -306,6 +306,7 @@ const DEMO_STATUS_WIDGET: StatusWidgetType = {
 // DEMO FILES (goOS Editor)
 // ============================================
 // Initial files for GoOSProvider (GoOSFileData format)
+// Use fixed dates to prevent hydration mismatch between server and client
 const INITIAL_GOOS_FILES: GoOSFileData[] = [
     {
         id: 'file-1',
@@ -314,9 +315,9 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         content: '<h1>Welcome to goOS!</h1><p>This is your digital creative space. Use the editor to write notes, case studies, and more.</p><p>Try the formatting toolbar above to style your text.</p>',
         status: 'published',
         accessLevel: 'free',
-        publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        publishedAt: new Date('2025-01-15T10:00:00Z'),
+        createdAt: new Date('2025-01-13T10:00:00Z'),
+        updatedAt: new Date('2025-01-18T10:00:00Z'),
         parentId: null,
         position: { x: 5, y: 35 },
         headerImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1920&h=1080&fit=crop',
