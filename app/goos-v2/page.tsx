@@ -2124,6 +2124,7 @@ function GoOSDemoContent() {
     const [logoClicks, setLogoClicks] = useState(0);
     const [showEasterEgg, setShowEasterEgg] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
     // Celebration helper
     const celebrate = useCallback(() => {
@@ -2789,8 +2790,8 @@ function GoOSDemoContent() {
                     borderBottom: `2px solid ${goOS.colors.border}`,
                 }}
             >
-                {/* Left: Logo */}
-                <div className="flex items-center gap-3 min-w-[100px]">
+                {/* Left: Logo + Widgets Menu */}
+                <div className="flex items-center gap-3 min-w-[180px]">
                     <motion.button
                         onClick={handleLogoClick}
                         whileHover={{ scale: 1.03 }}
@@ -2826,6 +2827,70 @@ function GoOSDemoContent() {
                             )}
                         </AnimatePresence>
                     </motion.button>
+
+                    {/* Widgets Dropdown Menu */}
+                    <div className="relative">
+                        <motion.button
+                            onClick={() => setShowWidgetsMenu(!showWidgetsMenu)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="text-xs font-medium px-2 py-1 rounded"
+                            style={{
+                                color: showWidgetsMenu ? goOS.colors.accent.primary : goOS.colors.text.secondary,
+                                background: showWidgetsMenu ? goOS.colors.accent.light : 'transparent',
+                            }}
+                        >
+                            Widgets
+                        </motion.button>
+                        <AnimatePresence>
+                            {showWidgetsMenu && (
+                                <>
+                                    {/* Backdrop to close menu */}
+                                    <div
+                                        className="fixed inset-0 z-[2000]"
+                                        onClick={() => setShowWidgetsMenu(false)}
+                                    />
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -4 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -4 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="absolute top-full left-0 mt-1 z-[2001] py-1"
+                                        style={{
+                                            background: goOS.colors.paper,
+                                            border: `2px solid ${goOS.colors.border}`,
+                                            borderRadius: '10px',
+                                            boxShadow: 'var(--shadow-lg)',
+                                            minWidth: '160px',
+                                        }}
+                                    >
+                                        {Object.entries(WIDGET_METADATA).map(([type, meta]) => (
+                                            <motion.button
+                                                key={type}
+                                                onClick={() => {
+                                                    handleAddWidget(type, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                                                    setShowWidgetsMenu(false);
+                                                }}
+                                                whileHover={{ backgroundColor: 'var(--color-bg-subtle)' }}
+                                                className="w-full px-3 py-2 flex items-center gap-2 text-left"
+                                                style={{
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    fontSize: '12px',
+                                                    fontWeight: 500,
+                                                    color: goOS.colors.text.primary,
+                                                }}
+                                            >
+                                                <span className="text-base">{meta.icon}</span>
+                                                <span>{meta.label}</span>
+                                            </motion.button>
+                                        ))}
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
 
                 {/* Center: View Switcher - The main action */}
@@ -3508,7 +3573,6 @@ function GoOSDemoContent() {
                 onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewEmbed={() => handleOpenCreateFileDialog('embed', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewDownload={() => handleOpenCreateFileDialog('download', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
-                onAddWidget={(type) => handleAddWidget(type, { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onPaste={pasteFile}
                 canPaste={!!clipboard}
             />
