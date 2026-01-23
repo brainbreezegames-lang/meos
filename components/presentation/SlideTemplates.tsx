@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { Slide, SlideContent } from '@/lib/presentation/parser';
 import type { PresentationTheme } from '@/lib/presentation/themes';
 
@@ -59,11 +59,47 @@ interface SlideProps {
 
 /**
  * Main Slide component - renders any slide template
+ * Scales to fit viewport when in full mode
  */
 export function SlideRenderer({ slide, theme, size = 'full' }: SlideProps) {
-  const scale = size === 'thumbnail' ? 0.167 : 1;
-  const width = size === 'thumbnail' ? 320 : 1920;
-  const height = size === 'thumbnail' ? 180 : 1080;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(size === 'thumbnail' ? 0.167 : 1);
+
+  // Base slide dimensions (16:9 aspect ratio)
+  const baseWidth = 1920;
+  const baseHeight = 1080;
+
+  // Calculate scale to fit container
+  useEffect(() => {
+    if (size === 'thumbnail') {
+      setScale(0.167);
+      return;
+    }
+
+    const updateScale = () => {
+      if (containerRef.current) {
+        const container = containerRef.current.parentElement;
+        if (container) {
+          const containerWidth = container.clientWidth;
+          const containerHeight = container.clientHeight;
+
+          // Calculate scale to fit while maintaining 16:9 aspect ratio
+          const scaleX = containerWidth / baseWidth;
+          const scaleY = containerHeight / baseHeight;
+          const newScale = Math.min(scaleX, scaleY, 1); // Don't scale up beyond 1
+
+          setScale(newScale);
+        }
+      }
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [size]);
+
+  const containerWidth = size === 'thumbnail' ? 320 : '100%';
+  const containerHeight = size === 'thumbnail' ? 180 : '100%';
 
   const themeStyles: React.CSSProperties = {
     '--slide-bg': theme.colors.background,
@@ -78,23 +114,28 @@ export function SlideRenderer({ slide, theme, size = 'full' }: SlideProps) {
 
   return (
     <div
+      ref={containerRef}
       style={{
-        width,
-        height,
+        width: containerWidth,
+        height: containerHeight,
         overflow: 'hidden',
         borderRadius: size === 'thumbnail' ? '4px' : 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       <div
         style={{
-          width: 1920,
-          height: 1080,
+          width: baseWidth,
+          height: baseHeight,
           transform: `scale(${scale})`,
-          transformOrigin: 'top left',
+          transformOrigin: 'center center',
           background: theme.colors.background,
           color: theme.colors.text,
           fontFamily: theme.fonts.body,
           position: 'relative',
+          flexShrink: 0,
           ...themeStyles,
         }}
       >
