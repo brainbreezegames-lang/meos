@@ -6,6 +6,7 @@ import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
+import { mergeAttributes } from '@tiptap/core';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
@@ -16,6 +17,30 @@ import { common, createLowlight } from 'lowlight';
 import { GoOSEditorToolbar } from './GoOSEditorToolbar';
 
 const lowlight = createLowlight(common);
+
+// Image layout types for different display options
+export type ImageLayout = 'content' | 'full-bleed' | 'side-by-side';
+
+// Custom Image extension with layout support
+const GoOSImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      layout: {
+        default: 'content',
+        parseHTML: element => element.getAttribute('data-layout') || 'content',
+        renderHTML: attributes => {
+          return { 'data-layout': attributes.layout };
+        },
+      },
+    };
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['img', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+      class: `goos-image goos-image-${HTMLAttributes['data-layout'] || 'content'}`,
+    })];
+  },
+});
 
 // goOS Design Tokens - Aligned with design-system.css CSS variables
 // NOTE: These use the EXACT variable names from design-system.css
@@ -97,7 +122,17 @@ interface GoOSTipTapEditorProps {
   hideToolbar?: boolean;
 }
 
-// Upload image to API
+// Convert file to base64 data URL
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Upload image to API with base64 fallback
 async function uploadImage(file: File): Promise<string | null> {
   try {
     const formData = new FormData();
@@ -113,11 +148,14 @@ async function uploadImage(file: File): Promise<string | null> {
     if (result.success) {
       return result.data.url;
     }
-    console.error('Upload failed:', result.error);
-    return null;
+
+    // If upload failed (auth issues, etc.), fallback to base64
+    console.warn('Upload failed, using base64 fallback:', result.error);
+    return await fileToBase64(file);
   } catch (error) {
-    console.error('Upload error:', error);
-    return null;
+    // Network error or other issues - fallback to base64
+    console.warn('Upload error, using base64 fallback:', error);
+    return await fileToBase64(file);
   }
 }
 
@@ -133,6 +171,8 @@ export function GoOSTipTapEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [showLayoutPicker, setShowLayoutPicker] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   const editor = useEditor({
     extensions: [
@@ -146,7 +186,7 @@ export function GoOSTipTapEditor({
         placeholder,
         emptyEditorClass: 'is-editor-empty',
       }),
-      Image.configure({
+      GoOSImage.configure({
         inline: false,
         allowBase64: true,
         HTMLAttributes: {
@@ -283,30 +323,62 @@ export function GoOSTipTapEditor({
     }
   }, [editor]);
 
-  // Handle file input change for image upload
-  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editor) return;
-
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
-      return;
-    }
+  // Insert image(s) with specific layout
+  const insertImagesWithLayout = useCallback(async (files: File[], layout: ImageLayout) => {
+    if (!editor || files.length === 0) return;
 
     setIsUploading(true);
-    const url = await uploadImage(file);
-    setIsUploading(false);
+    setShowLayoutPicker(false);
 
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+    if (layout === 'side-by-side' && files.length >= 2) {
+      // Insert first two images side by side
+      const url1 = await uploadImage(files[0]);
+      const url2 = await uploadImage(files[1]);
+
+      if (url1 && url2) {
+        // Insert both images with side-by-side layout
+        editor.chain().focus()
+          .setImage({ src: url1, layout: 'side-by-side' } as any)
+          .run();
+        editor.chain().focus()
+          .setImage({ src: url2, layout: 'side-by-side' } as any)
+          .run();
+      }
     } else {
-      alert('Failed to upload image. Please try again.');
+      // Insert single image with chosen layout
+      for (const file of files) {
+        const url = await uploadImage(file);
+        if (url) {
+          editor.chain().focus()
+            .setImage({ src: url, layout } as any)
+            .run();
+        }
+      }
     }
+
+    setIsUploading(false);
+    setPendingFiles([]);
 
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  }, [editor]);
+
+  // Handle file input change for image upload
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0 || !editor) return;
+
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length === 0) {
+      alert('Please select image files');
+      return;
+    }
+
+    // Show layout picker for user to choose
+    setPendingFiles(imageFiles);
+    setShowLayoutPicker(true);
   }, [editor]);
 
   const addImage = useCallback(() => {
@@ -354,11 +426,12 @@ export function GoOSTipTapEditor({
 
   return (
     <div className="goos-editor-wrapper">
-      {/* Hidden file input for image upload */}
+      {/* Hidden file input for image upload (multiple allowed for side-by-side) */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        multiple
         onChange={handleFileSelect}
         style={{ display: 'none' }}
         aria-hidden="true"
@@ -393,6 +466,211 @@ export function GoOSTipTapEditor({
             }}
           >
             Uploading image...
+          </div>
+        </div>
+      )}
+
+      {/* Image Layout Picker */}
+      {showLayoutPicker && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'var(--color-bg-overlay, rgba(251, 249, 239, 0.95))',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+          }}
+          onClick={() => { setShowLayoutPicker(false); setPendingFiles([]); }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: goOSTokens.colors.paper,
+              border: `1px solid ${goOSTokens.colors.border}`,
+              borderRadius: 16,
+              boxShadow: goOSTokens.shadows.lg,
+              padding: '24px',
+              minWidth: 320,
+              fontFamily: goOSTokens.fonts.body,
+            }}
+          >
+            <h3 style={{
+              margin: '0 0 16px 0',
+              fontSize: 16,
+              fontWeight: 600,
+              fontFamily: goOSTokens.fonts.display,
+              color: goOSTokens.colors.text.primary,
+            }}>
+              Choose image layout
+            </h3>
+            <p style={{
+              margin: '0 0 20px 0',
+              fontSize: 13,
+              color: goOSTokens.colors.text.secondary,
+            }}>
+              {pendingFiles.length} image{pendingFiles.length > 1 ? 's' : ''} selected
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* Content width (default) */}
+              <button
+                onClick={() => insertImagesWithLayout(pendingFiles, 'content')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '12px 14px',
+                  background: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  textAlign: 'left',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--color-accent-primary-subtle)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 119, 34, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--color-bg-subtle)';
+                  e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
+                }}
+              >
+                <div style={{
+                  width: 48,
+                  height: 32,
+                  background: '#e5e5e5',
+                  borderRadius: 4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '4px 8px',
+                }}>
+                  <div style={{ width: '70%', height: '100%', background: '#999', borderRadius: 2 }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: goOSTokens.colors.text.primary }}>
+                    Content width
+                  </div>
+                  <div style={{ fontSize: 12, color: goOSTokens.colors.text.muted }}>
+                    Aligned with text
+                  </div>
+                </div>
+              </button>
+
+              {/* Full bleed */}
+              <button
+                onClick={() => insertImagesWithLayout(pendingFiles, 'full-bleed')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '12px 14px',
+                  background: 'var(--color-bg-subtle)',
+                  border: '1px solid var(--color-border-subtle)',
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  textAlign: 'left',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--color-accent-primary-subtle)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 119, 34, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--color-bg-subtle)';
+                  e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
+                }}
+              >
+                <div style={{
+                  width: 48,
+                  height: 32,
+                  background: '#999',
+                  borderRadius: 4,
+                }} />
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: goOSTokens.colors.text.primary }}>
+                    Full bleed
+                  </div>
+                  <div style={{ fontSize: 12, color: goOSTokens.colors.text.muted }}>
+                    Edge to edge cover
+                  </div>
+                </div>
+              </button>
+
+              {/* Side by side (only if 2+ files) */}
+              {pendingFiles.length >= 2 && (
+                <button
+                  onClick={() => insertImagesWithLayout(pendingFiles.slice(0, 2), 'side-by-side')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '12px 14px',
+                    background: 'var(--color-bg-subtle)',
+                    border: '1px solid var(--color-border-subtle)',
+                    borderRadius: 10,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--color-accent-primary-subtle)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 119, 34, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'var(--color-bg-subtle)';
+                    e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
+                  }}
+                >
+                  <div style={{
+                    width: 48,
+                    height: 32,
+                    background: '#e5e5e5',
+                    borderRadius: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 3,
+                    padding: 3,
+                  }}>
+                    <div style={{ flex: 1, height: '100%', background: '#999', borderRadius: 2 }} />
+                    <div style={{ flex: 1, height: '100%', background: '#999', borderRadius: 2 }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: goOSTokens.colors.text.primary }}>
+                      Side by side
+                    </div>
+                    <div style={{ fontSize: 12, color: goOSTokens.colors.text.muted }}>
+                      Two images in a row
+                    </div>
+                  </div>
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={() => { setShowLayoutPicker(false); setPendingFiles([]); }}
+              style={{
+                marginTop: 16,
+                width: '100%',
+                padding: '10px',
+                background: 'transparent',
+                border: 'none',
+                borderRadius: 8,
+                cursor: 'pointer',
+                fontSize: 13,
+                color: goOSTokens.colors.text.muted,
+              }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
@@ -660,7 +938,47 @@ export function GoOSTipTapEditor({
           border-radius: 2px;
         }
 
-        .goos-editor-content img {
+        /* Image layouts */
+        .goos-editor-content img.goos-image {
+          max-width: 100%;
+          height: auto;
+          border-radius: 8px;
+          box-shadow: ${goOSTokens.shadows.sm};
+          margin: 1.5em 0;
+          display: block;
+        }
+
+        /* Content width (default) - aligned with text */
+        .goos-editor-content img.goos-image-content {
+          max-width: 100%;
+          border: 1px solid ${goOSTokens.colors.border};
+        }
+
+        /* Full bleed - edge to edge */
+        .goos-editor-content img.goos-image-full-bleed {
+          width: calc(100% + 48px);
+          max-width: none;
+          margin-left: -24px;
+          margin-right: -24px;
+          border-radius: 0;
+          border: none;
+        }
+
+        /* Side by side - two images in a row */
+        .goos-editor-content img.goos-image-side-by-side {
+          display: inline-block;
+          width: calc(50% - 8px);
+          max-width: calc(50% - 8px);
+          margin: 1em 0;
+          vertical-align: top;
+        }
+
+        .goos-editor-content img.goos-image-side-by-side + img.goos-image-side-by-side {
+          margin-left: 16px;
+        }
+
+        /* Legacy/fallback for images without layout class */
+        .goos-editor-content img:not(.goos-image) {
           max-width: 100%;
           height: auto;
           border-radius: 4px;
