@@ -1701,13 +1701,13 @@ const DockIcon = React.memo(({
                 </motion.span>
             )}
 
-            {/* Active indicator dot */}
+            {/* Active indicator dot - absolute to prevent dock height change */}
             {isActive && (
                 <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={goOS.springs.gentle}
-                    className="w-1 h-1 rounded-full mt-1.5"
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
                     style={{ background: '#ffffff' }}
                 />
             )}
