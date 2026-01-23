@@ -507,8 +507,8 @@ html.theme-sketch {
 }
 
 /* ============================================
-   DARK MODE - goOS Dark Theme
-   Inspired by premium dark interfaces with oklch colors
+   DARK MODE - goOS Premium Dark Theme
+   Based on magicpath.ai oklch color system
    ============================================ */
 
 .theme-sketch.dark,
@@ -516,126 +516,129 @@ html.theme-sketch {
 html.theme-sketch.dark {
     color-scheme: dark;
 
-    /* ========== OKLCH-BASED COLORS FOR PERCEPTUAL UNIFORMITY ========== */
+    /* ========== BACKGROUNDS - oklch layered system ========== */
+    /* Matches magicpath: 14.5% → 20.5% → 26.9% progression */
+    --bg-canvas: oklch(14.5% 0 0);
+    --bg-surface: oklch(20.5% 0 0);
+    --bg-elevated: oklch(26.9% 0 0);
+    --bg-muted: oklch(16.8% 0.002 106);
+    --bg-overlay: rgba(255, 119, 34, 0.06);
 
-    /* Backgrounds - Deep, layered darks */
-    --bg-canvas: oklch(14.5% 0.005 285);
-    --bg-surface: oklch(18% 0.005 285);
-    --bg-elevated: oklch(22% 0.005 285);
-    --bg-muted: oklch(16% 0.005 285);
-    --bg-overlay: rgba(255, 119, 34, 0.08);
+    /* Calm-tech dark tokens */
+    --color-bg-base: oklch(14.5% 0 0);
+    --color-bg-dark: oklch(20.5% 0 0);
+    --color-bg-subtle: oklch(18% 0 0);
+    --color-bg-white: oklch(26.9% 0 0);
+    --color-bg-glass: oklch(20.5% 0 0 / 0.95);
+    --color-bg-glass-heavy: oklch(16.8% 0 0 / 0.98);
+    --topnav-bg: oklch(14.5% 0 0 / 0.85);
 
-    /* Calm-tech 2025 dark tokens */
-    --color-bg-base: oklch(14.5% 0.005 285);
-    --color-bg-subtle: rgba(255, 255, 255, 0.02);
-    --color-bg-white: rgba(255, 255, 255, 0.06);
-    --color-bg-glass: oklch(18% 0.005 285 / 0.85);
-    --color-bg-glass-heavy: oklch(16% 0.005 285 / 0.92);
-    --topnav-bg: rgba(20, 20, 22, 0.55);
+    /* ========== TEXT - oklch hierarchy ========== */
+    /* Matches magicpath: 98.5% → 93.64% → 70.8% */
+    --text-primary: oklch(98.5% 0 0);
+    --text-secondary: oklch(93.64% 0.0068 97);
+    --text-tertiary: oklch(70.8% 0 0);
+    --text-disabled: oklch(55.6% 0 0);
+    --text-inverse: oklch(14.5% 0 0);
 
-    /* Text Colors - Warm off-whites */
-    --text-primary: oklch(96% 0.005 90);
-    --text-secondary: oklch(75% 0.01 90);
-    --text-tertiary: oklch(55% 0.008 90);
-    --text-disabled: oklch(45% 0.005 90);
-    --text-inverse: oklch(14.5% 0.005 285);
-
-    --color-text-primary: oklch(96% 0.005 90);
-    --color-text-secondary: oklch(75% 0.01 90);
-    --color-text-muted: oklch(55% 0.008 90);
+    --color-text-primary: oklch(98.5% 0 0);
+    --color-text-secondary: oklch(91.79% 0.0122 96);
+    --color-text-tertiary: oklch(70.8% 0 0);
+    --color-text-muted: oklch(70.8% 0 0);
     --color-text-on-accent: oklch(100% 0 0);
-    --color-text-inverse: oklch(14.5% 0.005 285);
+    --color-text-inverse: oklch(14.5% 0 0);
 
-    /* Accent Colors - Warm orange preserved */
-    --accent-primary: oklch(72% 0.18 45);
-    --accent-dark: oklch(65% 0.18 45);
-    --accent-light: oklch(72% 0.18 45 / 0.15);
-    --accent-pale: oklch(72% 0.18 45 / 0.08);
+    /* ========== ACCENT - Warm Orange ========== */
+    --accent-primary: #ff7722;
+    --accent-dark: #e5691e;
+    --accent-light: rgba(255, 119, 34, 0.15);
+    --accent-pale: rgba(255, 119, 34, 0.08);
 
-    --color-accent-primary: oklch(72% 0.18 45);
-    --color-accent-primary-subtle: oklch(72% 0.18 45 / 0.12);
-    --color-accent-primary-hover: oklch(65% 0.18 45);
-    --color-accent-primary-glow: 0 0 20px oklch(72% 0.18 45 / 0.3);
+    --color-accent-primary: #ff7722;
+    --color-accent-primary-subtle: rgba(255, 119, 34, 0.12);
+    --color-accent-primary-hover: #ff8844;
+    --color-accent-primary-glow: 0 0 24px rgba(255, 119, 34, 0.2);
 
-    /* Borders - Subtle light edges */
-    --border-strong: rgba(255, 255, 255, 0.12);
-    --border-medium: rgba(255, 255, 255, 0.08);
-    --border-subtle: rgba(255, 255, 255, 0.04);
+    /* ========== BORDERS - oklch neutral ========== */
+    /* Matches magicpath: oklch(27.5% 0 0) */
+    --border-strong: oklch(32% 0 0);
+    --border-medium: oklch(27.5% 0 0);
+    --border-subtle: oklch(22% 0 0);
 
-    --color-border-default: rgba(255, 255, 255, 0.10);
-    --color-border-subtle: rgba(255, 255, 255, 0.05);
-    --color-border-strong: rgba(255, 255, 255, 0.15);
+    --color-border-default: oklch(27.5% 0 0);
+    --color-border-subtle: oklch(22% 0 0);
+    --color-border-strong: oklch(32% 0 0);
 
-    /* Semantic Colors */
-    --color-success: oklch(70% 0.17 145);
-    --color-warning: oklch(80% 0.15 80);
-    --color-error: oklch(65% 0.22 25);
-    --color-info: oklch(72% 0.18 45);
+    /* ========== SEMANTIC COLORS ========== */
+    --color-success: oklch(79.2% 0.209 151);
+    --color-warning: oklch(82.8% 0.189 84);
+    --color-error: oklch(70.4% 0.191 22);
+    --color-info: #ff7722;
 
-    /* Traffic lights - Slightly muted for dark mode */
-    --traffic-red: oklch(62% 0.22 25);
-    --traffic-yellow: oklch(78% 0.15 80);
-    --traffic-green: oklch(65% 0.17 145);
-    --traffic-border: rgba(255, 255, 255, 0.15);
+    /* ========== TRAFFIC LIGHTS ========== */
+    --traffic-red: oklch(70.4% 0.191 22);
+    --traffic-yellow: oklch(82.8% 0.189 84);
+    --traffic-green: oklch(79.2% 0.209 151);
+    --traffic-border: oklch(32% 0 0);
 
-    --color-traffic-close: oklch(62% 0.22 25);
-    --color-traffic-minimize: oklch(78% 0.15 80);
-    --color-traffic-maximize: oklch(65% 0.17 145);
+    --color-traffic-close: oklch(70.4% 0.191 22);
+    --color-traffic-minimize: oklch(82.8% 0.189 84);
+    --color-traffic-maximize: oklch(79.2% 0.209 151);
 
-    /* Shadows - Deeper, more dramatic */
-    --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3), 0 12px 40px rgba(0, 0, 0, 0.25);
-    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.35), 0 12px 40px rgba(0, 0, 0, 0.3), 0 24px 60px rgba(0, 0, 0, 0.2);
-    --shadow-window: 0 2px 8px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35), 0 24px 48px rgba(0, 0, 0, 0.25), 0 48px 80px rgba(0, 0, 0, 0.15);
-    --shadow-dock: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    /* ========== SHADOWS - magicpath style ========== */
+    --shadow-xs: 0 1px 3px 0px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 1px 3px 0px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-window: 0 1px 3px 0px rgba(0, 0, 0, 0.25), 0 8px 10px -1px rgba(0, 0, 0, 0.1);
+    --shadow-dock: 0 1px 3px 0px rgba(0, 0, 0, 0.4);
 
-    /* Glass effects - Darker, subtler */
-    --blur-glass: blur(20px) saturate(150%);
-    --blur-glass-heavy: blur(24px) saturate(150%);
+    /* ========== GLASS EFFECTS ========== */
+    --blur-glass: blur(24px) saturate(120%);
+    --blur-glass-heavy: blur(32px) saturate(130%);
 
-    /* Window compatibility */
-    --bg-glass-elevated: var(--bg-elevated);
-    --bg-glass: var(--bg-surface);
-    --bg-glass-heavy: var(--bg-muted);
-    --radius-window: var(--radius-md);
-    --border-glass-outer: var(--border-strong);
-    --border-glass-inner: rgba(255, 255, 255, 0.04);
-    --border-light: var(--border-subtle);
-    --border-highlight: var(--border-medium);
+    /* Window surfaces - use oklch */
+    --bg-glass-elevated: oklch(26.9% 0 0);
+    --bg-glass: oklch(20.5% 0 0);
+    --bg-glass-heavy: oklch(16.8% 0 0);
+    --radius-window: var(--radius-lg);
+    --border-glass-outer: oklch(32% 0 0);
+    --border-glass-inner: oklch(22% 0 0);
+    --border-light: oklch(22% 0 0);
+    --border-highlight: oklch(27.5% 0 0);
 
-    /* Dock styling - Dark glass */
-    --bg-dock: oklch(18% 0.005 285 / 0.88);
-    --blur-dock: blur(40px) saturate(150%);
+    /* ========== DOCK ========== */
+    --bg-dock: oklch(20.5% 0 0 / 0.92);
+    --blur-dock: blur(32px) saturate(120%);
 
-    /* Additional compatibility */
-    --bg-card: var(--bg-surface);
-    --bg-item: var(--bg-surface);
-    --bg-app: var(--bg-canvas);
-    --bg-subtle: var(--bg-elevated);
+    /* ========== COMPATIBILITY TOKENS ========== */
+    --bg-card: oklch(20.5% 0 0);
+    --bg-item: oklch(20.5% 0 0);
+    --bg-app: oklch(14.5% 0 0);
+    --bg-subtle: oklch(26.9% 0 0);
     --shadow-item: var(--shadow-sm);
     --shadow-item-hover: var(--shadow-md);
     --accent-success: var(--color-success);
 
-    /* Sticky notes - Muted dark variants */
-    --sticky-yellow: oklch(35% 0.05 90);
-    --sticky-blue: oklch(30% 0.05 250);
-    --sticky-pink: oklch(32% 0.05 350);
-    --sticky-green: oklch(30% 0.05 145);
-    --sticky-orange: oklch(32% 0.06 60);
-    --sticky-purple: oklch(30% 0.05 300);
+    /* ========== STICKY NOTES - Muted Dark Variants ========== */
+    --sticky-yellow: oklch(28% 0.04 90);
+    --sticky-blue: oklch(24% 0.04 250);
+    --sticky-pink: oklch(26% 0.04 350);
+    --sticky-green: oklch(24% 0.04 145);
+    --sticky-orange: oklch(26% 0.05 60);
+    --sticky-purple: oklch(24% 0.04 300);
 
-    /* Icon Colors - Dark mode (light on dark) */
-    --icon-stroke: oklch(95% 0.005 90);
-    --icon-fill: oklch(72% 0.18 45 / 0.15);
-    --icon-accent: oklch(72% 0.18 45);
-    --icon-muted: oklch(60% 0.01 90);
+    /* ========== ICON COLORS ========== */
+    --icon-stroke: oklch(98.5% 0 0);
+    --icon-fill: rgba(255, 119, 34, 0.12);
+    --icon-accent: #ff7722;
+    --icon-muted: oklch(70.8% 0 0);
 
-    /* Selection - Dark mode selection */
-    --selection-bg: oklch(72% 0.18 45 / 0.3);
-    --selection-text: var(--text-primary);
+    /* ========== SELECTION ========== */
+    --selection-bg: rgba(255, 119, 34, 0.25);
+    --selection-text: oklch(98.5% 0 0);
 
-    /* Apply base styles */
+    /* Apply base styles to root */
     background-color: var(--bg-canvas);
     color: var(--text-primary);
 }
