@@ -463,12 +463,13 @@ export function parseNoteToSlides(note: NoteInput): Slide[] {
 
 /**
  * Browser-safe parser using regex (for client-side without DOMParser)
+ * Simplified for reliability - processes content sequentially
  */
 export function parseNoteToSlidesSimple(note: NoteInput): Slide[] {
   const slides: Slide[] = [];
   const content = note.content;
 
-  // 1. Title Slide
+  // 1. Title Slide (always first)
   slides.push({
     id: generateId(),
     template: 'title',
@@ -485,190 +486,211 @@ export function parseNoteToSlidesSimple(note: NoteInput): Slide[] {
     },
   });
 
-  // Parse content using regex
-  // H1 headers
-  const h1Regex = /<h1[^>]*>(.*?)<\/h1>/gi;
-  // H2 headers
-  const h2Regex = /<h2[^>]*>(.*?)<\/h2>/gi;
-  // H3 headers
-  const h3Regex = /<h3[^>]*>(.*?)<\/h3>/gi;
-  // Paragraphs
-  const pRegex = /<p[^>]*>(.*?)<\/p>/gi;
-  // Images
-  const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*(?:alt=["']([^"']*)["'])?[^>]*>/gi;
-  // Blockquotes
-  const blockquoteRegex = /<blockquote[^>]*>(.*?)<\/blockquote>/gis;
-  // Lists
-  const ulRegex = /<ul[^>]*>(.*?)<\/ul>/gis;
-  const liRegex = /<li[^>]*>(.*?)<\/li>/gi;
-  // Stats
-  const statRegex = /\[stat:\s*(.+?):\s*(.+?)\]/g;
-  // HR
-  const hrRegex = /<hr\s*\/?>/gi;
+  // Parse HTML content into ordered blocks
+  const blocks: { type: string; content: string; items?: string[]; src?: string; alt?: string }[] = [];
 
-  // Split by major elements
-  const elements: { type: string; content: string; match?: RegExpMatchArray }[] = [];
+  // Tokenize the content - find all elements in order
+  const tokenRegex = /<(h1|h2|h3|p|img|blockquote|ul|ol|hr)[^>]*>[\s\S]*?<\/\1>|<(img|hr)[^>]*\/?>/gi;
+  const tokens = content.match(tokenRegex) || [];
 
-  let workingContent = content;
+  for (const token of tokens) {
+    // Heading 1 - Section break
+    if (token.match(/^<h1/i)) {
+      const text = stripHtml(token);
+      if (text) blocks.push({ type: 'h1', content: text });
+    }
+    // Heading 2 - Slide heading
+    else if (token.match(/^<h2/i)) {
+      const text = stripHtml(token);
+      if (text) blocks.push({ type: 'h2', content: text });
+    }
+    // Heading 3 - Sub-heading
+    else if (token.match(/^<h3/i)) {
+      const text = stripHtml(token);
+      if (text) blocks.push({ type: 'h3', content: text });
+    }
+    // Paragraph - may contain image
+    else if (token.match(/^<p/i)) {
+      // Check for image inside paragraph
+      const imgMatch = token.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i);
+      const altMatch = token.match(/alt=["']([^"']*)["']/i);
 
-  // Extract H1s
-  let match;
-  while ((match = h1Regex.exec(content)) !== null) {
-    elements.push({ type: 'h1', content: stripHtml(match[1]) });
-  }
-
-  // Extract H2s with following content
-  const h2Matches = [...content.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi)];
-  for (const h2Match of h2Matches) {
-    const h2Text = stripHtml(h2Match[1]);
-    const h2Index = h2Match.index!;
-
-    // Find content until next H1, H2, or HR
-    const nextHeadingMatch = content.slice(h2Index + h2Match[0].length).match(/<(h1|h2|hr)[^>]*>/i);
-    const endIndex = nextHeadingMatch
-      ? h2Index + h2Match[0].length + nextHeadingMatch.index!
-      : content.length;
-
-    const sectionContent = content.slice(h2Index + h2Match[0].length, endIndex);
-
-    // Check for list
-    const listMatch = sectionContent.match(/<ul[^>]*>(.*?)<\/ul>/is);
-    if (listMatch) {
-      const items = [...listMatch[1].matchAll(/<li[^>]*>(.*?)<\/li>/gi)]
+      if (imgMatch) {
+        // If paragraph has only image, extract it
+        const textOnly = stripHtml(token.replace(/<img[^>]*>/gi, ''));
+        if (!textOnly.trim()) {
+          blocks.push({ type: 'image', content: '', src: imgMatch[1], alt: altMatch?.[1] || '' });
+        } else {
+          // Image with caption text
+          blocks.push({ type: 'image', content: textOnly, src: imgMatch[1], alt: altMatch?.[1] || '' });
+        }
+      } else {
+        const text = stripHtml(token);
+        if (text) blocks.push({ type: 'p', content: text });
+      }
+    }
+    // Standalone image
+    else if (token.match(/^<img/i)) {
+      const srcMatch = token.match(/src=["']([^"']+)["']/i);
+      const altMatch = token.match(/alt=["']([^"']*)["']/i);
+      if (srcMatch) {
+        blocks.push({ type: 'image', content: '', src: srcMatch[1], alt: altMatch?.[1] || '' });
+      }
+    }
+    // Blockquote
+    else if (token.match(/^<blockquote/i)) {
+      const text = stripHtml(token);
+      if (text) blocks.push({ type: 'quote', content: text });
+    }
+    // Lists
+    else if (token.match(/^<(ul|ol)/i)) {
+      const items = [...token.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)]
         .map(m => stripHtml(m[1]))
         .filter(Boolean);
-
-      if (items.length > 0) {
-        const chunks = splitList(items);
-        chunks.forEach((chunkItems, idx) => {
-          slides.push({
-            id: generateId(),
-            template: 'list',
-            content: {
-              heading: idx === 0 ? h2Text : `${h2Text} (continued)`,
-              items: chunkItems,
-            },
-          });
-        });
-        continue;
-      }
+      if (items.length > 0) blocks.push({ type: 'list', content: '', items });
     }
-
-    // Check for blockquote
-    const quoteMatch = sectionContent.match(/<blockquote[^>]*>(.*?)<\/blockquote>/is);
-    if (quoteMatch) {
-      const quoteText = stripHtml(quoteMatch[1]);
-      // Check for attribution
-      const lines = quoteText.split('\n');
-      let quote = quoteText;
-      let attribution: string | undefined;
-
-      for (let i = lines.length - 1; i >= 0; i--) {
-        if (lines[i].trim().startsWith('—') || lines[i].trim().startsWith('-')) {
-          attribution = lines[i].trim().replace(/^[—-]\s*/, '');
-          quote = lines.slice(0, i).join('\n').trim();
-          break;
-        }
-      }
-
-      slides.push({
-        id: generateId(),
-        template: 'quote',
-        content: { quote, attribution },
-      });
-      continue;
+    // Horizontal rule
+    else if (token.match(/^<hr/i)) {
+      blocks.push({ type: 'hr', content: '' });
     }
+  }
 
-    // Check for image
-    const imgMatch = sectionContent.match(/<img[^>]+src=["']([^"']+)["'][^>]*(?:alt=["']([^"']*)["'])?[^>]*>/i);
-    const paragraphText = stripHtml(sectionContent.replace(/<img[^>]*>/gi, ''));
-    const wordCount = paragraphText.split(/\s+/).filter(Boolean).length;
+  // Convert blocks to slides
+  let currentHeading = '';
+  let pendingContent: string[] = [];
+  let pendingItems: string[] = [];
 
-    if (imgMatch && wordCount < 50) {
-      // Image + Text slide
-      slides.push({
-        id: generateId(),
-        template: 'image-text',
-        content: {
-          heading: h2Text,
-          image: imgMatch[1],
-          caption: imgMatch[2],
-          body: paragraphText,
-        },
-      });
-    } else if (paragraphText) {
-      // Content slide(s)
-      const chunks = splitText(paragraphText);
-      chunks.forEach((body, idx) => {
+  const flushContent = () => {
+    if (pendingContent.length > 0) {
+      const body = pendingContent.join('\n\n');
+      const chunks = splitText(body);
+      chunks.forEach((chunk, idx) => {
         slides.push({
           id: generateId(),
           template: 'content',
           content: {
-            heading: idx === 0 ? h2Text : `${h2Text} (continued)`,
-            body,
+            heading: currentHeading && idx === 0 ? currentHeading : undefined,
+            body: chunk,
           },
         });
       });
-    } else {
-      // Section slide
-      slides.push({
-        id: generateId(),
-        template: 'section',
-        content: { heading: h2Text },
+      pendingContent = [];
+    }
+    if (pendingItems.length > 0) {
+      const chunks = splitList(pendingItems);
+      chunks.forEach((items, idx) => {
+        slides.push({
+          id: generateId(),
+          template: 'list',
+          content: {
+            heading: currentHeading && idx === 0 ? currentHeading : undefined,
+            items,
+          },
+        });
+      });
+      pendingItems = [];
+    }
+  };
+
+  for (const block of blocks) {
+    switch (block.type) {
+      case 'h1':
+        flushContent();
+        currentHeading = '';
+        slides.push({
+          id: generateId(),
+          template: 'section',
+          content: { heading: block.content },
+        });
+        break;
+
+      case 'h2':
+        flushContent();
+        currentHeading = block.content;
+        break;
+
+      case 'h3':
+        // Treat H3 as a smaller heading - add to pending content
+        if (block.content) {
+          pendingContent.push(`**${block.content}**`);
+        }
+        break;
+
+      case 'p':
+        pendingContent.push(block.content);
+        break;
+
+      case 'image':
+        flushContent();
+        if (block.src) {
+          slides.push({
+            id: generateId(),
+            template: 'image',
+            content: {
+              heading: currentHeading || undefined,
+              image: block.src,
+              caption: block.alt || block.content || undefined,
+            },
+          });
+          currentHeading = ''; // Clear heading after image
+        }
+        break;
+
+      case 'quote':
+        flushContent();
+        // Check for attribution (— or -)
+        const lines = block.content.split('\n');
+        let quote = block.content;
+        let attribution: string | undefined;
+
+        for (let i = lines.length - 1; i >= 0; i--) {
+          const line = lines[i].trim();
+          if (line.startsWith('—') || (line.startsWith('-') && !line.startsWith('--'))) {
+            attribution = line.replace(/^[—-]\s*/, '').trim();
+            quote = lines.slice(0, i).join('\n').trim();
+            break;
+          }
+        }
+
+        slides.push({
+          id: generateId(),
+          template: 'quote',
+          content: { quote, attribution },
+        });
+        break;
+
+      case 'list':
+        if (block.items) {
+          pendingItems.push(...block.items);
+        }
+        break;
+
+      case 'hr':
+        flushContent();
+        currentHeading = '';
+        break;
+    }
+  }
+
+  // Flush any remaining content
+  flushContent();
+
+  // If we only have title slide (no content), add the note content as a simple slide
+  if (slides.length === 1 && content.trim()) {
+    const plainText = stripHtml(content);
+    if (plainText.trim()) {
+      const chunks = splitText(plainText);
+      chunks.forEach((body) => {
+        slides.push({
+          id: generateId(),
+          template: 'content',
+          content: { body },
+        });
       });
     }
   }
 
-  // Extract standalone blockquotes
-  const blockquoteMatches = [...content.matchAll(/<blockquote[^>]*>(.*?)<\/blockquote>/gis)];
-  for (const bqMatch of blockquoteMatches) {
-    // Check if already processed (under an H2)
-    const bqIndex = bqMatch.index!;
-    const precedingH2 = content.slice(0, bqIndex).match(/<h2[^>]*>/gi);
-    if (!precedingH2 || precedingH2.length === 0) {
-      const quoteText = stripHtml(bqMatch[1]);
-      slides.push({
-        id: generateId(),
-        template: 'quote',
-        content: { quote: quoteText },
-      });
-    }
-  }
-
-  // Extract stats
-  const statMatches = [...content.matchAll(statRegex)];
-  for (const statMatch of statMatches) {
-    slides.push({
-      id: generateId(),
-      template: 'stat',
-      content: {
-        stat_value: statMatch[1].trim(),
-        stat_label: statMatch[2].trim(),
-      },
-    });
-  }
-
-  // Extract standalone images
-  const imgMatches = [...content.matchAll(imgRegex)];
-  for (const imgMatch of imgMatches) {
-    // Check if inside a paragraph with text or under H2
-    const imgIndex = imgMatch.index!;
-    const surroundingText = content.slice(Math.max(0, imgIndex - 100), Math.min(content.length, imgIndex + 100));
-    const isStandalone = !surroundingText.match(/<p[^>]*>[^<]*<img/i);
-
-    if (isStandalone) {
-      slides.push({
-        id: generateId(),
-        template: 'image',
-        content: {
-          image: imgMatch[1],
-          caption: imgMatch[2],
-        },
-      });
-    }
-  }
-
-  // 3. End Slide
+  // End Slide (always last)
   slides.push({
     id: generateId(),
     template: 'end',

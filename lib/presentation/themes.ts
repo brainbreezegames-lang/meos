@@ -32,22 +32,23 @@ export const themes: Record<string, PresentationTheme> = {
   /**
    * PAPER - Warm, approachable, like a well-printed book
    * Inspired by: Kinfolk magazine, Japanese minimalism
+   * Uses design system fonts: Averia Serif Libre + Instrument Sans
    */
   paper: {
     id: 'paper',
     name: 'Paper',
     description: 'Warm and inviting, like a beautiful book',
     colors: {
-      background: '#FAF8F5',      // Warm off-white, hint of cream
+      background: '#FBF9EF',      // Warm cream from design system
       surface: '#FFFFFF',
-      text: '#2C2825',            // Warm charcoal, not pure black
-      textMuted: '#8A847D',       // Warm gray
-      accent: '#C4650A',          // Burnt orange - editorial, confident
-      accentMuted: '#E8DED4',     // Pale warm accent
+      text: '#171412',            // Text primary from design system
+      textMuted: '#7A746C',       // Text muted from design system
+      accent: '#FF7722',          // Accent from design system
+      accentMuted: '#FFF0E5',     // Accent subtle from design system
     },
     fonts: {
-      display: '"Newsreader", "Georgia", serif',
-      body: '"Source Serif 4", "Georgia", serif',
+      display: '"Averia Serif Libre", Georgia, serif',
+      body: '"Instrument Sans", system-ui, sans-serif',
     },
   },
 
@@ -68,8 +69,8 @@ export const themes: Record<string, PresentationTheme> = {
       accentMuted: '#E5E5E5',     // Pale gray
     },
     fonts: {
-      display: '"DM Sans", "Helvetica Neue", sans-serif',
-      body: '"DM Sans", "Helvetica Neue", sans-serif',
+      display: '"Instrument Sans", system-ui, sans-serif',
+      body: '"Instrument Sans", system-ui, sans-serif',
     },
   },
 
@@ -90,8 +91,8 @@ export const themes: Record<string, PresentationTheme> = {
       accentMuted: '#DFE4D8',     // Pale sage
     },
     fonts: {
-      display: '"Fraunces", "Georgia", serif',
-      body: '"Source Serif 4", "Georgia", serif',
+      display: '"Averia Serif Libre", Georgia, serif',
+      body: '"Instrument Sans", system-ui, sans-serif',
     },
   },
 
@@ -116,8 +117,8 @@ export const themes: Record<string, PresentationTheme> = {
       accentMuted: '#3D3527',     // Dark gold
     },
     fonts: {
-      display: '"Playfair Display", "Georgia", serif',
-      body: '"Inter", "Helvetica Neue", sans-serif',
+      display: '"Averia Serif Libre", Georgia, serif',
+      body: '"Instrument Sans", system-ui, sans-serif',
     },
   },
 
@@ -138,8 +139,8 @@ export const themes: Record<string, PresentationTheme> = {
       accentMuted: '#1E3A5F',     // Deep blue
     },
     fonts: {
-      display: '"Inter", "Helvetica Neue", sans-serif',
-      body: '"Inter", "Helvetica Neue", sans-serif',
+      display: '"Instrument Sans", system-ui, sans-serif',
+      body: '"Instrument Sans", system-ui, sans-serif',
     },
   },
 
@@ -160,8 +161,8 @@ export const themes: Record<string, PresentationTheme> = {
       accentMuted: '#4A1C1C',     // Dark red
     },
     fonts: {
-      display: '"Bebas Neue", "Impact", sans-serif',
-      body: '"DM Sans", "Helvetica Neue", sans-serif',
+      display: '"Averia Serif Libre", Georgia, serif',
+      body: '"Instrument Sans", system-ui, sans-serif',
     },
   },
 };
