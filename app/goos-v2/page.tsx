@@ -2460,6 +2460,11 @@ function GoOSDemoContent() {
         { id: 'bg12', label: 'Gradient 12', preview: '/bg12.png' },
         { id: 'bg13', label: 'Gradient 13', preview: '/bg13.png' },
         { id: 'bg14', label: 'Gradient 14', preview: '/bg14.png' },
+        { id: 'bg15', label: 'Gradient 15', preview: '/bg15.png' },
+        { id: 'bg16', label: 'Gradient 16', preview: '/bg16.png' },
+        { id: 'bg17', label: 'Gradient 17', preview: '/bg17.png' },
+        { id: 'bg18', label: 'Gradient 18', preview: '/bg18.png' },
+        { id: 'bg19', label: 'Gradient 19', preview: '/bg19.png' },
     ];
 
     // Celebration helper
@@ -2577,6 +2582,8 @@ function GoOSDemoContent() {
     const [widgetContextMenu, setWidgetContextMenu] = useState<{ isOpen: boolean; x: number; y: number; widget: Widget | null }>({ isOpen: false, x: 0, y: 0, widget: null });
     const [openFolders, setOpenFolders] = useState<string[]>([]); // Folder windows
     const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+    const [openImageViewers, setOpenImageViewers] = useState<string[]>([]); // Image viewer windows
+    const [isDraggingFile, setIsDraggingFile] = useState(false); // For drag-drop visual feedback
 
     // New file type creation dialog state
     const [createFileDialog, setCreateFileDialog] = useState<{ isOpen: boolean; fileType: 'image' | 'link' | 'embed' | 'download' | null }>({ isOpen: false, fileType: null });
@@ -2711,6 +2718,66 @@ function GoOSDemoContent() {
         return { x: 20, y: 20 };
     }, []);
 
+    // Drag-drop handlers for image files
+    const handleDesktopDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.dataTransfer.types.includes('Files')) {
+            setIsDraggingFile(true);
+            e.dataTransfer.dropEffect = 'copy';
+        }
+    }, []);
+
+    const handleDesktopDragLeave = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Only set to false if leaving the desktop area entirely
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+            setIsDraggingFile(false);
+        }
+    }, []);
+
+    const handleDesktopDrop = useCallback(async (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDraggingFile(false);
+
+        const files = Array.from(e.dataTransfer.files);
+        const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+        if (imageFiles.length === 0) return;
+
+        // Get drop position
+        const position = convertToPercentPosition(e.clientX, e.clientY);
+
+        // Process each dropped image
+        for (let i = 0; i < imageFiles.length; i++) {
+            const file = imageFiles[i];
+
+            // Create object URL for local preview (in demo mode)
+            const imageUrl = URL.createObjectURL(file);
+
+            // Offset each subsequent image slightly
+            const offsetPosition = {
+                x: Math.min(90, position.x + (i * 5)),
+                y: Math.min(85, position.y + (i * 5)),
+            };
+
+            // Create the image file using the context
+            const { createImageFile } = goosContext;
+            if (createImageFile) {
+                await createImageFile(imageUrl, {
+                    caption: file.name.replace(/\.[^/.]+$/, ''), // Remove extension for title
+                    alt: file.name,
+                    position: offsetPosition,
+                });
+            }
+        }
+
+        showGoOSToast(`Added ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''}`, 'success');
+    }, [convertToPercentPosition, goosContext, showGoOSToast]);
+
     // New file type creation handlers
     const handleOpenCreateFileDialog = useCallback((fileType: 'image' | 'link' | 'embed' | 'download', position?: { x: number; y: number }) => {
         setCreateFilePosition(position || null);
@@ -2787,6 +2854,16 @@ function GoOSDemoContent() {
             return;
         }
 
+        // If it's an image, open in image viewer
+        if (file.type === 'image') {
+            if (!openImageViewers.includes(fileId)) {
+                setOpenImageViewers(prev => [...prev, fileId]);
+            }
+            setWindowZ(prev => ({ ...prev, [`image-${fileId}`]: topZIndex + 1 }));
+            setTopZIndex(prev => prev + 1);
+            return;
+        }
+
         // It's a file, open the editor
         if (!openEditors.includes(fileId)) {
             setOpenEditors(prev => [...prev, fileId]);
@@ -2794,7 +2871,7 @@ function GoOSDemoContent() {
         setActiveEditorId(fileId);
         setWindowZ(prev => ({ ...prev, [`editor-${fileId}`]: topZIndex + 1 }));
         setTopZIndex(prev => prev + 1);
-    }, [goosFiles, openEditors, openFolders, topZIndex]);
+    }, [goosFiles, openEditors, openFolders, openImageViewers, topZIndex]);
 
     const closeFolder = useCallback((folderId: string) => {
         setOpenFolders(prev => prev.filter(id => id !== folderId));
