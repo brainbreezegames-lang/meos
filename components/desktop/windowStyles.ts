@@ -23,8 +23,8 @@ export const WINDOW = {
   // Background - warm cream
   background: 'var(--color-bg-base, #faf8f2)',
 
-  // Shadows - ultra-soft, cloud-like diffuse
-  shadow: '0 4px 16px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.06), 0 24px 64px rgba(23, 20, 18, 0.04)',
+  // Shadows - ultra-soft, cloud-like diffuse (using CSS variable)
+  shadow: 'var(--shadow-window)',
   shadowMaximized: 'none',
 
   // Opacity
@@ -75,12 +75,12 @@ export const TITLE_BAR_DARK = {
 export const TRAFFIC = {
   size: 12,
   gap: 8,
-  shadow: '0 1px 2px rgba(0, 0, 0, 0.1), inset 0 0.5px 0 rgba(255, 255, 255, 0.2)',
+  shadow: 'var(--shadow-xs)',
 
-  // Colors - classic macOS
-  close: '#ff5f57',
-  minimize: '#ffbd2e',
-  maximize: '#28c840',
+  // Colors - classic macOS (using CSS variables for theme support)
+  close: 'var(--traffic-red, #ff5f57)',
+  minimize: 'var(--traffic-yellow, #ffbd2e)',
+  maximize: 'var(--traffic-green, #28c840)',
 
   // Icon colors (shown on hover)
   closeIcon: 'rgba(77, 0, 0, 0.8)',
