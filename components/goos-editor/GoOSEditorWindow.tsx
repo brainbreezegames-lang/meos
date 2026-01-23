@@ -12,7 +12,7 @@ import { AccessLevel } from '@/contexts/GoOSContext';
 
 export interface GoOSFile {
   id: string;
-  type: 'note' | 'case-study' | 'folder';
+  type: 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download';
   title: string;
   content: string;
   status: PublishStatus;
@@ -21,6 +21,10 @@ export interface GoOSFile {
   updatedAt: Date;
   parentFolderId?: string;
   position: { x: number; y: number };
+  // Image file fields
+  imageUrl?: string;
+  imageAlt?: string;
+  imageCaption?: string;
 }
 
 interface GoOSEditorWindowProps {

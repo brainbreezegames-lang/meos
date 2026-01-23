@@ -217,7 +217,7 @@ function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   }) as T;
 }
 
-export type FileType = 'note' | 'case-study' | 'folder' | 'cv';
+export type FileType = 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download';
 
 interface GoOSFileIconProps {
   id: string;
