@@ -138,16 +138,16 @@ export function DesktopItem({ item, onClick, isEditing = false }: DesktopItemPro
         />
       </motion.div>
 
-      {/* Label - bolder styling */}
+      {/* Label - uses unified label system for any wallpaper */}
       <div className="relative">
         <span
           className="block text-[12px] font-bold text-center max-w-[100px] leading-[1.3] px-2.5 py-1.5 rounded-lg tracking-tight group-hover:scale-105 transition-transform duration-200"
           style={{
-            color: 'var(--text-on-image)',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.9), 0 0 24px rgba(0, 0, 0, 0.7), 0 0 48px rgba(0, 0, 0, 0.5)',
-            background: 'rgba(0, 0, 0, 0.35)',
-            backdropFilter: 'blur(12px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+            color: 'var(--label-text)',
+            textShadow: 'var(--label-shadow)',
+            background: 'var(--label-bg)',
+            backdropFilter: 'var(--label-blur)',
+            WebkitBackdropFilter: 'var(--label-blur)',
           }}
         >
           {item.label}

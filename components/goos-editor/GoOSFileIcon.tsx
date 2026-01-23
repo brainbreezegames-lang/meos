@@ -665,7 +665,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             fontFamily: goOSTokens.fonts.body,
             fontWeight: 500,
             textAlign: 'center',
-            background: '#fff',
+            background: 'var(--bg-elevated, #fff)',
+            color: 'var(--text-primary, #171412)',
             border: '2px solid var(--color-accent-primary, #ff7722)',
             borderRadius: 6,
             outline: 'none',
@@ -679,8 +680,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
           style={{
             fontSize: 11,
             fontFamily: goOSTokens.fonts.body,
-            fontWeight: 500,
-            color: 'var(--color-text-primary, #171412)',
+            fontWeight: 600,
+            color: isSelected ? '#fff' : 'var(--label-text, #ffffff)',
             textAlign: 'center',
             maxWidth: '100%',
             overflow: 'hidden',
@@ -690,11 +691,11 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             borderRadius: 6,
             background: isSelected
               ? 'var(--color-accent-primary, #ff7722)'
-              : 'rgba(251, 249, 239, 0.85)',
-            backdropFilter: isSelected ? 'none' : 'blur(8px)',
-            WebkitBackdropFilter: isSelected ? 'none' : 'blur(8px)',
-            boxShadow: '0 1px 3px rgba(23, 20, 18, 0.08)',
-            ...(isSelected && { color: '#fff' }),
+              : 'var(--label-bg, rgba(0, 0, 0, 0.4))',
+            backdropFilter: isSelected ? 'none' : 'var(--label-blur, blur(12px) saturate(150%))',
+            WebkitBackdropFilter: isSelected ? 'none' : 'var(--label-blur, blur(12px) saturate(150%))',
+            textShadow: isSelected ? 'none' : 'var(--label-shadow, 0 1px 3px rgba(0, 0, 0, 0.9))',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.15)',
           }}
           title={title}
         >

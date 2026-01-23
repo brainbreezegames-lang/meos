@@ -359,14 +359,16 @@ export function EditableDesktopItem({
             </motion.div>
 
             <span
-              className="px-2 py-0.5 font-medium text-white text-center leading-tight max-w-[90px] truncate pointer-events-none"
+              className="px-2 py-0.5 font-medium text-center leading-tight max-w-[90px] truncate pointer-events-none"
               style={{
                 fontSize: '11px',
                 fontFamily: 'var(--font-body)',
                 borderRadius: 'var(--radius-sm)',
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.6)',
-                background: 'rgba(0, 0, 0, 0.35)',
-                backdropFilter: 'blur(8px)',
+                color: 'var(--label-text)',
+                textShadow: 'var(--label-shadow)',
+                background: 'var(--label-bg)',
+                backdropFilter: 'var(--label-blur)',
+                WebkitBackdropFilter: 'var(--label-blur)',
               }}
             >
               {item.label}

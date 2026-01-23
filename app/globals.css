@@ -390,6 +390,20 @@ html.theme-sketch {
     --shadow-item: var(--shadow-sm);
     --shadow-item-hover: var(--shadow-md);
     --accent-success: var(--color-success);
+
+    /* ========== DESKTOP LABELS - Universal on any wallpaper ========== */
+    /* These work on both light AND dark wallpapers - always light text with dark bg */
+    --label-text: #ffffff;
+    --label-bg: rgba(0, 0, 0, 0.4);
+    --label-bg-hover: rgba(0, 0, 0, 0.5);
+    --label-blur: blur(12px) saturate(150%);
+    --label-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.6);
+    --label-border: rgba(255, 255, 255, 0.1);
+
+    /* Text on dark backgrounds (tooltips, dock labels) */
+    --text-on-dark: #ffffff;
+    --bg-tooltip: rgba(30, 30, 30, 0.95);
+
     --spacing-window-padding: var(--space-5);
     --radius-xs: var(--radius-sm);
     --radius-xl: var(--radius-lg);
@@ -620,6 +634,19 @@ html.theme-sketch.dark {
     --shadow-item: var(--shadow-sm);
     --shadow-item-hover: var(--shadow-md);
     --accent-success: var(--color-success);
+
+    /* ========== DESKTOP LABELS - Universal on any wallpaper ========== */
+    /* Same as light mode - works on any wallpaper */
+    --label-text: #ffffff;
+    --label-bg: rgba(0, 0, 0, 0.45);
+    --label-bg-hover: rgba(0, 0, 0, 0.55);
+    --label-blur: blur(12px) saturate(150%);
+    --label-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 0, 0, 0.6);
+    --label-border: rgba(255, 255, 255, 0.15);
+
+    /* Text on dark backgrounds (tooltips, dock labels) */
+    --text-on-dark: oklch(96% 0.01 95);
+    --bg-tooltip: oklch(21% 0.008 70 / 0.98);
 
     /* ========== STICKY NOTES - Warm Muted ========== */
     --sticky-yellow: oklch(30% 0.06 90);
