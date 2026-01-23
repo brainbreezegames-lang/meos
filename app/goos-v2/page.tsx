@@ -567,25 +567,25 @@ const GoOSCVWindow = dynamic(
 // ============================================
 // ============================================
 // ICON COLORS - Returns hex values based on theme mode
-// (SVG attributes don't support CSS variables)
+// CSS Variables for theme-aware colors (no isDark needed - CSS handles it)
 // ============================================
-const getIconColors = (isDark: boolean) => ({
-    stroke: isDark ? '#f0ece4' : '#171412',
-    fill: isDark ? 'rgba(255, 119, 34, 0.15)' : 'rgba(255, 119, 34, 0.1)',
-    accent: '#ff7722',
-    muted: isDark ? '#8a8580' : '#706a63',
+const getIconColors = () => ({
+    stroke: 'var(--icon-stroke)',
+    fill: 'var(--icon-fill)',
+    accent: 'var(--icon-accent)',
+    muted: 'var(--icon-muted)',
 });
 
 // ============================================
-// STICKY NOTE COLORS - Theme-aware
+// STICKY NOTE COLORS - CSS Variables (theme-aware via CSS)
 // ============================================
-const getStickyColors = (isDark: boolean) => ({
-    yellow: isDark ? 'rgba(255, 249, 219, 0.08)' : '#fff9db',
-    blue: isDark ? 'rgba(232, 244, 253, 0.08)' : '#e8f4fd',
-    pink: isDark ? 'rgba(253, 232, 240, 0.08)' : '#fde8f0',
-    green: isDark ? 'rgba(232, 253, 232, 0.08)' : '#e8fde8',
-    orange: isDark ? 'rgba(255, 240, 230, 0.08)' : '#fff0e6',
-    purple: isDark ? 'rgba(240, 232, 253, 0.08)' : '#f0e8fd',
+const getStickyColors = () => ({
+    yellow: 'var(--sticky-yellow)',
+    blue: 'var(--sticky-blue)',
+    pink: 'var(--sticky-pink)',
+    green: 'var(--sticky-green)',
+    orange: 'var(--sticky-orange)',
+    purple: 'var(--sticky-purple)',
 });
 
 const goOS = {
@@ -618,20 +618,20 @@ const goOS = {
             border: 'var(--color-text-primary)',
         },
         sticky: {
-            yellow: '#fff9db',
-            blue: '#e8f4fd',
-            pink: '#fde8f0',
-            green: '#e8fde8',
-            orange: '#fff0e6',
-            purple: '#f0e8fd',
+            yellow: 'var(--sticky-yellow)',
+            blue: 'var(--sticky-blue)',
+            pink: 'var(--sticky-pink)',
+            green: 'var(--sticky-green)',
+            orange: 'var(--sticky-orange)',
+            purple: 'var(--sticky-purple)',
         }
     },
-    // Hex values for SVG stroke/fill (CSS vars don't work in SVG attributes)
-    // Note: For dynamic theming, use getIconColors(isDark) instead
+    // CSS variables for icons - theme-aware
     icon: {
-        stroke: '#171412',
-        fill: 'rgba(255, 119, 34, 0.1)',
-        accent: '#ff7722',
+        stroke: 'var(--icon-stroke)',
+        fill: 'var(--icon-fill)',
+        accent: 'var(--icon-accent)',
+        muted: 'var(--icon-muted)',
     },
     shadows: {
         solid: 'var(--shadow-md)',
@@ -2480,7 +2480,8 @@ function GoOSDemoContent() {
 
         setIsDarkMode(shouldBeDark);
 
-        // Apply theme classes to html element
+        // Apply theme classes to html element (theme-sketch + dark on same element for CSS selector)
+        document.documentElement.classList.add('theme-sketch');
         if (shouldBeDark) {
             document.documentElement.classList.add('dark');
             document.documentElement.setAttribute('data-mode', 'dark');
@@ -2496,6 +2497,8 @@ function GoOSDemoContent() {
             const newValue = !prev;
             localStorage.setItem('goos-dark-mode', String(newValue));
 
+            // Ensure theme-sketch is always on html for CSS variables
+            document.documentElement.classList.add('theme-sketch');
             if (newValue) {
                 document.documentElement.classList.add('dark');
                 document.documentElement.setAttribute('data-mode', 'dark');
@@ -2508,9 +2511,9 @@ function GoOSDemoContent() {
         });
     }, []);
 
-    // Get theme-aware icon colors
-    const iconColors = useMemo(() => getIconColors(isDarkMode), [isDarkMode]);
-    const stickyColors = useMemo(() => getStickyColors(isDarkMode), [isDarkMode]);
+    // Theme-aware colors via CSS variables (no JS dependency on isDarkMode)
+    const iconColors = getIconColors();
+    const stickyColors = getStickyColors();
     const WALLPAPERS = [
         { id: null, label: 'None', preview: null },
         { id: 'bg01', label: 'Gradient 1', preview: '/bg01.png' },

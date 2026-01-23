@@ -291,6 +291,20 @@ html.theme-sketch {
     --border-medium: rgba(23, 20, 18, 0.08);
     --border-subtle: rgba(23, 20, 18, 0.05);
 
+    /* Sticky Notes - Light mode (pastel) */
+    --sticky-yellow: #fff9db;
+    --sticky-blue: #e8f4fd;
+    --sticky-pink: #fde8f0;
+    --sticky-green: #e8fde8;
+    --sticky-orange: #fff0e6;
+    --sticky-purple: #f0e8fd;
+
+    /* Icon Colors (for desktop icons etc.) */
+    --icon-stroke: #171412;
+    --icon-fill: rgba(255, 119, 34, 0.1);
+    --icon-accent: #ff7722;
+    --icon-muted: #706a63;
+
     /* ========== SPACING ========== */
     --space-0: 0;
     --space-1: 0.25rem;
@@ -610,6 +624,12 @@ html.theme-sketch.dark {
     --sticky-green: oklch(30% 0.05 145);
     --sticky-orange: oklch(32% 0.06 60);
     --sticky-purple: oklch(30% 0.05 300);
+
+    /* Icon Colors - Dark mode (light on dark) */
+    --icon-stroke: oklch(95% 0.005 90);
+    --icon-fill: oklch(72% 0.18 45 / 0.15);
+    --icon-accent: oklch(72% 0.18 45);
+    --icon-muted: oklch(60% 0.01 90);
 
     /* Selection - Dark mode selection */
     --selection-bg: oklch(72% 0.18 45 / 0.3);
