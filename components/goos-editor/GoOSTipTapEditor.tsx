@@ -122,21 +122,106 @@ interface GoOSTipTapEditorProps {
   hideToolbar?: boolean;
 }
 
-// Convert file to base64 data URL
-function fileToBase64(file: File): Promise<string> {
+// Image compression settings
+const IMAGE_MAX_WIDTH = 2048;
+const IMAGE_MAX_HEIGHT = 2048;
+const IMAGE_QUALITY = 0.85;
+const COMPRESSION_THRESHOLD = 500 * 1024; // 500KB - skip compression for small files
+
+/**
+ * Compress image using Canvas API
+ * - Resizes large images to max dimensions
+ * - Compresses to WebP (with JPEG fallback)
+ * - Skips small files that don't need compression
+ */
+async function compressImage(file: File): Promise<File> {
+  // Skip compression for small files or non-images
+  if (file.size < COMPRESSION_THRESHOLD || !file.type.startsWith('image/')) {
+    return file;
+  }
+
+  // Skip GIFs (animation would be lost)
+  if (file.type === 'image/gif') {
+    return file;
+  }
+
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    img.onload = () => {
+      // Calculate new dimensions maintaining aspect ratio
+      let { width, height } = img;
+
+      if (width > IMAGE_MAX_WIDTH || height > IMAGE_MAX_HEIGHT) {
+        const ratio = Math.min(IMAGE_MAX_WIDTH / width, IMAGE_MAX_HEIGHT / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      // Draw and compress
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      // Try WebP first (better compression), fallback to JPEG
+      const mimeType = 'image/webp';
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob && blob.size < file.size) {
+            // Compression successful and smaller
+            const compressedFile = new File(
+              [blob],
+              file.name.replace(/\.[^.]+$/, '.webp'),
+              { type: mimeType }
+            );
+            resolve(compressedFile);
+          } else {
+            // Compression didn't help or failed, use original
+            resolve(file);
+          }
+        },
+        mimeType,
+        IMAGE_QUALITY
+      );
+
+      // Cleanup
+      URL.revokeObjectURL(img.src);
+    };
+
+    img.onerror = () => {
+      // On error, return original file
+      resolve(file);
+    };
+
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+// Convert file to base64 data URL (optimized with compression)
+async function fileToBase64(file: File): Promise<string> {
+  // Compress before converting to base64
+  const compressed = await compressImage(file);
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = reject;
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(compressed);
   });
 }
 
-// Upload image to API with base64 fallback
+// Upload image to API with compression and base64 fallback
 async function uploadImage(file: File): Promise<string | null> {
   try {
+    // Compress image first
+    const compressed = await compressImage(file);
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', compressed);
     formData.append('type', 'image');
 
     const response = await fetch('/api/goos/upload', {
@@ -151,7 +236,7 @@ async function uploadImage(file: File): Promise<string | null> {
 
     // If upload failed (auth issues, etc.), fallback to base64
     console.warn('Upload failed, using base64 fallback:', result.error);
-    return await fileToBase64(file);
+    return await fileToBase64(compressed);
   } catch (error) {
     // Network error or other issues - fallback to base64
     console.warn('Upload error, using base64 fallback:', error);
@@ -171,6 +256,7 @@ export function GoOSTipTapEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('');
   const [showLayoutPicker, setShowLayoutPicker] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
@@ -241,11 +327,13 @@ export function GoOSTipTapEditor({
             const file = item.getAsFile();
             if (file) {
               setIsUploading(true);
+              setUploadStatus('Optimizing image...');
               uploadImage(file).then(url => {
                 setIsUploading(false);
+                setUploadStatus('');
                 if (url) {
                   view.dispatch(view.state.tr.replaceSelectionWith(
-                    view.state.schema.nodes.image.create({ src: url })
+                    view.state.schema.nodes.image.create({ src: url, layout: 'content' })
                   ));
                 }
               });
@@ -260,22 +348,29 @@ export function GoOSTipTapEditor({
         const files = event.dataTransfer?.files;
         if (!files || files.length === 0) return false;
 
-        const file = files[0];
-        if (!file.type.startsWith('image/')) return false;
+        const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+        if (imageFiles.length === 0) return false;
 
         event.preventDefault();
         setIsUploading(true);
+        setUploadStatus('Optimizing image...');
 
         const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
 
-        uploadImage(file).then(url => {
-          setIsUploading(false);
-          if (url && coordinates) {
-            const node = view.state.schema.nodes.image.create({ src: url });
-            const transaction = view.state.tr.insert(coordinates.pos, node);
-            view.dispatch(transaction);
+        // Process images sequentially
+        (async () => {
+          for (let i = 0; i < imageFiles.length; i++) {
+            setUploadStatus(`Optimizing image ${i + 1} of ${imageFiles.length}...`);
+            const url = await uploadImage(imageFiles[i]);
+            if (url && coordinates) {
+              const node = view.state.schema.nodes.image.create({ src: url, layout: 'content' });
+              const transaction = view.state.tr.insert(coordinates.pos + i, node);
+              view.dispatch(transaction);
+            }
           }
-        });
+          setIsUploading(false);
+          setUploadStatus('');
+        })();
 
         return true;
       },
@@ -330,13 +425,15 @@ export function GoOSTipTapEditor({
     setIsUploading(true);
     setShowLayoutPicker(false);
 
+    const total = layout === 'side-by-side' ? Math.min(files.length, 2) : files.length;
+
     if (layout === 'side-by-side' && files.length >= 2) {
-      // Insert first two images side by side
+      setUploadStatus('Optimizing image 1 of 2...');
       const url1 = await uploadImage(files[0]);
+      setUploadStatus('Optimizing image 2 of 2...');
       const url2 = await uploadImage(files[1]);
 
       if (url1 && url2) {
-        // Insert both images with side-by-side layout
         editor.chain().focus()
           .setImage({ src: url1, layout: 'side-by-side' } as any)
           .run();
@@ -345,9 +442,9 @@ export function GoOSTipTapEditor({
           .run();
       }
     } else {
-      // Insert single image with chosen layout
-      for (const file of files) {
-        const url = await uploadImage(file);
+      for (let i = 0; i < files.length; i++) {
+        setUploadStatus(`Optimizing image ${i + 1} of ${total}...`);
+        const url = await uploadImage(files[i]);
         if (url) {
           editor.chain().focus()
             .setImage({ src: url, layout } as any)
@@ -357,6 +454,7 @@ export function GoOSTipTapEditor({
     }
 
     setIsUploading(false);
+    setUploadStatus('');
     setPendingFiles([]);
 
     // Reset file input
@@ -465,7 +563,7 @@ export function GoOSTipTapEditor({
               color: goOSTokens.colors.text.primary,
             }}
           >
-            Uploading image...
+            {uploadStatus || 'Optimizing image...'}
           </div>
         </div>
       )}
@@ -745,6 +843,56 @@ export function GoOSTipTapEditor({
           aria-pressed={editor.isActive('highlight')}
         >
           Highlight
+        </button>
+      </BubbleMenu>
+
+      {/* Image Bubble Menu - shows when image is selected */}
+      <BubbleMenu
+        editor={editor}
+        tippyOptions={{ duration: 100 }}
+        className="goos-image-menu"
+        shouldShow={({ editor }) => editor.isActive('image')}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            editor.chain().focus().updateAttributes('image', { layout: 'content' }).run();
+          }}
+          className={editor.getAttributes('image').layout === 'content' || !editor.getAttributes('image').layout ? 'is-active' : ''}
+          aria-label="Content width"
+          title="Content width"
+        >
+          <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+            <rect x="3" y="2" width="10" height="10" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            editor.chain().focus().updateAttributes('image', { layout: 'full-bleed' }).run();
+          }}
+          className={editor.getAttributes('image').layout === 'full-bleed' ? 'is-active' : ''}
+          aria-label="Full bleed"
+          title="Full bleed"
+        >
+          <svg width="16" height="14" viewBox="0 0 16 14" fill="none">
+            <rect x="0.5" y="2" width="15" height="10" rx="0" stroke="currentColor" strokeWidth="1"/>
+            <rect x="1" y="2.5" width="14" height="9" fill="currentColor" fillOpacity="0.2"/>
+          </svg>
+        </button>
+        <span style={{ width: 1, height: 16, background: 'rgba(0,0,0,0.1)', margin: '0 4px' }} />
+        <button
+          type="button"
+          onClick={() => {
+            editor.chain().focus().deleteSelection().run();
+          }}
+          aria-label="Delete image"
+          title="Delete"
+          style={{ color: '#ef4444' }}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M2 4h10M5 4V2.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V4M11 4v7.5a1 1 0 01-1 1H4a1 1 0 01-1-1V4" strokeLinecap="round"/>
+          </svg>
         </button>
       </BubbleMenu>
 
@@ -1138,6 +1286,47 @@ export function GoOSTipTapEditor({
           background: ${goOSTokens.colors.accent.primary};
           color: var(--color-text-on-accent, #fbf9ef);
           box-shadow: 0 2px 8px rgba(255, 119, 34, 0.3);
+        }
+
+        /* Image Menu - appears when image selected */
+        .goos-image-menu {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+          padding: 6px 8px;
+          background: var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.98));
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08));
+          border-radius: var(--radius-md, 12px);
+          box-shadow: var(--shadow-lg);
+          animation: menuPopIn 0.15s ease-out;
+        }
+
+        .goos-image-menu button {
+          padding: 6px 8px;
+          font-size: 12px;
+          font-weight: 500;
+          font-family: ${goOSTokens.fonts.body};
+          background: transparent;
+          border: none;
+          border-radius: var(--radius-sm, 6px);
+          cursor: pointer;
+          color: ${goOSTokens.colors.text.secondary};
+          transition: all 0.15s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .goos-image-menu button:hover {
+          background: var(--color-bg-subtle, rgba(23, 20, 18, 0.06));
+          color: ${goOSTokens.colors.text.primary};
+        }
+
+        .goos-image-menu button.is-active {
+          background: ${goOSTokens.colors.accent.primary};
+          color: var(--color-text-on-accent, #fbf9ef);
         }
 
         /* Floating Menu - calm-tech glass style */
