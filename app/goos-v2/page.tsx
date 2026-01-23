@@ -4419,8 +4419,8 @@ function GoOSDemoContent() {
                     onOpenAsPage={() => {
                         const file = goosFiles.find(f => f.id === fileContextMenu.fileId);
                         if (file && (file.type === 'note' || file.type === 'case-study')) {
-                            // In demo, just open in editor - in production this navigates to /{username}/{id}
-                            openFile(fileContextMenu.fileId!);
+                            // Open in full-page view overlay
+                            setCaseStudyFileId(fileContextMenu.fileId);
                         }
                     }}
                     onOpenAsPresent={() => {
@@ -4520,9 +4520,9 @@ function GoOSDemoContent() {
                         note={{
                             id: file.id,
                             title: file.title,
-                            subtitle: undefined,
+                            subtitle: file.type === 'case-study' ? 'Case Study' : undefined,
                             content: file.content,
-                            headerImage: undefined,
+                            headerImage: file.headerImage,
                         }}
                         author={{
                             username: 'demo',
