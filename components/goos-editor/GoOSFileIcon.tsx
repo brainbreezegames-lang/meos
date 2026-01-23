@@ -202,6 +202,91 @@ function FolderIcon() {
   );
 }
 
+// Image icon - Photo frame with mountain/sun
+function ImageIcon() {
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="7" y="9" width="30" height="26" rx="3" fill="rgba(23, 20, 18, 0.08)" />
+      <rect x="6" y="8" width="30" height="26" rx="3" fill="url(#imageFrameGradient)" />
+      <rect x="9" y="11" width="24" height="20" rx="1" fill="#E8F4FD" />
+      <circle cx="16" cy="17" r="3" fill="#FFD54F" />
+      <path d="M9 31L18 21L24 26L33 18V31H9Z" fill="url(#mountainGradient)" />
+      <defs>
+        <linearGradient id="imageFrameGradient" x1="6" y1="8" x2="36" y2="34" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#F5F5F5" />
+          <stop offset="1" stopColor="#E0E0E0" />
+        </linearGradient>
+        <linearGradient id="mountainGradient" x1="9" y1="18" x2="33" y2="31" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#66BB6A" />
+          <stop offset="1" stopColor="#43A047" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+// Link icon - Chain link
+function LinkIcon() {
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="22" cy="22" r="16" fill="url(#linkBgGradient)" />
+      <path
+        d="M18 22H26M20 18H17C14.7909 18 13 19.7909 13 22C13 24.2091 14.7909 26 17 26H20M24 18H27C29.2091 18 31 19.7909 31 22C31 24.2091 29.2091 26 27 26H24"
+        stroke="white"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <defs>
+        <linearGradient id="linkBgGradient" x1="6" y1="6" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#5C6BC0" />
+          <stop offset="1" stopColor="#3949AB" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+// Embed icon - Code/play button
+function EmbedIcon() {
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="10" width="32" height="24" rx="4" fill="url(#embedBgGradient)" />
+      <path d="M19 16V28L29 22L19 16Z" fill="white" />
+      <defs>
+        <linearGradient id="embedBgGradient" x1="6" y1="10" x2="38" y2="34" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#E53935" />
+          <stop offset="1" stopColor="#C62828" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+// Download icon - File with arrow
+function DownloadIcon() {
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M12 8C12 6.34315 13.3431 5 15 5H25L32 12V36C32 37.6569 30.6569 39 29 39H15C13.3431 39 12 37.6569 12 36V8Z"
+        fill="rgba(23, 20, 18, 0.08)"
+        transform="translate(1, 1)"
+      />
+      <path
+        d="M12 8C12 6.34315 13.3431 5 15 5H25L32 12V36C32 37.6569 30.6569 39 29 39H15C13.3431 39 12 37.6569 12 36V8Z"
+        fill="url(#downloadGradient)"
+      />
+      <path d="M25 5V10C25 11.1046 25.8954 12 27 12H32L25 5Z" fill="#B0BEC5" />
+      <path d="M22 18V28M22 28L18 24M22 28L26 24" stroke="#546E7A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <defs>
+        <linearGradient id="downloadGradient" x1="12" y1="5" x2="32" y2="39" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#ECEFF1" />
+          <stop offset="1" stopColor="#CFD8DC" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
 // Throttle function for performance
 function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
@@ -236,6 +321,8 @@ interface GoOSFileIconProps {
   isDraggedOver?: boolean;
   onDragStart?: (fileId: string) => void;
   onDrag?: (info: { x: number; y: number }, fileId: string) => void;
+  // Image-specific props
+  imageUrl?: string;
 }
 
 export const GoOSFileIcon = memo(function GoOSFileIcon({
@@ -255,6 +342,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   isDraggedOver = false,
   onDragStart: onDragStartProp,
   onDrag,
+  imageUrl,
 }: GoOSFileIconProps) {
   const isLocked = accessLevel === 'locked';
   const [renameValue, setRenameValue] = useState(title);
@@ -300,6 +388,51 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
 
   const getIcon = () => {
     switch (type) {
+      case 'image':
+        // Show actual image thumbnail
+        if (imageUrl) {
+          return (
+            <div
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 8,
+                overflow: 'hidden',
+                background: 'rgba(23, 20, 18, 0.04)',
+                border: '1px solid rgba(23, 20, 18, 0.08)',
+                boxShadow: '0 2px 8px rgba(23, 20, 18, 0.1)',
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt={title}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+                draggable={false}
+              />
+            </div>
+          );
+        }
+        // Fallback to generic image icon
+        return (
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="8" width="32" height="28" rx="3" fill="rgba(23, 20, 18, 0.08)" transform="translate(1, 1)" />
+            <rect x="6" y="8" width="32" height="28" rx="3" fill="url(#imgGradient)" />
+            <circle cx="15" cy="17" r="4" fill="#ff7722" opacity="0.8" />
+            <path d="M6 28L14 22L20 26L28 18L38 26V33C38 34.6569 36.6569 36 35 36H9C7.34315 36 6 34.6569 6 33V28Z" fill="#22c55e" opacity="0.7" />
+            <rect x="6" y="8" width="32" height="28" rx="3" stroke="rgba(23, 20, 18, 0.15)" strokeWidth="1" fill="none" />
+            <defs>
+              <linearGradient id="imgGradient" x1="6" y1="8" x2="38" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#FFFDF7" />
+                <stop offset="1" stopColor="#F5F0E4" />
+              </linearGradient>
+            </defs>
+          </svg>
+        );
       case 'case-study':
         return <CaseStudyIcon />;
       case 'folder':

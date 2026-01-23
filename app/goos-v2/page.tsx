@@ -2534,6 +2534,9 @@ function GoOSDemoContent() {
         updatedAt: new Date(f.updatedAt),
         parentFolderId: f.parentId || undefined,
         position: f.position,
+        imageUrl: f.imageUrl || undefined,
+        imageAlt: f.imageAlt || undefined,
+        imageCaption: f.imageCaption || undefined,
     })), [spaceFilteredFiles]);
 
     // Convert goosFiles to DesktopItem format for PageView/PresentView
@@ -3244,6 +3247,9 @@ function GoOSDemoContent() {
                 '--zen-dock-offset': isZenMode ? '0px' : '80px',
             } as React.CSSProperties}
             onContextMenu={handleDesktopContextMenu}
+            onDragOver={handleDesktopDragOver}
+            onDragLeave={handleDesktopDragLeave}
+            onDrop={handleDesktopDrop}
             onClick={(e) => {
                 // Close context menus
                 setDesktopContextMenu(prev => prev.isOpen ? { ...prev, isOpen: false } : prev);
@@ -3283,6 +3289,36 @@ function GoOSDemoContent() {
                         zIndex: 0,
                     }}
                 />
+            )}
+
+            {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
+            {isDraggingFile && (
+                <div
+                    className="absolute inset-0 pointer-events-none z-[9999]"
+                    style={{
+                        background: 'rgba(255, 119, 34, 0.05)',
+                        border: '3px dashed rgba(255, 119, 34, 0.4)',
+                        borderRadius: 12,
+                        margin: 8,
+                    }}
+                >
+                    <div
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2"
+                        style={{
+                            background: 'rgba(255, 255, 255, 0.95)',
+                            padding: '16px 24px',
+                            borderRadius: 12,
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                        }}
+                    >
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff7722" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21,15 16,10 5,21"/>
+                        </svg>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#171412' }}>Drop images here</span>
+                    </div>
+                </div>
             )}
 
             {/* CONFETTI CELEBRATION */}
@@ -3618,6 +3654,7 @@ function GoOSDemoContent() {
                                         onDoubleClick={() => openFile(file.id)}
                                         onContextMenu={(e) => handleFileContextMenu(e, file.id)}
                                         onRename={(newTitle) => renameFile(file.id, newTitle)}
+                                        imageUrl={file.imageUrl}
                                     />
                                 );
                             })}
@@ -3775,6 +3812,106 @@ function GoOSDemoContent() {
                                             setTopZIndex(prev => prev + 1);
                                         }}
                                     />
+                                );
+                            })}
+                        </AnimatePresence>
+
+                        {/* goOS Image Viewer Windows */}
+                        <AnimatePresence>
+                            {openImageViewers.map((imageId) => {
+                                const imageFile = goosFiles.find(f => f.id === imageId);
+                                if (!imageFile || imageFile.type !== 'image') return null;
+                                const imageUrl = imageFile.imageUrl || '';
+                                return (
+                                    <motion.div
+                                        key={imageFile.id}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                                        drag
+                                        dragMomentum={false}
+                                        data-window
+                                        onClick={() => {
+                                            setWindowZ(prev => ({ ...prev, [`image-${imageFile.id}`]: topZIndex + 1 }));
+                                            setTopZIndex(prev => prev + 1);
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            left: `${Math.min(imageFile.position.x + 5, 60)}%`,
+                                            top: `${Math.min(imageFile.position.y + 5, 40)}%`,
+                                            zIndex: windowZ[`image-${imageFile.id}`] || topZIndex,
+                                            background: 'var(--color-bg-base, #faf8f2)',
+                                            borderRadius: 12,
+                                            boxShadow: '0 8px 32px rgba(23, 20, 18, 0.15), 0 2px 8px rgba(23, 20, 18, 0.08)',
+                                            border: '1px solid rgba(23, 20, 18, 0.08)',
+                                            overflow: 'hidden',
+                                            maxWidth: '80vw',
+                                            maxHeight: '80vh',
+                                        }}
+                                    >
+                                        {/* Title bar */}
+                                        <div
+                                            className="flex items-center justify-between px-4 cursor-move"
+                                            style={{
+                                                height: 44,
+                                                background: 'var(--color-bg-base, #faf8f2)',
+                                                borderBottom: '1px solid rgba(23, 20, 18, 0.06)',
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenImageViewers(prev => prev.filter(id => id !== imageFile.id));
+                                                    }}
+                                                    className="w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff3b30] transition-colors"
+                                                    style={{ boxShadow: 'inset 0 -1px 1px rgba(0,0,0,0.1)' }}
+                                                />
+                                            </div>
+                                            <span
+                                                className="text-xs font-medium truncate max-w-[200px]"
+                                                style={{ color: 'var(--color-text-secondary, #6b6560)' }}
+                                            >
+                                                {imageFile.title}
+                                            </span>
+                                            <div style={{ width: 12 }} />
+                                        </div>
+                                        {/* Image content */}
+                                        <div
+                                            style={{
+                                                padding: 8,
+                                                background: 'rgba(23, 20, 18, 0.02)',
+                                            }}
+                                        >
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={imageUrl}
+                                                alt={imageFile.imageAlt || imageFile.title}
+                                                style={{
+                                                    maxWidth: '70vw',
+                                                    maxHeight: '65vh',
+                                                    objectFit: 'contain',
+                                                    borderRadius: 8,
+                                                    display: 'block',
+                                                }}
+                                                draggable={false}
+                                            />
+                                        </div>
+                                        {/* Caption */}
+                                        {imageFile.imageCaption && (
+                                            <div
+                                                style={{
+                                                    padding: '8px 12px 12px',
+                                                    fontSize: 12,
+                                                    color: 'var(--color-text-secondary, #6b6560)',
+                                                    textAlign: 'center',
+                                                }}
+                                            >
+                                                {imageFile.imageCaption}
+                                            </div>
+                                        )}
+                                    </motion.div>
                                 );
                             })}
                         </AnimatePresence>
