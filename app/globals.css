@@ -247,6 +247,7 @@ html.theme-sketch {
     --color-bg-white: rgba(255, 255, 255, 0.8);
     --color-bg-glass: rgba(251, 249, 239, 0.92);
     --color-bg-glass-heavy: rgba(251, 249, 239, 0.95);
+    --topnav-bg: rgba(251, 249, 239, 0.55);
 
     --color-text-primary: #171412;
     --color-text-secondary: #4a4744;
@@ -489,6 +490,173 @@ html.theme-sketch {
 
 .theme-sketch .text-accent {
     color: var(--text-primary);
+}
+
+/* ============================================
+   DARK MODE - goOS Dark Theme
+   Inspired by premium dark interfaces with oklch colors
+   ============================================ */
+
+.theme-sketch.dark,
+[data-theme="sketch"][data-mode="dark"],
+html.theme-sketch.dark {
+    color-scheme: dark;
+
+    /* ========== OKLCH-BASED COLORS FOR PERCEPTUAL UNIFORMITY ========== */
+
+    /* Backgrounds - Deep, layered darks */
+    --bg-canvas: oklch(14.5% 0.005 285);
+    --bg-surface: oklch(18% 0.005 285);
+    --bg-elevated: oklch(22% 0.005 285);
+    --bg-muted: oklch(16% 0.005 285);
+    --bg-overlay: rgba(255, 119, 34, 0.08);
+
+    /* Calm-tech 2025 dark tokens */
+    --color-bg-base: oklch(14.5% 0.005 285);
+    --color-bg-subtle: rgba(255, 255, 255, 0.02);
+    --color-bg-white: rgba(255, 255, 255, 0.06);
+    --color-bg-glass: oklch(18% 0.005 285 / 0.85);
+    --color-bg-glass-heavy: oklch(16% 0.005 285 / 0.92);
+    --topnav-bg: rgba(20, 20, 22, 0.55);
+
+    /* Text Colors - Warm off-whites */
+    --text-primary: oklch(96% 0.005 90);
+    --text-secondary: oklch(75% 0.01 90);
+    --text-tertiary: oklch(55% 0.008 90);
+    --text-disabled: oklch(45% 0.005 90);
+    --text-inverse: oklch(14.5% 0.005 285);
+
+    --color-text-primary: oklch(96% 0.005 90);
+    --color-text-secondary: oklch(75% 0.01 90);
+    --color-text-muted: oklch(55% 0.008 90);
+    --color-text-on-accent: oklch(100% 0 0);
+    --color-text-inverse: oklch(14.5% 0.005 285);
+
+    /* Accent Colors - Warm orange preserved */
+    --accent-primary: oklch(72% 0.18 45);
+    --accent-dark: oklch(65% 0.18 45);
+    --accent-light: oklch(72% 0.18 45 / 0.15);
+    --accent-pale: oklch(72% 0.18 45 / 0.08);
+
+    --color-accent-primary: oklch(72% 0.18 45);
+    --color-accent-primary-subtle: oklch(72% 0.18 45 / 0.12);
+    --color-accent-primary-hover: oklch(65% 0.18 45);
+    --color-accent-primary-glow: 0 0 20px oklch(72% 0.18 45 / 0.3);
+
+    /* Borders - Subtle light edges */
+    --border-strong: rgba(255, 255, 255, 0.12);
+    --border-medium: rgba(255, 255, 255, 0.08);
+    --border-subtle: rgba(255, 255, 255, 0.04);
+
+    --color-border-default: rgba(255, 255, 255, 0.10);
+    --color-border-subtle: rgba(255, 255, 255, 0.05);
+    --color-border-strong: rgba(255, 255, 255, 0.15);
+
+    /* Semantic Colors */
+    --color-success: oklch(70% 0.17 145);
+    --color-warning: oklch(80% 0.15 80);
+    --color-error: oklch(65% 0.22 25);
+    --color-info: oklch(72% 0.18 45);
+
+    /* Traffic lights - Slightly muted for dark mode */
+    --traffic-red: oklch(62% 0.22 25);
+    --traffic-yellow: oklch(78% 0.15 80);
+    --traffic-green: oklch(65% 0.17 145);
+    --traffic-border: rgba(255, 255, 255, 0.15);
+
+    --color-traffic-close: oklch(62% 0.22 25);
+    --color-traffic-minimize: oklch(78% 0.15 80);
+    --color-traffic-maximize: oklch(65% 0.17 145);
+
+    /* Shadows - Deeper, more dramatic */
+    --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3), 0 12px 40px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.35), 0 12px 40px rgba(0, 0, 0, 0.3), 0 24px 60px rgba(0, 0, 0, 0.2);
+    --shadow-window: 0 2px 8px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35), 0 24px 48px rgba(0, 0, 0, 0.25), 0 48px 80px rgba(0, 0, 0, 0.15);
+    --shadow-dock: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+    /* Glass effects - Darker, subtler */
+    --blur-glass: blur(20px) saturate(150%);
+    --blur-glass-heavy: blur(24px) saturate(150%);
+
+    /* Window compatibility */
+    --bg-glass-elevated: var(--bg-elevated);
+    --bg-glass: var(--bg-surface);
+    --bg-glass-heavy: var(--bg-muted);
+    --radius-window: var(--radius-md);
+    --border-glass-outer: var(--border-strong);
+    --border-glass-inner: rgba(255, 255, 255, 0.04);
+    --border-light: var(--border-subtle);
+    --border-highlight: var(--border-medium);
+
+    /* Dock styling - Dark glass */
+    --bg-dock: oklch(18% 0.005 285 / 0.88);
+    --blur-dock: blur(40px) saturate(150%);
+
+    /* Additional compatibility */
+    --bg-card: var(--bg-surface);
+    --bg-item: var(--bg-surface);
+    --bg-app: var(--bg-canvas);
+    --bg-subtle: var(--bg-elevated);
+    --shadow-item: var(--shadow-sm);
+    --shadow-item-hover: var(--shadow-md);
+    --accent-success: var(--color-success);
+
+    /* Sticky notes - Muted dark variants */
+    --sticky-yellow: oklch(35% 0.05 90);
+    --sticky-blue: oklch(30% 0.05 250);
+    --sticky-pink: oklch(32% 0.05 350);
+    --sticky-green: oklch(30% 0.05 145);
+    --sticky-orange: oklch(32% 0.06 60);
+    --sticky-purple: oklch(30% 0.05 300);
+
+    /* Selection - Dark mode selection */
+    --selection-bg: oklch(72% 0.18 45 / 0.3);
+    --selection-text: var(--text-primary);
+
+    /* Apply base styles */
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+}
+
+/* Dark mode scrollbars */
+.theme-sketch.dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.theme-sketch.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Dark mode selection */
+.theme-sketch.dark ::selection {
+    background: var(--selection-bg, oklch(72% 0.18 45 / 0.3));
+    color: var(--selection-text, oklch(96% 0.005 90));
+}
+
+.theme-sketch.dark ::-moz-selection {
+    background: var(--selection-bg, oklch(72% 0.18 45 / 0.3));
+    color: var(--selection-text, oklch(96% 0.005 90));
+}
+
+/* Dark mode form inputs */
+.theme-sketch.dark input,
+.theme-sketch.dark button,
+.theme-sketch.dark select,
+.theme-sketch.dark textarea {
+    color: var(--text-primary);
+    border-color: var(--border-medium);
+}
+
+.theme-sketch.dark input::placeholder,
+.theme-sketch.dark textarea::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* Dark mode border color default */
+.theme-sketch.dark * {
+    border-color: var(--border-medium);
 }
 
 /* ========== STICKY NOTE STYLES (APPART) ========== */

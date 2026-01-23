@@ -54,7 +54,7 @@ import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext
 import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
 import { WidgetRenderer, WIDGET_METADATA, WidgetContextMenu } from '@/components/widgets';
 import type { Widget } from '@/types';
-import { ViewSwitcher, PageView, PresentView } from '@/components/views';
+import { PresentView } from '@/components/views';
 import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
@@ -565,6 +565,29 @@ const GoOSCVWindow = dynamic(
 // GOOS DESIGN TOKENS - Calm-Tech 2025 Design System
 // Note: icon.* values are hex for SVG attributes, colors.* are CSS vars for styles
 // ============================================
+// ============================================
+// ICON COLORS - Returns hex values based on theme mode
+// (SVG attributes don't support CSS variables)
+// ============================================
+const getIconColors = (isDark: boolean) => ({
+    stroke: isDark ? '#f0ece4' : '#171412',
+    fill: isDark ? 'rgba(255, 119, 34, 0.15)' : 'rgba(255, 119, 34, 0.1)',
+    accent: '#ff7722',
+    muted: isDark ? '#8a8580' : '#706a63',
+});
+
+// ============================================
+// STICKY NOTE COLORS - Theme-aware
+// ============================================
+const getStickyColors = (isDark: boolean) => ({
+    yellow: isDark ? 'rgba(255, 249, 219, 0.08)' : '#fff9db',
+    blue: isDark ? 'rgba(232, 244, 253, 0.08)' : '#e8f4fd',
+    pink: isDark ? 'rgba(253, 232, 240, 0.08)' : '#fde8f0',
+    green: isDark ? 'rgba(232, 253, 232, 0.08)' : '#e8fde8',
+    orange: isDark ? 'rgba(255, 240, 230, 0.08)' : '#fff0e6',
+    purple: isDark ? 'rgba(240, 232, 253, 0.08)' : '#f0e8fd',
+});
+
 const goOS = {
     // CSS Variables for style props (backgrounds, text, borders)
     colors: {
@@ -604,6 +627,7 @@ const goOS = {
         }
     },
     // Hex values for SVG stroke/fill (CSS vars don't work in SVG attributes)
+    // Note: For dynamic theming, use getIconColors(isDark) instead
     icon: {
         stroke: '#171412',
         fill: 'rgba(255, 119, 34, 0.1)',
@@ -1821,10 +1845,10 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 width,
                 height,
                 zIndex,
-                background: 'var(--color-bg-base, #faf8f2)',
-                border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.06))',
+                background: 'var(--color-bg-base)',
+                border: '1px solid var(--color-border-default)',
                 borderRadius: 'var(--radius-lg, 20px)',
-                boxShadow: '0 4px 16px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.06), 0 24px 64px rgba(23, 20, 18, 0.04)'
+                boxShadow: 'var(--shadow-window)'
             }}
         >
             {/* Title Bar - unified 48px height, subtle border */}
@@ -1832,8 +1856,8 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 className="flex items-center justify-between px-4 select-none cursor-move flex-shrink-0"
                 style={{
                     height: 48,
-                    background: 'var(--color-bg-base, #faf8f2)',
-                    borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.04))'
+                    background: 'var(--color-bg-base)',
+                    borderBottom: '1px solid var(--color-border-subtle)'
                 }}
                 onMouseEnter={() => setIsHoveredTraffic(true)}
                 onMouseLeave={() => setIsHoveredTraffic(false)}
@@ -1850,8 +1874,8 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                             width: 12,
                             height: 12,
                             borderRadius: '50%',
-                            background: '#ff5f57',
-                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1), inset 0 0.5px 0 rgba(255, 255, 255, 0.2)',
+                            background: 'var(--traffic-red, #ff5f57)',
+                            boxShadow: 'var(--shadow-xs)',
                             border: 'none',
                             cursor: 'pointer',
                         }}
@@ -1869,8 +1893,8 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                             width: 12,
                             height: 12,
                             borderRadius: '50%',
-                            background: '#ffbd2e',
-                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1), inset 0 0.5px 0 rgba(255, 255, 255, 0.2)',
+                            background: 'var(--traffic-yellow, #ffbd2e)',
+                            boxShadow: 'var(--shadow-xs)',
                             border: 'none',
                             cursor: 'pointer',
                         }}
@@ -1888,8 +1912,8 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                             width: 12,
                             height: 12,
                             borderRadius: '50%',
-                            background: '#28c840',
-                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1), inset 0 0.5px 0 rgba(255, 255, 255, 0.2)',
+                            background: 'var(--traffic-green, #28c840)',
+                            boxShadow: 'var(--shadow-xs)',
                             border: 'none',
                             cursor: 'pointer',
                         }}
@@ -2444,6 +2468,49 @@ function GoOSDemoContent() {
     // Wallpaper state
     const [wallpaper, setWallpaper] = useState<string | null>(null); // null = no wallpaper (default pattern)
     const [showWallpaperPicker, setShowWallpaperPicker] = useState(false);
+
+    // Dark mode state
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    // Initialize dark mode from localStorage and apply theme class
+    useEffect(() => {
+        const stored = localStorage.getItem('goos-dark-mode');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const shouldBeDark = stored === 'true' || (stored === null && prefersDark);
+
+        setIsDarkMode(shouldBeDark);
+
+        // Apply theme classes to html element
+        if (shouldBeDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-mode', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-mode', 'light');
+        }
+    }, []);
+
+    // Toggle dark mode
+    const toggleDarkMode = useCallback(() => {
+        setIsDarkMode(prev => {
+            const newValue = !prev;
+            localStorage.setItem('goos-dark-mode', String(newValue));
+
+            if (newValue) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-mode', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.setAttribute('data-mode', 'light');
+            }
+
+            return newValue;
+        });
+    }, []);
+
+    // Get theme-aware icon colors
+    const iconColors = useMemo(() => getIconColors(isDarkMode), [isDarkMode]);
+    const stickyColors = useMemo(() => getStickyColors(isDarkMode), [isDarkMode]);
     const WALLPAPERS = [
         { id: null, label: 'None', preview: null },
         { id: 'bg01', label: 'Gradient 1', preview: '/bg01.png' },
@@ -3336,23 +3403,21 @@ function GoOSDemoContent() {
                             stiffness: 300,
                             damping: 30,
                         }}
-                        className="h-9 flex items-center justify-between px-5 fixed top-0 left-0 right-0 z-[2000] select-none"
+                        className="h-7 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
                         style={{
-                            background: goOS.colors.headerBg,
-                            backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
-                            WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
-                            borderBottom: `1px solid ${goOS.colors.borderSubtle}`,
-                            boxShadow: 'var(--shadow-xs, 0 1px 3px rgba(23, 20, 18, 0.04))',
+                            background: 'var(--topnav-bg, rgba(251, 249, 239, 0.55))',
+                            backdropFilter: 'blur(20px) saturate(180%)',
+                            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                         }}
                     >
-                {/* Left: Logo + Widgets Menu */}
-                <div className="flex items-center gap-3 min-w-[180px]">
+                {/* Left: Logo + Space Switcher */}
+                <div className="flex items-center gap-2">
                     <motion.button
                         onClick={handleLogoClick}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="text-lg font-bold relative tracking-tight"
-                        style={{ color: goOS.colors.text.primary }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="text-[13px] font-semibold relative"
+                        style={{ color: goOS.colors.text.secondary }}
                     >
                         goOS
                         <AnimatePresence>
@@ -3402,12 +3467,11 @@ function GoOSDemoContent() {
                     <div className="relative">
                         <motion.button
                             onClick={() => setShowWidgetsMenu(!showWidgetsMenu)}
-                            whileHover={{ scale: 1.02 }}
+                            whileHover={{ opacity: 0.8 }}
                             whileTap={{ scale: 0.98 }}
-                            className="text-xs font-medium px-2 py-1 rounded"
+                            className="text-[12px] font-medium"
                             style={{
-                                color: showWidgetsMenu ? goOS.colors.accent.primary : goOS.colors.text.secondary,
-                                background: showWidgetsMenu ? goOS.colors.accent.light : 'transparent',
+                                color: goOS.colors.text.muted,
                             }}
                         >
                             Widgets
@@ -3465,17 +3529,50 @@ function GoOSDemoContent() {
                     </div>
                 </div>
 
-                {/* Center: View Switcher - The main action */}
-                <div className="absolute left-1/2 -translate-x-1/2">
-                    <ViewSwitcher
-                        currentView={viewMode}
-                        onViewChange={setViewMode}
-                    />
-                </div>
-
-                {/* Right: Minimal system info */}
-                <div className="flex items-center gap-3 text-sm min-w-[100px] justify-end" style={{ color: goOS.colors.text.secondary }}>
-                    <span className="font-medium text-xs" style={{ color: goOS.colors.text.primary }}>{time}</span>
+                {/* Right: Theme toggle + time */}
+                <div className="flex items-center gap-2 text-sm justify-end" style={{ color: goOS.colors.text.muted }}>
+                    {/* Theme Toggle - Minimal icon */}
+                    <motion.button
+                        onClick={toggleDarkMode}
+                        whileHover={{ opacity: 0.7 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="relative flex items-center justify-center w-5 h-5"
+                        style={{ color: goOS.colors.text.muted }}
+                        aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+                    >
+                        <AnimatePresence mode="wait">
+                            {isDarkMode ? (
+                                <motion.svg
+                                    key="moon"
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.1 }}
+                                >
+                                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                                </motion.svg>
+                            ) : (
+                                <motion.svg
+                                    key="sun"
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.1 }}
+                                >
+                                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                                </motion.svg>
+                            )}
+                        </AnimatePresence>
+                    </motion.button>
+                    <span className="text-[11px]" style={{ color: goOS.colors.text.muted }}>{time}</span>
                 </div>
                     </motion.header>
                 )}
