@@ -2541,6 +2541,9 @@ function GoOSDemoContent() {
         { id: 'bg17', label: 'Gradient 17', preview: '/bg17.png' },
         { id: 'bg18', label: 'Gradient 18', preview: '/bg18.png' },
         { id: 'bg19', label: 'Gradient 19', preview: '/bg19.png' },
+        { id: 'bg20', label: 'Gradient 20', preview: '/bg20.png' },
+        { id: 'bg21', label: 'Gradient 21', preview: '/bg21.png' },
+        { id: 'bg22', label: 'Gradient 22', preview: '/bg22.png' },
     ];
 
     // Celebration helper
