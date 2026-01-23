@@ -1,8 +1,27 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import type { Slide, SlideContent } from '@/lib/presentation/parser';
 import type { PresentationTheme } from '@/lib/presentation/themes';
+import {
+  springs,
+  fadeUp,
+  fadeUpSubtle,
+  slideFromLeft,
+  slideFromRight,
+  scaleIn,
+  scaleInBouncy,
+  growFromCenter,
+  fadeIn,
+  staggerWords,
+  staggerItems,
+  staggerSlide,
+  listItem,
+  listBullet,
+  wordReveal,
+  withDelay,
+} from '@/lib/presentation/animations';
 
 /**
  * Typography System - Fixed, beautiful defaults
@@ -112,6 +131,9 @@ export function SlideRenderer({ slide, theme, size = 'full' }: SlideProps) {
     '--slide-font-body': theme.fonts.body,
   } as React.CSSProperties;
 
+  // Disable animations for thumbnails
+  const animate = size !== 'thumbnail';
+
   return (
     <div
       ref={containerRef}
@@ -139,7 +161,7 @@ export function SlideRenderer({ slide, theme, size = 'full' }: SlideProps) {
           ...themeStyles,
         }}
       >
-        {renderTemplate(slide, theme)}
+        {renderTemplate(slide, theme, animate)}
       </div>
     </div>
   );
@@ -148,36 +170,46 @@ export function SlideRenderer({ slide, theme, size = 'full' }: SlideProps) {
 /**
  * Render the appropriate template
  */
-function renderTemplate(slide: Slide, theme: PresentationTheme) {
+function renderTemplate(slide: Slide, theme: PresentationTheme, animate: boolean) {
   switch (slide.template) {
     case 'title':
-      return <TitleSlide content={slide.content} theme={theme} />;
+      return <TitleSlide content={slide.content} theme={theme} animate={animate} />;
     case 'section':
-      return <SectionSlide content={slide.content} theme={theme} />;
+      return <SectionSlide content={slide.content} theme={theme} animate={animate} />;
     case 'content':
-      return <ContentSlide content={slide.content} theme={theme} />;
+      return <ContentSlide content={slide.content} theme={theme} animate={animate} />;
     case 'image':
-      return <ImageSlide content={slide.content} theme={theme} />;
+      return <ImageSlide content={slide.content} theme={theme} animate={animate} />;
     case 'image-text':
-      return <ImageTextSlide content={slide.content} theme={theme} />;
+      return <ImageTextSlide content={slide.content} theme={theme} animate={animate} />;
     case 'quote':
-      return <QuoteSlide content={slide.content} theme={theme} />;
+      return <QuoteSlide content={slide.content} theme={theme} animate={animate} />;
     case 'list':
-      return <ListSlide content={slide.content} theme={theme} />;
+      return <ListSlide content={slide.content} theme={theme} animate={animate} />;
     case 'stat':
-      return <StatSlide content={slide.content} theme={theme} />;
+      return <StatSlide content={slide.content} theme={theme} animate={animate} />;
     case 'end':
-      return <EndSlide content={slide.content} theme={theme} />;
+      return <EndSlide content={slide.content} theme={theme} animate={animate} />;
     default:
-      return <ContentSlide content={slide.content} theme={theme} />;
+      return <ContentSlide content={slide.content} theme={theme} animate={animate} />;
   }
+}
+
+interface TemplateProps {
+  content: SlideContent;
+  theme: PresentationTheme;
+  animate: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────
 // TEMPLATE 1: TITLE SLIDE
+// Choreography: Background → Title → Subtitle → Author/Date
 // ─────────────────────────────────────────────────────────────
 
-function TitleSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function TitleSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+
   return (
     <div
       style={{
@@ -194,11 +226,13 @@ function TitleSlide({ content, theme }: { content: SlideContent; theme: Presenta
     >
       {/* Background image if provided */}
       {content.image && (
-        <div
+        <motion.div
+          initial={shouldAnimate ? { opacity: 0 } : false}
+          animate={{ opacity: 0.15 }}
+          transition={shouldAnimate ? { duration: 0.8, ease: 'easeOut' } : { duration: 0 }}
           style={{
             position: 'absolute',
             inset: 0,
-            opacity: 0.15,
             background: `url(${content.image}) center/cover no-repeat`,
           }}
         />
@@ -206,7 +240,10 @@ function TitleSlide({ content, theme }: { content: SlideContent; theme: Presenta
 
       <div style={{ position: 'relative', maxWidth: '1200px' }}>
         {/* Title */}
-        <h1
+        <motion.h1
+          initial={shouldAnimate ? fadeUp.hidden : false}
+          animate={fadeUp.visible}
+          transition={shouldAnimate ? withDelay(springs.snappy, 100) : { duration: 0 }}
           style={{
             fontSize: typography.title,
             fontFamily: theme.fonts.display,
@@ -218,11 +255,14 @@ function TitleSlide({ content, theme }: { content: SlideContent; theme: Presenta
           }}
         >
           {content.heading}
-        </h1>
+        </motion.h1>
 
         {/* Subtitle */}
         {content.subheading && (
-          <p
+          <motion.p
+            initial={shouldAnimate ? fadeUpSubtle.hidden : false}
+            animate={fadeUpSubtle.visible}
+            transition={shouldAnimate ? withDelay(springs.smooth, 400) : { duration: 0 }}
             style={{
               fontSize: typography.subheading,
               fontFamily: theme.fonts.body,
@@ -234,13 +274,16 @@ function TitleSlide({ content, theme }: { content: SlideContent; theme: Presenta
             }}
           >
             {content.subheading}
-          </p>
+          </motion.p>
         )}
       </div>
 
       {/* Author + Date - Bottom */}
       {(content.author || content.date) && (
-        <div
+        <motion.div
+          initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={shouldAnimate ? withDelay(springs.gentle, 600) : { duration: 0 }}
           style={{
             position: 'absolute',
             bottom: space.slide,
@@ -262,7 +305,7 @@ function TitleSlide({ content, theme }: { content: SlideContent; theme: Presenta
             {content.author && content.date && ' · '}
             {content.date}
           </span>
-        </div>
+        </motion.div>
       )}
     </div>
   );
@@ -270,9 +313,13 @@ function TitleSlide({ content, theme }: { content: SlideContent; theme: Presenta
 
 // ─────────────────────────────────────────────────────────────
 // TEMPLATE 2: SECTION HEADER
+// Choreography: Accent line grows → Heading fades up
 // ─────────────────────────────────────────────────────────────
 
-function SectionSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function SectionSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+
   return (
     <div
       style={{
@@ -285,17 +332,25 @@ function SectionSlide({ content, theme }: { content: SlideContent; theme: Presen
         padding: space.slide,
       }}
     >
-      {/* Accent line above */}
-      <div
+      {/* Accent line above - grows from center */}
+      <motion.div
+        initial={shouldAnimate ? growFromCenter.hidden : false}
+        animate={growFromCenter.visible}
+        transition={shouldAnimate ? springs.snappy : { duration: 0 }}
         style={{
           width: '60px',
           height: '4px',
           background: theme.colors.accent,
           marginBottom: space.lg,
+          transformOrigin: 'center',
         }}
       />
 
-      <h2
+      {/* Heading */}
+      <motion.h2
+        initial={shouldAnimate ? fadeUp.hidden : false}
+        animate={fadeUp.visible}
+        transition={shouldAnimate ? withDelay(springs.snappy, 200) : { duration: 0 }}
         style={{
           fontSize: typography.section,
           fontFamily: theme.fonts.display,
@@ -308,16 +363,20 @@ function SectionSlide({ content, theme }: { content: SlideContent; theme: Presen
         }}
       >
         {content.heading}
-      </h2>
+      </motion.h2>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────
 // TEMPLATE 3: CONTENT SLIDE
+// Choreography: Heading slides from left → Body fades up
 // ─────────────────────────────────────────────────────────────
 
-function ContentSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function ContentSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+
   return (
     <div
       style={{
@@ -333,7 +392,10 @@ function ContentSlide({ content, theme }: { content: SlideContent; theme: Presen
     >
       {/* Heading */}
       {content.heading && (
-        <h3
+        <motion.h3
+          initial={shouldAnimate ? slideFromLeft.hidden : false}
+          animate={slideFromLeft.visible}
+          transition={shouldAnimate ? springs.snappy : { duration: 0 }}
           style={{
             fontSize: typography.heading,
             fontFamily: theme.fonts.display,
@@ -345,12 +407,15 @@ function ContentSlide({ content, theme }: { content: SlideContent; theme: Presen
           }}
         >
           {content.heading}
-        </h3>
+        </motion.h3>
       )}
 
       {/* Body */}
       {content.body && (
-        <p
+        <motion.p
+          initial={shouldAnimate ? fadeUpSubtle.hidden : false}
+          animate={fadeUpSubtle.visible}
+          transition={shouldAnimate ? withDelay(springs.smooth, 200) : { duration: 0 }}
           style={{
             fontSize: typography.body,
             fontFamily: theme.fonts.body,
@@ -361,7 +426,7 @@ function ContentSlide({ content, theme }: { content: SlideContent; theme: Presen
           }}
         >
           {content.body}
-        </p>
+        </motion.p>
       )}
     </div>
   );
@@ -369,9 +434,13 @@ function ContentSlide({ content, theme }: { content: SlideContent; theme: Presen
 
 // ─────────────────────────────────────────────────────────────
 // TEMPLATE 4: IMAGE SLIDE (Full Bleed)
+// Choreography: Image scales in → Caption fades up
 // ─────────────────────────────────────────────────────────────
 
-function ImageSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function ImageSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+
   return (
     <div
       style={{
@@ -385,7 +454,10 @@ function ImageSlide({ content, theme }: { content: SlideContent; theme: Presenta
       }}
     >
       {/* Image container */}
-      <div
+      <motion.div
+        initial={shouldAnimate ? scaleIn.hidden : false}
+        animate={scaleIn.visible}
+        transition={shouldAnimate ? springs.smooth : { duration: 0 }}
         style={{
           flex: 1,
           width: '100%',
@@ -406,11 +478,14 @@ function ImageSlide({ content, theme }: { content: SlideContent; theme: Presenta
             }}
           />
         )}
-      </div>
+      </motion.div>
 
       {/* Caption */}
       {content.caption && (
-        <p
+        <motion.p
+          initial={shouldAnimate ? fadeUpSubtle.hidden : false}
+          animate={fadeUpSubtle.visible}
+          transition={shouldAnimate ? withDelay(springs.gentle, 300) : { duration: 0 }}
           style={{
             marginTop: space.md,
             fontSize: typography.caption,
@@ -420,7 +495,7 @@ function ImageSlide({ content, theme }: { content: SlideContent; theme: Presenta
           }}
         >
           {content.caption}
-        </p>
+        </motion.p>
       )}
     </div>
   );
@@ -428,9 +503,13 @@ function ImageSlide({ content, theme }: { content: SlideContent; theme: Presenta
 
 // ─────────────────────────────────────────────────────────────
 // TEMPLATE 5: IMAGE + TEXT SLIDE
+// Choreography: Image from left → Heading from right → Body fades
 // ─────────────────────────────────────────────────────────────
 
-function ImageTextSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function ImageTextSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+
   return (
     <div
       style={{
@@ -444,7 +523,10 @@ function ImageTextSlide({ content, theme }: { content: SlideContent; theme: Pres
       }}
     >
       {/* Image - Left */}
-      <div
+      <motion.div
+        initial={shouldAnimate ? slideFromLeft.hidden : false}
+        animate={slideFromLeft.visible}
+        transition={shouldAnimate ? springs.snappy : { duration: 0 }}
         style={{
           height: '100%',
           display: 'flex',
@@ -465,7 +547,7 @@ function ImageTextSlide({ content, theme }: { content: SlideContent; theme: Pres
             }}
           />
         )}
-      </div>
+      </motion.div>
 
       {/* Text - Right */}
       <div
@@ -476,7 +558,10 @@ function ImageTextSlide({ content, theme }: { content: SlideContent; theme: Pres
         }}
       >
         {content.heading && (
-          <h3
+          <motion.h3
+            initial={shouldAnimate ? slideFromRight.hidden : false}
+            animate={slideFromRight.visible}
+            transition={shouldAnimate ? withDelay(springs.snappy, 150) : { duration: 0 }}
             style={{
               fontSize: typography.heading,
               fontFamily: theme.fonts.display,
@@ -488,11 +573,14 @@ function ImageTextSlide({ content, theme }: { content: SlideContent; theme: Pres
             }}
           >
             {content.heading}
-          </h3>
+          </motion.h3>
         )}
 
         {content.body && (
-          <p
+          <motion.p
+            initial={shouldAnimate ? fadeUpSubtle.hidden : false}
+            animate={fadeUpSubtle.visible}
+            transition={shouldAnimate ? withDelay(springs.smooth, 300) : { duration: 0 }}
             style={{
               fontSize: typography.body,
               fontFamily: theme.fonts.body,
@@ -502,7 +590,7 @@ function ImageTextSlide({ content, theme }: { content: SlideContent; theme: Pres
             }}
           >
             {content.body}
-          </p>
+          </motion.p>
         )}
       </div>
     </div>
@@ -510,10 +598,15 @@ function ImageTextSlide({ content, theme }: { content: SlideContent; theme: Pres
 }
 
 // ─────────────────────────────────────────────────────────────
-// TEMPLATE 6: QUOTE SLIDE
+// TEMPLATE 6: QUOTE SLIDE ✨
+// Choreography: Quote mark bounces → Words reveal one-by-one → Attribution fades
 // ─────────────────────────────────────────────────────────────
 
-function QuoteSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function QuoteSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+  const words = content.quote?.split(' ') || [];
+
   return (
     <div
       style={{
@@ -528,8 +621,11 @@ function QuoteSlide({ content, theme }: { content: SlideContent; theme: Presenta
         paddingRight: '160px',
       }}
     >
-      {/* Opening quote mark */}
-      <span
+      {/* Opening quote mark - bouncy entrance */}
+      <motion.span
+        initial={shouldAnimate ? scaleInBouncy.hidden : false}
+        animate={scaleInBouncy.visible}
+        transition={shouldAnimate ? springs.bouncy : { duration: 0 }}
         style={{
           fontSize: '120px',
           fontFamily: theme.fonts.display,
@@ -540,10 +636,13 @@ function QuoteSlide({ content, theme }: { content: SlideContent; theme: Presenta
         }}
       >
         "
-      </span>
+      </motion.span>
 
-      {/* Quote text */}
-      <blockquote
+      {/* Quote text - word by word reveal */}
+      <motion.blockquote
+        initial="hidden"
+        animate="visible"
+        variants={shouldAnimate ? staggerWords : undefined}
         style={{
           fontSize: typography.quote,
           fontFamily: theme.fonts.display,
@@ -556,12 +655,24 @@ function QuoteSlide({ content, theme }: { content: SlideContent; theme: Presenta
           margin: 0,
         }}
       >
-        {content.quote}
-      </blockquote>
+        {words.map((word, i) => (
+          <motion.span
+            key={i}
+            variants={shouldAnimate ? wordReveal : undefined}
+            transition={shouldAnimate ? springs.gentle : { duration: 0 }}
+            style={{ display: 'inline-block', marginRight: '0.3em' }}
+          >
+            {word}
+          </motion.span>
+        ))}
+      </motion.blockquote>
 
       {/* Attribution */}
       {content.attribution && (
-        <cite
+        <motion.cite
+          initial={shouldAnimate ? fadeUpSubtle.hidden : false}
+          animate={fadeUpSubtle.visible}
+          transition={shouldAnimate ? withDelay(springs.gentle, 600 + words.length * 30) : { duration: 0 }}
           style={{
             marginTop: space.lg,
             fontSize: typography.caption,
@@ -574,17 +685,21 @@ function QuoteSlide({ content, theme }: { content: SlideContent; theme: Presenta
           }}
         >
           — {content.attribution}
-        </cite>
+        </motion.cite>
       )}
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────
-// TEMPLATE 7: LIST SLIDE
+// TEMPLATE 7: LIST SLIDE ✨
+// Choreography: Heading slides in → Items stagger one-by-one
 // ─────────────────────────────────────────────────────────────
 
-function ListSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function ListSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+
   return (
     <div
       style={{
@@ -600,7 +715,10 @@ function ListSlide({ content, theme }: { content: SlideContent; theme: Presentat
     >
       {/* Heading */}
       {content.heading && (
-        <h3
+        <motion.h3
+          initial={shouldAnimate ? slideFromLeft.hidden : false}
+          animate={slideFromLeft.visible}
+          transition={shouldAnimate ? springs.snappy : { duration: 0 }}
           style={{
             fontSize: typography.heading,
             fontFamily: theme.fonts.display,
@@ -612,11 +730,14 @@ function ListSlide({ content, theme }: { content: SlideContent; theme: Presentat
           }}
         >
           {content.heading}
-        </h3>
+        </motion.h3>
       )}
 
-      {/* List */}
-      <ul
+      {/* List - staggered items */}
+      <motion.ul
+        initial="hidden"
+        animate="visible"
+        variants={shouldAnimate ? staggerItems : undefined}
         style={{
           listStyle: 'none',
           padding: 0,
@@ -624,8 +745,10 @@ function ListSlide({ content, theme }: { content: SlideContent; theme: Presentat
         }}
       >
         {content.items?.map((item, index) => (
-          <li
+          <motion.li
             key={index}
+            variants={shouldAnimate ? listItem : undefined}
+            transition={shouldAnimate ? springs.snappy : { duration: 0 }}
             style={{
               fontSize: typography.list,
               fontFamily: theme.fonts.body,
@@ -638,8 +761,10 @@ function ListSlide({ content, theme }: { content: SlideContent; theme: Presentat
               gap: space.md,
             }}
           >
-            {/* Custom bullet */}
-            <span
+            {/* Custom bullet - scales in */}
+            <motion.span
+              variants={shouldAnimate ? listBullet : undefined}
+              transition={shouldAnimate ? springs.bouncy : { duration: 0 }}
               style={{
                 width: '8px',
                 height: '8px',
@@ -650,18 +775,70 @@ function ListSlide({ content, theme }: { content: SlideContent; theme: Presentat
               }}
             />
             <span>{item}</span>
-          </li>
+          </motion.li>
         ))}
-      </ul>
+      </motion.ul>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────
-// TEMPLATE 8: STAT SLIDE
+// TEMPLATE 8: STAT SLIDE ✨
+// Choreography: Number counts up with spring → Label fades up
 // ─────────────────────────────────────────────────────────────
 
-function StatSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function StatSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+
+  // Parse the stat value to extract number and suffix
+  const statValue = content.stat_value || '0';
+  const match = statValue.match(/^([\d,.]+)(.*)$/);
+  const numericPart = match ? match[1].replace(/,/g, '') : '0';
+  const suffix = match ? match[2] : '';
+  const targetValue = parseFloat(numericPart) || 0;
+
+  // Animated counter state
+  const [displayValue, setDisplayValue] = useState(shouldAnimate ? 0 : targetValue);
+
+  useEffect(() => {
+    if (!shouldAnimate) {
+      setDisplayValue(targetValue);
+      return;
+    }
+
+    // Reset on mount for animation
+    setDisplayValue(0);
+
+    const duration = 1200; // ms
+    const startTime = performance.now();
+
+    const animateCount = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Ease-out cubic for satisfying deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const currentValue = Math.round(targetValue * eased);
+
+      setDisplayValue(currentValue);
+
+      if (progress < 1) {
+        requestAnimationFrame(animateCount);
+      }
+    };
+
+    // Delay start to let scale animation begin
+    const timeout = setTimeout(() => {
+      requestAnimationFrame(animateCount);
+    }, 200);
+
+    return () => clearTimeout(timeout);
+  }, [targetValue, shouldAnimate]);
+
+  // Format the display value with commas
+  const formattedValue = displayValue.toLocaleString();
+
   return (
     <div
       style={{
@@ -674,8 +851,11 @@ function StatSlide({ content, theme }: { content: SlideContent; theme: Presentat
         padding: space.slide,
       }}
     >
-      {/* Big number */}
-      <div
+      {/* Big number - bouncy scale entrance */}
+      <motion.div
+        initial={shouldAnimate ? scaleInBouncy.hidden : false}
+        animate={scaleInBouncy.visible}
+        transition={shouldAnimate ? springs.bouncy : { duration: 0 }}
         style={{
           fontSize: typography.stat,
           fontFamily: theme.fonts.display,
@@ -685,12 +865,15 @@ function StatSlide({ content, theme }: { content: SlideContent; theme: Presentat
           color: theme.colors.accent,
         }}
       >
-        {content.stat_value}
-      </div>
+        {formattedValue}{suffix}
+      </motion.div>
 
       {/* Label */}
       {content.stat_label && (
-        <p
+        <motion.p
+          initial={shouldAnimate ? fadeUpSubtle.hidden : false}
+          animate={fadeUpSubtle.visible}
+          transition={shouldAnimate ? withDelay(springs.smooth, 300) : { duration: 0 }}
           style={{
             marginTop: space.lg,
             fontSize: typography.subheading,
@@ -703,7 +886,7 @@ function StatSlide({ content, theme }: { content: SlideContent; theme: Presentat
           }}
         >
           {content.stat_label}
-        </p>
+        </motion.p>
       )}
     </div>
   );
@@ -711,9 +894,13 @@ function StatSlide({ content, theme }: { content: SlideContent; theme: Presentat
 
 // ─────────────────────────────────────────────────────────────
 // TEMPLATE 9: END SLIDE
+// Choreography: Thank you scales in → URL slides up
 // ─────────────────────────────────────────────────────────────
 
-function EndSlide({ content, theme }: { content: SlideContent; theme: PresentationTheme }) {
+function EndSlide({ content, theme, animate }: TemplateProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = animate && !prefersReducedMotion;
+
   return (
     <div
       style={{
@@ -726,8 +913,11 @@ function EndSlide({ content, theme }: { content: SlideContent; theme: Presentati
         padding: space.slide,
       }}
     >
-      {/* Thank You */}
-      <h2
+      {/* Thank You - satisfying spring entrance */}
+      <motion.h2
+        initial={shouldAnimate ? scaleInBouncy.hidden : false}
+        animate={scaleInBouncy.visible}
+        transition={shouldAnimate ? springs.bouncy : { duration: 0 }}
         style={{
           fontSize: typography.section,
           fontFamily: theme.fonts.display,
@@ -738,11 +928,14 @@ function EndSlide({ content, theme }: { content: SlideContent; theme: Presentati
         }}
       >
         Thank You
-      </h2>
+      </motion.h2>
 
       {/* URL */}
       {content.url && (
-        <a
+        <motion.a
+          initial={shouldAnimate ? fadeUpSubtle.hidden : false}
+          animate={fadeUpSubtle.visible}
+          transition={shouldAnimate ? withDelay(springs.smooth, 300) : { duration: 0 }}
           href={`https://${content.url}`}
           style={{
             fontSize: typography.subheading,
@@ -753,7 +946,7 @@ function EndSlide({ content, theme }: { content: SlideContent; theme: Presentati
           }}
         >
           {content.url}
-        </a>
+        </motion.a>
       )}
     </div>
   );
