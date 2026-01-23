@@ -11,6 +11,8 @@ import {
   Share2,
   Eye,
   EyeOff,
+  Presentation,
+  FileText,
 } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { FileType } from './GoOSFileIcon';
@@ -64,10 +66,8 @@ export function GoOSFileContextMenu({
   onClose,
   fileType,
   fileStatus,
-  // These props are accepted for backward compatibility but not displayed in the simplified menu
+  // These props are accepted for backward compatibility but not used
   accessLevel: _accessLevel,
-  onOpenAsPage: _onOpenAsPage,
-  onOpenAsPresent: _onOpenAsPresent,
   onCut: _onCut,
   onPaste: _onPaste,
   onToggleLock: _onToggleLock,
@@ -75,6 +75,8 @@ export function GoOSFileContextMenu({
   canPaste: _canPaste,
   // Used props
   onOpen,
+  onOpenAsPage,
+  onOpenAsPresent,
   onRename,
   onDuplicate,
   onCopy,
@@ -90,7 +92,7 @@ export function GoOSFileContextMenu({
   const isFolder = fileType === 'folder';
   const isDraft = fileStatus === 'draft';
 
-  // Simplified, user-friendly menu items
+  // Menu items
   const items: ContextMenuItem[] = useMemo(() => {
     const menuItems: ContextMenuItem[] = [
       {
@@ -99,15 +101,36 @@ export function GoOSFileContextMenu({
         icon: isFolder ? <FolderOpen size={15} strokeWidth={1.75} /> : <Edit3 size={15} strokeWidth={1.75} />,
         onClick: onOpen,
       },
-      {
-        id: 'rename',
-        label: 'Rename',
-        icon: <Edit3 size={15} strokeWidth={1.75} />,
-        shortcut: '⏎',
-        onClick: onRename,
-        dividerAfter: true,
-      },
     ];
+
+    // View modes for notes and case studies
+    if (!isFolder && (fileType === 'note' || fileType === 'case-study')) {
+      if (onOpenAsPage) {
+        menuItems.push({
+          id: 'openAsPage',
+          label: 'View as Page',
+          icon: <FileText size={15} strokeWidth={1.75} />,
+          onClick: onOpenAsPage,
+        });
+      }
+      if (onOpenAsPresent) {
+        menuItems.push({
+          id: 'present',
+          label: 'Present',
+          icon: <Presentation size={15} strokeWidth={1.75} />,
+          onClick: onOpenAsPresent,
+        });
+      }
+    }
+
+    menuItems.push({
+      id: 'rename',
+      label: 'Rename',
+      icon: <Edit3 size={15} strokeWidth={1.75} />,
+      shortcut: '⏎',
+      onClick: onRename,
+      dividerAfter: true,
+    });
 
     // Only show publish toggle for files (not folders)
     if (!isFolder && onTogglePublish) {
@@ -158,7 +181,7 @@ export function GoOSFileContextMenu({
     );
 
     return menuItems;
-  }, [isFolder, isDraft, onOpen, onRename, onTogglePublish, onShare, onDuplicate, onCopy, onDelete]);
+  }, [isFolder, isDraft, fileType, onOpen, onOpenAsPage, onOpenAsPresent, onRename, onTogglePublish, onShare, onDuplicate, onCopy, onDelete]);
 
   // Calculate divider count for height estimation
   const dividerCount = items.filter(item => item.dividerAfter).length;
