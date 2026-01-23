@@ -3310,7 +3310,7 @@ function GoOSDemoContent() {
             id="goos-desktop-area"
             data-goos-desktop
             data-zen-mode={isZenMode ? 'true' : undefined}
-            className="min-h-screen w-full relative overflow-hidden theme-sketch"
+            className={`min-h-screen w-full relative overflow-hidden theme-sketch ${isDarkMode ? 'dark' : ''}`}
             style={{
                 backgroundColor: goOS.colors.paper,
                 // CSS variable for zen mode - windows use this for full-height
