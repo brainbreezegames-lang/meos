@@ -59,6 +59,7 @@ import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
 import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
+import { SPRING, DURATION, EASE, fadeInUp, fadeInScale, TRANSITION, WILL_CHANGE, getStaggerDelayCapped } from '@/lib/animations';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -647,9 +648,11 @@ const goOS = {
         window: 'var(--window-radius)',
     },
     springs: {
-        snappy: { type: "spring" as const, damping: 20, stiffness: 400 },
-        gentle: { type: "spring" as const, damping: 25, stiffness: 200 },
-        bouncy: { type: "spring" as const, damping: 15, stiffness: 300 },
+        snappy: SPRING.snappy,
+        gentle: SPRING.gentle,
+        bouncy: SPRING.bouncy,
+        smooth: SPRING.smooth,
+        dock: SPRING.dock,
     }
 };
 
@@ -1663,23 +1666,24 @@ const DockIcon = React.memo(({
             <AnimatePresence>
                 {isHovered && label && (
                     <motion.div
-                        initial={{ opacity: 0, y: 6, scale: 0.85 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 6, scale: 0.85 }}
-                        transition={{ type: 'spring', damping: 20, stiffness: 400 }}
+                        initial={fadeInUp.initial}
+                        animate={fadeInUp.animate}
+                        exit={fadeInUp.exit}
+                        transition={TRANSITION.tooltip}
                         className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
                         style={{
-                            background: 'rgba(250, 248, 243, 0.95)',
-                            color: '#1a1816',
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+                            background: 'var(--bg-elevated)',
+                            color: 'var(--text-primary)',
+                            boxShadow: 'var(--shadow-lg)',
                             backdropFilter: 'blur(12px)',
+                            ...WILL_CHANGE.transformOpacity,
                         }}
                     >
                         {label}
                         {/* Tooltip arrow */}
                         <div
                             className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45"
-                            style={{ background: 'rgba(250, 248, 243, 0.95)' }}
+                            style={{ background: 'var(--bg-elevated)' }}
                         />
                     </motion.div>
                 )}
@@ -1828,15 +1832,15 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
         <motion.div
             drag
             dragMomentum={false}
-            initial={{ opacity: 0, scale: 0.85, y: 20 }}
+            initial={fadeInScale.initial}
             animate={isClosing
-                ? { opacity: 0, scale: 0.8, y: -10, rotate: -2 }
-                : { opacity: 1, scale: 1, y: 0, rotate: 0 }
+                ? { opacity: 0, scale: 0.94, y: -8 }
+                : fadeInScale.animate
             }
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            exit={fadeInScale.exit}
             transition={isClosing
-                ? { duration: 0.2, ease: [0.4, 0, 1, 1] }
-                : { type: 'spring', stiffness: 350, damping: 25, mass: 0.8 }
+                ? { duration: DURATION.normal, ease: EASE.out }
+                : SPRING.smooth
             }
             onMouseDown={onFocus}
             className="fixed flex flex-col overflow-hidden"
@@ -1849,7 +1853,8 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                 background: 'var(--color-bg-base)',
                 border: '1px solid var(--color-border-default)',
                 borderRadius: 'var(--radius-lg, 20px)',
-                boxShadow: 'var(--shadow-window)'
+                boxShadow: 'var(--shadow-window)',
+                ...WILL_CHANGE.transformOpacity,
             }}
         >
             {/* Title Bar - unified 48px height, subtle border */}

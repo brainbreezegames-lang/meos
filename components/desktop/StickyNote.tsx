@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useEditContextSafe } from '@/contexts/EditContext';
 
 // Sticky note colors matching macOS Stickies
@@ -34,6 +34,7 @@ interface StickyNoteProps {
 }
 
 export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyNoteProps) {
+  const prefersReducedMotion = useReducedMotion();
   const context = useEditContextSafe();
   const isOwner = context?.isOwner ?? false;
 
@@ -172,14 +173,13 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
         onMouseDown={handleMouseDown}
         onDoubleClick={handleDoubleClick}
         onContextMenu={handleContextMenu}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{
-          scale: isDragging ? 1.05 : 1,
-          opacity: 1,
-          y: isDragging ? -5 : 0,
-        }}
-        exit={{ scale: 0, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
+        animate={prefersReducedMotion
+          ? { opacity: 1 }
+          : { scale: isDragging ? 1.05 : 1, opacity: 1, y: isDragging ? -5 : 0 }
+        }
+        exit={prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
+        transition={prefersReducedMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 400, damping: 25 }}
       >
         {/* Pin */}
         <div
@@ -287,9 +287,9 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
               }}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+              animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
             >
               {(Object.keys(STICKY_COLORS) as StickyColor[]).map((color) => (
                 <button
@@ -333,6 +333,7 @@ interface StickyNotesContainerProps {
 }
 
 export function StickyNotesContainer({ notes, onNotesChange, maxNotes = 5 }: StickyNotesContainerProps) {
+  const prefersReducedMotion = useReducedMotion();
   const context = useEditContextSafe();
   const isOwner = context?.isOwner ?? false;
   const [localNotes, setLocalNotes] = useState(notes);
@@ -409,8 +410,8 @@ export function StickyNotesContainer({ notes, onNotesChange, maxNotes = 5 }: Sti
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
             fontSize: '20px',
           }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+          whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
           title="Add sticky note"
         >
           +

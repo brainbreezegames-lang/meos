@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget, StatusType } from '@/types';
@@ -50,6 +50,7 @@ export function StatusWidget({
   onContextMenu,
   isHighlighted,
 }: StatusWidgetProps) {
+  const prefersReducedMotion = useReducedMotion();
   const [isHovered, setIsHovered] = useState(false);
   const theme = useWidgetTheme();
   const config: StatusWidgetConfig = {
@@ -92,7 +93,7 @@ export function StatusWidget({
               ? `var(--shadow-md), ${statusTheme.glow}`
               : 'var(--shadow-sm)',
           }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
         >
           {/* Glass background */}
           <div

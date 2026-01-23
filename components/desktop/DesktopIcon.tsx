@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface DesktopIconProps {
     icon: React.ReactNode;
@@ -21,15 +21,16 @@ export default function DesktopIcon({
     isOpen = false,
     delay = 0,
 }: DesktopIconProps) {
+    const prefersReducedMotion = useReducedMotion();
+
     return (
         <motion.button
-            initial={{ opacity: 0, scale: 0.8, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{
-                delay,
-                duration: 0.4,
-                ease: [0.16, 1, 0.3, 1]
-            }}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8, y: 10 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            transition={prefersReducedMotion
+                ? { duration: 0.1 }
+                : { delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] }
+            }
             onDoubleClick={onOpen}
             onClick={onFocus}
             className="group flex flex-col items-center gap-2.5 w-[80px] focus:outline-none relative"
@@ -72,10 +73,10 @@ export default function DesktopIcon({
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
+                        animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1, opacity: 1 }}
+                        exit={prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
+                        transition={prefersReducedMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 500, damping: 30 }}
                         className="absolute -bottom-1 left-1/2 -translate-x-1/2"
                     >
                         <div

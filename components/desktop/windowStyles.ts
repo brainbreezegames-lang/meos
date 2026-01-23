@@ -7,6 +7,10 @@
  */
 
 import React from 'react';
+import { SPRING, DURATION, REDUCED_MOTION, windowOpen } from '@/lib/animations';
+
+// Re-export animation system for easy access
+export { SPRING, DURATION, REDUCED_MOTION } from '@/lib/animations';
 
 // ============================================================================
 // WINDOW CONTAINER STYLES
@@ -109,23 +113,22 @@ export const CONTROLS = {
 } as const;
 
 // ============================================================================
-// ANIMATION - Spring bounce
+// ANIMATION - Spring bounce (uses unified animation system)
 // ============================================================================
 export const ANIMATION = {
-  initial: { opacity: 0, scale: 0.85, y: 20 },
-  animate: { opacity: 1, scale: 1, y: 0 },
-  exit: { opacity: 0, scale: 0.95, y: 10 },
-  transition: {
-    type: 'spring' as const,
-    stiffness: 350,
-    damping: 25,
-    mass: 0.8,
-  },
-  // Reduced motion
-  reducedInitial: { opacity: 0 },
-  reducedAnimate: { opacity: 1 },
-  reducedExit: { opacity: 0 },
-  reducedTransition: { duration: 0.15 },
+  // Window open/close variants
+  initial: windowOpen.initial,
+  animate: windowOpen.animate,
+  exit: windowOpen.exit,
+
+  // Spring transition (from unified system)
+  transition: SPRING.smooth,
+
+  // Reduced motion (from unified system)
+  reducedInitial: REDUCED_MOTION.fade.initial,
+  reducedAnimate: REDUCED_MOTION.fade.animate,
+  reducedExit: REDUCED_MOTION.fade.exit,
+  reducedTransition: REDUCED_MOTION.transition,
 } as const;
 
 // ============================================================================

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback, ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,6 +11,7 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+  const prefersReducedMotion = useReducedMotion();
   const modalRef = useRef<HTMLDivElement>(null);
 
   const handleKeyDown = useCallback(
@@ -53,7 +54,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: prefersReducedMotion ? 0.01 : 0.15 }}
           />
 
           {/* Modal */}
@@ -71,10 +72,10 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
               borderRadius: 'var(--radius-lg, 18px)',
               boxShadow: 'var(--shadow-window)',
             }}
-            initial={{ opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
+            initial={prefersReducedMotion ? { opacity: 0, x: '-50%', y: '-50%' } : { opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
             animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
-            exit={{ opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            exit={prefersReducedMotion ? { opacity: 0, x: '-50%', y: '-50%' } : { opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
+            transition={prefersReducedMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 400, damping: 30 }}
           >
             {/* Header */}
             <div

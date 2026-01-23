@@ -731,6 +731,92 @@ body {
 }
 
 /* ============================================
+   REDUCED MOTION - Accessibility
+   Respects user's system preference for reduced motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Allow opacity transitions for accessibility (screen readers benefit) */
+    .allow-opacity-transition {
+        transition-duration: 0.15s !important;
+        transition-property: opacity !important;
+    }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   GPU acceleration hints for animated elements
+   ============================================ */
+
+/* Windows and draggable elements */
+[data-window],
+[draggable="true"],
+.dock-item,
+.desktop-icon {
+    will-change: transform;
+    contain: layout style;
+}
+
+/* Frequently animated UI elements */
+.animate-on-hover:hover {
+    will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes (auto-cleanup) */
+.animate-on-hover:not(:hover) {
+    will-change: auto;
+}
+
+/* Optimize backdrop-filter performance */
+.glass-panel,
+.glass-card,
+[style*="backdrop-filter"] {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Contain paint for complex components */
+.window-content,
+.dock-container,
+.desktop-area {
+    contain: paint;
+}
+
+/* ============================================
+   UNIFIED TRANSITION DURATIONS
+   Use these classes for consistent timing
+   ============================================ */
+.transition-fast {
+    transition-duration: 0.15s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-normal {
+    transition-duration: 0.2s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-slow {
+    transition-duration: 0.3s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* GPU-optimized transitions (only transform + opacity) */
+.transition-gpu {
+    transition-property: transform, opacity;
+    transition-duration: 0.2s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
    PREMIUM UTILITIES
    ============================================ */
 

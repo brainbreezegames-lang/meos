@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { SparkleEffect, haptic } from '@/components/ui/Delight';
 
 interface WelcomeNotificationProps {
@@ -23,6 +23,7 @@ export function WelcomeNotification({
   duration = 8000,
   onDismiss,
 }: WelcomeNotificationProps) {
+  const prefersReducedMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState(false);
   const [hasSeenWelcome, setHasSeenWelcome] = useState(true);
   const [showSparkles, setShowSparkles] = useState(false);
@@ -72,15 +73,13 @@ export function WelcomeNotification({
             right: '16px',
             width: '360px',
           }}
-          initial={{ x: 400, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: 400, opacity: 0 }}
-          transition={{
-            type: 'spring',
-            stiffness: 400,
-            damping: 35,
-            mass: 1,
-          }}
+          initial={prefersReducedMotion ? { opacity: 0 } : { x: 400, opacity: 0 }}
+          animate={prefersReducedMotion ? { opacity: 1 } : { x: 0, opacity: 1 }}
+          exit={prefersReducedMotion ? { opacity: 0 } : { x: 400, opacity: 0 }}
+          transition={prefersReducedMotion
+            ? { duration: 0.1 }
+            : { type: 'spring', stiffness: 400, damping: 35, mass: 1 }
+          }
           onClick={handleDismiss}
         >
           <div
@@ -111,15 +110,17 @@ export function WelcomeNotification({
             />
 
             {/* Progress bar */}
-            <motion.div
-              className="absolute top-0 left-0 h-[2px]"
-              style={{
-                background: 'var(--accent-primary)',
-              }}
-              initial={{ width: '100%' }}
-              animate={{ width: '0%' }}
-              transition={{ duration: duration / 1000, ease: 'linear' }}
-            />
+            {!prefersReducedMotion && (
+              <motion.div
+                className="absolute top-0 left-0 h-[2px]"
+                style={{
+                  background: 'var(--accent-primary)',
+                }}
+                initial={{ width: '100%' }}
+                animate={{ width: '0%' }}
+                transition={{ duration: duration / 1000, ease: 'linear' }}
+              />
+            )}
 
             <div className="flex gap-3 p-4">
               {/* Icon */}
