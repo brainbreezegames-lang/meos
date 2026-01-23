@@ -3375,18 +3375,18 @@ function GoOSDemoContent() {
                     <div
                         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2"
                         style={{
-                            background: 'rgba(255, 255, 255, 0.95)',
+                            background: 'var(--bg-elevated)',
                             padding: '16px 24px',
                             borderRadius: 12,
-                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                            boxShadow: 'var(--shadow-lg)',
                         }}
                     >
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff7722" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                             <circle cx="8.5" cy="8.5" r="1.5"/>
                             <polyline points="21,15 16,10 5,21"/>
                         </svg>
-                        <span style={{ fontSize: 14, fontWeight: 600, color: '#171412' }}>Drop images here</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>Drop images here</span>
                     </div>
                 </div>
             )}
@@ -4058,7 +4058,7 @@ function GoOSDemoContent() {
                                 onClose={() => closeApp('notes')}
                                 onFocus={() => focusApp('notes')}
                             >
-                                <div className="p-4 h-full" style={{ background: '#FFFACD' }}>
+                                <div className="p-4 h-full" style={{ background: 'var(--sticky-yellow)' }}>
                                     <h3 className="text-base font-bold mb-3 pb-2" style={{ borderBottom: `1px solid ${goOS.colors.border}20` }}>📝 Todo List</h3>
                                     <ul className="space-y-2">
                                         <CelebratoryCheckbox defaultChecked={false} label="Explore the portfolio" />
@@ -4254,34 +4254,34 @@ function GoOSDemoContent() {
                         <div
                             className="flex items-center gap-3 px-4 py-3 rounded-[22px]"
                             style={{
-                                background: 'rgba(28, 28, 30, 0.88)',
-                                backdropFilter: 'blur(40px) saturate(180%)',
-                                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-                                border: '1px solid rgba(255, 255, 255, 0.06)',
-                                boxShadow: '0 25px 70px rgba(0, 0, 0, 0.35), 0 10px 30px rgba(0, 0, 0, 0.22)'
+                                background: 'var(--bg-dock)',
+                                backdropFilter: 'var(--blur-dock)',
+                                WebkitBackdropFilter: 'var(--blur-dock)',
+                                border: '1px solid var(--border-subtle)',
+                                boxShadow: 'var(--shadow-dock)'
                             }}
                         >
                     <RubberDuck />
                     <DockIcon
-                        icon={<Folder size={22} fill="rgba(255,255,255,0.15)" stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<Folder size={22} fill="var(--icon-fill)" stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('nest')}
                         isActive={appWindows.nest}
                         label="Nest"
                     />
                     <DockIcon
-                        icon={<div className="w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-bold text-white/90" style={{ background: 'rgba(255,255,255,0.1)' }}>23</div>}
+                        icon={<div className="w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-bold" style={{ background: 'var(--border-subtle)', color: 'var(--text-primary)' }}>23</div>}
                         onClick={() => { }}
                         label="Calendar"
                     />
                     <DockIcon
-                        icon={<Mail size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<Mail size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('quackmail')}
                         isActive={appWindows.quackmail}
                         badge={3}
                         label="Mail"
                     />
                     <DockIcon
-                        icon={<Camera size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<Camera size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => {
                             const photoItem = items.find(i => i.label === 'Photography');
                             if (photoItem) windowContext.openWindow(photoItem.id);
@@ -4289,40 +4289,40 @@ function GoOSDemoContent() {
                         label="Photos"
                     />
                     <DockIcon
-                        icon={<FileText size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<FileText size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('notes')}
                         isActive={appWindows.notes}
                         label="Notes"
                     />
                     <div className="w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
-                        icon={<MessageCircle size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<MessageCircle size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('chat')}
                         isActive={appWindows.chat}
                         label="Chat"
                     />
                     <DockIcon
-                        icon={<Terminal size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<Terminal size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('shell')}
                         isActive={appWindows.shell}
                         label="Shell"
                     />
                     <DockIcon
-                        icon={<Settings size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<Settings size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('settings')}
                         isActive={appWindows.settings}
                         label="Settings"
                     />
                     <div className="w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
-                        icon={<BookOpen size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<BookOpen size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('guestbook')}
                         isActive={appWindows.guestbook}
                         badge={guestbookEntries.length}
                         label="Guestbook"
                     />
                     <DockIcon
-                        icon={<BarChart3 size={22} stroke="#e8e6e3" strokeWidth={1.5} />}
+                        icon={<BarChart3 size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('analytics')}
                         isActive={appWindows.analytics}
                         label="Analytics"
