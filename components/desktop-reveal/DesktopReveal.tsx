@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { SPRING, DURATION, EASE } from '@/lib/animations';
+import { SPRING, DURATION } from '@/lib/animations';
 
 // ============================================================================
 // TYPES
@@ -15,93 +15,76 @@ interface DesktopRevealProps {
 }
 
 // ============================================================================
-// ANIMATION VARIANTS
+// ANIMATION EASING - Premium cubic bezier
 // ============================================================================
 
-const TEXT_VARIANTS = {
-  initial: { opacity: 1, y: 0 },
-  exit: {
-    opacity: 0,
-    y: -30,
-    transition: { duration: 0.4, ease: EASE.in }
-  },
-};
-
-const STAIR_VARIANTS = {
-  initial: { scaleY: 1 },
-  animate: (i: number) => ({
-    scaleY: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.65, 0, 0.35, 1],
-      delay: i * 0.05,
-    }
-  }),
-};
+const CURVE_EASE = [0.76, 0, 0.24, 1] as const;
 
 // ============================================================================
-// CURVE SVG COMPONENT
+// CURVE SVG COMPONENT - The main attraction
 // ============================================================================
 
-interface CurveSVGProps {
-  width: number;
-  height: number;
-}
+function CurveReveal({ width, height }: { width: number; height: number }) {
+  // SVG dimensions with extra space for the curve
+  const svgHeight = height + 300;
 
-function CurveSVG({ width, height }: CurveSVGProps) {
-  // Create SVG paths for the curve animation
-  // Initial path has a dramatic curve, target is flat
-  const initialPath = `
-    M0 300
-    Q${width / 2} 0 ${width} 300
-    L${width} ${height + 300}
-    Q${width / 2} ${height + 600} 0 ${height + 300}
-    L0 300
-  `;
-
-  const targetPath = `
-    M0 300
-    Q${width / 2} 0 ${width} 300
-    L${width} ${height}
-    Q${width / 2} ${height} 0 ${height}
-    L0 300
-  `;
+  // Curve paths - initial has dramatic curve at bottom, target is flat
+  const paths = {
+    initial: `
+      M 0 0
+      L ${width} 0
+      L ${width} ${height}
+      Q ${width / 2} ${height + 300} 0 ${height}
+      L 0 0
+    `.trim(),
+    target: `
+      M 0 0
+      L ${width} 0
+      L ${width} ${height}
+      Q ${width / 2} ${height} 0 ${height}
+      L 0 0
+    `.trim(),
+  };
 
   return (
-    <motion.svg
-      className="fixed inset-0 w-full h-full"
+    <motion.div
+      className="fixed inset-0"
       style={{ zIndex: 10002 }}
       initial={{ y: 0 }}
-      animate={{ y: '-100vh' }}
+      animate={{ y: '-100%' }}
       transition={{
-        duration: 0.8,
-        ease: [0.76, 0, 0.24, 1],
-        delay: 0.3,
+        duration: 0.75,
+        ease: CURVE_EASE,
+        delay: 0.15,
       }}
     >
-      <motion.path
-        fill="var(--color-accent-primary, #ff7722)"
-        initial={{ d: initialPath }}
-        animate={{ d: targetPath }}
-        transition={{
-          duration: 0.8,
-          ease: [0.76, 0, 0.24, 1],
-          delay: 0.3,
-        }}
-      />
-    </motion.svg>
+      <svg
+        width={width}
+        height={svgHeight}
+        viewBox={`0 0 ${width} ${svgHeight}`}
+        preserveAspectRatio="none"
+        style={{ display: 'block' }}
+      >
+        <motion.path
+          fill="#ff7722"
+          initial={{ d: paths.initial }}
+          animate={{ d: paths.target }}
+          transition={{
+            duration: 0.75,
+            ease: CURVE_EASE,
+            delay: 0.15,
+          }}
+        />
+      </svg>
+    </motion.div>
   );
 }
 
 // ============================================================================
-// STAIRS COMPONENT
+// STAIRS COMPONENT - Staggered column reveal
 // ============================================================================
 
-interface StairsProps {
-  columns?: number;
-}
-
-function Stairs({ columns = 6 }: StairsProps) {
+function StairsReveal({ columns = 5 }: { columns?: number }) {
   return (
     <div
       className="fixed inset-0 flex"
@@ -110,16 +93,16 @@ function Stairs({ columns = 6 }: StairsProps) {
       {[...Array(columns)].map((_, i) => (
         <motion.div
           key={i}
-          custom={columns - 1 - i}
-          variants={STAIR_VARIANTS}
-          initial="initial"
-          animate="animate"
           className="flex-1 h-full origin-top"
           style={{
-            background: `linear-gradient(180deg,
-              var(--color-accent-primary, #ff7722) 0%,
-              color-mix(in oklch, var(--color-accent-primary, #ff7722), #000 20%) 100%
-            )`,
+            background: `linear-gradient(180deg, #ff7722 0%, #e56a1a 100%)`,
+          }}
+          initial={{ scaleY: 1 }}
+          animate={{ scaleY: 0 }}
+          transition={{
+            duration: 0.5,
+            ease: CURVE_EASE,
+            delay: (columns - 1 - i) * 0.08,
           }}
         />
       ))}
@@ -128,7 +111,7 @@ function Stairs({ columns = 6 }: StairsProps) {
 }
 
 // ============================================================================
-// PERSPECTIVE REVEAL COMPONENT
+// PERSPECTIVE REVEAL - Single slide up
 // ============================================================================
 
 function PerspectiveReveal() {
@@ -137,15 +120,15 @@ function PerspectiveReveal() {
       className="fixed inset-0"
       style={{
         zIndex: 10002,
-        background: 'var(--color-accent-primary, #ff7722)',
+        background: 'linear-gradient(180deg, #ff7722 0%, #e56a1a 100%)',
         transformOrigin: 'top center',
       }}
-      initial={{ y: 0, scaleY: 1 }}
-      animate={{ y: '-100%', scaleY: 1.1 }}
+      initial={{ y: 0 }}
+      animate={{ y: '-100%' }}
       transition={{
-        duration: 0.7,
-        ease: [0.76, 0, 0.24, 1],
-        delay: 0.2,
+        duration: 0.65,
+        ease: CURVE_EASE,
+        delay: 0.1,
       }}
     />
   );
@@ -158,147 +141,68 @@ function PerspectiveReveal() {
 export function DesktopReveal({ isActive, onComplete, variant = 'curve' }: DesktopRevealProps) {
   const prefersReducedMotion = useReducedMotion();
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [showBranding, setShowBranding] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  // Get window dimensions
+  // Get window dimensions on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-
-      const handleResize = () => {
+      const updateDimensions = () => {
         setDimensions({
           width: window.innerWidth,
           height: window.innerHeight,
         });
       };
 
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
+      updateDimensions();
+      window.addEventListener('resize', updateDimensions);
+      return () => window.removeEventListener('resize', updateDimensions);
     }
   }, []);
 
-  // Hide branding after animation starts, then complete
+  // Start animation and complete
   useEffect(() => {
-    if (isActive) {
-      // Hide the "Welcome" text first
-      const brandingTimer = setTimeout(() => {
-        setShowBranding(false);
-      }, 200);
+    if (isActive && dimensions.width > 0) {
+      setIsAnimating(true);
 
-      // Complete the transition after animation finishes
-      const completeTimer = setTimeout(() => {
+      // Complete after animation finishes
+      const timer = setTimeout(() => {
         onComplete();
-      }, prefersReducedMotion ? 300 : 1200);
+      }, prefersReducedMotion ? 200 : 1000);
 
-      return () => {
-        clearTimeout(brandingTimer);
-        clearTimeout(completeTimer);
-      };
+      return () => clearTimeout(timer);
     }
-  }, [isActive, onComplete, prefersReducedMotion]);
+  }, [isActive, dimensions.width, onComplete, prefersReducedMotion]);
 
-  // Reset branding when becoming active again
-  useEffect(() => {
-    if (isActive) {
-      setShowBranding(true);
-    }
-  }, [isActive]);
+  // Don't render until we have dimensions
+  if (!isActive || dimensions.width === 0) {
+    return null;
+  }
 
+  // Reduced motion: simple quick fade
   if (prefersReducedMotion) {
     return (
-      <AnimatePresence>
-        {isActive && (
-          <motion.div
-            className="fixed inset-0"
-            style={{
-              zIndex: 10002,
-              background: 'var(--color-accent-primary, #ff7722)',
-            }}
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          />
-        )}
-      </AnimatePresence>
+      <motion.div
+        className="fixed inset-0"
+        style={{
+          zIndex: 10002,
+          background: '#ff7722',
+        }}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      />
     );
   }
 
   return (
-    <AnimatePresence>
-      {isActive && (
-        <>
-          {/* Background overlay that ensures clean coverage */}
-          <motion.div
-            className="fixed inset-0"
-            style={{
-              zIndex: 10001,
-              background: 'var(--color-accent-primary, #ff7722)',
-            }}
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.8 }}
-          />
-
-          {/* Branding text that fades out first */}
-          <AnimatePresence>
-            {showBranding && (
-              <motion.div
-                className="fixed inset-0 flex items-center justify-center"
-                style={{ zIndex: 10003 }}
-                variants={TEXT_VARIANTS}
-                initial="initial"
-                exit="exit"
-              >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ ...SPRING.bouncy, delay: 0.05 }}
-                  className="text-center"
-                >
-                  {/* Duck icon */}
-                  <motion.div
-                    className="text-6xl mb-4"
-                    animate={{
-                      rotate: [0, -10, 10, 0],
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      ease: 'easeInOut',
-                    }}
-                  >
-                    🦆
-                  </motion.div>
-
-                  {/* Welcome text */}
-                  <motion.h1
-                    className="text-3xl font-bold tracking-tight"
-                    style={{ color: '#fff', textShadow: '0 2px 20px rgba(0,0,0,0.2)' }}
-                  >
-                    Welcome to goOS
-                  </motion.h1>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* The actual transition effect */}
-          {dimensions.width > 0 && (
-            <>
-              {variant === 'curve' && (
-                <CurveSVG width={dimensions.width} height={dimensions.height} />
-              )}
-              {variant === 'stairs' && <Stairs />}
-              {variant === 'perspective' && <PerspectiveReveal />}
-            </>
-          )}
-        </>
+    <>
+      {/* Render the selected transition variant */}
+      {variant === 'curve' && (
+        <CurveReveal width={dimensions.width} height={dimensions.height} />
       )}
-    </AnimatePresence>
+      {variant === 'stairs' && <StairsReveal />}
+      {variant === 'perspective' && <PerspectiveReveal />}
+    </>
   );
 }
 
