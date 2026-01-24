@@ -18,60 +18,76 @@ import type { Transition, Variants, MotionProps } from 'framer-motion';
 // ============================================================================
 
 export const SPRING = {
-  /** Quick micro-interactions: buttons, toggles, clicks (~150ms feel) */
+  /** Quick micro-interactions: buttons, toggles, clicks - SNAPPY with slight bounce */
   snappy: {
     type: 'spring' as const,
-    stiffness: 500,
-    damping: 30,
-    mass: 0.5,
+    stiffness: 600,
+    damping: 20,  // Lower = more bounce
+    mass: 0.4,
   },
 
-  /** Standard interactions: hover states, focus, small UI changes (~250ms feel) */
+  /** Standard interactions: hover states, focus - visible but controlled */
   gentle: {
     type: 'spring' as const,
     stiffness: 400,
-    damping: 28,
-    mass: 0.8,
+    damping: 22,  // Lower for more life
+    mass: 0.6,
   },
 
-  /** Window/modal animations: open, close, maximize (~350ms feel) */
+  /** Window/modal animations: open, close - DRAMATIC entrance with overshoot */
   smooth: {
     type: 'spring' as const,
-    stiffness: 350,
-    damping: 28,
+    stiffness: 300,
+    damping: 18,  // Much lower = visible overshoot!
     mass: 0.8,
   },
 
-  /** Bouncy attention-grabbing: notifications, celebrations (~400ms feel) */
+  /** Bouncy attention-grabbing: notifications, celebrations - VERY bouncy! */
   bouncy: {
     type: 'spring' as const,
+    stiffness: 400,
+    damping: 12,  // Low damping = lots of bounce
+    mass: 0.6,
+  },
+
+  /** Extra playful: easter eggs, special moments - MAXIMUM fun */
+  playful: {
+    type: 'spring' as const,
     stiffness: 350,
-    damping: 18,
+    damping: 10,  // Very low = wobbly fun!
     mass: 0.8,
   },
 
-  /** Extra playful: easter eggs, special moments (~500ms with overshoot) */
-  playful: {
+  /** THE GOOSE SPRING: absurd, fun, unforgettable - for special goose moments */
+  goose: {
     type: 'spring' as const,
-    stiffness: 300,
-    damping: 15,
-    mass: 1.0,
-  },
-
-  /** Dock magnification: responsive to mouse movement */
-  dock: {
-    type: 'spring' as const,
-    stiffness: 400,
-    damping: 25,
+    stiffness: 500,
+    damping: 8,   // Almost no damping = HONK HONK bounce
     mass: 0.5,
   },
 
-  /** Subtle: background elements, slow movements */
+  /** Dock magnification: responsive but bouncy */
+  dock: {
+    type: 'spring' as const,
+    stiffness: 500,
+    damping: 15,  // More bounce on dock
+    mass: 0.4,
+  },
+
+  /** Subtle: background elements, slow dreamy movements */
   slow: {
     type: 'spring' as const,
-    stiffness: 200,
-    damping: 30,
-    mass: 1.2,
+    stiffness: 150,
+    damping: 20,
+    mass: 1.0,
+  },
+
+  /** Wobbly: for shake effects, attention-grabbing */
+  wobbly: {
+    type: 'spring' as const,
+    stiffness: 600,
+    damping: 5,   // Almost no damping = keeps wobbling
+    mass: 0.3,
   },
 } as const;
 
@@ -139,25 +155,25 @@ export const EASE = {
 // Pre-built variants for common patterns - USE THESE!
 // ============================================================================
 
-/** Fade in with subtle scale - windows, modals, cards */
+/** Fade in with VISIBLE scale - windows, modals, cards */
 export const fadeInScale: Variants = {
-  initial: { opacity: 0, scale: 0.95 },
+  initial: { opacity: 0, scale: 0.85 },  // More dramatic scale
   animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.97 },
+  exit: { opacity: 0, scale: 0.9 },
 };
 
 /** Fade in from below - notifications, tooltips, popovers */
 export const fadeInUp: Variants = {
-  initial: { opacity: 0, y: 12 },
+  initial: { opacity: 0, y: 30 },  // Larger movement
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 6 },
+  exit: { opacity: 0, y: 15 },
 };
 
 /** Fade in from above - dropdown menus, context menus */
 export const fadeInDown: Variants = {
-  initial: { opacity: 0, y: -8 },
+  initial: { opacity: 0, y: -16 },  // Larger movement
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -4 },
+  exit: { opacity: 0, y: -8 },
 };
 
 /** Simple fade - background overlays, subtle state changes */
@@ -167,45 +183,74 @@ export const fade: Variants = {
   exit: { opacity: 0 },
 };
 
-/** Window open - the signature goOS window animation */
+/** Window open - the SIGNATURE goOS window animation - DRAMATIC! */
 export const windowOpen: Variants = {
-  initial: { opacity: 0, scale: 0.92, y: 16 },
+  initial: { opacity: 0, scale: 0.8, y: 40 },  // Start smaller and lower
   animate: { opacity: 1, scale: 1, y: 0 },
-  exit: { opacity: 0, scale: 0.95, y: 8 },
+  exit: { opacity: 0, scale: 0.85, y: 20 },
+};
+
+/** Window open with wobble - extra playful version */
+export const windowOpenPlayful: Variants = {
+  initial: { opacity: 0, scale: 0.7, y: 50, rotate: -3 },
+  animate: { opacity: 1, scale: 1, y: 0, rotate: 0 },
+  exit: { opacity: 0, scale: 0.8, y: 30, rotate: 2 },
 };
 
 /** Boot screen - the goOS startup reveal */
 export const bootReveal: Variants = {
   initial: { opacity: 1 },
-  exit: { opacity: 0, scale: 1.05 },
+  exit: { opacity: 0, scale: 1.1 },  // More dramatic zoom out
 };
 
-/** Context menu - snappy appearance */
+/** Context menu - snappy pop-in */
 export const contextMenu: Variants = {
-  initial: { opacity: 0, scale: 0.95, y: -4 },
+  initial: { opacity: 0, scale: 0.85, y: -10 },  // More dramatic
   animate: { opacity: 1, scale: 1, y: 0 },
-  exit: { opacity: 0, scale: 0.97, y: -2 },
+  exit: { opacity: 0, scale: 0.9, y: -5 },
 };
 
-/** Toast notification - slide up with bounce */
+/** Toast notification - slide up with BOUNCE */
 export const toast: Variants = {
-  initial: { opacity: 0, y: 20, scale: 0.95 },
+  initial: { opacity: 0, y: 50, scale: 0.8 },  // Much more dramatic
   animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: 10, scale: 0.98 },
+  exit: { opacity: 0, y: 25, scale: 0.9 },
 };
 
-/** Dock entrance - slide up from below */
+/** Dock entrance - DRAMATIC slide up from below */
 export const dockEntrance: Variants = {
-  initial: { opacity: 0, y: 60 },
+  initial: { opacity: 0, y: 100 },  // Start way below
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 40 },
+  exit: { opacity: 0, y: 60 },
 };
 
-/** Menu bar entrance - slide down */
+/** Menu bar entrance - slide down with presence */
 export const menuBarEntrance: Variants = {
-  initial: { opacity: 0, y: -30 },
+  initial: { opacity: 0, y: -50 },  // Start way above
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
+  exit: { opacity: 0, y: -30 },
+};
+
+/** File icon pop - for desktop icons appearing */
+export const fileIconPop: Variants = {
+  initial: { opacity: 0, scale: 0.5, y: 20 },
+  animate: { opacity: 1, scale: 1, y: 0 },
+  exit: { opacity: 0, scale: 0.7, y: 10 },
+};
+
+/** Dock item bounce - when clicked */
+export const dockItemBounce: Variants = {
+  initial: { y: 0 },
+  animate: { y: [0, -30, 0, -15, 0, -5, 0] },  // Multiple bounces!
+};
+
+/** Goose quack - the signature silly animation */
+export const gooseQuack: Variants = {
+  initial: { scale: 1, rotate: 0 },
+  animate: {
+    scale: [1, 1.3, 0.9, 1.1, 1],
+    rotate: [0, -10, 10, -5, 0],
+  },
 };
 
 // ============================================================================
@@ -213,45 +258,45 @@ export const menuBarEntrance: Variants = {
 // Use with whileHover and whileTap
 // ============================================================================
 
-/** Standard button/card hover - subtle lift */
+/** Standard button/card hover - VISIBLE lift */
 export const hoverLift = {
   rest: { y: 0, scale: 1 },
-  hover: { y: -2, scale: 1.02 },
-  tap: { y: 0, scale: 0.98 },
+  hover: { y: -6, scale: 1.05 },  // More dramatic
+  tap: { y: 0, scale: 0.95 },
 };
 
-/** Dock item hover - pronounced lift and scale */
+/** Dock item hover - BIG lift and scale */
 export const dockHover = {
   rest: { y: 0, scale: 1 },
-  hover: { y: -8, scale: 1.15 },
-  tap: { y: -4, scale: 1.05 },
+  hover: { y: -16, scale: 1.25 },  // Much bigger!
+  tap: { y: -8, scale: 1.1 },
 };
 
-/** Icon click - scale feedback */
+/** Icon click - punchy scale feedback */
 export const iconClick = {
   rest: { scale: 1 },
-  hover: { scale: 1.05 },
-  tap: { scale: 0.92 },
+  hover: { scale: 1.1 },  // More dramatic
+  tap: { scale: 0.85 },   // Squish more
 };
 
-/** File icon interaction - desktop icons */
+/** File icon interaction - desktop icons with character */
 export const fileIconClick = {
-  rest: { scale: 1 },
-  hover: { scale: 1.03 },
-  tap: { scale: 0.95 },
+  rest: { scale: 1, rotate: 0 },
+  hover: { scale: 1.08, rotate: 2 },  // Slight tilt adds personality
+  tap: { scale: 0.9, rotate: -1 },
 };
 
-/** Button press - satisfying click */
+/** Button press - SATISFYING squish */
 export const buttonPress = {
   rest: { scale: 1 },
-  hover: { scale: 1.02 },
-  tap: { scale: 0.96 },
+  hover: { scale: 1.05 },
+  tap: { scale: 0.9 },  // More dramatic squish
 };
 
-/** Traffic light button - subtle */
+/** Traffic light button - playful */
 export const trafficLight = {
   rest: { scale: 1, opacity: 1 },
-  hover: { scale: 1.1, opacity: 1 },
+  hover: { scale: 1.2, opacity: 1 },  // Bigger hover
   tap: { scale: 0.9, opacity: 0.9 },
 };
 
@@ -262,25 +307,34 @@ export const trafficLight = {
 
 /** Window animation props */
 export const MOTION = {
-  /** Window open/close */
+  /** Window open/close - DRAMATIC entrance */
   window: {
     initial: 'initial',
     animate: 'animate',
     exit: 'exit',
     variants: windowOpen,
-    transition: SPRING.smooth,
+    transition: SPRING.smooth,  // Uses the bouncy smooth spring
   } as MotionProps,
 
-  /** Context menu appearance */
+  /** Window open/close - PLAYFUL version with wobble */
+  windowPlayful: {
+    initial: 'initial',
+    animate: 'animate',
+    exit: 'exit',
+    variants: windowOpenPlayful,
+    transition: SPRING.playful,  // Extra wobbly
+  } as MotionProps,
+
+  /** Context menu appearance - snappy pop */
   contextMenu: {
     initial: 'initial',
     animate: 'animate',
     exit: 'exit',
     variants: contextMenu,
-    transition: { ...SPRING.snappy, duration: 0.15 },
+    transition: SPRING.snappy,
   } as MotionProps,
 
-  /** Toast notification */
+  /** Toast notification - bouncy entrance */
   toast: {
     initial: 'initial',
     animate: 'animate',
@@ -298,22 +352,22 @@ export const MOTION = {
     transition: { duration: DURATION.normal },
   } as MotionProps,
 
-  /** Dock entrance */
+  /** Dock entrance - DRAMATIC slide up */
   dock: {
     initial: 'initial',
     animate: 'animate',
     exit: 'exit',
     variants: dockEntrance,
-    transition: SPRING.smooth,
+    transition: SPRING.bouncy,  // Bouncy dock!
   } as MotionProps,
 
-  /** Menu bar */
+  /** Menu bar - slides down with presence */
   menuBar: {
     initial: 'initial',
     animate: 'animate',
     exit: 'exit',
     variants: menuBarEntrance,
-    transition: SPRING.smooth,
+    transition: SPRING.gentle,
   } as MotionProps,
 
   /** Boot screen exit */
@@ -322,6 +376,23 @@ export const MOTION = {
     exit: 'exit',
     variants: bootReveal,
     transition: { duration: DURATION.boot, ease: EASE.out },
+  } as MotionProps,
+
+  /** File icon pop - for desktop icons */
+  fileIcon: {
+    initial: 'initial',
+    animate: 'animate',
+    exit: 'exit',
+    variants: fileIconPop,
+    transition: SPRING.bouncy,
+  } as MotionProps,
+
+  /** Goose special - for silly goose moments */
+  goose: {
+    initial: 'initial',
+    animate: 'animate',
+    variants: gooseQuack,
+    transition: SPRING.goose,
   } as MotionProps,
 };
 

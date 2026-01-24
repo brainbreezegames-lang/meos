@@ -1640,7 +1640,7 @@ const TypewriterText = React.memo(({
 TypewriterText.displayName = 'TypewriterText';
 
 // ============================================
-// DOCK ICON - Simple hover magnification
+// DOCK ICON - Bouncy hover with glow
 // ============================================
 
 const DockIcon = React.memo(({
@@ -1663,37 +1663,49 @@ const DockIcon = React.memo(({
         playSound('bubble');
         setJustClicked(true);
         onClick();
-        setTimeout(() => setJustClicked(false), 500);
+        setTimeout(() => setJustClicked(false), 400);
     };
 
     return (
-        <div
-            className="dock-item"
+        <motion.div
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            animate={{
+                scale: justClicked ? [1, 0.8, 1.15, 0.95, 1] : isHovered ? 1.15 : 1,
+                y: justClicked ? [0, 4, -12, -8, 0] : isHovered ? -8 : 0,
+                rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
+            }}
+            transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 20,
+            }}
+            style={{
+                width: 48,
+                height: 48,
+                position: 'relative',
+                transformOrigin: 'bottom center',
+            }}
         >
-            <motion.button
+            <button
                 onClick={handleClick}
-                animate={{
-                    scale: justClicked ? [1, 0.85, 1.15, 0.95, 1] : 1,
-                    rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
-                }}
-                transition={goOS.springs.bouncy}
-                className="dock-item-inner focus:outline-none"
+                className="w-full h-full focus:outline-none"
             >
-                {/* Tooltip label */}
+                {/* Tooltip */}
                 <AnimatePresence>
                     {isHovered && label && (
                         <motion.div
-                            initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                            initial={{ opacity: 0, y: 8, scale: 0.9 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 4, scale: 0.98 }}
-                            transition={TRANSITION.fast}
-                            className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50 pointer-events-none"
+                            exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                            className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
                             style={{
-                                background: 'rgba(0,0,0,0.75)',
+                                background: 'rgba(20, 20, 20, 0.95)',
                                 color: '#fff',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                                backdropFilter: 'blur(12px)',
+                                border: '1px solid rgba(255,255,255,0.08)',
                             }}
                         >
                             {label}
@@ -1701,18 +1713,20 @@ const DockIcon = React.memo(({
                     )}
                 </AnimatePresence>
 
+                {/* Icon with glow effect */}
                 <div
-                    className="w-full h-full flex items-center justify-center rounded-[14px] transition-colors duration-150"
+                    className="w-full h-full flex items-center justify-center rounded-[14px] transition-all duration-200"
                     style={{
                         background: isActive
-                            ? 'rgba(255, 255, 255, 0.18)'
+                            ? 'rgba(255, 255, 255, 0.2)'
                             : isHovered
-                                ? 'rgba(255, 255, 255, 0.12)'
+                                ? 'rgba(255, 255, 255, 0.15)'
                                 : 'rgba(255, 255, 255, 0.06)',
-                        border: 'none',
-                        boxShadow: isActive
-                            ? 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.2)'
-                            : 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                        boxShadow: isHovered
+                            ? '0 0 24px rgba(255,255,255,0.2), 0 8px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+                            : isActive
+                                ? '0 4px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12)'
+                                : 'inset 0 1px 0 rgba(255,255,255,0.06)',
                     }}
                 >
                     {icon}
@@ -1721,31 +1735,33 @@ const DockIcon = React.memo(({
                 {/* Badge */}
                 {badge !== undefined && badge > 0 && (
                     <motion.span
-                        initial={{ scale: 0, rotate: -20 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={goOS.springs.bouncy}
-                        className="absolute top-0 right-0 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-white text-[9px] font-semibold px-1 z-10"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                        className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
                         style={{
-                            background: '#f47a3e',
-                            boxShadow: '0 2px 8px rgba(244, 122, 62, 0.5)',
+                            background: 'linear-gradient(135deg, #ff6b4a 0%, #ff4757 100%)',
+                            boxShadow: '0 2px 8px rgba(255, 71, 87, 0.5)',
                         }}
                     >
                         {badge}
                     </motion.span>
                 )}
 
-                {/* Active indicator dot */}
+                {/* Active dot */}
                 {isActive && (
                     <motion.div
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        transition={goOS.springs.gentle}
-                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                        style={{ background: 'var(--text-primary)' }}
+                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
+                        style={{
+                            background: 'rgba(255,255,255,0.9)',
+                            boxShadow: '0 0 8px rgba(255,255,255,0.6)',
+                        }}
                     />
                 )}
-            </motion.button>
-        </div>
+            </button>
+        </motion.div>
     );
 });
 
