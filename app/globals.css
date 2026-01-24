@@ -247,7 +247,6 @@ html.theme-sketch {
     --color-bg-white: rgba(255, 255, 255, 0.8);
     --color-bg-glass: rgba(251, 249, 239, 0.92);
     --color-bg-glass-heavy: rgba(251, 249, 239, 0.95);
-    --topnav-bg: rgba(251, 249, 239, 0.55);
 
     --color-text-primary: #171412;
     --color-text-secondary: #4a4744;
@@ -378,9 +377,25 @@ html.theme-sketch {
     --shadow-window: 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08);
     --shadow-dock: 0 8px 32px rgba(23, 20, 18, 0.12);
 
-    /* Dock styling */
-    --bg-dock: #FFFFFF;
-    --blur-dock: none;
+    /* Dock styling - Premium glass effect for light mode */
+    /* Refined glassmorphism: subtle blur, warm tint, delicate borders */
+    --bg-dock: rgba(255, 255, 255, 0.72);
+    --blur-dock: blur(16px) saturate(180%);
+    --dock-border: rgba(255, 255, 255, 0.6);
+    --dock-border-outer: rgba(23, 20, 18, 0.06);
+    --dock-shadow:
+        0 0 0 0.5px rgba(23, 20, 18, 0.04),
+        0 2px 8px rgba(23, 20, 18, 0.04),
+        0 8px 24px rgba(23, 20, 18, 0.08),
+        0 16px 48px rgba(23, 20, 18, 0.06),
+        inset 0 0.5px 0 rgba(255, 255, 255, 0.8);
+    --dock-inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+
+    /* Top nav glass - matching premium effect */
+    --topnav-bg: rgba(251, 249, 239, 0.65);
+    --topnav-blur: blur(16px) saturate(180%);
+    --topnav-border: 0.5px solid rgba(23, 20, 18, 0.04);
+    --topnav-shadow: 0 1px 3px rgba(23, 20, 18, 0.02);
 
     /* Additional compatibility */
     --bg-card: var(--bg-surface);
@@ -546,7 +561,6 @@ html.theme-sketch.dark {
     --color-bg-white: oklch(26% 0.006 65);
     --color-bg-glass: oklch(21% 0.008 70 / 0.95);
     --color-bg-glass-heavy: oklch(18% 0.01 75 / 0.98);
-    --topnav-bg: oklch(16% 0.01 75 / 0.92);
 
     /* ========== TEXT - Warm Off-White ========== */
     /* Slight warmth in text too - hue ~90-100 */
@@ -622,9 +636,17 @@ html.theme-sketch.dark {
     --border-light: oklch(24% 0.005 70);
     --border-highlight: oklch(30% 0.006 70);
 
-    /* ========== DOCK ========== */
+    /* ========== DOCK - Dark mode: solid, no glass ========== */
     --bg-dock: oklch(21% 0.008 70 / 0.94);
     --blur-dock: blur(32px) saturate(120%);
+    --dock-border-outer: oklch(30% 0.006 70);
+    --dock-shadow: 0 -2px 16px rgba(20, 15, 10, 0.3), 0 0 1px rgba(255, 255, 255, 0.05);
+
+    /* ========== TOP NAV - Dark mode ========== */
+    --topnav-bg: oklch(16% 0.01 75 / 0.92);
+    --topnav-blur: blur(24px) saturate(120%);
+    --topnav-border: none;
+    --topnav-shadow: 0 1px 0 oklch(24% 0.005 70);
 
     /* ========== COMPATIBILITY TOKENS ========== */
     --bg-card: oklch(21% 0.008 70);
@@ -844,7 +866,7 @@ body {
 }
 
 /* ============================================
-   DOCK STYLES
+   DOCK STYLES - Premium Glass Effect (Light Mode)
    ============================================ */
 
 .dock-container {
@@ -852,6 +874,28 @@ body {
     align-items: flex-end;
     gap: 2px;
     overflow: visible !important;
+    /* Subtle inner glow for premium glass feel */
+    position: relative;
+}
+
+/* Light mode glass enhancement - subtle inner glow */
+.theme-sketch:not(.dark) .dock-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .dock-separator {

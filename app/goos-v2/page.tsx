@@ -3730,9 +3730,11 @@ function GoOSDemoContent() {
                         transition={SPRING.smooth}
                         className="h-7 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
                         style={{
-                            background: 'var(--topnav-bg, rgba(251, 249, 239, 0.55))',
-                            backdropFilter: 'blur(20px) saturate(180%)',
-                            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                            background: 'var(--topnav-bg)',
+                            backdropFilter: 'var(--topnav-blur)',
+                            WebkitBackdropFilter: 'var(--topnav-blur)',
+                            borderBottom: 'var(--topnav-border)',
+                            boxShadow: 'var(--topnav-shadow)',
                         }}
                     >
                 {/* Left: Logo + Space Switcher */}
@@ -4587,8 +4589,8 @@ function GoOSDemoContent() {
                                 background: 'var(--bg-dock)',
                                 backdropFilter: 'var(--blur-dock)',
                                 WebkitBackdropFilter: 'var(--blur-dock)',
-                                border: '1px solid var(--border-subtle)',
-                                boxShadow: 'var(--shadow-dock)'
+                                border: '1px solid var(--dock-border-outer, var(--border-subtle))',
+                                boxShadow: 'var(--dock-shadow, var(--shadow-dock))',
                             }}
                         >
                     <RubberDuck />
