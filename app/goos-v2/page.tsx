@@ -2490,8 +2490,8 @@ function GoOSDemoContent() {
     const [showConfetti, setShowConfetti] = useState(false);
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
-    // Boot sequence state
-    const [bootPhase, setBootPhase] = useState<'booting' | 'ready'>('booting');
+    // Boot sequence state: splash -> booting -> ready
+    const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'ready'>('splash');
     const [bootMessage, setBootMessage] = useState(0);
 
     // Fun loading messages that rotate
@@ -2503,12 +2503,16 @@ function GoOSDemoContent() {
         'Almost ready to quack!',
     ], []);
 
-    // Boot sequence effect - show logo, then transition to desktop
+    // Handle splash click - starts boot with sound
+    const handleSplashClick = useCallback(() => {
+        setBootPhase('booting');
+        // Play startup sound immediately on user interaction (bypasses autoplay block)
+        setTimeout(() => playSound('startup'), 100);
+    }, []);
+
+    // Boot sequence effect - runs when booting phase starts
     useEffect(() => {
-        // Play startup sound after a brief delay
-        const soundTimer = setTimeout(() => {
-            playSound('startup');
-        }, 600);
+        if (bootPhase !== 'booting') return;
 
         // Rotate through boot messages
         const messageInterval = setInterval(() => {
@@ -2521,11 +2525,10 @@ function GoOSDemoContent() {
         }, 3500); // 3.5 seconds - longer for personality
 
         return () => {
-            clearTimeout(soundTimer);
             clearTimeout(bootTimer);
             clearInterval(messageInterval);
         };
-    }, [bootMessages.length]);
+    }, [bootPhase, bootMessages.length]);
 
     // Spaces state (demo mode - will be replaced by SpaceContext)
     const [activeSpaceId, setActiveSpaceId] = useState('space-1');
@@ -3425,6 +3428,81 @@ function GoOSDemoContent() {
                 }
             }}
         >
+            {/* SPLASH SCREEN - Click to start (enables sound) */}
+            <AnimatePresence>
+                {bootPhase === 'splash' && (
+                    <motion.div
+                        key="splash-screen"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        onClick={handleSplashClick}
+                        className="fixed inset-0 z-[10001] flex flex-col items-center justify-center cursor-pointer"
+                        style={{
+                            background: 'linear-gradient(180deg, #faf8f2 0%, #f5f0e6 100%)',
+                        }}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                            className="flex flex-col items-center gap-6"
+                        >
+                            {/* Duck with subtle pulse */}
+                            <motion.div
+                                animate={{ scale: [1, 1.05, 1] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                className="text-8xl select-none"
+                            >
+                                🦆
+                            </motion.div>
+
+                            <div className="text-center">
+                                <h1
+                                    className="text-4xl font-bold tracking-tight mb-2"
+                                    style={{ color: 'var(--text-primary, #171412)' }}
+                                >
+                                    goOS
+                                </h1>
+                                <p
+                                    className="text-sm"
+                                    style={{ color: 'var(--text-muted, #8e827c)' }}
+                                >
+                                    Your personal web desktop
+                                </p>
+                            </div>
+
+                            {/* Click to enter button */}
+                            <motion.div
+                                animate={{ y: [0, 4, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                                className="mt-4 px-6 py-3 rounded-full text-sm font-medium"
+                                style={{
+                                    background: 'var(--accent-primary, #ff7722)',
+                                    color: '#fff',
+                                    boxShadow: '0 4px 20px rgba(255, 119, 34, 0.3)',
+                                }}
+                            >
+                                Click anywhere to start
+                            </motion.div>
+                        </motion.div>
+
+                        {/* Sound indicator */}
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1 }}
+                            className="absolute bottom-8 flex items-center gap-2 text-xs"
+                            style={{ color: 'var(--text-tertiary, #a09a94)' }}
+                        >
+                            <span>🔊</span>
+                            <span>Sound on for the full experience</span>
+                        </motion.p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* BOOT SCREEN - Shows during startup */}
             <AnimatePresence>
                 {bootPhase === 'booting' && (
