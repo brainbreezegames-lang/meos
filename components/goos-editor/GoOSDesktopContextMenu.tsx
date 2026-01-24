@@ -13,6 +13,7 @@ import {
   Link,
   FileUser,
 } from 'lucide-react';
+import { playSound } from '@/lib/sounds';
 
 // Menu dimensions
 const MENU_WIDTH = 200;
@@ -146,6 +147,13 @@ export function GoOSDesktopContextMenu({
     }
   }, [isOpen, onClose]);
 
+  // Play sound when menu opens
+  useEffect(() => {
+    if (isOpen) {
+      playSound('expand');
+    }
+  }, [isOpen]);
+
   // Event listeners
   useEffect(() => {
     if (isOpen) {
@@ -176,6 +184,7 @@ export function GoOSDesktopContextMenu({
   const handleItemClick = (item: ContextMenuItem) => {
     if (item.disabled) return;
     setPressedId(item.id);
+    playSound('click');
     setTimeout(() => {
       item.onClick?.();
       onClose();

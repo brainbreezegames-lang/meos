@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { goOSTokens } from './GoOSTipTapEditor';
+import { playSound } from '@/lib/sounds';
 
 export type PublishStatus = 'draft' | 'published';
 
@@ -44,7 +45,12 @@ export function GoOSPublishToggle({ status, onChange, disabled }: GoOSPublishTog
       <button
         type="button"
         role="switch"
-        onClick={() => !disabled && onChange(isDraft ? 'published' : 'draft')}
+        onClick={() => {
+          if (!disabled) {
+            playSound('toggle');
+            onChange(isDraft ? 'published' : 'draft');
+          }
+        }}
         disabled={disabled}
         style={{
           position: 'relative',

@@ -18,6 +18,7 @@ import { goOSTokens } from './GoOSTipTapEditor';
 import { FileType } from './GoOSFileIcon';
 import { PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
+import { playSound } from '@/lib/sounds';
 
 // Menu dimensions for positioning calculations
 const MENU_WIDTH = 200;
@@ -224,6 +225,13 @@ export function GoOSFileContextMenu({
     }
   }, [isOpen, onClose]);
 
+  // Play sound when menu opens
+  useEffect(() => {
+    if (isOpen) {
+      playSound('expand');
+    }
+  }, [isOpen]);
+
   // Event listeners
   useEffect(() => {
     if (isOpen) {
@@ -254,6 +262,12 @@ export function GoOSFileContextMenu({
     if (item.disabled) return;
 
     setPressedId(item.id);
+    // Play appropriate sound based on action type
+    if (item.danger) {
+      playSound('delete');
+    } else {
+      playSound('click');
+    }
 
     // Brief visual feedback before closing
     setTimeout(() => {

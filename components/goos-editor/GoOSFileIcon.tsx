@@ -5,6 +5,7 @@ import { Lock } from 'lucide-react';
 import { goOSTokens } from './GoOSTipTapEditor';
 import { PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
+import { playSound } from '@/lib/sounds';
 
 // ============================================================================
 // BEAUTIFUL FILE ICONS - macOS Big Sur inspired with goOS warmth
@@ -482,6 +483,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       if (!hasDragged.current && (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5)) {
         hasDragged.current = true;
         setIsDragging(true);
+        playSound('drag');
         onDragStartRef.current?.(id);
       }
 
@@ -517,6 +519,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       // Save the final position if we actually dragged
       // Use currentPositionRef instead of localPosition to avoid stale closure
       if (wasActualDrag && dragStartRef.current) {
+        playSound('drop');
         onPositionChangeRef.current?.(currentPositionRef.current, id);
       }
 
@@ -533,8 +536,14 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       hasDragged.current = false;
       return;
     }
+    playSound('click');
     onClick?.(e, id);
   }, [onClick, id]);
+
+  const handleDoubleClick = useCallback(() => {
+    playSound('pop');
+    onDoubleClick?.();
+  }, [onDoubleClick]);
 
   return (
     <div
@@ -546,12 +555,12 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       data-file-type={type}
       onMouseDown={handleMouseDown}
       onClick={handleClick}
-      onDoubleClick={onDoubleClick}
+      onDoubleClick={handleDoubleClick}
       onContextMenu={onContextMenu}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onDoubleClick?.();
+          handleDoubleClick();
         }
       }}
       style={{

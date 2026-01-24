@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import type { GoOSFile, GoOSFileType, PublishStatus } from '@/lib/validations/goos';
 import { getDefaultCVContent } from '@/lib/validations/goos';
+import { playSound } from '@/lib/sounds';
 
 // Types
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -278,6 +279,7 @@ export function GoOSProvider({
     // In local-only mode, just add to state and return
     if (localOnly) {
       setFiles(prev => [...prev, newFile]);
+      playSound('success');
       showToast(`${type === 'folder' ? 'Folder' : 'File'} created`, 'success');
       return newFile;
     }
@@ -308,6 +310,7 @@ export function GoOSProvider({
       // Replace temp file with real one and clear pending flag
       pendingCreatesRef.current.delete(newId);
       setFiles(prev => prev.map(f => f.id === newId ? result.data : f));
+      playSound('success');
       showToast(`${type === 'folder' ? 'Folder' : 'File'} created`, 'success');
       return result.data;
     } catch (err) {
@@ -456,6 +459,7 @@ export function GoOSProvider({
 
     // In local-only mode, just delete from state
     if (localOnly) {
+      playSound('delete');
       showToast('Deleted', 'success');
       return true;
     }
@@ -471,6 +475,7 @@ export function GoOSProvider({
         throw new Error(result.error?.message || 'Failed to delete file');
       }
 
+      playSound('delete');
       showToast('Deleted', 'success');
       return true;
     } catch (err) {

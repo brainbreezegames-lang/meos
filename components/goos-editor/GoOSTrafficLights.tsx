@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Minus, Square } from 'lucide-react';
+import { playSound } from '@/lib/sounds';
 
 interface GoOSTrafficLightsProps {
   onClose: () => void;
@@ -59,7 +60,10 @@ export function GoOSTrafficLights({
       {/* Close */}
       <button
         type="button"
-        onClick={onClose}
+        onClick={() => {
+          playSound('popReverse');
+          onClose();
+        }}
         aria-label="Close window"
         title="Close"
         style={{
@@ -79,7 +83,10 @@ export function GoOSTrafficLights({
       {onMinimize && (
         <button
           type="button"
-          onClick={onMinimize}
+          onClick={() => {
+            playSound('minimize');
+            onMinimize();
+          }}
           aria-label="Minimize window"
           title="Minimize"
           style={{
@@ -100,7 +107,10 @@ export function GoOSTrafficLights({
       {onMaximize && (
         <button
           type="button"
-          onClick={onMaximize}
+          onClick={() => {
+            playSound(isMaximized ? 'collapse' : 'maximize');
+            onMaximize();
+          }}
           aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
           title={isMaximized ? 'Restore' : 'Maximize'}
           style={{
