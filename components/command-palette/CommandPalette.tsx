@@ -2,13 +2,12 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { SPRING, DURATION, fade } from '@/lib/animations';
+import { SPRING, DURATION } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
 import {
   fuzzyMatch,
   highlightMatches,
   searchItems,
-  type SearchableItem,
   type HighlightSegment,
 } from '@/lib/fuzzySearch';
 
@@ -25,23 +24,14 @@ export interface CommandFile {
   parentFolderId?: string;
 }
 
-export interface CommandAction {
-  id: string;
-  name: string;
-  icon: string;
-  shortcut?: string;
-  keywords?: string[];
-  onExecute: () => void;
-  category: 'file' | 'action' | 'navigation' | 'settings';
-}
-
 interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
   files: CommandFile[];
+  folders?: CommandFile[];
   selectedFileId?: string | null;
   onOpenFile: (id: string) => void;
-  onCreateNote?: () => void;
+  onCreateNote?: (title?: string) => void;
   onCreateFolder?: () => void;
   onCreateCaseStudy?: () => void;
   onToggleDarkMode?: () => void;
@@ -49,19 +39,31 @@ interface CommandPaletteProps {
   onRenameFile?: (id: string) => void;
   onDeleteFile?: (id: string) => void;
   onDuplicateFile?: (id: string) => void;
+  onMoveFile?: (fileId: string, folderId: string | null) => void;
+  onChangeWallpaper?: () => void;
+  onChangeTheme?: (theme: string) => void;
+  onSwitchSpace?: (spaceId: string) => void;
   isDarkMode?: boolean;
+  currentTheme?: string;
+  spaces?: Array<{ id: string; name: string; icon: string }>;
+  themes?: Array<{ id: string; name: string }>;
 }
 
 interface CommandResultItem {
   id: string;
   name: string;
-  type: 'file' | 'action';
+  type: 'file' | 'action' | 'submenu';
   icon: string;
   shortcut?: string;
   category?: string;
+  hint?: string;
   matches: number[];
+  hasSubmenu?: boolean;
+  submenuItems?: CommandResultItem[];
   onExecute: () => void;
 }
+
+type SubmenuType = 'move-to' | 'change-theme' | 'go-to-space' | null;
 
 // ============================================================================
 // FILE TYPE ICONS
@@ -79,28 +81,79 @@ const FILE_ICONS: Record<FileType, string> = {
 };
 
 // ============================================================================
-// RECENT FILES STORAGE
+// STORAGE KEYS
 // ============================================================================
 
 const RECENT_FILES_KEY = 'goos-recent-files';
+const FILE_FREQUENCY_KEY = 'goos-file-frequency';
 const MAX_RECENT = 20;
 
-function getRecentFiles(): string[] {
+// ============================================================================
+// RECENT FILES WITH TIMESTAMPS
+// ============================================================================
+
+interface RecentFile {
+  id: string;
+  timestamp: number;
+}
+
+function getRecentFilesWithTimestamps(): RecentFile[] {
   if (typeof window === 'undefined') return [];
   try {
     const stored = localStorage.getItem(RECENT_FILES_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    const data = JSON.parse(stored);
+    // Handle old format (array of strings)
+    if (Array.isArray(data) && typeof data[0] === 'string') {
+      return data.map((id: string) => ({ id, timestamp: Date.now() }));
+    }
+    return data;
   } catch {
     return [];
   }
 }
 
+function getRecentFileIds(): string[] {
+  return getRecentFilesWithTimestamps().map(f => f.id);
+}
+
 function addRecentFile(fileId: string): void {
   if (typeof window === 'undefined') return;
   try {
-    const recent = getRecentFiles().filter(id => id !== fileId);
-    recent.unshift(fileId);
+    const recent = getRecentFilesWithTimestamps().filter(f => f.id !== fileId);
+    recent.unshift({ id: fileId, timestamp: Date.now() });
     localStorage.setItem(RECENT_FILES_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+function getFileTimestamp(fileId: string): number | undefined {
+  const recent = getRecentFilesWithTimestamps();
+  return recent.find(f => f.id === fileId)?.timestamp;
+}
+
+// ============================================================================
+// FILE FREQUENCY TRACKING
+// ============================================================================
+
+function getFileFrequency(): Map<string, number> {
+  if (typeof window === 'undefined') return new Map();
+  try {
+    const stored = localStorage.getItem(FILE_FREQUENCY_KEY);
+    if (!stored) return new Map();
+    return new Map(Object.entries(JSON.parse(stored)));
+  } catch {
+    return new Map();
+  }
+}
+
+function incrementFileFrequency(fileId: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const freq = getFileFrequency();
+    freq.set(fileId, (freq.get(fileId) || 0) + 1);
+    localStorage.setItem(FILE_FREQUENCY_KEY, JSON.stringify(Object.fromEntries(freq)));
   } catch {
     // Ignore storage errors
   }
@@ -121,6 +174,7 @@ function getRelativeTime(timestamp?: number): string {
   if (minutes < 1) return 'just now';
   if (minutes < 60) return `${minutes}m ago`;
   if (hours < 24) return `${hours}h ago`;
+  if (days === 1) return 'yesterday';
   if (days < 7) return `${days}d ago`;
   return '';
 }
@@ -154,6 +208,17 @@ function HighlightedText({ segments }: { segments: HighlightSegment[] }) {
 }
 
 // ============================================================================
+// DEFAULT THEMES
+// ============================================================================
+
+const DEFAULT_THEMES = [
+  { id: 'monterey', name: 'Monterey' },
+  { id: 'dark', name: 'Dark' },
+  { id: 'bluren', name: 'Bluren' },
+  { id: 'refined', name: 'Refined' },
+];
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -161,6 +226,7 @@ export function CommandPalette({
   isOpen,
   onClose,
   files,
+  folders,
   selectedFileId,
   onOpenFile,
   onCreateNote,
@@ -171,7 +237,14 @@ export function CommandPalette({
   onRenameFile,
   onDeleteFile,
   onDuplicateFile,
+  onMoveFile,
+  onChangeWallpaper,
+  onChangeTheme,
+  onSwitchSpace,
   isDarkMode,
+  currentTheme,
+  spaces = [],
+  themes = DEFAULT_THEMES,
 }: CommandPaletteProps) {
   const prefersReducedMotion = useReducedMotion();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -180,182 +253,207 @@ export function CommandPalette({
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [activeSubmenu, setActiveSubmenu] = useState<SubmenuType>(null);
+  const [submenuQuery, setSubmenuQuery] = useState('');
+
+  // Get all folders for "Move to" submenu
+  const allFolders = useMemo(() => {
+    if (folders) return folders;
+    return files.filter(f => f.type === 'folder');
+  }, [files, folders]);
 
   // Get prefix mode from query
   const prefixMode = useMemo(() => {
-    if (query.startsWith('>')) return 'actions';
-    if (query.startsWith('/')) return 'create';
-    if (query.startsWith('@')) return 'spaces';
-    if (query.startsWith('#')) return 'settings';
+    const q = activeSubmenu ? submenuQuery : query;
+    if (q.startsWith('>')) return 'actions';
+    if (q.startsWith('/')) return 'create';
+    if (q.startsWith('@')) return 'spaces';
+    if (q.startsWith('#')) return 'settings';
     return null;
-  }, [query]);
+  }, [query, submenuQuery, activeSubmenu]);
 
-  const searchQuery = prefixMode ? query.slice(1) : query;
+  const searchQuery = useMemo(() => {
+    const q = activeSubmenu ? submenuQuery : query;
+    return prefixMode ? q.slice(1) : q;
+  }, [query, submenuQuery, activeSubmenu, prefixMode]);
 
-  // Build actions list
-  const actions = useMemo<CommandAction[]>(() => {
-    const baseActions: CommandAction[] = [];
+  // Build submenu items
+  const submenuItems = useMemo<CommandResultItem[]>(() => {
+    if (!activeSubmenu) return [];
 
-    // Create actions
-    if (onCreateNote) {
-      baseActions.push({
-        id: 'new-note',
-        name: 'New Note',
-        icon: '\u2795',
-        shortcut: '\u2318N',
-        keywords: ['create', 'add'],
-        category: 'action',
-        onExecute: onCreateNote,
-      });
-    }
-    if (onCreateCaseStudy) {
-      baseActions.push({
-        id: 'new-case-study',
-        name: 'New Case Study',
-        icon: '\u2795',
-        shortcut: '\u2318\u21e7N',
-        keywords: ['create', 'add', 'project'],
-        category: 'action',
-        onExecute: onCreateCaseStudy,
-      });
-    }
-    if (onCreateFolder) {
-      baseActions.push({
-        id: 'new-folder',
-        name: 'New Folder',
-        icon: '\ud83d\udcc1',
-        keywords: ['create', 'add', 'directory'],
-        category: 'action',
-        onExecute: onCreateFolder,
-      });
-    }
+    const items: CommandResultItem[] = [];
 
-    // Settings actions
-    if (onToggleDarkMode) {
-      baseActions.push({
-        id: 'toggle-dark-mode',
-        name: isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
-        icon: isDarkMode ? '\u2600\ufe0f' : '\ud83c\udf19',
-        keywords: ['theme', 'appearance', 'dark', 'light'],
-        category: 'settings',
-        onExecute: onToggleDarkMode,
+    if (activeSubmenu === 'move-to') {
+      // Root option
+      items.push({
+        id: 'move-to-root',
+        name: 'Desktop (root)',
+        type: 'action',
+        icon: '\ud83d\udda5\ufe0f',
+        matches: [],
+        onExecute: () => {
+          if (selectedFileId && onMoveFile) {
+            onMoveFile(selectedFileId, null);
+          }
+        },
       });
-    }
-    if (onOpenSettings) {
-      baseActions.push({
-        id: 'settings',
-        name: 'Settings',
-        icon: '\u2699\ufe0f',
-        shortcut: '\u2318,',
-        keywords: ['preferences', 'options', 'config'],
-        category: 'settings',
-        onExecute: onOpenSettings,
-      });
-    }
 
-    // Context actions for selected file
-    if (selectedFileId) {
-      const selectedFile = files.find(f => f.id === selectedFileId);
-      if (selectedFile) {
-        baseActions.push({
-          id: 'open-selected',
-          name: `Open ${selectedFile.title}`,
-          icon: '\ud83d\udcc2',
-          keywords: ['open'],
-          category: 'file',
-          onExecute: () => onOpenFile(selectedFileId),
+      // Folders
+      for (const folder of allFolders) {
+        if (folder.id === selectedFileId) continue; // Can't move to self
+        const match = submenuQuery ? fuzzyMatch(submenuQuery, folder.title) : null;
+        if (!submenuQuery || match) {
+          items.push({
+            id: `move-to-${folder.id}`,
+            name: folder.title,
+            type: 'action',
+            icon: '\ud83d\udcc1',
+            matches: match?.matches || [],
+            onExecute: () => {
+              if (selectedFileId && onMoveFile) {
+                onMoveFile(selectedFileId, folder.id);
+              }
+            },
+          });
+        }
+      }
+
+      // Create new folder option
+      if (onCreateFolder) {
+        items.push({
+          id: 'move-to-new-folder',
+          name: 'New Folder...',
+          type: 'action',
+          icon: '\u2795',
+          matches: [],
+          onExecute: onCreateFolder,
         });
-        if (onRenameFile) {
-          baseActions.push({
-            id: 'rename-selected',
-            name: `Rename ${selectedFile.title}`,
-            icon: '\u270f\ufe0f',
-            shortcut: '\u2318R',
-            category: 'file',
-            onExecute: () => onRenameFile(selectedFileId),
-          });
-        }
-        if (onDuplicateFile) {
-          baseActions.push({
-            id: 'duplicate-selected',
-            name: `Duplicate ${selectedFile.title}`,
-            icon: '\ud83d\udccb',
-            shortcut: '\u2318D',
-            category: 'file',
-            onExecute: () => onDuplicateFile(selectedFileId),
-          });
-        }
-        if (onDeleteFile) {
-          baseActions.push({
-            id: 'delete-selected',
-            name: `Delete ${selectedFile.title}`,
-            icon: '\ud83d\uddd1\ufe0f',
-            shortcut: '\u232b',
-            category: 'file',
-            onExecute: () => onDeleteFile(selectedFileId),
+      }
+    }
+
+    if (activeSubmenu === 'change-theme') {
+      for (const theme of themes) {
+        const match = submenuQuery ? fuzzyMatch(submenuQuery, theme.name) : null;
+        if (!submenuQuery || match) {
+          const isCurrent = currentTheme === theme.id;
+          items.push({
+            id: `theme-${theme.id}`,
+            name: theme.name,
+            type: 'action',
+            icon: isCurrent ? '\u25cf' : '\u25cb',
+            hint: isCurrent ? 'current' : undefined,
+            matches: match?.matches || [],
+            onExecute: () => {
+              if (onChangeTheme) {
+                onChangeTheme(theme.id);
+              }
+            },
           });
         }
       }
     }
 
-    return baseActions;
-  }, [
-    onCreateNote,
-    onCreateCaseStudy,
-    onCreateFolder,
-    onToggleDarkMode,
-    onOpenSettings,
-    onRenameFile,
-    onDeleteFile,
-    onDuplicateFile,
-    selectedFileId,
-    files,
-    isDarkMode,
-    onOpenFile,
-  ]);
+    if (activeSubmenu === 'go-to-space') {
+      for (const space of spaces) {
+        const match = submenuQuery ? fuzzyMatch(submenuQuery, space.name) : null;
+        if (!submenuQuery || match) {
+          items.push({
+            id: `space-${space.id}`,
+            name: space.name,
+            type: 'action',
+            icon: space.icon || '\ud83c\udfe0',
+            matches: match?.matches || [],
+            onExecute: () => {
+              if (onSwitchSpace) {
+                onSwitchSpace(space.id);
+              }
+            },
+          });
+        }
+      }
+    }
 
-  // Build results based on query and mode
+    return items;
+  }, [activeSubmenu, submenuQuery, allFolders, selectedFileId, onMoveFile, onCreateFolder, themes, currentTheme, onChangeTheme, spaces, onSwitchSpace]);
+
+  // Build main results
   const results = useMemo<CommandResultItem[]>(() => {
-    const recentIds = getRecentFiles();
+    // If submenu is active, show submenu items
+    if (activeSubmenu) {
+      return submenuItems;
+    }
+
+    const recentIds = getRecentFileIds();
+    const frequency = getFileFrequency();
     const items: CommandResultItem[] = [];
 
     // Empty state: show recent files + quick actions
     if (!query.trim()) {
-      // Recent files
+      // Recent files with timestamps
       const recentFiles = files
         .filter(f => recentIds.includes(f.id))
         .sort((a, b) => recentIds.indexOf(a.id) - recentIds.indexOf(b.id))
         .slice(0, 5);
 
       for (const file of recentFiles) {
+        const timestamp = getFileTimestamp(file.id);
         items.push({
           id: file.id,
           name: file.title,
           type: 'file',
           icon: FILE_ICONS[file.type] || '\ud83d\udcc4',
           category: 'Recent',
+          hint: getRelativeTime(timestamp),
           matches: [],
           onExecute: () => {
             addRecentFile(file.id);
+            incrementFileFrequency(file.id);
             onOpenFile(file.id);
           },
         });
       }
 
       // Quick actions
-      const quickActions = actions.filter(a =>
-        ['new-note', 'settings', 'toggle-dark-mode'].includes(a.id)
-      );
-      for (const action of quickActions) {
-        items.push({
-          id: action.id,
-          name: action.name,
+      const quickActions: CommandResultItem[] = [];
+
+      if (onCreateNote) {
+        quickActions.push({
+          id: 'new-note',
+          name: 'New Note',
           type: 'action',
-          icon: action.icon,
-          shortcut: action.shortcut,
-          category: items.length === recentFiles.length ? 'Quick Actions' : undefined,
+          icon: '\u2795',
+          shortcut: '\u2318N',
           matches: [],
-          onExecute: action.onExecute,
+          onExecute: () => onCreateNote(),
+        });
+      }
+      if (onCreateFolder) {
+        quickActions.push({
+          id: 'new-folder',
+          name: 'New Folder',
+          type: 'action',
+          icon: '\ud83d\udcc1',
+          matches: [],
+          onExecute: onCreateFolder,
+        });
+      }
+      if (onOpenSettings) {
+        quickActions.push({
+          id: 'settings',
+          name: 'Settings',
+          type: 'action',
+          icon: '\u2699\ufe0f',
+          shortcut: '\u2318,',
+          matches: [],
+          onExecute: onOpenSettings,
+        });
+      }
+
+      for (let i = 0; i < quickActions.length; i++) {
+        const action = quickActions[i];
+        items.push({
+          ...action,
+          category: i === 0 ? 'Quick Actions' : undefined,
         });
       }
 
@@ -364,21 +462,17 @@ export function CommandPalette({
 
     // Filter by prefix mode
     if (prefixMode === 'actions' || prefixMode === 'create') {
+      const actionItems = buildActionItems();
       const filtered = prefixMode === 'create'
-        ? actions.filter(a => a.id.startsWith('new-'))
-        : actions;
+        ? actionItems.filter(a => a.id.startsWith('new-'))
+        : actionItems;
 
       for (const action of filtered) {
         const match = fuzzyMatch(searchQuery, action.name);
         if (match || !searchQuery) {
           items.push({
-            id: action.id,
-            name: action.name,
-            type: 'action',
-            icon: action.icon,
-            shortcut: action.shortcut,
+            ...action,
             matches: match?.matches || [],
-            onExecute: action.onExecute,
           });
         }
       }
@@ -391,18 +485,34 @@ export function CommandPalette({
     }
 
     if (prefixMode === 'settings') {
-      const settingsActions = actions.filter(a => a.category === 'settings');
-      for (const action of settingsActions) {
+      const settingsItems = buildSettingsItems();
+      for (const action of settingsItems) {
         const match = fuzzyMatch(searchQuery, action.name);
         if (match || !searchQuery) {
           items.push({
-            id: action.id,
-            name: action.name,
-            type: 'action',
-            icon: action.icon,
-            shortcut: action.shortcut,
+            ...action,
             matches: match?.matches || [],
-            onExecute: action.onExecute,
+          });
+        }
+      }
+      return items;
+    }
+
+    if (prefixMode === 'spaces' && spaces.length > 0) {
+      for (const space of spaces) {
+        const match = fuzzyMatch(searchQuery, space.name);
+        if (match || !searchQuery) {
+          items.push({
+            id: `space-${space.id}`,
+            name: space.name,
+            type: 'action',
+            icon: space.icon || '\ud83c\udfe0',
+            matches: match?.matches || [],
+            onExecute: () => {
+              if (onSwitchSpace) {
+                onSwitchSpace(space.id);
+              }
+            },
           });
         }
       }
@@ -410,40 +520,39 @@ export function CommandPalette({
     }
 
     // Regular search: files + actions
-    // Search files
     const fileResults = searchItems(
       searchQuery,
       files.map(f => ({ id: f.id, name: f.title, type: f.type })),
-      { recentIds, maxResults: 8 }
+      { recentIds, frequentIds: frequency, maxResults: 8 }
     );
 
     for (const result of fileResults) {
       const file = files.find(f => f.id === result.item.id)!;
+      const timestamp = getFileTimestamp(file.id);
+      const freq = frequency.get(file.id);
       items.push({
         id: file.id,
         name: file.title,
         type: 'file',
         icon: FILE_ICONS[file.type] || '\ud83d\udcc4',
+        hint: timestamp ? getRelativeTime(timestamp) : freq && freq > 3 ? 'frequent' : undefined,
         matches: result.matches,
         onExecute: () => {
           addRecentFile(file.id);
+          incrementFileFrequency(file.id);
           onOpenFile(file.id);
         },
       });
     }
 
     // Search actions
-    for (const action of actions) {
+    const allActions = [...buildActionItems(), ...buildSettingsItems()];
+    for (const action of allActions) {
       const match = fuzzyMatch(searchQuery, action.name);
       if (match && match.score > 20) {
         items.push({
-          id: action.id,
-          name: action.name,
-          type: 'action',
-          icon: action.icon,
-          shortcut: action.shortcut,
+          ...action,
           matches: match.matches,
-          onExecute: action.onExecute,
         });
       }
     }
@@ -455,7 +564,7 @@ export function CommandPalette({
       return (matchB?.score || 0) - (matchA?.score || 0);
     });
 
-    // No results: offer to create a note
+    // No results: offer to create a note with that title
     if (items.length === 0 && searchQuery && onCreateNote) {
       items.push({
         id: 'create-from-search',
@@ -463,27 +572,195 @@ export function CommandPalette({
         type: 'action',
         icon: '\u2795',
         matches: [],
-        onExecute: () => {
-          onCreateNote();
-          // TODO: Pass the query as the note title
-        },
+        onExecute: () => onCreateNote(searchQuery),
       });
     }
 
     return items.slice(0, 10);
-  }, [query, searchQuery, prefixMode, files, actions, onOpenFile, onCreateNote]);
+  }, [query, searchQuery, prefixMode, files, spaces, activeSubmenu, submenuItems, onOpenFile, onCreateNote, onSwitchSpace]);
+
+  // Build action items (memoized builder function)
+  function buildActionItems(): CommandResultItem[] {
+    const items: CommandResultItem[] = [];
+
+    // Create actions
+    if (onCreateNote) {
+      items.push({
+        id: 'new-note',
+        name: 'New Note',
+        type: 'action',
+        icon: '\u2795',
+        shortcut: '\u2318N',
+        matches: [],
+        onExecute: () => onCreateNote(),
+      });
+    }
+    if (onCreateCaseStudy) {
+      items.push({
+        id: 'new-case-study',
+        name: 'New Case Study',
+        type: 'action',
+        icon: '\u2795',
+        shortcut: '\u2318\u21e7N',
+        matches: [],
+        onExecute: onCreateCaseStudy,
+      });
+    }
+    if (onCreateFolder) {
+      items.push({
+        id: 'new-folder',
+        name: 'New Folder',
+        type: 'action',
+        icon: '\ud83d\udcc1',
+        matches: [],
+        onExecute: onCreateFolder,
+      });
+    }
+
+    // Context actions for selected file
+    if (selectedFileId) {
+      const selectedFile = files.find(f => f.id === selectedFileId);
+      if (selectedFile) {
+        items.push({
+          id: 'open-selected',
+          name: `Open "${selectedFile.title}"`,
+          type: 'action',
+          icon: '\ud83d\udcc2',
+          matches: [],
+          onExecute: () => {
+            addRecentFile(selectedFileId);
+            incrementFileFrequency(selectedFileId);
+            onOpenFile(selectedFileId);
+          },
+        });
+        if (onRenameFile) {
+          items.push({
+            id: 'rename-selected',
+            name: `Rename "${selectedFile.title}"`,
+            type: 'action',
+            icon: '\u270f\ufe0f',
+            shortcut: '\u2318R',
+            matches: [],
+            onExecute: () => onRenameFile(selectedFileId),
+          });
+        }
+        if (onDuplicateFile) {
+          items.push({
+            id: 'duplicate-selected',
+            name: `Duplicate "${selectedFile.title}"`,
+            type: 'action',
+            icon: '\ud83d\udccb',
+            shortcut: '\u2318D',
+            matches: [],
+            onExecute: () => onDuplicateFile(selectedFileId),
+          });
+        }
+        if (onMoveFile && allFolders.length > 0) {
+          items.push({
+            id: 'move-to',
+            name: 'Move to...',
+            type: 'submenu',
+            icon: '\ud83d\udce4',
+            hasSubmenu: true,
+            matches: [],
+            onExecute: () => setActiveSubmenu('move-to'),
+          });
+        }
+        if (onDeleteFile) {
+          items.push({
+            id: 'delete-selected',
+            name: `Delete "${selectedFile.title}"`,
+            type: 'action',
+            icon: '\ud83d\uddd1\ufe0f',
+            shortcut: '\u232b',
+            matches: [],
+            onExecute: () => onDeleteFile(selectedFileId),
+          });
+        }
+      }
+    }
+
+    return items;
+  }
+
+  // Build settings items
+  function buildSettingsItems(): CommandResultItem[] {
+    const items: CommandResultItem[] = [];
+
+    if (onToggleDarkMode) {
+      items.push({
+        id: 'toggle-dark-mode',
+        name: isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+        type: 'action',
+        icon: isDarkMode ? '\u2600\ufe0f' : '\ud83c\udf19',
+        matches: [],
+        onExecute: onToggleDarkMode,
+      });
+    }
+
+    if (onChangeTheme && themes.length > 0) {
+      items.push({
+        id: 'change-theme',
+        name: 'Change Theme',
+        type: 'submenu',
+        icon: '\ud83c\udfa8',
+        hasSubmenu: true,
+        matches: [],
+        onExecute: () => setActiveSubmenu('change-theme'),
+      });
+    }
+
+    if (onChangeWallpaper) {
+      items.push({
+        id: 'change-wallpaper',
+        name: 'Change Wallpaper',
+        type: 'action',
+        icon: '\ud83d\uddbc\ufe0f',
+        matches: [],
+        onExecute: onChangeWallpaper,
+      });
+    }
+
+    if (onOpenSettings) {
+      items.push({
+        id: 'settings',
+        name: 'Settings',
+        type: 'action',
+        icon: '\u2699\ufe0f',
+        shortcut: '\u2318,',
+        matches: [],
+        onExecute: onOpenSettings,
+      });
+    }
+
+    if (spaces.length > 0 && onSwitchSpace) {
+      items.push({
+        id: 'go-to-space',
+        name: 'Go to Space...',
+        type: 'submenu',
+        icon: '\ud83c\udfe0',
+        hasSubmenu: true,
+        matches: [],
+        onExecute: () => setActiveSubmenu('go-to-space'),
+      });
+    }
+
+    return items;
+  }
 
   // Reset selection when results change
   useEffect(() => {
     setSelectedIndex(0);
-  }, [results.length, query]);
+  }, [results.length, query, submenuQuery, activeSubmenu]);
 
   // Focus input on open
   useEffect(() => {
     if (isOpen) {
       setQuery('');
+      setSubmenuQuery('');
       setSelectedIndex(0);
       setHasInteracted(false);
+      setActiveSubmenu(null);
       setTimeout(() => inputRef.current?.focus(), 50);
       playSound('expand');
     }
@@ -492,7 +769,8 @@ export function CommandPalette({
   // Scroll selected item into view
   useEffect(() => {
     if (listRef.current && hasInteracted) {
-      const selectedEl = listRef.current.children[selectedIndex] as HTMLElement;
+      const items = listRef.current.querySelectorAll('[role="option"]');
+      const selectedEl = items[selectedIndex] as HTMLElement;
       selectedEl?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }, [selectedIndex, hasInteracted]);
@@ -500,6 +778,17 @@ export function CommandPalette({
   // Keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      // Back out of submenu with Escape or Backspace on empty query
+      if (activeSubmenu) {
+        if (e.key === 'Escape' || (e.key === 'Backspace' && !submenuQuery)) {
+          e.preventDefault();
+          setActiveSubmenu(null);
+          setSubmenuQuery('');
+          playSound('collapse');
+          return;
+        }
+      }
+
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
@@ -513,12 +802,35 @@ export function CommandPalette({
           setSelectedIndex(i => (i - 1 + results.length) % results.length);
           playSound('clickSoft');
           break;
+        case 'Tab':
+          // Tab expands submenu if current item has one
+          e.preventDefault();
+          const item = results[selectedIndex];
+          if (item?.hasSubmenu) {
+            playSound('expand');
+            item.onExecute();
+          }
+          break;
+        case 'ArrowRight':
+          // Right arrow also expands submenu
+          const itemRight = results[selectedIndex];
+          if (itemRight?.hasSubmenu) {
+            e.preventDefault();
+            playSound('expand');
+            itemRight.onExecute();
+          }
+          break;
         case 'Enter':
           e.preventDefault();
           if (results[selectedIndex]) {
-            playSound('pop');
-            results[selectedIndex].onExecute();
-            onClose();
+            const selectedItem = results[selectedIndex];
+            if (selectedItem.hasSubmenu) {
+              playSound('expand');
+            } else {
+              playSound('pop');
+              onClose();
+            }
+            selectedItem.onExecute();
           }
           break;
         case 'Escape':
@@ -532,15 +844,30 @@ export function CommandPalette({
             e.preventDefault();
             const index = parseInt(e.key) - 1;
             if (results[index]) {
-              playSound('pop');
-              results[index].onExecute();
-              onClose();
+              const selectedItem = results[index];
+              if (selectedItem.hasSubmenu) {
+                playSound('expand');
+                selectedItem.onExecute();
+              } else {
+                playSound('pop');
+                selectedItem.onExecute();
+                onClose();
+              }
             }
           }
       }
     },
-    [results, selectedIndex, onClose]
+    [results, selectedIndex, onClose, activeSubmenu, submenuQuery]
   );
+
+  // Handle input change
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (activeSubmenu) {
+      setSubmenuQuery(e.target.value);
+    } else {
+      setQuery(e.target.value);
+    }
+  }, [activeSubmenu]);
 
   // Handle backdrop click
   const handleBackdropClick = useCallback(() => {
@@ -551,12 +878,25 @@ export function CommandPalette({
   // Execute item
   const handleItemClick = useCallback(
     (item: CommandResultItem) => {
-      playSound('pop');
-      item.onExecute();
-      onClose();
+      if (item.hasSubmenu) {
+        playSound('expand');
+        item.onExecute();
+      } else {
+        playSound('pop');
+        item.onExecute();
+        onClose();
+      }
     },
     [onClose]
   );
+
+  // Current input value
+  const inputValue = activeSubmenu ? submenuQuery : query;
+  const placeholder = activeSubmenu
+    ? activeSubmenu === 'move-to' ? 'Search folders...'
+      : activeSubmenu === 'change-theme' ? 'Search themes...'
+      : 'Search spaces...'
+    : 'Search files and actions...';
 
   return (
     <AnimatePresence>
@@ -612,13 +952,44 @@ export function CommandPalette({
               overflow: 'hidden',
             }}
           >
+            {/* Submenu breadcrumb */}
+            {activeSubmenu && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '10px 20px',
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: 'var(--color-text-secondary)',
+                  background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.02))',
+                  borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  setActiveSubmenu(null);
+                  setSubmenuQuery('');
+                  playSound('collapse');
+                }}
+              >
+                <span style={{ opacity: 0.5 }}>\u2190</span>
+                <span>
+                  {activeSubmenu === 'move-to' && 'Move to'}
+                  {activeSubmenu === 'change-theme' && 'Change Theme'}
+                  {activeSubmenu === 'go-to-space' && 'Go to Space'}
+                </span>
+                <span style={{ opacity: 0.4, fontSize: 11 }}>esc to go back</span>
+              </div>
+            )}
+
             {/* Input */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                padding: '16px 20px',
+                padding: '14px 20px',
                 borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
               }}
             >
@@ -626,10 +997,10 @@ export function CommandPalette({
               <input
                 ref={inputRef}
                 type="text"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
+                value={inputValue}
+                onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder="Search files and actions..."
+                placeholder={placeholder}
                 role="combobox"
                 aria-expanded={true}
                 aria-controls="command-results"
@@ -640,7 +1011,7 @@ export function CommandPalette({
                 spellCheck={false}
                 style={{
                   flex: 1,
-                  height: 32,
+                  height: 28,
                   fontSize: 15,
                   fontWeight: 450,
                   color: 'var(--color-text-primary)',
@@ -649,7 +1020,7 @@ export function CommandPalette({
                   outline: 'none',
                 }}
               />
-              {!query && (
+              {!inputValue && !activeSubmenu && (
                 <kbd
                   style={{
                     padding: '4px 8px',
@@ -667,7 +1038,7 @@ export function CommandPalette({
             </div>
 
             {/* Prefix hint */}
-            {prefixMode && (
+            {prefixMode && !activeSubmenu && (
               <div
                 style={{
                   padding: '8px 20px',
@@ -696,7 +1067,7 @@ export function CommandPalette({
                 overflowX: 'hidden',
               }}
             >
-              {results.length === 0 && query && (
+              {results.length === 0 && (inputValue || activeSubmenu) && (
                 <div
                   style={{
                     padding: '32px 20px',
@@ -739,7 +1110,8 @@ export function CommandPalette({
                         display: 'flex',
                         alignItems: 'center',
                         gap: 12,
-                        padding: '10px 20px',
+                        height: 44,
+                        padding: '0 20px',
                         cursor: 'pointer',
                         background: isSelected
                           ? 'var(--color-accent-primary-glow, rgba(255, 119, 34, 0.08))'
@@ -762,6 +1134,20 @@ export function CommandPalette({
                       >
                         <HighlightedText segments={segments} />
                       </span>
+                      {item.hint && (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: 'var(--color-text-muted)',
+                            opacity: 0.7,
+                          }}
+                        >
+                          {item.hint}
+                        </span>
+                      )}
+                      {item.hasSubmenu && (
+                        <span style={{ fontSize: 12, color: 'var(--color-text-muted)', opacity: 0.6 }}>\u203a</span>
+                      )}
                       {item.shortcut && (
                         <kbd
                           style={{
@@ -776,14 +1162,14 @@ export function CommandPalette({
                           {item.shortcut}
                         </kbd>
                       )}
-                      {index < 9 && (
+                      {index < 9 && !item.hasSubmenu && (
                         <kbd
                           style={{
                             padding: '2px 6px',
                             fontSize: 10,
                             fontFamily: 'var(--font-mono, monospace)',
                             color: 'var(--color-text-muted)',
-                            opacity: 0.6,
+                            opacity: 0.5,
                           }}
                         >
                           \u2318{index + 1}
@@ -796,22 +1182,23 @@ export function CommandPalette({
             </div>
 
             {/* Footer hint */}
-            {results.length > 0 && (
-              <div
-                style={{
-                  padding: '10px 20px',
-                  fontSize: 11,
-                  color: 'var(--color-text-muted)',
-                  borderTop: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
-                  display: 'flex',
-                  gap: 16,
-                }}
-              >
-                <span><kbd style={{ opacity: 0.7 }}>\u2191\u2193</kbd> navigate</span>
-                <span><kbd style={{ opacity: 0.7 }}>\u21b5</kbd> select</span>
-                <span><kbd style={{ opacity: 0.7 }}>esc</kbd> close</span>
-              </div>
-            )}
+            <div
+              style={{
+                padding: '10px 20px',
+                fontSize: 11,
+                color: 'var(--color-text-muted)',
+                borderTop: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
+                display: 'flex',
+                gap: 16,
+              }}
+            >
+              <span><kbd style={{ opacity: 0.7 }}>\u2191\u2193</kbd> navigate</span>
+              <span><kbd style={{ opacity: 0.7 }}>\u21b5</kbd> select</span>
+              {results.some(r => r.hasSubmenu) && (
+                <span><kbd style={{ opacity: 0.7 }}>tab</kbd> expand</span>
+              )}
+              <span><kbd style={{ opacity: 0.7 }}>esc</kbd> {activeSubmenu ? 'back' : 'close'}</span>
+            </div>
           </motion.div>
         </>
       )}

@@ -2898,7 +2898,11 @@ function GoOSDemoContent() {
     }, []);
 
     // File management functions - now use API persistence
-    const createFile = useCallback(async (type: FileType, pixelPosition?: { x: number; y: number }) => {
+    const createFile = useCallback(async (type: FileType, titleOrPosition?: string | { x: number; y: number }) => {
+        // Support both (type, title) and (type, pixelPosition) signatures
+        const title = typeof titleOrPosition === 'string' ? titleOrPosition : undefined;
+        const pixelPosition = typeof titleOrPosition === 'object' ? titleOrPosition : undefined;
+
         // Convert pixel position to percentage if provided
         let position: { x: number; y: number } | undefined;
         if (pixelPosition) {
@@ -2918,13 +2922,17 @@ function GoOSDemoContent() {
 
         const newFile = await createGoOSFile(type, null, position);
         if (newFile) {
+            // Set custom title if provided
+            if (title) {
+                await updateGoOSFile(newFile.id, { title });
+            }
             if (type !== 'folder') {
                 setOpenEditors(prev => [...prev, newFile.id]);
                 setActiveEditorId(newFile.id);
             }
             // Don't auto-rename - user can right-click > Rename if needed
         }
-    }, [createGoOSFile]);
+    }, [createGoOSFile, updateGoOSFile]);
 
     // Convert pixel to percentage position helper
     const convertToPercentPosition = useCallback((pixelX: number, pixelY: number) => {
@@ -5117,7 +5125,7 @@ function GoOSDemoContent() {
                 }))}
                 selectedFileId={selectedFileId}
                 onOpenFile={openFile}
-                onCreateNote={() => createFile('note')}
+                onCreateNote={(title) => createFile('note', title)}
                 onCreateFolder={() => createFile('folder')}
                 onCreateCaseStudy={() => createFile('case-study')}
                 onToggleDarkMode={toggleDarkMode}
@@ -5129,7 +5137,15 @@ function GoOSDemoContent() {
                     }
                 }}
                 onDuplicateFile={duplicateFile}
+                onMoveFile={(fileId, folderId) => moveGoOSFile(fileId, folderId)}
+                onChangeWallpaper={() => setShowWallpaperPicker(true)}
+                onSwitchSpace={(spaceId) => {
+                    setActiveSpaceId(spaceId);
+                    const space = DEMO_SPACES.find(s => s.id === spaceId);
+                    if (space) showGoOSToast(`Switched to ${space.name}`, 'success');
+                }}
                 isDarkMode={isDarkMode}
+                spaces={DEMO_SPACES.map(s => ({ id: s.id, name: s.name, icon: s.icon }))}
             />
 
             {/* Create Space Modal */}
