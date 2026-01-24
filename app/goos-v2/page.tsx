@@ -2492,24 +2492,40 @@ function GoOSDemoContent() {
 
     // Boot sequence state
     const [bootPhase, setBootPhase] = useState<'booting' | 'ready'>('booting');
+    const [bootMessage, setBootMessage] = useState(0);
+
+    // Fun loading messages that rotate
+    const bootMessages = useMemo(() => [
+        'Waking up the duck...',
+        'Fluffing feathers...',
+        'Counting breadcrumbs...',
+        'Polishing pixels...',
+        'Almost ready to quack!',
+    ], []);
 
     // Boot sequence effect - show logo, then transition to desktop
     useEffect(() => {
-        // Play startup sound after a brief delay (lets the animation start first)
+        // Play startup sound after a brief delay
         const soundTimer = setTimeout(() => {
             playSound('startup');
-        }, 400);
+        }, 600);
+
+        // Rotate through boot messages
+        const messageInterval = setInterval(() => {
+            setBootMessage(prev => (prev + 1) % bootMessages.length);
+        }, 700);
 
         // Transition to ready state after boot animation
         const bootTimer = setTimeout(() => {
             setBootPhase('ready');
-        }, 2400); // 2.4 seconds total boot time
+        }, 3500); // 3.5 seconds - longer for personality
 
         return () => {
             clearTimeout(soundTimer);
             clearTimeout(bootTimer);
+            clearInterval(messageInterval);
         };
-    }, []);
+    }, [bootMessages.length]);
 
     // Spaces state (demo mode - will be replaced by SpaceContext)
     const [activeSpaceId, setActiveSpaceId] = useState('space-1');
@@ -3415,85 +3431,154 @@ function GoOSDemoContent() {
                     <motion.div
                         key="boot-screen"
                         initial={{ opacity: 1 }}
-                        exit={{ opacity: 0, scale: 1.05 }}
-                        transition={{ duration: DURATION.boot, ease: EASE.out }}
-                        className="fixed inset-0 z-[10000] flex flex-col items-center justify-center"
+                        exit={{ opacity: 0, scale: 1.02 }}
+                        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                        className="fixed inset-0 z-[10000] flex flex-col items-center justify-center overflow-hidden"
                         style={{
-                            background: 'var(--bg-canvas, #fbf9ef)',
+                            background: 'linear-gradient(180deg, #faf8f2 0%, #f5f0e6 100%)',
                         }}
                     >
+                        {/* Subtle floating particles in background */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            {[...Array(6)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    className="absolute w-2 h-2 rounded-full"
+                                    style={{
+                                        background: 'var(--accent-primary, #ff7722)',
+                                        opacity: 0.15,
+                                        left: `${15 + i * 15}%`,
+                                        top: `${30 + (i % 3) * 20}%`,
+                                    }}
+                                    animate={{
+                                        y: [0, -30, 0],
+                                        x: [0, (i % 2 === 0 ? 10 : -10), 0],
+                                        scale: [1, 1.2, 1],
+                                    }}
+                                    transition={{
+                                        duration: 3 + i * 0.5,
+                                        repeat: Infinity,
+                                        ease: 'easeInOut',
+                                        delay: i * 0.3,
+                                    }}
+                                />
+                            ))}
+                        </div>
+
                         {/* goOS Logo */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={SPRING.smooth}
-                            className="flex flex-col items-center gap-6"
+                            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.2 }}
+                            className="flex flex-col items-center gap-5"
                         >
-                            {/* Duck icon with playful bounce */}
+                            {/* Duck with waddle animation */}
                             <motion.div
-                                animate={{ y: [0, -12, 0] }}
-                                transition={{
-                                    duration: 1.2,
-                                    repeat: Infinity,
-                                    ease: EASE.inOut,
+                                animate={{
+                                    y: [0, -15, 0],
+                                    rotate: [0, -5, 5, -5, 0],
+                                    scale: [1, 1.05, 1],
                                 }}
-                                className="text-6xl select-none"
+                                transition={{
+                                    duration: 1.5,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                }}
+                                className="relative"
                             >
-                                🦆
+                                <span className="text-7xl select-none drop-shadow-lg">🦆</span>
+                                {/* Sparkle effect */}
+                                <motion.div
+                                    className="absolute -top-1 -right-1 text-lg"
+                                    animate={{
+                                        scale: [0, 1, 0],
+                                        rotate: [0, 180],
+                                        opacity: [0, 1, 0],
+                                    }}
+                                    transition={{
+                                        duration: 1.2,
+                                        repeat: Infinity,
+                                        delay: 0.5,
+                                    }}
+                                >
+                                    ✨
+                                </motion.div>
                             </motion.div>
 
-                            {/* Logo text */}
-                            <motion.h1
-                                initial={{ opacity: 0, y: 12 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ ...SPRING.gentle, delay: 0.15 }}
-                                className="text-2xl font-semibold tracking-tight"
-                                style={{ color: 'var(--text-primary, #171412)' }}
-                            >
-                                goOS
-                            </motion.h1>
+                            {/* Logo text with letter animation */}
+                            <motion.div className="flex items-baseline gap-0.5">
+                                {['g', 'o', 'O', 'S'].map((letter, i) => (
+                                    <motion.span
+                                        key={i}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{
+                                            type: 'spring',
+                                            stiffness: 300,
+                                            damping: 20,
+                                            delay: 0.4 + i * 0.08,
+                                        }}
+                                        className="text-3xl font-bold tracking-tight"
+                                        style={{
+                                            color: 'var(--text-primary, #171412)',
+                                            textShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                                        }}
+                                    >
+                                        {letter}
+                                    </motion.span>
+                                ))}
+                            </motion.div>
 
-                            {/* Loading bar */}
+                            {/* Playful loading bar */}
                             <motion.div
-                                initial={{ opacity: 0, scaleX: 0.8 }}
-                                animate={{ opacity: 1, scaleX: 1 }}
-                                transition={{ ...SPRING.gentle, delay: 0.3 }}
-                                className="relative overflow-hidden"
+                                initial={{ opacity: 0, width: 0 }}
+                                animate={{ opacity: 1, width: 140 }}
+                                transition={{ delay: 0.6, duration: 0.4 }}
+                                className="relative h-1.5 rounded-full overflow-hidden"
                                 style={{
-                                    width: 120,
-                                    height: 4,
-                                    background: 'var(--border-subtle, rgba(23, 20, 18, 0.08))',
-                                    borderRadius: 2,
+                                    background: 'rgba(23, 20, 18, 0.08)',
                                 }}
                             >
                                 <motion.div
-                                    initial={{ x: '-100%' }}
-                                    animate={{ x: '100%' }}
+                                    animate={{ x: ['-100%', '200%'] }}
                                     transition={{
-                                        duration: 1,
+                                        duration: 1.2,
                                         repeat: Infinity,
-                                        ease: EASE.inOut,
+                                        ease: [0.4, 0, 0.6, 1],
                                     }}
+                                    className="absolute inset-y-0 w-1/2 rounded-full"
                                     style={{
-                                        position: 'absolute',
-                                        inset: 0,
                                         background: 'linear-gradient(90deg, transparent, var(--accent-primary, #ff7722), transparent)',
-                                        borderRadius: 2,
                                     }}
                                 />
                             </motion.div>
 
-                            {/* Loading text */}
-                            <motion.p
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: DURATION.slow, delay: 0.5 }}
-                                className="text-xs"
-                                style={{ color: 'var(--text-tertiary, #a09a94)' }}
-                            >
-                                Starting up...
-                            </motion.p>
+                            {/* Fun rotating messages */}
+                            <AnimatePresence mode="wait">
+                                <motion.p
+                                    key={bootMessage}
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8 }}
+                                    transition={{ duration: 0.25 }}
+                                    className="text-sm font-medium"
+                                    style={{ color: 'var(--text-muted, #8e827c)' }}
+                                >
+                                    {bootMessages[bootMessage]}
+                                </motion.p>
+                            </AnimatePresence>
                         </motion.div>
+
+                        {/* Footer branding */}
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1.5 }}
+                            className="absolute bottom-8 text-[10px] tracking-wider uppercase"
+                            style={{ color: 'var(--text-tertiary, #a09a94)' }}
+                        >
+                            Your personal web desktop
+                        </motion.p>
                     </motion.div>
                 )}
             </AnimatePresence>

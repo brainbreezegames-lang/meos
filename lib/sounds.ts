@@ -532,54 +532,127 @@ function synthesizeBubble(ctx: AudioContext, time: number, volume: number): void
   osc.stop(time + 0.15);
 }
 
-// Startup - warm system boot chime (ascending arpeggio)
+// Startup - iconic goOS welcome chime
+// Memorable 3-note motif: playful, warm, and distinctly "goOS"
 function synthesizeStartup(ctx: AudioContext, time: number, volume: number): void {
-  // Create a warm, memorable startup chime with ascending notes
-  // Notes: C4 -> E4 -> G4 -> C5 (major arpeggio)
+  // Create a reverb-like effect
+  const convolver = ctx.createConvolver();
+  const reverbTime = 1.5;
+  const sampleRate = ctx.sampleRate;
+  const length = sampleRate * reverbTime;
+  const impulse = ctx.createBuffer(2, length, sampleRate);
+
+  for (let channel = 0; channel < 2; channel++) {
+    const channelData = impulse.getChannelData(channel);
+    for (let i = 0; i < length; i++) {
+      channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.5);
+    }
+  }
+  convolver.buffer = impulse;
+
+  // Master gain for wet signal
+  const wetGain = ctx.createGain();
+  wetGain.gain.setValueAtTime(0.15, time);
+
+  // Dry gain
+  const dryGain = ctx.createGain();
+  dryGain.gain.setValueAtTime(0.85, time);
+
+  convolver.connect(wetGain);
+  wetGain.connect(ctx.destination);
+  dryGain.connect(ctx.destination);
+
+  // Iconic 3-note goOS melody: "go-O-S" feel
+  // G4 -> Bb4 -> D5 (playful minor with bright ending)
   const notes = [
-    { freq: 261.63, delay: 0 },      // C4
-    { freq: 329.63, delay: 0.12 },   // E4
-    { freq: 392.00, delay: 0.24 },   // G4
-    { freq: 523.25, delay: 0.36 },   // C5
+    { freq: 392.00, delay: 0, duration: 0.4 },      // G4 - "go"
+    { freq: 466.16, delay: 0.15, duration: 0.35 },  // Bb4 - "O"
+    { freq: 587.33, delay: 0.35, duration: 0.8 },   // D5 - "S" (longer, bright ending)
   ];
 
-  notes.forEach(({ freq, delay }) => {
-    // Main tone
+  notes.forEach(({ freq, delay, duration }, i) => {
+    // Main bell-like tone
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, time + delay);
 
-    // Soft attack, smooth decay
+    // Bell-like envelope: quick attack, smooth decay
     gain.gain.setValueAtTime(0, time + delay);
-    gain.gain.linearRampToValueAtTime(volume * 0.35, time + delay + 0.05);
-    gain.gain.exponentialRampToValueAtTime(volume * 0.15, time + delay + 0.3);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + delay + 0.8);
+    gain.gain.linearRampToValueAtTime(volume * 0.5, time + delay + 0.02);
+    gain.gain.exponentialRampToValueAtTime(volume * 0.25, time + delay + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + delay + duration);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(dryGain);
+    gain.connect(convolver);
 
     osc.start(time + delay);
-    osc.stop(time + delay + 0.9);
+    osc.stop(time + delay + duration + 0.1);
 
-    // Add subtle harmonic (fifth above, very quiet)
-    const harmonic = ctx.createOscillator();
-    const harmonicGain = ctx.createGain();
+    // Warm harmonic (octave below, adds richness)
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
 
-    harmonic.type = 'sine';
-    harmonic.frequency.setValueAtTime(freq * 1.5, time + delay);
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(freq / 2, time + delay);
 
-    harmonicGain.gain.setValueAtTime(0, time + delay);
-    harmonicGain.gain.linearRampToValueAtTime(volume * 0.08, time + delay + 0.05);
-    harmonicGain.gain.exponentialRampToValueAtTime(0.001, time + delay + 0.5);
+    subGain.gain.setValueAtTime(0, time + delay);
+    subGain.gain.linearRampToValueAtTime(volume * 0.15, time + delay + 0.03);
+    subGain.gain.exponentialRampToValueAtTime(0.001, time + delay + duration * 0.7);
 
-    harmonic.connect(harmonicGain);
-    harmonicGain.connect(ctx.destination);
+    subOsc.connect(subGain);
+    subGain.connect(dryGain);
 
-    harmonic.start(time + delay);
-    harmonic.stop(time + delay + 0.6);
+    subOsc.start(time + delay);
+    subOsc.stop(time + delay + duration);
+
+    // Bright sparkle (2 octaves up, very subtle)
+    if (i === 2) { // Only on the last note
+      const sparkle = ctx.createOscillator();
+      const sparkleGain = ctx.createGain();
+
+      sparkle.type = 'sine';
+      sparkle.frequency.setValueAtTime(freq * 2, time + delay + 0.1);
+
+      sparkleGain.gain.setValueAtTime(0, time + delay + 0.1);
+      sparkleGain.gain.linearRampToValueAtTime(volume * 0.12, time + delay + 0.12);
+      sparkleGain.gain.exponentialRampToValueAtTime(0.001, time + delay + 0.5);
+
+      sparkle.connect(sparkleGain);
+      sparkleGain.connect(dryGain);
+      sparkleGain.connect(convolver);
+
+      sparkle.start(time + delay + 0.1);
+      sparkle.stop(time + delay + 0.6);
+    }
   });
+
+  // Add a subtle "quack" character at the very end (duck personality!)
+  const quackOsc = ctx.createOscillator();
+  const quackGain = ctx.createGain();
+  const quackFilter = ctx.createBiquadFilter();
+
+  quackOsc.type = 'sawtooth';
+  quackOsc.frequency.setValueAtTime(300, time + 0.55);
+  quackOsc.frequency.exponentialRampToValueAtTime(200, time + 0.62);
+  quackOsc.frequency.exponentialRampToValueAtTime(250, time + 0.65);
+
+  quackFilter.type = 'bandpass';
+  quackFilter.frequency.setValueAtTime(800, time + 0.55);
+  quackFilter.Q.setValueAtTime(3, time + 0.55);
+
+  quackGain.gain.setValueAtTime(0, time + 0.55);
+  quackGain.gain.linearRampToValueAtTime(volume * 0.08, time + 0.57);
+  quackGain.gain.exponentialRampToValueAtTime(0.001, time + 0.7);
+
+  quackOsc.connect(quackFilter);
+  quackFilter.connect(quackGain);
+  quackGain.connect(dryGain);
+
+  quackOsc.start(time + 0.55);
+  quackOsc.stop(time + 0.75);
 }
 
 /**
