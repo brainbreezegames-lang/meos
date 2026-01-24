@@ -584,21 +584,32 @@ html.theme-sketch {
 html.theme-sketch.dark {
     color-scheme: dark;
 
-    /* ========== BACKGROUNDS - Warm Dark Palette ========== */
-    /* NO pure black - all have warm hue (60-110) and subtle chroma */
-    --bg-canvas: oklch(16% 0.01 75);
-    --bg-surface: oklch(21% 0.008 70);
-    --bg-elevated: oklch(26% 0.006 65);
-    --bg-muted: oklch(18% 0.01 80);
+    /* ========== UNIFIED DARK MODE BACKGROUNDS ========== */
+    /* ONE palette, used EVERYWHERE - no exceptions
+       Base: oklch(18% 0.012 70) - warm charcoal with brown undertone
+       This is the ONLY dark background. All variables point here. */
+
+    /* Primary background - ALL windows, surfaces, content areas */
+    --dark-bg-primary: oklch(18% 0.012 70);
+    /* Slightly elevated - cards, inputs, hover states */
+    --dark-bg-elevated: oklch(22% 0.010 70);
+    /* Subtle variation - borders, dividers */
+    --dark-bg-subtle: oklch(15% 0.012 70);
+
+    /* Map ALL legacy variables to the unified palette */
+    --bg-canvas: var(--dark-bg-primary);
+    --bg-surface: var(--dark-bg-primary);
+    --bg-elevated: var(--dark-bg-elevated);
+    --bg-muted: var(--dark-bg-primary);
     --bg-overlay: rgba(255, 119, 34, 0.06);
 
-    /* Calm-tech dark tokens - warm undertones */
-    --color-bg-base: oklch(16% 0.01 75);
-    --color-bg-dark: oklch(21% 0.008 70);
-    --color-bg-subtle: oklch(19% 0.008 75);
-    --color-bg-white: oklch(26% 0.006 65);
-    --color-bg-glass: oklch(21% 0.008 70 / 0.95);
-    --color-bg-glass-heavy: oklch(18% 0.01 75 / 0.98);
+    /* Calm-tech dark tokens - ALL map to unified palette */
+    --color-bg-base: var(--dark-bg-primary);
+    --color-bg-dark: var(--dark-bg-primary);
+    --color-bg-subtle: var(--dark-bg-subtle);
+    --color-bg-white: var(--dark-bg-elevated);
+    --color-bg-glass: oklch(18% 0.012 70 / 0.95);
+    --color-bg-glass-heavy: oklch(18% 0.012 70 / 0.98);
 
     /* ========== TEXT - Warm Off-White ========== */
     /* Slight warmth in text too - hue ~90-100 */
@@ -664,33 +675,33 @@ html.theme-sketch.dark {
     --blur-glass: blur(24px) saturate(120%);
     --blur-glass-heavy: blur(32px) saturate(130%);
 
-    /* Window surfaces - warm */
-    --bg-glass-elevated: oklch(26% 0.006 65);
-    --bg-glass: oklch(21% 0.008 70);
-    --bg-glass-heavy: oklch(18% 0.01 75);
+    /* Window surfaces - ALL use unified palette */
+    --bg-glass-elevated: var(--dark-bg-elevated);
+    --bg-glass: var(--dark-bg-primary);
+    --bg-glass-heavy: var(--dark-bg-primary);
     --radius-window: var(--radius-lg);
-    --border-glass-outer: oklch(36% 0.008 70);
-    --border-glass-inner: oklch(24% 0.005 70);
-    --border-light: oklch(24% 0.005 70);
-    --border-highlight: oklch(30% 0.006 70);
+    --border-glass-outer: oklch(30% 0.010 70);
+    --border-glass-inner: oklch(25% 0.008 70);
+    --border-light: oklch(25% 0.008 70);
+    --border-highlight: oklch(30% 0.010 70);
 
-    /* ========== DOCK - Dark mode: solid, no glass ========== */
-    --bg-dock: oklch(21% 0.008 70 / 0.94);
+    /* ========== DOCK - Dark mode: consistent with windows ========== */
+    --bg-dock: oklch(18% 0.012 70 / 0.94);
     --blur-dock: blur(32px) saturate(120%);
-    --dock-border-outer: oklch(30% 0.006 70);
+    --dock-border-outer: oklch(30% 0.010 70);
     --dock-shadow: 0 -2px 16px rgba(20, 15, 10, 0.3), 0 0 1px rgba(255, 255, 255, 0.05);
 
-    /* ========== TOP NAV - Dark mode ========== */
-    --topnav-bg: oklch(16% 0.01 75 / 0.92);
+    /* ========== TOP NAV - Dark mode: same as dock ========== */
+    --topnav-bg: oklch(18% 0.012 70 / 0.92);
     --topnav-blur: blur(24px) saturate(120%);
     --topnav-border: none;
-    --topnav-shadow: 0 1px 0 oklch(24% 0.005 70);
+    --topnav-shadow: 0 1px 0 oklch(25% 0.008 70);
 
-    /* ========== COMPATIBILITY TOKENS ========== */
-    --bg-card: oklch(21% 0.008 70);
-    --bg-item: oklch(21% 0.008 70);
-    --bg-app: oklch(16% 0.01 75);
-    --bg-subtle: oklch(26% 0.006 65);
+    /* ========== COMPATIBILITY TOKENS - ALL unified ========== */
+    --bg-card: var(--dark-bg-primary);
+    --bg-item: var(--dark-bg-primary);
+    --bg-app: var(--dark-bg-primary);
+    --bg-subtle: var(--dark-bg-elevated);
     --shadow-item: var(--shadow-sm);
     --shadow-item-hover: var(--shadow-md);
     --accent-success: var(--color-success);
@@ -740,11 +751,10 @@ html.theme-sketch.dark {
     --selection-bg: rgba(255, 119, 34, 0.3);
     --selection-text: oklch(96% 0.01 95);
 
-    /* ========== CASE STUDY - Dark Mode ========== */
-    /* Warm dark palette avoiding pure black */
-    --cs-background: oklch(18% 0.01 75);
-    --cs-surface: oklch(22% 0.008 70);
-    --cs-surface-alt: oklch(20% 0.009 72);
+    /* ========== CASE STUDY - Dark Mode (uses unified palette) ========== */
+    --cs-background: var(--dark-bg-primary);
+    --cs-surface: var(--dark-bg-elevated);
+    --cs-surface-alt: var(--dark-bg-primary);
     --cs-text: oklch(94% 0.008 95);
     --cs-text-muted: oklch(70% 0.006 90);
     --cs-text-light: oklch(55% 0.005 85);
@@ -752,15 +762,15 @@ html.theme-sketch.dark {
     --cs-accent-alt: #8b7cf7;
     --cs-border: rgba(255, 255, 255, 0.08);
     --cs-border-light: rgba(255, 255, 255, 0.04);
-    --cs-hero: oklch(14% 0.01 75);
+    --cs-hero: var(--dark-bg-subtle);
     --cs-hero-text: oklch(96% 0.01 95);
     --cs-watermark: rgba(255, 255, 255, 0.04);
 
-    /* ========== CV DOCUMENT - Dark Mode ========== */
-    --cv-background: oklch(20% 0.008 70);
+    /* ========== CV DOCUMENT - Dark Mode (uses unified palette) ========== */
+    --cv-background: var(--dark-bg-primary);
     --cv-text: oklch(94% 0.008 95);
     --cv-text-muted: oklch(65% 0.006 90);
-    --cv-border: oklch(35% 0.006 70);
+    --cv-border: oklch(35% 0.010 70);
     --cv-link: #ff8833;
     --cv-edit-bg: rgba(255, 119, 34, 0.1);
     --cv-edit-border: rgba(255, 119, 34, 0.4);

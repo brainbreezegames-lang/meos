@@ -459,7 +459,7 @@ export function GoOSCVWindow({
           style={{
             flex: 1,
             overflow: 'auto',
-            background: 'var(--bg-muted, #f5f5f5)',
+            background: 'var(--color-bg-base)',
           }}
         >
           <GoOSCVDocument

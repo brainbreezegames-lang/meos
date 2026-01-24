@@ -421,3 +421,116 @@
     background: none;
   }
 }
+
+/* ==========================================================================
+   DARK MODE - Explicit overrides for guaranteed dark theme support
+   Uses the unified dark palette from globals.css
+   ========================================================================== */
+
+.dark .cv-document,
+.theme-sketch.dark .cv-document,
+html.dark .cv-document {
+  --cv-background: oklch(18% 0.012 70);
+  --cv-text: oklch(94% 0.008 95);
+  --cv-text-muted: oklch(65% 0.006 90);
+  --cv-border: oklch(35% 0.010 70);
+  --cv-link: #ff8833;
+  --cv-edit-bg: rgba(255, 119, 34, 0.12);
+  --cv-edit-border: rgba(255, 119, 34, 0.4);
+
+  background: var(--cv-background);
+  color: var(--cv-text);
+}
+
+.dark .cv-header,
+.theme-sketch.dark .cv-header,
+html.dark .cv-header {
+  border-bottom-color: var(--cv-border);
+}
+
+.dark .cv-name,
+.theme-sketch.dark .cv-name,
+html.dark .cv-name {
+  color: var(--cv-text);
+}
+
+.dark .cv-section-title,
+.theme-sketch.dark .cv-section-title,
+html.dark .cv-section-title {
+  color: var(--cv-text);
+}
+
+.dark .cv-skill-category-name,
+.dark .cv-skill-items,
+.dark .cv-education-degree,
+.dark .cv-education-institution,
+.dark .cv-contact,
+.dark .cv-about,
+.dark .cv-role-title,
+.dark .cv-company-line,
+.dark .cv-responsibilities,
+.theme-sketch.dark .cv-skill-category-name,
+.theme-sketch.dark .cv-skill-items,
+.theme-sketch.dark .cv-education-degree,
+.theme-sketch.dark .cv-education-institution,
+.theme-sketch.dark .cv-contact,
+.theme-sketch.dark .cv-about,
+.theme-sketch.dark .cv-role-title,
+.theme-sketch.dark .cv-company-line,
+.theme-sketch.dark .cv-responsibilities {
+  color: var(--cv-text);
+}
+
+.dark .cv-education-dates,
+.dark .cv-contact-tagline,
+.dark .cv-date-separator,
+.dark .cv-company-description,
+.theme-sketch.dark .cv-education-dates,
+.theme-sketch.dark .cv-contact-tagline,
+.theme-sketch.dark .cv-date-separator,
+.theme-sketch.dark .cv-company-description {
+  color: var(--cv-text-muted);
+}
+
+.dark .cv-link,
+.theme-sketch.dark .cv-link {
+  color: var(--cv-link);
+}
+
+.dark .cv-editable-hover:hover,
+.theme-sketch.dark .cv-editable-hover:hover {
+  background-color: var(--cv-edit-bg);
+}
+
+.dark .cv-editable-input,
+.theme-sketch.dark .cv-editable-input {
+  background: var(--cv-edit-bg);
+  color: var(--cv-text);
+  outline-color: var(--cv-edit-border);
+}
+
+.dark .cv-add-btn,
+.theme-sketch.dark .cv-add-btn {
+  border-color: var(--cv-text-muted);
+  color: var(--cv-text-muted);
+}
+
+.dark .cv-add-btn:hover,
+.theme-sketch.dark .cv-add-btn:hover {
+  border-color: var(--cv-link);
+  color: var(--cv-link);
+  background: var(--cv-edit-bg);
+}
+
+/* Selection in dark mode */
+.dark .cv-document ::selection,
+.theme-sketch.dark .cv-document ::selection {
+  background: rgba(255, 136, 51, 0.3);
+  color: var(--cv-text);
+}
+
+.dark .cv-document ::-moz-selection,
+.theme-sketch.dark .cv-document ::-moz-selection {
+  background: rgba(255, 136, 51, 0.3);
+  color: var(--cv-text);
+}
