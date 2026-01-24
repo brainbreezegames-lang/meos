@@ -7,7 +7,7 @@ import { GoOSTipTapEditor, goOSTokens } from './GoOSTipTapEditor';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
 import { TrafficLights } from '../desktop/TrafficLights';
-import { WINDOW, TITLE_BAR_DARK, ANIMATION } from '../desktop/windowStyles';
+import { WINDOW, TITLE_BAR_DARK, ANIMATION, SPRING, DURATION } from '../desktop/windowStyles';
 import { AccessLevel } from '@/contexts/GoOSContext';
 import { playSound } from '@/lib/sounds';
 
@@ -137,7 +137,7 @@ export function GoOSEditorWindow({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: DURATION.slow }}
         style={{
           position: 'fixed',
           inset: 0,
@@ -273,10 +273,10 @@ export function GoOSEditorWindow({
           <AnimatePresence>
             {showZenStats && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{ duration: 0.15 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={SPRING.snappy}
                 style={{
                   position: 'absolute',
                   bottom: 12,

@@ -59,7 +59,21 @@ import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
 import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
-import { SPRING, DURATION, EASE, fadeInUp, fadeInScale, TRANSITION, WILL_CHANGE, getStaggerDelayCapped } from '@/lib/animations';
+import {
+    SPRING,
+    DURATION,
+    EASE,
+    fadeInUp,
+    fadeInScale,
+    TRANSITION,
+    WILL_CHANGE,
+    getStaggerDelayCapped,
+    windowOpen,
+    menuBarEntrance,
+    dockEntrance,
+    contextMenu,
+    buttonPress,
+} from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
 
 // ============================================
@@ -1671,10 +1685,10 @@ const DockIcon = React.memo(({
                 <AnimatePresence>
                     {isHovered && label && (
                         <motion.div
-                            initial={{ opacity: 0, y: 4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 4 }}
-                            transition={{ duration: 0.15 }}
+                            initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                            transition={TRANSITION.fast}
                             className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50 pointer-events-none"
                             style={{
                                 background: 'rgba(0,0,0,0.75)',
@@ -3382,8 +3396,8 @@ function GoOSDemoContent() {
                     <motion.div
                         key="boot-screen"
                         initial={{ opacity: 1 }}
-                        exit={{ opacity: 0, scale: 1.1 }}
-                        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ duration: DURATION.boot, ease: EASE.out }}
                         className="fixed inset-0 z-[10000] flex flex-col items-center justify-center"
                         style={{
                             background: 'var(--bg-canvas, #fbf9ef)',
@@ -3391,20 +3405,18 @@ function GoOSDemoContent() {
                     >
                         {/* goOS Logo */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
+                            initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                            transition={SPRING.smooth}
                             className="flex flex-col items-center gap-6"
                         >
-                            {/* Duck icon with gentle animation */}
+                            {/* Duck icon with playful bounce */}
                             <motion.div
-                                animate={{
-                                    y: [0, -8, 0],
-                                }}
+                                animate={{ y: [0, -12, 0] }}
                                 transition={{
-                                    duration: 1.5,
+                                    duration: 1.2,
                                     repeat: Infinity,
-                                    ease: 'easeInOut',
+                                    ease: EASE.inOut,
                                 }}
                                 className="text-6xl select-none"
                             >
@@ -3413,9 +3425,9 @@ function GoOSDemoContent() {
 
                             {/* Logo text */}
                             <motion.h1
-                                initial={{ opacity: 0, y: 10 }}
+                                initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2, duration: 0.4 }}
+                                transition={{ ...SPRING.gentle, delay: 0.15 }}
                                 className="text-2xl font-semibold tracking-tight"
                                 style={{ color: 'var(--text-primary, #171412)' }}
                             >
@@ -3424,9 +3436,9 @@ function GoOSDemoContent() {
 
                             {/* Loading bar */}
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.4, duration: 0.3 }}
+                                initial={{ opacity: 0, scaleX: 0.8 }}
+                                animate={{ opacity: 1, scaleX: 1 }}
+                                transition={{ ...SPRING.gentle, delay: 0.3 }}
                                 className="relative overflow-hidden"
                                 style={{
                                     width: 120,
@@ -3439,9 +3451,9 @@ function GoOSDemoContent() {
                                     initial={{ x: '-100%' }}
                                     animate={{ x: '100%' }}
                                     transition={{
-                                        duration: 1.2,
+                                        duration: 1,
                                         repeat: Infinity,
-                                        ease: 'easeInOut',
+                                        ease: EASE.inOut,
                                     }}
                                     style={{
                                         position: 'absolute',
@@ -3456,7 +3468,7 @@ function GoOSDemoContent() {
                             <motion.p
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                transition={{ delay: 0.6, duration: 0.3 }}
+                                transition={{ duration: DURATION.slow, delay: 0.5 }}
                                 className="text-xs"
                                 style={{ color: 'var(--text-tertiary, #a09a94)' }}
                             >
@@ -3530,14 +3542,10 @@ function GoOSDemoContent() {
             <AnimatePresence>
                 {!isZenMode && (
                     <motion.header
-                        initial={{ y: -50, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -50, opacity: 0 }}
-                        transition={{
-                            type: 'spring',
-                            stiffness: 300,
-                            damping: 30,
-                        }}
+                        initial={menuBarEntrance.initial}
+                        animate={menuBarEntrance.animate}
+                        exit={menuBarEntrance.exit}
+                        transition={SPRING.smooth}
                         className="h-7 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
                         style={{
                             background: 'var(--topnav-bg, rgba(251, 249, 239, 0.55))',
@@ -4372,15 +4380,10 @@ function GoOSDemoContent() {
             <AnimatePresence>
                 {!isZenMode && (
                     <motion.footer
-                        initial={{ y: 100, x: '-50%', opacity: 0 }}
-                        animate={{ y: 0, x: '-50%', opacity: 1 }}
-                        exit={{ y: 100, x: '-50%', opacity: 0 }}
-                        transition={{
-                            type: 'spring',
-                            stiffness: 300,
-                            damping: 30,
-                            mass: 0.8
-                        }}
+                        initial={{ ...dockEntrance.initial, x: '-50%' }}
+                        animate={{ ...dockEntrance.animate, x: '-50%' }}
+                        exit={{ ...dockEntrance.exit, x: '-50%' }}
+                        transition={SPRING.smooth}
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
@@ -4594,11 +4597,12 @@ function GoOSDemoContent() {
                             color: 'var(--text-primary)',
                             boxShadow: goOS.shadows.sm,
                         }}
-                        whileHover={{ scale: 1.05 }}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.3 }}
+                        whileHover={buttonPress.hover}
+                        whileTap={buttonPress.tap}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={SPRING.gentle}
                     >
                         Made with goOS
                     </motion.a>

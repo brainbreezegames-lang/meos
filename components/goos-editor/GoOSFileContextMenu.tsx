@@ -19,6 +19,7 @@ import { FileType } from './GoOSFileIcon';
 import { PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
 import { playSound } from '@/lib/sounds';
+import { SPRING, contextMenu as contextMenuVariants } from '@/lib/animations';
 
 // Menu dimensions for positioning calculations
 const MENU_WIDTH = 200;
@@ -283,13 +284,10 @@ export function GoOSFileContextMenu({
           ref={menuRef}
           role="menu"
           aria-label="Context menu"
-          initial={{ opacity: 0, scale: 0.96, y: -4 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: -4 }}
-          transition={{
-            duration: 0.12,
-            ease: [0.2, 0, 0, 1], // Custom ease for snappy feel
-          }}
+          initial={contextMenuVariants.initial}
+          animate={contextMenuVariants.animate}
+          exit={contextMenuVariants.exit}
+          transition={SPRING.snappy}
           style={{
             position: 'fixed',
             top: adjustedPosition.y,

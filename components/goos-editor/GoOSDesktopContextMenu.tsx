@@ -14,6 +14,7 @@ import {
   FileUser,
 } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
+import { SPRING, contextMenu as contextMenuVariants, TRANSITION } from '@/lib/animations';
 
 // Menu dimensions
 const MENU_WIDTH = 200;
@@ -210,10 +211,10 @@ export function GoOSDesktopContextMenu({
           role="menu"
           aria-label="Desktop context menu"
           tabIndex={-1}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.1, ease: [0.2, 0, 0, 1] }}
+          initial={contextMenuVariants.initial}
+          animate={contextMenuVariants.animate}
+          exit={contextMenuVariants.exit}
+          transition={SPRING.snappy}
           style={{
             ...menuStyle,
             position: 'fixed',
