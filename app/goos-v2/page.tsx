@@ -1652,47 +1652,48 @@ const DockIcon = React.memo(({
     };
 
     return (
-        <motion.button
-            onClick={handleClick}
-            onHoverStart={() => setIsHovered(true)}
-            onHoverEnd={() => setIsHovered(false)}
-            animate={{
-                // Only bounce animation on click - CSS handles hover magnification
-                scale: justClicked ? [1, 0.85, 1.15, 0.95, 1] : 1,
-                rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
-            }}
-            transition={goOS.springs.bouncy}
-            className="dock-item relative flex flex-col items-center focus:outline-none"
-        >
-            {/* Tooltip label - positioned higher for magnification */}
-            <AnimatePresence>
-                {isHovered && label && (
-                    <motion.div
-                        initial={fadeInUp.initial}
-                        animate={fadeInUp.animate}
-                        exit={fadeInUp.exit}
-                        transition={TRANSITION.tooltip}
-                        className="absolute -top-16 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
-                        style={{
-                            background: 'var(--bg-elevated)',
-                            color: 'var(--text-primary)',
-                            boxShadow: 'var(--shadow-lg)',
-                            backdropFilter: 'blur(12px)',
-                            ...WILL_CHANGE.transformOpacity,
-                        }}
-                    >
-                        {label}
-                        {/* Tooltip arrow */}
-                        <div
-                            className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45"
-                            style={{ background: 'var(--bg-elevated)' }}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+        <div className="dock-item">
+            <motion.button
+                onClick={handleClick}
+                onHoverStart={() => setIsHovered(true)}
+                onHoverEnd={() => setIsHovered(false)}
+                animate={{
+                    // Only bounce animation on click
+                    scale: justClicked ? [1, 0.85, 1.15, 0.95, 1] : 1,
+                    rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
+                }}
+                transition={goOS.springs.bouncy}
+                className="relative flex flex-col items-center focus:outline-none"
+            >
+                {/* Tooltip label - positioned higher for magnification */}
+                <AnimatePresence>
+                    {isHovered && label && (
+                        <motion.div
+                            initial={fadeInUp.initial}
+                            animate={fadeInUp.animate}
+                            exit={fadeInUp.exit}
+                            transition={TRANSITION.tooltip}
+                            className="absolute -top-16 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
+                            style={{
+                                background: 'var(--bg-elevated)',
+                                color: 'var(--text-primary)',
+                                boxShadow: 'var(--shadow-lg)',
+                                backdropFilter: 'blur(12px)',
+                                ...WILL_CHANGE.transformOpacity,
+                            }}
+                        >
+                            {label}
+                            {/* Tooltip arrow */}
+                            <div
+                                className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45"
+                                style={{ background: 'var(--bg-elevated)' }}
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-            <div
-                className="w-12 h-12 flex items-center justify-center rounded-[14px] transition-colors duration-150"
+                <div
+                    className="w-12 h-12 flex items-center justify-center rounded-[14px] transition-colors duration-150"
                 style={{
                     background: isActive
                         ? 'rgba(255, 255, 255, 0.18)'
@@ -1724,17 +1725,18 @@ const DockIcon = React.memo(({
                 </motion.span>
             )}
 
-            {/* Active indicator dot - absolute to prevent dock height change */}
-            {isActive && (
-                <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={goOS.springs.gentle}
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                    style={{ background: 'var(--text-primary)' }}
-                />
-            )}
-        </motion.button>
+                {/* Active indicator dot - absolute to prevent dock height change */}
+                {isActive && (
+                    <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={goOS.springs.gentle}
+                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                        style={{ background: 'var(--text-primary)' }}
+                    />
+                )}
+            </motion.button>
+        </div>
     );
 });
 
