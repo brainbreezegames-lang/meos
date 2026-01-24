@@ -1626,20 +1626,8 @@ const TypewriterText = React.memo(({
 TypewriterText.displayName = 'TypewriterText';
 
 // ============================================
-// DOCK ICON - macOS-style magnification
-// Based on: github.com/frontendfyi/macos-dock-animation-with-css
+// DOCK ICON - Simple hover magnification
 // ============================================
-
-// Utility to map mouse position to offset value
-const scaleValue = (
-    inputValue: number,
-    inputMin: number,
-    inputMax: number,
-    outputMin: number,
-    outputMax: number
-): number => {
-    return ((inputValue - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
-};
 
 const DockIcon = React.memo(({
     icon,
@@ -1647,18 +1635,15 @@ const DockIcon = React.memo(({
     isActive,
     badge,
     label,
-    dockRef
 }: {
     icon: React.ReactNode;
     onClick: () => void;
     isActive?: boolean;
     badge?: number;
     label?: string;
-    dockRef?: React.RefObject<HTMLDivElement | null>;
 }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [justClicked, setJustClicked] = useState(false);
-    const itemRef = useRef<HTMLDivElement>(null);
 
     const handleClick = () => {
         playSound('bubble');
@@ -1667,48 +1652,15 @@ const DockIcon = React.memo(({
         setTimeout(() => setJustClicked(false), 500);
     };
 
-    // Handle mouse move for smooth magnification interpolation
-    const handleMouseMove = (e: React.MouseEvent) => {
-        if (!itemRef.current || !dockRef?.current) return;
-
-        const itemRect = itemRef.current.getBoundingClientRect();
-        const itemCenterX = itemRect.left + itemRect.width / 2;
-        const distance = e.clientX - itemCenterX;
-
-        // Map distance to offset value (-5 to +5 pixels for subtle smoothing)
-        const offset = scaleValue(Math.abs(distance), 0, itemRect.width / 2, 5, -5);
-        const clampedOffset = Math.max(-5, Math.min(5, offset));
-
-        // Set CSS variables on the dock container
-        if (distance < 0) {
-            dockRef.current.style.setProperty('--dock-offset-left', `${clampedOffset}px`);
-            dockRef.current.style.setProperty('--dock-offset-right', '0px');
-        } else {
-            dockRef.current.style.setProperty('--dock-offset-right', `${clampedOffset}px`);
-            dockRef.current.style.setProperty('--dock-offset-left', '0px');
-        }
-    };
-
-    const handleMouseLeave = () => {
-        setIsHovered(false);
-        if (dockRef?.current) {
-            dockRef.current.style.setProperty('--dock-offset-left', '0px');
-            dockRef.current.style.setProperty('--dock-offset-right', '0px');
-        }
-    };
-
     return (
         <div
-            ref={itemRef}
             className="dock-item"
-            onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={handleMouseLeave}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <motion.button
                 onClick={handleClick}
                 animate={{
-                    // Only bounce animation on click - CSS handles size changes
                     scale: justClicked ? [1, 0.85, 1.15, 0.95, 1] : 1,
                     rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
                 }}
@@ -2531,9 +2483,22 @@ function GoOSDemoContent() {
     const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
     const [showManageSpacesDialog, setShowManageSpacesDialog] = useState(false);
 
-    // Wallpaper state
-    const [wallpaper, setWallpaper] = useState<string | null>(null); // null = no wallpaper (default pattern)
+    // Wallpaper state - persisted to localStorage
+    const [wallpaper, setWallpaper] = useState<string | null>('bg01'); // Default to bg01
     const [showWallpaperPicker, setShowWallpaperPicker] = useState(false);
+
+    // Load wallpaper from localStorage on mount
+    useEffect(() => {
+        const stored = localStorage.getItem('goos-wallpaper');
+        if (stored !== null) {
+            setWallpaper(stored === 'null' ? null : stored);
+        }
+    }, []);
+
+    // Save wallpaper to localStorage when changed
+    useEffect(() => {
+        localStorage.setItem('goos-wallpaper', wallpaper ?? 'null');
+    }, [wallpaper]);
 
     // Dark mode state
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -2717,9 +2682,6 @@ function GoOSDemoContent() {
         createdAt: new Date(f.createdAt),
         updatedAt: new Date(f.updatedAt),
     })), [spaceFilteredFiles]);
-
-    // Dock ref for magnification CSS variables
-    const dockRef = useRef<HTMLDivElement>(null);
 
     // goOS Editor UI state (local only)
     const [openEditors, setOpenEditors] = useState<string[]>([]);
@@ -4422,7 +4384,6 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            ref={dockRef}
                             className="dock-container flex items-end gap-1 px-3 py-2 rounded-[22px]"
                             style={{
                                 background: 'var(--bg-dock)',
@@ -4438,13 +4399,11 @@ function GoOSDemoContent() {
                         onClick={() => toggleApp('nest')}
                         isActive={appWindows.nest}
                         label="Nest"
-                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<div className="w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-bold" style={{ background: 'var(--border-subtle)', color: 'var(--text-primary)' }}>23</div>}
                         onClick={() => { }}
                         label="Calendar"
-                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<Mail size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
@@ -4452,7 +4411,6 @@ function GoOSDemoContent() {
                         isActive={appWindows.quackmail}
                         badge={3}
                         label="Mail"
-                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<Camera size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
@@ -4461,14 +4419,12 @@ function GoOSDemoContent() {
                             if (photoItem) windowContext.openWindow(photoItem.id);
                         }}
                         label="Photos"
-                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<FileText size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('notes')}
                         isActive={appWindows.notes}
                         label="Notes"
-                        dockRef={dockRef}
                     />
                     <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
@@ -4476,27 +4432,23 @@ function GoOSDemoContent() {
                         onClick={() => toggleApp('chat')}
                         isActive={appWindows.chat}
                         label="Chat"
-                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<Terminal size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('shell')}
                         isActive={appWindows.shell}
                         label="Shell"
-                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<Settings size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('settings')}
                         isActive={appWindows.settings}
                         label="Settings"
-                        dockRef={dockRef}
                     />
                     <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
                         icon={<BookOpen size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('guestbook')}
-                        dockRef={dockRef}
                         isActive={appWindows.guestbook}
                         badge={guestbookEntries.length}
                         label="Guestbook"
@@ -4506,7 +4458,6 @@ function GoOSDemoContent() {
                         onClick={() => toggleApp('analytics')}
                         isActive={appWindows.analytics}
                         label="Analytics"
-                        dockRef={dockRef}
                     />
                     <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     {/* Wallpaper Picker */}
@@ -4519,8 +4470,7 @@ function GoOSDemoContent() {
                             }}
                             isActive={showWallpaperPicker}
                             label="Wallpaper"
-                            dockRef={dockRef}
-                        />
+                            />
                         <AnimatePresence>
                             {showWallpaperPicker && (
                                 <motion.div
@@ -4604,7 +4554,6 @@ function GoOSDemoContent() {
                         icon={<PenLine size={24} stroke={goOS.icon.accent} strokeWidth={1.5} />}
                         onClick={() => createFile('note')}
                         label="New Note"
-                        dockRef={dockRef}
                     />
                     {/* Minimized Editors */}
                     {minimizedEditors.size > 0 && (
@@ -4623,8 +4572,7 @@ function GoOSDemoContent() {
                                         onClick={() => restoreEditor(fileId)}
                                         label={file.title || 'Untitled'}
                                         isActive={false}
-                                        dockRef={dockRef}
-                                    />
+                                                    />
                                 );
                             })}
                         </>

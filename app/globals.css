@@ -811,8 +811,8 @@ body {
 }
 
 /* Contain paint for complex components */
+/* NOTE: .dock-container removed - magnification needs overflow visible */
 .window-content,
-.dock-container,
 .desktop-area {
     contain: paint;
 }
@@ -852,47 +852,21 @@ body {
 .dock-container {
     display: flex;
     align-items: flex-end;
-    padding-bottom: 8px;
+    overflow: visible !important;
 }
 
 .dock-item {
-    /* Base size - will grow on hover */
+    /* Base size */
     width: 48px;
     height: 48px;
-    /* Smooth cubic-bezier transition for natural feel */
-    transition: width 150ms cubic-bezier(0.25, 1, 0.5, 1),
-                height 150ms cubic-bezier(0.25, 1, 0.5, 1),
-                margin-top 150ms cubic-bezier(0.25, 1, 0.5, 1);
+    /* Smooth transition for hover */
+    transition: transform 150ms cubic-bezier(0.25, 1, 0.5, 1);
+    transform-origin: bottom center;
 }
 
-/* Hovered item - maximum size */
+/* Only hovered item scales - clear and simple */
 .dock-item:hover {
-    width: 72px;
-    height: 72px;
-    margin-top: -24px;
-}
-
-/* Direct neighbors (1 away) - use CSS variables for fine-tuning */
-.dock-item:has(+ .dock-item:hover),
-.dock-item:hover + .dock-item {
-    width: calc(64px + var(--dock-offset-right, 0px));
-    height: calc(64px + var(--dock-offset-right, 0px));
-    margin-top: calc(-16px - var(--dock-offset-right, 0px));
-}
-
-/* Left neighbor specifically */
-.dock-item:has(+ .dock-item:hover) {
-    width: calc(64px + var(--dock-offset-left, 0px));
-    height: calc(64px + var(--dock-offset-left, 0px));
-    margin-top: calc(-16px - var(--dock-offset-left, 0px));
-}
-
-/* 2 items away */
-.dock-item:has(+ .dock-item + .dock-item:hover),
-.dock-item:hover + .dock-item + .dock-item {
-    width: 56px;
-    height: 56px;
-    margin-top: -8px;
+    transform: scale(1.25) translateY(-6px);
 }
 
 /* Separators should not be affected */
