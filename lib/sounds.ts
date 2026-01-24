@@ -23,7 +23,8 @@ type SoundType =
   | 'error'           // Gentle error tone
   | 'notification'    // Attention getter
   | 'whoosh'          // Quick transition
-  | 'bubble';         // Bubbly pop
+  | 'bubble'          // Bubbly pop
+  | 'startup';        // System boot chime
 
 // Audio context singleton
 let audioContext: AudioContext | null = null;
@@ -119,6 +120,9 @@ export function playSound(type: SoundType, options?: { volume?: number }): void 
       break;
     case 'bubble':
       synthesizeBubble(ctx, now, volume);
+      break;
+    case 'startup':
+      synthesizeStartup(ctx, now, volume);
       break;
   }
 }
@@ -526,6 +530,56 @@ function synthesizeBubble(ctx: AudioContext, time: number, volume: number): void
 
   osc.start(time);
   osc.stop(time + 0.15);
+}
+
+// Startup - warm system boot chime (ascending arpeggio)
+function synthesizeStartup(ctx: AudioContext, time: number, volume: number): void {
+  // Create a warm, memorable startup chime with ascending notes
+  // Notes: C4 -> E4 -> G4 -> C5 (major arpeggio)
+  const notes = [
+    { freq: 261.63, delay: 0 },      // C4
+    { freq: 329.63, delay: 0.12 },   // E4
+    { freq: 392.00, delay: 0.24 },   // G4
+    { freq: 523.25, delay: 0.36 },   // C5
+  ];
+
+  notes.forEach(({ freq, delay }) => {
+    // Main tone
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, time + delay);
+
+    // Soft attack, smooth decay
+    gain.gain.setValueAtTime(0, time + delay);
+    gain.gain.linearRampToValueAtTime(volume * 0.35, time + delay + 0.05);
+    gain.gain.exponentialRampToValueAtTime(volume * 0.15, time + delay + 0.3);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + delay + 0.8);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(time + delay);
+    osc.stop(time + delay + 0.9);
+
+    // Add subtle harmonic (fifth above, very quiet)
+    const harmonic = ctx.createOscillator();
+    const harmonicGain = ctx.createGain();
+
+    harmonic.type = 'sine';
+    harmonic.frequency.setValueAtTime(freq * 1.5, time + delay);
+
+    harmonicGain.gain.setValueAtTime(0, time + delay);
+    harmonicGain.gain.linearRampToValueAtTime(volume * 0.08, time + delay + 0.05);
+    harmonicGain.gain.exponentialRampToValueAtTime(0.001, time + delay + 0.5);
+
+    harmonic.connect(harmonicGain);
+    harmonicGain.connect(ctx.destination);
+
+    harmonic.start(time + delay);
+    harmonic.stop(time + delay + 0.6);
+  });
 }
 
 /**

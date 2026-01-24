@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -1626,23 +1626,39 @@ const TypewriterText = React.memo(({
 TypewriterText.displayName = 'TypewriterText';
 
 // ============================================
-// DOCK ICON - Enhanced with bounce, wobble and tooltip
+// DOCK ICON - macOS-style magnification
+// Based on: github.com/frontendfyi/macos-dock-animation-with-css
 // ============================================
+
+// Utility to map mouse position to offset value
+const scaleValue = (
+    inputValue: number,
+    inputMin: number,
+    inputMax: number,
+    outputMin: number,
+    outputMax: number
+): number => {
+    return ((inputValue - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
+};
+
 const DockIcon = React.memo(({
     icon,
     onClick,
     isActive,
     badge,
-    label
+    label,
+    dockRef
 }: {
     icon: React.ReactNode;
     onClick: () => void;
     isActive?: boolean;
     badge?: number;
     label?: string;
+    dockRef?: React.RefObject<HTMLDivElement | null>;
 }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [justClicked, setJustClicked] = useState(false);
+    const itemRef = useRef<HTMLDivElement>(null);
 
     const handleClick = () => {
         playSound('bubble');
@@ -1651,87 +1667,114 @@ const DockIcon = React.memo(({
         setTimeout(() => setJustClicked(false), 500);
     };
 
+    // Handle mouse move for smooth magnification interpolation
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!itemRef.current || !dockRef?.current) return;
+
+        const itemRect = itemRef.current.getBoundingClientRect();
+        const itemCenterX = itemRect.left + itemRect.width / 2;
+        const distance = e.clientX - itemCenterX;
+
+        // Map distance to offset value (-5 to +5 pixels for subtle smoothing)
+        const offset = scaleValue(Math.abs(distance), 0, itemRect.width / 2, 5, -5);
+        const clampedOffset = Math.max(-5, Math.min(5, offset));
+
+        // Set CSS variables on the dock container
+        if (distance < 0) {
+            dockRef.current.style.setProperty('--dock-offset-left', `${clampedOffset}px`);
+            dockRef.current.style.setProperty('--dock-offset-right', '0px');
+        } else {
+            dockRef.current.style.setProperty('--dock-offset-right', `${clampedOffset}px`);
+            dockRef.current.style.setProperty('--dock-offset-left', '0px');
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+        if (dockRef?.current) {
+            dockRef.current.style.setProperty('--dock-offset-left', '0px');
+            dockRef.current.style.setProperty('--dock-offset-right', '0px');
+        }
+    };
+
     return (
-        <div className="dock-item">
+        <div
+            ref={itemRef}
+            className="dock-item"
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={handleMouseLeave}
+        >
             <motion.button
                 onClick={handleClick}
-                onHoverStart={() => setIsHovered(true)}
-                onHoverEnd={() => setIsHovered(false)}
                 animate={{
-                    // Only bounce animation on click
+                    // Only bounce animation on click - CSS handles size changes
                     scale: justClicked ? [1, 0.85, 1.15, 0.95, 1] : 1,
                     rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
                 }}
                 transition={goOS.springs.bouncy}
-                className="relative flex flex-col items-center focus:outline-none"
+                className="dock-item-inner focus:outline-none"
             >
-                {/* Tooltip label - positioned higher for magnification */}
+                {/* Tooltip label */}
                 <AnimatePresence>
                     {isHovered && label && (
                         <motion.div
-                            initial={fadeInUp.initial}
-                            animate={fadeInUp.animate}
-                            exit={fadeInUp.exit}
-                            transition={TRANSITION.tooltip}
-                            className="absolute -top-16 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 4 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50 pointer-events-none"
                             style={{
-                                background: 'var(--bg-elevated)',
-                                color: 'var(--text-primary)',
-                                boxShadow: 'var(--shadow-lg)',
-                                backdropFilter: 'blur(12px)',
-                                ...WILL_CHANGE.transformOpacity,
+                                background: 'rgba(0,0,0,0.75)',
+                                color: '#fff',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                             }}
                         >
                             {label}
-                            {/* Tooltip arrow */}
-                            <div
-                                className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 rotate-45"
-                                style={{ background: 'var(--bg-elevated)' }}
-                            />
                         </motion.div>
                     )}
                 </AnimatePresence>
 
                 <div
-                    className="w-12 h-12 flex items-center justify-center rounded-[14px] transition-colors duration-150"
-                style={{
-                    background: isActive
-                        ? 'rgba(255, 255, 255, 0.18)'
-                        : isHovered
-                            ? 'rgba(255, 255, 255, 0.12)'
-                            : 'rgba(255, 255, 255, 0.06)',
-                    border: 'none',
-                    boxShadow: isActive
-                        ? 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.2)'
-                        : 'inset 0 1px 0 rgba(255,255,255,0.08)',
-                }}
-            >
-                {icon}
-            </div>
-
-            {/* Badge with bounce animation */}
-            {badge !== undefined && badge > 0 && (
-                <motion.span
-                    initial={{ scale: 0, rotate: -20 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={goOS.springs.bouncy}
-                    className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-white text-[9px] font-semibold px-1 z-10"
+                    className="w-full h-full flex items-center justify-center rounded-[14px] transition-colors duration-150"
                     style={{
-                        background: '#f47a3e',
-                        boxShadow: '0 2px 8px rgba(244, 122, 62, 0.5)',
+                        background: isActive
+                            ? 'rgba(255, 255, 255, 0.18)'
+                            : isHovered
+                                ? 'rgba(255, 255, 255, 0.12)'
+                                : 'rgba(255, 255, 255, 0.06)',
+                        border: 'none',
+                        boxShadow: isActive
+                            ? 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.2)'
+                            : 'inset 0 1px 0 rgba(255,255,255,0.08)',
                     }}
                 >
-                    {badge}
-                </motion.span>
-            )}
+                    {icon}
+                </div>
 
-                {/* Active indicator dot - absolute to prevent dock height change */}
+                {/* Badge */}
+                {badge !== undefined && badge > 0 && (
+                    <motion.span
+                        initial={{ scale: 0, rotate: -20 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={goOS.springs.bouncy}
+                        className="absolute top-0 right-0 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-white text-[9px] font-semibold px-1 z-10"
+                        style={{
+                            background: '#f47a3e',
+                            boxShadow: '0 2px 8px rgba(244, 122, 62, 0.5)',
+                        }}
+                    >
+                        {badge}
+                    </motion.span>
+                )}
+
+                {/* Active indicator dot */}
                 {isActive && (
                     <motion.div
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={goOS.springs.gentle}
-                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
                         style={{ background: 'var(--text-primary)' }}
                     />
                 )}
@@ -2462,6 +2505,27 @@ function GoOSDemoContent() {
     const [showConfetti, setShowConfetti] = useState(false);
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
+    // Boot sequence state
+    const [bootPhase, setBootPhase] = useState<'booting' | 'ready'>('booting');
+
+    // Boot sequence effect - show logo, then transition to desktop
+    useEffect(() => {
+        // Play startup sound after a brief delay (lets the animation start first)
+        const soundTimer = setTimeout(() => {
+            playSound('startup');
+        }, 400);
+
+        // Transition to ready state after boot animation
+        const bootTimer = setTimeout(() => {
+            setBootPhase('ready');
+        }, 2400); // 2.4 seconds total boot time
+
+        return () => {
+            clearTimeout(soundTimer);
+            clearTimeout(bootTimer);
+        };
+    }, []);
+
     // Spaces state (demo mode - will be replaced by SpaceContext)
     const [activeSpaceId, setActiveSpaceId] = useState('space-1');
     const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
@@ -2653,6 +2717,9 @@ function GoOSDemoContent() {
         createdAt: new Date(f.createdAt),
         updatedAt: new Date(f.updatedAt),
     })), [spaceFilteredFiles]);
+
+    // Dock ref for magnification CSS variables
+    const dockRef = useRef<HTMLDivElement>(null);
 
     // goOS Editor UI state (local only)
     const [openEditors, setOpenEditors] = useState<string[]>([]);
@@ -3347,6 +3414,97 @@ function GoOSDemoContent() {
                 }
             }}
         >
+            {/* BOOT SCREEN - Shows during startup */}
+            <AnimatePresence>
+                {bootPhase === 'booting' && (
+                    <motion.div
+                        key="boot-screen"
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0, scale: 1.1 }}
+                        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                        className="fixed inset-0 z-[10000] flex flex-col items-center justify-center"
+                        style={{
+                            background: 'var(--bg-canvas, #fbf9ef)',
+                        }}
+                    >
+                        {/* goOS Logo */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                            className="flex flex-col items-center gap-6"
+                        >
+                            {/* Duck icon with gentle animation */}
+                            <motion.div
+                                animate={{
+                                    y: [0, -8, 0],
+                                }}
+                                transition={{
+                                    duration: 1.5,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                }}
+                                className="text-6xl select-none"
+                            >
+                                🦆
+                            </motion.div>
+
+                            {/* Logo text */}
+                            <motion.h1
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2, duration: 0.4 }}
+                                className="text-2xl font-semibold tracking-tight"
+                                style={{ color: 'var(--text-primary, #171412)' }}
+                            >
+                                goOS
+                            </motion.h1>
+
+                            {/* Loading bar */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.4, duration: 0.3 }}
+                                className="relative overflow-hidden"
+                                style={{
+                                    width: 120,
+                                    height: 4,
+                                    background: 'var(--border-subtle, rgba(23, 20, 18, 0.08))',
+                                    borderRadius: 2,
+                                }}
+                            >
+                                <motion.div
+                                    initial={{ x: '-100%' }}
+                                    animate={{ x: '100%' }}
+                                    transition={{
+                                        duration: 1.2,
+                                        repeat: Infinity,
+                                        ease: 'easeInOut',
+                                    }}
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        background: 'linear-gradient(90deg, transparent, var(--accent-primary, #ff7722), transparent)',
+                                        borderRadius: 2,
+                                    }}
+                                />
+                            </motion.div>
+
+                            {/* Loading text */}
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.6, duration: 0.3 }}
+                                className="text-xs"
+                                style={{ color: 'var(--text-tertiary, #a09a94)' }}
+                            >
+                                Starting up...
+                            </motion.p>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* WALLPAPER BACKGROUND - With Space Theme Support */}
             {wallpaper ? (
                 <img
@@ -4264,7 +4422,8 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="dock-container flex items-end gap-2 px-4 py-3 rounded-[22px]"
+                            ref={dockRef}
+                            className="dock-container flex items-end gap-1 px-3 py-2 rounded-[22px]"
                             style={{
                                 background: 'var(--bg-dock)',
                                 backdropFilter: 'var(--blur-dock)',
@@ -4279,11 +4438,13 @@ function GoOSDemoContent() {
                         onClick={() => toggleApp('nest')}
                         isActive={appWindows.nest}
                         label="Nest"
+                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<div className="w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-bold" style={{ background: 'var(--border-subtle)', color: 'var(--text-primary)' }}>23</div>}
                         onClick={() => { }}
                         label="Calendar"
+                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<Mail size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
@@ -4291,6 +4452,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.quackmail}
                         badge={3}
                         label="Mail"
+                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<Camera size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
@@ -4299,12 +4461,14 @@ function GoOSDemoContent() {
                             if (photoItem) windowContext.openWindow(photoItem.id);
                         }}
                         label="Photos"
+                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<FileText size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('notes')}
                         isActive={appWindows.notes}
                         label="Notes"
+                        dockRef={dockRef}
                     />
                     <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
@@ -4312,23 +4476,27 @@ function GoOSDemoContent() {
                         onClick={() => toggleApp('chat')}
                         isActive={appWindows.chat}
                         label="Chat"
+                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<Terminal size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('shell')}
                         isActive={appWindows.shell}
                         label="Shell"
+                        dockRef={dockRef}
                     />
                     <DockIcon
                         icon={<Settings size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('settings')}
                         isActive={appWindows.settings}
                         label="Settings"
+                        dockRef={dockRef}
                     />
                     <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
                         icon={<BookOpen size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('guestbook')}
+                        dockRef={dockRef}
                         isActive={appWindows.guestbook}
                         badge={guestbookEntries.length}
                         label="Guestbook"
@@ -4338,6 +4506,7 @@ function GoOSDemoContent() {
                         onClick={() => toggleApp('analytics')}
                         isActive={appWindows.analytics}
                         label="Analytics"
+                        dockRef={dockRef}
                     />
                     <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     {/* Wallpaper Picker */}
@@ -4350,6 +4519,7 @@ function GoOSDemoContent() {
                             }}
                             isActive={showWallpaperPicker}
                             label="Wallpaper"
+                            dockRef={dockRef}
                         />
                         <AnimatePresence>
                             {showWallpaperPicker && (
@@ -4434,11 +4604,12 @@ function GoOSDemoContent() {
                         icon={<PenLine size={24} stroke={goOS.icon.accent} strokeWidth={1.5} />}
                         onClick={() => createFile('note')}
                         label="New Note"
+                        dockRef={dockRef}
                     />
                     {/* Minimized Editors */}
                     {minimizedEditors.size > 0 && (
                         <>
-                            <div className="w-px h-8 bg-black/10 mx-1" />
+                            <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                             {Array.from(minimizedEditors).map(fileId => {
                                 const file = goosFiles.find(f => f.id === fileId);
                                 if (!file) return null;
@@ -4452,6 +4623,7 @@ function GoOSDemoContent() {
                                         onClick={() => restoreEditor(fileId)}
                                         label={file.title || 'Untitled'}
                                         isActive={false}
+                                        dockRef={dockRef}
                                     />
                                 );
                             })}
