@@ -1528,51 +1528,55 @@ const RubberDuck = React.memo(({ onClick }: { onClick?: () => void }) => {
     };
 
     return (
-        <motion.button
-            onClick={handleClick}
-            className="relative flex items-center justify-center focus:outline-none w-10 h-10"
-            whileHover={{ y: -20, scale: 1.3, rotate: 10 }}
-            whileTap={{ scale: 0.8 }}
-            transition={SPRING.goose}
-            title={`Click me! (${quackCount} quacks)`}
-        >
-            <motion.span
-                className="text-2xl select-none"
-                animate={isQuacking ? {
-                    // MAXIMUM QUACK - very dramatic!
-                    rotate: [0, -30, 30, -25, 25, -15, 15, -5, 0],
-                    y: [0, -20, 5, -15, 0, -10, 0],
-                    scale: [1, 1.5, 0.8, 1.3, 0.9, 1.1, 1],
-                } : {
-                    // Idle wobble
-                    rotate: [0, 5, 0, -5, 0],
-                    y: [0, -3, 0],
-                }}
-                transition={isQuacking ? { duration: 0.8, ease: 'easeOut' } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        // Wrapper with padding to match DockIcon hitbox
+        <div style={{ padding: '4px 2px' }}>
+            <motion.button
+                onClick={handleClick}
+                className="relative flex items-center justify-center focus:outline-none"
+                style={{ width: 48, height: 48 }}
+                whileHover={{ y: -14, scale: 1.18 }}
+                whileTap={{ scale: 0.85 }}
+                transition={SPRING.goose}
+                title={`Click me! (${quackCount} quacks)`}
             >
-                🦆
-            </motion.span>
-            <AnimatePresence>
-                {isQuacking && (
-                    <motion.div
-                        initial={{ scale: 0, opacity: 0, y: 20, rotate: -10 }}
-                        animate={{ scale: 1, opacity: 1, y: -50, rotate: 0 }}
-                        exit={{ scale: 0.5, opacity: 0, y: -70, rotate: 10 }}
-                        transition={SPRING.playful}
-                        className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-lg px-3 py-1.5 text-xs whitespace-nowrap z-50 font-medium"
-                        style={{
-                            background: 'var(--bg-elevated)',
-                            border: '1px solid var(--border-subtle)',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                            color: 'var(--text-primary)',
-                            maxWidth: 180,
-                        }}
-                    >
-                        {saying}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.button>
+                <motion.span
+                    className="text-2xl select-none"
+                    animate={isQuacking ? {
+                        // MAXIMUM QUACK - very dramatic!
+                        rotate: [0, -30, 30, -25, 25, -15, 15, -5, 0],
+                        y: [0, -20, 5, -15, 0, -10, 0],
+                        scale: [1, 1.5, 0.8, 1.3, 0.9, 1.1, 1],
+                    } : {
+                        // Idle wobble
+                        rotate: [0, 5, 0, -5, 0],
+                        y: [0, -3, 0],
+                    }}
+                    transition={isQuacking ? { duration: 0.8, ease: 'easeOut' } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                    🦆
+                </motion.span>
+                <AnimatePresence>
+                    {isQuacking && (
+                        <motion.div
+                            initial={{ scale: 0, opacity: 0, y: 20, rotate: -10 }}
+                            animate={{ scale: 1, opacity: 1, y: -50, rotate: 0 }}
+                            exit={{ scale: 0.5, opacity: 0, y: -70, rotate: 10 }}
+                            transition={SPRING.playful}
+                            className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-lg px-3 py-1.5 text-xs whitespace-nowrap z-50 font-medium"
+                            style={{
+                                background: 'var(--bg-elevated)',
+                                border: '1px solid var(--border-subtle)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                color: 'var(--text-primary)',
+                                maxWidth: 180,
+                            }}
+                        >
+                            {saying}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.button>
+        </div>
     );
 });
 
@@ -1663,6 +1667,32 @@ const DockIcon = React.memo(({
 }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [justClicked, setJustClicked] = useState(false);
+    const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleMouseEnter = useCallback(() => {
+        // Clear any pending leave timeout
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = null;
+        }
+        setIsHovered(true);
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        // Small delay before unhover to prevent flickering between icons
+        hoverTimeoutRef.current = setTimeout(() => {
+            setIsHovered(false);
+        }, 50);
+    }, []);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (hoverTimeoutRef.current) {
+                clearTimeout(hoverTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const handleClick = () => {
         playSound('bubble');
@@ -1672,99 +1702,136 @@ const DockIcon = React.memo(({
     };
 
     return (
-        <motion.div
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            animate={{
-                // DRAMATIC bounce on click, BIG lift on hover
-                scale: justClicked ? [1, 0.7, 1.3, 0.9, 1.1, 1] : isHovered ? 1.25 : 1,
-                y: justClicked ? [0, 8, -30, -20, -25, -20] : isHovered ? -20 : 0,
-                rotate: justClicked ? [0, -15, 15, -8, 4, 0] : isHovered ? 3 : 0,
-            }}
-            transition={SPRING.dock}
-            style={{
-                width: 48,
-                height: 48,
-                position: 'relative',
-                transformOrigin: 'bottom center',
-            }}
+        // Outer wrapper with extended hitbox (padding) to prevent gaps
+        <div
+            className="relative"
+            style={{ padding: '4px 2px' }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
-            <button
-                onClick={handleClick}
-                className="w-full h-full focus:outline-none"
+            <motion.div
+                animate={{
+                    // Smooth lift on hover, dramatic bounce on click
+                    scale: justClicked ? [1, 0.75, 1.2, 0.95, 1.05, 1] : isHovered ? 1.18 : 1,
+                    y: justClicked ? [0, 6, -24, -16, -18, -14] : isHovered ? -14 : 0,
+                    rotate: justClicked ? [0, -10, 10, -5, 2, 0] : 0,
+                }}
+                transition={SPRING.dock}
+                style={{
+                    width: 48,
+                    height: 48,
+                    position: 'relative',
+                    transformOrigin: 'bottom center',
+                }}
             >
-                {/* Tooltip - pops in with bounce */}
-                <AnimatePresence>
-                    {isHovered && label && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 15, scale: 0.7 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 8, scale: 0.85 }}
-                            transition={SPRING.snappy}
-                            className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
-                            style={{
-                                background: 'rgba(20, 20, 20, 0.95)',
-                                color: '#fff',
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                                backdropFilter: 'blur(12px)',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                            }}
-                        >
-                            {label}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Icon with glow effect */}
-                <div
-                    className="w-full h-full flex items-center justify-center rounded-[14px] transition-all duration-200"
-                    style={{
-                        background: isActive
-                            ? 'rgba(255, 255, 255, 0.2)'
-                            : isHovered
-                                ? 'rgba(255, 255, 255, 0.15)'
-                                : 'rgba(255, 255, 255, 0.06)',
-                        boxShadow: isHovered
-                            ? '0 0 24px rgba(255,255,255,0.2), 0 8px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
-                            : isActive
-                                ? '0 4px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12)'
-                                : 'inset 0 1px 0 rgba(255,255,255,0.06)',
-                    }}
+                <button
+                    onClick={handleClick}
+                    className="w-full h-full focus:outline-none"
                 >
-                    {icon}
-                </div>
+                    {/* Tooltip - pops in with bounce */}
+                    <AnimatePresence>
+                        {isHovered && label && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 12, scale: 0.8 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 6, scale: 0.9 }}
+                                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
+                                style={{
+                                    background: 'rgba(30, 28, 26, 0.92)',
+                                    color: '#fff',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.35), 0 0 0 0.5px rgba(255,255,255,0.1)',
+                                    backdropFilter: 'blur(12px)',
+                                }}
+                            >
+                                {label}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
-                {/* Badge - bouncy pop-in */}
-                {badge !== undefined && badge > 0 && (
-                    <motion.span
-                        initial={{ scale: 0, rotate: -20 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={SPRING.bouncy}
-                        className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
+                    {/* Icon container with premium glass effect on hover */}
+                    <motion.div
+                        className="w-full h-full flex items-center justify-center rounded-[14px] overflow-hidden"
+                        animate={{
+                            background: isActive
+                                ? 'rgba(255, 255, 255, 0.28)'
+                                : isHovered
+                                    ? 'rgba(255, 255, 255, 0.45)'
+                                    : 'rgba(255, 255, 255, 0.08)',
+                        }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
                         style={{
-                            background: 'linear-gradient(135deg, #ff6b4a 0%, #ff4757 100%)',
-                            boxShadow: '0 2px 8px rgba(255, 71, 87, 0.5)',
+                            // Premium glass effect: blur, border, shadow
+                            backdropFilter: isHovered ? 'blur(8px) saturate(150%)' : 'none',
+                            WebkitBackdropFilter: isHovered ? 'blur(8px) saturate(150%)' : 'none',
+                            boxShadow: isHovered
+                                ? `
+                                    0 0 0 0.5px rgba(255, 255, 255, 0.5),
+                                    0 4px 16px rgba(0,0,0,0.15),
+                                    0 8px 24px rgba(0,0,0,0.1),
+                                    inset 0 1px 0 rgba(255,255,255,0.6),
+                                    inset 0 -1px 0 rgba(0,0,0,0.05)
+                                `
+                                : isActive
+                                    ? `
+                                        0 0 0 0.5px rgba(255, 255, 255, 0.3),
+                                        0 2px 8px rgba(0,0,0,0.12),
+                                        inset 0 1px 0 rgba(255,255,255,0.3)
+                                    `
+                                    : 'inset 0 1px 0 rgba(255,255,255,0.08)',
                         }}
                     >
-                        {badge}
-                    </motion.span>
-                )}
+                        {/* Inner gradient overlay for glass depth */}
+                        {isHovered && (
+                            <div
+                                className="absolute inset-0 rounded-[14px] pointer-events-none"
+                                style={{
+                                    background: `linear-gradient(
+                                        180deg,
+                                        rgba(255, 255, 255, 0.25) 0%,
+                                        rgba(255, 255, 255, 0.05) 50%,
+                                        rgba(0, 0, 0, 0.02) 100%
+                                    )`,
+                                }}
+                            />
+                        )}
+                        <div className="relative z-10">
+                            {icon}
+                        </div>
+                    </motion.div>
 
-                {/* Active dot - pops in */}
-                {isActive && (
-                    <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={SPRING.bouncy}
-                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
-                        style={{
-                            background: 'rgba(255,255,255,0.9)',
-                            boxShadow: '0 0 8px rgba(255,255,255,0.6)',
-                        }}
-                    />
-                )}
-            </button>
-        </motion.div>
+                    {/* Badge - bouncy pop-in */}
+                    {badge !== undefined && badge > 0 && (
+                        <motion.span
+                            initial={{ scale: 0, rotate: -20 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={SPRING.bouncy}
+                            className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
+                            style={{
+                                background: 'linear-gradient(135deg, #ff6b4a 0%, #ff4757 100%)',
+                                boxShadow: '0 2px 8px rgba(255, 71, 87, 0.5)',
+                            }}
+                        >
+                            {badge}
+                        </motion.span>
+                    )}
+
+                    {/* Active dot */}
+                    {isActive && (
+                        <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={SPRING.bouncy}
+                            className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                            style={{
+                                background: 'var(--color-text-primary, #171412)',
+                                boxShadow: '0 0 4px rgba(23,20,18,0.3)',
+                            }}
+                        />
+                    )}
+                </button>
+            </motion.div>
+        </div>
     );
 });
 
@@ -4584,7 +4651,7 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="dock-container flex items-end gap-1 px-3 py-2 rounded-[22px]"
+                            className="dock-container flex items-end px-2 py-1.5 rounded-[22px]"
                             style={{
                                 background: 'var(--bg-dock)',
                                 backdropFilter: 'var(--blur-dock)',
