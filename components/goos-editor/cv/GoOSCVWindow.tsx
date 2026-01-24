@@ -255,15 +255,16 @@ export function GoOSCVWindow({
         >
           <div
             style={{
-              background: 'white',
+              background: 'var(--bg-surface, white)',
               borderRadius: 12,
               padding: 24,
               maxWidth: 400,
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              boxShadow: 'var(--shadow-lg, 0 20px 60px rgba(0, 0, 0, 0.3))',
+              border: '1px solid var(--border-subtle, transparent)',
             }}
           >
-            <h3 style={{ margin: '0 0 12px', fontWeight: 600 }}>Unsaved Changes</h3>
-            <p style={{ margin: '0 0 20px', color: '#666' }}>
+            <h3 style={{ margin: '0 0 12px', fontWeight: 600, color: 'var(--text-primary)' }}>Unsaved Changes</h3>
+            <p style={{ margin: '0 0 20px', color: 'var(--text-secondary, #666)' }}>
               You have unpublished changes. What would you like to do?
             </p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
@@ -271,9 +272,10 @@ export function GoOSCVWindow({
                 onClick={() => setShowUnsavedModal(false)}
                 style={{
                   padding: '8px 16px',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-medium, #ddd)',
                   borderRadius: 6,
-                  background: 'white',
+                  background: 'var(--bg-surface, white)',
+                  color: 'var(--text-primary)',
                   cursor: 'pointer',
                 }}
               >
@@ -288,7 +290,7 @@ export function GoOSCVWindow({
                   padding: '8px 16px',
                   border: 'none',
                   borderRadius: 6,
-                  background: '#ef4444',
+                  background: 'var(--color-error, #ef4444)',
                   color: 'white',
                   cursor: 'pointer',
                 }}
@@ -305,7 +307,7 @@ export function GoOSCVWindow({
                   padding: '8px 16px',
                   border: 'none',
                   borderRadius: 6,
-                  background: '#3b82f6',
+                  background: 'var(--accent-primary, #3b82f6)',
                   color: 'white',
                   cursor: 'pointer',
                 }}
@@ -438,7 +440,7 @@ export function GoOSCVWindow({
                   padding: '6px 14px',
                   border: 'none',
                   borderRadius: 6,
-                  background: '#3b82f6',
+                  background: 'var(--accent-primary, #3b82f6)',
                   color: 'white',
                   cursor: 'pointer',
                   fontFamily: 'var(--font-body)',
@@ -457,7 +459,7 @@ export function GoOSCVWindow({
           style={{
             flex: 1,
             overflow: 'auto',
-            background: '#f5f5f5',
+            background: 'var(--bg-muted, #f5f5f5)',
           }}
         >
           <GoOSCVDocument
