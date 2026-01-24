@@ -902,8 +902,15 @@ body {
     width: 1px !important;
     height: 28px !important;
     background: rgba(255, 255, 255, 0.12) !important;
-    margin: 0 6px !important;
+    margin: 0 4px !important;
     align-self: center;
+}
+
+/* Dock icon glass effect - light mode premium frosted glass */
+.theme-sketch:not(.dark) .dock-icon-glass {
+    /* Ensure GPU acceleration for smooth transitions */
+    will-change: background, box-shadow;
+    transform: translateZ(0);
 }
 
 /* ============================================

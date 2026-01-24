@@ -1650,7 +1650,7 @@ const TypewriterText = React.memo(({
 TypewriterText.displayName = 'TypewriterText';
 
 // ============================================
-// DOCK ICON - Bouncy hover with glow
+// DOCK ICON - Premium glass hover with smooth transitions
 // ============================================
 
 const DockIcon = React.memo(({
@@ -1671,7 +1671,6 @@ const DockIcon = React.memo(({
     const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleMouseEnter = useCallback(() => {
-        // Clear any pending leave timeout
         if (hoverTimeoutRef.current) {
             clearTimeout(hoverTimeoutRef.current);
             hoverTimeoutRef.current = null;
@@ -1680,13 +1679,11 @@ const DockIcon = React.memo(({
     }, []);
 
     const handleMouseLeave = useCallback(() => {
-        // Small delay before unhover to prevent flickering between icons
         hoverTimeoutRef.current = setTimeout(() => {
             setIsHovered(false);
-        }, 50);
+        }, 30);
     }, []);
 
-    // Cleanup on unmount
     useEffect(() => {
         return () => {
             if (hoverTimeoutRef.current) {
@@ -1703,19 +1700,17 @@ const DockIcon = React.memo(({
     };
 
     return (
-        // Outer wrapper with extended hitbox (padding) to prevent gaps
         <div
             className="relative"
-            style={{ padding: '4px 2px' }}
+            style={{ padding: '6px 3px' }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             <motion.div
                 animate={{
-                    // Smooth lift on hover, dramatic bounce on click
-                    scale: justClicked ? [1, 0.75, 1.2, 0.95, 1.05, 1] : isHovered ? 1.18 : 1,
-                    y: justClicked ? [0, 6, -24, -16, -18, -14] : isHovered ? -14 : 0,
-                    rotate: justClicked ? [0, -10, 10, -5, 2, 0] : 0,
+                    scale: justClicked ? [1, 0.8, 1.15, 0.95, 1.02, 1] : isHovered ? 1.12 : 1,
+                    y: justClicked ? [0, 4, -20, -12, -14, -10] : isHovered ? -10 : 0,
+                    rotate: justClicked ? [0, -8, 8, -3, 1, 0] : 0,
                 }}
                 transition={SPRING.dock}
                 style={{
@@ -1727,22 +1722,23 @@ const DockIcon = React.memo(({
             >
                 <button
                     onClick={handleClick}
-                    className="w-full h-full focus:outline-none"
+                    className="w-full h-full focus:outline-none relative"
                 >
-                    {/* Tooltip - pops in with bounce */}
+                    {/* Tooltip */}
                     <AnimatePresence>
                         {isHovered && label && (
                             <motion.div
-                                initial={{ opacity: 0, y: 12, scale: 0.8 }}
+                                initial={{ opacity: 0, y: 8, scale: 0.9 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 6, scale: 0.9 }}
-                                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                                className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
+                                exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                                transition={{ type: 'spring', stiffness: 500, damping: 28 }}
+                                className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
                                 style={{
-                                    background: 'rgba(30, 28, 26, 0.92)',
+                                    background: 'rgba(30, 28, 26, 0.88)',
                                     color: '#fff',
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.35), 0 0 0 0.5px rgba(255,255,255,0.1)',
-                                    backdropFilter: 'blur(12px)',
+                                    boxShadow: '0 4px 16px rgba(0,0,0,0.25), 0 0 0 0.5px rgba(255,255,255,0.08)',
+                                    backdropFilter: 'blur(16px) saturate(180%)',
+                                    WebkitBackdropFilter: 'blur(16px) saturate(180%)',
                                 }}
                             >
                                 {label}
@@ -1750,83 +1746,73 @@ const DockIcon = React.memo(({
                         )}
                     </AnimatePresence>
 
-                    {/* Icon container with premium glass effect on hover */}
-                    <motion.div
-                        className="w-full h-full flex items-center justify-center rounded-[14px] overflow-hidden"
-                        animate={{
-                            background: isActive
-                                ? 'rgba(255, 255, 255, 0.28)'
-                                : isHovered
-                                    ? 'rgba(255, 255, 255, 0.45)'
-                                    : 'rgba(255, 255, 255, 0.08)',
-                        }}
-                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                    {/* Glass container - always has blur, opacity changes smoothly */}
+                    <div
+                        className="dock-icon-glass w-full h-full flex items-center justify-center rounded-[13px] relative overflow-hidden"
                         style={{
-                            // Premium glass effect: blur, border, shadow
-                            backdropFilter: isHovered ? 'blur(8px) saturate(150%)' : 'none',
-                            WebkitBackdropFilter: isHovered ? 'blur(8px) saturate(150%)' : 'none',
-                            boxShadow: isHovered
+                            // Always apply backdrop-filter for smooth transition
+                            backdropFilter: 'blur(12px) saturate(180%)',
+                            WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                            // Use CSS transitions for smooth opacity/background changes
+                            background: isActive
+                                ? 'rgba(255, 255, 255, 0.55)'
+                                : isHovered
+                                    ? 'rgba(255, 255, 255, 0.5)'
+                                    : 'rgba(255, 255, 255, 0)',
+                            boxShadow: isHovered || isActive
                                 ? `
-                                    0 0 0 0.5px rgba(255, 255, 255, 0.5),
-                                    0 4px 16px rgba(0,0,0,0.15),
-                                    0 8px 24px rgba(0,0,0,0.1),
-                                    inset 0 1px 0 rgba(255,255,255,0.6),
-                                    inset 0 -1px 0 rgba(0,0,0,0.05)
+                                    0 0 0 1px rgba(255, 255, 255, 0.4),
+                                    0 2px 8px rgba(0, 0, 0, 0.08),
+                                    0 8px 20px rgba(0, 0, 0, 0.06),
+                                    inset 0 1px 1px rgba(255, 255, 255, 0.7),
+                                    inset 0 -0.5px 1px rgba(0, 0, 0, 0.04)
                                 `
-                                : isActive
-                                    ? `
-                                        0 0 0 0.5px rgba(255, 255, 255, 0.3),
-                                        0 2px 8px rgba(0,0,0,0.12),
-                                        inset 0 1px 0 rgba(255,255,255,0.3)
-                                    `
-                                    : 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                                : 'none',
+                            transition: 'background 0.2s ease-out, box-shadow 0.2s ease-out',
                         }}
                     >
-                        {/* Inner gradient overlay for glass depth */}
-                        {isHovered && (
-                            <div
-                                className="absolute inset-0 rounded-[14px] pointer-events-none"
-                                style={{
-                                    background: `linear-gradient(
-                                        180deg,
-                                        rgba(255, 255, 255, 0.25) 0%,
-                                        rgba(255, 255, 255, 0.05) 50%,
-                                        rgba(0, 0, 0, 0.02) 100%
-                                    )`,
-                                }}
-                            />
-                        )}
+                        {/* Top reflection - smooth fade */}
+                        <div
+                            className="absolute inset-x-0 top-0 h-[60%] rounded-t-[13px] pointer-events-none"
+                            style={{
+                                background: 'linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 100%)',
+                                opacity: isHovered || isActive ? 1 : 0,
+                                transition: 'opacity 0.2s ease-out',
+                            }}
+                        />
+
+                        {/* Icon */}
                         <div className="relative z-10">
                             {icon}
                         </div>
-                    </motion.div>
+                    </div>
 
-                    {/* Badge - bouncy pop-in */}
+                    {/* Badge */}
                     {badge !== undefined && badge > 0 && (
                         <motion.span
-                            initial={{ scale: 0, rotate: -20 }}
-                            animate={{ scale: 1, rotate: 0 }}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
                             transition={SPRING.bouncy}
-                            className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
+                            className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-20"
                             style={{
                                 background: 'linear-gradient(135deg, #ff6b4a 0%, #ff4757 100%)',
-                                boxShadow: '0 2px 8px rgba(255, 71, 87, 0.5)',
+                                boxShadow: '0 2px 6px rgba(255, 71, 87, 0.4), 0 0 0 2px var(--bg-dock, #fff)',
                             }}
                         >
                             {badge}
                         </motion.span>
                     )}
 
-                    {/* Active dot */}
+                    {/* Active indicator */}
                     {isActive && (
                         <motion.div
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={SPRING.bouncy}
-                            className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                            className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full"
                             style={{
                                 background: 'var(--color-text-primary, #171412)',
-                                boxShadow: '0 0 4px rgba(23,20,18,0.3)',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                             }}
                         />
                     )}
