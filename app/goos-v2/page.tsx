@@ -76,6 +76,7 @@ import {
 } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
 import { CommandPalette } from '@/components/command-palette/CommandPalette';
+import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -2544,8 +2545,8 @@ function GoOSDemoContent() {
     const [showConfetti, setShowConfetti] = useState(false);
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
-    // Boot sequence state: splash -> booting -> ready
-    const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'ready'>('splash');
+    // Boot sequence state: splash -> booting -> revealing -> ready
+    const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'revealing' | 'ready'>('splash');
     const [bootMessage, setBootMessage] = useState(0);
 
     // Fun loading messages that rotate
@@ -2573,9 +2574,11 @@ function GoOSDemoContent() {
             setBootMessage(prev => (prev + 1) % bootMessages.length);
         }, 700);
 
-        // Transition to ready state after boot animation
+        // Transition to reveal phase after boot animation
         const bootTimer = setTimeout(() => {
-            setBootPhase('ready');
+            setBootPhase('revealing');
+            // Play a whoosh sound for the reveal
+            playSound('expand');
         }, 3500); // 3.5 seconds - longer for personality
 
         return () => {
@@ -2583,6 +2586,11 @@ function GoOSDemoContent() {
             clearInterval(messageInterval);
         };
     }, [bootPhase, bootMessages.length]);
+
+    // Handle reveal complete - final transition to ready
+    const handleRevealComplete = useCallback(() => {
+        setBootPhase('ready');
+    }, []);
 
     // Spaces state (demo mode - will be replaced by SpaceContext)
     const [activeSpaceId, setActiveSpaceId] = useState('space-1');
@@ -3732,6 +3740,13 @@ function GoOSDemoContent() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* DESKTOP REVEAL TRANSITION - Dramatic curve animation */}
+            <DesktopReveal
+                isActive={bootPhase === 'revealing'}
+                onComplete={handleRevealComplete}
+                variant="curve"
+            />
 
             {/* WALLPAPER BACKGROUND - With Space Theme Support */}
             {wallpaper ? (
