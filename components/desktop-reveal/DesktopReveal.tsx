@@ -15,10 +15,14 @@ interface DesktopRevealProps {
 }
 
 // ============================================================================
-// ANIMATION EASING - Premium cubic bezier
+// ANIMATION EASING - Snappy, premium cubic beziers
 // ============================================================================
 
-const CURVE_EASE = [0.76, 0, 0.24, 1] as const;
+// Fast start, smooth landing - feels responsive
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
+// Even snappier - aggressive deceleration
+const EASE_OUT_QUINT = [0.22, 1, 0.36, 1] as const;
 
 // ============================================================================
 // CURVE SVG COMPONENT - The main attraction
@@ -53,9 +57,9 @@ function CurveReveal({ width, height }: { width: number; height: number }) {
       initial={{ y: 0 }}
       animate={{ y: '-100%' }}
       transition={{
-        duration: 0.75,
-        ease: CURVE_EASE,
-        delay: 0.15,
+        duration: 0.55,
+        ease: EASE_OUT_EXPO,
+        delay: 0.05,
       }}
     >
       <svg
@@ -70,9 +74,9 @@ function CurveReveal({ width, height }: { width: number; height: number }) {
           initial={{ d: paths.initial }}
           animate={{ d: paths.target }}
           transition={{
-            duration: 0.75,
-            ease: CURVE_EASE,
-            delay: 0.15,
+            duration: 0.5,
+            ease: EASE_OUT_QUINT,
+            delay: 0.05,
           }}
         />
       </svg>
@@ -100,9 +104,9 @@ function StairsReveal({ columns = 5 }: { columns?: number }) {
           initial={{ scaleY: 1 }}
           animate={{ scaleY: 0 }}
           transition={{
-            duration: 0.5,
-            ease: CURVE_EASE,
-            delay: (columns - 1 - i) * 0.08,
+            duration: 0.4,
+            ease: EASE_OUT_EXPO,
+            delay: (columns - 1 - i) * 0.04,
           }}
         />
       ))}
@@ -126,9 +130,9 @@ function PerspectiveReveal() {
       initial={{ y: 0 }}
       animate={{ y: '-100%' }}
       transition={{
-        duration: 0.65,
-        ease: CURVE_EASE,
-        delay: 0.1,
+        duration: 0.45,
+        ease: EASE_OUT_EXPO,
+        delay: 0.02,
       }}
     />
   );
@@ -164,10 +168,10 @@ export function DesktopReveal({ isActive, onComplete, variant = 'curve' }: Deskt
     if (isActive && dimensions.width > 0) {
       setIsAnimating(true);
 
-      // Complete after animation finishes
+      // Complete after animation finishes (faster now)
       const timer = setTimeout(() => {
         onComplete();
-      }, prefersReducedMotion ? 200 : 1000);
+      }, prefersReducedMotion ? 150 : 650);
 
       return () => clearTimeout(timer);
     }
