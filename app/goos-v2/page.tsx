@@ -1655,14 +1655,14 @@ const DockIcon = React.memo(({
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
             animate={{
-                y: isHovered ? -14 : 0,
+                // Only bounce animation on click - CSS handles hover magnification
                 scale: justClicked ? [1, 0.85, 1.15, 0.95, 1] : 1,
                 rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
             }}
             transition={goOS.springs.bouncy}
-            className="relative flex flex-col items-center focus:outline-none"
+            className="dock-item relative flex flex-col items-center focus:outline-none"
         >
-            {/* Tooltip label */}
+            {/* Tooltip label - positioned higher for magnification */}
             <AnimatePresence>
                 {isHovered && label && (
                     <motion.div
@@ -1670,7 +1670,7 @@ const DockIcon = React.memo(({
                         animate={fadeInUp.animate}
                         exit={fadeInUp.exit}
                         transition={TRANSITION.tooltip}
-                        className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
+                        className="absolute -top-16 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap z-50"
                         style={{
                             background: 'var(--bg-elevated)',
                             color: 'var(--text-primary)',
@@ -1689,8 +1689,8 @@ const DockIcon = React.memo(({
                 )}
             </AnimatePresence>
 
-            <motion.div
-                className="w-12 h-12 flex items-center justify-center rounded-[14px]"
+            <div
+                className="w-12 h-12 flex items-center justify-center rounded-[14px] transition-colors duration-150"
                 style={{
                     background: isActive
                         ? 'rgba(255, 255, 255, 0.18)'
@@ -1702,17 +1702,9 @@ const DockIcon = React.memo(({
                         ? 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.2)'
                         : 'inset 0 1px 0 rgba(255,255,255,0.08)',
                 }}
-                animate={{
-                    scale: isHovered && !justClicked ? 1.12 : 1,
-                    rotate: isHovered && !justClicked ? [0, -2, 2, 0] : 0,
-                }}
-                transition={{
-                    scale: goOS.springs.gentle,
-                    rotate: { duration: 0.4, ease: 'easeInOut' }
-                }}
             >
                 {icon}
-            </motion.div>
+            </div>
 
             {/* Badge with bounce animation */}
             {badge !== undefined && badge > 0 && (
@@ -4268,7 +4260,7 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="flex items-center gap-3 px-4 py-3 rounded-[22px]"
+                            className="dock-container flex items-end gap-2 px-4 py-3 rounded-[22px]"
                             style={{
                                 background: 'var(--bg-dock)',
                                 backdropFilter: 'var(--blur-dock)',
@@ -4310,7 +4302,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.notes}
                         label="Notes"
                     />
-                    <div className="w-px h-6 bg-white/10 mx-1" />
+                    <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
                         icon={<MessageCircle size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('chat')}
@@ -4329,7 +4321,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.settings}
                         label="Settings"
                     />
-                    <div className="w-px h-6 bg-white/10 mx-1" />
+                    <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     <DockIcon
                         icon={<BookOpen size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                         onClick={() => toggleApp('guestbook')}
@@ -4343,7 +4335,7 @@ function GoOSDemoContent() {
                         isActive={appWindows.analytics}
                         label="Analytics"
                     />
-                    <div className="w-px h-6 bg-white/10 mx-1" />
+                    <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     {/* Wallpaper Picker */}
                     <div className="relative" data-wallpaper-picker>
                         <DockIcon
