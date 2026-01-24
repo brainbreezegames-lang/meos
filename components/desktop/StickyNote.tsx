@@ -5,14 +5,45 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { SPRING, fadeInUp, REDUCED_MOTION, buttonPress } from '@/lib/animations';
 
-// Sticky note colors matching macOS Stickies
+// Sticky note colors - warm, refined palette that works in light and dark mode
+// Using CSS variables for dark mode adaptation
 const STICKY_COLORS = {
-  yellow: { bg: '#FFFC79', text: '#333' },
-  blue: { bg: '#7AFCFF', text: '#1a3a4a' },
-  green: { bg: '#7AFF7A', text: '#1a3a1a' },
-  pink: { bg: '#FF7AFF', text: '#3a1a3a' },
-  purple: { bg: '#D4AAFF', text: '#2a1a3a' },
-  orange: { bg: '#FFBE38', text: '#3a2a1a' },
+  yellow: {
+    bg: 'var(--sticky-yellow-bg, #fef3c7)',
+    text: 'var(--sticky-yellow-text, #78350f)',
+    darkBg: '#4a3f2a',
+    darkText: '#fef3c7'
+  },
+  blue: {
+    bg: 'var(--sticky-blue-bg, #dbeafe)',
+    text: 'var(--sticky-blue-text, #1e3a5f)',
+    darkBg: '#2a3a4f',
+    darkText: '#dbeafe'
+  },
+  green: {
+    bg: 'var(--sticky-green-bg, #dcfce7)',
+    text: 'var(--sticky-green-text, #14532d)',
+    darkBg: '#2a4035',
+    darkText: '#dcfce7'
+  },
+  pink: {
+    bg: 'var(--sticky-pink-bg, #fce7f3)',
+    text: 'var(--sticky-pink-text, #831843)',
+    darkBg: '#4a2a3f',
+    darkText: '#fce7f3'
+  },
+  purple: {
+    bg: 'var(--sticky-purple-bg, #ede9fe)',
+    text: 'var(--sticky-purple-text, #3b0764)',
+    darkBg: '#3a2f4a',
+    darkText: '#ede9fe'
+  },
+  orange: {
+    bg: 'var(--sticky-orange-bg, #ffedd5)',
+    text: 'var(--sticky-orange-text, #7c2d12)',
+    darkBg: '#4a3525',
+    darkText: '#ffedd5'
+  },
 } as const;
 
 type StickyColor = keyof typeof STICKY_COLORS;

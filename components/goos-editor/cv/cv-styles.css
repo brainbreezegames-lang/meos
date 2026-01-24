@@ -13,8 +13,8 @@
   max-width: 850px;
   margin: 0 auto;
   padding: 48px 56px;
-  background: #ffffff;
-  color: #1a1a1a;
+  background: var(--cv-background, #ffffff);
+  color: var(--cv-text, var(--cv-text, #1a1a1a));
   font-family: var(--font-instrument), 'Instrument Sans', system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.6;
@@ -24,12 +24,12 @@
 /* Text Selection - warm accent with visible dark text */
 .cv-document ::selection {
   background: rgba(255, 119, 34, 0.25);
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
 }
 
 .cv-document ::-moz-selection {
   background: rgba(255, 119, 34, 0.25);
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
 }
 
 /* ==========================================================================
@@ -39,14 +39,14 @@
 .cv-header {
   margin-bottom: 40px;
   padding-bottom: 28px;
-  border-bottom: 1.5px solid #1a1a1a;
+  border-bottom: 1.5px solid var(--cv-border, var(--cv-text, #1a1a1a));
 }
 
 .cv-name {
   font-family: 'Averia Serif Libre', Georgia, serif !important;
   font-size: clamp(36px, 5vw, 44px);
   font-weight: 400;
-  color: #1a1a1a;
+  color: var(--cv-text, var(--cv-text, #1a1a1a));
   line-height: 1.15;
   margin: 0;
   letter-spacing: -0.01em;
@@ -96,7 +96,7 @@
   font-family: 'Averia Serif Libre', Georgia, serif !important;
   font-size: 13px;
   font-weight: 400;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 0 0 16px 0;
@@ -117,14 +117,14 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   margin: 0 0 4px 0;
 }
 
 .cv-skill-items {
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 13px;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   line-height: 1.5;
   margin: 0;
 }
@@ -146,21 +146,21 @@
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   margin: 0 0 2px 0;
 }
 
 .cv-education-dates {
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 12px;
-  color: #666666;
+  color: var(--cv-text-muted, #666666);
   margin: 0 0 2px 0;
 }
 
 .cv-education-institution {
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 13px;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   margin: 0;
 }
 
@@ -171,7 +171,7 @@
 .cv-contact {
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 13px;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   line-height: 1.8;
 }
 
@@ -182,11 +182,11 @@
 .cv-contact-tagline {
   margin-top: 12px;
   font-style: italic;
-  color: #666666;
+  color: var(--cv-text-muted, #666666);
 }
 
 .cv-link {
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   text-decoration: none;
   transition: color 0.15s;
 }
@@ -202,7 +202,7 @@
 .cv-about {
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 14px;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   line-height: 1.7;
 }
 
@@ -225,14 +225,14 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   margin: 0 0 6px 0;
 }
 
 .cv-company-line {
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 14px;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   margin: 0 0 6px 0;
 }
 
@@ -241,14 +241,14 @@
 }
 
 .cv-date-separator {
-  color: #666666;
+  color: var(--cv-text-muted, #666666);
 }
 
 .cv-company-description {
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 13px;
   font-style: italic;
-  color: #666666;
+  color: var(--cv-text-muted, #666666);
   line-height: 1.5;
   margin: 0 0 10px 0;
 }
@@ -256,7 +256,7 @@
 .cv-responsibilities {
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 14px;
-  color: #1a1a1a;
+  color: var(--cv-text, #1a1a1a);
   line-height: 1.6;
 }
 
@@ -280,7 +280,7 @@
 }
 
 .cv-editable-hover:hover {
-  background-color: rgba(59, 130, 246, 0.08);
+  background-color: var(--cv-edit-bg, rgba(59, 130, 246, 0.08));
 }
 
 .cv-placeholder {
@@ -296,10 +296,10 @@
   line-height: inherit;
   letter-spacing: inherit;
   text-transform: inherit;
-  background: rgba(59, 130, 246, 0.08);
+  background: var(--cv-edit-bg, rgba(59, 130, 246, 0.08));
   border: none;
   border-radius: 3px;
-  outline: 2px solid rgba(59, 130, 246, 0.4);
+  outline: 2px solid var(--cv-edit-border, rgba(59, 130, 246, 0.4));
   outline-offset: 1px;
   padding: 2px 6px;
   margin: -2px -6px;
@@ -355,19 +355,19 @@
   padding: 8px 14px;
   margin-top: 12px;
   background: transparent;
-  border: 1px dashed #cccccc;
+  border: 1px dashed var(--cv-text-muted, #cccccc);
   border-radius: 6px;
   cursor: pointer;
   font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
   font-size: 12px;
-  color: #666666;
+  color: var(--cv-text-muted, #666666);
   transition: all 0.15s;
 }
 
 .cv-add-btn:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.04);
+  border-color: var(--cv-link, #3b82f6);
+  color: var(--cv-link, #3b82f6);
+  background: var(--cv-edit-bg, rgba(59, 130, 246, 0.04));
 }
 
 .cv-add-btn-icon {

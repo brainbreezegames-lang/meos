@@ -397,6 +397,30 @@ html.theme-sketch {
     --topnav-border: 0.5px solid rgba(23, 20, 18, 0.04);
     --topnav-shadow: 0 1px 3px rgba(23, 20, 18, 0.02);
 
+    /* ========== CASE STUDY - Light Mode ========== */
+    --cs-background: #fbf9ef;
+    --cs-surface: #ffffff;
+    --cs-surface-alt: #f5f3e8;
+    --cs-text: #1a1a1a;
+    --cs-text-muted: #6b6b6b;
+    --cs-text-light: #999999;
+    --cs-accent: #ff7722;
+    --cs-accent-alt: #3d2fa9;
+    --cs-border: rgba(0, 0, 0, 0.08);
+    --cs-border-light: rgba(0, 0, 0, 0.04);
+    --cs-hero: #1a1410;
+    --cs-hero-text: #ffffff;
+    --cs-watermark: rgba(0, 0, 0, 0.06);
+
+    /* ========== CV DOCUMENT - Light Mode ========== */
+    --cv-background: #ffffff;
+    --cv-text: #1a1a1a;
+    --cv-text-muted: #666666;
+    --cv-border: #1a1a1a;
+    --cv-link: #1a1a1a;
+    --cv-edit-bg: rgba(59, 130, 246, 0.08);
+    --cv-edit-border: rgba(59, 130, 246, 0.4);
+
     /* Additional compatibility */
     --bg-card: var(--bg-surface);
     --bg-item: var(--bg-surface);
@@ -418,6 +442,20 @@ html.theme-sketch {
     /* Text on dark backgrounds (tooltips, dock labels) */
     --text-on-dark: #ffffff;
     --bg-tooltip: rgba(30, 30, 30, 0.95);
+
+    /* ========== STICKY NOTES - Light Mode (Warm Pastels) ========== */
+    --sticky-yellow-bg: #fef3c7;
+    --sticky-yellow-text: #78350f;
+    --sticky-blue-bg: #dbeafe;
+    --sticky-blue-text: #1e3a5f;
+    --sticky-green-bg: #dcfce7;
+    --sticky-green-text: #14532d;
+    --sticky-pink-bg: #fce7f3;
+    --sticky-pink-text: #831843;
+    --sticky-purple-bg: #ede9fe;
+    --sticky-purple-text: #3b0764;
+    --sticky-orange-bg: #ffedd5;
+    --sticky-orange-text: #7c2d12;
 
     --spacing-window-padding: var(--space-5);
     --radius-xs: var(--radius-sm);
@@ -670,13 +708,27 @@ html.theme-sketch.dark {
     --text-on-dark: oklch(96% 0.01 95);
     --bg-tooltip: oklch(21% 0.008 70 / 0.98);
 
-    /* ========== STICKY NOTES - Warm Muted ========== */
-    --sticky-yellow: oklch(30% 0.06 90);
-    --sticky-blue: oklch(26% 0.05 250);
-    --sticky-pink: oklch(28% 0.05 350);
-    --sticky-green: oklch(26% 0.05 145);
-    --sticky-orange: oklch(28% 0.06 60);
-    --sticky-purple: oklch(26% 0.05 300);
+    /* ========== STICKY NOTES - Dark Mode (Deep Warm Tones) ========== */
+    /* Avoiding pure black - warm undertones with visible color identity */
+    --sticky-yellow-bg: oklch(32% 0.06 85);
+    --sticky-yellow-text: oklch(92% 0.04 90);
+    --sticky-blue-bg: oklch(28% 0.05 250);
+    --sticky-blue-text: oklch(90% 0.03 245);
+    --sticky-green-bg: oklch(28% 0.05 145);
+    --sticky-green-text: oklch(90% 0.04 145);
+    --sticky-pink-bg: oklch(30% 0.06 350);
+    --sticky-pink-text: oklch(92% 0.04 350);
+    --sticky-purple-bg: oklch(28% 0.05 300);
+    --sticky-purple-text: oklch(90% 0.04 300);
+    --sticky-orange-bg: oklch(30% 0.07 60);
+    --sticky-orange-text: oklch(92% 0.04 60);
+    /* Legacy variables for backward compatibility */
+    --sticky-yellow: oklch(32% 0.06 85);
+    --sticky-blue: oklch(28% 0.05 250);
+    --sticky-pink: oklch(30% 0.06 350);
+    --sticky-green: oklch(28% 0.05 145);
+    --sticky-orange: oklch(30% 0.07 60);
+    --sticky-purple: oklch(28% 0.05 300);
 
     /* ========== ICON COLORS ========== */
     --icon-stroke: oklch(96% 0.01 95);
@@ -687,6 +739,31 @@ html.theme-sketch.dark {
     /* ========== SELECTION ========== */
     --selection-bg: rgba(255, 119, 34, 0.3);
     --selection-text: oklch(96% 0.01 95);
+
+    /* ========== CASE STUDY - Dark Mode ========== */
+    /* Warm dark palette avoiding pure black */
+    --cs-background: oklch(18% 0.01 75);
+    --cs-surface: oklch(22% 0.008 70);
+    --cs-surface-alt: oklch(20% 0.009 72);
+    --cs-text: oklch(94% 0.008 95);
+    --cs-text-muted: oklch(70% 0.006 90);
+    --cs-text-light: oklch(55% 0.005 85);
+    --cs-accent: #ff8833;
+    --cs-accent-alt: #8b7cf7;
+    --cs-border: rgba(255, 255, 255, 0.08);
+    --cs-border-light: rgba(255, 255, 255, 0.04);
+    --cs-hero: oklch(14% 0.01 75);
+    --cs-hero-text: oklch(96% 0.01 95);
+    --cs-watermark: rgba(255, 255, 255, 0.04);
+
+    /* ========== CV DOCUMENT - Dark Mode ========== */
+    --cv-background: oklch(20% 0.008 70);
+    --cv-text: oklch(94% 0.008 95);
+    --cv-text-muted: oklch(65% 0.006 90);
+    --cv-border: oklch(35% 0.006 70);
+    --cv-link: #ff8833;
+    --cv-edit-bg: rgba(255, 119, 34, 0.1);
+    --cv-edit-border: rgba(255, 119, 34, 0.4);
 
     /* Apply base styles to root */
     background-color: var(--bg-canvas);

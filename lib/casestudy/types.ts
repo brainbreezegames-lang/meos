@@ -81,27 +81,28 @@ export interface RelatedStudy {
 }
 
 // Design tokens for the case study theme (Brand Appart-inspired bold style)
+// These are light mode defaults - dark mode uses CSS variables
 export const caseStudyTokens = {
   colors: {
-    // Warm cream base
-    background: '#fbf9ef',
-    surface: '#ffffff',
-    surfaceAlt: '#f5f3e8',
+    // Use CSS variables to support dark mode
+    background: 'var(--cs-background, #fbf9ef)',
+    surface: 'var(--cs-surface, #ffffff)',
+    surfaceAlt: 'var(--cs-surface-alt, #f5f3e8)',
     // Text colors - rich blacks and warm grays
-    text: '#1a1a1a',
-    textMuted: '#6b6b6b',
-    textLight: '#999999',
+    text: 'var(--cs-text, #1a1a1a)',
+    textMuted: 'var(--cs-text-muted, #6b6b6b)',
+    textLight: 'var(--cs-text-light, #999999)',
     // Accent colors - bold and vibrant
-    accent: '#ff7722',        // Warm orange
-    accentAlt: '#3d2fa9',     // Deep purple
+    accent: 'var(--cs-accent, #ff7722)',        // Warm orange
+    accentAlt: 'var(--cs-accent-alt, #3d2fa9)', // Deep purple
     // Borders
-    border: 'rgba(0, 0, 0, 0.08)',
-    borderLight: 'rgba(0, 0, 0, 0.04)',
+    border: 'var(--cs-border, rgba(0, 0, 0, 0.08))',
+    borderLight: 'var(--cs-border-light, rgba(0, 0, 0, 0.04))',
     // Hero
-    hero: '#1a1410',
-    heroText: '#ffffff',
+    hero: 'var(--cs-hero, #1a1410)',
+    heroText: 'var(--cs-hero-text, #ffffff)',
     // Watermark text (very faded)
-    watermark: 'rgba(0, 0, 0, 0.06)',
+    watermark: 'var(--cs-watermark, rgba(0, 0, 0, 0.06))',
   },
   fonts: {
     // Warm serif for headings
