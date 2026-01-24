@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Editor } from '@tiptap/react';
+import { playSound } from '@/lib/sounds';
 
 interface ToolbarButtonProps {
   onClick: () => void;
@@ -15,7 +16,12 @@ function ToolbarButton({ onClick, isActive, disabled, title, children }: Toolbar
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={() => {
+        if (!disabled) {
+          playSound('click');
+          onClick();
+        }
+      }}
       disabled={disabled}
       title={title}
       aria-label={title}
@@ -96,7 +102,10 @@ export function GoOSEditorToolbar({ editor, onAddImage, onAddImageFromUrl, onAdd
         <div style={{ position: 'relative' }}>
           <button
             type="button"
-            onClick={() => setShowHeadingDropdown(!showHeadingDropdown)}
+            onClick={() => {
+              playSound(showHeadingDropdown ? 'collapse' : 'expand');
+              setShowHeadingDropdown(!showHeadingDropdown);
+            }}
             aria-label="Text style"
             aria-haspopup="listbox"
             aria-expanded={showHeadingDropdown}
@@ -157,7 +166,7 @@ export function GoOSEditorToolbar({ editor, onAddImage, onAddImageFromUrl, onAdd
                     type="button"
                     role="option"
                     aria-selected={item.active}
-                    onClick={() => { item.action(); setShowHeadingDropdown(false); }}
+                    onClick={() => { playSound('click'); item.action(); setShowHeadingDropdown(false); }}
                     style={{
                       width: '100%',
                       padding: '8px 12px',

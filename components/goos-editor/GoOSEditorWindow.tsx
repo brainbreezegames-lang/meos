@@ -9,6 +9,7 @@ import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublis
 import { TrafficLights } from '../desktop/TrafficLights';
 import { WINDOW, TITLE_BAR_DARK, ANIMATION } from '../desktop/windowStyles';
 import { AccessLevel } from '@/contexts/GoOSContext';
+import { playSound } from '@/lib/sounds';
 
 export interface GoOSFile {
   id: string;
@@ -60,6 +61,11 @@ export function GoOSEditorWindow({
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dragControls = useDragControls();
   const prefersReducedMotion = useReducedMotion();
+
+  // Play window open sound on mount
+  useEffect(() => {
+    playSound('whoosh');
+  }, []);
 
   // Auto-save with debounce
   const triggerSave = useCallback(() => {

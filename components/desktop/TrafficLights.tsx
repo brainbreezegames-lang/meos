@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { TRAFFIC, CONTROLS } from './windowStyles';
+import { playSound } from '@/lib/sounds';
 
 interface TrafficLightsProps {
   onClose: () => void;
@@ -36,7 +37,10 @@ export function TrafficLights({
       >
         {/* Close */}
         <button
-          onClick={onClose}
+          onClick={() => {
+            playSound('popReverse');
+            onClose();
+          }}
           aria-label="Close window"
           className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
           style={{
@@ -58,7 +62,10 @@ export function TrafficLights({
           <>
             {/* Minimize */}
             <button
-              onClick={onMinimize}
+              onClick={() => {
+                playSound('minimize');
+                onMinimize?.();
+              }}
               aria-label="Minimize window"
               className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
               style={{
@@ -78,7 +85,10 @@ export function TrafficLights({
 
             {/* Maximize */}
             <button
-              onClick={onMaximize}
+              onClick={() => {
+                playSound(isMaximized ? 'collapse' : 'maximize');
+                onMaximize?.();
+              }}
               aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
               className="flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
               style={{
@@ -123,7 +133,10 @@ export function TrafficLights({
     >
       {/* Close */}
       <button
-        onClick={onClose}
+        onClick={() => {
+          playSound('popReverse');
+          onClose();
+        }}
         aria-label="Close window"
         className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
         style={buttonBaseStyle}
@@ -153,7 +166,10 @@ export function TrafficLights({
 
       {showAll && onMinimize && (
         <button
-          onClick={onMinimize}
+          onClick={() => {
+            playSound('minimize');
+            onMinimize();
+          }}
           aria-label="Minimize window"
           className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
           style={buttonBaseStyle}
@@ -184,7 +200,10 @@ export function TrafficLights({
 
       {showAll && onMaximize && (
         <button
-          onClick={onMaximize}
+          onClick={() => {
+            playSound(isMaximized ? 'collapse' : 'maximize');
+            onMaximize();
+          }}
           aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
           className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
           style={buttonBaseStyle}

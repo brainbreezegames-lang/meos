@@ -1,12 +1,13 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Folder, FolderOpen } from 'lucide-react';
 import { GoOSFileIcon } from './GoOSFileIcon';
 import { TrafficLights } from '../desktop/TrafficLights';
 import { WINDOW, TITLE_BAR_DARK, ANIMATION } from '../desktop/windowStyles';
 import type { GoOSFile } from './GoOSEditorWindow';
+import { playSound } from '@/lib/sounds';
 
 interface GoOSFolderWindowProps {
   folder: GoOSFile;
@@ -39,6 +40,11 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
 }: GoOSFolderWindowProps) {
   const prefersReducedMotion = useReducedMotion();
   const filesInFolder = files.filter(f => f.parentFolderId === folder.id);
+
+  // Play folder open sound on mount
+  useEffect(() => {
+    playSound('pop');
+  }, []);
 
   return (
     <motion.div

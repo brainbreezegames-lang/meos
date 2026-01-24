@@ -60,6 +60,7 @@ import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
 import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
 import { SPRING, DURATION, EASE, fadeInUp, fadeInScale, TRANSITION, WILL_CHANGE, getStaggerDelayCapped } from '@/lib/animations';
+import { playSound } from '@/lib/sounds';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -1644,6 +1645,7 @@ const DockIcon = React.memo(({
     const [justClicked, setJustClicked] = useState(false);
 
     const handleClick = () => {
+        playSound('bubble');
         setJustClicked(true);
         onClick();
         setTimeout(() => setJustClicked(false), 500);
@@ -4340,7 +4342,10 @@ function GoOSDemoContent() {
                     <div className="relative" data-wallpaper-picker>
                         <DockIcon
                             icon={<ImageIcon size={22} stroke="#f47a3e" strokeWidth={1.5} />}
-                            onClick={() => setShowWallpaperPicker(!showWallpaperPicker)}
+                            onClick={() => {
+                                playSound(showWallpaperPicker ? 'collapse' : 'expand');
+                                setShowWallpaperPicker(!showWallpaperPicker);
+                            }}
                             isActive={showWallpaperPicker}
                             label="Wallpaper"
                         />
@@ -4369,6 +4374,7 @@ function GoOSDemoContent() {
                                             <button
                                                 key={wp.id || 'none'}
                                                 onClick={() => {
+                                                    playSound('click');
                                                     setWallpaper(wp.id);
                                                     setShowWallpaperPicker(false);
                                                 }}

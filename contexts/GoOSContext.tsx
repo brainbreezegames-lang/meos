@@ -133,8 +133,15 @@ export function GoOSProvider({
   // Track pending create operations to prevent race conditions with refreshFiles
   const pendingCreatesRef = useRef<Set<string>>(new Set());
 
-  // Show toast
+  // Show toast with sound
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    // Play appropriate sound for toast type
+    if (type === 'error') {
+      playSound('error');
+    } else if (type === 'info') {
+      playSound('notification');
+    }
+    // Note: success sounds are played at the action site for more specific feedback
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   }, []);
