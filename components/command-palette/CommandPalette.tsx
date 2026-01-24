@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { SPRING, DURATION } from '@/lib/animations';
+import React, { useState, useCallback, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
+import { motion, AnimatePresence, useReducedMotion, useSpring, useTransform } from 'framer-motion';
+import { SPRING, DURATION, EASE } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
 import {
   fuzzyMatch,
@@ -10,6 +10,128 @@ import {
   searchItems,
   type HighlightSegment,
 } from '@/lib/fuzzySearch';
+
+// ============================================================================
+// ANIMATION VARIANTS - Premium micro-interactions
+// ============================================================================
+
+const PALETTE_VARIANTS = {
+  initial: { opacity: 0, scale: 0.92, y: -20 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      ...SPRING.smooth,
+      staggerChildren: 0.02,
+      delayChildren: 0.05,
+    }
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.96,
+    y: -8,
+    transition: { duration: DURATION.fast, ease: EASE.in }
+  },
+};
+
+const RESULT_ITEM_VARIANTS = {
+  initial: { opacity: 0, x: -8, scale: 0.98 },
+  animate: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: SPRING.gentle,
+  },
+  exit: {
+    opacity: 0,
+    x: -4,
+    transition: { duration: DURATION.fast }
+  },
+};
+
+const CATEGORY_VARIANTS = {
+  initial: { opacity: 0, y: -4 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { ...SPRING.gentle, delay: 0.02 }
+  },
+};
+
+const ICON_BOUNCE_VARIANTS = {
+  initial: { scale: 1, rotate: 0 },
+  selected: {
+    scale: [1, 1.25, 0.95, 1.08, 1],
+    rotate: [0, -8, 8, -4, 0],
+    transition: { duration: 0.4, ease: EASE.bounce }
+  },
+  hover: {
+    scale: 1.12,
+    rotate: 3,
+    transition: SPRING.snappy,
+  },
+};
+
+const SUBMENU_SLIDE_VARIANTS = {
+  initial: { opacity: 0, x: 20, scale: 0.98 },
+  animate: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: {
+      ...SPRING.gentle,
+      staggerChildren: 0.015,
+      delayChildren: 0.03,
+    }
+  },
+  exit: {
+    opacity: 0,
+    x: -10,
+    transition: { duration: DURATION.fast }
+  },
+};
+
+const BREADCRUMB_VARIANTS = {
+  initial: { opacity: 0, y: -10, height: 0 },
+  animate: { opacity: 1, y: 0, height: 'auto', transition: SPRING.gentle },
+  exit: { opacity: 0, y: -5, height: 0, transition: { duration: DURATION.fast } },
+};
+
+const PREFIX_HINT_VARIANTS = {
+  initial: { opacity: 0, height: 0, scale: 0.95 },
+  animate: {
+    opacity: 1,
+    height: 'auto',
+    scale: 1,
+    transition: SPRING.snappy
+  },
+  exit: {
+    opacity: 0,
+    height: 0,
+    scale: 0.95,
+    transition: { duration: DURATION.instant }
+  },
+};
+
+const FOOTER_KBD_VARIANTS = {
+  initial: { opacity: 0, y: 4 },
+  animate: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.3 + i * 0.05, ...SPRING.gentle }
+  }),
+};
+
+const EMPTY_STATE_VARIANTS = {
+  initial: { opacity: 0, scale: 0.95, y: 10 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { ...SPRING.gentle, delay: 0.1 }
+  },
+};
 
 // ============================================================================
 // TYPES
@@ -180,25 +302,35 @@ function getRelativeTime(timestamp?: number): string {
 }
 
 // ============================================================================
-// HIGHLIGHTED TEXT COMPONENT
+// HIGHLIGHTED TEXT COMPONENT - With subtle glow animation
 // ============================================================================
 
-function HighlightedText({ segments }: { segments: HighlightSegment[] }) {
+function HighlightedText({ segments, isSelected }: { segments: HighlightSegment[]; isSelected?: boolean }) {
   return (
     <>
       {segments.map((segment, i) =>
         segment.highlighted ? (
-          <mark
+          <motion.mark
             key={i}
+            initial={{ opacity: 0.7, scale: 0.95 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              textShadow: isSelected
+                ? '0 0 8px var(--color-accent-primary-glow)'
+                : 'none',
+            }}
+            transition={SPRING.snappy}
             style={{
               background: 'var(--color-accent-primary-glow)',
               color: 'inherit',
-              borderRadius: 2,
-              padding: '0 1px',
+              borderRadius: 3,
+              padding: '1px 3px',
+              margin: '0 -1px',
             }}
           >
             {segment.text}
-          </mark>
+          </motion.mark>
         ) : (
           <span key={i}>{segment.text}</span>
         )
@@ -898,101 +1030,162 @@ export function CommandPalette({
       : 'Search spaces...'
     : 'Search files and actions...';
 
+  // Track selection position for sliding indicator
+  const [selectionY, setSelectionY] = useState(0);
+  const resultRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Update selection position when selectedIndex changes
+  useLayoutEffect(() => {
+    const selectedRef = resultRefs.current[selectedIndex];
+    if (selectedRef && listRef.current) {
+      const listRect = listRef.current.getBoundingClientRect();
+      const itemRect = selectedRef.getBoundingClientRect();
+      setSelectionY(itemRect.top - listRect.top + listRef.current.scrollTop);
+    }
+  }, [selectedIndex, results]);
+
+  // Animated spring for selection indicator
+  const selectionSpring = useSpring(selectionY, {
+    stiffness: 500,
+    damping: 30,
+    mass: 0.5,
+  });
+
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop with premium blur */}
           <motion.div
             className="command-palette-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? DURATION.instant : DURATION.fast }}
+            initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            animate={{ opacity: 1, backdropFilter: 'blur(8px)' }}
+            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            transition={{
+              opacity: { duration: prefersReducedMotion ? DURATION.instant : DURATION.normal },
+              backdropFilter: { duration: prefersReducedMotion ? 0 : 0.3 }
+            }}
             onClick={handleBackdropClick}
             style={{
               position: 'fixed',
               inset: 0,
               zIndex: 9998,
-              background: 'rgba(23, 20, 18, 0.15)',
-              backdropFilter: 'blur(4px)',
-              WebkitBackdropFilter: 'blur(4px)',
+              background: 'rgba(23, 20, 18, 0.2)',
+              WebkitBackdropFilter: 'blur(8px)',
             }}
           />
 
-          {/* Palette */}
+          {/* Main Palette Container */}
           <motion.div
             className="command-palette"
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
-            initial={prefersReducedMotion ? { opacity: 0, x: '-50%' } : { opacity: 0, scale: 0.96, y: -10, x: '-50%' }}
-            animate={{ opacity: 1, scale: 1, y: 0, x: '-50%' }}
-            exit={prefersReducedMotion ? { opacity: 0, x: '-50%' } : { opacity: 0, scale: 0.98, y: -5, x: '-50%' }}
-            transition={prefersReducedMotion ? { duration: DURATION.instant } : SPRING.smooth}
+            variants={prefersReducedMotion ? undefined : PALETTE_VARIANTS}
+            initial={prefersReducedMotion ? { opacity: 0, x: '-50%' } : { ...PALETTE_VARIANTS.initial, x: '-50%' }}
+            animate={prefersReducedMotion ? { opacity: 1, x: '-50%' } : { ...PALETTE_VARIANTS.animate, x: '-50%' }}
+            exit={prefersReducedMotion ? { opacity: 0, x: '-50%' } : { ...PALETTE_VARIANTS.exit, x: '-50%' }}
             style={{
               position: 'fixed',
-              top: '20%',
+              top: '18%',
               left: '50%',
               zIndex: 9999,
               width: '100%',
               maxWidth: 560,
-              background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
-              backdropFilter: 'blur(24px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-              borderRadius: 16,
-              border: '1px solid var(--color-border-glass-outer, rgba(255, 255, 255, 0.5))',
+              background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.97))',
+              backdropFilter: 'blur(40px) saturate(200%)',
+              WebkitBackdropFilter: 'blur(40px) saturate(200%)',
+              borderRadius: 18,
+              border: '1px solid var(--color-border-glass-outer, rgba(255, 255, 255, 0.6))',
               boxShadow: `
-                0 0 0 1px rgba(23, 20, 18, 0.05),
+                0 0 0 1px rgba(23, 20, 18, 0.04),
+                0 1px 2px rgba(23, 20, 18, 0.04),
                 0 4px 16px rgba(23, 20, 18, 0.08),
-                0 12px 32px rgba(23, 20, 18, 0.12),
-                0 24px 60px rgba(23, 20, 18, 0.16)
+                0 12px 40px rgba(23, 20, 18, 0.12),
+                0 32px 80px rgba(23, 20, 18, 0.18),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5)
               `,
               overflow: 'hidden',
+              transformOrigin: 'top center',
             }}
           >
-            {/* Submenu breadcrumb */}
-            {activeSubmenu && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '10px 20px',
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: 'var(--color-text-secondary)',
-                  background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.02))',
-                  borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
-                  cursor: 'pointer',
-                }}
-                onClick={() => {
-                  setActiveSubmenu(null);
-                  setSubmenuQuery('');
-                  playSound('collapse');
-                }}
-              >
-                <span style={{ opacity: 0.5 }}>\u2190</span>
-                <span>
-                  {activeSubmenu === 'move-to' && 'Move to'}
-                  {activeSubmenu === 'change-theme' && 'Change Theme'}
-                  {activeSubmenu === 'go-to-space' && 'Go to Space'}
-                </span>
-                <span style={{ opacity: 0.4, fontSize: 11 }}>esc to go back</span>
-              </div>
-            )}
+            {/* Submenu breadcrumb - Animated */}
+            <AnimatePresence>
+              {activeSubmenu && (
+                <motion.div
+                  variants={BREADCRUMB_VARIANTS}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '12px 20px',
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: 'var(--color-text-secondary)',
+                    background: 'linear-gradient(180deg, var(--color-bg-subtle, rgba(23, 20, 18, 0.03)) 0%, transparent 100%)',
+                    borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                  }}
+                  onClick={() => {
+                    setActiveSubmenu(null);
+                    setSubmenuQuery('');
+                    playSound('collapse');
+                  }}
+                  whileHover={{ background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.05))' }}
+                >
+                  <motion.span
+                    animate={{ x: [0, -3, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+                    style={{ opacity: 0.5 }}
+                  >
+                    ←
+                  </motion.span>
+                  <span style={{ fontWeight: 600 }}>
+                    {activeSubmenu === 'move-to' && 'Move to'}
+                    {activeSubmenu === 'change-theme' && 'Change Theme'}
+                    {activeSubmenu === 'go-to-space' && 'Go to Space'}
+                  </span>
+                  <motion.span
+                    initial={{ opacity: 0, x: 5 }}
+                    animate={{ opacity: 0.4, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    style={{ fontSize: 11, marginLeft: 'auto' }}
+                  >
+                    esc to go back
+                  </motion.span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* Input */}
-            <div
+            {/* Input - Premium with animated search icon */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.05 }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: '14px 20px',
-                borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
+                gap: 14,
+                padding: '16px 20px',
+                borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+                position: 'relative',
               }}
             >
-              <span style={{ fontSize: 18, opacity: 0.5 }}>\ud83d\udd0d</span>
+              {/* Animated search icon */}
+              <motion.span
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.5 }}
+                transition={{ ...SPRING.bouncy, delay: 0.1 }}
+                style={{ fontSize: 18 }}
+              >
+                🔍
+              </motion.span>
+
+              {/* Input with animated placeholder */}
               <input
                 ref={inputRef}
                 type="text"
@@ -1010,194 +1203,347 @@ export function CommandPalette({
                 spellCheck={false}
                 style={{
                   flex: 1,
-                  height: 28,
-                  fontSize: 15,
+                  height: 32,
+                  fontSize: 16,
                   fontWeight: 450,
                   color: 'var(--color-text-primary)',
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
+                  letterSpacing: '-0.01em',
                 }}
               />
-              {!inputValue && !activeSubmenu && (
-                <kbd
+
+              {/* Animated keyboard hint */}
+              <AnimatePresence>
+                {!inputValue && !activeSubmenu && (
+                  <motion.kbd
+                    initial={{ opacity: 0, scale: 0.9, y: 4 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: -4 }}
+                    transition={SPRING.snappy}
+                    style={{
+                      padding: '5px 10px',
+                      fontSize: 11,
+                      fontFamily: 'var(--font-mono, monospace)',
+                      color: 'var(--color-text-muted)',
+                      background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.04))',
+                      borderRadius: 6,
+                      border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                    }}
+                  >
+                    ⌘K
+                  </motion.kbd>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Prefix hint - Animated */}
+            <AnimatePresence>
+              {prefixMode && !activeSubmenu && (
+                <motion.div
+                  variants={PREFIX_HINT_VARIANTS}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
                   style={{
-                    padding: '4px 8px',
-                    fontSize: 11,
-                    fontFamily: 'var(--font-mono, monospace)',
-                    color: 'var(--color-text-muted)',
-                    background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.04))',
-                    borderRadius: 6,
-                    border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
+                    padding: '10px 20px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: 'var(--color-accent-primary)',
+                    background: 'linear-gradient(90deg, var(--color-accent-primary-glow, rgba(255, 119, 34, 0.1)) 0%, transparent 100%)',
+                    borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    overflow: 'hidden',
                   }}
                 >
-                  \u2318K
-                </kbd>
+                  <motion.span
+                    animate={{ scale: [1, 1.15, 1] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                  >
+                    {prefixMode === 'actions' && '⚡'}
+                    {prefixMode === 'create' && '✨'}
+                    {prefixMode === 'spaces' && '🏠'}
+                    {prefixMode === 'settings' && '⚙️'}
+                  </motion.span>
+                  <span>
+                    {prefixMode === 'actions' && 'Actions'}
+                    {prefixMode === 'create' && 'Create new...'}
+                    {prefixMode === 'spaces' && 'Spaces'}
+                    {prefixMode === 'settings' && 'Settings'}
+                  </span>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
 
-            {/* Prefix hint */}
-            {prefixMode && !activeSubmenu && (
-              <div
-                style={{
-                  padding: '8px 20px',
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: 'var(--color-accent-primary)',
-                  background: 'var(--color-accent-primary-glow, rgba(255, 119, 34, 0.08))',
-                  borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
-                }}
-              >
-                {prefixMode === 'actions' && '\u26a1 Actions'}
-                {prefixMode === 'create' && '\u2795 Create new...'}
-                {prefixMode === 'spaces' && '\ud83c\udfe0 Spaces'}
-                {prefixMode === 'settings' && '\u2699\ufe0f Settings'}
-              </div>
-            )}
-
-            {/* Results */}
+            {/* Results - With staggered animations and sliding selection */}
             <div
               ref={listRef}
               id="command-results"
               role="listbox"
               style={{
-                maxHeight: 352,
+                maxHeight: 360,
                 overflowY: 'auto',
                 overflowX: 'hidden',
+                position: 'relative',
               }}
             >
-              {results.length === 0 && (inputValue || activeSubmenu) && (
-                <div
+              {/* Sliding selection indicator */}
+              {results.length > 0 && !prefersReducedMotion && (
+                <motion.div
+                  layoutId="selection-indicator"
                   style={{
-                    padding: '32px 20px',
-                    textAlign: 'center',
-                    color: 'var(--color-text-muted)',
+                    position: 'absolute',
+                    left: 0,
+                    top: selectionSpring,
+                    width: '100%',
+                    height: 48,
+                    background: 'linear-gradient(90deg, var(--color-accent-primary-glow, rgba(255, 119, 34, 0.08)) 0%, rgba(255, 119, 34, 0.02) 100%)',
+                    borderLeft: '3px solid var(--color-accent-primary)',
+                    pointerEvents: 'none',
+                    zIndex: 0,
                   }}
-                >
-                  <p style={{ marginBottom: 12 }}>No results for &quot;{searchQuery}&quot;</p>
-                </div>
+                />
               )}
 
-              {results.map((item, index) => {
-                const isSelected = index === selectedIndex;
-                const segments = highlightMatches(item.name, item.matches);
-                const showCategory = item.category && (index === 0 || results[index - 1]?.category !== item.category);
-
-                return (
-                  <React.Fragment key={item.id}>
-                    {showCategory && (
-                      <div
-                        style={{
-                          padding: '12px 20px 6px',
-                          fontSize: 11,
-                          fontWeight: 600,
-                          color: 'var(--color-text-muted)',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
-                        }}
-                      >
-                        {item.category}
-                      </div>
-                    )}
-                    <div
-                      role="option"
-                      id={item.id}
-                      aria-selected={isSelected}
-                      onClick={() => handleItemClick(item)}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        height: 44,
-                        padding: '0 20px',
-                        cursor: 'pointer',
-                        background: isSelected
-                          ? 'var(--color-accent-primary-glow, rgba(255, 119, 34, 0.08))'
-                          : 'transparent',
-                        borderLeft: isSelected ? '3px solid var(--color-accent-primary)' : '3px solid transparent',
-                        transition: 'background 0.1s, border-color 0.1s',
-                      }}
+              {/* Empty state - Animated */}
+              <AnimatePresence>
+                {results.length === 0 && (inputValue || activeSubmenu) && (
+                  <motion.div
+                    variants={EMPTY_STATE_VARIANTS}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    style={{
+                      padding: '40px 20px',
+                      textAlign: 'center',
+                      color: 'var(--color-text-muted)',
+                    }}
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.05, 1], rotate: [0, -3, 3, 0] }}
+                      transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+                      style={{ fontSize: 32, marginBottom: 12, opacity: 0.5 }}
                     >
-                      <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>{item.icon}</span>
-                      <span
+                      🔍
+                    </motion.div>
+                    <p style={{ marginBottom: 8, fontWeight: 500 }}>No results for &quot;{searchQuery}&quot;</p>
+                    <p style={{ fontSize: 12, opacity: 0.6 }}>Try a different search term</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Results list - Staggered animations */}
+              <AnimatePresence mode="popLayout">
+                {results.map((item, index) => {
+                  const isSelected = index === selectedIndex;
+                  const segments = highlightMatches(item.name, item.matches);
+                  const showCategory = item.category && (index === 0 || results[index - 1]?.category !== item.category);
+
+                  return (
+                    <React.Fragment key={item.id}>
+                      {/* Category header - Animated */}
+                      {showCategory && (
+                        <motion.div
+                          variants={CATEGORY_VARIANTS}
+                          initial="initial"
+                          animate="animate"
+                          style={{
+                            padding: '14px 20px 8px',
+                            fontSize: 10,
+                            fontWeight: 700,
+                            color: 'var(--color-text-muted)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.08em',
+                            opacity: 0.6,
+                          }}
+                        >
+                          {item.category}
+                        </motion.div>
+                      )}
+
+                      {/* Result item - Animated */}
+                      <motion.div
+                        ref={(el) => { resultRefs.current[index] = el; }}
+                        variants={activeSubmenu ? SUBMENU_SLIDE_VARIANTS : RESULT_ITEM_VARIANTS}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        layout
+                        role="option"
+                        id={item.id}
+                        aria-selected={isSelected}
+                        onClick={() => handleItemClick(item)}
+                        onMouseEnter={() => {
+                          if (selectedIndex !== index) {
+                            setSelectedIndex(index);
+                          }
+                        }}
+                        whileHover={prefersReducedMotion ? {} : { x: 2 }}
+                        whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                         style={{
-                          flex: 1,
-                          fontSize: 14,
-                          fontWeight: 450,
-                          color: 'var(--color-text-primary)',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 14,
+                          height: 48,
+                          padding: '0 20px',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          zIndex: 1,
                         }}
                       >
-                        <HighlightedText segments={segments} />
-                      </span>
-                      {item.hint && (
-                        <span
+                        {/* Icon with bounce animation on selection */}
+                        <motion.span
+                          variants={ICON_BOUNCE_VARIANTS}
+                          initial="initial"
+                          animate={isSelected ? 'selected' : 'initial'}
+                          whileHover="hover"
                           style={{
-                            fontSize: 11,
-                            color: 'var(--color-text-muted)',
-                            opacity: 0.7,
+                            fontSize: 20,
+                            width: 28,
+                            textAlign: 'center',
+                            filter: isSelected ? 'drop-shadow(0 0 4px var(--color-accent-primary-glow))' : 'none',
                           }}
                         >
-                          {item.hint}
-                        </span>
-                      )}
-                      {item.hasSubmenu && (
-                        <span style={{ fontSize: 12, color: 'var(--color-text-muted)', opacity: 0.6 }}>\u203a</span>
-                      )}
-                      {item.shortcut && (
-                        <kbd
+                          {item.icon}
+                        </motion.span>
+
+                        {/* Item name with highlight */}
+                        <motion.span
+                          animate={{
+                            color: isSelected ? 'var(--color-text-primary)' : 'var(--color-text-primary)',
+                            fontWeight: isSelected ? 500 : 450,
+                          }}
                           style={{
-                            padding: '2px 6px',
-                            fontSize: 11,
-                            fontFamily: 'var(--font-mono, monospace)',
-                            color: 'var(--color-text-muted)',
-                            background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.04))',
-                            borderRadius: 4,
+                            flex: 1,
+                            fontSize: 14,
+                            letterSpacing: '-0.01em',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
                           }}
                         >
-                          {item.shortcut}
-                        </kbd>
-                      )}
-                      {index < 9 && !item.hasSubmenu && (
-                        <kbd
-                          style={{
-                            padding: '2px 6px',
-                            fontSize: 10,
-                            fontFamily: 'var(--font-mono, monospace)',
-                            color: 'var(--color-text-muted)',
-                            opacity: 0.5,
-                          }}
-                        >
-                          \u2318{index + 1}
-                        </kbd>
-                      )}
-                    </div>
-                  </React.Fragment>
-                );
-              })}
+                          <HighlightedText segments={segments} isSelected={isSelected} />
+                        </motion.span>
+
+                        {/* Hint badge */}
+                        {item.hint && (
+                          <motion.span
+                            initial={{ opacity: 0, x: 4 }}
+                            animate={{ opacity: 0.6, x: 0 }}
+                            style={{
+                              fontSize: 11,
+                              color: 'var(--color-text-muted)',
+                              fontWeight: 450,
+                            }}
+                          >
+                            {item.hint}
+                          </motion.span>
+                        )}
+
+                        {/* Submenu chevron - Animated */}
+                        {item.hasSubmenu && (
+                          <motion.span
+                            animate={{
+                              x: isSelected ? [0, 3, 0] : 0,
+                              opacity: isSelected ? 0.8 : 0.4,
+                            }}
+                            transition={{
+                              x: { repeat: isSelected ? Infinity : 0, duration: 1, ease: 'easeInOut' },
+                            }}
+                            style={{ fontSize: 14, color: 'var(--color-text-muted)' }}
+                          >
+                            ›
+                          </motion.span>
+                        )}
+
+                        {/* Keyboard shortcut */}
+                        {item.shortcut && (
+                          <motion.kbd
+                            animate={{ opacity: isSelected ? 0.8 : 0.5 }}
+                            style={{
+                              padding: '3px 7px',
+                              fontSize: 11,
+                              fontFamily: 'var(--font-mono, monospace)',
+                              color: 'var(--color-text-muted)',
+                              background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.04))',
+                              borderRadius: 5,
+                              border: '1px solid var(--color-border-subtle, rgba(23,20,18,0.06))',
+                            }}
+                          >
+                            {item.shortcut}
+                          </motion.kbd>
+                        )}
+
+                        {/* Quick select number */}
+                        {index < 9 && !item.hasSubmenu && (
+                          <motion.kbd
+                            animate={{ opacity: isSelected ? 0.7 : 0.35 }}
+                            style={{
+                              padding: '3px 6px',
+                              fontSize: 10,
+                              fontFamily: 'var(--font-mono, monospace)',
+                              color: 'var(--color-text-muted)',
+                            }}
+                          >
+                            ⌘{index + 1}
+                          </motion.kbd>
+                        )}
+                      </motion.div>
+                    </React.Fragment>
+                  );
+                })}
+              </AnimatePresence>
             </div>
 
-            {/* Footer hint */}
-            <div
+            {/* Footer hint - Animated */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
               style={{
-                padding: '10px 20px',
+                padding: '12px 20px',
                 fontSize: 11,
                 color: 'var(--color-text-muted)',
-                borderTop: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.08))',
+                borderTop: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.05))',
                 display: 'flex',
-                gap: 16,
+                gap: 18,
+                background: 'linear-gradient(0deg, var(--color-bg-subtle, rgba(23, 20, 18, 0.02)) 0%, transparent 100%)',
               }}
             >
-              <span><kbd style={{ opacity: 0.7 }}>\u2191\u2193</kbd> navigate</span>
-              <span><kbd style={{ opacity: 0.7 }}>\u21b5</kbd> select</span>
-              {results.some(r => r.hasSubmenu) && (
-                <span><kbd style={{ opacity: 0.7 }}>tab</kbd> expand</span>
-              )}
-              <span><kbd style={{ opacity: 0.7 }}>esc</kbd> {activeSubmenu ? 'back' : 'close'}</span>
-            </div>
+              {[
+                { kbd: '↑↓', label: 'navigate' },
+                { kbd: '↵', label: 'select' },
+                ...(results.some(r => r.hasSubmenu) ? [{ kbd: 'tab', label: 'expand' }] : []),
+                { kbd: 'esc', label: activeSubmenu ? 'back' : 'close' },
+              ].map((hint, i) => (
+                <motion.span
+                  key={hint.kbd}
+                  custom={i}
+                  variants={FOOTER_KBD_VARIANTS}
+                  initial="initial"
+                  animate="animate"
+                  style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+                >
+                  <kbd
+                    style={{
+                      padding: '2px 5px',
+                      fontSize: 10,
+                      fontFamily: 'var(--font-mono, monospace)',
+                      background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.04))',
+                      borderRadius: 4,
+                      opacity: 0.8,
+                    }}
+                  >
+                    {hint.kbd}
+                  </kbd>
+                  <span style={{ opacity: 0.6 }}>{hint.label}</span>
+                </motion.span>
+              ))}
+            </motion.div>
           </motion.div>
         </>
       )}
