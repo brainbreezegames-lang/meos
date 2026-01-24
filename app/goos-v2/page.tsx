@@ -75,6 +75,7 @@ import {
     buttonPress,
 } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
+import { CommandPalette } from '@/components/command-palette/CommandPalette';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -2827,6 +2828,9 @@ function GoOSDemoContent() {
     const [presentingFileId, setPresentingFileId] = useState<string | null>(null);
     const [caseStudyFileId, setCaseStudyFileId] = useState<string | null>(null);
 
+    // Command palette state
+    const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
     // Zen focus mode - true when any window is maximized OR in page/present view
     const isZenMode = maximizedEditors.size > 0 || viewMode === 'page' || viewMode === 'present';
 
@@ -3260,6 +3264,13 @@ function GoOSDemoContent() {
 
             const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
             const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+            // Cmd+K or Cmd+P: Open command palette
+            if (modKey && (e.key === 'k' || e.key === 'p')) {
+                e.preventDefault();
+                setCommandPaletteOpen(true);
+                return;
+            }
 
             // Cmd+N: New Note
             if (modKey && e.key === 'n' && !e.shiftKey) {
@@ -5107,6 +5118,33 @@ function GoOSDemoContent() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Command Palette */}
+            <CommandPalette
+                isOpen={commandPaletteOpen}
+                onClose={() => setCommandPaletteOpen(false)}
+                files={goosFiles.map(f => ({
+                    id: f.id,
+                    title: f.title,
+                    type: f.type,
+                    parentFolderId: f.parentFolderId,
+                }))}
+                selectedFileId={selectedFileId}
+                onOpenFile={openFile}
+                onCreateNote={() => createFile('note')}
+                onCreateFolder={() => createFile('folder')}
+                onCreateCaseStudy={() => createFile('case-study')}
+                onToggleDarkMode={toggleDarkMode}
+                onOpenSettings={() => setAppWindows(prev => ({ ...prev, settings: true }))}
+                onRenameFile={(id) => setRenamingFileId(id)}
+                onDeleteFile={(id) => {
+                    if (window.confirm('Are you sure you want to delete this file?')) {
+                        deleteFile(id);
+                    }
+                }}
+                onDuplicateFile={duplicateFile}
+                isDarkMode={isDarkMode}
+            />
 
             {/* Create Space Modal */}
             <CreateSpaceModal
