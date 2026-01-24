@@ -668,6 +668,9 @@ const goOS = {
         bouncy: SPRING.bouncy,
         smooth: SPRING.smooth,
         dock: SPRING.dock,
+        goose: SPRING.goose,
+        playful: SPRING.playful,
+        wobbly: SPRING.wobbly,
     }
 };
 
@@ -1528,32 +1531,34 @@ const RubberDuck = React.memo(({ onClick }: { onClick?: () => void }) => {
         <motion.button
             onClick={handleClick}
             className="relative flex items-center justify-center focus:outline-none w-10 h-10"
-            whileHover={{ y: -8, scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            transition={goOS.springs.bouncy}
+            whileHover={{ y: -20, scale: 1.3, rotate: 10 }}
+            whileTap={{ scale: 0.8 }}
+            transition={SPRING.goose}
             title={`Click me! (${quackCount} quacks)`}
         >
             <motion.span
                 className="text-2xl select-none"
                 animate={isQuacking ? {
-                    rotate: [0, -20, 20, -15, 15, -10, 10, 0],
-                    y: [0, -8, 0, -4, 0],
-                    scale: [1, 1.2, 1, 1.1, 1],
+                    // MAXIMUM QUACK - very dramatic!
+                    rotate: [0, -30, 30, -25, 25, -15, 15, -5, 0],
+                    y: [0, -20, 5, -15, 0, -10, 0],
+                    scale: [1, 1.5, 0.8, 1.3, 0.9, 1.1, 1],
                 } : {
-                    rotate: [0, 3, 0, -3, 0],
-                    y: [0, -2, 0],
+                    // Idle wobble
+                    rotate: [0, 5, 0, -5, 0],
+                    y: [0, -3, 0],
                 }}
-                transition={isQuacking ? { duration: 0.8 } : { duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                transition={isQuacking ? { duration: 0.8, ease: 'easeOut' } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             >
                 🦆
             </motion.span>
             <AnimatePresence>
                 {isQuacking && (
                     <motion.div
-                        initial={{ scale: 0, opacity: 0, y: 10 }}
-                        animate={{ scale: 1, opacity: 1, y: -40 }}
-                        exit={{ scale: 0.8, opacity: 0, y: -50 }}
-                        transition={goOS.springs.snappy}
+                        initial={{ scale: 0, opacity: 0, y: 20, rotate: -10 }}
+                        animate={{ scale: 1, opacity: 1, y: -50, rotate: 0 }}
+                        exit={{ scale: 0.5, opacity: 0, y: -70, rotate: 10 }}
+                        transition={SPRING.playful}
                         className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-lg px-3 py-1.5 text-xs whitespace-nowrap z-50 font-medium"
                         style={{
                             background: 'var(--bg-elevated)',
@@ -1671,15 +1676,12 @@ const DockIcon = React.memo(({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             animate={{
-                scale: justClicked ? [1, 0.8, 1.15, 0.95, 1] : isHovered ? 1.15 : 1,
-                y: justClicked ? [0, 4, -12, -8, 0] : isHovered ? -8 : 0,
-                rotate: justClicked ? [0, -8, 8, -4, 0] : 0,
+                // DRAMATIC bounce on click, BIG lift on hover
+                scale: justClicked ? [1, 0.7, 1.3, 0.9, 1.1, 1] : isHovered ? 1.25 : 1,
+                y: justClicked ? [0, 8, -30, -20, -25, -20] : isHovered ? -20 : 0,
+                rotate: justClicked ? [0, -15, 15, -8, 4, 0] : isHovered ? 3 : 0,
             }}
-            transition={{
-                type: 'spring',
-                stiffness: 400,
-                damping: 20,
-            }}
+            transition={SPRING.dock}
             style={{
                 width: 48,
                 height: 48,
@@ -1691,14 +1693,14 @@ const DockIcon = React.memo(({
                 onClick={handleClick}
                 className="w-full h-full focus:outline-none"
             >
-                {/* Tooltip */}
+                {/* Tooltip - pops in with bounce */}
                 <AnimatePresence>
                     {isHovered && label && (
                         <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                            initial={{ opacity: 0, y: 15, scale: 0.7 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                            exit={{ opacity: 0, y: 8, scale: 0.85 }}
+                            transition={SPRING.snappy}
                             className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-xl text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
                             style={{
                                 background: 'rgba(20, 20, 20, 0.95)',
@@ -1732,12 +1734,12 @@ const DockIcon = React.memo(({
                     {icon}
                 </div>
 
-                {/* Badge */}
+                {/* Badge - bouncy pop-in */}
                 {badge !== undefined && badge > 0 && (
                     <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                        initial={{ scale: 0, rotate: -20 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={SPRING.bouncy}
                         className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-10"
                         style={{
                             background: 'linear-gradient(135deg, #ff6b4a 0%, #ff4757 100%)',
@@ -1748,11 +1750,12 @@ const DockIcon = React.memo(({
                     </motion.span>
                 )}
 
-                {/* Active dot */}
+                {/* Active dot - pops in */}
                 {isActive && (
                     <motion.div
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
+                        transition={SPRING.bouncy}
                         className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
                         style={{
                             background: 'rgba(255,255,255,0.9)',
@@ -3886,32 +3889,45 @@ function GoOSDemoContent() {
                         {/* Portfolio Windows */}
                         <WindowManager items={items} />
 
-                        {/* goOS File Icons (desktop - root level only) */}
+                        {/* goOS File Icons (desktop - root level only) - with staggered pop-in */}
                         <AnimatePresence mode="sync" initial={false}>
-                            {filesOnDesktop.map((file) => {
+                            {filesOnDesktop.map((file, index) => {
                                 // Ensure file has a valid position
                                 const filePosition = file.position || { x: 40, y: 320 };
                                 return (
-                                    <GoOSFileIcon
+                                    <motion.div
                                         key={file.id}
-                                        id={file.id}
-                                        type={file.type}
-                                        title={file.title}
-                                        status={file.status}
-                                        accessLevel={file.accessLevel}
-                                        isSelected={selectedFileId === file.id}
-                                        isRenaming={renamingFileId === file.id}
-                                        position={filePosition}
-                                        isDraggedOver={dragOverFolderId === file.id}
-                                        onDragStart={handleDragStart}
-                                        onDrag={checkFolderHit}
-                                        onPositionChange={handlePositionChange}
-                                        onClick={handleFileClick}
-                                        onDoubleClick={() => openFile(file.id)}
-                                        onContextMenu={(e) => handleFileContextMenu(e, file.id)}
-                                        onRename={(newTitle) => renameFile(file.id, newTitle)}
-                                        imageUrl={file.imageUrl}
-                                    />
+                                        initial={{ opacity: 0, scale: 0.5, y: 30 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.7, y: 15 }}
+                                        transition={{
+                                            ...SPRING.bouncy,
+                                            delay: getStaggerDelayCapped(index, 0.06, 0.4),
+                                        }}
+                                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+                                    >
+                                        <div style={{ pointerEvents: 'auto' }}>
+                                            <GoOSFileIcon
+                                                id={file.id}
+                                                type={file.type}
+                                                title={file.title}
+                                                status={file.status}
+                                                accessLevel={file.accessLevel}
+                                                isSelected={selectedFileId === file.id}
+                                                isRenaming={renamingFileId === file.id}
+                                                position={filePosition}
+                                                isDraggedOver={dragOverFolderId === file.id}
+                                                onDragStart={handleDragStart}
+                                                onDrag={checkFolderHit}
+                                                onPositionChange={handlePositionChange}
+                                                onClick={handleFileClick}
+                                                onDoubleClick={() => openFile(file.id)}
+                                                onContextMenu={(e) => handleFileContextMenu(e, file.id)}
+                                                onRename={(newTitle) => renameFile(file.id, newTitle)}
+                                                imageUrl={file.imageUrl}
+                                            />
+                                        </div>
+                                    </motion.div>
                                 );
                             })}
                         </AnimatePresence>
@@ -4399,7 +4415,7 @@ function GoOSDemoContent() {
                         initial={{ ...dockEntrance.initial, x: '-50%' }}
                         animate={{ ...dockEntrance.animate, x: '-50%' }}
                         exit={{ ...dockEntrance.exit, x: '-50%' }}
-                        transition={SPRING.smooth}
+                        transition={SPRING.bouncy}
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
