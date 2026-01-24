@@ -926,15 +926,14 @@ export function CommandPalette({
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
-            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: -5 }}
+            initial={prefersReducedMotion ? { opacity: 0, x: '-50%' } : { opacity: 0, scale: 0.96, y: -10, x: '-50%' }}
+            animate={{ opacity: 1, scale: 1, y: 0, x: '-50%' }}
+            exit={prefersReducedMotion ? { opacity: 0, x: '-50%' } : { opacity: 0, scale: 0.98, y: -5, x: '-50%' }}
             transition={prefersReducedMotion ? { duration: DURATION.instant } : SPRING.smooth}
             style={{
               position: 'fixed',
               top: '20%',
               left: '50%',
-              transform: 'translateX(-50%)',
               zIndex: 9999,
               width: '100%',
               maxWidth: 560,
