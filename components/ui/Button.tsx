@@ -3,6 +3,7 @@
 import { forwardRef } from 'react';
 import { motion, HTMLMotionProps, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SPRING, buttonPress, REDUCED_MOTION } from '@/lib/animations';
 
 interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -56,9 +57,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(baseStyles, variants[variant], sizes[size], className)}
         style={variantStyles[variant]}
         disabled={disabled || isLoading}
-        whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
-        whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
-        transition={{ duration: prefersReducedMotion ? 0 : 0.1 }}
+        whileHover={prefersReducedMotion ? {} : buttonPress.hover}
+        whileTap={prefersReducedMotion ? {} : buttonPress.tap}
+        transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy}
         {...props}
       >
         {isLoading && (

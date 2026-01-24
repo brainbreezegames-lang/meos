@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { SPRING, fileIconPop, REDUCED_MOTION, DURATION } from '@/lib/animations';
 
 interface DesktopIconProps {
     icon: React.ReactNode;
@@ -25,11 +26,11 @@ export default function DesktopIcon({
 
     return (
         <motion.button
-            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8, y: 10 }}
-            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            initial={prefersReducedMotion ? REDUCED_MOTION.fade.initial : fileIconPop.initial}
+            animate={prefersReducedMotion ? REDUCED_MOTION.fade.animate : fileIconPop.animate}
             transition={prefersReducedMotion
-                ? { duration: 0.1 }
-                : { delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] }
+                ? REDUCED_MOTION.transition
+                : { delay, ...SPRING.bouncy }
             }
             onDoubleClick={onOpen}
             onClick={onFocus}
@@ -76,7 +77,7 @@ export default function DesktopIcon({
                         initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
                         animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1, opacity: 1 }}
                         exit={prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
-                        transition={prefersReducedMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 500, damping: 30 }}
+                        transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.bouncy}
                         className="absolute -bottom-1 left-1/2 -translate-x-1/2"
                     >
                         <div

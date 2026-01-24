@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { SPRING, REDUCED_MOTION, DURATION } from '@/lib/animations';
 
 // ============================================================================
 // SPARKLE BURST - A celebratory particle effect
@@ -251,11 +252,7 @@ export function SuccessCheck({
             initial={{ scale: 0, rotate: -45 }}
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, opacity: 0 }}
-            transition={prefersReducedMotion ? { duration: 0 } : {
-              type: 'spring',
-              stiffness: 500,
-              damping: 25,
-            }}
+            transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.bouncy}
           >
             <motion.circle
               cx="12"
@@ -277,8 +274,8 @@ export function SuccessCheck({
               fill="none"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: 1 }}
-              transition={prefersReducedMotion ? { duration: 0 } : {
-                duration: 0.3,
+              transition={prefersReducedMotion ? REDUCED_MOTION.transition : {
+                duration: DURATION.normal,
                 delay: 0.1,
                 ease: [0.65, 0, 0.35, 1],
               }}

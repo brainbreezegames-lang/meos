@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Lock, Mail, X, FileText, Folder, BarChart3 } from 'lucide-react';
+import { SPRING, windowOpen, fade, REDUCED_MOTION, buttonPress } from '@/lib/animations';
 import { goOSTokens } from './GoOSTipTapEditor';
 
 interface GoOSLockedContentModalProps {
@@ -28,6 +29,7 @@ export function GoOSLockedContentModal({
   onUnlockWithEmail,
   onPurchase,
 }: GoOSLockedContentModalProps) {
+  const prefersReducedMotion = useReducedMotion();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,9 +74,11 @@ export function GoOSLockedContentModal({
         <>
           {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            variants={fade}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.15 }}
             style={{
               position: 'fixed',
               inset: 0,
@@ -86,10 +90,11 @@ export function GoOSLockedContentModal({
 
           {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            variants={windowOpen}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.smooth}
             style={{
               position: 'fixed',
               inset: 0,
@@ -275,8 +280,8 @@ export function GoOSLockedContentModal({
                     <motion.button
                       type="submit"
                       disabled={isSubmitting || !email.trim()}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={buttonPress.hover}
+                      whileTap={buttonPress.tap}
                       style={{
                         width: '100%',
                         padding: 12,
@@ -326,8 +331,8 @@ export function GoOSLockedContentModal({
 
                     <motion.button
                       onClick={onPurchase}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={buttonPress.hover}
+                      whileTap={buttonPress.tap}
                       style={{
                         width: '100%',
                         padding: 12,

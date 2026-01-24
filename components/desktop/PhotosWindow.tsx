@@ -9,7 +9,8 @@ import { useWindowContext, WindowInstance } from '@/contexts/WindowContext';
 import { useThemeSafe, ThemeId } from '@/contexts/ThemeContext';
 import { haptic } from '@/components/ui/Delight';
 import { TrafficLights } from './TrafficLights';
-import { WINDOW, TITLE_BAR, ANIMATION } from './windowStyles';
+import { WINDOW, TITLE_BAR } from './windowStyles';
+import { SPRING, windowOpen, fade, REDUCED_MOTION, DURATION } from '@/lib/animations';
 
 interface PhotosWindowProps {
   window: WindowInstance;
@@ -245,10 +246,10 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
             border: isMaximized ? WINDOW.borderMaximized : WINDOW.border,
             opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
           }}
-          initial={prefersReducedMotion ? ANIMATION.reducedInitial : ANIMATION.initial}
-          animate={prefersReducedMotion ? ANIMATION.reducedAnimate : ANIMATION.animate}
-          exit={prefersReducedMotion ? ANIMATION.reducedExit : ANIMATION.exit}
-          transition={prefersReducedMotion ? ANIMATION.reducedTransition : ANIMATION.transition}
+          initial={prefersReducedMotion ? REDUCED_MOTION.fade.initial : windowOpen.initial}
+          animate={prefersReducedMotion ? REDUCED_MOTION.fade.animate : windowOpen.animate}
+          exit={prefersReducedMotion ? REDUCED_MOTION.fade.exit : windowOpen.exit}
+          transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.smooth}
         >
           {/* Title Bar */}
           <div
@@ -338,12 +339,12 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                         background: colors.photoCardBg,
                         boxShadow: colors.photoCardShadow,
                       }}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.03, duration: 0.2 }}
+                      initial={{ opacity: 0, scale: 0.85, y: 15 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{ delay: index * DURATION.stagger, ...SPRING.bouncy }}
                       onClick={() => handlePhotoClick(photo)}
                       whileHover={{
-                        scale: viewMode === 'grid' ? 1.02 : 1,
+                        scale: viewMode === 'grid' ? 1.05 : 1.01,
                         boxShadow: colors.photoCardHoverShadow,
                       }}
                     >
@@ -503,10 +504,10 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                   {/* Image */}
                   <motion.div
                     className="relative max-w-[90%] max-h-[85%]"
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.9, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
+                    initial={{ scale: 0.8, opacity: 0, y: 30 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.85, opacity: 0, y: 15 }}
+                    transition={SPRING.smooth}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Image

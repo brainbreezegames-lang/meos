@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, Image, Link, Video, Download, Loader2 } from 'lucide-react';
+import { SPRING, windowOpen, fade, REDUCED_MOTION, buttonPress } from '@/lib/animations';
 import { goOSTokens } from './GoOSTipTapEditor';
 
 type FileType = 'image' | 'link' | 'embed' | 'download';
@@ -89,6 +90,7 @@ export function GoOSCreateFileDialog({
   onCreateEmbed,
   onCreateDownload,
 }: GoOSCreateFileDialogProps) {
+  const prefersReducedMotion = useReducedMotion();
   const [url, setUrl] = useState('');
   const [secondary, setSecondary] = useState('');
   const [tertiary, setTertiary] = useState('');
@@ -151,9 +153,11 @@ export function GoOSCreateFileDialog({
         <>
           {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            variants={fade}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: REDUCED_MOTION.transition.duration }}
             onClick={onClose}
             style={{
               position: 'fixed',
@@ -165,10 +169,11 @@ export function GoOSCreateFileDialog({
 
           {/* Dialog */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            variants={windowOpen}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.smooth}
             style={{
               position: 'fixed',
               top: '50%',

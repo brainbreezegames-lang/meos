@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { SparkleEffect, haptic } from '@/components/ui/Delight';
+import { SPRING, REDUCED_MOTION, DURATION } from '@/lib/animations';
 
 interface WelcomeNotificationProps {
   title?: string;
@@ -73,13 +74,10 @@ export function WelcomeNotification({
             right: '16px',
             width: '360px',
           }}
-          initial={prefersReducedMotion ? { opacity: 0 } : { x: 400, opacity: 0 }}
-          animate={prefersReducedMotion ? { opacity: 1 } : { x: 0, opacity: 1 }}
-          exit={prefersReducedMotion ? { opacity: 0 } : { x: 400, opacity: 0 }}
-          transition={prefersReducedMotion
-            ? { duration: 0.1 }
-            : { type: 'spring', stiffness: 400, damping: 35, mass: 1 }
-          }
+          initial={prefersReducedMotion ? REDUCED_MOTION.fade.initial : { x: 400, opacity: 0, scale: 0.9 }}
+          animate={prefersReducedMotion ? REDUCED_MOTION.fade.animate : { x: 0, opacity: 1, scale: 1 }}
+          exit={prefersReducedMotion ? REDUCED_MOTION.fade.exit : { x: 400, opacity: 0, scale: 0.95 }}
+          transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.smooth}
           onClick={handleDismiss}
         >
           <div

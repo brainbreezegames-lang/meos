@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useSpring, useReducedMotion } from 'framer-mot
 import Image from 'next/image';
 import type { DockItem as DockItemType } from '@/types';
 import { SparkleEffect, haptic } from '@/components/ui/Delight';
+import { SPRING, fadeInUp, REDUCED_MOTION, DURATION } from '@/lib/animations';
 
 interface DockItemProps {
   item: DockItemType;
@@ -28,7 +29,7 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
 
   const springConfig = prefersReducedMotion
     ? { stiffness: 1000, damping: 100, mass: 0.1 }
-    : { stiffness: 400, damping: 30, mass: 0.5 };
+    : { stiffness: SPRING.dock.stiffness, damping: SPRING.dock.damping, mass: SPRING.dock.mass };
 
   const scale = useSpring(1, springConfig);
   const translateY = useSpring(0, springConfig);
@@ -109,7 +110,7 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      whileTap={prefersReducedMotion ? {} : { scale: 0.92 }}
+      whileTap={prefersReducedMotion ? {} : { scale: 0.85 }}
     >
       {/* Tooltip */}
       <AnimatePresence>
@@ -128,14 +129,10 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
               `,
               letterSpacing: '0.01em',
             }}
-            initial={{ opacity: 0, y: 8, scale: 0.9 }}
+            initial={{ opacity: 0, y: 12, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.95 }}
-            transition={{
-              type: 'spring',
-              stiffness: 500,
-              damping: 30
-            }}
+            exit={{ opacity: 0, y: 6, scale: 0.9 }}
+            transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy}
           >
             {item.label}
             {/* Arrow */}

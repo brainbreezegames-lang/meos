@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useEditContextSafe } from '@/contexts/EditContext';
+import { SPRING, fadeInUp, REDUCED_MOTION, buttonPress } from '@/lib/animations';
 
 // Sticky note colors matching macOS Stickies
 const STICKY_COLORS = {
@@ -173,13 +174,13 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
         onMouseDown={handleMouseDown}
         onDoubleClick={handleDoubleClick}
         onContextMenu={handleContextMenu}
-        initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
+        initial={prefersReducedMotion ? REDUCED_MOTION.fade.initial : { scale: 0.5, opacity: 0, y: 20 }}
         animate={prefersReducedMotion
-          ? { opacity: 1 }
-          : { scale: isDragging ? 1.05 : 1, opacity: 1, y: isDragging ? -5 : 0 }
+          ? REDUCED_MOTION.fade.animate
+          : { scale: isDragging ? 1.08 : 1, opacity: 1, y: isDragging ? -8 : 0 }
         }
-        exit={prefersReducedMotion ? { opacity: 0 } : { scale: 0, opacity: 0 }}
-        transition={prefersReducedMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 400, damping: 25 }}
+        exit={prefersReducedMotion ? REDUCED_MOTION.fade.exit : { scale: 0.5, opacity: 0, y: 10 }}
+        transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.bouncy}
       >
         {/* Pin */}
         <div
@@ -410,8 +411,8 @@ export function StickyNotesContainer({ notes, onNotesChange, maxNotes = 5 }: Sti
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
             fontSize: '20px',
           }}
-          whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
-          whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
+          whileHover={prefersReducedMotion ? {} : { scale: 1.15 }}
+          whileTap={prefersReducedMotion ? {} : { scale: 0.85 }}
           title="Add sticky note"
         >
           +

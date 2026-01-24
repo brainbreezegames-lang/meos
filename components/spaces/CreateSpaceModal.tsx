@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Globe, Lock, ChevronDown, Sparkles, Copy } from 'lucide-react';
 import { TrafficLights } from '../desktop/TrafficLights';
-import { WINDOW, TITLE_BAR, ANIMATION } from '../desktop/windowStyles';
+import { WINDOW, TITLE_BAR } from '../desktop/windowStyles';
+import { SPRING, windowOpen, fadeInDown, REDUCED_MOTION, buttonPress, DURATION } from '@/lib/animations';
 import type { SpaceSummary } from '@/types';
 
 // ============================================
@@ -233,16 +234,16 @@ export function CreateSpaceModal({
   // Animation props
   const animationProps = prefersReducedMotion
     ? {
-        initial: ANIMATION.reducedInitial,
-        animate: ANIMATION.reducedAnimate,
-        exit: ANIMATION.reducedExit,
-        transition: ANIMATION.reducedTransition,
+        initial: REDUCED_MOTION.fade.initial,
+        animate: REDUCED_MOTION.fade.animate,
+        exit: REDUCED_MOTION.fade.exit,
+        transition: REDUCED_MOTION.transition,
       }
     : {
-        initial: ANIMATION.initial,
-        animate: ANIMATION.animate,
-        exit: ANIMATION.exit,
-        transition: ANIMATION.transition,
+        initial: windowOpen.initial,
+        animate: windowOpen.animate,
+        exit: windowOpen.exit,
+        transition: SPRING.smooth,
       };
 
   return (
@@ -347,8 +348,8 @@ export function CreateSpaceModal({
                 <motion.button
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={buttonPress.hover}
+                  whileTap={buttonPress.tap}
                   style={{
                     width: 56,
                     height: 56,
@@ -368,10 +369,11 @@ export function CreateSpaceModal({
                 <AnimatePresence>
                   {showEmojiPicker && (
                     <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                      transition={{ duration: 0.15 }}
+                      variants={fadeInDown}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      transition={SPRING.snappy}
                       style={{
                         position: 'absolute',
                         top: 'calc(100% + 8px)',
@@ -451,8 +453,8 @@ export function CreateSpaceModal({
                                     setIcon(emoji);
                                     setShowEmojiPicker(false);
                                   }}
-                                  whileHover={{ scale: 1.15 }}
-                                  whileTap={{ scale: 0.9 }}
+                                  whileHover={{ scale: 1.2 }}
+                                  whileTap={{ scale: 0.85 }}
                                   style={{
                                     width: 36,
                                     height: 36,
@@ -551,8 +553,8 @@ export function CreateSpaceModal({
                 <motion.button
                   type="button"
                   onClick={() => setIsPublic(true)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={buttonPress.hover}
+                  whileTap={buttonPress.tap}
                   style={{
                     flex: 1,
                     display: 'flex',
@@ -575,8 +577,8 @@ export function CreateSpaceModal({
                 <motion.button
                   type="button"
                   onClick={() => setIsPublic(false)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={buttonPress.hover}
+                  whileTap={buttonPress.tap}
                   style={{
                     flex: 1,
                     display: 'flex',
@@ -727,10 +729,11 @@ export function CreateSpaceModal({
                 <AnimatePresence>
                   {showCopyDropdown && (
                     <motion.div
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.15 }}
+                      variants={fadeInDown}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      transition={SPRING.snappy}
                       style={{
                         position: 'absolute',
                         top: 'calc(100% + 4px)',
@@ -802,8 +805,8 @@ export function CreateSpaceModal({
               <motion.button
                 type="button"
                 onClick={onClose}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={buttonPress.hover}
+                whileTap={buttonPress.tap}
                 style={{
                   flex: 1,
                   padding: '12px 16px',
@@ -821,8 +824,8 @@ export function CreateSpaceModal({
               <motion.button
                 type="submit"
                 disabled={!isValid}
-                whileHover={isValid ? { scale: 1.02 } : {}}
-                whileTap={isValid ? { scale: 0.98 } : {}}
+                whileHover={isValid ? buttonPress.hover : {}}
+                whileTap={isValid ? buttonPress.tap : {}}
                 style={{
                   flex: 1,
                   padding: '12px 16px',

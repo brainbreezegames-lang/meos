@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, Reorder, useDragControls, useReducedMotion } from 'framer-motion';
 import { GripVertical, Star, Globe, Lock, Trash2, Check, AlertTriangle } from 'lucide-react';
 import { TrafficLights } from '../desktop/TrafficLights';
-import { WINDOW, TITLE_BAR, ANIMATION, getAnimationProps } from '../desktop/windowStyles';
+import { WINDOW, TITLE_BAR } from '../desktop/windowStyles';
+import { SPRING, windowOpen, fade, fadeInUp, REDUCED_MOTION, buttonPress, DURATION, getAnimationProps } from '@/lib/animations';
 import type { SpaceSummary } from '@/types';
 
 // ============================================
@@ -214,8 +215,8 @@ function SpaceRow({ space, isOnly, onUpdate, onSetPrimary, onDelete }: SpaceRowP
           {!space.isPrimary && (
             <motion.button
               onClick={onSetPrimary}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.85 }}
               title="Set as main space"
               style={{
                 padding: 6,
@@ -234,8 +235,8 @@ function SpaceRow({ space, isOnly, onUpdate, onSetPrimary, onDelete }: SpaceRowP
           {/* Visibility Toggle */}
           <motion.button
             onClick={() => onUpdate({ isPublic: !space.isPublic })}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.85 }}
             title={space.isPublic ? 'Make private' : 'Make public'}
             style={{
               padding: 6,
@@ -257,8 +258,8 @@ function SpaceRow({ space, isOnly, onUpdate, onSetPrimary, onDelete }: SpaceRowP
           {/* Delete */}
           <motion.button
             onClick={() => canDelete && setShowDeleteConfirm(true)}
-            whileHover={canDelete ? { scale: 1.1 } : {}}
-            whileTap={canDelete ? { scale: 0.9 } : {}}
+            whileHover={canDelete ? { scale: 1.15 } : {}}
+            whileTap={canDelete ? { scale: 0.85 } : {}}
             title={
               space.isPrimary
                 ? "Can't delete main space"
@@ -321,8 +322,8 @@ function SpaceRow({ space, isOnly, onUpdate, onSetPrimary, onDelete }: SpaceRowP
               <div style={{ display: 'flex', gap: 6 }}>
                 <motion.button
                   onClick={() => setShowDeleteConfirm(false)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={buttonPress.hover}
+                  whileTap={buttonPress.tap}
                   style={{
                     padding: '4px 10px',
                     fontSize: 11,
@@ -341,8 +342,8 @@ function SpaceRow({ space, isOnly, onUpdate, onSetPrimary, onDelete }: SpaceRowP
                     onDelete();
                     setShowDeleteConfirm(false);
                   }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={buttonPress.hover}
+                  whileTap={buttonPress.tap}
                   style={{
                     padding: '4px 10px',
                     fontSize: 11,
@@ -419,7 +420,7 @@ export function ManageSpacesDialog({
     onClose();
   }, [orderedSpaces, onReorder, onClose]);
 
-  const animationProps = getAnimationProps(prefersReducedMotion);
+  const animationProps = getAnimationProps(prefersReducedMotion, windowOpen, SPRING.smooth);
 
   return (
     <AnimatePresence>
@@ -427,10 +428,11 @@ export function ManageSpacesDialog({
         <>
           {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            variants={fade}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: DURATION.fast }}
             onClick={onClose}
             style={{
               position: 'fixed',
@@ -578,8 +580,8 @@ export function ManageSpacesDialog({
             >
               <motion.button
                 onClick={handleDone}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={buttonPress.hover}
+                whileTap={buttonPress.tap}
                 style={{
                   width: '100%',
                   display: 'flex',

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useTheme, THEMES, type ThemeId } from '@/contexts/ThemeContext';
+import { SPRING, fadeInDown, REDUCED_MOTION, buttonPress } from '@/lib/animations';
 
 // Theme preview colors for the dropdown
 const themePreviewColors: Record<ThemeId, { bg: string; accent: string; isDark: boolean }> = {
@@ -17,6 +18,7 @@ const themePreviewColors: Record<ThemeId, { bg: string; accent: string; isDark: 
 
 export function ThemeSwitcher() {
   const { theme: currentTheme, setTheme } = useTheme();
+  const prefersReducedMotion = useReducedMotion();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -58,8 +60,8 @@ export function ThemeSwitcher() {
           background: 'var(--border-light)',
           color: 'var(--text-primary)',
         }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={prefersReducedMotion ? {} : buttonPress.hover}
+        whileTap={prefersReducedMotion ? {} : buttonPress.tap}
       >
         {/* Theme preview dot */}
         <div
@@ -93,10 +95,11 @@ export function ThemeSwitcher() {
               WebkitBackdropFilter: 'blur(40px) saturate(200%)',
               boxShadow: 'var(--shadow-lg), 0 0 0 1px var(--border-light)',
             }}
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
+            variants={fadeInDown}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy}
           >
             {Object.values(THEMES).map((theme) => {
               const preview = themePreviewColors[theme.id];

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, ReactNode } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { SPRING, windowOpen, fade, REDUCED_MOTION, DURATION } from '@/lib/animations';
 
 interface ModalProps {
   isOpen: boolean;
@@ -51,10 +52,11 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
           <motion.div
             className="fixed inset-0 z-[400]"
             style={{ background: 'rgba(23, 20, 18, 0.2)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0.01 : 0.15 }}
+            variants={fade}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: prefersReducedMotion ? DURATION.instant : DURATION.fast }}
           />
 
           {/* Modal */}
@@ -72,10 +74,10 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
               borderRadius: 'var(--radius-lg, 18px)',
               boxShadow: 'var(--shadow-window)',
             }}
-            initial={prefersReducedMotion ? { opacity: 0, x: '-50%', y: '-50%' } : { opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
+            initial={prefersReducedMotion ? { opacity: 0, x: '-50%', y: '-50%' } : { opacity: 0, scale: 0.8, y: '-45%', x: '-50%' }}
             animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
-            exit={prefersReducedMotion ? { opacity: 0, x: '-50%', y: '-50%' } : { opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
-            transition={prefersReducedMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 400, damping: 30 }}
+            exit={prefersReducedMotion ? { opacity: 0, x: '-50%', y: '-50%' } : { opacity: 0, scale: 0.85, y: '-45%', x: '-50%' }}
+            transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.smooth}
           >
             {/* Header */}
             <div

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { motion } from 'framer-motion';
+import { SPRING, buttonPress } from '@/lib/animations';
 
 interface CTAButtonProps {
     href?: string;
@@ -37,9 +38,9 @@ export default function CTAButton({
     const combinedClassName = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
 
     const animationProps = {
-        whileHover: { scale: 1.02, y: -1 },
-        whileTap: { scale: 0.95, y: 0 },
-        transition: { type: "spring", stiffness: 400, damping: 17 } as const
+        whileHover: { scale: 1.05, y: -2 },
+        whileTap: { scale: 0.9, y: 0 },
+        transition: SPRING.snappy,
     };
 
     if (href) {

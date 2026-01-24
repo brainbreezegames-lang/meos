@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { SparkleEffect, haptic } from '@/components/ui/Delight';
+import { SPRING, toast as toastVariants, REDUCED_MOTION } from '@/lib/animations';
 
 export function SaveIndicator() {
   const context = useEditContextSafe();
@@ -40,15 +41,13 @@ export function SaveIndicator() {
       {saveStatus !== 'idle' && (
         <motion.div
           className="fixed bottom-20 right-4 z-[100] flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-medium"
-          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+          initial={toastVariants.initial}
           animate={{
-            opacity: 1,
-            y: 0,
-            scale: 1,
+            ...toastVariants.animate,
             ...shakeAnimation,
           }}
-          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-          transition={{ duration: 0.2 }}
+          exit={toastVariants.exit}
+          transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.bouncy}
           style={{
             background: saveStatus === 'error'
               ? 'rgba(239, 68, 68, 0.9)'
@@ -90,7 +89,7 @@ export function SaveIndicator() {
                 fill="none"
                 initial={{ scale: 0, rotate: -45 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                transition={SPRING.bouncy}
               >
                 <motion.path
                   d="M3 8l4 4 6-7"
@@ -134,10 +133,10 @@ export function Toast() {
       {toast && (
         <motion.div
           className="fixed bottom-20 left-1/2 z-[100] flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium"
-          initial={{ opacity: 0, y: 10, x: '-50%' }}
-          animate={{ opacity: 1, y: 0, x: '-50%' }}
-          exit={{ opacity: 0, y: 10, x: '-50%' }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, y: 50, x: '-50%', scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, x: '-50%', scale: 1 }}
+          exit={{ opacity: 0, y: 25, x: '-50%', scale: 0.9 }}
+          transition={SPRING.bouncy}
           style={{
             background: toast.type === 'error'
               ? 'rgba(239, 68, 68, 0.95)'

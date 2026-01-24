@@ -6,6 +6,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget, StatusType } from '@/types';
 import { useWidgetTheme } from '@/hooks/useWidgetTheme';
+import { SPRING, fadeInUp, DURATION, REDUCED_MOTION } from '@/lib/animations';
 
 interface StatusWidgetConfig {
   statusType: StatusType;
@@ -92,8 +93,9 @@ export function StatusWidget({
             boxShadow: isHovered
               ? `var(--shadow-md), ${statusTheme.glow}`
               : 'var(--shadow-sm)',
+            scale: isHovered ? 1.02 : 1,
           }}
-          transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
+          transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.gentle}
         >
           {/* Glass background */}
           <div
@@ -202,10 +204,10 @@ export function StatusWidget({
                 marginBottom: '8px',
                 width: '240px',
               }}
-              initial={{ opacity: 0, y: 4, scale: 0.98 }}
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 4, scale: 0.98 }}
-              transition={{ duration: 0.15 }}
+              exit={{ opacity: 0, y: 6, scale: 0.95 }}
+              transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy}
             >
               <div
                 style={{

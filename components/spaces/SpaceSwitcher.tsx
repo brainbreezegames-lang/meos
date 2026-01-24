@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChevronDown, Check, Lock, Plus, Settings2 } from 'lucide-react';
+import { SPRING, fadeInDown, REDUCED_MOTION, buttonPress, DURATION } from '@/lib/animations';
 
 // ============================================
 // TYPES
@@ -46,6 +47,7 @@ export function SpaceSwitcher({
   onCreateSpace,
   onManageSpaces,
 }: SpaceSwitcherProps) {
+  const prefersReducedMotion = useReducedMotion();
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -171,8 +173,8 @@ export function SpaceSwitcher({
         ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={buttonPress.hover}
+        whileTap={buttonPress.tap}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`Current space: ${activeSpace?.name || 'Select space'}`}
@@ -234,13 +236,11 @@ export function SpaceSwitcher({
               ref={menuRef}
               role="listbox"
               aria-label="Spaces"
-              initial={{ opacity: 0, y: -8, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -4, scale: 0.98 }}
-              transition={{
-                duration: 0.15,
-                ease: [0.2, 0, 0, 1],
-              }}
+              variants={fadeInDown}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy}
               onKeyDown={handleKeyDown}
               className="absolute top-full left-0 mt-1.5 z-[2001] overflow-hidden"
               style={{
