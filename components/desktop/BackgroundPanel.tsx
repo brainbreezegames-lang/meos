@@ -54,6 +54,42 @@ const PRESET_WALLPAPERS = [
     thumb: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=200&h=120&fit=crop&q=80',
     name: 'Ocean Blue',
   },
+  {
+    id: 'bg30',
+    url: '/bg30.png',
+    thumb: '/bg30.png',
+    name: 'Gradient 30',
+  },
+  {
+    id: 'bg31',
+    url: '/bg31.png',
+    thumb: '/bg31.png',
+    name: 'Gradient 31',
+  },
+  {
+    id: 'bg32',
+    url: '/bg32.png',
+    thumb: '/bg32.png',
+    name: 'Gradient 32',
+  },
+  {
+    id: 'bg33',
+    url: '/bg33.png',
+    thumb: '/bg33.png',
+    name: 'Gradient 33',
+  },
+  {
+    id: 'bg34',
+    url: '/bg34.png',
+    thumb: '/bg34.png',
+    name: 'Gradient 34',
+  },
+  {
+    id: 'bg35',
+    url: '/bg35.png',
+    thumb: '/bg35.png',
+    name: 'Gradient 35',
+  },
 ];
 
 interface BackgroundPanelProps {
