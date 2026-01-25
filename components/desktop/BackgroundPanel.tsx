@@ -464,12 +464,21 @@ export function BackgroundPanel({
                           : '0 4px 12px rgba(0, 0, 0, 0.15)',
                       }}
                     >
-                      <Image
-                        src={wallpaper.thumb}
-                        alt={wallpaper.name}
-                        fill
-                        className="object-cover"
-                      />
+{/* Use native img for local files, Next Image for remote */}
+                      {wallpaper.thumb.startsWith('/') ? (
+                        <img
+                          src={wallpaper.thumb}
+                          alt={wallpaper.name}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Image
+                          src={wallpaper.thumb}
+                          alt={wallpaper.name}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
                       {/* Name overlay on hover */}
                       <div
                         className="absolute inset-x-0 bottom-0 py-2 px-2 opacity-0 group-hover:opacity-100 transition-opacity"
