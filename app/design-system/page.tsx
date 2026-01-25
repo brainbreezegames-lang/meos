@@ -1,275 +1,943 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import '@/styles/design-system.css';
 
 // ============================================================================
-// DESIGN SYSTEM PREVIEW PAGE
-// Visual reference for all design tokens
+// DESIGN SYSTEM - VISUAL REFERENCE
+// Complete visual reference for goOS design tokens and components
 // ============================================================================
 
 export default function DesignSystemPage() {
+  const [activeTab, setActiveTab] = useState<'colors' | 'typography' | 'spacing' | 'components'>('colors');
+
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: 'var(--color-bg-base)',
-        color: 'var(--color-text-primary)',
-        fontFamily: 'var(--font-body)',
-        padding: '48px',
+        background: '#fbf9ef',
+        color: '#171412',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
       }}
     >
       {/* Header */}
-      <header style={{ marginBottom: 64 }}>
+      <header
+        style={{
+          padding: '32px 48px',
+          borderBottom: '1px solid rgba(23, 20, 18, 0.08)',
+          background: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(20px)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+        }}
+      >
         <h1
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--font-size-4xl)',
+            fontSize: 32,
             fontWeight: 700,
             marginBottom: 8,
-            letterSpacing: 'var(--letter-spacing-tight)',
+            color: '#171412',
           }}
         >
           goOS Design System
         </h1>
-        <p
-          style={{
-            fontSize: 'var(--font-size-lg)',
-            color: 'var(--color-text-secondary)',
-            maxWidth: 600,
-          }}
-        >
-          Visual reference for all design tokens. Warm creative studio aesthetic.
+        <p style={{ fontSize: 16, color: '#4a4744', marginBottom: 24 }}>
+          Visual reference for all design tokens and components
         </p>
-      </header>
 
-      {/* Colors Section */}
-      <Section title="Colors">
-        {/* Backgrounds */}
-        <Subsection title="Backgrounds">
-          <ColorGrid>
-            <ColorSwatch name="bg-base" color="var(--color-bg-base)" hex="#fbf9ef" />
-            <ColorSwatch name="bg-elevated" color="var(--color-bg-elevated)" hex="rgba(255,255,255,0.85)" />
-            <ColorSwatch name="bg-subtle" color="var(--color-bg-subtle)" hex="#f2f0e7" />
-            <ColorSwatch name="bg-subtle-hover" color="var(--color-bg-subtle-hover)" hex="#ebe9df" />
-            <ColorSwatch name="bg-inverse" color="var(--color-bg-inverse)" hex="#171412" dark />
-            <ColorSwatch name="bg-white" color="var(--color-bg-white)" hex="#ffffff" />
-          </ColorGrid>
-        </Subsection>
-
-        {/* Text Colors */}
-        <Subsection title="Text">
-          <ColorGrid>
-            <ColorSwatch name="text-primary" color="var(--color-text-primary)" hex="#171412" dark />
-            <ColorSwatch name="text-secondary" color="var(--color-text-secondary)" hex="#4a4744" dark />
-            <ColorSwatch name="text-muted" color="var(--color-text-muted)" hex="#8e827c" />
-            <ColorSwatch name="text-inverse" color="var(--color-text-inverse)" hex="#ffffff" border />
-          </ColorGrid>
-        </Subsection>
-
-        {/* Accent Colors */}
-        <Subsection title="Accent - Primary (Orange)">
-          <ColorGrid>
-            <ColorSwatch name="accent-primary" color="var(--color-accent-primary)" hex="#ff7722" />
-            <ColorSwatch name="accent-primary-hover" color="var(--color-accent-primary-hover)" hex="#e5691e" />
-            <ColorSwatch name="accent-primary-active" color="var(--color-accent-primary-active)" hex="#cc5d1a" />
-            <ColorSwatch name="accent-primary-subtle" color="var(--color-accent-primary-subtle)" hex="rgba(255,119,34,0.1)" />
-            <ColorSwatch name="accent-primary-glow" color="var(--color-accent-primary-glow)" hex="rgba(255,119,34,0.4)" />
-          </ColorGrid>
-        </Subsection>
-
-        <Subsection title="Accent - Secondary (Purple)">
-          <ColorGrid>
-            <ColorSwatch name="accent-secondary" color="var(--color-accent-secondary)" hex="#3d2fa9" dark />
-            <ColorSwatch name="accent-secondary-hover" color="var(--color-accent-secondary-hover)" hex="#352994" dark />
-            <ColorSwatch name="accent-secondary-subtle" color="var(--color-accent-secondary-subtle)" hex="rgba(61,47,169,0.1)" />
-          </ColorGrid>
-        </Subsection>
-
-        {/* Semantic Colors */}
-        <Subsection title="Semantic">
-          <ColorGrid>
-            <ColorSwatch name="success" color="var(--color-success)" hex="#22c55e" />
-            <ColorSwatch name="success-subtle" color="var(--color-success-subtle)" hex="rgba(34,197,94,0.15)" />
-            <ColorSwatch name="warning" color="var(--color-warning)" hex="#ffc765" />
-            <ColorSwatch name="warning-subtle" color="var(--color-warning-subtle)" hex="rgba(255,199,101,0.2)" />
-            <ColorSwatch name="error" color="var(--color-error)" hex="#ff3c34" />
-            <ColorSwatch name="error-subtle" color="var(--color-error-subtle)" hex="rgba(255,60,52,0.1)" />
-          </ColorGrid>
-        </Subsection>
-
-        {/* Traffic Lights */}
-        <Subsection title="Traffic Lights (Window Controls)">
-          <ColorGrid>
-            <ColorSwatch name="traffic-close" color="var(--color-traffic-close)" hex="#ff5f57" />
-            <ColorSwatch name="traffic-minimize" color="var(--color-traffic-minimize)" hex="#ffbd2e" />
-            <ColorSwatch name="traffic-maximize" color="var(--color-traffic-maximize)" hex="#28c840" />
-            <ColorSwatch name="traffic-inactive" color="var(--color-traffic-inactive)" hex="rgba(23,20,18,0.15)" />
-          </ColorGrid>
-        </Subsection>
-
-        {/* Borders */}
-        <Subsection title="Borders">
-          <ColorGrid>
-            <ColorSwatch name="border-default" color="var(--color-border-default)" hex="rgba(23,20,18,0.08)" />
-            <ColorSwatch name="border-subtle" color="var(--color-border-subtle)" hex="rgba(23,20,18,0.05)" />
-            <ColorSwatch name="border-strong" color="var(--color-border-strong)" hex="rgba(23,20,18,0.15)" />
-          </ColorGrid>
-        </Subsection>
-      </Section>
-
-      {/* Typography Section */}
-      <Section title="Typography">
-        <Subsection title="Font Families">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div>
-              <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>
-                Display / Headings
-              </p>
-              <p style={{ fontFamily: 'var(--font-display)', fontSize: 32 }}>
-                Averia Serif Libre
-              </p>
-            </div>
-            <div>
-              <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>
-                Body / UI
-              </p>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 32 }}>
-                Instrument Sans
-              </p>
-            </div>
-            <div>
-              <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>
-                Monospace
-              </p>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 32 }}>
-                SF Mono / Cascadia
-              </p>
-            </div>
-          </div>
-        </Subsection>
-
-        <Subsection title="Type Scale (Major Third 1.25)">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <TypeSample name="5xl" size="var(--font-size-5xl)" desc="48-72px Display" />
-            <TypeSample name="4xl" size="var(--font-size-4xl)" desc="40-56px H1" />
-            <TypeSample name="3xl" size="var(--font-size-3xl)" desc="30-40px H2" />
-            <TypeSample name="2xl" size="var(--font-size-2xl)" desc="24-30px H3" />
-            <TypeSample name="xl" size="var(--font-size-xl)" desc="20-24px H4" />
-            <TypeSample name="lg" size="var(--font-size-lg)" desc="18-20px Large" />
-            <TypeSample name="md" size="var(--font-size-md)" desc="16-18px Medium" />
-            <TypeSample name="base" size="var(--font-size-base)" desc="14-16px Body" />
-            <TypeSample name="sm" size="var(--font-size-sm)" desc="12-14px Small" />
-            <TypeSample name="xs" size="var(--font-size-xs)" desc="10-12px Caption" />
-          </div>
-        </Subsection>
-
-        <Subsection title="Font Weights">
-          <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 400 }}>400 Normal</span>
-            <span style={{ fontWeight: 500 }}>500 Medium</span>
-            <span style={{ fontWeight: 600 }}>600 Semibold</span>
-            <span style={{ fontWeight: 700 }}>700 Bold</span>
-          </div>
-        </Subsection>
-      </Section>
-
-      {/* Spacing Section */}
-      <Section title="Spacing Scale (8-point grid)">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SpacingSample name="space-1" value="4px" />
-          <SpacingSample name="space-2" value="8px" />
-          <SpacingSample name="space-3" value="12px" />
-          <SpacingSample name="space-4" value="16px" />
-          <SpacingSample name="space-5" value="20px" />
-          <SpacingSample name="space-6" value="24px" />
-          <SpacingSample name="space-8" value="32px" />
-          <SpacingSample name="space-10" value="40px" />
-          <SpacingSample name="space-12" value="48px" />
-          <SpacingSample name="space-16" value="64px" />
-          <SpacingSample name="space-20" value="80px" />
-          <SpacingSample name="space-24" value="96px" />
-        </div>
-      </Section>
-
-      {/* Border Radius Section */}
-      <Section title="Border Radius">
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <RadiusSample name="xs" value="4px" />
-          <RadiusSample name="sm" value="6px" />
-          <RadiusSample name="md" value="10px" />
-          <RadiusSample name="lg" value="12px" />
-          <RadiusSample name="xl" value="14px" />
-          <RadiusSample name="xxl" value="16px" />
-          <RadiusSample name="dock" value="20px" />
-          <RadiusSample name="full" value="9999px" />
-        </div>
-      </Section>
-
-      {/* Shadows Section */}
-      <Section title="Shadows">
-        <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
-          <ShadowSample name="sm" shadow="var(--shadow-sm)" />
-          <ShadowSample name="md" shadow="var(--shadow-md)" />
-          <ShadowSample name="lg" shadow="var(--shadow-lg)" />
-          <ShadowSample name="xl" shadow="var(--shadow-xl)" />
-        </div>
-        <div style={{ marginTop: 32, display: 'flex', gap: 32, flexWrap: 'wrap' }}>
-          <ShadowSample name="window" shadow="var(--shadow-window)" />
-          <ShadowSample name="dock" shadow="var(--shadow-dock)" />
-          <ShadowSample name="dropdown" shadow="var(--shadow-dropdown)" />
-        </div>
-      </Section>
-
-      {/* Blur / Glassmorphism */}
-      <Section title="Blur / Glassmorphism">
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          <BlurSample name="subtle" value="12px" />
-          <BlurSample name="medium" value="20px" />
-          <BlurSample name="heavy" value="24px" />
-        </div>
-      </Section>
-
-      {/* Interactive States */}
-      <Section title="Interactive States">
-        <Subsection title="Focus Ring">
-          <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {(['colors', 'typography', 'spacing', 'components'] as const).map((tab) => (
             <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
               style={{
-                padding: '12px 24px',
-                background: 'var(--color-accent-primary)',
-                color: 'white',
+                padding: '10px 20px',
+                fontSize: 14,
+                fontWeight: 500,
                 border: 'none',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 8,
                 cursor: 'pointer',
-                boxShadow: 'var(--focus-ring)',
+                background: activeTab === tab ? '#ff7722' : 'rgba(23, 20, 18, 0.05)',
+                color: activeTab === tab ? '#ffffff' : '#171412',
+                transition: 'all 150ms ease',
               }}
             >
-              Focused Button
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
-            <span style={{ color: 'var(--color-text-muted)', fontSize: 14 }}>
-              2px orange ring with 2px offset
-            </span>
-          </div>
-        </Subsection>
-
-        <Subsection title="Opacity States">
-          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-            <OpacitySample name="disabled" value="0.5" />
-            <OpacitySample name="hover" value="0.9" />
-            <OpacitySample name="loading" value="0.7" />
-            <OpacitySample name="placeholder" value="0.5" />
-          </div>
-        </Subsection>
-      </Section>
-
-      {/* Transitions */}
-      <Section title="Transitions">
-        <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
-          <TransitionSample name="fast" value="150ms" />
-          <TransitionSample name="medium" value="200ms" />
-          <TransitionSample name="slow" value="300ms" />
+          ))}
         </div>
-      </Section>
+      </header>
+
+      {/* Content */}
+      <main style={{ padding: '48px' }}>
+        {activeTab === 'colors' && <ColorsSection />}
+        {activeTab === 'typography' && <TypographySection />}
+        {activeTab === 'spacing' && <SpacingSection />}
+        {activeTab === 'components' && <ComponentsSection />}
+      </main>
+    </div>
+  );
+}
+
+// ============================================================================
+// COLORS SECTION
+// ============================================================================
+
+function ColorsSection() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+      {/* Backgrounds */}
+      <ColorGroup title="Backgrounds">
+        <ColorSwatch name="bg-base" color="#fbf9ef" />
+        <ColorSwatch name="bg-elevated" color="rgba(255, 255, 255, 0.85)" border />
+        <ColorSwatch name="bg-subtle" color="#f2f0e7" />
+        <ColorSwatch name="bg-subtle-hover" color="#ebe9df" />
+        <ColorSwatch name="bg-inverse" color="#171412" dark />
+        <ColorSwatch name="bg-white" color="#ffffff" border />
+      </ColorGroup>
+
+      {/* Text */}
+      <ColorGroup title="Text Colors">
+        <ColorSwatch name="text-primary" color="#171412" dark />
+        <ColorSwatch name="text-secondary" color="#4a4744" dark />
+        <ColorSwatch name="text-muted" color="#8e827c" />
+        <ColorSwatch name="text-inverse" color="#ffffff" border />
+      </ColorGroup>
+
+      {/* Accent Primary */}
+      <ColorGroup title="Accent - Primary (Orange)">
+        <ColorSwatch name="accent-primary" color="#ff7722" />
+        <ColorSwatch name="accent-primary-hover" color="#e5691e" />
+        <ColorSwatch name="accent-primary-active" color="#cc5d1a" />
+        <ColorSwatch name="accent-primary-subtle" color="rgba(255, 119, 34, 0.1)" border />
+        <ColorSwatch name="accent-primary-glow" color="rgba(255, 119, 34, 0.4)" />
+      </ColorGroup>
+
+      {/* Accent Secondary */}
+      <ColorGroup title="Accent - Secondary (Purple)">
+        <ColorSwatch name="accent-secondary" color="#3d2fa9" dark />
+        <ColorSwatch name="accent-secondary-hover" color="#352994" dark />
+        <ColorSwatch name="accent-secondary-subtle" color="rgba(61, 47, 169, 0.1)" border />
+      </ColorGroup>
+
+      {/* Semantic */}
+      <ColorGroup title="Semantic Colors">
+        <ColorSwatch name="success" color="#22c55e" />
+        <ColorSwatch name="success-subtle" color="rgba(34, 197, 94, 0.15)" border />
+        <ColorSwatch name="warning" color="#ffc765" />
+        <ColorSwatch name="warning-subtle" color="rgba(255, 199, 101, 0.2)" border />
+        <ColorSwatch name="error" color="#ff3c34" />
+        <ColorSwatch name="error-subtle" color="rgba(255, 60, 52, 0.1)" border />
+      </ColorGroup>
+
+      {/* Traffic Lights */}
+      <ColorGroup title="Traffic Lights (Window Controls)">
+        <ColorSwatch name="close" color="#ff5f57" size="small" />
+        <ColorSwatch name="minimize" color="#ffbd2e" size="small" />
+        <ColorSwatch name="maximize" color="#28c840" size="small" />
+        <ColorSwatch name="inactive" color="rgba(23, 20, 18, 0.15)" size="small" border />
+      </ColorGroup>
+
+      {/* Borders */}
+      <ColorGroup title="Borders">
+        <ColorSwatch name="border-default" color="rgba(23, 20, 18, 0.08)" border />
+        <ColorSwatch name="border-subtle" color="rgba(23, 20, 18, 0.05)" border />
+        <ColorSwatch name="border-strong" color="rgba(23, 20, 18, 0.15)" border />
+      </ColorGroup>
+    </div>
+  );
+}
+
+// ============================================================================
+// TYPOGRAPHY SECTION
+// ============================================================================
+
+function TypographySection() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+      {/* Font Families */}
+      <div>
+        <SectionTitle>Font Families</SectionTitle>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 16 }}>
+          <div
+            style={{
+              padding: 24,
+              background: '#ffffff',
+              borderRadius: 12,
+              border: '1px solid rgba(23, 20, 18, 0.08)',
+            }}
+          >
+            <p style={{ fontSize: 12, color: '#8e827c', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Display / Headings
+            </p>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 36, color: '#171412' }}>
+              Averia Serif Libre
+            </p>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, color: '#4a4744', marginTop: 8 }}>
+              The quick brown fox jumps over the lazy dog
+            </p>
+          </div>
+
+          <div
+            style={{
+              padding: 24,
+              background: '#ffffff',
+              borderRadius: 12,
+              border: '1px solid rgba(23, 20, 18, 0.08)',
+            }}
+          >
+            <p style={{ fontSize: 12, color: '#8e827c', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Body / UI
+            </p>
+            <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: 36, color: '#171412' }}>
+              Instrument Sans
+            </p>
+            <p style={{ fontFamily: 'system-ui, sans-serif', fontSize: 18, color: '#4a4744', marginTop: 8 }}>
+              The quick brown fox jumps over the lazy dog
+            </p>
+          </div>
+
+          <div
+            style={{
+              padding: 24,
+              background: '#ffffff',
+              borderRadius: 12,
+              border: '1px solid rgba(23, 20, 18, 0.08)',
+            }}
+          >
+            <p style={{ fontSize: 12, color: '#8e827c', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Monospace
+            </p>
+            <p style={{ fontFamily: 'ui-monospace, monospace', fontSize: 36, color: '#171412' }}>
+              SF Mono
+            </p>
+            <p style={{ fontFamily: 'ui-monospace, monospace', fontSize: 18, color: '#4a4744', marginTop: 8 }}>
+              const goOS = &quot;awesome&quot;;
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Type Scale */}
+      <div>
+        <SectionTitle>Type Scale (Major Third 1.25)</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid rgba(23, 20, 18, 0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+          }}
+        >
+          <TypeRow name="5xl" size={48} desc="Display" />
+          <TypeRow name="4xl" size={40} desc="H1" />
+          <TypeRow name="3xl" size={32} desc="H2" />
+          <TypeRow name="2xl" size={24} desc="H3" />
+          <TypeRow name="xl" size={20} desc="H4" />
+          <TypeRow name="lg" size={18} desc="Large" />
+          <TypeRow name="md" size={16} desc="Medium" />
+          <TypeRow name="base" size={14} desc="Body" />
+          <TypeRow name="sm" size={12} desc="Small" />
+          <TypeRow name="xs" size={10} desc="Caption" />
+        </div>
+      </div>
+
+      {/* Font Weights */}
+      <div>
+        <SectionTitle>Font Weights</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid rgba(23, 20, 18, 0.08)',
+            display: 'flex',
+            gap: 32,
+            flexWrap: 'wrap',
+          }}
+        >
+          <span style={{ fontSize: 24, fontWeight: 400 }}>400 Normal</span>
+          <span style={{ fontSize: 24, fontWeight: 500 }}>500 Medium</span>
+          <span style={{ fontSize: 24, fontWeight: 600 }}>600 Semibold</span>
+          <span style={{ fontSize: 24, fontWeight: 700 }}>700 Bold</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// SPACING SECTION
+// ============================================================================
+
+function SpacingSection() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+      {/* Spacing Scale */}
+      <div>
+        <SectionTitle>Spacing Scale (8-point grid)</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid rgba(23, 20, 18, 0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+          }}
+        >
+          <SpaceRow name="space-1" value={4} desc="Tight: icon padding" />
+          <SpaceRow name="space-2" value={8} desc="Compact: button padding" />
+          <SpaceRow name="space-3" value={12} desc="Default: card padding" />
+          <SpaceRow name="space-4" value={16} desc="Comfortable: section gaps" />
+          <SpaceRow name="space-5" value={20} desc="Relaxed: card margins" />
+          <SpaceRow name="space-6" value={24} desc="Spacious: section padding" />
+          <SpaceRow name="space-8" value={32} desc="Large: major section gaps" />
+          <SpaceRow name="space-10" value={40} desc="Extra large: page margins" />
+          <SpaceRow name="space-12" value={48} desc="Hero sections" />
+          <SpaceRow name="space-16" value={64} desc="Major page sections" />
+        </div>
+      </div>
+
+      {/* Border Radius */}
+      <div>
+        <SectionTitle>Border Radius</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid rgba(23, 20, 18, 0.08)',
+            display: 'flex',
+            gap: 24,
+            flexWrap: 'wrap',
+            alignItems: 'flex-end',
+          }}
+        >
+          <RadiusBox name="xs" value={4} />
+          <RadiusBox name="sm" value={6} />
+          <RadiusBox name="md" value={10} />
+          <RadiusBox name="lg" value={12} />
+          <RadiusBox name="xl" value={14} />
+          <RadiusBox name="xxl" value={16} />
+          <RadiusBox name="dock" value={20} />
+          <RadiusBox name="full" value={9999} />
+        </div>
+      </div>
+
+      {/* Shadows */}
+      <div>
+        <SectionTitle>Shadows</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: 24,
+          }}
+        >
+          <ShadowBox name="sm" shadow="0 2px 8px rgba(23, 20, 18, 0.06)" />
+          <ShadowBox name="md" shadow="0 4px 20px rgba(23, 20, 18, 0.08)" />
+          <ShadowBox name="lg" shadow="0 8px 32px rgba(23, 20, 18, 0.12)" />
+          <ShadowBox name="xl" shadow="0 16px 48px rgba(23, 20, 18, 0.15)" />
+          <ShadowBox
+            name="window"
+            shadow="0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12)"
+          />
+          <ShadowBox name="dock" shadow="0 8px 32px rgba(23, 20, 18, 0.12)" />
+        </div>
+      </div>
+
+      {/* Blur */}
+      <div>
+        <SectionTitle>Blur / Glassmorphism</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            display: 'flex',
+            gap: 24,
+            padding: 24,
+            background: 'linear-gradient(135deg, #ff7722 0%, #3d2fa9 100%)',
+            borderRadius: 12,
+          }}
+        >
+          <BlurBox name="subtle" value={12} />
+          <BlurBox name="medium" value={20} />
+          <BlurBox name="heavy" value={24} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// COMPONENTS SECTION
+// ============================================================================
+
+function ComponentsSection() {
+  const [buttonHover, setButtonHover] = useState<string | null>(null);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+      {/* Buttons */}
+      <div>
+        <SectionTitle>Buttons</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid rgba(23, 20, 18, 0.08)',
+            display: 'flex',
+            gap: 16,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}
+        >
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              padding: '12px 24px',
+              fontSize: 14,
+              fontWeight: 500,
+              border: 'none',
+              borderRadius: 10,
+              cursor: 'pointer',
+              background: '#ff7722',
+              color: '#ffffff',
+            }}
+          >
+            Primary Button
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              padding: '12px 24px',
+              fontSize: 14,
+              fontWeight: 500,
+              border: '1px solid rgba(23, 20, 18, 0.15)',
+              borderRadius: 10,
+              cursor: 'pointer',
+              background: 'transparent',
+              color: '#171412',
+            }}
+          >
+            Secondary Button
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              padding: '12px 24px',
+              fontSize: 14,
+              fontWeight: 500,
+              border: 'none',
+              borderRadius: 10,
+              cursor: 'pointer',
+              background: '#3d2fa9',
+              color: '#ffffff',
+            }}
+          >
+            Purple Button
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              padding: '12px 24px',
+              fontSize: 14,
+              fontWeight: 500,
+              border: 'none',
+              borderRadius: 10,
+              cursor: 'pointer',
+              background: 'rgba(23, 20, 18, 0.05)',
+              color: '#171412',
+            }}
+          >
+            Ghost Button
+          </motion.button>
+
+          <button
+            style={{
+              padding: '12px 24px',
+              fontSize: 14,
+              fontWeight: 500,
+              border: 'none',
+              borderRadius: 10,
+              cursor: 'not-allowed',
+              background: '#ff7722',
+              color: '#ffffff',
+              opacity: 0.5,
+            }}
+          >
+            Disabled
+          </button>
+        </div>
+      </div>
+
+      {/* Traffic Lights */}
+      <div>
+        <SectionTitle>Window Traffic Lights</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid rgba(23, 20, 18, 0.08)',
+            display: 'flex',
+            gap: 32,
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ display: 'flex', gap: 8 }}>
+            <motion.div
+              whileHover={{ scale: 1.15 }}
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: '#ff5f57',
+                cursor: 'pointer',
+              }}
+            />
+            <motion.div
+              whileHover={{ scale: 1.15 }}
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: '#ffbd2e',
+                cursor: 'pointer',
+              }}
+            />
+            <motion.div
+              whileHover={{ scale: 1.15 }}
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: '#28c840',
+                cursor: 'pointer',
+              }}
+            />
+          </div>
+          <span style={{ color: '#8e827c', fontSize: 14 }}>Active state</span>
+
+          <div style={{ display: 'flex', gap: 8 }}>
+            <div
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: 'rgba(23, 20, 18, 0.15)',
+              }}
+            />
+            <div
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: 'rgba(23, 20, 18, 0.15)',
+              }}
+            />
+            <div
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: 'rgba(23, 20, 18, 0.15)',
+              }}
+            />
+          </div>
+          <span style={{ color: '#8e827c', fontSize: 14 }}>Inactive state</span>
+        </div>
+      </div>
+
+      {/* Window */}
+      <div>
+        <SectionTitle>Window</SectionTitle>
+        <div style={{ marginTop: 16 }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            style={{
+              width: '100%',
+              maxWidth: 500,
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(24px)',
+              borderRadius: 12,
+              boxShadow: '0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08)',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Title bar */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '16px 20px',
+                background: 'rgba(255, 255, 255, 0.5)',
+                borderBottom: '1px solid rgba(23, 20, 18, 0.05)',
+              }}
+            >
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57' }} />
+                <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffbd2e' }} />
+                <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840' }} />
+              </div>
+              <span style={{ flex: 1, textAlign: 'center', fontSize: 13, fontWeight: 500, color: '#171412' }}>
+                Window Title
+              </span>
+              <div style={{ width: 52 }} />
+            </div>
+            {/* Content */}
+            <div style={{ padding: 24 }}>
+              <p style={{ color: '#4a4744', lineHeight: 1.6 }}>
+                This is a sample window component with the goOS design system applied.
+                It features glassmorphism, warm shadows, and traffic light controls.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Dock */}
+      <div>
+        <SectionTitle>Dock</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 32,
+            background: 'linear-gradient(180deg, #f2f0e7 0%, #e8e5db 100%)',
+            borderRadius: 12,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <motion.div
+            style={{
+              display: 'flex',
+              gap: 8,
+              padding: '10px 16px',
+              background: 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: 20,
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+              boxShadow: '0 8px 32px rgba(23, 20, 18, 0.12)',
+            }}
+          >
+            {['📁', '📝', '🖼️', '🔗', '⚙️'].map((icon, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ y: -8, scale: 1.15 }}
+                style={{
+                  width: 44,
+                  height: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 24,
+                  background: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                }}
+              >
+                {icon}
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Desktop Icon */}
+      <div>
+        <SectionTitle>Desktop Icons</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 32,
+            background: 'linear-gradient(180deg, #f2f0e7 0%, #e8e5db 100%)',
+            borderRadius: 12,
+            display: 'flex',
+            gap: 32,
+          }}
+        >
+          {[
+            { icon: '📁', name: 'Projects' },
+            { icon: '📝', name: 'About Me' },
+            { icon: '🖼️', name: 'Gallery' },
+            { icon: '🔗', name: 'Links' },
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05 }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 8,
+                cursor: 'pointer',
+              }}
+            >
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 32,
+                  background: 'rgba(255, 255, 255, 0.8)',
+                  borderRadius: 16,
+                  boxShadow: '0 2px 8px rgba(23, 20, 18, 0.06)',
+                }}
+              >
+                {item.icon}
+              </div>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: '#171412',
+                  textAlign: 'center',
+                  maxWidth: 80,
+                }}
+              >
+                {item.name}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Cards */}
+      <div>
+        <SectionTitle>Cards</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: 24,
+          }}
+        >
+          <motion.div
+            whileHover={{ y: -4 }}
+            style={{
+              padding: 24,
+              background: '#ffffff',
+              borderRadius: 12,
+              border: '1px solid rgba(23, 20, 18, 0.08)',
+              boxShadow: '0 2px 8px rgba(23, 20, 18, 0.06)',
+            }}
+          >
+            <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Basic Card</h3>
+            <p style={{ fontSize: 14, color: '#4a4744', lineHeight: 1.5 }}>
+              A simple card with subtle shadow and border.
+            </p>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ y: -4 }}
+            style={{
+              padding: 24,
+              background: 'linear-gradient(135deg, #ff7722 0%, #e5691e 100%)',
+              borderRadius: 12,
+              color: '#ffffff',
+              boxShadow: '0 8px 24px rgba(255, 119, 34, 0.3)',
+            }}
+          >
+            <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Accent Card</h3>
+            <p style={{ fontSize: 14, opacity: 0.9, lineHeight: 1.5 }}>
+              A card with the primary accent color gradient.
+            </p>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ y: -4 }}
+            style={{
+              padding: 24,
+              background: 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: 12,
+              border: '1px solid rgba(255, 255, 255, 0.5)',
+              boxShadow: '0 4px 20px rgba(23, 20, 18, 0.08)',
+            }}
+          >
+            <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Glass Card</h3>
+            <p style={{ fontSize: 14, color: '#4a4744', lineHeight: 1.5 }}>
+              A card with glassmorphism effect.
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Inputs */}
+      <div>
+        <SectionTitle>Inputs</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid rgba(23, 20, 18, 0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            maxWidth: 400,
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Default input"
+            style={{
+              padding: '12px 16px',
+              fontSize: 14,
+              border: '1px solid rgba(23, 20, 18, 0.15)',
+              borderRadius: 10,
+              outline: 'none',
+              background: '#ffffff',
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Focused input (click me)"
+            style={{
+              padding: '12px 16px',
+              fontSize: 14,
+              border: '2px solid #ff7722',
+              borderRadius: 10,
+              outline: 'none',
+              background: '#ffffff',
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Disabled input"
+            disabled
+            style={{
+              padding: '12px 16px',
+              fontSize: 14,
+              border: '1px solid rgba(23, 20, 18, 0.08)',
+              borderRadius: 10,
+              outline: 'none',
+              background: '#f2f0e7',
+              opacity: 0.5,
+              cursor: 'not-allowed',
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Badges */}
+      <div>
+        <SectionTitle>Badges & Tags</SectionTitle>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 24,
+            background: '#ffffff',
+            borderRadius: 12,
+            border: '1px solid rgba(23, 20, 18, 0.08)',
+            display: 'flex',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <span
+            style={{
+              padding: '6px 12px',
+              fontSize: 12,
+              fontWeight: 500,
+              background: '#ff7722',
+              color: '#ffffff',
+              borderRadius: 9999,
+            }}
+          >
+            Primary
+          </span>
+          <span
+            style={{
+              padding: '6px 12px',
+              fontSize: 12,
+              fontWeight: 500,
+              background: 'rgba(255, 119, 34, 0.1)',
+              color: '#ff7722',
+              borderRadius: 9999,
+            }}
+          >
+            Primary Subtle
+          </span>
+          <span
+            style={{
+              padding: '6px 12px',
+              fontSize: 12,
+              fontWeight: 500,
+              background: '#22c55e',
+              color: '#ffffff',
+              borderRadius: 9999,
+            }}
+          >
+            Success
+          </span>
+          <span
+            style={{
+              padding: '6px 12px',
+              fontSize: 12,
+              fontWeight: 500,
+              background: '#ffc765',
+              color: '#171412',
+              borderRadius: 9999,
+            }}
+          >
+            Warning
+          </span>
+          <span
+            style={{
+              padding: '6px 12px',
+              fontSize: 12,
+              fontWeight: 500,
+              background: '#ff3c34',
+              color: '#ffffff',
+              borderRadius: 9999,
+            }}
+          >
+            Error
+          </span>
+          <span
+            style={{
+              padding: '6px 12px',
+              fontSize: 12,
+              fontWeight: 500,
+              background: 'rgba(23, 20, 18, 0.05)',
+              color: '#4a4744',
+              borderRadius: 9999,
+            }}
+          >
+            Neutral
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -278,34 +946,30 @@ export default function DesignSystemPage() {
 // HELPER COMPONENTS
 // ============================================================================
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <section style={{ marginBottom: 64 }}>
-      <h2
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'var(--font-size-2xl)',
-          fontWeight: 600,
-          marginBottom: 24,
-          paddingBottom: 12,
-          borderBottom: '2px solid var(--color-border-default)',
-        }}
-      >
-        {title}
-      </h2>
+    <h2
+      style={{
+        fontSize: 20,
+        fontWeight: 600,
+        color: '#171412',
+        paddingBottom: 12,
+        borderBottom: '2px solid rgba(23, 20, 18, 0.08)',
+      }}
+    >
       {children}
-    </section>
+    </h2>
   );
 }
 
-function Subsection({ title, children }: { title: string; children: React.ReactNode }) {
+function ColorGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 32 }}>
+    <div>
       <h3
         style={{
-          fontSize: 'var(--font-size-sm)',
+          fontSize: 12,
           fontWeight: 600,
-          color: 'var(--color-text-muted)',
+          color: '#8e827c',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
           marginBottom: 16,
@@ -313,15 +977,7 @@ function Subsection({ title, children }: { title: string; children: React.ReactN
       >
         {title}
       </h3>
-      {children}
-    </div>
-  );
-}
-
-function ColorGrid({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-      {children}
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>{children}</div>
     </div>
   );
 }
@@ -329,200 +985,149 @@ function ColorGrid({ children }: { children: React.ReactNode }) {
 function ColorSwatch({
   name,
   color,
-  hex,
   dark,
   border,
+  size = 'normal',
 }: {
   name: string;
   color: string;
-  hex: string;
   dark?: boolean;
   border?: boolean;
+  size?: 'normal' | 'small';
 }) {
+  const boxSize = size === 'small' ? 48 : 100;
   return (
-    <div style={{ width: 140 }}>
+    <div style={{ width: size === 'small' ? 80 : 120 }}>
       <div
         style={{
-          width: '100%',
-          height: 80,
+          width: boxSize,
+          height: boxSize,
           background: color,
-          borderRadius: 'var(--radius-lg)',
+          borderRadius: 12,
           marginBottom: 8,
-          border: border ? '1px solid var(--color-border-default)' : 'none',
-          boxShadow: 'var(--shadow-sm)',
+          border: border ? '1px solid rgba(23, 20, 18, 0.15)' : 'none',
+          boxShadow: '0 2px 8px rgba(23, 20, 18, 0.06)',
         }}
       />
-      <p style={{ fontSize: 13, fontWeight: 500, color: dark ? color : 'var(--color-text-primary)' }}>
-        {name}
-      </p>
-      <p style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-        {hex}
+      <p style={{ fontSize: 13, fontWeight: 500, color: '#171412' }}>{name}</p>
+      <p style={{ fontSize: 11, color: '#8e827c', fontFamily: 'ui-monospace, monospace' }}>
+        {color.length > 20 ? color.slice(0, 20) + '...' : color}
       </p>
     </div>
   );
 }
 
-function TypeSample({ name, size, desc }: { name: string; size: string; desc: string }) {
+function TypeRow({ name, size, desc }: { name: string; size: number; desc: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
       <span
         style={{
-          width: 60,
+          width: 50,
           fontSize: 12,
-          color: 'var(--color-text-muted)',
-          fontFamily: 'var(--font-mono)',
+          color: '#8e827c',
+          fontFamily: 'ui-monospace, monospace',
         }}
       >
         {name}
       </span>
-      <span style={{ fontSize: size, fontWeight: 500 }}>
+      <span style={{ fontSize: size, fontWeight: 500, color: '#171412', flex: 1 }}>
         The quick brown fox
       </span>
-      <span style={{ fontSize: 12, color: 'var(--color-text-muted)', marginLeft: 'auto' }}>
-        {desc}
-      </span>
+      <span style={{ fontSize: 12, color: '#8e827c' }}>{size}px - {desc}</span>
     </div>
   );
 }
 
-function SpacingSample({ name, value }: { name: string; value: string }) {
-  const numValue = parseInt(value);
+function SpaceRow({ name, value, desc }: { name: string; value: number; desc: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
       <span
         style={{
-          width: 100,
-          fontSize: 13,
-          fontFamily: 'var(--font-mono)',
-          color: 'var(--color-text-muted)',
+          width: 80,
+          fontSize: 12,
+          color: '#8e827c',
+          fontFamily: 'ui-monospace, monospace',
         }}
       >
         {name}
       </span>
       <div
         style={{
-          width: numValue,
+          width: value,
           height: 24,
-          background: 'var(--color-accent-primary)',
+          background: '#ff7722',
           borderRadius: 4,
         }}
       />
-      <span style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>{value}</span>
+      <span style={{ fontSize: 13, color: '#4a4744', minWidth: 40 }}>{value}px</span>
+      <span style={{ fontSize: 12, color: '#8e827c' }}>{desc}</span>
     </div>
   );
 }
 
-function RadiusSample({ name, value }: { name: string; value: string }) {
+function RadiusBox({ name, value }: { name: string; value: number }) {
   return (
     <div style={{ textAlign: 'center' }}>
       <div
         style={{
           width: 64,
           height: 64,
-          background: 'var(--color-accent-primary-subtle)',
-          border: '2px solid var(--color-accent-primary)',
+          background: 'rgba(255, 119, 34, 0.1)',
+          border: '2px solid #ff7722',
           borderRadius: value,
           marginBottom: 8,
         }}
       />
-      <p style={{ fontSize: 12, fontWeight: 500 }}>{name}</p>
-      <p style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-        {value}
+      <p style={{ fontSize: 12, fontWeight: 500, color: '#171412' }}>{name}</p>
+      <p style={{ fontSize: 11, color: '#8e827c', fontFamily: 'ui-monospace, monospace' }}>
+        {value === 9999 ? 'full' : value + 'px'}
       </p>
     </div>
   );
 }
 
-function ShadowSample({ name, shadow }: { name: string; shadow: string }) {
+function ShadowBox({ name, shadow }: { name: string; shadow: string }) {
   return (
-    <div style={{ textAlign: 'center' }}>
-      <div
-        style={{
-          width: 120,
-          height: 80,
-          background: 'var(--color-bg-white)',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: shadow,
-          marginBottom: 12,
-        }}
-      />
-      <p style={{ fontSize: 13, fontWeight: 500 }}>{name}</p>
+    <div
+      style={{
+        padding: 24,
+        background: '#ffffff',
+        borderRadius: 12,
+        boxShadow: shadow,
+        textAlign: 'center',
+      }}
+    >
+      <p style={{ fontSize: 14, fontWeight: 500, color: '#171412' }}>shadow-{name}</p>
     </div>
   );
 }
 
-function BlurSample({ name, value }: { name: string; value: string }) {
+function BlurBox({ name, value }: { name: string; value: number }) {
   return (
     <div style={{ textAlign: 'center' }}>
       <div
         style={{
           width: 120,
           height: 80,
-          background: 'rgba(255, 255, 255, 0.7)',
-          backdropFilter: `blur(${value})`,
-          WebkitBackdropFilter: `blur(${value})`,
-          borderRadius: 'var(--radius-lg)',
-          border: '1px solid rgba(255,255,255,0.5)',
-          marginBottom: 12,
+          background: 'rgba(255, 255, 255, 0.5)',
+          backdropFilter: `blur(${value}px)`,
+          WebkitBackdropFilter: `blur(${value}px)`,
+          borderRadius: 12,
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          marginBottom: 8,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'var(--color-text-secondary)',
-          fontSize: 12,
+          color: '#ffffff',
+          fontWeight: 500,
+          fontSize: 14,
         }}
       >
         Glass
       </div>
-      <p style={{ fontSize: 13, fontWeight: 500 }}>{name}</p>
-      <p style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function OpacitySample({ name, value }: { name: string; value: string }) {
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <div
-        style={{
-          width: 100,
-          height: 48,
-          background: 'var(--color-accent-primary)',
-          borderRadius: 'var(--radius-md)',
-          opacity: parseFloat(value),
-          marginBottom: 8,
-        }}
-      />
-      <p style={{ fontSize: 13, fontWeight: 500 }}>{name}</p>
-      <p style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function TransitionSample({ name, value }: { name: string; value: string }) {
-  const [hovered, setHovered] = React.useState(false);
-  return (
-    <div style={{ textAlign: 'center' }}>
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{
-          width: 100,
-          height: 48,
-          background: hovered ? 'var(--color-accent-primary)' : 'var(--color-bg-subtle)',
-          borderRadius: 'var(--radius-md)',
-          marginBottom: 8,
-          cursor: 'pointer',
-          transition: `all ${value} var(--ease-out)`,
-          transform: hovered ? 'scale(1.05)' : 'scale(1)',
-        }}
-      />
-      <p style={{ fontSize: 13, fontWeight: 500 }}>{name}</p>
-      <p style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-        {value}
+      <p style={{ fontSize: 13, fontWeight: 500, color: '#ffffff' }}>{name}</p>
+      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', fontFamily: 'ui-monospace, monospace' }}>
+        {value}px
       </p>
     </div>
   );
