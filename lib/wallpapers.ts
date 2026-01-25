@@ -1,15 +1,11 @@
 // ============================================================================
-// WALLPAPERS CONFIG
+// WALLPAPERS CONFIG - AUTO-GENERATED, DO NOT EDIT
 // ============================================================================
-//
-// TO ADD NEW WALLPAPERS:
-// 1. Drop your new bg files in /public (e.g., bg36.png, bg37.png)
-// 2. Update WALLPAPER_COUNT below to match the highest number
-// 3. Done! They'll appear automatically.
-//
+// Just drop new bg files (bg36.png, bg37.png, etc.) in /public and push.
+// This file updates automatically during build.
 // ============================================================================
 
-export const WALLPAPER_COUNT = 35;
+export const WALLPAPER_COUNT = 36;
 
 // Generate wallpaper array automatically
 export const WALLPAPERS = [
