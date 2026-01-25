@@ -77,6 +77,7 @@ import {
 import { playSound } from '@/lib/sounds';
 import { CommandPalette } from '@/components/command-palette/CommandPalette';
 import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
+import { WALLPAPERS } from '@/lib/wallpapers';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -2659,44 +2660,6 @@ function GoOSDemoContent() {
     // Theme-aware colors via CSS variables (no JS dependency on isDarkMode)
     const iconColors = getIconColors();
     const stickyColors = getStickyColors();
-    const WALLPAPERS = [
-        { id: null, label: 'None', preview: null },
-        { id: 'bg01', label: 'Gradient 1', preview: '/bg01.png' },
-        { id: 'bg02', label: 'Gradient 2', preview: '/bg02.png' },
-        { id: 'bg03', label: 'Gradient 3', preview: '/bg03.png' },
-        { id: 'bg04', label: 'Gradient 4', preview: '/bg04.png' },
-        { id: 'bg05', label: 'Gradient 5', preview: '/bg05.png' },
-        { id: 'bg06', label: 'Gradient 6', preview: '/bg06.png' },
-        { id: 'bg07', label: 'Gradient 7', preview: '/bg07.png' },
-        { id: 'bg08', label: 'Gradient 8', preview: '/bg08.png' },
-        { id: 'bg09', label: 'Gradient 9', preview: '/bg09.png' },
-        { id: 'bg10', label: 'Gradient 10', preview: '/bg10.png' },
-        { id: 'bg11', label: 'Gradient 11', preview: '/bg11.png' },
-        { id: 'bg12', label: 'Gradient 12', preview: '/bg12.png' },
-        { id: 'bg13', label: 'Gradient 13', preview: '/bg13.png' },
-        { id: 'bg14', label: 'Gradient 14', preview: '/bg14.png' },
-        { id: 'bg15', label: 'Gradient 15', preview: '/bg15.png' },
-        { id: 'bg16', label: 'Gradient 16', preview: '/bg16.png' },
-        { id: 'bg17', label: 'Gradient 17', preview: '/bg17.png' },
-        { id: 'bg18', label: 'Gradient 18', preview: '/bg18.png' },
-        { id: 'bg19', label: 'Gradient 19', preview: '/bg19.png' },
-        { id: 'bg20', label: 'Gradient 20', preview: '/bg20.png' },
-        { id: 'bg21', label: 'Gradient 21', preview: '/bg21.png' },
-        { id: 'bg22', label: 'Gradient 22', preview: '/bg22.png' },
-        { id: 'bg23', label: 'Gradient 23', preview: '/bg23.png' },
-        { id: 'bg24', label: 'Gradient 24', preview: '/bg24.png' },
-        { id: 'bg25', label: 'Gradient 25', preview: '/bg25.png' },
-        { id: 'bg26', label: 'Gradient 26', preview: '/bg26.png' },
-        { id: 'bg27', label: 'Gradient 27', preview: '/bg27.png' },
-        { id: 'bg28', label: 'Gradient 28', preview: '/bg28.png' },
-        { id: 'bg29', label: 'Gradient 29', preview: '/bg29.png' },
-        { id: 'bg30', label: 'Gradient 30', preview: '/bg30.png' },
-        { id: 'bg31', label: 'Gradient 31', preview: '/bg31.png' },
-        { id: 'bg32', label: 'Gradient 32', preview: '/bg32.png' },
-        { id: 'bg33', label: 'Gradient 33', preview: '/bg33.png' },
-        { id: 'bg34', label: 'Gradient 34', preview: '/bg34.png' },
-        { id: 'bg35', label: 'Gradient 35', preview: '/bg35.png' },
-    ];
 
     // Celebration helper
     const celebrate = useCallback(() => {
