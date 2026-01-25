@@ -3528,9 +3528,9 @@ function GoOSDemoContent() {
                                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                                 className="mt-4 px-6 py-3 rounded-full text-sm font-medium"
                                 style={{
-                                    background: 'var(--accent-primary, #ff7722)',
+                                    background: 'var(--color-accent-primary, #ff7722)',
                                     color: '#fff',
-                                    boxShadow: '0 4px 20px rgba(255, 119, 34, 0.3)',
+                                    boxShadow: 'var(--shadow-badge, 0 4px 20px rgba(255, 119, 34, 0.3))',
                                 }}
                             >
                                 Click anywhere to start
@@ -3572,7 +3572,7 @@ function GoOSDemoContent() {
                                     key={i}
                                     className="absolute w-2 h-2 rounded-full"
                                     style={{
-                                        background: 'var(--accent-primary, #ff7722)',
+                                        background: 'var(--color-accent-primary, #ff7722)',
                                         opacity: 0.15,
                                         left: `${15 + i * 15}%`,
                                         top: `${30 + (i % 3) * 20}%`,
@@ -3675,7 +3675,7 @@ function GoOSDemoContent() {
                                     }}
                                     className="absolute inset-y-0 w-1/2 rounded-full"
                                     style={{
-                                        background: 'linear-gradient(90deg, transparent, var(--accent-primary, #ff7722), transparent)',
+                                        background: 'linear-gradient(90deg, transparent, var(--color-accent-primary, #ff7722), transparent)',
                                     }}
                                 />
                             </motion.div>

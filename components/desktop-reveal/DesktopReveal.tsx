@@ -70,7 +70,7 @@ function CurveReveal({ width, height }: { width: number; height: number }) {
         style={{ display: 'block' }}
       >
         <motion.path
-          fill="#ff7722"
+          fill="var(--color-accent-primary)"
           initial={{ d: paths.initial }}
           animate={{ d: paths.target }}
           transition={{
@@ -99,7 +99,7 @@ function StairsReveal({ columns = 5 }: { columns?: number }) {
           key={i}
           className="flex-1 h-full origin-top"
           style={{
-            background: `linear-gradient(180deg, #ff7722 0%, #e56a1a 100%)`,
+            background: `linear-gradient(180deg, var(--color-accent-primary) 0%, var(--color-accent-primary-hover) 100%)`,
           }}
           initial={{ scaleY: 1 }}
           animate={{ scaleY: 0 }}
@@ -124,7 +124,7 @@ function PerspectiveReveal() {
       className="fixed inset-0"
       style={{
         zIndex: 10002,
-        background: 'linear-gradient(180deg, #ff7722 0%, #e56a1a 100%)',
+        background: 'linear-gradient(180deg, var(--color-accent-primary) 0%, var(--color-accent-primary-hover) 100%)',
         transformOrigin: 'top center',
       }}
       initial={{ y: 0 }}
@@ -189,7 +189,7 @@ export function DesktopReveal({ isActive, onComplete, variant = 'curve' }: Deskt
         className="fixed inset-0"
         style={{
           zIndex: 10002,
-          background: '#ff7722',
+          background: 'var(--color-accent-primary)',
         }}
         initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}

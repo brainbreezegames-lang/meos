@@ -114,20 +114,20 @@ function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
     searchBgFocused: 'var(--color-bg-white, #ffffff)',
     searchBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
     searchBorderFocused: 'var(--color-accent-primary, #ff7722)',
-    searchShadowFocused: '0 0 0 3px rgba(255, 119, 34, 0.15)',
+    searchShadowFocused: '0 0 0 3px var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.15))',
     searchIcon: 'var(--color-text-muted, #8e827c)',
     searchIconFocused: 'var(--color-accent-primary, #ff7722)',
     searchText: 'var(--color-text-primary, #171412)',
 
     folderText: 'var(--color-text-primary, #171412)',
     folderCount: 'var(--color-text-muted, #8e827c)',
-    folderHoverBg: 'rgba(255, 119, 34, 0.08)',
+    folderHoverBg: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.08))',
 
     noteCardBg: 'var(--color-bg-white, #ffffff)',
     noteCardShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
     noteCardHoverShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
     noteCardSelectedBg: 'var(--color-accent-primary, #ff7722)',
-    noteCardSelectedShadow: '0 4px 16px rgba(255, 119, 34, 0.25)',
+    noteCardSelectedShadow: 'var(--shadow-badge, 0 4px 16px rgba(255, 119, 34, 0.25))',
     noteTitle: 'var(--color-text-primary, #171412)',
     noteTitleSelected: 'var(--color-bg-white, #ffffff)',
     noteDate: 'var(--color-accent-primary, #ff7722)',
@@ -144,21 +144,21 @@ function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
     contentMeta: 'var(--color-text-muted, #8e827c)',
     contentText: 'var(--color-text-primary, #171412)',
 
-    emptyBg: 'rgba(255, 119, 34, 0.06)',
-    emptyShadow: '0 8px 24px rgba(255, 119, 34, 0.08)',
+    emptyBg: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.06))',
+    emptyShadow: 'var(--shadow-badge, 0 8px 24px rgba(255, 119, 34, 0.08))',
     emptyIconColor: 'var(--color-accent-primary, #ff7722)',
     emptyTitle: 'var(--color-text-primary, #171412)',
     emptyText: 'var(--color-text-muted, #8e827c)',
 
     buttonText: 'var(--color-text-muted, #8e827c)',
-    buttonHoverBg: 'rgba(255, 119, 34, 0.08)',
+    buttonHoverBg: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.08))',
     buttonHoverText: 'var(--color-text-primary, #171412)',
     primaryButtonBg: 'var(--color-accent-primary, #ff7722)',
     primaryButtonText: 'var(--color-bg-white, #ffffff)',
-    primaryButtonShadow: '0 4px 12px rgba(255, 119, 34, 0.25)',
+    primaryButtonShadow: 'var(--shadow-badge, 0 4px 12px rgba(255, 119, 34, 0.25))',
 
     accent: 'var(--color-accent-primary, #ff7722)',
-    accentLight: 'rgba(255, 119, 34, 0.1)',
+    accentLight: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.1))',
   };
 }
 
