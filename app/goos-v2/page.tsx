@@ -3960,138 +3960,58 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* Bottom lava glow - pure CSS layered flames */}
+            {/* Bottom lava glow - static CSS only, no animation */}
             {!wallpaper && (
-                <>
-                    <style>{`
-                        @keyframes lavaBreath {
-                            0%, 100% { opacity: 0.85; transform: scaleY(1); }
-                            50% { opacity: 1; transform: scaleY(1.02); }
-                        }
-                    `}</style>
-                    <div
-                        className="pointer-events-none"
-                        style={{
-                            position: 'fixed',
-                            zIndex: 4,
-                            bottom: '-5vh',
-                            left: '-8vw',
-                            width: '116vw',
-                            height: '45vh',
-                            transformOrigin: 'bottom center',
-                            animation: 'lavaBreath 8s ease-in-out infinite',
-                        }}
-                    >
-                        {/* Layer 1: Deep crimson base - full coverage */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: `
-                                    linear-gradient(to top,
-                                        #6B1010 0%,
-                                        #8B1A1A 15%,
-                                        #A02020 30%,
-                                        transparent 70%
-                                    )
-                                `,
-                            }}
-                        />
-                        {/* Layer 2: Red-orange flames with irregular peaks */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: `
-                                    radial-gradient(ellipse 25% 60% at 8% 100%, #C83818 0%, transparent 100%),
-                                    radial-gradient(ellipse 20% 55% at 18% 100%, #D84818 0%, transparent 100%),
-                                    radial-gradient(ellipse 30% 70% at 32% 100%, #B83020 0%, transparent 100%),
-                                    radial-gradient(ellipse 22% 50% at 45% 100%, #D04020 0%, transparent 100%),
-                                    radial-gradient(ellipse 28% 65% at 58% 100%, #C83818 0%, transparent 100%),
-                                    radial-gradient(ellipse 18% 45% at 70% 100%, #D84818 0%, transparent 100%),
-                                    radial-gradient(ellipse 24% 58% at 82% 100%, #B83020 0%, transparent 100%),
-                                    radial-gradient(ellipse 20% 52% at 95% 100%, #C04020 0%, transparent 100%)
-                                `,
-                            }}
-                        />
-                        {/* Layer 3: Orange mid-flames */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: `
-                                    radial-gradient(ellipse 18% 50% at 5% 100%, #E85A00 0%, transparent 100%),
-                                    radial-gradient(ellipse 22% 58% at 15% 100%, #FF6800 0%, transparent 100%),
-                                    radial-gradient(ellipse 15% 42% at 25% 100%, #E86000 0%, transparent 100%),
-                                    radial-gradient(ellipse 26% 62% at 38% 100%, #FF5500 0%, transparent 100%),
-                                    radial-gradient(ellipse 20% 55% at 50% 100%, #F06000 0%, transparent 100%),
-                                    radial-gradient(ellipse 18% 48% at 62% 100%, #FF6800 0%, transparent 100%),
-                                    radial-gradient(ellipse 24% 56% at 75% 100%, #E85A00 0%, transparent 100%),
-                                    radial-gradient(ellipse 16% 44% at 88% 100%, #FF5500 0%, transparent 100%),
-                                    radial-gradient(ellipse 20% 50% at 98% 100%, #E86000 0%, transparent 100%)
-                                `,
-                            }}
-                        />
-                        {/* Layer 4: Bright orange peaks */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: `
-                                    radial-gradient(ellipse 14% 40% at 10% 100%, #FF8020 0%, transparent 100%),
-                                    radial-gradient(ellipse 18% 48% at 22% 100%, #FF7818 0%, transparent 100%),
-                                    radial-gradient(ellipse 12% 35% at 35% 100%, #FF9030 0%, transparent 100%),
-                                    radial-gradient(ellipse 20% 52% at 48% 100%, #FF8020 0%, transparent 100%),
-                                    radial-gradient(ellipse 16% 44% at 60% 100%, #FF7818 0%, transparent 100%),
-                                    radial-gradient(ellipse 14% 38% at 72% 100%, #FF9030 0%, transparent 100%),
-                                    radial-gradient(ellipse 18% 46% at 85% 100%, #FF8020 0%, transparent 100%),
-                                    radial-gradient(ellipse 12% 34% at 95% 100%, #FF7818 0%, transparent 100%)
-                                `,
-                            }}
-                        />
-                        {/* Layer 5: Yellow-orange hotspots */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: `
-                                    radial-gradient(ellipse 10% 32% at 12% 100%, #FFAA40 0%, transparent 100%),
-                                    radial-gradient(ellipse 14% 38% at 28% 100%, #FF9A30 0%, transparent 100%),
-                                    radial-gradient(ellipse 12% 34% at 42% 100%, #FFB850 0%, transparent 100%),
-                                    radial-gradient(ellipse 16% 42% at 55% 100%, #FFAA40 0%, transparent 100%),
-                                    radial-gradient(ellipse 10% 30% at 68% 100%, #FF9A30 0%, transparent 100%),
-                                    radial-gradient(ellipse 14% 36% at 80% 100%, #FFB850 0%, transparent 100%),
-                                    radial-gradient(ellipse 12% 32% at 92% 100%, #FFAA40 0%, transparent 100%)
-                                `,
-                            }}
-                        />
-                        {/* Layer 6: Yellow cores - brightest */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: `
-                                    radial-gradient(ellipse 8% 24% at 18% 100%, #FFC860 0%, transparent 100%),
-                                    radial-gradient(ellipse 10% 28% at 35% 100%, #FFD070 0%, transparent 100%),
-                                    radial-gradient(ellipse 12% 32% at 52% 100%, #FFC860 0%, transparent 100%),
-                                    radial-gradient(ellipse 8% 22% at 68% 100%, #FFD878 0%, transparent 100%),
-                                    radial-gradient(ellipse 10% 26% at 85% 100%, #FFC860 0%, transparent 100%)
-                                `,
-                            }}
-                        />
-                        {/* Soft blur overlay for natural blending */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                backdropFilter: 'blur(2px)',
-                                WebkitBackdropFilter: 'blur(2px)',
-                                maskImage: 'linear-gradient(to top, transparent 0%, black 30%, black 70%, transparent 100%)',
-                                WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 30%, black 70%, transparent 100%)',
-                            }}
-                        />
-                    </div>
-                </>
+                <div
+                    className="pointer-events-none"
+                    style={{
+                        position: 'fixed',
+                        zIndex: 4,
+                        bottom: '-8vh',
+                        left: '-10vw',
+                        width: '120vw',
+                        height: '50vh',
+                        background: `
+                            /* Deep red base */
+                            linear-gradient(to top, #5A0A0A 0%, #7A1515 8%, #9A2020 16%, transparent 45%),
+                            /* Red-orange flames */
+                            radial-gradient(ellipse 30% 55% at 0% 100%, #C83020 0%, transparent 100%),
+                            radial-gradient(ellipse 25% 50% at 12% 100%, #D84818 0%, transparent 100%),
+                            radial-gradient(ellipse 35% 60% at 28% 100%, #B83020 0%, transparent 100%),
+                            radial-gradient(ellipse 28% 52% at 42% 100%, #D04020 0%, transparent 100%),
+                            radial-gradient(ellipse 32% 58% at 58% 100%, #C83818 0%, transparent 100%),
+                            radial-gradient(ellipse 26% 48% at 72% 100%, #D84818 0%, transparent 100%),
+                            radial-gradient(ellipse 30% 54% at 88% 100%, #B83020 0%, transparent 100%),
+                            radial-gradient(ellipse 28% 50% at 100% 100%, #C04020 0%, transparent 100%),
+                            /* Orange mid layer */
+                            radial-gradient(ellipse 22% 42% at 5% 100%, #E85A00 0%, transparent 100%),
+                            radial-gradient(ellipse 28% 48% at 18% 100%, #FF6800 0%, transparent 100%),
+                            radial-gradient(ellipse 20% 38% at 32% 100%, #F06000 0%, transparent 100%),
+                            radial-gradient(ellipse 30% 52% at 48% 100%, #FF5500 0%, transparent 100%),
+                            radial-gradient(ellipse 24% 44% at 62% 100%, #FF6800 0%, transparent 100%),
+                            radial-gradient(ellipse 26% 46% at 78% 100%, #E85A00 0%, transparent 100%),
+                            radial-gradient(ellipse 22% 40% at 92% 100%, #FF5500 0%, transparent 100%),
+                            /* Bright orange peaks */
+                            radial-gradient(ellipse 18% 35% at 8% 100%, #FF8020 0%, transparent 100%),
+                            radial-gradient(ellipse 22% 40% at 22% 100%, #FF9030 0%, transparent 100%),
+                            radial-gradient(ellipse 16% 32% at 38% 100%, #FF8020 0%, transparent 100%),
+                            radial-gradient(ellipse 24% 42% at 52% 100%, #FF7818 0%, transparent 100%),
+                            radial-gradient(ellipse 20% 36% at 68% 100%, #FF9030 0%, transparent 100%),
+                            radial-gradient(ellipse 18% 34% at 82% 100%, #FF8020 0%, transparent 100%),
+                            radial-gradient(ellipse 22% 38% at 95% 100%, #FF7818 0%, transparent 100%),
+                            /* Yellow-orange hotspots */
+                            radial-gradient(ellipse 14% 28% at 15% 100%, #FFAA40 0%, transparent 100%),
+                            radial-gradient(ellipse 18% 32% at 35% 100%, #FFB850 0%, transparent 100%),
+                            radial-gradient(ellipse 16% 30% at 55% 100%, #FFAA40 0%, transparent 100%),
+                            radial-gradient(ellipse 14% 26% at 75% 100%, #FFB850 0%, transparent 100%),
+                            radial-gradient(ellipse 16% 28% at 90% 100%, #FFAA40 0%, transparent 100%),
+                            /* Yellow cores */
+                            radial-gradient(ellipse 10% 22% at 25% 100%, #FFC860 0%, transparent 100%),
+                            radial-gradient(ellipse 12% 24% at 50% 100%, #FFD070 0%, transparent 100%),
+                            radial-gradient(ellipse 10% 20% at 75% 100%, #FFC860 0%, transparent 100%)
+                        `,
+                    }}
+                />
             )}
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
@@ -5202,13 +5122,47 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="dock-container flex items-end px-3 py-2 rounded-[18px]"
+                            className="dock-container flex items-end px-3 py-2.5 rounded-[20px] relative"
                             style={{
                                 background: 'var(--dock-physical-bg, linear-gradient(180deg, #ffffff 0%, #f4f4f2 100%))',
                                 border: 'var(--dock-physical-border, 1px solid rgba(0, 0, 0, 0.06))',
-                                boxShadow: 'var(--dock-physical-shadow)',
+                                boxShadow: `
+                                    0 2px 4px rgba(0, 0, 0, 0.06),
+                                    0 8px 24px rgba(0, 0, 0, 0.1),
+                                    0 16px 48px rgba(0, 0, 0, 0.06),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                                    inset 0 -1px 0 rgba(0, 0, 0, 0.03)
+                                `,
                             }}
                         >
+                            {/* Left corner detail - physical screw/rivet */}
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    left: 10,
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    width: 4,
+                                    height: 4,
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #d8d8d6 0%, #e8e8e6 100%)',
+                                    boxShadow: 'inset 0 0.5px 1px rgba(0,0,0,0.15)',
+                                }}
+                            />
+                            {/* Right corner detail */}
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    right: 10,
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    width: 4,
+                                    height: 4,
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #d8d8d6 0%, #e8e8e6 100%)',
+                                    boxShadow: 'inset 0 0.5px 1px rgba(0,0,0,0.15)',
+                                }}
+                            />
                             <RubberDuck />
                             <DockIcon
                                 icon={<Mail size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
@@ -5223,7 +5177,17 @@ function GoOSDemoContent() {
                                 isActive={appWindows.notes}
                                 label="Notes"
                             />
-                            <div className="dock-separator w-px h-7 mx-2" style={{ background: 'rgba(0,0,0,0.08)' }} />
+                            {/* Physical separator - recessed groove */}
+                            <div
+                                className="dock-separator mx-2"
+                                style={{
+                                    width: 2,
+                                    height: 28,
+                                    borderRadius: 1,
+                                    background: 'linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 100%)',
+                                    boxShadow: '1px 0 0 rgba(255,255,255,0.6)',
+                                }}
+                            />
                             <DockIcon
                                 icon={<MessageCircle size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                                 onClick={() => toggleApp('chat')}
@@ -5236,7 +5200,17 @@ function GoOSDemoContent() {
                                 isActive={appWindows.shell}
                                 label="Shell"
                             />
-                            <div className="dock-separator w-px h-7 mx-2" style={{ background: 'rgba(0,0,0,0.08)' }} />
+                            {/* Physical separator - recessed groove */}
+                            <div
+                                className="dock-separator mx-2"
+                                style={{
+                                    width: 2,
+                                    height: 28,
+                                    borderRadius: 1,
+                                    background: 'linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 100%)',
+                                    boxShadow: '1px 0 0 rgba(255,255,255,0.6)',
+                                }}
+                            />
                             <DockIcon
                                 icon={<BookOpen size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                                 onClick={() => toggleApp('guestbook')}
@@ -5247,7 +5221,17 @@ function GoOSDemoContent() {
                             {/* Minimized Editors */}
                             {minimizedEditors.size > 0 && (
                                 <>
-                                    <div className="dock-separator w-px h-7 mx-2" style={{ background: 'rgba(0,0,0,0.08)' }} />
+                                    {/* Physical separator - recessed groove */}
+                            <div
+                                className="dock-separator mx-2"
+                                style={{
+                                    width: 2,
+                                    height: 28,
+                                    borderRadius: 1,
+                                    background: 'linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 100%)',
+                                    boxShadow: '1px 0 0 rgba(255,255,255,0.6)',
+                                }}
+                            />
                                     {Array.from(minimizedEditors).map(fileId => {
                                         const file = goosFiles.find(f => f.id === fileId);
                                         if (!file) return null;

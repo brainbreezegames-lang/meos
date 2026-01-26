@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
@@ -28,16 +28,92 @@ const DEFAULT_CONFIG: BookWidgetConfig = {
   price: 'Free',
 };
 
-// Widget container styles matching the spec
-const WIDGET_CONTAINER = {
-  background: '#FDFBF7',
-  borderRadius: 24,
-  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
-  border: '1px solid rgba(255,255,255,0.5)',
+// Braun-inspired theme colors
+const THEMES = {
+  light: {
+    housing: 'linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.1),
+      0 20px 48px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03)
+    `,
+    textPrimary: '#1a1a1a',
+    textSecondary: '#666666',
+    buttonBg: 'linear-gradient(180deg, #ffffff 0%, #f5f5f3 100%)',
+    buttonShadow: `
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      0 2px 4px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.04)
+    `,
+    buttonHoverShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.08),
+      0 4px 8px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.04)
+    `,
+    calendarBg: 'linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%)',
+    calendarShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255,255,255,0.8)',
+    dotBg: '#e8e4e0',
+  },
+  dark: {
+    housing: 'linear-gradient(180deg, #2a2a28 0%, #1e1e1c 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      0 8px 24px rgba(0, 0, 0, 0.3),
+      0 20px 48px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
+    textPrimary: '#f0f0ec',
+    textSecondary: '#a0a09c',
+    buttonBg: 'linear-gradient(180deg, #3a3a38 0%, #2e2e2c 100%)',
+    buttonShadow: `
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 2px 4px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04)
+    `,
+    buttonHoverShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.25),
+      0 4px 8px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04)
+    `,
+    calendarBg: 'linear-gradient(180deg, #2e2e2c 0%, #262624 100%)',
+    calendarShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(255,255,255,0.03)',
+    dotBg: '#3a3a38',
+  },
 };
 
 export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted }: BookWidgetProps) {
+  const [isDark, setIsDark] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Detect dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const themeElement = document.querySelector('.theme-sketch');
+      const hasDarkClass = themeElement?.classList.contains('dark') || false;
+      setIsDark(hasDarkClass);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    const themeElement = document.querySelector('.theme-sketch');
+    if (themeElement) {
+      observer.observe(themeElement, { attributes: true, attributeFilter: ['class'] });
+    }
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
   const config: BookWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<BookWidgetConfig>) };
+  const theme = isDark ? THEMES.dark : THEMES.light;
 
   const handleClick = () => {
     if (config.url) {
@@ -45,7 +121,7 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
     }
   };
 
-  // Get today's date for the calendar icon
+  // Get today's date for the calendar
   const today = new Date();
   const dayOfMonth = today.getDate();
 
@@ -59,38 +135,57 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
       onContextMenu={onContextMenu}
       isHighlighted={isHighlighted}
     >
-      {/* Large widget: 280x180 */}
+      {/* Outer housing - Braun-style plastic */}
       <div
         style={{
-          ...WIDGET_CONTAINER,
           width: 280,
           height: 160,
-          padding: 20,
+          borderRadius: 20,
+          background: theme.housing,
+          boxShadow: theme.housingShadow,
+          padding: 18,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
+          position: 'relative',
+          transition: 'all 0.3s ease',
         }}
       >
+        {/* Top corner detail */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            width: 4,
+            height: 4,
+            borderRadius: '50%',
+            background: theme.dotBg,
+            transition: 'all 0.3s ease',
+          }}
+        />
+
         <div style={{ display: 'flex', gap: 16 }}>
-          {/* 3D Calendar icon */}
+          {/* Calendar icon - physical recessed display */}
           <div
             style={{
               width: 52,
               height: 56,
-              borderRadius: 10,
-              background: 'linear-gradient(145deg, #ffffff, #f0efea)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.08), inset 0 1px 2px rgba(255,255,255,0.9)',
+              borderRadius: 12,
+              background: theme.calendarBg,
+              boxShadow: theme.calendarShadow,
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
               flexShrink: 0,
+              transition: 'all 0.3s ease',
             }}
           >
-            {/* Calendar header (red strip) */}
+            {/* Orange header strip - Braun accent */}
             <div
               style={{
                 height: 14,
-                background: 'linear-gradient(180deg, #ef4444, #dc2626)',
+                background: '#ff6b00',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -101,7 +196,7 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
                 <div style={{ width: 4, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.4)' }}/>
               </div>
             </div>
-            {/* Calendar body */}
+            {/* Date number */}
             <div
               style={{
                 flex: 1,
@@ -110,8 +205,9 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
                 justifyContent: 'center',
                 fontSize: 24,
                 fontWeight: 600,
-                color: '#333',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+                color: theme.textPrimary,
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                transition: 'color 0.3s ease',
               }}
             >
               {dayOfMonth}
@@ -124,10 +220,11 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
               style={{
                 fontSize: 16,
                 fontWeight: 600,
-                color: '#333',
+                color: theme.textPrimary,
                 margin: 0,
                 marginBottom: 6,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                transition: 'color 0.3s ease',
               }}
             >
               {widget.title || 'Book a Call'}
@@ -135,68 +232,73 @@ export function BookWidget({ widget, isOwner, onEdit, onDelete, onPositionChange
             <p
               style={{
                 fontSize: 13,
-                color: '#777',
+                color: theme.textSecondary,
                 margin: 0,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                transition: 'color 0.3s ease',
               }}
             >
-              {config.duration} · {config.price}
+              <span style={{ color: '#ff6b00', fontWeight: 500 }}>{config.duration}</span>
+              <span style={{ margin: '0 6px', opacity: 0.5 }}>·</span>
+              {config.price}
             </p>
           </div>
         </div>
 
-        {/* CTA Button */}
+        {/* CTA Button - physical raised button */}
         <button
           onClick={handleClick}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           disabled={!config.url}
           style={{
             width: '100%',
-            padding: '12px 20px',
-            borderRadius: 14,
+            padding: '12px 18px',
+            borderRadius: 12,
             border: 'none',
-            background: config.url
-              ? 'linear-gradient(145deg, #f8f7f4, #eeeee8)'
-              : '#f0f0f0',
-            boxShadow: config.url
-              ? '0 2px 6px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.8)'
-              : 'none',
+            background: config.url ? theme.buttonBg : (isDark ? '#2a2a28' : '#f0f0ee'),
+            boxShadow: config.url ? (isHovered ? theme.buttonHoverShadow : theme.buttonShadow) : 'none',
             fontSize: 13,
             fontWeight: 600,
-            color: config.url ? '#333' : '#999',
+            color: config.url ? theme.textPrimary : (isDark ? '#5a5a58' : '#999'),
             cursor: config.url ? 'pointer' : 'not-allowed',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 8,
             transition: 'all 0.15s ease',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
-          }}
-          onMouseEnter={(e) => {
-            if (config.url) {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.8)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.8)';
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            transform: isHovered && config.url ? 'translateY(-1px)' : 'none',
           }}
         >
           {config.buttonText || 'View Times'}
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="5" y1="12" x2="19" y2="12"/>
-            <polyline points="12 5 19 12 12 19"/>
-          </svg>
+          <span style={{ color: config.url ? '#ff6b00' : 'inherit' }}>→</span>
         </button>
+
+        {/* Bottom speaker grille detail */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 8,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: 4,
+          }}
+        >
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: 3,
+                height: 3,
+                borderRadius: '50%',
+                background: theme.dotBg,
+                transition: 'all 0.3s ease',
+              }}
+            />
+          ))}
+        </div>
       </div>
     </WidgetWrapper>
   );
