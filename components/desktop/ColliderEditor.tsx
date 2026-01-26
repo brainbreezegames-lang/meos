@@ -18,7 +18,7 @@ interface LetterColliders {
 }
 
 const LETTERS = ['H', 'E', 'L', 'O', 'HEAD'];
-const LETTER_SIZE = 400; // Editor display size
+const LETTER_SIZE = 400; // Editor canvas size
 
 export function ColliderEditor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
