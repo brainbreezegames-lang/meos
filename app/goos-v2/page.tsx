@@ -925,23 +925,6 @@ const INITIAL_DEMO_WIDGETS = [
         createdAt: new Date(),
         updatedAt: new Date(),
     },
-    {
-        id: 'demo-widget-sticky',
-        desktopId: 'goos-demo',
-        widgetType: 'sticky-note' as const,
-        positionX: 8,
-        positionY: 14,
-        title: null,
-        isVisible: true,
-        config: {
-            content: 'Welcome to goOS! ✨\n\nDouble-click icons to explore.\nDrag to rearrange.',
-            color: 'cream',
-            rotation: -3,
-        },
-        order: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
 ];
 
 // ============================================

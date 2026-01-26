@@ -209,12 +209,12 @@ export function StickyNoteWidget({
             background: 'transparent',
             resize: 'none',
             outline: 'none',
-            // Beautiful handwritten typography
-            fontFamily: "'Caveat', 'Kalam', 'Patrick Hand', cursive, Georgia, serif",
-            fontSize: 20,
-            fontWeight: 500,
-            lineHeight: 1.5,
-            letterSpacing: '0.01em',
+            // Clean design system typography
+            fontFamily: 'var(--font-body)',
+            fontSize: 15,
+            fontWeight: 400,
+            lineHeight: 1.6,
+            letterSpacing: '-0.01em',
             color: colors.text,
             caretColor: colors.text,
             cursor: isOwner ? 'text' : 'default',
