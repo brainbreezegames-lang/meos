@@ -102,8 +102,9 @@ export function ASCIIFilter({
         luminance = ((luminance - 0.5) * contrast + 0.5) * brightness;
         luminance = Math.max(0, Math.min(1, luminance));
 
-        // Map brightness to character (inverted - bright areas get light chars)
-        const charIndex = Math.floor(luminance * (charset.length - 1));
+        // Map brightness to character - invert so bright areas get light chars (spaces)
+        // and dark areas get dense chars (@, #, etc)
+        const charIndex = Math.floor((1 - luminance) * (charset.length - 1));
         const char = charset[charIndex] || ' ';
 
         row += char;
