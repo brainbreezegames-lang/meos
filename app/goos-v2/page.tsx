@@ -80,6 +80,7 @@ import { playSound } from '@/lib/sounds';
 import { CommandPalette } from '@/components/command-palette/CommandPalette';
 import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
+import { FallingLetters } from '@/components/desktop/FallingLetters';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -3799,6 +3800,9 @@ function GoOSDemoContent() {
                     }}
                 />
             )}
+
+            {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
+            <FallingLetters />
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
             {isDraggingFile && (
