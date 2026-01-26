@@ -50,12 +50,11 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
       icon={
         <FolderOpen
           size={18}
-          fill="rgba(255, 255, 255, 0.2)"
-          color="rgba(255, 255, 255, 0.8)"
+          color="var(--color-text-secondary)"
           strokeWidth={1.5}
         />
       }
-      variant="dark"
+      variant="light"
       isActive={isActive}
       isMaximized={isMaximized}
       zIndex={zIndex}
@@ -72,7 +71,7 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
           style={{
             fontSize: 'var(--font-size-xs, 10px)',
             fontFamily: 'var(--font-mono)',
-            color: 'rgba(255, 255, 255, 0.5)',
+            color: 'var(--color-text-muted)',
           }}
         >
           {filesInFolder.length} {filesInFolder.length === 1 ? 'item' : 'items'}

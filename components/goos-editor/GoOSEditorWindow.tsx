@@ -7,7 +7,7 @@ import { GoOSTipTapEditor, goOSTokens } from './GoOSTipTapEditor';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
 import { TrafficLights } from '../desktop/TrafficLights';
-import { WINDOW, TITLE_BAR_DARK, ANIMATION, SPRING, DURATION } from '../desktop/windowStyles';
+import { WINDOW, TITLE_BAR, ANIMATION, SPRING, DURATION } from '../desktop/windowStyles';
 import { AccessLevel } from '@/contexts/GoOSContext';
 import { playSound } from '@/lib/sounds';
 
@@ -352,16 +352,16 @@ export function GoOSEditorWindow({
           opacity: isActive ? WINDOW.opacityActive : WINDOW.opacityInactive,
         }}
       >
-        {/* Title Bar - Dark variant for editor windows */}
+        {/* Title Bar - Light variant for consistent styling */}
         <div
           onPointerDown={startDrag}
           style={{
             display: 'flex',
             alignItems: 'center',
-            padding: `0 ${TITLE_BAR_DARK.paddingX}px`,
-            height: TITLE_BAR_DARK.height,
-            background: TITLE_BAR_DARK.background,
-            borderBottom: TITLE_BAR_DARK.borderBottom,
+            padding: `0 ${TITLE_BAR.paddingX}px`,
+            height: TITLE_BAR.height,
+            background: TITLE_BAR.background,
+            borderBottom: TITLE_BAR.borderBottom,
             // No border-radius here - outer container handles it with overflow: hidden
             gap: 12,
             cursor: isMaximized ? 'default' : 'grab',
@@ -369,7 +369,7 @@ export function GoOSEditorWindow({
             touchAction: 'none',
           }}
         >
-          {/* Traffic Lights - macOS style for editor windows */}
+          {/* Traffic Lights - macOS style */}
           <TrafficLights
             onClose={onClose}
             onMinimize={onMinimize}
@@ -378,11 +378,11 @@ export function GoOSEditorWindow({
             variant="macos"
           />
 
-          {/* File Icon + Title - white on dark */}
+          {/* File Icon + Title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
             <FileIcon
               size={16}
-              color="rgba(255, 255, 255, 0.7)"
+              color="var(--color-text-secondary)"
               strokeWidth={1.5}
             />
 
@@ -414,11 +414,11 @@ export function GoOSEditorWindow({
               <span
                 onClick={() => setIsEditingTitle(true)}
                 style={{
-                  fontSize: TITLE_BAR_DARK.titleFontSize,
-                  fontWeight: TITLE_BAR_DARK.titleFontWeight,
+                  fontSize: TITLE_BAR.titleFontSize,
+                  fontWeight: TITLE_BAR.titleFontWeight,
                   fontFamily: 'var(--font-body)',
-                  color: TITLE_BAR_DARK.titleColor,
-                  opacity: TITLE_BAR_DARK.titleOpacityActive,
+                  color: TITLE_BAR.titleColor,
+                  opacity: TITLE_BAR.titleOpacityActive,
                   cursor: 'text',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
