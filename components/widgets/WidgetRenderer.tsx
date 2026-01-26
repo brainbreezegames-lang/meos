@@ -14,6 +14,7 @@ import { StickyNoteWidget } from './StickyNoteWidget';
 interface WidgetRendererProps {
   widgets: Widget[];
   isOwner?: boolean;
+  isDark?: boolean;
   onWidgetEdit?: (widget: Widget) => void;
   onWidgetDelete?: (id: string) => void;
   onWidgetPositionChange?: (id: string, x: number, y: number) => void;
@@ -28,6 +29,7 @@ interface WidgetRendererProps {
 export function WidgetRenderer({
   widgets,
   isOwner = false,
+  isDark = false,
   onWidgetEdit,
   onWidgetDelete,
   onWidgetPositionChange,
@@ -57,6 +59,7 @@ export function WidgetRenderer({
         const commonProps = {
           widget,
           isOwner,
+          isDark,
           onEdit: getEditHandler(widget),
           onDelete: getDeleteHandler(widget.id),
           onPositionChange: getPositionHandler(widget.id),

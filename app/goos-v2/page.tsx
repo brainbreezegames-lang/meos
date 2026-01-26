@@ -4578,6 +4578,7 @@ function GoOSDemoContent() {
                         <WidgetRenderer
                             widgets={widgets}
                             isOwner={true}
+                            isDark={isDarkMode}
                             onWidgetEdit={(widget) => {
                                 setEditingWidget(widget);
                             }}
