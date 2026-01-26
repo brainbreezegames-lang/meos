@@ -3938,53 +3938,28 @@ function GoOSDemoContent() {
 
             {/* WALLPAPER BACKGROUND - With Space Theme Support */}
             {wallpaper ? (
-                <>
-                    {/* Wallpaper image */}
-                    <img
-                        src={`/${wallpaper}.png`}
-                        alt=""
-                        className="absolute inset-0 w-full h-full pointer-events-none select-none"
-                        style={{
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                            zIndex: 0,
-                        }}
-                        draggable={false}
-                    />
-                    {/* Subtle dotted overlay when enabled */}
-                    {asciiFilter && (
-                        <div
-                            className="absolute inset-0 pointer-events-none"
-                            style={{
-                                zIndex: 1,
-                                backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.12) 1px, transparent 1px)`,
-                                backgroundSize: '12px 12px',
-                            }}
-                        />
-                    )}
-                </>
+                <img
+                    src={`/${wallpaper}.png`}
+                    alt=""
+                    className="absolute inset-0 w-full h-full pointer-events-none select-none"
+                    style={{
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        zIndex: 0,
+                    }}
+                    draggable={false}
+                />
             ) : (
-                <>
-                    {/* Solid background when no wallpaper */}
-                    <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                            background: 'var(--color-bg-base, #fbf9ef)',
-                            zIndex: 0,
-                        }}
-                    />
-                    {/* Subtle dotted overlay on plain background */}
-                    {asciiFilter && (
-                        <div
-                            className="absolute inset-0 pointer-events-none"
-                            style={{
-                                zIndex: 2,
-                                backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px)`,
-                                backgroundSize: '12px 12px',
-                            }}
-                        />
-                    )}
-                </>
+                /* Plain background with subtle dots */
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        background: 'var(--color-bg-base, #fbf9ef)',
+                        backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.06) 1px, transparent 1px)`,
+                        backgroundSize: '14px 14px',
+                        zIndex: 0,
+                    }}
+                />
             )}
 
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
@@ -5368,44 +5343,6 @@ function GoOSDemoContent() {
                                     </button>
                                 ))}
                             </div>
-
-                            {/* Dotted Pattern Overlay */}
-                            {wallpaper && (
-                                <div
-                                    className="mt-4 pt-3"
-                                    style={{ borderTop: '1px solid var(--border-subtle)' }}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                                            Dotted Overlay
-                                        </span>
-                                        <button
-                                            onClick={() => {
-                                                playSound('click');
-                                                setAsciiFilter(!asciiFilter);
-                                            }}
-                                            className="relative rounded-full transition-all"
-                                            style={{
-                                                width: 40,
-                                                height: 22,
-                                                background: asciiFilter ? 'var(--accent-primary)' : 'var(--bg-surface)',
-                                                border: '1px solid var(--border-subtle)',
-                                            }}
-                                        >
-                                            <div
-                                                className="absolute top-1 rounded-full transition-all"
-                                                style={{
-                                                    width: 16,
-                                                    height: 16,
-                                                    background: 'white',
-                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                                                    left: asciiFilter ? 20 : 2,
-                                                }}
-                                            />
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
                         </motion.div>
                     </motion.div>
                 )}
