@@ -3954,9 +3954,11 @@ function GoOSDemoContent() {
                 <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                        background: 'var(--color-bg-base, #fbf9ef)',
-                        backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.06) 1px, transparent 1px)`,
-                        backgroundSize: '14px 14px',
+                        background: isDarkMode ? '#171412' : 'var(--color-bg-base, #fbf9ef)',
+                        backgroundImage: isDarkMode
+                            ? `radial-gradient(circle, rgba(255, 255, 255, 0.06) 1.5px, transparent 1.5px)`
+                            : `radial-gradient(circle, rgba(23, 20, 18, 0.08) 1.5px, transparent 1.5px)`,
+                        backgroundSize: '28px 28px',
                         zIndex: 0,
                     }}
                 />
