@@ -916,8 +916,8 @@ const INITIAL_DEMO_WIDGETS = [
         id: 'demo-widget-clock',
         desktopId: 'goos-demo',
         widgetType: 'clock' as const,
-        positionX: 85,
-        positionY: 12,
+        positionX: 78,
+        positionY: 6,
         title: null,
         isVisible: true,
         config: { timezone: 'America/New_York', format: '12h', showTimezoneName: true },
@@ -3769,7 +3769,7 @@ function GoOSDemoContent() {
             )}
 
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
-            <FallingLetters isReady={bootPhase === 'ready'} textSize={800} />
+            <FallingLetters isReady={bootPhase === 'ready'} textSize={560} />
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
             {isDraggingFile && (
