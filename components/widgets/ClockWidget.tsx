@@ -60,11 +60,98 @@ function getTimezoneAbbreviation(timezone: string): string {
   }
 }
 
+// Theme colors for light and dark modes
+const THEME = {
+  light: {
+    // Outer bezel - warm cream with depth
+    bezelGradient: 'linear-gradient(145deg, #fdfcfa 0%, #f5f3ef 40%, #ebe8e3 100%)',
+    bezelShadow: `
+      0 10px 40px rgba(120, 100, 80, 0.15),
+      0 4px 12px rgba(120, 100, 80, 0.08),
+      inset 0 2px 3px rgba(255, 255, 255, 0.95),
+      inset 0 -3px 6px rgba(180, 160, 140, 0.08)
+    `,
+    // Inner face - clean cream white
+    faceGradient: 'linear-gradient(180deg, #faf9f7 0%, #f3f1ed 100%)',
+    faceShadow: `
+      inset 0 2px 12px rgba(100, 80, 60, 0.06),
+      inset 0 1px 3px rgba(100, 80, 60, 0.04)
+    `,
+    // Tick marks
+    tickMain: '#6b5c4d',
+    tickMinor: '#c4b8a8',
+    // Hands - dark walnut
+    hourHand: 'linear-gradient(180deg, #3d3428 0%, #2a241c 100%)',
+    minuteHand: 'linear-gradient(180deg, #4a4036 0%, #3d3428 100%)',
+    centerPin: 'linear-gradient(145deg, #5c5040 0%, #3d3428 100%)',
+    centerPinShadow: '0 2px 4px rgba(60, 50, 40, 0.4)',
+    // Text
+    timeColor: '#2a241c',
+    timezoneColor: '#7a6c5c',
+  },
+  dark: {
+    // Outer bezel - deep charcoal with metallic sheen
+    bezelGradient: 'linear-gradient(145deg, #3a3632 0%, #2a2724 40%, #1e1c1a 100%)',
+    bezelShadow: `
+      0 10px 40px rgba(0, 0, 0, 0.5),
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 2px 3px rgba(255, 255, 255, 0.08),
+      inset 0 -3px 6px rgba(0, 0, 0, 0.2)
+    `,
+    // Inner face - matte dark slate
+    faceGradient: 'linear-gradient(180deg, #2d2a27 0%, #242220 100%)',
+    faceShadow: `
+      inset 0 2px 12px rgba(0, 0, 0, 0.3),
+      inset 0 1px 3px rgba(0, 0, 0, 0.2)
+    `,
+    // Tick marks - subtle champagne gold
+    tickMain: '#c9b896',
+    tickMinor: '#5a5450',
+    // Hands - brushed silver
+    hourHand: 'linear-gradient(180deg, #e8e4dc 0%, #ccc8c0 100%)',
+    minuteHand: 'linear-gradient(180deg, #dcd8d0 0%, #c4c0b8 100%)',
+    centerPin: 'linear-gradient(145deg, #c9b896 0%, #a89870 100%)',
+    centerPinShadow: '0 2px 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(201, 184, 150, 0.2)',
+    // Text - warm off-white
+    timeColor: '#f0ece4',
+    timezoneColor: '#a89880',
+  },
+};
+
 export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted }: ClockWidgetProps) {
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState<Date | null>(null);
+  const [isDark, setIsDark] = useState(false);
 
   const config: ClockWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ClockWidgetConfig>) };
+
+  // Detect dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      // Check for .dark class on ancestors or prefers-color-scheme
+      const hasDarkClass = document.documentElement.classList.contains('dark') ||
+                          document.body.classList.contains('dark') ||
+                          !!document.querySelector('.dark');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDark(hasDarkClass || prefersDark);
+    };
+
+    checkDarkMode();
+
+    // Listen for class changes on document
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    // Listen for system preference changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', checkDarkMode);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', checkDarkMode);
+    };
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -118,17 +205,17 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       const minutes = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
       const seconds = parseInt(parts.find(p => p.type === 'second')?.value || '0');
 
-      const secondAngle = (seconds / 60) * 360;
       const minuteAngle = ((minutes + seconds / 60) / 60) * 360;
       const hourAngle = (((hours % 12) + minutes / 60) / 12) * 360;
 
-      return { hourAngle, minuteAngle, secondAngle };
+      return { hourAngle, minuteAngle };
     } catch {
-      return { hourAngle: 0, minuteAngle: 0, secondAngle: 0 };
+      return { hourAngle: 0, minuteAngle: 0 };
     }
   }, [config.timezone]);
 
   const timezoneAbbr = getTimezoneAbbreviation(config.timezone);
+  const theme = isDark ? THEME.dark : THEME.light;
 
   if (!mounted || !time) {
     return (
@@ -142,7 +229,7 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
         isHighlighted={isHighlighted}
       >
         <div style={{ width: 180, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ color: '#999', fontSize: 12 }}>...</div>
+          <div style={{ color: isDark ? '#666' : '#999', fontSize: 12 }}>...</div>
         </div>
       </WidgetWrapper>
     );
@@ -161,129 +248,131 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       onContextMenu={onContextMenu}
       isHighlighted={isHighlighted}
     >
-      {/* 3D Clock bezel - the outer ring */}
+      {/* Outer bezel - luxury desk clock frame */}
       <div
         style={{
           width: 180,
           height: 180,
           borderRadius: '50%',
-          background: 'linear-gradient(145deg, #ffffff 0%, #f0eeea 50%, #e8e6e2 100%)',
-          boxShadow: `
-            0 8px 32px rgba(0, 0, 0, 0.15),
-            0 4px 12px rgba(0, 0, 0, 0.1),
-            inset 0 2px 4px rgba(255, 255, 255, 0.9),
-            inset 0 -4px 8px rgba(0, 0, 0, 0.05)
-          `,
+          background: theme.bezelGradient,
+          boxShadow: theme.bezelShadow,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
+          transition: 'all 0.4s ease',
         }}
       >
         {/* Inner clock face */}
         <div
           style={{
-            width: 140,
-            height: 140,
+            width: 142,
+            height: 142,
             borderRadius: '50%',
-            background: 'linear-gradient(180deg, #fafaf8 0%, #f5f4f2 100%)',
-            boxShadow: `
-              inset 0 2px 8px rgba(0, 0, 0, 0.06),
-              inset 0 1px 2px rgba(0, 0, 0, 0.04)
-            `,
+            background: theme.faceGradient,
+            boxShadow: theme.faceShadow,
             position: 'relative',
+            transition: 'all 0.4s ease',
           }}
         >
-          {/* Hour tick marks */}
-          {[...Array(12)].map((_, i) => {
-            const angle = (i * 30) * (Math.PI / 180);
-            const isMain = i % 3 === 0;
-            const outerRadius = 62;
-            const length = isMain ? 8 : 4;
-            const innerRadius = outerRadius - length;
+          {/* Hour tick marks - rendered as single SVG for performance */}
+          <svg
+            width="142"
+            height="142"
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              pointerEvents: 'none',
+            }}
+          >
+            {[...Array(12)].map((_, i) => {
+              const angle = (i * 30) * (Math.PI / 180);
+              const isMain = i % 3 === 0;
+              const outerRadius = 64;
+              const length = isMain ? 10 : 5;
+              const innerRadius = outerRadius - length;
 
-            const x1 = 70 + Math.sin(angle) * innerRadius;
-            const y1 = 70 - Math.cos(angle) * innerRadius;
-            const x2 = 70 + Math.sin(angle) * outerRadius;
-            const y2 = 70 - Math.cos(angle) * outerRadius;
+              const x1 = 71 + Math.sin(angle) * innerRadius;
+              const y1 = 71 - Math.cos(angle) * innerRadius;
+              const x2 = 71 + Math.sin(angle) * outerRadius;
+              const y2 = 71 - Math.cos(angle) * outerRadius;
 
-            return (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  width: '100%',
-                  height: '100%',
-                  pointerEvents: 'none',
-                }}
-              >
-                <svg width="140" height="140" style={{ position: 'absolute', left: 0, top: 0 }}>
-                  <line
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke={isMain ? '#888' : '#ccc'}
-                    strokeWidth={isMain ? 2 : 1}
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-            );
-          })}
+              return (
+                <line
+                  key={i}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke={isMain ? theme.tickMain : theme.tickMinor}
+                  strokeWidth={isMain ? 2.5 : 1.5}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke 0.4s ease' }}
+                />
+              );
+            })}
+          </svg>
 
-          {/* Hour hand */}
+          {/* Hour hand - tapered design */}
           <div
             style={{
               position: 'absolute',
               left: '50%',
               top: '50%',
-              width: 4,
-              height: 35,
-              background: '#333',
-              borderRadius: 2,
+              width: 5,
+              height: 36,
+              background: theme.hourHand,
+              borderRadius: '2px 2px 1px 1px',
               transformOrigin: '50% 100%',
               transform: `translateX(-50%) translateY(-100%) rotate(${hourAngle}deg)`,
+              boxShadow: isDark
+                ? '0 2px 4px rgba(0,0,0,0.4), 0 0 6px rgba(255,255,255,0.05)'
+                : '0 1px 3px rgba(60,50,40,0.25)',
+              transition: 'background 0.4s ease, box-shadow 0.4s ease',
             }}
           />
 
-          {/* Minute hand */}
+          {/* Minute hand - elegant thin */}
           <div
             style={{
               position: 'absolute',
               left: '50%',
               top: '50%',
-              width: 2.5,
-              height: 50,
-              background: '#444',
-              borderRadius: 1.5,
+              width: 3,
+              height: 52,
+              background: theme.minuteHand,
+              borderRadius: '1.5px 1.5px 1px 1px',
               transformOrigin: '50% 100%',
               transform: `translateX(-50%) translateY(-100%) rotate(${minuteAngle}deg)`,
+              boxShadow: isDark
+                ? '0 2px 4px rgba(0,0,0,0.4), 0 0 4px rgba(255,255,255,0.03)'
+                : '0 1px 2px rgba(60,50,40,0.2)',
+              transition: 'background 0.4s ease, box-shadow 0.4s ease',
             }}
           />
 
-          {/* Center pin */}
+          {/* Center pin - jewel-like accent */}
           <div
             style={{
               position: 'absolute',
               left: '50%',
               top: '50%',
-              width: 10,
-              height: 10,
-              background: 'linear-gradient(145deg, #555 0%, #333 100%)',
+              width: 12,
+              height: 12,
+              background: theme.centerPin,
               borderRadius: '50%',
               transform: 'translate(-50%, -50%)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+              boxShadow: theme.centerPinShadow,
+              transition: 'all 0.4s ease',
             }}
           />
 
-          {/* Digital time display - inside clock face */}
+          {/* Digital time display */}
           <div
             style={{
               position: 'absolute',
-              bottom: 25,
+              bottom: 24,
               left: '50%',
               transform: 'translateX(-50%)',
               textAlign: 'center',
@@ -291,24 +380,27 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
           >
             <div
               style={{
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: 600,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
-                color: '#222',
+                fontFamily: 'var(--font-display, -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif)',
+                color: theme.timeColor,
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
                 fontVariantNumeric: 'tabular-nums',
+                transition: 'color 0.4s ease',
               }}
             >
               {hours}:{minutes}
             </div>
             <div
               style={{
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: 600,
-                color: '#666',
-                letterSpacing: '0.02em',
-                marginTop: 2,
+                color: theme.timezoneColor,
+                letterSpacing: '0.04em',
+                marginTop: 3,
+                textTransform: 'uppercase',
+                transition: 'color 0.4s ease',
               }}
             >
               {period} {timezoneAbbr}
