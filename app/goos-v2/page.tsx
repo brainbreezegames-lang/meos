@@ -896,7 +896,7 @@ const DEMO_FILES: GoOSFile[] = INITIAL_GOOS_FILES.map(f => ({
 }));
 
 // ============================================
-// DEMO WIDGETS - Initial widgets for the demo
+// DEMO WIDGETS - Initial widgets for the demo (only clock by default)
 // ============================================
 const INITIAL_DEMO_WIDGETS = [
     {
@@ -909,61 +909,6 @@ const INITIAL_DEMO_WIDGETS = [
         isVisible: true,
         config: { timezone: 'America/New_York', format: '12h', showTimezoneName: true },
         order: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: 'demo-widget-links',
-        desktopId: 'goos-demo',
-        widgetType: 'links' as const,
-        positionX: 85,
-        positionY: 32,
-        title: 'Connect',
-        isVisible: true,
-        config: {
-            links: [
-                { name: 'Portfolio', url: 'https://example.com', icon: 'globe' },
-                { name: 'GitHub', url: 'https://github.com', icon: 'github' },
-                { name: 'Twitter', url: 'https://twitter.com', icon: 'twitter' },
-            ]
-        },
-        order: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: 'demo-widget-status',
-        desktopId: 'goos-demo',
-        widgetType: 'status' as const,
-        positionX: 85,
-        positionY: 55,
-        title: null,
-        isVisible: true,
-        config: {
-            statusType: 'available',
-            title: 'Available for Projects',
-            description: 'Open to freelance and consulting work',
-            ctaUrl: 'https://cal.com',
-            ctaLabel: 'Book a Call',
-        },
-        order: 2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: 'demo-widget-tipjar',
-        desktopId: 'goos-demo',
-        widgetType: 'tipjar' as const,
-        positionX: 15,
-        positionY: 85,
-        title: 'Buy me a coffee',
-        isVisible: true,
-        config: {
-            amounts: [3, 5, 10],
-            customAmount: false,
-            message: 'Buy me a coffee',
-        },
-        order: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
     },
@@ -2639,7 +2584,7 @@ function GoOSDemoContent() {
     const [showManageSpacesDialog, setShowManageSpacesDialog] = useState(false);
 
     // Wallpaper state - persisted to localStorage
-    const [wallpaper, setWallpaper] = useState<string | null>('bg01'); // Default to bg01
+    const [wallpaper, setWallpaper] = useState<string | null>(null); // No wallpaper by default
     const [showWallpaperPicker, setShowWallpaperPicker] = useState(false);
 
     // Load wallpaper from localStorage on mount

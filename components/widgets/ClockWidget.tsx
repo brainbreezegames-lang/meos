@@ -125,33 +125,30 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
 
   const config: ClockWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ClockWidgetConfig>) };
 
-  // Detect dark mode
+  // Detect dark mode - specifically check for theme-sketch.dark class
   useEffect(() => {
     const checkDarkMode = () => {
-      // Check for .dark class on ancestors or prefers-color-scheme
-      const hasDarkClass = document.documentElement.classList.contains('dark') ||
-                          document.body.classList.contains('dark') ||
-                          !!document.querySelector('.dark');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDark(hasDarkClass || prefersDark);
+      // Check for .dark class specifically on the theme-sketch element (goOS desktop)
+      const themeElement = document.querySelector('.theme-sketch');
+      const hasDarkClass = themeElement?.classList.contains('dark') || false;
+      setIsDark(hasDarkClass);
     };
 
     checkDarkMode();
 
-    // Listen for class changes on document
+    // Listen for class changes on the theme element
     const observer = new MutationObserver(checkDarkMode);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-
-    // Listen for system preference changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', checkDarkMode);
+    const themeElement = document.querySelector('.theme-sketch');
+    if (themeElement) {
+      observer.observe(themeElement, { attributes: true, attributeFilter: ['class'] });
+    }
+    // Also observe document in case theme element is added later
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
 
     return () => {
       observer.disconnect();
-      mediaQuery.removeEventListener('change', checkDarkMode);
     };
-  }, []);
+  }, [mounted]); // Re-run when mounted to ensure theme element exists
 
   useEffect(() => {
     setMounted(true);
