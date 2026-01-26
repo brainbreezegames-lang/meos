@@ -32,7 +32,7 @@ const COLLIDER_DATA: Record<string, Array<{
     { type: "ellipse", x: 0.49, y: 0.465625, radiusX: 0.2825, radiusY: 0.28750000000000003 }
   ],
   "HEAD": [
-    { type: "ellipse", x: 0.5, y: 0.5, radiusX: 0.20, radiusY: 0.20 }
+    { type: "ellipse", x: 0.5, y: 0.5, radiusX: 0.154, radiusY: 0.154 }
   ]
 };
 
@@ -48,7 +48,7 @@ export function FallingLetters({
   isReady = true,
   text = "HELLO",
   className,
-  textSize = 350, // 25% bigger than original 280
+  textSize = 455, // 30% bigger than 350 (letters only, HEAD stays same)
   showColliders = false // Set to true for debugging colliders
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -337,8 +337,8 @@ export function FallingLetters({
                 alt=""
                 style={{
                   // Keep same absolute size (140px) despite larger container
-                  width: '40%',
-                  height: '40%',
+                  width: '31%',
+                  height: '31%',
                   objectFit: 'contain',
                 }}
               />
