@@ -41,6 +41,14 @@ function getTimezoneAbbreviation(timezone: string): string {
   }
 }
 
+// Widget container styles matching the spec
+const WIDGET_CONTAINER = {
+  background: '#FDFBF7',
+  borderRadius: 24,
+  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+  border: '1px solid rgba(255,255,255,0.5)',
+};
+
 export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted }: ClockWidgetProps) {
   const [time, setTime] = useState<Date>(new Date());
   const config: ClockWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ClockWidgetConfig>) };
@@ -122,90 +130,73 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       onContextMenu={onContextMenu}
       isHighlighted={isHighlighted}
     >
-      {/* Main clock container with 3D effect */}
+      {/* Small widget: 120x120 */}
       <div
         style={{
-          width: 180,
-          height: 180,
-          borderRadius: '50%',
-          background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f0 50%, #e8e8e0 100%)',
-          boxShadow: `
-            0 20px 60px rgba(0, 0, 0, 0.15),
-            0 10px 20px rgba(0, 0, 0, 0.1),
-            inset 0 2px 4px rgba(255, 255, 255, 0.9),
-            inset 0 -2px 4px rgba(0, 0, 0, 0.05)
-          `,
-          position: 'relative',
+          ...WIDGET_CONTAINER,
+          width: 120,
+          height: 120,
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        {/* Outer bezel ring */}
+        {/* Analog clock face */}
         <div
           style={{
-            position: 'absolute',
-            inset: 4,
+            width: 64,
+            height: 64,
             borderRadius: '50%',
-            background: 'linear-gradient(180deg, #fafafa 0%, #e5e5e0 100%)',
+            background: 'linear-gradient(145deg, #ffffff 0%, #f8f7f4 100%)',
             boxShadow: `
-              inset 0 4px 8px rgba(0, 0, 0, 0.08),
-              inset 0 -2px 4px rgba(255, 255, 255, 0.8)
+              0 2px 8px rgba(0, 0, 0, 0.08),
+              inset 0 1px 2px rgba(255, 255, 255, 0.9),
+              inset 0 -1px 2px rgba(0, 0, 0, 0.03)
             `,
-          }}
-        />
-
-        {/* Inner clock face */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 12,
-            borderRadius: '50%',
-            background: 'linear-gradient(180deg, #ffffff 0%, #fafaf8 100%)',
-            boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.06)',
+            position: 'relative',
+            marginBottom: 6,
           }}
         >
-          {/* Hour markers */}
+          {/* Hour markers - dots */}
           {[...Array(12)].map((_, i) => {
             const angle = (i * 30) * (Math.PI / 180);
+            const radius = 26;
+            const x = 32 + Math.sin(angle) * radius;
+            const y = 32 - Math.cos(angle) * radius;
             const isMainHour = i % 3 === 0;
-            const radius = 62;
-            const x = 50 + Math.sin(angle) * (radius / 78 * 50);
-            const y = 50 - Math.cos(angle) * (radius / 78 * 50);
 
             return (
               <div
                 key={i}
                 style={{
                   position: 'absolute',
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  width: isMainHour ? 3 : 2,
-                  height: isMainHour ? 10 : 6,
-                  background: isMainHour ? '#555' : '#bbb',
-                  borderRadius: 1,
-                  transform: `translate(-50%, -50%) rotate(${i * 30}deg)`,
-                  transformOrigin: 'center center',
+                  left: x - (isMainHour ? 2 : 1.5),
+                  top: y - (isMainHour ? 2 : 1.5),
+                  width: isMainHour ? 4 : 3,
+                  height: isMainHour ? 4 : 3,
+                  borderRadius: '50%',
+                  background: isMainHour ? '#555' : '#ccc',
                 }}
               />
             );
           })}
 
-          {/* Clock hands */}
           {/* Hour hand */}
           <div
             style={{
               position: 'absolute',
               left: '50%',
               top: '50%',
-              width: 4,
-              height: 36,
-              background: '#444',
+              width: 3,
+              height: 18,
+              background: '#333',
               borderRadius: 2,
               transformOrigin: 'center top',
               transform: `translateX(-50%) rotate(${hourAngle}deg)`,
-              marginTop: -36,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+              marginTop: -18,
             }}
           />
 
@@ -215,159 +206,79 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
               position: 'absolute',
               left: '50%',
               top: '50%',
-              width: 3,
-              height: 50,
+              width: 2,
+              height: 24,
               background: '#555',
-              borderRadius: 1.5,
+              borderRadius: 1,
               transformOrigin: 'center top',
               transform: `translateX(-50%) rotate(${minuteAngle}deg)`,
-              marginTop: -50,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
+              marginTop: -24,
             }}
           />
 
-          {/* Center cap */}
+          {/* Center dot */}
           <div
             style={{
               position: 'absolute',
               left: '50%',
               top: '50%',
-              width: 10,
-              height: 10,
-              background: 'linear-gradient(145deg, #666, #444)',
+              width: 6,
+              height: 6,
+              background: '#444',
               borderRadius: '50%',
               transform: 'translate(-50%, -50%)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
             }}
           />
+        </div>
 
-          {/* Digital time overlay */}
+        {/* Digital time */}
+        <div style={{ textAlign: 'center' }}>
           <div
             style={{
-              position: 'absolute',
-              left: '50%',
-              top: '38%',
-              transform: 'translate(-50%, -50%)',
-              textAlign: 'center',
-              zIndex: 10,
+              fontSize: 14,
+              fontWeight: 500,
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+              color: '#333',
+              letterSpacing: '-0.01em',
+              lineHeight: 1,
             }}
           >
+            {hours}:{minutes} {period}
+          </div>
+          {config.showTimezoneName && (
             <div
               style={{
-                fontSize: 42,
-                fontWeight: 300,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif',
-                color: '#333',
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
-                textShadow: '0 1px 2px rgba(255,255,255,0.8)',
-              }}
-            >
-              {hours}:{minutes}
-            </div>
-            <div
-              style={{
-                fontSize: 11,
+                fontSize: 9,
                 fontWeight: 500,
-                color: '#777',
-                letterSpacing: '0.08em',
+                color: '#888',
+                letterSpacing: '0.05em',
                 marginTop: 2,
                 textTransform: 'uppercase',
               }}
             >
-              {period} {config.showTimezoneName && timezoneAbbr}
+              {timezoneAbbr}
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Decorative plant at the bottom */}
+        {/* Tiny plant decoration */}
         <div
           style={{
             position: 'absolute',
-            bottom: 8,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 20,
+            bottom: 6,
+            right: 8,
+            fontSize: 12,
           }}
         >
-          {/* Pot */}
-          <div
-            style={{
-              width: 22,
-              height: 16,
-              background: 'linear-gradient(180deg, #c4825a 0%, #a86b45 100%)',
-              borderRadius: '2px 2px 4px 4px',
-              position: 'relative',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-            }}
-          >
-            {/* Pot rim */}
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: -1,
-                right: -1,
-                height: 4,
-                background: 'linear-gradient(180deg, #d4926a 0%, #c4825a 100%)',
-                borderRadius: '2px 2px 0 0',
-              }}
-            />
-          </div>
-
-          {/* Plant leaves */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 12,
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}
-          >
-            {/* Center leaf */}
-            <div
-              style={{
-                width: 8,
-                height: 16,
-                background: 'linear-gradient(180deg, #7cb342 0%, #558b2f 100%)',
-                borderRadius: '50% 50% 50% 50% / 80% 80% 20% 20%',
-                position: 'absolute',
-                left: '50%',
-                bottom: 0,
-                transform: 'translateX(-50%)',
-              }}
-            />
-            {/* Left leaf */}
-            <div
-              style={{
-                width: 7,
-                height: 13,
-                background: 'linear-gradient(180deg, #8bc34a 0%, #689f38 100%)',
-                borderRadius: '50% 50% 50% 50% / 80% 80% 20% 20%',
-                position: 'absolute',
-                left: '50%',
-                bottom: 2,
-                transform: 'translateX(-50%) rotate(-25deg)',
-                transformOrigin: 'bottom center',
-                marginLeft: -6,
-              }}
-            />
-            {/* Right leaf */}
-            <div
-              style={{
-                width: 7,
-                height: 13,
-                background: 'linear-gradient(180deg, #8bc34a 0%, #689f38 100%)',
-                borderRadius: '50% 50% 50% 50% / 80% 80% 20% 20%',
-                position: 'absolute',
-                left: '50%',
-                bottom: 2,
-                transform: 'translateX(-50%) rotate(25deg)',
-                transformOrigin: 'bottom center',
-                marginLeft: 6,
-              }}
-            />
-          </div>
+          <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+            {/* Pot */}
+            <path d="M4 12H10L9 16H5L4 12Z" fill="#c4825a"/>
+            <path d="M3 11H11V12H3V11Z" fill="#d4926a"/>
+            {/* Leaves */}
+            <ellipse cx="7" cy="8" rx="2" ry="4" fill="#7cb342"/>
+            <ellipse cx="5" cy="9" rx="1.5" ry="3" fill="#8bc34a" transform="rotate(-20 5 9)"/>
+            <ellipse cx="9" cy="9" rx="1.5" ry="3" fill="#8bc34a" transform="rotate(20 9 9)"/>
+          </svg>
         </div>
       </div>
     </WidgetWrapper>

@@ -1,12 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
+import React from 'react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget, StatusType } from '@/types';
-import { useWidgetTheme } from '@/hooks/useWidgetTheme';
-import { SPRING, fadeInUp, DURATION, REDUCED_MOTION } from '@/lib/animations';
 
 interface StatusWidgetConfig {
   statusType: StatusType;
@@ -28,18 +24,47 @@ interface StatusWidgetProps {
 
 export const STATUS_WIDGET_DEFAULT_CONFIG: StatusWidgetConfig = {
   statusType: 'available',
-  title: 'Open for work',
+  title: 'Available for Work',
   description: null,
   ctaUrl: null,
   ctaLabel: null,
 };
 
-const STATUS_LABELS: Record<StatusType, { emoji: string; label: string }> = {
-  available: { emoji: '✦', label: 'Available' },
-  looking: { emoji: '◈', label: 'Looking for' },
-  taking: { emoji: '◇', label: 'Taking' },
-  open: { emoji: '○', label: 'Open to' },
-  consulting: { emoji: '◎', label: 'Consulting' },
+// Widget container styles matching the spec
+const WIDGET_CONTAINER = {
+  background: '#FDFBF7',
+  borderRadius: 24,
+  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+  border: '1px solid rgba(255,255,255,0.5)',
+};
+
+// Status colors and styles
+const STATUS_STYLES: Record<StatusType, { color: string; glow: string; label: string }> = {
+  available: {
+    color: '#22c55e',
+    glow: '0 0 12px rgba(34, 197, 94, 0.4)',
+    label: 'Available',
+  },
+  looking: {
+    color: '#f59e0b',
+    glow: '0 0 12px rgba(245, 158, 11, 0.4)',
+    label: 'Looking for',
+  },
+  taking: {
+    color: '#f59e0b',
+    glow: '0 0 12px rgba(245, 158, 11, 0.4)',
+    label: 'Taking',
+  },
+  open: {
+    color: '#3b82f6',
+    glow: '0 0 12px rgba(59, 130, 246, 0.4)',
+    label: 'Open to',
+  },
+  consulting: {
+    color: '#8b5cf6',
+    glow: '0 0 12px rgba(139, 92, 246, 0.4)',
+    label: 'Consulting',
+  },
 };
 
 export function StatusWidget({
@@ -51,16 +76,124 @@ export function StatusWidget({
   onContextMenu,
   isHighlighted,
 }: StatusWidgetProps) {
-  const prefersReducedMotion = useReducedMotion();
-  const [isHovered, setIsHovered] = useState(false);
-  const theme = useWidgetTheme();
   const config: StatusWidgetConfig = {
     ...STATUS_WIDGET_DEFAULT_CONFIG,
     ...(widget.config as Partial<StatusWidgetConfig>),
   };
 
-  const labelConfig = STATUS_LABELS[config.statusType] || STATUS_LABELS.available;
-  const statusTheme = theme.status[config.statusType] || theme.status.available;
+  const statusStyle = STATUS_STYLES[config.statusType] || STATUS_STYLES.available;
+  const hasDescription = config.description && config.description.trim().length > 0;
+  const hasCta = config.ctaUrl && config.ctaLabel;
+
+  // Wide widget for full availability display, or compact without description
+  const isCompact = !hasDescription && !hasCta;
+
+  const content = (
+    <div
+      style={{
+        ...WIDGET_CONTAINER,
+        width: isCompact ? 200 : 280,
+        minHeight: isCompact ? 56 : 100,
+        padding: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}
+    >
+      {/* Status indicator row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Glowing dot */}
+        <div
+          style={{
+            width: 12,
+            height: 12,
+            borderRadius: '50%',
+            background: statusStyle.color,
+            boxShadow: statusStyle.glow,
+            flexShrink: 0,
+          }}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: '#333',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {config.title}
+          </div>
+        </div>
+      </div>
+
+      {/* Description */}
+      {hasDescription && (
+        <p
+          style={{
+            fontSize: 13,
+            lineHeight: 1.5,
+            color: '#666',
+            margin: 0,
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+          }}
+        >
+          {config.description}
+        </p>
+      )}
+
+      {/* CTA Button */}
+      {hasCta && (
+        <a
+          href={config.ctaUrl!}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '10px 20px',
+            borderRadius: 12,
+            background: 'linear-gradient(145deg, #f8f7f4, #eeeee8)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.8)',
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#333',
+            textDecoration: 'none',
+            transition: 'all 0.15s ease',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.8)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.8)';
+          }}
+        >
+          {config.ctaLabel}
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ marginLeft: 6 }}
+          >
+            <line x1="7" y1="17" x2="17" y2="7"/>
+            <polyline points="7 7 17 7 17 17"/>
+          </svg>
+        </a>
+      )}
+    </div>
+  );
 
   return (
     <WidgetWrapper
@@ -71,188 +204,8 @@ export function StatusWidget({
       onPositionChange={onPositionChange}
       onContextMenu={onContextMenu}
       isHighlighted={isHighlighted}
-      style={{
-        background: 'transparent',
-        border: 'none',
-        boxShadow: 'none',
-        padding: 0,
-      }}
     >
-      <motion.div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {/* Main pill */}
-        <motion.div
-          className="relative cursor-pointer"
-          style={{
-            borderRadius: 'var(--radius-xl, 22px)',
-            overflow: 'hidden',
-          }}
-          animate={{
-            boxShadow: isHovered
-              ? `var(--shadow-md), ${statusTheme.glow}`
-              : 'var(--shadow-sm)',
-            scale: isHovered ? 1.02 : 1,
-          }}
-          transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.gentle}
-        >
-          {/* Glass background */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
-              backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
-              WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
-              border: statusTheme.borderColor ? `1px solid ${statusTheme.borderColor}` : '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-              borderRadius: 'var(--radius-xl, 22px)',
-            }}
-          />
-
-          {/* Content */}
-          <div
-            className="relative flex items-center gap-3"
-            style={{
-              padding: '10px 16px 10px 12px',
-            }}
-          >
-            {/* Status indicator */}
-            <div
-              className="flex items-center justify-center"
-              style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '50%',
-                boxShadow: isHovered && statusTheme.glow !== 'none' ? statusTheme.glow : 'none',
-                transition: 'box-shadow 0.2s ease',
-                border: statusTheme.borderColor ? `1.5px solid ${statusTheme.borderColor}` : 'none',
-                color: statusTheme.borderColor ? statusTheme.borderColor : 'white',
-                background: statusTheme.gradient !== 'transparent' ? statusTheme.gradient : 'transparent',
-                opacity: 1,
-              }}
-            >
-              {labelConfig.emoji}
-            </div>
-
-            {/* Text */}
-            <div className="flex flex-col" style={{ minWidth: 0 }}>
-              <span
-                style={{
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  color: theme.colors.text.muted,
-                  fontFamily: theme.fonts.heading,
-                }}
-              >
-                {labelConfig.label}
-              </span>
-              <span
-                style={{
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  color: theme.colors.text.primary,
-                  fontFamily: theme.fonts.heading,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '160px',
-                }}
-              >
-                {config.title}
-              </span>
-            </div>
-
-            {/* CTA arrow */}
-            {config.ctaUrl && (
-              <motion.div
-                animate={{
-                  x: isHovered ? 2 : 0,
-                  opacity: isHovered ? 1 : 0.5,
-                }}
-                transition={{ duration: 0.15 }}
-              >
-                <ArrowUpRight
-                  size={14}
-                  style={{ color: 'var(--text-tertiary, #888)' }}
-                />
-              </motion.div>
-            )}
-          </div>
-
-          {/* Clickable link overlay */}
-          {config.ctaUrl && (
-            <a
-              href={config.ctaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute inset-0"
-              style={{ zIndex: 1 }}
-            />
-          )}
-        </motion.div>
-
-        {/* Expanded tooltip on hover */}
-        <AnimatePresence>
-          {isHovered && config.description && (
-            <motion.div
-              className="absolute right-0 mt-2"
-              style={{
-                bottom: '100%',
-                marginBottom: '8px',
-                width: '240px',
-              }}
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 6, scale: 0.95 }}
-              transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy}
-            >
-              <div
-                style={{
-                  background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
-                  backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-                  WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-                  borderRadius: 'var(--radius-md, 14px)',
-                  padding: '12px 14px',
-                  boxShadow: 'var(--shadow-lg)',
-                  border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: '12px',
-                    lineHeight: 1.5,
-                    color: 'var(--color-text-secondary, #4a4744)',
-                    fontFamily: 'var(--font-body)',
-                    margin: 0,
-                  }}
-                >
-                  {config.description}
-                </p>
-                {config.ctaLabel && config.ctaUrl && (
-                  <div
-                    className="mt-2 pt-2"
-                    style={{ borderTop: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))' }}
-                  >
-                    <span
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: 500,
-                        color: 'var(--color-accent-primary, #ff7722)',
-                        fontFamily: 'var(--font-body)',
-                      }}
-                    >
-                      {config.ctaLabel} →
-                    </span>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+      {content}
     </WidgetWrapper>
   );
 }

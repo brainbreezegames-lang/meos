@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Send, X, Check, ChevronDown } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
@@ -26,6 +25,14 @@ const DEFAULT_CONFIG: ContactWidgetConfig = {
   fields: ['name', 'email', 'message'],
   emailTo: '',
   successMessage: 'Thanks for reaching out!',
+};
+
+// Widget container styles matching the spec
+const WIDGET_CONTAINER = {
+  background: '#FDFBF7',
+  borderRadius: 24,
+  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+  border: '1px solid rgba(255,255,255,0.5)',
 };
 
 export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted, onSubmit }: ContactWidgetProps) {
@@ -73,99 +80,140 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
       isHighlighted={isHighlighted}
     >
       {!isExpanded ? (
-        // Collapsed state - friendly pill button
-        <button
-          onClick={() => setIsExpanded(true)}
+        /* Medium widget: 180x180 - collapsed state */
+        <div
           style={{
-            background: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
-            backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
-            WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
-            border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-            borderRadius: 'var(--radius-xl, 20px)',
-            boxShadow: 'var(--shadow-sm)',
-            padding: '12px 18px',
-            cursor: 'pointer',
+            ...WIDGET_CONTAINER,
+            width: 180,
+            height: 180,
+            padding: 16,
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: '10px',
-            transition: 'all 0.2s ease',
+            justifyContent: 'center',
+            gap: 12,
+            cursor: 'pointer',
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
+          onClick={() => setIsExpanded(true)}
         >
-          <Mail
-            size={16}
-            strokeWidth={2}
-            style={{ color: 'var(--color-accent-primary, #ff7722)' }}
-          />
+          {/* 3D Envelope icon */}
+          <div style={{ marginBottom: 4 }}>
+            <svg width="48" height="40" viewBox="0 0 48 40" fill="none">
+              {/* Envelope body */}
+              <path
+                d="M4 8C4 6 6 4 8 4H40C42 4 44 6 44 8V32C44 34 42 36 40 36H8C6 36 4 34 4 32V8Z"
+                fill="url(#envelopeGrad)"
+              />
+              {/* Envelope flap shadow */}
+              <path
+                d="M4 8L24 22L44 8"
+                fill="none"
+                stroke="#e0ded8"
+                strokeWidth="1"
+              />
+              {/* Envelope flap */}
+              <path
+                d="M4 8C4 6 6 4 8 4H40C42 4 44 6 44 8L24 22L4 8Z"
+                fill="url(#flapGrad)"
+              />
+              {/* Highlight on flap */}
+              <path
+                d="M8 6H40L24 18L8 6Z"
+                fill="rgba(255,255,255,0.3)"
+              />
+              <defs>
+                <linearGradient id="envelopeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#f8f7f4"/>
+                  <stop offset="100%" stopColor="#e8e7e2"/>
+                </linearGradient>
+                <linearGradient id="flapGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff"/>
+                  <stop offset="100%" stopColor="#f0efea"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+
+          {/* Title */}
           <span
             style={{
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
-              color: 'var(--color-text-primary, #171412)',
-              whiteSpace: 'nowrap',
+              color: '#333',
+              textAlign: 'center',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
             }}
           >
             {widget.title || 'Get in Touch'}
           </span>
-          <ChevronDown
-            size={14}
-            strokeWidth={2}
-            style={{ color: 'var(--color-text-muted, #8e827c)' }}
-          />
-        </button>
+
+          {/* Subtitle */}
+          <span
+            style={{
+              fontSize: 11,
+              color: '#888',
+              textAlign: 'center',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+            }}
+          >
+            {config.emailTo || 'hello@example.com'}
+          </span>
+
+          {/* Button */}
+          <button
+            style={{
+              padding: '8px 16px',
+              borderRadius: 12,
+              border: 'none',
+              background: 'linear-gradient(145deg, #f8f7f4, #eeeee8)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.8)',
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#555',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+            }}
+          >
+            Send Message
+          </button>
+        </div>
       ) : (
-        // Expanded state - contact form
+        /* Expanded form */
         <div
           style={{
-            background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
-            backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-            WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-            border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-            borderRadius: 'var(--radius-lg, 18px)',
-            boxShadow: 'var(--shadow-lg)',
-            width: '280px',
+            ...WIDGET_CONTAINER,
+            width: 280,
+            padding: 0,
             overflow: 'hidden',
           }}
         >
           {isSuccess ? (
-            // Success state
             <div
               style={{
                 padding: '32px 24px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '12px',
+                gap: 12,
               }}
             >
               <div
                 style={{
                   width: 48,
                   height: 48,
-                  borderRadius: 'var(--radius-full, 9999px)',
-                  background: 'var(--color-success, #22c55e)',
+                  borderRadius: '50%',
+                  background: '#22c55e',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Check size={24} color="white" strokeWidth={2.5} />
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
               </div>
-              <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: 'var(--color-text-primary, #171412)',
-                  textAlign: 'center',
-                }}
-              >
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#333', textAlign: 'center' }}>
                 {config.successMessage}
               </span>
             </div>
@@ -174,26 +222,19 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
               {/* Header */}
               <div
                 style={{
-                  padding: '12px 14px',
-                  borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+                  padding: '14px 16px',
+                  borderBottom: '1px solid rgba(0,0,0,0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Mail
-                    size={16}
-                    strokeWidth={2}
-                    style={{ color: 'var(--color-accent-primary, #ff7722)' }}
-                  />
-                  <span
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: 'var(--color-text-primary, #171412)',
-                    }}
-                  >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#333' }}>
                     {widget.title || 'Contact'}
                   </span>
                 </div>
@@ -204,19 +245,22 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     background: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
-                    color: 'var(--color-text-muted, #8e827c)',
-                    borderRadius: 'var(--radius-sm, 6px)',
+                    color: '#888',
+                    borderRadius: 6,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <X size={16} strokeWidth={2} />
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
                 </button>
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} style={{ padding: '14px' }}>
+              <form onSubmit={handleSubmit} style={{ padding: 16 }}>
                 {config.fields.includes('name') && (
                   <input
                     type="text"
@@ -227,21 +271,13 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                       width: '100%',
                       padding: '10px 12px',
                       marginBottom: 10,
-                      borderRadius: 'var(--radius-sm, 10px)',
-                      border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-                      background: 'var(--color-bg-white, rgba(255, 255, 255, 0.8))',
-                      color: 'var(--color-text-primary, #171412)',
+                      borderRadius: 10,
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      background: '#fff',
+                      color: '#333',
                       fontSize: 13,
                       outline: 'none',
-                      transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--color-accent-primary, #ff7722)';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255, 119, 34, 0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(23, 20, 18, 0.06)';
-                      e.currentTarget.style.boxShadow = 'none';
+                      boxSizing: 'border-box',
                     }}
                   />
                 )}
@@ -257,21 +293,13 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                       width: '100%',
                       padding: '10px 12px',
                       marginBottom: 10,
-                      borderRadius: 'var(--radius-sm, 10px)',
-                      border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-                      background: 'var(--color-bg-white, rgba(255, 255, 255, 0.8))',
-                      color: 'var(--color-text-primary, #171412)',
+                      borderRadius: 10,
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      background: '#fff',
+                      color: '#333',
                       fontSize: 13,
                       outline: 'none',
-                      transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--color-accent-primary, #ff7722)';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255, 119, 34, 0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(23, 20, 18, 0.06)';
-                      e.currentTarget.style.boxShadow = 'none';
+                      boxSizing: 'border-box',
                     }}
                   />
                 )}
@@ -287,22 +315,14 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                       width: '100%',
                       padding: '10px 12px',
                       marginBottom: 14,
-                      borderRadius: 'var(--radius-sm, 10px)',
-                      border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-                      background: 'var(--color-bg-white, rgba(255, 255, 255, 0.8))',
-                      color: 'var(--color-text-primary, #171412)',
+                      borderRadius: 10,
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      background: '#fff',
+                      color: '#333',
                       fontSize: 13,
                       outline: 'none',
                       resize: 'none',
-                      transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--color-accent-primary, #ff7722)';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255, 119, 34, 0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(23, 20, 18, 0.06)';
-                      e.currentTarget.style.boxShadow = 'none';
+                      boxSizing: 'border-box',
                     }}
                   />
                 )}
@@ -313,14 +333,12 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    borderRadius: '10px',
+                    borderRadius: 12,
                     border: 'none',
                     background: isValid
-                      ? 'var(--color-accent-primary, #ff7722)'
-                      : 'var(--color-bg-subtle, #f2f0e7)',
-                    color: isValid
-                      ? 'var(--color-text-on-accent, #ffffff)'
-                      : 'var(--color-text-muted, #8e827c)',
+                      ? 'linear-gradient(145deg, #333, #222)'
+                      : '#eee',
+                    color: isValid ? '#fff' : '#999',
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: isValid ? 'pointer' : 'not-allowed',
@@ -332,7 +350,10 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <Send size={14} strokeWidth={2} />
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
                   <span>{isLoading ? 'Sending...' : 'Send Message'}</span>
                 </button>
               </form>

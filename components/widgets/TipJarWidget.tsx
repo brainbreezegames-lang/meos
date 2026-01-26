@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Coffee, Heart, X, ChevronDown } from 'lucide-react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
@@ -23,35 +22,33 @@ interface TipJarWidgetProps {
 }
 
 const DEFAULT_CONFIG: TipJarWidgetConfig = {
-  amounts: [5, 10, 25],
-  customAmount: true,
+  amounts: [3, 5, 10],
+  customAmount: false,
   message: 'Buy me a coffee',
 };
 
-export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted, onTip }: TipJarWidgetProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
-  const [customValue, setCustomValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+// Widget container styles matching the spec
+const WIDGET_CONTAINER = {
+  background: '#FDFBF7',
+  borderRadius: 24,
+  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+  border: '1px solid rgba(255,255,255,0.5)',
+};
 
+export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted, onTip }: TipJarWidgetProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const config: TipJarWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<TipJarWidgetConfig>) };
 
-  const handleTip = async () => {
-    const amount = selectedAmount || (customValue ? parseFloat(customValue) : 0);
-    if (amount > 0 && onTip) {
+  const handleTip = async (amount: number) => {
+    if (onTip) {
       setIsLoading(true);
       try {
         await onTip(amount);
-        setIsExpanded(false);
-        setSelectedAmount(null);
-        setCustomValue('');
       } finally {
         setIsLoading(false);
       }
     }
   };
-
-  const hasAmount = selectedAmount || customValue;
 
   return (
     <WidgetWrapper
@@ -63,222 +60,122 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
       onContextMenu={onContextMenu}
       isHighlighted={isHighlighted}
     >
-      {!isExpanded ? (
-        // Collapsed state - calm-tech 2025 glass pill
-        <button
-          onClick={() => setIsExpanded(true)}
-          style={{
-            background: 'var(--color-bg-glass, rgba(251, 249, 239, 0.92))',
-            backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
-            WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
-            border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-            borderRadius: 'var(--radius-xl, 20px)',
-            boxShadow: 'var(--shadow-sm)',
-            padding: '12px 18px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          <Coffee
-            size={16}
-            strokeWidth={2}
-            style={{ color: 'var(--color-accent-primary, #ff7722)' }}
-          />
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--color-text-primary, #171412)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {widget.title || config.message}
-          </span>
-          <ChevronDown
-            size={14}
-            strokeWidth={2}
-            style={{ color: 'var(--color-text-muted, #8e827c)' }}
-          />
-        </button>
-      ) : (
-        // Expanded state - calm-tech 2025 glass panel
-        <div
-          style={{
-            background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
-            backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-            WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-            border: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-            borderRadius: 'var(--radius-lg, 18px)',
-            boxShadow: 'var(--shadow-lg)',
-            width: '240px',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Header */}
-          <div
-            style={{
-              padding: '12px 14px',
-              borderBottom: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Coffee
-                size={16}
-                strokeWidth={2}
-                style={{ color: 'var(--color-accent-primary, #ff7722)' }}
-              />
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: 'var(--color-text-primary, #171412)',
-                }}
-              >
-                Tip Jar
-              </span>
-            </div>
-            <button
-              onClick={() => setIsExpanded(false)}
-              style={{
-                padding: 4,
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'var(--color-text-muted, #8e827c)',
-                borderRadius: 'var(--radius-sm, 6px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <X size={16} strokeWidth={2} />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div style={{ padding: '14px' }}>
-            {/* Amount buttons */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-              {config.amounts.map((amount) => (
-                <button
-                  key={amount}
-                  onClick={() => {
-                    setSelectedAmount(amount);
-                    setCustomValue('');
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: '10px 8px',
-                    borderRadius: 'var(--radius-sm, 6px)',
-                    border: selectedAmount === amount
-                      ? '2px solid var(--color-accent-primary, #ff7722)'
-                      : '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-                    background: selectedAmount === amount
-                      ? 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.1))'
-                      : 'var(--color-bg-white, #ffffff)',
-                    color: selectedAmount === amount
-                      ? 'var(--color-accent-primary, #ff7722)'
-                      : 'var(--color-text-primary, #171412)',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    fontVariantNumeric: 'tabular-nums',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  ${amount}
-                </button>
-              ))}
-            </div>
-
-            {/* Custom amount */}
-            {config.customAmount && (
-              <div style={{ position: 'relative', marginBottom: '14px' }}>
-                <span
-                  style={{
-                    position: 'absolute',
-                    left: 12,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: 'var(--color-text-muted, #8e827c)',
-                    fontSize: 14,
-                    fontWeight: 500,
-                  }}
-                >
-                  $
-                </span>
-                <input
-                  type="number"
-                  placeholder="Other"
-                  value={customValue}
-                  onChange={(e) => {
-                    setCustomValue(e.target.value);
-                    setSelectedAmount(null);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px 10px 24px',
-                    borderRadius: 'var(--radius-sm, 6px)',
-                    border: customValue
-                      ? '2px solid var(--color-accent-primary, #ff7722)'
-                      : '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-                    background: 'var(--color-bg-white, #ffffff)',
-                    color: 'var(--color-text-primary, #171412)',
-                    fontSize: 14,
-                    fontVariantNumeric: 'tabular-nums',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease',
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Submit button */}
-            <button
-              onClick={handleTip}
-              disabled={isLoading || !hasAmount}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: 'var(--radius-sm, 6px)',
-                border: 'none',
-                background: hasAmount
-                  ? 'var(--color-accent-primary, #ff7722)'
-                  : 'var(--color-bg-subtle, #f2f0e7)',
-                color: hasAmount
-                  ? 'var(--color-text-on-accent, #ffffff)'
-                  : 'var(--color-text-muted, #8e827c)',
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: hasAmount ? 'pointer' : 'not-allowed',
-                opacity: isLoading ? 0.7 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <Heart size={14} strokeWidth={2} />
-              <span>{isLoading ? 'Processing...' : 'Send Tip'}</span>
-            </button>
-          </div>
+      {/* Small widget: 120x120 */}
+      <div
+        style={{
+          ...WIDGET_CONTAINER,
+          width: 120,
+          height: 120,
+          padding: 14,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+        }}
+      >
+        {/* 3D Coffee cup with steam */}
+        <div style={{ position: 'relative', marginBottom: 2 }}>
+          <svg width="32" height="36" viewBox="0 0 32 36" fill="none">
+            {/* Steam wisps */}
+            <path
+              d="M10 8 Q12 4 10 0"
+              stroke="#ccc"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.6"
+            />
+            <path
+              d="M16 6 Q18 2 16 -2"
+              stroke="#ccc"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.6"
+            />
+            <path
+              d="M22 8 Q20 4 22 0"
+              stroke="#ccc"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.6"
+            />
+            {/* Cup body */}
+            <path
+              d="M4 12 L6 32 C6 34 8 36 16 36 C24 36 26 34 26 32 L28 12 Z"
+              fill="url(#cupGradient)"
+            />
+            {/* Cup rim highlight */}
+            <ellipse cx="16" cy="12" rx="12" ry="3" fill="#fff" opacity="0.8"/>
+            <ellipse cx="16" cy="12" rx="11" ry="2.5" fill="#f5f5f0"/>
+            {/* Handle */}
+            <path
+              d="M26 16 Q32 16 32 22 Q32 28 26 28"
+              stroke="url(#cupGradient)"
+              strokeWidth="3"
+              fill="none"
+            />
+            <defs>
+              <linearGradient id="cupGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#f8f7f4"/>
+                <stop offset="100%" stopColor="#e8e7e2"/>
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
-      )}
+
+        {/* Message */}
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: '#555',
+            textAlign: 'center',
+            lineHeight: 1.2,
+            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+          }}
+        >
+          {widget.title || config.message}
+        </span>
+
+        {/* Amount buttons */}
+        <div style={{ display: 'flex', gap: 4 }}>
+          {config.amounts.map((amount) => (
+            <button
+              key={amount}
+              onClick={() => handleTip(amount)}
+              disabled={isLoading}
+              style={{
+                padding: '4px 8px',
+                borderRadius: 8,
+                border: 'none',
+                background: 'linear-gradient(145deg, #f8f7f4, #eeeee8)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.8)',
+                fontSize: 11,
+                fontWeight: 600,
+                color: '#555',
+                cursor: isLoading ? 'wait' : 'pointer',
+                transition: 'all 0.15s ease',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading) {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.8)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.8)';
+              }}
+            >
+              ${amount}
+            </button>
+          ))}
+        </div>
+      </div>
     </WidgetWrapper>
   );
 }
