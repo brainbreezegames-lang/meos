@@ -5110,8 +5110,8 @@ function GoOSDemoContent() {
                 }}
                 onEdit={() => {
                     if (widgetContextMenu.widget) {
-                        console.log('Edit widget:', widgetContextMenu.widget);
-                        // TODO: Open widget edit modal
+                        setEditingWidget(widgetContextMenu.widget);
+                        closeWidgetContextMenu();
                     }
                 }}
                 onToggleVisibility={() => {

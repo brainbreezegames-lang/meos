@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X, Image, Link, Video, Download, Loader2 } from 'lucide-react';
+import { Image, Link, Video, Download, Loader2 } from 'lucide-react';
 import { SPRING, fade, REDUCED_MOTION } from '@/lib/animations';
+import { TrafficLights } from '../desktop/TrafficLights';
+import { WINDOW, TITLE_BAR } from '../desktop/windowStyles';
 
 type FileType = 'image' | 'link' | 'embed' | 'download';
 
@@ -28,7 +30,7 @@ const FILE_TYPE_CONFIG: Record<FileType, {
 }> = {
   image: {
     title: 'Add Image',
-    icon: <Image size={18} />,
+    icon: <Image size={16} strokeWidth={1.5} />,
     placeholder: 'https://example.com/image.jpg',
     secondaryLabel: 'Caption (optional)',
     secondaryPlaceholder: 'Describe this image...',
@@ -37,7 +39,7 @@ const FILE_TYPE_CONFIG: Record<FileType, {
   },
   link: {
     title: 'Add Link',
-    icon: <Link size={18} />,
+    icon: <Link size={16} strokeWidth={1.5} />,
     placeholder: 'https://example.com',
     secondaryLabel: 'Title (optional)',
     secondaryPlaceholder: 'Link title...',
@@ -46,14 +48,14 @@ const FILE_TYPE_CONFIG: Record<FileType, {
   },
   embed: {
     title: 'Add Embed',
-    icon: <Video size={18} />,
+    icon: <Video size={16} strokeWidth={1.5} />,
     placeholder: 'https://youtube.com/watch?v=... or https://vimeo.com/...',
     secondaryLabel: 'Platform',
     secondaryPlaceholder: 'Auto-detected',
   },
   download: {
     title: 'Add Download',
-    icon: <Download size={18} />,
+    icon: <Download size={16} strokeWidth={1.5} />,
     placeholder: 'https://example.com/file.pdf',
     secondaryLabel: 'File name',
     secondaryPlaceholder: 'my-file.pdf',
@@ -80,7 +82,7 @@ function detectEmbedPlatform(url: string): string {
   return 'other';
 }
 
-// Custom dialog animation that doesn't use y offset (which breaks centering)
+// Dialog animation
 const dialogVariants = {
   initial: { opacity: 0, scale: 0.95 },
   animate: { opacity: 1, scale: 1 },
@@ -166,11 +168,42 @@ export function GoOSCreateFileDialog({
 
   const config = FILE_TYPE_CONFIG[fileType];
 
+  // Input styles - consistent across all inputs
+  const getInputStyle = (fieldName: string): React.CSSProperties => ({
+    width: '100%',
+    padding: '12px 14px',
+    fontSize: 14,
+    fontFamily: 'var(--font-body)',
+    border: focusedField === fieldName
+      ? '2px solid var(--color-accent-primary)'
+      : '1px solid var(--color-border-default)',
+    borderRadius: 'var(--radius-sm)',
+    background: 'var(--color-bg-base)',
+    color: 'var(--color-text-primary)',
+    outline: 'none',
+    boxSizing: 'border-box' as const,
+    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+    boxShadow: focusedField === fieldName
+      ? '0 0 0 3px var(--color-accent-primary-subtle)'
+      : 'none',
+  });
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: 11,
+    fontWeight: 600,
+    color: 'var(--color-text-muted)',
+    marginBottom: 8,
+    fontFamily: 'var(--font-body)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop with blur */}
+          {/* Backdrop */}
           <motion.div
             variants={fade}
             initial="initial"
@@ -188,7 +221,7 @@ export function GoOSCreateFileDialog({
             }}
           />
 
-          {/* Centering container - flexbox for perfect centering */}
+          {/* Centering container */}
           <div
             style={{
               position: 'fixed',
@@ -201,8 +234,11 @@ export function GoOSCreateFileDialog({
               pointerEvents: 'none',
             }}
           >
-            {/* Dialog */}
+            {/* Dialog - uses unified WINDOW styles */}
             <motion.div
+              role="dialog"
+              aria-label={config.title}
+              aria-modal="true"
               variants={dialogVariants}
               initial="initial"
               animate="animate"
@@ -212,113 +248,60 @@ export function GoOSCreateFileDialog({
               style={{
                 width: '100%',
                 maxWidth: 420,
-                background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.98))',
-                backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-                WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-                border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-                borderRadius: 'var(--radius-lg, 18px)',
-                boxShadow: 'var(--shadow-xl)',
+                // Use unified WINDOW styles
+                background: WINDOW.background,
+                border: WINDOW.border,
+                borderRadius: WINDOW.borderRadius,
+                boxShadow: WINDOW.shadow,
                 overflow: 'hidden',
                 pointerEvents: 'auto',
               }}
             >
-              {/* Header with traffic lights styling */}
+              {/* Title Bar - uses unified TITLE_BAR styles */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
+                  padding: `0 ${TITLE_BAR.paddingX}px`,
+                  height: TITLE_BAR.height,
+                  background: TITLE_BAR.background,
+                  borderBottom: TITLE_BAR.borderBottom,
                   gap: 12,
-                  padding: '14px 16px',
-                  borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-                  background: 'var(--color-bg-elevated, rgba(255, 255, 255, 0.5))',
                 }}
               >
-                {/* Close button styled like traffic light */}
-                <button
-                  onClick={onClose}
-                  aria-label="Close dialog"
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(180deg, #ff6058 0%, #e0443e 100%)',
-                    border: '0.5px solid rgba(0, 0, 0, 0.12)',
-                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 0,
-                    transition: 'transform 0.1s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.1)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }}
-                >
-                  <X size={8} strokeWidth={2.5} style={{ opacity: 0 }} className="hover:opacity-100" />
-                </button>
+                {/* Traffic Lights - unified component, only close button for modal */}
+                <TrafficLights
+                  onClose={onClose}
+                  showAll={false}
+                  variant="macos"
+                />
 
-                {/* Spacer dots for visual balance */}
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <div
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: '50%',
-                      background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.06))',
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: '50%',
-                      background: 'var(--color-bg-subtle, rgba(23, 20, 18, 0.06))',
-                    }}
-                  />
-                </div>
-
-                {/* Title centered */}
+                {/* Title */}
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <span style={{ color: 'var(--color-accent-primary, #ff7722)' }}>{config.icon}</span>
-                  <h2
+                  <span style={{ color: 'var(--color-accent-primary)' }}>{config.icon}</span>
+                  <span
                     style={{
-                      margin: 0,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: 'var(--color-text-primary, #171412)',
+                      fontSize: TITLE_BAR.titleFontSize,
+                      fontWeight: TITLE_BAR.titleFontWeight,
+                      color: TITLE_BAR.titleColor,
                       fontFamily: 'var(--font-body)',
+                      letterSpacing: TITLE_BAR.titleLetterSpacing,
+                      opacity: TITLE_BAR.titleOpacityActive,
                     }}
                   >
                     {config.title}
-                  </h2>
+                  </span>
                 </div>
 
-                {/* Invisible spacer to balance the layout */}
-                <div style={{ width: 54 }} />
+                {/* Spacer to balance layout */}
+                <div style={{ width: 12 }} />
               </div>
 
               {/* Form */}
               <form onSubmit={handleSubmit} style={{ padding: 20 }}>
                 {/* URL Input */}
                 <div style={{ marginBottom: 16 }}>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: 'var(--color-text-muted, #8e827c)',
-                      marginBottom: 8,
-                      fontFamily: 'var(--font-body)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    URL
-                  </label>
+                  <label style={labelStyle}>URL</label>
                   <input
                     ref={inputRef}
                     type="url"
@@ -328,45 +311,17 @@ export function GoOSCreateFileDialog({
                     onBlur={() => setFocusedField(null)}
                     placeholder={config.placeholder}
                     required
-                    style={{
-                      width: '100%',
-                      padding: '12px 14px',
-                      fontSize: 14,
-                      fontFamily: 'var(--font-body)',
-                      border: focusedField === 'url'
-                        ? '2px solid var(--color-accent-primary, #ff7722)'
-                        : '1px solid var(--color-border-default, rgba(23, 20, 18, 0.12))',
-                      borderRadius: 'var(--radius-sm, 10px)',
-                      background: 'var(--color-bg-primary, #fbf9ef)',
-                      color: 'var(--color-text-primary, #171412)',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                      transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                      boxShadow: focusedField === 'url'
-                        ? '0 0 0 3px var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.12))'
-                        : 'none',
-                    }}
+                    style={getInputStyle('url')}
                   />
                 </div>
 
                 {/* Secondary Input */}
                 {config.secondaryLabel && (
                   <div style={{ marginBottom: 16 }}>
-                    <label
-                      style={{
-                        display: 'block',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: 'var(--color-text-muted, #8e827c)',
-                        marginBottom: 8,
-                        fontFamily: 'var(--font-body)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                      }}
-                    >
+                    <label style={labelStyle}>
                       {config.secondaryLabel}
                       {fileType === 'embed' && detectedPlatform && (
-                        <span style={{ marginLeft: 8, color: 'var(--color-accent-primary, #ff7722)', textTransform: 'none' }}>
+                        <span style={{ marginLeft: 8, color: 'var(--color-accent-primary)', textTransform: 'none' }}>
                           (Detected: {detectedPlatform})
                         </span>
                       )}
@@ -376,16 +331,7 @@ export function GoOSCreateFileDialog({
                         value={detectedPlatform}
                         onChange={(e) => setDetectedPlatform(e.target.value)}
                         style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          fontSize: 14,
-                          fontFamily: 'var(--font-body)',
-                          border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.12))',
-                          borderRadius: 'var(--radius-sm, 10px)',
-                          background: 'var(--color-bg-primary, #fbf9ef)',
-                          color: 'var(--color-text-primary, #171412)',
-                          outline: 'none',
-                          boxSizing: 'border-box',
+                          ...getInputStyle('secondary'),
                           cursor: 'pointer',
                         }}
                       >
@@ -402,24 +348,7 @@ export function GoOSCreateFileDialog({
                         onFocus={() => setFocusedField('secondary')}
                         onBlur={() => setFocusedField(null)}
                         placeholder={config.secondaryPlaceholder}
-                        style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          fontSize: 14,
-                          fontFamily: 'var(--font-body)',
-                          border: focusedField === 'secondary'
-                            ? '2px solid var(--color-accent-primary, #ff7722)'
-                            : '1px solid var(--color-border-default, rgba(23, 20, 18, 0.12))',
-                          borderRadius: 'var(--radius-sm, 10px)',
-                          background: 'var(--color-bg-primary, #fbf9ef)',
-                          color: 'var(--color-text-primary, #171412)',
-                          outline: 'none',
-                          boxSizing: 'border-box',
-                          transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                          boxShadow: focusedField === 'secondary'
-                            ? '0 0 0 3px var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.12))'
-                            : 'none',
-                        }}
+                        style={getInputStyle('secondary')}
                       />
                     )}
                   </div>
@@ -428,20 +357,7 @@ export function GoOSCreateFileDialog({
                 {/* Tertiary Input */}
                 {config.tertiaryLabel && (
                   <div style={{ marginBottom: 20 }}>
-                    <label
-                      style={{
-                        display: 'block',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: 'var(--color-text-muted, #8e827c)',
-                        marginBottom: 8,
-                        fontFamily: 'var(--font-body)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      {config.tertiaryLabel}
-                    </label>
+                    <label style={labelStyle}>{config.tertiaryLabel}</label>
                     <input
                       type="text"
                       value={tertiary}
@@ -449,24 +365,7 @@ export function GoOSCreateFileDialog({
                       onFocus={() => setFocusedField('tertiary')}
                       onBlur={() => setFocusedField(null)}
                       placeholder={config.tertiaryPlaceholder}
-                      style={{
-                        width: '100%',
-                        padding: '12px 14px',
-                        fontSize: 14,
-                        fontFamily: 'var(--font-body)',
-                        border: focusedField === 'tertiary'
-                          ? '2px solid var(--color-accent-primary, #ff7722)'
-                          : '1px solid var(--color-border-default, rgba(23, 20, 18, 0.12))',
-                        borderRadius: 'var(--radius-sm, 10px)',
-                        background: 'var(--color-bg-primary, #fbf9ef)',
-                        color: 'var(--color-text-primary, #171412)',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                        boxShadow: focusedField === 'tertiary'
-                          ? '0 0 0 3px var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.12))'
-                          : 'none',
-                      }}
+                      style={getInputStyle('tertiary')}
                     />
                   </div>
                 )}
@@ -481,18 +380,18 @@ export function GoOSCreateFileDialog({
                       fontSize: 13,
                       fontWeight: 500,
                       fontFamily: 'var(--font-body)',
-                      border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.12))',
-                      borderRadius: 'var(--radius-sm, 10px)',
-                      background: 'var(--color-bg-primary, #fbf9ef)',
-                      color: 'var(--color-text-secondary, #4a4744)',
+                      border: '1px solid var(--color-border-default)',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--color-bg-base)',
+                      color: 'var(--color-text-secondary)',
                       cursor: 'pointer',
-                      transition: 'background 0.15s ease, border-color 0.15s ease',
+                      transition: 'background 0.15s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'var(--color-bg-subtle, #f2f0e7)';
+                      e.currentTarget.style.background = 'var(--color-bg-subtle)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'var(--color-bg-primary, #fbf9ef)';
+                      e.currentTarget.style.background = 'var(--color-bg-base)';
                     }}
                   >
                     Cancel
@@ -506,13 +405,13 @@ export function GoOSCreateFileDialog({
                       fontWeight: 600,
                       fontFamily: 'var(--font-body)',
                       border: 'none',
-                      borderRadius: 'var(--radius-sm, 10px)',
+                      borderRadius: 'var(--radius-sm)',
                       background: !url.trim() || isSubmitting
-                        ? 'var(--color-bg-subtle, #f2f0e7)'
-                        : 'var(--color-accent-primary, #ff7722)',
+                        ? 'var(--color-bg-subtle)'
+                        : 'var(--color-accent-primary)',
                       color: !url.trim() || isSubmitting
-                        ? 'var(--color-text-muted, #8e827c)'
-                        : 'var(--color-text-on-accent, #fff)',
+                        ? 'var(--color-text-muted)'
+                        : 'var(--color-text-on-accent)',
                       cursor: !url.trim() || isSubmitting ? 'not-allowed' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -521,23 +420,17 @@ export function GoOSCreateFileDialog({
                     }}
                     onMouseEnter={(e) => {
                       if (url.trim() && !isSubmitting) {
-                        e.currentTarget.style.background = 'var(--color-accent-primary-hover, #e56a1a)';
                         e.currentTarget.style.transform = 'translateY(-1px)';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (url.trim() && !isSubmitting) {
-                        e.currentTarget.style.background = 'var(--color-accent-primary, #ff7722)';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                      }
+                      e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >
                     {isSubmitting && (
                       <Loader2
                         size={14}
-                        style={{
-                          animation: 'spin 1s linear infinite',
-                        }}
+                        style={{ animation: 'spin 1s linear infinite' }}
                       />
                     )}
                     Create
