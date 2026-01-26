@@ -115,30 +115,73 @@ export function FallingLetters({
         return Bodies.circle(x, y, width / 2, opts);
       }
 
-      // Thickness of the strokes (approx 25% of width for heavy font)
-      const t = width * 0.28;
+      // Averia Serif is organic and thinner than a slab serif.
+      // Thickness of the strokes is roughly 15-18% of the width.
+      const t = width * 0.18;
+      const serifWidth = t * 2.5;
+      const serifHeight = t * 0.6;
 
       switch (char.toUpperCase()) {
         case 'H': {
-          // H: Two vertical bars, one horizontal crossbar
-          const left = Bodies.rectangle(x - width / 2 + t / 2, y, t, height, opts);
-          const right = Bodies.rectangle(x + width / 2 - t / 2, y, t, height, opts);
-          const cross = Bodies.rectangle(x, y, width - 2 * t, t, opts);
-          return Body.create({ parts: [left, right, cross], ...opts });
+          // H: Two verticals + Crossbar + 4 Serifs
+          const leftX = x - width / 2 + t / 2;
+          const rightX = x + width / 2 - t / 2;
+
+          // Vertical bars (slightly shorter to make room for serif height if we wanted exactness, but overlapping is safer)
+          const left = Bodies.rectangle(leftX, y, t, height, opts);
+          const right = Bodies.rectangle(rightX, y, t, height, opts);
+          const cross = Bodies.rectangle(x, y, width - 2 * t, t * 0.8, opts); // Crossbar is usually thinner
+
+          // Serifs (Top-Left, Bottom-Left, Top-Right, Bottom-Right)
+          const tl = Bodies.rectangle(leftX, y - height / 2 + serifHeight / 2, serifWidth, serifHeight, opts);
+          const bl = Bodies.rectangle(leftX, y + height / 2 - serifHeight / 2, serifWidth, serifHeight, opts);
+          const tr = Bodies.rectangle(rightX, y - height / 2 + serifHeight / 2, serifWidth, serifHeight, opts);
+          const br = Bodies.rectangle(rightX, y + height / 2 - serifHeight / 2, serifWidth, serifHeight, opts);
+
+          return Body.create({ parts: [left, right, cross, tl, bl, tr, br], ...opts });
         }
         case 'E': {
-          // E: One vertical spine, three horizontal arms
-          const spine = Bodies.rectangle(x - width / 2 + t / 2, y, t, height, opts);
+          // E: Spine + 3 Arms + Serifs
+          const spineX = x - width / 2 + t / 2;
+
+          const spine = Bodies.rectangle(spineX, y, t, height, opts);
+
+          // Arms - Top, Middle, Bottom
+          // Use width * 0.9 for arms to account for visual length
           const top = Bodies.rectangle(x + t / 2, y - height / 2 + t / 2, width - t, t, opts);
-          const mid = Bodies.rectangle(x + t / 2, y, width - t * 1.2, t, opts);
+          const mid = Bodies.rectangle(x + t / 2, y, width - t * 1.5, t * 0.9, opts); // Middle arm often shorter/thinner
           const bot = Bodies.rectangle(x + t / 2, y + height / 2 - t / 2, width - t, t, opts);
-          return Body.create({ parts: [spine, top, mid, bot], ...opts });
+
+          // Serifs on Spine (Top and Bottom left) extend leftwards? Actually Averia E has serifs on the right tips of arms
+          // Vertical serifs at end of arms
+          const armSerifH = t * 2.5;
+          const armSerifW = t * 0.6;
+
+          const topSerif = Bodies.rectangle(x + width / 2 - armSerifW / 2, y - height / 2 + armSerifH / 2, armSerifW, armSerifH, opts);
+          const botSerif = Bodies.rectangle(x + width / 2 - armSerifW / 2, y + height / 2 - armSerifH / 2, armSerifW, armSerifH, opts);
+          // Main spine serifs (top/bottom left)
+          const spineTopSerif = Bodies.rectangle(spineX, y - height / 2 + serifHeight / 2, serifWidth, serifHeight, opts);
+          const spineBotSerif = Bodies.rectangle(spineX, y + height / 2 - serifHeight / 2, serifWidth, serifHeight, opts);
+
+          return Body.create({ parts: [spine, top, mid, bot, topSerif, botSerif, spineTopSerif, spineBotSerif], ...opts });
         }
         case 'L': {
-          // L: Vertical spine, bottom arm
-          const spine = Bodies.rectangle(x - width / 2 + t / 2, y, t, height, opts);
+          // L: Spine + Bottom Arm
+          const spineX = x - width / 2 + t / 2;
+
+          const spine = Bodies.rectangle(spineX, y, t, height, opts);
           const bot = Bodies.rectangle(x + t / 2, y + height / 2 - t / 2, width - t, t, opts);
-          return Body.create({ parts: [spine, bot], ...opts });
+
+          // Serifs
+          const spineTopSerif = Bodies.rectangle(spineX, y - height / 2 + serifHeight / 2, serifWidth, serifHeight, opts);
+          const spineBotSerif = Bodies.rectangle(spineX, y + height / 2 - serifHeight / 2, serifWidth, serifHeight, opts); // Corner serif
+
+          // End of arm serif (vertical blip)
+          const armSerifH = t * 2.5;
+          const armSerifW = t * 0.6;
+          const armTipSerif = Bodies.rectangle(x + width / 2 - armSerifW / 2, y + height / 2 - armSerifH / 2, armSerifW, armSerifH, opts);
+
+          return Body.create({ parts: [spine, bot, spineTopSerif, spineBotSerif, armTipSerif], ...opts });
         }
         case 'O': {
           // O: Use a Circle for natural rolling behavior and to prevent internal sticking.
