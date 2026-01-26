@@ -14,7 +14,7 @@ export function FallingLetters({
   isReady = true,
   text = "HELLO",
   className,
-  textSize = 420
+  textSize = 336
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -223,9 +223,9 @@ export function FallingLetters({
               fontSize: `${textSize}px`,
               opacity: 0,
               visibility: 'hidden',
-              // Font stack matching design system
-              fontFamily: 'var(--font-instrument, "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif)',
-              color: '#000000', // PURE BLACK as requested
+              // Font stack matching design system - using Outfit as requested for punchier look
+              fontFamily: 'var(--font-outfit, "Instrument Sans", sans-serif)',
+              color: 'var(--color-text-primary, #000000)', // Use CSS var for auto-dark mode or default black
               whiteSpace: 'nowrap',
               lineHeight: 0.8,
               fontWeight: 900 // EXTRA BOLD / BLACK
@@ -235,8 +235,18 @@ export function FallingLetters({
           </div>
         );
       })}
-    </div>
-  );
+      <style jsx>{`
+        /* Force white in dark mode if CSS vars aren't enough */
+        @media (prefers-color-scheme: dark) {
+          .will-change-transform {
+             color: #ffffff !important;
+          }
+        }
+        :global(.dark) .will-change-transform {
+           color: #ffffff !important;
+        }
+      `}</style>
+      );
 }
 
-export default FallingLetters;
+      export default FallingLetters;
