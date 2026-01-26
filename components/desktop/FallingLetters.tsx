@@ -14,7 +14,7 @@ export function FallingLetters({
   isReady = true,
   text = "HELLO",
   className,
-  textSize = 560
+  textSize = 280
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -51,6 +51,10 @@ export function FallingLetters({
 
     // Standard gravity
     engine.gravity.y = 1;
+
+    // HUMAN: High precision to prevent overlap
+    engine.positionIterations = 20;
+    engine.velocityIterations = 20;
 
     const containerWidth = containerRef.current.clientWidth;
     const containerHeight = containerRef.current.clientHeight;
