@@ -3960,122 +3960,138 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* Bottom warm glow - many small flame shapes rising from bottom */}
+            {/* Bottom lava glow - pure CSS layered flames */}
             {!wallpaper && (
-                <div
-                    className="pointer-events-none"
-                    style={{
-                        position: 'fixed',
-                        zIndex: 4,
-                        bottom: 0,
-                        left: 0,
-                        width: '100vw',
-                        height: '50vh',
-                        overflow: 'hidden',
-                    }}
-                >
-                    {/* Base ambient glow */}
+                <>
+                    <style>{`
+                        @keyframes lavaBreath {
+                            0%, 100% { opacity: 0.85; transform: scaleY(1); }
+                            50% { opacity: 1; transform: scaleY(1.02); }
+                        }
+                    `}</style>
                     <div
+                        className="pointer-events-none"
                         style={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: '-5%',
-                            width: '110%',
-                            height: '40%',
-                            background: 'linear-gradient(to top, rgba(200, 60, 10, 0.4) 0%, rgba(255, 100, 20, 0.2) 50%, transparent 100%)',
-                            filter: 'blur(30px)',
+                            position: 'fixed',
+                            zIndex: 4,
+                            bottom: '-5vh',
+                            left: '-8vw',
+                            width: '116vw',
+                            height: '45vh',
+                            transformOrigin: 'bottom center',
+                            animation: 'lavaBreath 8s ease-in-out infinite',
                         }}
-                    />
-                    {/* Many small flame particles */}
-                    {Array.from({ length: 80 }).map((_, i) => {
-                        const seed = i * 137.5;
-                        const rand = (s: number) => {
-                            const x = Math.sin(s * 9999) * 10000;
-                            return x - Math.floor(x);
-                        };
-                        const x = rand(seed) * 100;
-                        const heightPercent = 5 + rand(seed + 1) * 35;
-                        const size = 30 + rand(seed + 2) * 80;
-                        const blur = 20 + rand(seed + 3) * 40;
-                        const opacity = 0.3 + rand(seed + 4) * 0.5;
-                        const colors = [
-                            '#8B1A1A', '#A82020', '#B82828', '#C83818',
-                            '#D84818', '#E85010', '#F06800', '#FF5500',
-                            '#FF6800', '#FF7010', '#FF8020', '#FF8818',
-                            '#FF9020', '#FFAA40', '#FFB050', '#FFC040',
-                        ];
-                        const color = colors[Math.floor(rand(seed + 5) * colors.length)];
-                        const animDelay = rand(seed + 6) * 5;
-                        const animDuration = 4 + rand(seed + 7) * 6;
-
-                        return (
-                            <motion.div
-                                key={i}
-                                animate={{
-                                    y: [0, -10 - rand(seed + 8) * 15, 0],
-                                    opacity: [opacity * 0.7, opacity, opacity * 0.8],
-                                    scale: [1, 1.05, 1],
-                                }}
-                                transition={{
-                                    duration: animDuration,
-                                    delay: animDelay,
-                                    repeat: Infinity,
-                                    ease: 'easeInOut',
-                                }}
-                                style={{
-                                    position: 'absolute',
-                                    left: `${x}%`,
-                                    bottom: `${-5 + rand(seed + 9) * heightPercent}%`,
-                                    width: size,
-                                    height: size * 1.5,
-                                    borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-                                    background: `radial-gradient(ellipse at 50% 70%, ${color} 0%, ${color}66 50%, transparent 80%)`,
-                                    filter: `blur(${blur}px)`,
-                                    transform: 'translateX(-50%)',
-                                }}
-                            />
-                        );
-                    })}
-                    {/* Brighter core highlights */}
-                    {Array.from({ length: 25 }).map((_, i) => {
-                        const seed = (i + 100) * 137.5;
-                        const rand = (s: number) => {
-                            const x = Math.sin(s * 9999) * 10000;
-                            return x - Math.floor(x);
-                        };
-                        const x = 10 + rand(seed) * 80;
-                        const size = 20 + rand(seed + 1) * 40;
-                        const animDelay = rand(seed + 2) * 4;
-                        const animDuration = 3 + rand(seed + 3) * 4;
-
-                        return (
-                            <motion.div
-                                key={`core-${i}`}
-                                animate={{
-                                    y: [0, -15, 0],
-                                    opacity: [0.2, 0.5, 0.2],
-                                }}
-                                transition={{
-                                    duration: animDuration,
-                                    delay: animDelay,
-                                    repeat: Infinity,
-                                    ease: 'easeInOut',
-                                }}
-                                style={{
-                                    position: 'absolute',
-                                    left: `${x}%`,
-                                    bottom: `${rand(seed + 4) * 15}%`,
-                                    width: size,
-                                    height: size,
-                                    borderRadius: '50%',
-                                    background: 'radial-gradient(circle, #FFEE90 0%, #FFCC50 30%, #FFAA30 60%, transparent 80%)',
-                                    filter: `blur(${15 + rand(seed + 5) * 20}px)`,
-                                    transform: 'translateX(-50%)',
-                                }}
-                            />
-                        );
-                    })}
-                </div>
+                    >
+                        {/* Layer 1: Deep crimson base - full coverage */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: `
+                                    linear-gradient(to top,
+                                        #6B1010 0%,
+                                        #8B1A1A 15%,
+                                        #A02020 30%,
+                                        transparent 70%
+                                    )
+                                `,
+                            }}
+                        />
+                        {/* Layer 2: Red-orange flames with irregular peaks */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: `
+                                    radial-gradient(ellipse 25% 60% at 8% 100%, #C83818 0%, transparent 100%),
+                                    radial-gradient(ellipse 20% 55% at 18% 100%, #D84818 0%, transparent 100%),
+                                    radial-gradient(ellipse 30% 70% at 32% 100%, #B83020 0%, transparent 100%),
+                                    radial-gradient(ellipse 22% 50% at 45% 100%, #D04020 0%, transparent 100%),
+                                    radial-gradient(ellipse 28% 65% at 58% 100%, #C83818 0%, transparent 100%),
+                                    radial-gradient(ellipse 18% 45% at 70% 100%, #D84818 0%, transparent 100%),
+                                    radial-gradient(ellipse 24% 58% at 82% 100%, #B83020 0%, transparent 100%),
+                                    radial-gradient(ellipse 20% 52% at 95% 100%, #C04020 0%, transparent 100%)
+                                `,
+                            }}
+                        />
+                        {/* Layer 3: Orange mid-flames */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: `
+                                    radial-gradient(ellipse 18% 50% at 5% 100%, #E85A00 0%, transparent 100%),
+                                    radial-gradient(ellipse 22% 58% at 15% 100%, #FF6800 0%, transparent 100%),
+                                    radial-gradient(ellipse 15% 42% at 25% 100%, #E86000 0%, transparent 100%),
+                                    radial-gradient(ellipse 26% 62% at 38% 100%, #FF5500 0%, transparent 100%),
+                                    radial-gradient(ellipse 20% 55% at 50% 100%, #F06000 0%, transparent 100%),
+                                    radial-gradient(ellipse 18% 48% at 62% 100%, #FF6800 0%, transparent 100%),
+                                    radial-gradient(ellipse 24% 56% at 75% 100%, #E85A00 0%, transparent 100%),
+                                    radial-gradient(ellipse 16% 44% at 88% 100%, #FF5500 0%, transparent 100%),
+                                    radial-gradient(ellipse 20% 50% at 98% 100%, #E86000 0%, transparent 100%)
+                                `,
+                            }}
+                        />
+                        {/* Layer 4: Bright orange peaks */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: `
+                                    radial-gradient(ellipse 14% 40% at 10% 100%, #FF8020 0%, transparent 100%),
+                                    radial-gradient(ellipse 18% 48% at 22% 100%, #FF7818 0%, transparent 100%),
+                                    radial-gradient(ellipse 12% 35% at 35% 100%, #FF9030 0%, transparent 100%),
+                                    radial-gradient(ellipse 20% 52% at 48% 100%, #FF8020 0%, transparent 100%),
+                                    radial-gradient(ellipse 16% 44% at 60% 100%, #FF7818 0%, transparent 100%),
+                                    radial-gradient(ellipse 14% 38% at 72% 100%, #FF9030 0%, transparent 100%),
+                                    radial-gradient(ellipse 18% 46% at 85% 100%, #FF8020 0%, transparent 100%),
+                                    radial-gradient(ellipse 12% 34% at 95% 100%, #FF7818 0%, transparent 100%)
+                                `,
+                            }}
+                        />
+                        {/* Layer 5: Yellow-orange hotspots */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: `
+                                    radial-gradient(ellipse 10% 32% at 12% 100%, #FFAA40 0%, transparent 100%),
+                                    radial-gradient(ellipse 14% 38% at 28% 100%, #FF9A30 0%, transparent 100%),
+                                    radial-gradient(ellipse 12% 34% at 42% 100%, #FFB850 0%, transparent 100%),
+                                    radial-gradient(ellipse 16% 42% at 55% 100%, #FFAA40 0%, transparent 100%),
+                                    radial-gradient(ellipse 10% 30% at 68% 100%, #FF9A30 0%, transparent 100%),
+                                    radial-gradient(ellipse 14% 36% at 80% 100%, #FFB850 0%, transparent 100%),
+                                    radial-gradient(ellipse 12% 32% at 92% 100%, #FFAA40 0%, transparent 100%)
+                                `,
+                            }}
+                        />
+                        {/* Layer 6: Yellow cores - brightest */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: `
+                                    radial-gradient(ellipse 8% 24% at 18% 100%, #FFC860 0%, transparent 100%),
+                                    radial-gradient(ellipse 10% 28% at 35% 100%, #FFD070 0%, transparent 100%),
+                                    radial-gradient(ellipse 12% 32% at 52% 100%, #FFC860 0%, transparent 100%),
+                                    radial-gradient(ellipse 8% 22% at 68% 100%, #FFD878 0%, transparent 100%),
+                                    radial-gradient(ellipse 10% 26% at 85% 100%, #FFC860 0%, transparent 100%)
+                                `,
+                            }}
+                        />
+                        {/* Soft blur overlay for natural blending */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                backdropFilter: 'blur(2px)',
+                                WebkitBackdropFilter: 'blur(2px)',
+                                maskImage: 'linear-gradient(to top, transparent 0%, black 30%, black 70%, transparent 100%)',
+                                WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 30%, black 70%, transparent 100%)',
+                            }}
+                        />
+                    </div>
+                </>
             )}
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}

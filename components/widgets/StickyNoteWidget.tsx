@@ -27,55 +27,43 @@ const DEFAULT_CONFIG: StickyNoteWidgetConfig = {
   rotation: -2,
 };
 
-// Cozy, warm color palettes for sticky notes
-const STICKY_COLORS = {
-  yellow: {
-    bg: 'linear-gradient(145deg, #fff9e6 0%, #fff3cc 50%, #ffecb3 100%)',
-    shadow: 'rgba(200, 160, 80, 0.15)',
-    border: 'rgba(200, 160, 80, 0.2)',
-    text: '#5c4a28',
-    placeholder: '#9c8a68',
-    tape: 'rgba(200, 180, 140, 0.6)',
+// Braun-inspired theme colors
+const THEMES = {
+  light: {
+    housing: 'linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.1),
+      0 20px 48px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03)
+    `,
+    paperBg: 'linear-gradient(180deg, #fffef8 0%, #fdfcf5 100%)',
+    paperShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.04)',
+    textColor: '#3a3632',
+    placeholderColor: '#a09a90',
+    lineColor: 'rgba(200, 180, 160, 0.2)',
+    clipColor: '#ff6b00',
+    clipShadow: '0 1px 2px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3)',
+    dotColor: '#e0dcd4',
   },
-  blue: {
-    bg: 'linear-gradient(145deg, #e8f4fc 0%, #d4ebf7 50%, #c1e1f2 100%)',
-    shadow: 'rgba(100, 140, 180, 0.15)',
-    border: 'rgba(100, 140, 180, 0.2)',
-    text: '#2c4a5c',
-    placeholder: '#6888a0',
-    tape: 'rgba(140, 180, 200, 0.6)',
-  },
-  pink: {
-    bg: 'linear-gradient(145deg, #fce8ec 0%, #f7d4dc 50%, #f2c1cc 100%)',
-    shadow: 'rgba(180, 100, 120, 0.15)',
-    border: 'rgba(180, 100, 120, 0.2)',
-    text: '#5c2c3a',
-    placeholder: '#a06878',
-    tape: 'rgba(200, 140, 160, 0.6)',
-  },
-  green: {
-    bg: 'linear-gradient(145deg, #e8f5e9 0%, #d4ebd6 50%, #c1e1c4 100%)',
-    shadow: 'rgba(100, 160, 100, 0.15)',
-    border: 'rgba(100, 160, 100, 0.2)',
-    text: '#2c4a2c',
-    placeholder: '#688868',
-    tape: 'rgba(140, 180, 140, 0.6)',
-  },
-  orange: {
-    bg: 'linear-gradient(145deg, #fff4e6 0%, #ffe8cc 50%, #ffddb3 100%)',
-    shadow: 'rgba(200, 130, 80, 0.15)',
-    border: 'rgba(200, 130, 80, 0.2)',
-    text: '#5c3a1e',
-    placeholder: '#9c7858',
-    tape: 'rgba(200, 160, 120, 0.6)',
-  },
-  cream: {
-    bg: 'linear-gradient(145deg, #fdfcf8 0%, #f8f6f0 50%, #f3f0e8 100%)',
-    shadow: 'rgba(160, 140, 100, 0.12)',
-    border: 'rgba(160, 140, 100, 0.15)',
-    text: '#4a4035',
-    placeholder: '#8a7a68',
-    tape: 'rgba(180, 165, 140, 0.5)',
+  dark: {
+    housing: 'linear-gradient(180deg, #2a2a28 0%, #1e1e1c 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      0 8px 24px rgba(0, 0, 0, 0.3),
+      0 20px 48px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
+    paperBg: 'linear-gradient(180deg, #2e2e2a 0%, #262622 100%)',
+    paperShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.2)',
+    textColor: '#e8e4dc',
+    placeholderColor: '#6a6660',
+    lineColor: 'rgba(100, 95, 85, 0.3)',
+    clipColor: '#ff6b00',
+    clipShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
+    dotColor: '#3a3a38',
   },
 };
 
@@ -90,12 +78,33 @@ export function StickyNoteWidget({
   onContentChange,
 }: StickyNoteWidgetProps) {
   const config = { ...DEFAULT_CONFIG, ...(widget.config as Partial<StickyNoteWidgetConfig>) };
-  const colors = STICKY_COLORS[config.color] || STICKY_COLORS.cream;
-
   const [content, setContent] = useState(config.content);
   const [isFocused, setIsFocused] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Detect dark mode
+  useEffect(() => {
+    setMounted(true);
+    const checkDarkMode = () => {
+      const themeElement = document.querySelector('.theme-sketch');
+      const hasDarkClass = themeElement?.classList.contains('dark') || false;
+      setIsDark(hasDarkClass);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    const themeElement = document.querySelector('.theme-sketch');
+    if (themeElement) {
+      observer.observe(themeElement, { attributes: true, attributeFilter: ['class'] });
+    }
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Sync content with config
   useEffect(() => {
@@ -106,12 +115,10 @@ export function StickyNoteWidget({
   const handleContentChange = useCallback((newContent: string) => {
     setContent(newContent);
 
-    // Clear existing timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
-    // Debounce save
     saveTimeoutRef.current = setTimeout(() => {
       onContentChange?.(newContent);
     }, 500);
@@ -134,6 +141,8 @@ export function StickyNoteWidget({
     }
   }, [content]);
 
+  const theme = isDark ? THEMES.dark : THEMES.light;
+
   return (
     <WidgetWrapper
       widget={widget}
@@ -144,118 +153,167 @@ export function StickyNoteWidget({
       onContextMenu={onContextMenu}
       isHighlighted={isHighlighted}
     >
+      {/* Outer housing - Braun-style plastic */}
       <div
         style={{
-          position: 'relative',
           width: 220,
-          minHeight: 180,
-          padding: '28px 20px 20px',
-          background: colors.bg,
-          borderRadius: 3,
-          transform: `rotate(${config.rotation}deg)`,
-          boxShadow: `
-            0 4px 12px ${colors.shadow},
-            0 8px 24px ${colors.shadow},
-            0 1px 2px rgba(0, 0, 0, 0.04),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8)
-          `,
-          border: `1px solid ${colors.border}`,
-          transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          minHeight: 200,
+          borderRadius: 20,
+          background: theme.housing,
+          boxShadow: theme.housingShadow,
+          padding: 12,
+          position: 'relative',
+          transition: 'all 0.3s ease',
         }}
       >
-        {/* Tape effect at top */}
+        {/* Corner detail dots */}
+        {[
+          { top: 10, left: 10 },
+          { top: 10, right: 10 },
+        ].map((pos, i) => (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              ...pos,
+              width: 4,
+              height: 4,
+              borderRadius: '50%',
+              background: theme.dotColor,
+              transition: 'all 0.3s ease',
+            }}
+          />
+        ))}
+
+        {/* Paper clip - orange accent */}
         <div
           style={{
             position: 'absolute',
-            top: -8,
-            left: '50%',
-            transform: 'translateX(-50%) rotate(1deg)',
-            width: 60,
-            height: 20,
-            background: colors.tape,
-            borderRadius: 2,
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          }}
-        />
-
-        {/* Paper texture overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: 3,
-            background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
-            opacity: 0.03,
-            pointerEvents: 'none',
-            mixBlendMode: 'multiply',
-          }}
-        />
-
-        {/* Handwritten text area */}
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => handleContentChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder="Write something..."
-          readOnly={!isOwner}
-          style={{
-            width: '100%',
-            minHeight: 120,
-            padding: 0,
-            margin: 0,
-            border: 'none',
-            background: 'transparent',
-            resize: 'none',
-            outline: 'none',
-            // Clean design system typography
-            fontFamily: 'var(--font-body)',
-            fontSize: 15,
-            fontWeight: 400,
-            lineHeight: 1.6,
-            letterSpacing: '-0.01em',
-            color: colors.text,
-            caretColor: colors.text,
-            cursor: isOwner ? 'text' : 'default',
-            // Subtle text shadow for depth
-            textShadow: isFocused ? 'none' : '0 0.5px 0 rgba(255, 255, 255, 0.5)',
-          }}
-        />
-
-        {/* Decorative corner fold */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
+            top: -4,
+            right: 24,
             width: 20,
-            height: 20,
-            background: `linear-gradient(135deg, transparent 50%, ${colors.border} 50%)`,
-            borderRadius: '0 0 3px 0',
-            opacity: 0.5,
+            height: 32,
+            borderRadius: '10px 10px 4px 4px',
+            background: theme.clipColor,
+            boxShadow: theme.clipShadow,
+            zIndex: 2,
           }}
-        />
+        >
+          {/* Clip inner cutout */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 8,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 8,
+              height: 16,
+              borderRadius: 4,
+              background: isDark ? '#1e1e1c' : '#ffffff',
+              opacity: 0.3,
+            }}
+          />
+        </div>
 
-        {/* Subtle lines for notebook feel */}
+        {/* Paper area */}
+        <div
+          style={{
+            background: theme.paperBg,
+            borderRadius: 12,
+            padding: '24px 16px 16px',
+            minHeight: 160,
+            position: 'relative',
+            boxShadow: theme.paperShadow,
+            transition: 'all 0.3s ease',
+          }}
+        >
+          {/* Ruled lines */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 40,
+              left: 16,
+              right: 16,
+              bottom: 16,
+              background: `repeating-linear-gradient(
+                to bottom,
+                transparent,
+                transparent 26px,
+                ${theme.lineColor} 26px,
+                ${theme.lineColor} 27px
+              )`,
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Red margin line */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 24,
+              left: 36,
+              bottom: 16,
+              width: 1,
+              background: 'rgba(220, 80, 80, 0.25)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Textarea */}
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => handleContentChange(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder="Write something..."
+            readOnly={!isOwner}
+            style={{
+              width: '100%',
+              minHeight: 120,
+              padding: '0 0 0 24px',
+              margin: 0,
+              border: 'none',
+              background: 'transparent',
+              resize: 'none',
+              outline: 'none',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              fontSize: 14,
+              fontWeight: 400,
+              lineHeight: '27px',
+              letterSpacing: '-0.01em',
+              color: theme.textColor,
+              caretColor: theme.clipColor,
+              cursor: isOwner ? 'text' : 'default',
+              transition: 'color 0.3s ease',
+            }}
+          />
+        </div>
+
+        {/* Bottom detail - speaker grille pattern */}
         <div
           style={{
             position: 'absolute',
-            top: 50,
-            left: 20,
-            right: 20,
-            bottom: 30,
-            background: `repeating-linear-gradient(
-              to bottom,
-              transparent,
-              transparent 28px,
-              ${colors.border} 28px,
-              ${colors.border} 29px
-            )`,
-            opacity: 0.3,
-            pointerEvents: 'none',
+            bottom: 8,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: 4,
           }}
-        />
+        >
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: 3,
+                height: 3,
+                borderRadius: '50%',
+                background: theme.dotColor,
+                transition: 'all 0.3s ease',
+              }}
+            />
+          ))}
+        </div>
       </div>
     </WidgetWrapper>
   );

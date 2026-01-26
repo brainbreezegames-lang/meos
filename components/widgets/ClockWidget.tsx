@@ -42,17 +42,84 @@ export const POPULAR_TIMEZONES = [
   { id: 'Asia/Kolkata', label: 'Mumbai', abbr: 'IST' },
 ];
 
-function getTimezoneLabel(timezone: string): string {
+function getTimezoneInfo(timezone: string): { label: string; abbr: string } {
   const popular = POPULAR_TIMEZONES.find(tz => tz.id === timezone);
-  if (popular) return popular.label;
-  return timezone.split('/').pop()?.replace(/_/g, ' ') || '';
+  if (popular) return { label: popular.label, abbr: popular.abbr };
+
+  const label = timezone.split('/').pop()?.replace(/_/g, ' ') || '';
+  return { label, abbr: label.substring(0, 3).toUpperCase() };
 }
+
+// Theme colors - light and dark
+const THEMES = {
+  light: {
+    housing: 'linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.1),
+      0 20px 48px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03)
+    `,
+    face: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)',
+    faceShadow: 'inset 0 2px 6px rgba(0, 0, 0, 0.06), inset 0 0 0 1px rgba(0, 0, 0, 0.04)',
+    tickMain: '#1a1a1a',
+    tickMinor: '#c0c0c0',
+    handColor: '#1a1a1a',
+    textPrimary: '#1a1a1a',
+    textSecondary: '#666666',
+    textMuted: '#999999',
+    detailBg: 'linear-gradient(180deg, #f0f0ee 0%, #e4e4e0 100%)',
+    detailDot: '#d0d0cc',
+  },
+  dark: {
+    housing: 'linear-gradient(180deg, #2a2a28 0%, #1e1e1c 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      0 8px 24px rgba(0, 0, 0, 0.3),
+      0 20px 48px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
+    face: 'linear-gradient(180deg, #242422 0%, #1a1a18 100%)',
+    faceShadow: 'inset 0 2px 6px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.04)',
+    tickMain: '#e0e0dc',
+    tickMinor: '#4a4a48',
+    handColor: '#e8e8e4',
+    textPrimary: '#f0f0ec',
+    textSecondary: '#a0a09c',
+    textMuted: '#6a6a68',
+    detailBg: 'linear-gradient(180deg, #3a3a38 0%, #2a2a28 100%)',
+    detailDot: '#4a4a48',
+  },
+};
 
 export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted }: ClockWidgetProps) {
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState<Date | null>(null);
+  const [isDark, setIsDark] = useState(false);
 
   const config: ClockWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ClockWidgetConfig>) };
+
+  // Detect dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const themeElement = document.querySelector('.theme-sketch');
+      const hasDarkClass = themeElement?.classList.contains('dark') || false;
+      setIsDark(hasDarkClass);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    const themeElement = document.querySelector('.theme-sketch');
+    if (themeElement) {
+      observer.observe(themeElement, { attributes: true, attributeFilter: ['class'] });
+    }
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+
+    return () => observer.disconnect();
+  }, [mounted]);
 
   useEffect(() => {
     setMounted(true);
@@ -85,20 +152,8 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
     }
   }, [config.timezone]);
 
-  const getFormattedDate = useCallback((date: Date) => {
-    try {
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: config.timezone,
-        day: 'numeric',
-        month: 'short',
-      });
-      return formatter.format(date);
-    } catch {
-      return '';
-    }
-  }, [config.timezone]);
-
-  const timezoneLabel = getTimezoneLabel(config.timezone);
+  const theme = isDark ? THEMES.dark : THEMES.light;
+  const { label: timezoneLabel, abbr: timezoneAbbr } = getTimezoneInfo(config.timezone);
 
   if (!mounted || !time) {
     return (
@@ -112,19 +167,16 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
         isHighlighted={isHighlighted}
       >
         <div style={{ width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ color: '#999', fontSize: 12 }}>...</div>
+          <div style={{ color: theme.textMuted, fontSize: 12 }}>...</div>
         </div>
       </WidgetWrapper>
     );
   }
 
   const { hourAngle, minuteAngle, secondAngle, seconds } = getTimeAngles(time);
-  const formattedDate = getFormattedDate(time);
 
-  // Size of the widget
   const SIZE = 200;
   const FACE_SIZE = 170;
-  const CENTER = SIZE / 2;
   const FACE_CENTER = FACE_SIZE / 2;
 
   return (
@@ -137,27 +189,22 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       onContextMenu={onContextMenu}
       isHighlighted={isHighlighted}
     >
-      {/* Outer housing - Braun-style white plastic square with rounded corners */}
+      {/* Outer housing - Braun-style plastic */}
       <div
         style={{
           width: SIZE,
           height: SIZE,
           borderRadius: 24,
-          background: 'linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%)',
-          boxShadow: `
-            0 2px 4px rgba(0, 0, 0, 0.06),
-            0 8px 24px rgba(0, 0, 0, 0.1),
-            0 20px 48px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.03)
-          `,
+          background: theme.housing,
+          boxShadow: theme.housingShadow,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
+          transition: 'all 0.3s ease',
         }}
       >
-        {/* Top-left button detail */}
+        {/* Top-left button */}
         <div
           style={{
             position: 'absolute',
@@ -166,11 +213,9 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             width: 10,
             height: 10,
             borderRadius: '50%',
-            background: 'linear-gradient(180deg, #f0f0ee 0%, #e4e4e0 100%)',
-            boxShadow: `
-              inset 0 1px 2px rgba(0, 0, 0, 0.08),
-              0 1px 0 rgba(255, 255, 255, 0.8)
-            `,
+            background: theme.detailBg,
+            boxShadow: `inset 0 1px 2px rgba(0, 0, 0, ${isDark ? 0.3 : 0.08}), 0 1px 0 rgba(255, 255, 255, ${isDark ? 0.05 : 0.8})`,
+            transition: 'all 0.3s ease',
           }}
         />
 
@@ -195,13 +240,14 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                 width: 3,
                 height: 3,
                 borderRadius: '50%',
-                background: '#d0d0cc',
+                background: theme.detailDot,
+                transition: 'all 0.3s ease',
               }}
             />
           ))}
         </div>
 
-        {/* Corner screws/feet */}
+        {/* Corner feet */}
         {[
           { bottom: 8, left: 8 },
           { bottom: 8, right: 8 },
@@ -214,33 +260,32 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
               width: 6,
               height: 6,
               borderRadius: '50%',
-              background: 'linear-gradient(180deg, #e8e8e4 0%, #d8d8d4 100%)',
-              boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.1)',
+              background: theme.detailBg,
+              boxShadow: `inset 0 1px 2px rgba(0, 0, 0, ${isDark ? 0.3 : 0.1})`,
+              transition: 'all 0.3s ease',
             }}
           />
         ))}
 
-        {/* Inner clock face - circular */}
+        {/* Clock face */}
         <div
           style={{
             width: FACE_SIZE,
             height: FACE_SIZE,
             borderRadius: '50%',
-            background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)',
-            boxShadow: `
-              inset 0 2px 6px rgba(0, 0, 0, 0.06),
-              inset 0 0 0 1px rgba(0, 0, 0, 0.04)
-            `,
+            background: theme.face,
+            boxShadow: theme.faceShadow,
             position: 'relative',
+            transition: 'all 0.3s ease',
           }}
         >
-          {/* SVG for tick marks, numbers, and orange seconds arc */}
+          {/* SVG for tick marks and orange arc */}
           <svg
             width={FACE_SIZE}
             height={FACE_SIZE}
             style={{ position: 'absolute', left: 0, top: 0 }}
           >
-            {/* Orange seconds progress arc */}
+            {/* Orange seconds arc */}
             <circle
               cx={FACE_CENTER}
               cy={FACE_CENTER}
@@ -254,28 +299,24 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
               style={{ transition: 'stroke-dasharray 0.2s ease-out' }}
             />
 
-            {/* Minute tick marks - 60 marks */}
+            {/* 60 tick marks */}
             {[...Array(60)].map((_, i) => {
               const angle = (i * 6) * (Math.PI / 180);
               const isHour = i % 5 === 0;
               const outerRadius = 70;
               const innerRadius = isHour ? 60 : 65;
 
-              const x1 = FACE_CENTER + Math.sin(angle) * innerRadius;
-              const y1 = FACE_CENTER - Math.cos(angle) * innerRadius;
-              const x2 = FACE_CENTER + Math.sin(angle) * outerRadius;
-              const y2 = FACE_CENTER - Math.cos(angle) * outerRadius;
-
               return (
                 <line
                   key={i}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke={isHour ? '#1a1a1a' : '#c0c0c0'}
+                  x1={FACE_CENTER + Math.sin(angle) * innerRadius}
+                  y1={FACE_CENTER - Math.cos(angle) * innerRadius}
+                  x2={FACE_CENTER + Math.sin(angle) * outerRadius}
+                  y2={FACE_CENTER - Math.cos(angle) * outerRadius}
+                  stroke={isHour ? theme.tickMain : theme.tickMinor}
                   strokeWidth={isHour ? 2 : 1}
                   strokeLinecap="round"
+                  style={{ transition: 'stroke 0.3s ease' }}
                 />
               );
             })}
@@ -284,49 +325,18 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             {[12, 3, 6, 9].map((num) => {
               const angle = ((num === 12 ? 0 : num) * 30) * (Math.PI / 180);
               const radius = 48;
-              const x = FACE_CENTER + Math.sin(angle) * radius;
-              const y = FACE_CENTER - Math.cos(angle) * radius;
-
               return (
                 <text
                   key={num}
-                  x={x}
-                  y={y}
+                  x={FACE_CENTER + Math.sin(angle) * radius}
+                  y={FACE_CENTER - Math.cos(angle) * radius}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fill="#1a1a1a"
-                  fontSize={16}
+                  fill={theme.textPrimary}
+                  fontSize={14}
                   fontWeight={600}
                   fontFamily="system-ui, -apple-system, sans-serif"
-                >
-                  {num}
-                </text>
-              );
-            })}
-
-            {/* Small minute numbers (15, 30, 45, 60) */}
-            {[
-              { num: 60, angle: 0 },
-              { num: 15, angle: 90 },
-              { num: 30, angle: 180 },
-              { num: 45, angle: 270 },
-            ].map(({ num, angle }) => {
-              const angleRad = angle * (Math.PI / 180);
-              const radius = 78;
-              const x = FACE_CENTER + Math.sin(angleRad) * radius;
-              const y = FACE_CENTER - Math.cos(angleRad) * radius;
-
-              return (
-                <text
-                  key={num}
-                  x={x}
-                  y={y}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fill="#888"
-                  fontSize={8}
-                  fontWeight={500}
-                  fontFamily="system-ui, -apple-system, sans-serif"
+                  style={{ transition: 'fill 0.3s ease' }}
                 >
                   {num}
                 </text>
@@ -334,36 +344,40 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             })}
           </svg>
 
-          {/* Brand text */}
+          {/* TIMEZONE - THE HERO */}
           <div
             style={{
               position: 'absolute',
-              top: 48,
+              top: 40,
               left: '50%',
               transform: 'translateX(-50%)',
               textAlign: 'center',
             }}
           >
+            {/* City name - BIG */}
             <div
               style={{
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 700,
-                color: '#1a1a1a',
-                letterSpacing: '0.02em',
+                color: theme.textPrimary,
+                letterSpacing: '-0.01em',
                 fontFamily: 'system-ui, -apple-system, sans-serif',
-              }}
-            >
-              goOS
-            </div>
-            <div
-              style={{
-                fontSize: 7,
-                color: '#888',
-                letterSpacing: '0.05em',
-                marginTop: 1,
+                transition: 'color 0.3s ease',
               }}
             >
               {timezoneLabel}
+            </div>
+            {/* Abbreviation */}
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 600,
+                color: '#ff6b00',
+                letterSpacing: '0.08em',
+                marginTop: 2,
+              }}
+            >
+              {timezoneAbbr}
             </div>
           </div>
 
@@ -374,12 +388,13 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
               left: '50%',
               top: '50%',
               width: 5,
-              height: 40,
-              background: '#1a1a1a',
+              height: 36,
+              background: theme.handColor,
               borderRadius: '2px 2px 1px 1px',
               transformOrigin: '50% 100%',
               transform: `translateX(-50%) translateY(-100%) rotate(${hourAngle}deg)`,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+              boxShadow: `0 1px 2px rgba(0,0,0,${isDark ? 0.4 : 0.2})`,
+              transition: 'background 0.3s ease',
             }}
           />
 
@@ -390,12 +405,13 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
               left: '50%',
               top: '50%',
               width: 3,
-              height: 58,
-              background: '#1a1a1a',
+              height: 52,
+              background: theme.handColor,
               borderRadius: '1.5px 1.5px 1px 1px',
               transformOrigin: '50% 100%',
               transform: `translateX(-50%) translateY(-100%) rotate(${minuteAngle}deg)`,
-              boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
+              boxShadow: `0 1px 2px rgba(0,0,0,${isDark ? 0.3 : 0.15})`,
+              transition: 'background 0.3s ease',
             }}
           />
 
@@ -406,7 +422,7 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
               left: '50%',
               top: '50%',
               width: 1.5,
-              height: 62,
+              height: 58,
               background: '#ff6b00',
               borderRadius: '1px',
               transformOrigin: '50% calc(100% - 10px)',
@@ -443,23 +459,6 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
               boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
             }}
           />
-
-          {/* Date display */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 36,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              fontSize: 9,
-              fontWeight: 500,
-              color: '#666',
-              letterSpacing: '0.02em',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-            }}
-          >
-            {formattedDate}
-          </div>
         </div>
       </div>
     </WidgetWrapper>

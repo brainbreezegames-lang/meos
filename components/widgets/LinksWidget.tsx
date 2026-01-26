@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
@@ -28,12 +28,42 @@ const DEFAULT_CONFIG: LinksWidgetConfig = {
   links: [],
 };
 
-// Widget container styles matching the spec
-const WIDGET_CONTAINER = {
-  background: '#FDFBF7',
-  borderRadius: 24,
-  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
-  border: '1px solid rgba(255,255,255,0.5)',
+// Theme colors
+const THEMES = {
+  light: {
+    housing: 'linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.1),
+      0 20px 48px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03)
+    `,
+    textPrimary: '#1a1a1a',
+    textSecondary: '#666666',
+    textMuted: '#999999',
+    iconBg: 'linear-gradient(180deg, #f5f5f3 0%, #eaeae8 100%)',
+    iconBgHover: 'linear-gradient(180deg, #eaeae8 0%, #e0e0de 100%)',
+    divider: 'rgba(0, 0, 0, 0.06)',
+    hoverBg: 'rgba(0, 0, 0, 0.03)',
+  },
+  dark: {
+    housing: 'linear-gradient(180deg, #2a2a28 0%, #1e1e1c 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      0 8px 24px rgba(0, 0, 0, 0.3),
+      0 20px 48px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
+    textPrimary: '#f0f0ec',
+    textSecondary: '#a0a09c',
+    textMuted: '#6a6a68',
+    iconBg: 'linear-gradient(180deg, #3a3a38 0%, #2a2a28 100%)',
+    iconBgHover: 'linear-gradient(180deg, #4a4a48 0%, #3a3a38 100%)',
+    divider: 'rgba(255, 255, 255, 0.06)',
+    hoverBg: 'rgba(255, 255, 255, 0.04)',
+  },
 };
 
 // Social media icons as SVG components
@@ -96,26 +126,31 @@ function getIcon(iconName?: string): React.ReactNode {
   return ICONS[key] || ICONS.globe;
 }
 
-// Get brand color for icon
-function getIconColor(iconName?: string): string {
-  const colors: Record<string, string> = {
-    twitter: '#1DA1F2',
-    x: '#000000',
-    instagram: '#E4405F',
-    linkedin: '#0A66C2',
-    github: '#181717',
-    youtube: '#FF0000',
-    dribbble: '#EA4C89',
-    newsletter: '#6366f1',
-    globe: '#666666',
-  };
-  const key = (iconName || 'globe').toLowerCase();
-  return colors[key] || colors.globe;
-}
-
 export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted }: LinksWidgetProps) {
+  const [isDark, setIsDark] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const themeElement = document.querySelector('.theme-sketch');
+      setIsDark(themeElement?.classList.contains('dark') || false);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    const themeElement = document.querySelector('.theme-sketch');
+    if (themeElement) {
+      observer.observe(themeElement, { attributes: true, attributeFilter: ['class'] });
+    }
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
   const config: LinksWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<LinksWidgetConfig>) };
   const hasLinks = config.links && config.links.length > 0;
+  const theme = isDark ? THEMES.dark : THEMES.light;
 
   return (
     <WidgetWrapper
@@ -127,41 +162,48 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
       onContextMenu={onContextMenu}
       isHighlighted={isHighlighted}
     >
-      {/* Medium widget: 180x180 */}
+      {/* Physical housing */}
       <div
         style={{
-          ...WIDGET_CONTAINER,
           width: 180,
           minHeight: 120,
-          maxHeight: 200,
-          padding: 16,
+          maxHeight: 220,
+          borderRadius: 20,
+          background: theme.housing,
+          boxShadow: theme.housingShadow,
+          padding: 14,
           display: 'flex',
           flexDirection: 'column',
+          transition: 'all 0.3s ease',
         }}
       >
-        {/* Header with chain link icon */}
+        {/* Header */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
+            gap: 10,
             marginBottom: 12,
             paddingBottom: 10,
-            borderBottom: '1px solid rgba(0,0,0,0.06)',
+            borderBottom: `1px solid ${theme.divider}`,
           }}
         >
-          {/* 3D Chain link icon */}
+          {/* Physical link icon button */}
           <div
             style={{
               width: 28,
               height: 28,
               borderRadius: 8,
-              background: 'linear-gradient(145deg, #f8f7f4, #eeeee8)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.8)',
+              background: theme.iconBg,
+              boxShadow: `
+                0 1px 2px rgba(0, 0, 0, ${isDark ? 0.3 : 0.08}),
+                inset 0 1px 0 rgba(255, 255, 255, ${isDark ? 0.05 : 0.6})
+              `,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#666',
+              color: '#ff6b00',
+              transition: 'all 0.3s ease',
             }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -173,8 +215,9 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: '#333',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              color: theme.textPrimary,
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              transition: 'color 0.3s ease',
             }}
           >
             {widget.title || 'Links'}
@@ -182,14 +225,15 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
         </div>
 
         {/* Links list */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
           {!hasLinks ? (
             <div
               style={{
                 textAlign: 'center',
-                color: '#999',
+                color: theme.textMuted,
                 fontSize: 12,
                 padding: '16px 0',
+                transition: 'color 0.3s ease',
               }}
             >
               No links yet
@@ -201,54 +245,60 @@ export function LinksWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 10,
-                  padding: '8px 10px',
+                  padding: '7px 8px',
                   borderRadius: 10,
                   textDecoration: 'none',
+                  background: hoveredIndex === index ? theme.hoverBg : 'transparent',
+                  marginLeft: -8,
+                  marginRight: -8,
                   transition: 'background 0.15s ease',
-                  marginLeft: -10,
-                  marginRight: -10,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
                 }}
               >
-                {/* Icon with brand color */}
+                {/* Physical icon button */}
                 <span
                   style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: 6,
-                    background: 'white',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    width: 26,
+                    height: 26,
+                    borderRadius: 7,
+                    background: hoveredIndex === index ? theme.iconBgHover : theme.iconBg,
+                    boxShadow: `
+                      0 1px 2px rgba(0, 0, 0, ${isDark ? 0.3 : 0.08}),
+                      inset 0 1px 0 rgba(255, 255, 255, ${isDark ? 0.05 : 0.5})
+                    `,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: getIconColor(link.icon),
+                    color: theme.textSecondary,
                     flexShrink: 0,
+                    transition: 'all 0.15s ease',
                   }}
                 >
                   {getIcon(link.icon)}
                 </span>
                 <span
                   style={{
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: 500,
-                    color: '#333',
+                    color: theme.textPrimary,
                     flex: 1,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
+                    transition: 'color 0.3s ease',
                   }}
                 >
                   {link.name}
                 </span>
+                {/* Orange arrow on hover */}
+                {hoveredIndex === index && (
+                  <span style={{ color: '#ff6b00', fontSize: 12 }}>→</span>
+                )}
               </a>
             ))
           )}
