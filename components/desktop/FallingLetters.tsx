@@ -83,7 +83,7 @@ export function FallingLetters({
 
     World.add(engine.world, [ground, leftWall, rightWall]);
 
-    // Create letter colliders using COMPOUND BODIES (multiple parts)
+    // Create letter colliders - SMALLER than visual to avoid overlap
     const createLetterBody = (x: number, y: number, char: string, w: number, h: number) => {
       const opts: Matter.IBodyDefinition = {
         restitution: 0.05,
@@ -93,45 +93,48 @@ export function FallingLetters({
         slop: 0.01,
       };
 
-      // Stroke thickness for serif font (~18-20% of width)
-      const t = w * 0.19;
+      // Stroke thickness - slightly smaller than visual (~14% of width)
+      const t = w * 0.14;
+      // Inset from edges
+      const inset = w * 0.08;
 
       if (char === 'HEAD') {
-        // Circle exactly matching the image size (90% of container)
-        const radius = (w * 0.9) / 2;
+        // Circle SMALLER than image - image is 90% of container, circle is 38%
+        const radius = w * 0.38;
         return Bodies.circle(x, y, radius, opts);
       }
 
       switch (char.toUpperCase()) {
         case 'H': {
-          // H = left vertical + right vertical + crossbar (3 rectangles)
+          // H = left vertical + right vertical + crossbar
           const hw = w / 2;
           const hh = h / 2;
+          const barHeight = h * 0.85; // Shorter than full height
 
-          // Left vertical bar
+          // Left vertical bar (inset from edge)
           const leftBar = Bodies.rectangle(
-            x - hw + t/2,
+            x - hw + inset + t/2,
             y,
             t,
-            h,
+            barHeight,
             opts
           );
 
-          // Right vertical bar
+          // Right vertical bar (inset from edge)
           const rightBar = Bodies.rectangle(
-            x + hw - t/2,
+            x + hw - inset - t/2,
             y,
             t,
-            h,
+            barHeight,
             opts
           );
 
-          // Crossbar (horizontal middle)
+          // Crossbar (narrower)
           const crossbar = Bodies.rectangle(
             x,
             y,
-            w - t*2,
-            t * 0.9,
+            w - inset*2 - t*2,
+            t * 0.8,
             opts
           );
 
@@ -142,42 +145,43 @@ export function FallingLetters({
         }
 
         case 'E': {
-          // E = vertical spine + top arm + middle arm + bottom arm
+          // E = vertical spine + 3 arms
           const hw = w / 2;
           const hh = h / 2;
-          const armLength = w * 0.7;
+          const armLength = w * 0.55;
+          const spineHeight = h * 0.85;
 
-          // Vertical spine (left side)
+          // Vertical spine (inset from left)
           const spine = Bodies.rectangle(
-            x - hw + t/2,
+            x - hw + inset + t/2,
             y,
             t,
-            h,
+            spineHeight,
             opts
           );
 
           // Top arm
           const topArm = Bodies.rectangle(
-            x - hw + t/2 + armLength/2,
-            y - hh + t/2,
+            x - hw + inset + t/2 + armLength/2,
+            y - hh + inset + t/2,
             armLength,
             t,
             opts
           );
 
-          // Middle arm (slightly shorter)
+          // Middle arm (shorter)
           const midArm = Bodies.rectangle(
-            x - hw + t/2 + (armLength * 0.8)/2,
+            x - hw + inset + t/2 + (armLength * 0.7)/2,
             y,
-            armLength * 0.8,
-            t * 0.85,
+            armLength * 0.7,
+            t * 0.75,
             opts
           );
 
           // Bottom arm
           const botArm = Bodies.rectangle(
-            x - hw + t/2 + armLength/2,
-            y + hh - t/2,
+            x - hw + inset + t/2 + armLength/2,
+            y + hh - inset - t/2,
             armLength,
             t,
             opts
@@ -193,21 +197,22 @@ export function FallingLetters({
           // L = vertical spine + bottom arm
           const hw = w / 2;
           const hh = h / 2;
-          const armLength = w * 0.7;
+          const armLength = w * 0.55;
+          const spineHeight = h * 0.85;
 
-          // Vertical spine
+          // Vertical spine (inset)
           const spine = Bodies.rectangle(
-            x - hw + t/2,
+            x - hw + inset + t/2,
             y,
             t,
-            h,
+            spineHeight,
             opts
           );
 
           // Bottom arm
           const botArm = Bodies.rectangle(
-            x - hw + t/2 + armLength/2,
-            y + hh - t/2,
+            x - hw + inset + t/2 + armLength/2,
+            y + hh - inset - t/2,
             armLength,
             t,
             opts
@@ -220,14 +225,13 @@ export function FallingLetters({
         }
 
         case 'O': {
-          // O = circle sized to match the letter
-          // O letter is typically 85-90% of the bounding box
-          const radius = Math.min(w, h) * 0.42;
+          // O = circle SMALLER than the letter outline
+          const radius = Math.min(w, h) * 0.36;
           return Bodies.circle(x, y, radius, opts);
         }
 
         default:
-          return Bodies.rectangle(x, y, w * 0.85, h * 0.85, opts);
+          return Bodies.rectangle(x, y, w * 0.7, h * 0.7, opts);
       }
     };
 
