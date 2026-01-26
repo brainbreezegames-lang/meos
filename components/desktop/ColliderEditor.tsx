@@ -21,6 +21,7 @@ const LETTER_SIZE = 400; // Editor display size
 
 export function ColliderEditor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [currentLetter, setCurrentLetter] = useState(0);
   const [colliders, setColliders] = useState<LetterColliders>({
     H: [],
@@ -35,6 +36,10 @@ export function ColliderEditor() {
   const [shapeType, setShapeType] = useState<'rect' | 'circle'>('rect');
 
   const letter = LETTERS[currentLetter];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Draw the current state
   const draw = useCallback(() => {
@@ -118,8 +123,10 @@ export function ColliderEditor() {
   }, [colliders, letter, currentShape]);
 
   useEffect(() => {
-    draw();
-  }, [draw]);
+    if (mounted) {
+      draw();
+    }
+  }, [draw, mounted]);
 
   const getCanvasCoords = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -227,9 +234,29 @@ export function ColliderEditor() {
     console.log('=== END ===');
 
     // Also copy to clipboard
-    navigator.clipboard.writeText(JSON.stringify(colliders, null, 2));
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(JSON.stringify(colliders, null, 2));
+    }
     alert('Collider data copied to clipboard and logged to console!');
   };
+
+  if (!mounted) {
+    return (
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: '#000',
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#fff',
+        fontFamily: 'system-ui, sans-serif',
+      }}>
+        Loading editor...
+      </div>
+    );
+  }
 
   return (
     <div style={{
