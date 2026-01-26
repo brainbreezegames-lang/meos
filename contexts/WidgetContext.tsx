@@ -54,6 +54,7 @@ const DEFAULT_WIDGET_POSITIONS: Record<WidgetType, { x: number; y: number }> = {
   contact: { x: 85, y: 40 },
   links: { x: 85, y: 50 },
   feedback: { x: 85, y: 60 },
+  status: { x: 85, y: 70 },
 };
 
 export function WidgetProvider({
