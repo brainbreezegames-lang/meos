@@ -83,6 +83,7 @@ import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
 import { LiquidBackground } from '@/components/desktop/LiquidBackground';
+import { ASCIIFilter } from '@/components/effects/ASCIIFilter';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -3938,17 +3939,30 @@ function GoOSDemoContent() {
 
             {/* WALLPAPER BACKGROUND - With Space Theme Support */}
             {wallpaper ? (
-                <img
-                    src={`/${wallpaper}.png`}
-                    alt=""
-                    className="absolute inset-0 w-full h-full pointer-events-none select-none"
-                    style={{
-                        objectFit: 'cover',
-                        objectPosition: 'center',
-                        zIndex: 0,
-                    }}
-                    draggable={false}
-                />
+                asciiFilter ? (
+                    <ASCIIFilter
+                        imageUrl={`/${wallpaper}.png`}
+                        columns={160}
+                        rows={80}
+                        colorMode={asciiColorMode}
+                        fontSize={14}
+                        className="pointer-events-none select-none"
+                        backgroundColor={isDarkMode ? '#171412' : '#1a1815'}
+                        monoColor={isDarkMode ? '#e8e4dc' : '#d4d0c8'}
+                    />
+                ) : (
+                    <img
+                        src={`/${wallpaper}.png`}
+                        alt=""
+                        className="absolute inset-0 w-full h-full pointer-events-none select-none"
+                        style={{
+                            objectFit: 'cover',
+                            objectPosition: 'center',
+                            zIndex: 0,
+                        }}
+                        draggable={false}
+                    />
+                )
             ) : (
                 /* Solid background when no wallpaper */
                 <div
@@ -5240,14 +5254,13 @@ function GoOSDemoContent() {
                             <div className="text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
                                 Choose Wallpaper
                             </div>
-                            <div className="grid grid-cols-4 gap-2" style={{ width: 340, maxHeight: 320, overflowY: 'auto' }}>
+                            <div className="grid grid-cols-4 gap-2" style={{ width: 340, maxHeight: 240, overflowY: 'auto' }}>
                                 {WALLPAPERS.map((wp) => (
                                     <button
                                         key={wp.id || 'none'}
                                         onClick={() => {
                                             playSound('click');
                                             setWallpaper(wp.id);
-                                            setShowWallpaperPicker(false);
                                         }}
                                         className="relative rounded-lg overflow-hidden transition-all hover:ring-2 hover:ring-offset-1"
                                         style={{
@@ -5295,6 +5308,69 @@ function GoOSDemoContent() {
                                         )}
                                     </button>
                                 ))}
+                            </div>
+
+                            {/* ASCII Filter Section */}
+                            <div
+                                className="mt-4 pt-3"
+                                style={{ borderTop: '1px solid var(--border-subtle)' }}
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                                        ASCII Art Filter
+                                    </span>
+                                    <button
+                                        onClick={() => {
+                                            playSound('click');
+                                            setAsciiFilter(!asciiFilter);
+                                        }}
+                                        className="relative rounded-full transition-all"
+                                        style={{
+                                            width: 40,
+                                            height: 22,
+                                            background: asciiFilter ? 'var(--accent-primary)' : 'var(--bg-surface)',
+                                            border: '1px solid var(--border-subtle)',
+                                        }}
+                                    >
+                                        <div
+                                            className="absolute top-1 rounded-full transition-all"
+                                            style={{
+                                                width: 16,
+                                                height: 16,
+                                                background: 'white',
+                                                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                                left: asciiFilter ? 20 : 2,
+                                            }}
+                                        />
+                                    </button>
+                                </div>
+
+                                {/* Color Mode Selector - only show when ASCII filter is enabled */}
+                                {asciiFilter && wallpaper && (
+                                    <div className="flex gap-1 mt-2">
+                                        {(['mono', 'grey', 'color'] as const).map((mode) => (
+                                            <button
+                                                key={mode}
+                                                onClick={() => {
+                                                    playSound('click');
+                                                    setAsciiColorMode(mode);
+                                                }}
+                                                className="flex-1 py-1.5 px-2 rounded-md text-xs font-medium transition-all"
+                                                style={{
+                                                    background: asciiColorMode === mode
+                                                        ? 'var(--accent-primary)'
+                                                        : 'var(--bg-surface)',
+                                                    color: asciiColorMode === mode
+                                                        ? 'white'
+                                                        : 'var(--text-secondary)',
+                                                    border: '1px solid var(--border-subtle)',
+                                                }}
+                                            >
+                                                {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     </motion.div>

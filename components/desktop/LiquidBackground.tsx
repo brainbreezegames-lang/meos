@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 interface LiquidBackgroundProps {
   className?: string;
-  /** Color palette for the blobs - uses warm colors by default */
+  /** Color palette for the flames */
   colors?: string[];
   /** Animation speed multiplier (1 = normal, 0.5 = slow, 2 = fast) */
   speed?: number;
@@ -13,28 +13,30 @@ interface LiquidBackgroundProps {
   blur?: number;
   /** Overall opacity of the effect */
   opacity?: number;
-  /** Enable interactive mouse tracking blob */
+  /** Enable interactive mouse tracking */
   interactive?: boolean;
 }
 
+// Lava flame colors - deep oranges and reds
 const DEFAULT_COLORS = [
-  "rgba(255, 119, 34, 0.6)",   // Orange (accent)
-  "rgba(255, 180, 100, 0.5)", // Warm peach
-  "rgba(61, 47, 169, 0.4)",   // Purple (secondary accent)
-  "rgba(255, 220, 180, 0.5)", // Cream
-  "rgba(255, 140, 60, 0.45)", // Deep orange
+  "rgba(255, 80, 0, 0.9)",    // Bright orange
+  "rgba(255, 120, 30, 0.85)", // Orange
+  "rgba(255, 60, 0, 0.8)",    // Red-orange
+  "rgba(255, 160, 50, 0.75)", // Light orange
+  "rgba(200, 40, 0, 0.7)",    // Deep red
+  "rgba(255, 100, 20, 0.8)",  // Fire orange
 ];
 
 export function LiquidBackground({
   className = "",
   colors = DEFAULT_COLORS,
   speed = 1,
-  blur = 80,
-  opacity = 0.7,
-  interactive = true,
+  blur = 60,
+  opacity = 1,
+  interactive = false,
 }: LiquidBackgroundProps) {
   const [mounted, setMounted] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [mousePos, setMousePos] = useState({ x: 50, y: 80 });
 
   useEffect(() => {
     setMounted(true);
@@ -55,117 +57,102 @@ export function LiquidBackground({
 
   if (!mounted) return null;
 
-  // Animation variants for each blob
-  const blobVariants = [
+  // Flame animations - rising from bottom with wave-like movement
+  const flameVariants = [
     {
-      // Top-left blob - slow circular drift
+      // Left flame - slow rise
       animate: {
-        x: ["0%", "30%", "10%", "-20%", "0%"],
-        y: ["0%", "20%", "40%", "10%", "0%"],
-        scale: [1, 1.2, 0.9, 1.1, 1],
-        borderRadius: [
-          "60% 40% 30% 70% / 60% 30% 70% 40%",
-          "30% 60% 70% 40% / 50% 60% 30% 60%",
-          "50% 50% 40% 60% / 40% 50% 60% 50%",
-          "40% 60% 50% 50% / 60% 40% 50% 60%",
-          "60% 40% 30% 70% / 60% 30% 70% 40%",
-        ],
+        y: ["0%", "-15%", "-5%", "-20%", "0%"],
+        x: ["-5%", "10%", "-10%", "5%", "-5%"],
+        scaleY: [1, 1.15, 0.95, 1.1, 1],
+        scaleX: [1, 0.9, 1.1, 0.95, 1],
       },
       transition: {
-        duration: 25 / speed,
+        duration: 12 / speed,
         repeat: Infinity,
         ease: "easeInOut",
       },
     },
     {
-      // Top-right blob - diagonal movement
+      // Center-left flame
       animate: {
-        x: ["0%", "-40%", "-20%", "20%", "0%"],
-        y: ["0%", "30%", "50%", "20%", "0%"],
-        scale: [1, 0.9, 1.15, 1.05, 1],
-        borderRadius: [
-          "40% 60% 60% 40% / 70% 30% 70% 30%",
-          "60% 40% 30% 70% / 40% 60% 40% 60%",
-          "50% 50% 50% 50% / 50% 50% 50% 50%",
-          "70% 30% 50% 50% / 30% 70% 50% 50%",
-          "40% 60% 60% 40% / 70% 30% 70% 30%",
-        ],
+        y: ["0%", "-25%", "-10%", "-30%", "0%"],
+        x: ["0%", "15%", "-5%", "10%", "0%"],
+        scaleY: [1, 1.2, 1, 1.15, 1],
+        scaleX: [1, 0.85, 1.05, 0.9, 1],
       },
       transition: {
-        duration: 30 / speed,
+        duration: 15 / speed,
         repeat: Infinity,
         ease: "easeInOut",
       },
     },
     {
-      // Center blob - pulsing and drifting
+      // Center flame - tallest
       animate: {
-        x: ["-10%", "20%", "30%", "-15%", "-10%"],
-        y: ["10%", "-20%", "15%", "30%", "10%"],
-        scale: [1.1, 0.95, 1.2, 1, 1.1],
-        borderRadius: [
-          "50% 50% 40% 60% / 40% 60% 40% 60%",
-          "40% 60% 50% 50% / 60% 40% 60% 40%",
-          "60% 40% 60% 40% / 50% 50% 40% 60%",
-          "45% 55% 55% 45% / 55% 45% 55% 45%",
-          "50% 50% 40% 60% / 40% 60% 40% 60%",
-        ],
+        y: ["0%", "-35%", "-15%", "-40%", "0%"],
+        x: ["-3%", "8%", "-8%", "3%", "-3%"],
+        scaleY: [1.1, 1.3, 1.05, 1.25, 1.1],
+        scaleX: [1, 0.9, 1.1, 0.95, 1],
       },
       transition: {
-        duration: 20 / speed,
+        duration: 10 / speed,
         repeat: Infinity,
         ease: "easeInOut",
       },
     },
     {
-      // Bottom-left blob - slow rise and fall
+      // Center-right flame
       animate: {
-        x: ["0%", "25%", "40%", "15%", "0%"],
-        y: ["0%", "-25%", "-10%", "15%", "0%"],
-        scale: [1, 1.1, 0.95, 1.05, 1],
-        borderRadius: [
-          "70% 30% 50% 50% / 30% 70% 50% 50%",
-          "50% 50% 60% 40% / 50% 50% 40% 60%",
-          "30% 70% 40% 60% / 60% 40% 60% 40%",
-          "60% 40% 50% 50% / 40% 60% 50% 50%",
-          "70% 30% 50% 50% / 30% 70% 50% 50%",
-        ],
+        y: ["0%", "-20%", "-8%", "-28%", "0%"],
+        x: ["5%", "-10%", "12%", "-5%", "5%"],
+        scaleY: [1, 1.18, 0.98, 1.12, 1],
+        scaleX: [1, 1.05, 0.9, 1, 1],
       },
       transition: {
-        duration: 35 / speed,
+        duration: 14 / speed,
         repeat: Infinity,
         ease: "easeInOut",
       },
     },
     {
-      // Bottom-right blob - figure-8 pattern
+      // Right flame
       animate: {
-        x: ["0%", "-30%", "0%", "30%", "0%"],
-        y: ["0%", "-20%", "-30%", "-10%", "0%"],
-        scale: [1, 1.05, 1.15, 0.95, 1],
-        borderRadius: [
-          "45% 55% 45% 55% / 55% 45% 55% 45%",
-          "55% 45% 55% 45% / 45% 55% 45% 55%",
-          "40% 60% 40% 60% / 60% 40% 60% 40%",
-          "60% 40% 60% 40% / 40% 60% 40% 60%",
-          "45% 55% 45% 55% / 55% 45% 55% 45%",
-        ],
+        y: ["0%", "-18%", "-5%", "-22%", "0%"],
+        x: ["3%", "-8%", "10%", "-3%", "3%"],
+        scaleY: [1, 1.12, 1.02, 1.08, 1],
+        scaleX: [1, 0.95, 1.08, 0.92, 1],
       },
       transition: {
-        duration: 28 / speed,
+        duration: 13 / speed,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    },
+    {
+      // Far right flame
+      animate: {
+        y: ["0%", "-12%", "-3%", "-16%", "0%"],
+        x: ["-2%", "6%", "-6%", "4%", "-2%"],
+        scaleY: [1, 1.1, 0.95, 1.05, 1],
+        scaleX: [1, 0.92, 1.06, 0.98, 1],
+      },
+      transition: {
+        duration: 16 / speed,
         repeat: Infinity,
         ease: "easeInOut",
       },
     },
   ];
 
-  // Positions for the blobs
-  const blobPositions = [
-    { top: "5%", left: "10%" },
-    { top: "10%", right: "15%" },
-    { top: "35%", left: "30%" },
-    { bottom: "20%", left: "15%" },
-    { bottom: "15%", right: "20%" },
+  // Flame positions - all anchored at bottom
+  const flamePositions = [
+    { bottom: "-10%", left: "5%", width: "35vw", height: "70vh" },
+    { bottom: "-15%", left: "20%", width: "40vw", height: "85vh" },
+    { bottom: "-20%", left: "35%", width: "45vw", height: "100vh" },
+    { bottom: "-15%", left: "50%", width: "40vw", height: "80vh" },
+    { bottom: "-10%", left: "65%", width: "35vw", height: "75vh" },
+    { bottom: "-8%", left: "80%", width: "30vw", height: "65vh" },
   ];
 
   return (
@@ -176,86 +163,91 @@ export function LiquidBackground({
         zIndex: 0,
       }}
     >
-      {/* SVG filter for liquid merge effect */}
-      <svg style={{ position: "absolute", width: 0, height: 0 }}>
-        <defs>
-          <filter id="liquid-merge">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
-              result="liquid"
-            />
-            <feBlend in="SourceGraphic" in2="liquid" />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* Blur container */}
+      {/* Dark gradient overlay - black at top, transparent at bottom */}
       <div
         style={{
           position: "absolute",
-          inset: `-${blur}px`,
+          inset: 0,
+          background: "linear-gradient(to bottom, rgba(15, 10, 5, 0.98) 0%, rgba(20, 12, 8, 0.85) 30%, rgba(30, 15, 10, 0.4) 60%, transparent 100%)",
+          zIndex: 2,
+        }}
+      />
+
+      {/* Blur container for flames */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
           filter: `blur(${blur}px)`,
         }}
       >
-        {/* Static gradient blobs */}
+        {/* Flame blobs rising from bottom */}
         {colors.map((color, i) => (
           <motion.div
             key={i}
             initial={false}
-            animate={blobVariants[i % blobVariants.length].animate}
-            transition={blobVariants[i % blobVariants.length].transition}
+            animate={flameVariants[i % flameVariants.length].animate}
+            transition={flameVariants[i % flameVariants.length].transition}
             style={{
               position: "absolute",
-              ...blobPositions[i % blobPositions.length],
-              width: "clamp(300px, 40vw, 600px)",
-              height: "clamp(300px, 40vw, 600px)",
-              background: `radial-gradient(circle at 30% 30%, ${color}, transparent 70%)`,
-              mixBlendMode: i % 2 === 0 ? "normal" : "screen",
+              ...flamePositions[i % flamePositions.length],
+              background: `radial-gradient(ellipse 50% 80% at 50% 100%, ${color}, transparent 70%)`,
+              transformOrigin: "bottom center",
               willChange: "transform",
             }}
           />
         ))}
 
-        {/* Interactive mouse-following blob */}
-        {interactive && (
-          <motion.div
-            animate={{
-              left: `${mousePos.x}%`,
-              top: `${mousePos.y}%`,
-            }}
-            transition={{
-              type: "spring",
-              damping: 30,
-              stiffness: 100,
-              mass: 2,
-            }}
-            style={{
-              position: "absolute",
-              width: "clamp(200px, 25vw, 400px)",
-              height: "clamp(200px, 25vw, 400px)",
-              transform: "translate(-50%, -50%)",
-              background: `radial-gradient(circle at center, ${colors[0]}, transparent 60%)`,
-              borderRadius: "50%",
-              mixBlendMode: "screen",
-              opacity: 0.6,
-              willChange: "left, top",
-            }}
-          />
-        )}
+        {/* Extra glow layer at bottom */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: "-10%",
+            right: "-10%",
+            height: "50%",
+            background: "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(255, 100, 20, 0.6), transparent 70%)",
+          }}
+        />
       </div>
 
-      {/* Subtle grain overlay for texture */}
+      {/* Interactive mouse flame */}
+      {interactive && (
+        <motion.div
+          animate={{
+            left: `${mousePos.x}%`,
+            top: `${mousePos.y}%`,
+          }}
+          transition={{
+            type: "spring",
+            damping: 25,
+            stiffness: 80,
+            mass: 1.5,
+          }}
+          style={{
+            position: "absolute",
+            width: "clamp(150px, 20vw, 300px)",
+            height: "clamp(200px, 30vh, 400px)",
+            transform: "translate(-50%, -50%)",
+            background: `radial-gradient(ellipse 60% 80% at 50% 80%, ${colors[0]}, transparent 60%)`,
+            filter: `blur(${blur * 0.8}px)`,
+            opacity: 0.5,
+            willChange: "left, top",
+            zIndex: 1,
+          }}
+        />
+      )}
+
+      {/* Subtle noise texture */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          opacity: 0.03,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          opacity: 0.04,
           mixBlendMode: "overlay",
           pointerEvents: "none",
+          zIndex: 3,
         }}
       />
     </div>
