@@ -1285,91 +1285,226 @@ const DEMO_DESKTOP: Desktop = {
 // GOOS DESKTOP ICON (Sketch style)
 // ============================================
 const GoOSDesktopIcon = React.memo(({
+    id,
     label,
     icon,
     thumbnailUrl,
     onClick,
     isActive,
     badge,
+    position,
+    onPositionChange,
 }: {
+    id: string;
     label: string;
     icon?: React.ReactNode;
     thumbnailUrl?: string;
     onClick: () => void;
     isActive?: boolean;
     badge?: number;
+    position: { x: number; y: number };
+    onPositionChange?: (position: { x: number; y: number }, id: string) => void;
 }) => {
     const displayIcon = icon || PORTFOLIO_ICON_MAP[label] || <Folder size={28} fill={goOS.icon.fill} stroke={goOS.icon.stroke} strokeWidth={1.5} />;
 
+    // Drag state
+    const [localPosition, setLocalPosition] = useState({ x: position.x, y: position.y });
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartRef = useRef<{ mouseX: number; mouseY: number; elemX: number; elemY: number } | null>(null);
+    const hasDragged = useRef(false);
+    const currentPositionRef = useRef({ x: position.x, y: position.y });
+    const onPositionChangeRef = useRef(onPositionChange);
+
+    // Keep refs updated
+    onPositionChangeRef.current = onPositionChange;
+
+    // Sync local position with prop changes (only when NOT dragging)
+    useEffect(() => {
+        if (!isDragging) {
+            setLocalPosition({ x: position.x, y: position.y });
+            currentPositionRef.current = { x: position.x, y: position.y };
+        }
+    }, [position.x, position.y, isDragging]);
+
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+        // Only left click
+        if (e.button !== 0) return;
+
+        e.preventDefault();
+
+        // Get desktop area for percentage calculations
+        const desktop = document.getElementById('goos-desktop-area');
+        if (!desktop) return;
+        const parentRect = desktop.getBoundingClientRect();
+
+        dragStartRef.current = {
+            mouseX: e.clientX,
+            mouseY: e.clientY,
+            elemX: currentPositionRef.current.x,
+            elemY: currentPositionRef.current.y,
+        };
+        hasDragged.current = false;
+
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+            if (!dragStartRef.current) return;
+
+            const deltaX = moveEvent.clientX - dragStartRef.current.mouseX;
+            const deltaY = moveEvent.clientY - dragStartRef.current.mouseY;
+
+            // Only commit to drag after moving beyond threshold (5px)
+            if (!hasDragged.current && (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5)) {
+                hasDragged.current = true;
+                setIsDragging(true);
+                playSound('drag');
+            }
+
+            if (!hasDragged.current) return;
+
+            // Convert pixel delta to percentage
+            const deltaXPercent = (deltaX / parentRect.width) * 100;
+            const deltaYPercent = (deltaY / parentRect.height) * 100;
+
+            // Calculate new position
+            const newX = dragStartRef.current.elemX + deltaXPercent;
+            const newY = dragStartRef.current.elemY + deltaYPercent;
+
+            // Clamp to keep on screen (with margin for icon size)
+            const clampedX = Math.max(2, Math.min(92, newX));
+            const clampedY = Math.max(8, Math.min(85, newY));
+
+            // Update both state and ref
+            setLocalPosition({ x: clampedX, y: clampedY });
+            currentPositionRef.current = { x: clampedX, y: clampedY };
+        };
+
+        const handleMouseUp = () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+
+            const wasActualDrag = hasDragged.current;
+            setIsDragging(false);
+
+            // Save the final position if we actually dragged
+            if (wasActualDrag && dragStartRef.current) {
+                playSound('drop');
+                onPositionChangeRef.current?.(currentPositionRef.current, id);
+            }
+
+            dragStartRef.current = null;
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+    }, [id]);
+
+    const handleClick = useCallback((e: React.MouseEvent) => {
+        // If we dragged, don't trigger click
+        if (hasDragged.current) {
+            hasDragged.current = false;
+            return;
+        }
+    }, []);
+
+    const handleDoubleClick = useCallback(() => {
+        // If we dragged, don't trigger double click
+        if (hasDragged.current) {
+            hasDragged.current = false;
+            return;
+        }
+        playSound('pop');
+        onClick();
+    }, [onClick]);
+
     return (
-        <motion.button
-            onDoubleClick={onClick}
-            whileHover={{ scale: 1.08, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            transition={goOS.springs.snappy}
-            className="flex flex-col items-center gap-2 cursor-pointer group w-20"
+        <div
+            data-portfolio-icon={id}
+            onMouseDown={handleMouseDown}
+            onClick={handleClick}
+            onDoubleClick={handleDoubleClick}
+            style={{
+                position: 'absolute',
+                left: `${localPosition.x}%`,
+                top: `${localPosition.y}%`,
+                transform: 'translate(-50%, -50%)',
+                cursor: isDragging ? 'grabbing' : 'grab',
+                zIndex: isDragging ? 1000 : 10,
+                transition: isDragging ? 'none' : 'transform 0.15s ease',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+            }}
         >
             <motion.div
-                className="relative w-14 h-14 flex items-center justify-center rounded-lg overflow-hidden"
-                style={{
-                    background: 'var(--bg-elevated)',
-                    border: '1px solid var(--border-subtle)',
-                    boxShadow: isActive ? 'var(--shadow-md)' : 'var(--shadow-sm)',
-                }}
+                whileHover={!isDragging ? { scale: 1.08, y: -2 } : undefined}
+                whileTap={!isDragging ? { scale: 0.95 } : undefined}
                 animate={{
-                    y: isActive ? -2 : 0,
+                    scale: isDragging ? 1.1 : 1,
+                    filter: isDragging ? 'drop-shadow(0 8px 16px rgba(23, 20, 18, 0.2))' : 'drop-shadow(0 2px 4px rgba(23, 20, 18, 0.08))',
                 }}
+                transition={goOS.springs.snappy}
+                className="flex flex-col items-center gap-2 w-20"
             >
-                {thumbnailUrl ? (
-                    <Image
-                        src={thumbnailUrl}
-                        alt={label}
-                        fill
-                        className="object-cover"
-                        sizes="56px"
-                        draggable={false}
-                    />
-                ) : (
-                    displayIcon
-                )}
+                <motion.div
+                    className="relative w-14 h-14 flex items-center justify-center rounded-lg overflow-hidden"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-subtle)',
+                        boxShadow: isActive ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+                    }}
+                    animate={{
+                        y: isActive ? -2 : 0,
+                    }}
+                >
+                    {thumbnailUrl ? (
+                        <Image
+                            src={thumbnailUrl}
+                            alt={label}
+                            fill
+                            className="object-cover"
+                            sizes="56px"
+                            draggable={false}
+                        />
+                    ) : (
+                        displayIcon
+                    )}
 
-                {/* Badge */}
-                {badge !== undefined && badge > 0 && (
-                    <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1"
-                        style={{
-                            background: goOS.colors.accent.primary,
-                            border: `1.5px solid ${goOS.colors.border}`,
-                        }}
-                    >
-                        {badge > 99 ? '99+' : badge}
-                    </motion.span>
-                )}
+                    {/* Badge */}
+                    {badge !== undefined && badge > 0 && (
+                        <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1"
+                            style={{
+                                background: goOS.colors.accent.primary,
+                                border: `1.5px solid ${goOS.colors.border}`,
+                            }}
+                        >
+                            {badge > 99 ? '99+' : badge}
+                        </motion.span>
+                    )}
 
-                {/* Active indicator */}
-                {isActive && (
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full"
-                        style={{ background: goOS.colors.border }}
-                    />
-                )}
+                    {/* Active indicator */}
+                    {isActive && (
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full"
+                            style={{ background: goOS.colors.border }}
+                        />
+                    )}
+                </motion.div>
+
+                <span
+                    className="text-xs font-medium text-center leading-tight max-w-[80px] truncate px-1.5 py-0.5 rounded"
+                    style={{
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-surface)',
+                        border: '1px solid var(--border-subtle)',
+                    }}
+                >
+                    {label}
+                </span>
             </motion.div>
-
-            <span
-                className="text-xs font-medium text-center leading-tight max-w-[80px] truncate px-1.5 py-0.5 rounded"
-                style={{
-                    color: 'var(--text-primary)',
-                    background: 'var(--bg-surface)',
-                    border: '1px solid var(--border-subtle)',
-                }}
-            >
-                {label}
-            </span>
-        </motion.button>
+        </div>
     );
 });
 
@@ -2652,6 +2787,46 @@ function GoOSDemoContent() {
             }
 
             return newValue;
+        });
+    }, []);
+
+    // Portfolio item positions - persisted to localStorage
+    const [portfolioPositions, setPortfolioPositions] = useState<Record<string, { x: number; y: number }>>(() => {
+        // Default positions spread across the desktop
+        const defaults: Record<string, { x: number; y: number }> = {};
+        DEMO_ITEMS.forEach((item, index) => {
+            // Arrange in a nice grid pattern starting from top-left
+            // 5 columns, with spacing
+            const col = index % 5;
+            const row = Math.floor(index / 5);
+            defaults[item.id] = {
+                x: 10 + col * 16, // 10%, 26%, 42%, 58%, 74%
+                y: 15 + row * 18, // 15%, 33%, 51%
+            };
+        });
+        return defaults;
+    });
+
+    // Load portfolio positions from localStorage on mount
+    useEffect(() => {
+        const stored = localStorage.getItem('goos-portfolio-positions');
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                setPortfolioPositions(prev => ({ ...prev, ...parsed }));
+            } catch (e) {
+                console.warn('Failed to parse portfolio positions:', e);
+            }
+        }
+    }, []);
+
+    // Handle portfolio item position change
+    const handlePortfolioPositionChange = useCallback((position: { x: number; y: number }, id: string) => {
+        setPortfolioPositions(prev => {
+            const newPositions = { ...prev, [id]: position };
+            // Save to localStorage
+            localStorage.setItem('goos-portfolio-positions', JSON.stringify(newPositions));
+            return newPositions;
         });
     }, []);
 
@@ -4120,20 +4295,19 @@ function GoOSDemoContent() {
                             🪴
                         </motion.div>
 
-                        {/* Portfolio Desktop Icons - goOS style */}
-                        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-4xl px-8 pt-8">
-                            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4 place-items-center">
-                                {items.map((item) => (
-                                    <GoOSDesktopIcon
-                                        key={item.id}
-                                        label={item.label}
-                                        thumbnailUrl={item.thumbnailUrl}
-                                        onClick={() => windowContext.openWindow(item.id)}
-                                        isActive={windowContext.isItemOpen(item.id)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+                        {/* Portfolio Desktop Icons - goOS style (draggable) */}
+                        {items.map((item) => (
+                            <GoOSDesktopIcon
+                                key={item.id}
+                                id={item.id}
+                                label={item.label}
+                                thumbnailUrl={item.thumbnailUrl}
+                                onClick={() => windowContext.openWindow(item.id)}
+                                isActive={windowContext.isItemOpen(item.id)}
+                                position={portfolioPositions[item.id] || { x: 50, y: 50 }}
+                                onPositionChange={handlePortfolioPositionChange}
+                            />
+                        ))}
 
                         {/* Portfolio Windows */}
                         <WindowManager items={items} />
