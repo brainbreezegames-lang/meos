@@ -3977,16 +3977,61 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* LAVA BACKGROUND - Simple static gradient (LiquidBackground disabled for performance) */}
+            {/* LAVA BACKGROUND - Rich flames from bottom */}
             {!wallpaper && (
                 <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                        zIndex: 5,
-                        background: 'linear-gradient(to top, rgba(168, 32, 32, 0.6) 0%, rgba(216, 72, 24, 0.4) 20%, rgba(255, 104, 0, 0.3) 40%, transparent 70%)',
-                        filter: 'blur(40px)',
-                    }}
-                />
+                    className="absolute inset-0 pointer-events-none overflow-hidden"
+                    style={{ zIndex: 5 }}
+                >
+                    {/* Base layer - deep red, full width */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            bottom: '-10%',
+                            left: '-10%',
+                            right: '-10%',
+                            height: '50%',
+                            background: 'linear-gradient(to top, #8B1A1A 0%, #A82020 30%, transparent 100%)',
+                            filter: 'blur(60px)',
+                        }}
+                    />
+                    {/* Orange layer */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            bottom: '-10%',
+                            left: '-5%',
+                            right: '-5%',
+                            height: '45%',
+                            background: 'linear-gradient(to top, #D84818 0%, #FF6800 40%, transparent 100%)',
+                            filter: 'blur(50px)',
+                        }}
+                    />
+                    {/* Golden center peaks */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            bottom: '-10%',
+                            left: '20%',
+                            width: '60%',
+                            height: '55%',
+                            background: 'linear-gradient(to top, #FF9020 0%, #FFAA40 30%, transparent 100%)',
+                            filter: 'blur(45px)',
+                        }}
+                    />
+                    {/* Accent hot spots */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            bottom: '-5%',
+                            left: '30%',
+                            width: '40%',
+                            height: '40%',
+                            background: 'radial-gradient(ellipse at center bottom, #FFB850 0%, transparent 70%)',
+                            filter: 'blur(35px)',
+                        }}
+                    />
+                </div>
             )}
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
