@@ -65,12 +65,12 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    // Letter size - 2x bigger (was 0.35, now 0.7)
-    const baseSize = Math.min(height * 0.7, width * 0.5);
+    // Letter size - BIG (was 0.7, now ~1.0 for 2x effect)
+    const baseSize = Math.min(height * 1.0, width * 0.7);
 
-    // Create engine - PAUSED initially
+    // Create engine
     const engine = Matter.Engine.create({
-      gravity: { x: 0, y: 0.5 }, // Slower gravity
+      gravity: { x: 0, y: 0.5 },
     });
     engineRef.current = engine;
 
@@ -79,7 +79,7 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
     // Ground at bottom
     const ground = Matter.Bodies.rectangle(
       width / 2,
-      height + wallThickness / 2 - 20,
+      height + wallThickness / 2 - 30,
       width + wallThickness * 2,
       wallThickness,
       { isStatic: true, friction: 0.95, restitution: 0.02 }
@@ -87,7 +87,7 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
 
     // Left wall
     const leftWall = Matter.Bodies.rectangle(
-      -wallThickness / 2 + 20,
+      -wallThickness / 2 + 30,
       height / 2,
       wallThickness,
       height + wallThickness * 2,
@@ -114,19 +114,14 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
 
     Matter.Composite.add(engine.world, [ground, leftWall, rightWall, topWall]);
 
-    // Create letter bodies - SPREAD OUT so they don't overlap
+    // Create letter bodies - RANDOM positions each time, clustered together
     const letterBodies: LetterBody[] = LETTERS.map((letter, index) => {
       const size = baseSize * letter.scale;
 
-      // Spread letters across the available width - more spacing
-      const availableWidth = width * 0.5;
-      const letterWidth = size * 0.6;
-      const totalLettersWidth = LETTERS.length * letterWidth;
-      const spacing = (availableWidth - totalLettersWidth) / (LETTERS.length + 1);
-
-      // Position each letter with even spacing
-      const startX = spacing + letterWidth / 2 + index * (letterWidth + spacing);
-      const startY = 80 + index * 30; // Stagger vertically so they don't collide initially
+      // Random X position in left portion of screen (clustered, not spread)
+      const startX = 100 + Math.random() * (width * 0.35);
+      // Random Y position near top
+      const startY = 60 + Math.random() * 120;
 
       const body = Matter.Bodies.rectangle(
         startX,
@@ -134,14 +129,14 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
         size * 0.5,
         size * 0.7,
         {
-          restitution: 0.02, // Almost no bounce
+          restitution: 0.02,
           friction: 0.95,
-          frictionAir: 0.05, // More air resistance = slower fall
+          frictionAir: 0.05,
           frictionStatic: 0.95,
           mass: 200,
-          angle: 0, // Start upright
+          angle: (Math.random() - 0.5) * 0.1, // Slight random angle
           chamfer: { radius: size * 0.02 },
-          isStatic: true, // START STATIC - will become dynamic after delay
+          isStatic: true,
         }
       );
 
@@ -286,8 +281,8 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
   // Don't render until ready
   if (!mounted || !isReady || !visible) return null;
 
-  // Letter size for rendering - 2x bigger
-  const baseSize = Math.min(window.innerHeight * 0.7, window.innerWidth * 0.5);
+  // Letter size for rendering - BIG
+  const baseSize = Math.min(window.innerHeight * 1.0, window.innerWidth * 0.7);
 
   // Subtle color
   const letterColor = isDark
