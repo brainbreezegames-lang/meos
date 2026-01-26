@@ -3960,7 +3960,7 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* Bottom warm glow - rich gradient at bottom 10% */}
+            {/* Bottom warm glow - many small flame shapes rising from bottom */}
             {!wallpaper && (
                 <div
                     className="pointer-events-none"
@@ -3968,20 +3968,114 @@ function GoOSDemoContent() {
                         position: 'fixed',
                         zIndex: 4,
                         bottom: 0,
-                        left: '-5vw',
-                        width: '110vw',
-                        height: '10vh',
-                        background: `
-                            linear-gradient(to top,
-                                #E85A00 0%,
-                                #FF6D00 30%,
-                                #FF8020 60%,
-                                #FF9030 80%,
-                                transparent 100%
-                            )
-                        `,
+                        left: 0,
+                        width: '100vw',
+                        height: '50vh',
+                        overflow: 'hidden',
                     }}
-                />
+                >
+                    {/* Base ambient glow */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: '-5%',
+                            width: '110%',
+                            height: '40%',
+                            background: 'linear-gradient(to top, rgba(200, 60, 10, 0.4) 0%, rgba(255, 100, 20, 0.2) 50%, transparent 100%)',
+                            filter: 'blur(30px)',
+                        }}
+                    />
+                    {/* Many small flame particles */}
+                    {Array.from({ length: 80 }).map((_, i) => {
+                        const seed = i * 137.5;
+                        const rand = (s: number) => {
+                            const x = Math.sin(s * 9999) * 10000;
+                            return x - Math.floor(x);
+                        };
+                        const x = rand(seed) * 100;
+                        const heightPercent = 5 + rand(seed + 1) * 35;
+                        const size = 30 + rand(seed + 2) * 80;
+                        const blur = 20 + rand(seed + 3) * 40;
+                        const opacity = 0.3 + rand(seed + 4) * 0.5;
+                        const colors = [
+                            '#8B1A1A', '#A82020', '#B82828', '#C83818',
+                            '#D84818', '#E85010', '#F06800', '#FF5500',
+                            '#FF6800', '#FF7010', '#FF8020', '#FF8818',
+                            '#FF9020', '#FFAA40', '#FFB050', '#FFC040',
+                        ];
+                        const color = colors[Math.floor(rand(seed + 5) * colors.length)];
+                        const animDelay = rand(seed + 6) * 5;
+                        const animDuration = 4 + rand(seed + 7) * 6;
+
+                        return (
+                            <motion.div
+                                key={i}
+                                animate={{
+                                    y: [0, -10 - rand(seed + 8) * 15, 0],
+                                    opacity: [opacity * 0.7, opacity, opacity * 0.8],
+                                    scale: [1, 1.05, 1],
+                                }}
+                                transition={{
+                                    duration: animDuration,
+                                    delay: animDelay,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    left: `${x}%`,
+                                    bottom: `${-5 + rand(seed + 9) * heightPercent}%`,
+                                    width: size,
+                                    height: size * 1.5,
+                                    borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                                    background: `radial-gradient(ellipse at 50% 70%, ${color} 0%, ${color}66 50%, transparent 80%)`,
+                                    filter: `blur(${blur}px)`,
+                                    transform: 'translateX(-50%)',
+                                }}
+                            />
+                        );
+                    })}
+                    {/* Brighter core highlights */}
+                    {Array.from({ length: 25 }).map((_, i) => {
+                        const seed = (i + 100) * 137.5;
+                        const rand = (s: number) => {
+                            const x = Math.sin(s * 9999) * 10000;
+                            return x - Math.floor(x);
+                        };
+                        const x = 10 + rand(seed) * 80;
+                        const size = 20 + rand(seed + 1) * 40;
+                        const animDelay = rand(seed + 2) * 4;
+                        const animDuration = 3 + rand(seed + 3) * 4;
+
+                        return (
+                            <motion.div
+                                key={`core-${i}`}
+                                animate={{
+                                    y: [0, -15, 0],
+                                    opacity: [0.2, 0.5, 0.2],
+                                }}
+                                transition={{
+                                    duration: animDuration,
+                                    delay: animDelay,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    left: `${x}%`,
+                                    bottom: `${rand(seed + 4) * 15}%`,
+                                    width: size,
+                                    height: size,
+                                    borderRadius: '50%',
+                                    background: 'radial-gradient(circle, #FFEE90 0%, #FFCC50 30%, #FFAA30 60%, transparent 80%)',
+                                    filter: `blur(${15 + rand(seed + 5) * 20}px)`,
+                                    transform: 'translateX(-50%)',
+                                }}
+                            />
+                        );
+                    })}
+                </div>
             )}
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
