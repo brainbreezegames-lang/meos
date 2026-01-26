@@ -3,13 +3,14 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 
 interface Shape {
-  type: 'rect' | 'circle';
+  type: 'rect' | 'ellipse';
   // All values as percentages (0-1) of the letter's bounding box
-  x: number;
-  y: number;
+  x: number; // center x for ellipse, top-left x for rect
+  y: number; // center y for ellipse, top-left y for rect
   width?: number;  // for rect
   height?: number; // for rect
-  radius?: number; // for circle
+  radiusX?: number; // for ellipse (horizontal radius)
+  radiusY?: number; // for ellipse (vertical radius)
 }
 
 interface LetterColliders {
@@ -33,12 +34,29 @@ export function ColliderEditor() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawStart, setDrawStart] = useState<{ x: number; y: number } | null>(null);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
-  const [shapeType, setShapeType] = useState<'rect' | 'circle'>('rect');
+  const [shapeType, setShapeType] = useState<'rect' | 'ellipse'>('rect');
+  const [shiftHeld, setShiftHeld] = useState(false);
 
   const letter = LETTERS[currentLetter];
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Track shift key for perfect circles
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Shift') setShiftHeld(true);
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Shift') setShiftHeld(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, []);
 
   // Draw the current state
@@ -57,10 +75,10 @@ export function ColliderEditor() {
     // Draw the letter or HEAD image
     if (letter === 'HEAD') {
       const img = new Image();
-      img.src = '/zinoHead.svg';
+      img.src = '/zinoHead.png';
       img.onload = () => {
-        const padding = LETTER_SIZE * 0.05;
-        ctx.drawImage(img, padding, padding, LETTER_SIZE - padding * 2, LETTER_SIZE - padding * 2);
+        // Draw the PNG centered at full size (it's square with transparency)
+        ctx.drawImage(img, 0, 0, LETTER_SIZE, LETTER_SIZE);
         drawColliders(ctx);
       };
     } else {
@@ -88,12 +106,13 @@ export function ColliderEditor() {
         const h = (shape.height || 0) * LETTER_SIZE;
         ctx.fillRect(x, y, w, h);
         ctx.strokeRect(x, y, w, h);
-      } else if (shape.type === 'circle') {
+      } else if (shape.type === 'ellipse') {
         const cx = shape.x * LETTER_SIZE;
         const cy = shape.y * LETTER_SIZE;
-        const r = (shape.radius || 0) * LETTER_SIZE;
+        const rx = (shape.radiusX || 0) * LETTER_SIZE;
+        const ry = (shape.radiusY || 0) * LETTER_SIZE;
         ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
       }
@@ -110,12 +129,13 @@ export function ColliderEditor() {
         const h = (currentShape.height || 0) * LETTER_SIZE;
         ctx.fillRect(x, y, w, h);
         ctx.strokeRect(x, y, w, h);
-      } else if (currentShape.type === 'circle') {
+      } else if (currentShape.type === 'ellipse') {
         const cx = currentShape.x * LETTER_SIZE;
         const cy = currentShape.y * LETTER_SIZE;
-        const r = (currentShape.radius || 0) * LETTER_SIZE;
+        const rx = (currentShape.radiusX || 0) * LETTER_SIZE;
+        const ry = (currentShape.radiusY || 0) * LETTER_SIZE;
         ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
       }
@@ -153,10 +173,11 @@ export function ColliderEditor() {
       });
     } else {
       setCurrentShape({
-        type: 'circle',
+        type: 'ellipse',
         x: coords.x,
         y: coords.y,
-        radius: 0,
+        radiusX: 0,
+        radiusY: 0,
       });
     }
   };
@@ -178,15 +199,27 @@ export function ColliderEditor() {
         height,
       });
     } else {
-      const dx = coords.x - drawStart.x;
-      const dy = coords.y - drawStart.y;
-      const radius = Math.sqrt(dx * dx + dy * dy);
-      setCurrentShape({
-        type: 'circle',
-        x: drawStart.x,
-        y: drawStart.y,
-        radius,
-      });
+      const dx = Math.abs(coords.x - drawStart.x);
+      const dy = Math.abs(coords.y - drawStart.y);
+      // Shift = perfect circle, otherwise free ellipse
+      if (shiftHeld) {
+        const radius = Math.max(dx, dy);
+        setCurrentShape({
+          type: 'ellipse',
+          x: drawStart.x,
+          y: drawStart.y,
+          radiusX: radius,
+          radiusY: radius,
+        });
+      } else {
+        setCurrentShape({
+          type: 'ellipse',
+          x: drawStart.x,
+          y: drawStart.y,
+          radiusX: dx,
+          radiusY: dy,
+        });
+      }
     }
   };
 
@@ -195,7 +228,7 @@ export function ColliderEditor() {
       // Only add if shape has some size
       const hasSize = shapeType === 'rect'
         ? (currentShape.width || 0) > 0.01 && (currentShape.height || 0) > 0.01
-        : (currentShape.radius || 0) > 0.01;
+        : (currentShape.radiusX || 0) > 0.01 && (currentShape.radiusY || 0) > 0.01;
 
       if (hasSize) {
         setColliders(prev => ({
@@ -308,17 +341,17 @@ export function ColliderEditor() {
           Rectangle
         </button>
         <button
-          onClick={() => setShapeType('circle')}
+          onClick={() => setShapeType('ellipse')}
           style={{
             padding: '8px 16px',
-            background: shapeType === 'circle' ? '#22cc77' : '#333',
+            background: shapeType === 'ellipse' ? '#22cc77' : '#333',
             border: 'none',
             borderRadius: 6,
             color: '#fff',
             cursor: 'pointer',
           }}
         >
-          Circle
+          Ellipse {shiftHeld && '(⇧ Circle)'}
         </button>
       </div>
 
@@ -380,8 +413,8 @@ export function ColliderEditor() {
 
       <div style={{ fontSize: 12, color: '#888', maxWidth: 500, textAlign: 'center' }}>
         <p>Draw collision shapes for each letter. Red = saved shapes, Green = current drawing.</p>
-        <p>Use rectangles for H, E, L strokes. Use circles for O and HEAD.</p>
-        <p>Shapes are saved as percentages (0-1) of the bounding box.</p>
+        <p>Use rectangles for H, E, L strokes. Use ellipses for O and HEAD.</p>
+        <p><strong>Hold SHIFT</strong> while drawing ellipse for a perfect circle.</p>
       </div>
 
       <div style={{ fontSize: 11, color: '#666', marginTop: 10 }}>
