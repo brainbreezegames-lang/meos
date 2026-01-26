@@ -3967,68 +3967,49 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* LAVA BACKGROUND - Subtle animated flames at bottom edge */}
+            {/* LAVA BACKGROUND - 24 individual flame columns rising from bottom */}
             {!wallpaper && (
                 <div
                     className="absolute inset-0 pointer-events-none overflow-hidden"
-                    style={{ zIndex: 5 }}
+                    style={{ zIndex: 5, filter: 'blur(40px)' }}
                 >
                     <style>{`
-                        @keyframes lavaFloat1 {
-                            0%, 100% { transform: translateY(0) scaleY(1); }
-                            50% { transform: translateY(-8px) scaleY(1.05); }
-                        }
-                        @keyframes lavaFloat2 {
-                            0%, 100% { transform: translateY(0) scaleY(1); }
-                            50% { transform: translateY(-12px) scaleY(1.08); }
-                        }
-                        @keyframes lavaFloat3 {
-                            0%, 100% { transform: translateY(0) scaleY(1); }
-                            50% { transform: translateY(-6px) scaleY(1.03); }
-                        }
+                        @keyframes flame1 { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-15px) scaleY(1.12)} }
+                        @keyframes flame2 { 0%,100%{transform:translateY(0) scaleY(1)} 40%{transform:translateY(-20px) scaleY(1.08)} }
+                        @keyframes flame3 { 0%,100%{transform:translateY(0) scaleY(1)} 60%{transform:translateY(-10px) scaleY(1.15)} }
+                        @keyframes flame4 { 0%,100%{transform:translateY(0) scaleY(1)} 30%{transform:translateY(-25px) scaleY(1.05)} }
+                        @keyframes flame5 { 0%,100%{transform:translateY(0) scaleY(1)} 70%{transform:translateY(-8px) scaleY(1.18)} }
+                        @keyframes flame6 { 0%,100%{transform:translateY(0) scaleY(1)} 55%{transform:translateY(-18px) scaleY(1.1)} }
                     `}</style>
-                    {/* Base layer - deep red, rising from below */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            bottom: '-8%',
-                            left: '-20%',
-                            right: '-20%',
-                            height: '25%',
-                            background: 'linear-gradient(to top, #8B1A1A 0%, #A82020 60%, transparent 100%)',
-                            filter: 'blur(60px)',
-                            animation: 'lavaFloat1 8s ease-in-out infinite',
-                            transformOrigin: 'bottom center',
-                        }}
-                    />
-                    {/* Orange layer */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            bottom: '-6%',
-                            left: '-15%',
-                            right: '-15%',
-                            height: '22%',
-                            background: 'linear-gradient(to top, #D84818 0%, #FF6800 65%, transparent 100%)',
-                            filter: 'blur(55px)',
-                            animation: 'lavaFloat2 10s ease-in-out infinite',
-                            transformOrigin: 'bottom center',
-                        }}
-                    />
-                    {/* Golden center */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            bottom: '-4%',
-                            left: '-10%',
-                            right: '-10%',
-                            height: '18%',
-                            background: 'linear-gradient(to top, #FF9020 0%, #FFAA40 55%, transparent 100%)',
-                            filter: 'blur(50px)',
-                            animation: 'lavaFloat3 12s ease-in-out infinite',
-                            transformOrigin: 'bottom center',
-                        }}
-                    />
+                    {/* Deep reds - back layer */}
+                    <div style={{position:'absolute',bottom:'-5%',left:'-2%',width:'12%',height:'22%',background:'linear-gradient(to top,#8B1A1A,#A02525 70%,transparent)',animation:'flame1 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-5%',left:'8%',width:'10%',height:'18%',background:'linear-gradient(to top,#922020,#B03030 65%,transparent)',animation:'flame3 9s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-5%',left:'20%',width:'14%',height:'25%',background:'linear-gradient(to top,#7D1515,#9A2020 75%,transparent)',animation:'flame2 11s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-5%',left:'55%',width:'11%',height:'20%',background:'linear-gradient(to top,#881818,#A52828 60%,transparent)',animation:'flame4 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-5%',left:'75%',width:'13%',height:'24%',background:'linear-gradient(to top,#7A1212,#952222 70%,transparent)',animation:'flame1 10s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-5%',left:'90%',width:'15%',height:'19%',background:'linear-gradient(to top,#8F1C1C,#AA2A2A 65%,transparent)',animation:'flame5 12s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    {/* Oranges - middle layer */}
+                    <div style={{position:'absolute',bottom:'-4%',left:'0%',width:'9%',height:'20%',background:'linear-gradient(to top,#C54010,#E85515 70%,transparent)',animation:'flame2 6s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-4%',left:'12%',width:'11%',height:'26%',background:'linear-gradient(to top,#D04812,#F06018 75%,transparent)',animation:'flame5 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-4%',left:'25%',width:'13%',height:'30%',background:'linear-gradient(to top,#CC4510,#EE5A15 80%,transparent)',animation:'flame1 10s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-4%',left:'38%',width:'15%',height:'35%',background:'linear-gradient(to top,#D55015,#FF6820 85%,transparent)',animation:'flame3 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-4%',left:'50%',width:'12%',height:'28%',background:'linear-gradient(to top,#CA4212,#E85818 72%,transparent)',animation:'flame6 9s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-4%',left:'65%',width:'10%',height:'24%',background:'linear-gradient(to top,#D24A14,#F26220 68%,transparent)',animation:'flame4 11s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-4%',left:'78%',width:'14%',height:'22%',background:'linear-gradient(to top,#C84010,#E55515 65%,transparent)',animation:'flame2 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-4%',left:'92%',width:'12%',height:'27%',background:'linear-gradient(to top,#D55218,#F5681C 78%,transparent)',animation:'flame5 6s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    {/* Bright oranges and yellows - front layer */}
+                    <div style={{position:'absolute',bottom:'-3%',left:'5%',width:'8%',height:'18%',background:'linear-gradient(to top,#FF6B00,#FF8525 70%,transparent)',animation:'flame4 5s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-3%',left:'18%',width:'10%',height:'24%',background:'linear-gradient(to top,#FF7010,#FF9030 75%,transparent)',animation:'flame6 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-3%',left:'30%',width:'12%',height:'32%',background:'linear-gradient(to top,#FF7800,#FFA040 82%,transparent)',animation:'flame1 6s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-3%',left:'42%',width:'14%',height:'38%',background:'linear-gradient(to top,#FF8200,#FFB050 88%,transparent)',animation:'flame3 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-3%',left:'55%',width:'11%',height:'30%',background:'linear-gradient(to top,#FF7500,#FF9535 78%,transparent)',animation:'flame2 5s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-3%',left:'68%',width:'9%',height:'22%',background:'linear-gradient(to top,#FF6800,#FF8828 72%,transparent)',animation:'flame5 9s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-3%',left:'82%',width:'13%',height:'26%',background:'linear-gradient(to top,#FF7208,#FF9232 76%,transparent)',animation:'flame4 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    {/* Golden/yellow highlights - top layer */}
+                    <div style={{position:'absolute',bottom:'-2%',left:'22%',width:'8%',height:'20%',background:'linear-gradient(to top,#FF9020,#FFB848 72%,transparent)',animation:'flame2 4s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-2%',left:'35%',width:'10%',height:'28%',background:'linear-gradient(to top,#FFA030,#FFC858 80%,transparent)',animation:'flame6 6s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-2%',left:'48%',width:'12%',height:'34%',background:'linear-gradient(to top,#FFAA40,#FFD868 85%,transparent)',animation:'flame1 5s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div style={{position:'absolute',bottom:'-2%',left:'60%',width:'9%',height:'24%',background:'linear-gradient(to top,#FF9828,#FFC050 75%,transparent)',animation:'flame3 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
                 </div>
             )}
 
