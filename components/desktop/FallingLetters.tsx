@@ -22,6 +22,9 @@ export function FallingLetters({
   const runnerRef = useRef<Matter.Runner | null>(null);
   const [mounted, setMounted] = useState(false);
 
+  // Combine text characters with the special head item
+  const items = React.useMemo(() => [...text.split(''), 'HEAD'], [text]);
+
   // Handle client-side mounting
   useEffect(() => {
     setMounted(true);
@@ -97,11 +100,20 @@ export function FallingLetters({
     // -------------------------------------------------------------------------
     const createLetterBody = (x: number, y: number, char: string, width: number, height: number) => {
       const opts = {
-        restitution: 0.2, // Low bounce for heavy feel
-        friction: 0.8,    // High friction for stability
-        density: 0.005,   // Heavy
-        label: char
+        restitution: 0.1, // Almost no bounce
+        friction: 1,      // maximal friction to stop sliding/interpenetration
+        frictionStatic: 1,
+        density: 1,       // Very heavy
+        label: char,
+        slop: 0.05        // Reduce slop to force hard collisions
       };
+
+      // SPECIAL ZINO HEAD -> CIRCLE COLLIDER
+      if (char === 'HEAD') {
+        // Using a circle collider roughly fitting the O is the best "perfect" interaction.
+        // Circle radius = width / 2
+        return Bodies.circle(x, y, width / 2, opts);
+      }
 
       // Thickness of the strokes (approx 25% of width for heavy font)
       const t = width * 0.28;
@@ -130,7 +142,6 @@ export function FallingLetters({
         }
         case 'O': {
           // O: Use a Circle for natural rolling behavior and to prevent internal sticking.
-          // Using a circle collider roughly fitting the O is the best "perfect" interaction.
           return Bodies.circle(x, y, width / 2, opts);
         }
         default:
@@ -142,11 +153,17 @@ export function FallingLetters({
     // Create bodies for each letter
     const validLetterNodes = lettersRef.current.filter(n => n !== null);
 
+    // We must ensure the filtering of refs matches our items list logic
+    // Refs are assigned by index. If ' ' return null in map, that index is skipped in ref array assignment?
+    // No, if map returns null, the index 'i' in map still increments, so refs[i] might be undefined if we don't render it?
+    // Let's look at the render loop: if char === ' ' return null;
+    // So for that index i, no ref callback is called. lettersRef.current[i] will be undefined/null.
+    // So filtering n !== null works.
+
     const bodiesWithNodes = validLetterNodes.map((node, i) => {
       if (!node) return null;
 
       const rect = node.getBoundingClientRect();
-      // EXACT SIZE MATCHING to preventing overlap
       const physWidth = rect.width;
       const physHeight = rect.height;
 
@@ -156,7 +173,12 @@ export function FallingLetters({
       const startX = minX + Math.random() * (maxX - minX);
       const startY = -physHeight - (Math.random() * 800) - (i * 300);
 
-      const char = node.textContent || "?";
+      // Determine char identity from node. For the Head, we tag it in dataset or just check content
+      // But we can also access the 'items' array if we are careful about index alignment.
+      // Filtering ' ' out of validLetterNodes makes indices disjoint from 'items'.
+      // Better to read attribute from DOM.
+      const char = node.getAttribute('data-char') || node.textContent || "?";
+
       const body = createLetterBody(startX, startY, char, physWidth, physHeight);
 
       // Random initial rotation
@@ -196,12 +218,10 @@ export function FallingLetters({
       cancelAnimationFrame(requestID);
       cleanup();
     };
-  }, [mounted, isReady, text, textSize]); // Re-init if these change
+  }, [mounted, isReady, items, textSize]); // Depend on items now
 
   if (!mounted || !isReady) return null;
 
-  // Use passed className or default to fixed full screen
-  // Added z-0 to put it behind other content
   const containerClass = className || "fixed inset-0 z-0 overflow-hidden pointer-events-none";
 
   return (
@@ -210,14 +230,14 @@ export function FallingLetters({
       className={containerClass}
       aria-hidden="true"
     >
-      {text.split('').map((char, i) => {
-        if (char === ' ') return null;
+      {items.map((item, i) => {
+        if (item === ' ') return null;
 
         return (
           <div
             key={i}
             ref={(el) => { lettersRef.current[i] = el; }}
-            // Removed cursor interactivity classes
+            data-char={item}
             className="absolute top-0 left-0 font-extrabold leading-none will-change-transform pointer-events-none select-none"
             style={{
               fontSize: `${textSize}px`,
@@ -228,10 +248,31 @@ export function FallingLetters({
               color: 'var(--text-primary)', // CSS variable handles instant theme switching
               whiteSpace: 'nowrap',
               lineHeight: 0.8,
-              fontWeight: 700 // Bold for Averia
+              fontWeight: 700, // Bold for Averia
+              ...(item === 'HEAD' && {
+                width: '1em',
+                height: '1em',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              })
             }}
           >
-            {char}
+            {item === 'HEAD' ? (
+              // Zino Head SVG
+              <img
+                src="/zinoHead.svg"
+                alt="Head"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  borderRadius: '50%'
+                }}
+              />
+            ) : (
+              item
+            )}
           </div>
         );
       })}
