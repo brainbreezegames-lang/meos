@@ -3964,14 +3964,27 @@ function GoOSDemoContent() {
                     )}
                 </>
             ) : (
-                /* Solid background when no wallpaper */
-                <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                        background: 'var(--color-bg-base, #fbf9ef)',
-                        zIndex: 0,
-                    }}
-                />
+                <>
+                    {/* Solid background when no wallpaper */}
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            background: 'var(--color-bg-base, #fbf9ef)',
+                            zIndex: 0,
+                        }}
+                    />
+                    {/* Subtle dotted overlay on plain background */}
+                    {asciiFilter && (
+                        <div
+                            className="absolute inset-0 pointer-events-none"
+                            style={{
+                                zIndex: 2,
+                                backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px)`,
+                                backgroundSize: '12px 12px',
+                            }}
+                        />
+                    )}
+                </>
             )}
 
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
