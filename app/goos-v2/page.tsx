@@ -82,7 +82,7 @@ import { CommandPalette } from '@/components/command-palette/CommandPalette';
 import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
-import { LiquidBackground } from '@/components/desktop/LiquidBackground';
+// import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 import { ASCIIFilter } from '@/components/effects/ASCIIFilter';
 
 // ============================================
@@ -3991,11 +3991,16 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* LAVA BACKGROUND - Rich flames rising from bottom */}
+            {/* LAVA BACKGROUND - Simple static gradient (LiquidBackground disabled for performance) */}
             {!wallpaper && (
-                <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-                    <LiquidBackground speed={0.5} />
-                </div>
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        zIndex: 5,
+                        background: 'linear-gradient(to top, rgba(168, 32, 32, 0.6) 0%, rgba(216, 72, 24, 0.4) 20%, rgba(255, 104, 0, 0.3) 40%, transparent 70%)',
+                        filter: 'blur(40px)',
+                    }}
+                />
             )}
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
