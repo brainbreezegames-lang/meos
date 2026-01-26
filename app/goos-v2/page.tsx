@@ -2694,6 +2694,8 @@ function GoOSDemoContent() {
     const [logoClicks, setLogoClicks] = useState(0);
     const [showEasterEgg, setShowEasterEgg] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
+    const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
     // Boot sequence state: splash -> booting -> revealing -> ready
     const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'revealing' | 'ready'>('splash');
@@ -4084,6 +4086,173 @@ function GoOSDemoContent() {
                                 onCreateSpace={() => setShowCreateSpaceModal(true)}
                                 onManageSpaces={() => setShowManageSpacesDialog(true)}
                             />
+
+                            {/* Widgets Menu */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowWidgetsMenu(!showWidgetsMenu)}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '2px 6px',
+                                        fontSize: '13px',
+                                        fontWeight: 400,
+                                        color: 'var(--color-text-secondary)',
+                                        cursor: 'pointer',
+                                        borderRadius: 'var(--radius-xs)',
+                                        transition: 'background 0.15s ease',
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    Widgets
+                                </button>
+                                <AnimatePresence>
+                                    {showWidgetsMenu && (
+                                        <>
+                                            <div className="fixed inset-0 z-[2000]" onClick={() => setShowWidgetsMenu(false)} />
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -4, scale: 0.96 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: -4, scale: 0.96 }}
+                                                transition={{ duration: 0.12, ease: [0.4, 0, 0.2, 1] }}
+                                                className="absolute top-full left-0 mt-1 z-[2001] py-1"
+                                                style={{
+                                                    background: 'var(--color-bg-elevated)',
+                                                    backdropFilter: 'blur(20px) saturate(180%)',
+                                                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                                                    border: '1px solid var(--color-border-subtle)',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    boxShadow: 'var(--shadow-dropdown)',
+                                                    minWidth: '140px',
+                                                }}
+                                            >
+                                                {Object.entries(WIDGET_METADATA).map(([type, meta]) => (
+                                                    <button
+                                                        key={type}
+                                                        onClick={() => {
+                                                            handleAddWidget(type, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                                                            setShowWidgetsMenu(false);
+                                                        }}
+                                                        style={{
+                                                            width: '100%',
+                                                            padding: '6px 12px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '8px',
+                                                            background: 'transparent',
+                                                            border: 'none',
+                                                            cursor: 'pointer',
+                                                            fontSize: '13px',
+                                                            fontWeight: 400,
+                                                            color: 'var(--color-text-primary)',
+                                                            textAlign: 'left',
+                                                            transition: 'background 0.1s ease',
+                                                        }}
+                                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
+                                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                                    >
+                                                        <span style={{ fontSize: '14px' }}>{meta.icon}</span>
+                                                        <span>{meta.label}</span>
+                                                    </button>
+                                                ))}
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            {/* Settings Menu */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '2px 6px',
+                                        fontSize: '13px',
+                                        fontWeight: 400,
+                                        color: 'var(--color-text-secondary)',
+                                        cursor: 'pointer',
+                                        borderRadius: 'var(--radius-xs)',
+                                        transition: 'background 0.15s ease',
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    Settings
+                                </button>
+                                <AnimatePresence>
+                                    {showSettingsMenu && (
+                                        <>
+                                            <div className="fixed inset-0 z-[2000]" onClick={() => setShowSettingsMenu(false)} />
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -4, scale: 0.96 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: -4, scale: 0.96 }}
+                                                transition={{ duration: 0.12, ease: [0.4, 0, 0.2, 1] }}
+                                                className="absolute top-full left-0 mt-1 z-[2001] py-1"
+                                                style={{
+                                                    background: 'var(--color-bg-elevated)',
+                                                    backdropFilter: 'blur(20px) saturate(180%)',
+                                                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                                                    border: '1px solid var(--color-border-subtle)',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    boxShadow: 'var(--shadow-dropdown)',
+                                                    minWidth: '140px',
+                                                }}
+                                            >
+                                                <button
+                                                    onClick={() => { toggleApp('analytics'); setShowSettingsMenu(false); }}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '6px 12px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        background: 'transparent',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        fontSize: '13px',
+                                                        fontWeight: 400,
+                                                        color: 'var(--color-text-primary)',
+                                                        textAlign: 'left',
+                                                        transition: 'background 0.1s ease',
+                                                    }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                                >
+                                                    <BarChart3 size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
+                                                    <span>Analytics</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => { toggleApp('settings'); setShowSettingsMenu(false); }}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '6px 12px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        background: 'transparent',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        fontSize: '13px',
+                                                        fontWeight: 400,
+                                                        color: 'var(--color-text-primary)',
+                                                        textAlign: 'left',
+                                                        transition: 'background 0.1s ease',
+                                                    }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                                >
+                                                    <Settings size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
+                                                    <span>Preferences</span>
+                                                </button>
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
 
                         {/* Right: Time only - clean and minimal */}
