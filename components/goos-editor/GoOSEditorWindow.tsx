@@ -362,7 +362,7 @@ export function GoOSEditorWindow({
             height: TITLE_BAR_DARK.height,
             background: TITLE_BAR_DARK.background,
             borderBottom: TITLE_BAR_DARK.borderBottom,
-            borderRadius: isMaximized ? 0 : TITLE_BAR_DARK.borderRadius,
+            // No border-radius here - outer container handles it with overflow: hidden
             gap: 12,
             cursor: isMaximized ? 'default' : 'grab',
             flexShrink: 0,

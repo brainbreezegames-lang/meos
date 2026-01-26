@@ -185,7 +185,7 @@ export function WindowShell({
               height: titleBar.height,
               background: titleBar.background,
               borderBottom: titleBar.borderBottom,
-              borderRadius: isMaximized ? 0 : (variant === 'dark' ? TITLE_BAR_DARK.borderRadius : undefined),
+              // No border-radius here - outer container handles it with overflow: hidden
               gap: 12,
               cursor: isMaximized ? 'default' : 'grab',
               flexShrink: 0,

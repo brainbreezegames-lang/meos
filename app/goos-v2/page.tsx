@@ -2821,8 +2821,10 @@ function GoOSDemoContent() {
     const [widgetContextMenu, setWidgetContextMenu] = useState<{ isOpen: boolean; x: number; y: number; widget: Widget | null }>({ isOpen: false, x: 0, y: 0, widget: null });
     const [openFolders, setOpenFolders] = useState<string[]>([]); // Folder windows
     const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+    const [maximizedFolders, setMaximizedFolders] = useState<Set<string>>(new Set()); // Maximized folders
     const [openImageViewers, setOpenImageViewers] = useState<string[]>([]); // Image viewer windows
     const [openLinkBrowsers, setOpenLinkBrowsers] = useState<string[]>([]); // Link browser windows
+    const [maximizedLinkBrowsers, setMaximizedLinkBrowsers] = useState<Set<string>>(new Set()); // Maximized link browsers
     const [isDraggingFile, setIsDraggingFile] = useState(false); // For drag-drop visual feedback
 
     // New file type creation dialog state
@@ -4347,11 +4349,31 @@ function GoOSDemoContent() {
                                         key={folder.id}
                                         folder={folder}
                                         files={goosFiles}
-                                        onClose={() => closeFolder(folder.id)}
+                                        onClose={() => {
+                                            closeFolder(folder.id);
+                                            setMaximizedFolders(prev => {
+                                                const next = new Set(prev);
+                                                next.delete(folder.id);
+                                                return next;
+                                            });
+                                        }}
+                                        onMinimize={() => closeFolder(folder.id)}
+                                        onMaximize={() => {
+                                            setMaximizedFolders(prev => {
+                                                const next = new Set(prev);
+                                                if (next.has(folder.id)) {
+                                                    next.delete(folder.id);
+                                                } else {
+                                                    next.add(folder.id);
+                                                }
+                                                return next;
+                                            });
+                                        }}
                                         onFileDoubleClick={openFile}
                                         onFileClick={handleFileClick}
                                         selectedFileId={selectedFileId}
                                         isActive={activeFolderId === folder.id}
+                                        isMaximized={maximizedFolders.has(folder.id)}
                                         zIndex={windowZ[`folder-${folder.id}`] || topZIndex}
                                         onFocus={() => {
                                             setActiveFolderId(folder.id);
@@ -4476,7 +4498,29 @@ function GoOSDemoContent() {
                                         title={linkFile.title}
                                         zIndex={windowZ[`link-${linkFile.id}`] || topZIndex}
                                         isActive={windowZ[`link-${linkFile.id}`] === topZIndex}
-                                        onClose={() => setOpenLinkBrowsers(prev => prev.filter(id => id !== linkFile.id))}
+                                        isMaximized={maximizedLinkBrowsers.has(linkFile.id)}
+                                        onClose={() => {
+                                            setOpenLinkBrowsers(prev => prev.filter(id => id !== linkFile.id));
+                                            setMaximizedLinkBrowsers(prev => {
+                                                const next = new Set(prev);
+                                                next.delete(linkFile.id);
+                                                return next;
+                                            });
+                                        }}
+                                        onMinimize={() => {
+                                            setOpenLinkBrowsers(prev => prev.filter(id => id !== linkFile.id));
+                                        }}
+                                        onMaximize={() => {
+                                            setMaximizedLinkBrowsers(prev => {
+                                                const next = new Set(prev);
+                                                if (next.has(linkFile.id)) {
+                                                    next.delete(linkFile.id);
+                                                } else {
+                                                    next.add(linkFile.id);
+                                                }
+                                                return next;
+                                            });
+                                        }}
                                         onFocus={() => {
                                             setWindowZ(prev => ({ ...prev, [`link-${linkFile.id}`]: topZIndex + 1 }));
                                             setTopZIndex(prev => prev + 1);
