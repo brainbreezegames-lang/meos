@@ -92,7 +92,7 @@ export default function BrandAppartPage() {
                         <div className="w-full h-full max-w-[1400px] pointer-events-auto">
                             <FallingLetters
                                 text="HELLO"
-                                textSize={180}
+                                textSize={320}
                                 className="w-full h-full"
                             />
                         </div>

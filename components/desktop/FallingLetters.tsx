@@ -90,15 +90,19 @@ export function FallingLetters({
       if (!node) return null;
 
       const rect = node.getBoundingClientRect();
-      const spread = Math.min(containerWidth * 0.8, 800);
-      const startX = (containerWidth - spread) / 2 + (Math.random() * spread);
-      const startY = -rect.height - (Math.random() * 500) - (i * 150); // Staggered fall
+
+      // FALL FROM LEFT SIDE
+      // Constrain spawn area to the left ~35% of the screen
+      // Start randomly within that left zone.
+      const spawnZoneWidth = Math.min(containerWidth * 0.35, 400);
+      const startX = (Math.random() * spawnZoneWidth) + (rect.width * 0.5); // Ensure somewhat onscreen
+      const startY = -rect.height - (Math.random() * 800) - (i * 200); // Staggered fall from top
 
       const body = Bodies.rectangle(startX, startY, rect.width, rect.height, {
-        restitution: 0.6, // Bounciness
-        friction: 0.1,
-        density: 0.001,
-        angle: (Math.random() - 0.5) * 0.5,
+        restitution: 0.5, // Less bouncy for heavy feel
+        friction: 0.5, // More friction for stacking
+        density: 0.005, // Heavy
+        angle: (Math.random() - 0.5) * 0.2, // Subtle rotation
         label: node.textContent || "letter"
       });
 
@@ -178,9 +182,10 @@ export function FallingLetters({
               visibility: 'hidden',
               // Font stack matching design system
               fontFamily: 'var(--font-instrument, "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif)',
-              color: 'rgba(0, 0, 0, 0.1)', // subtle dark by default
+              color: '#000000', // PURE BLACK as requested
               whiteSpace: 'nowrap',
-              lineHeight: 0.8
+              lineHeight: 0.8,
+              fontWeight: 900 // EXTRA BOLD / BLACK
             }}
           >
             {char}
@@ -193,7 +198,7 @@ export function FallingLetters({
       */}
       <style jsx>{`
         div[class*="dark"] .cursor-grab {
-          color: rgba(255, 255, 255, 0.1) !important;
+          color: rgba(255, 255, 255, 0.9) !important;
         }
       `}</style>
     </div>
