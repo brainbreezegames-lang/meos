@@ -3990,58 +3990,66 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* LAVA BACKGROUND - Rich flames from bottom */}
+            {/* LAVA BACKGROUND - Subtle animated flames at bottom edge */}
             {!wallpaper && (
                 <div
                     className="absolute inset-0 pointer-events-none overflow-hidden"
                     style={{ zIndex: 5 }}
                 >
-                    {/* Base layer - deep red, full width */}
+                    <style>{`
+                        @keyframes lavaFloat1 {
+                            0%, 100% { transform: translateY(0) scaleY(1); }
+                            50% { transform: translateY(-8px) scaleY(1.05); }
+                        }
+                        @keyframes lavaFloat2 {
+                            0%, 100% { transform: translateY(0) scaleY(1); }
+                            50% { transform: translateY(-12px) scaleY(1.08); }
+                        }
+                        @keyframes lavaFloat3 {
+                            0%, 100% { transform: translateY(0) scaleY(1); }
+                            50% { transform: translateY(-6px) scaleY(1.03); }
+                        }
+                    `}</style>
+                    {/* Base layer - deep red */}
                     <div
                         style={{
                             position: 'absolute',
-                            bottom: '-10%',
+                            bottom: '-3%',
                             left: '-10%',
                             right: '-10%',
-                            height: '50%',
-                            background: 'linear-gradient(to top, #8B1A1A 0%, #A82020 30%, transparent 100%)',
-                            filter: 'blur(60px)',
+                            height: '15%',
+                            background: 'linear-gradient(to top, #8B1A1A 0%, #A82020 50%, transparent 100%)',
+                            filter: 'blur(35px)',
+                            animation: 'lavaFloat1 8s ease-in-out infinite',
+                            transformOrigin: 'bottom center',
                         }}
                     />
                     {/* Orange layer */}
                     <div
                         style={{
                             position: 'absolute',
-                            bottom: '-10%',
+                            bottom: '-3%',
                             left: '-5%',
                             right: '-5%',
-                            height: '45%',
-                            background: 'linear-gradient(to top, #D84818 0%, #FF6800 40%, transparent 100%)',
-                            filter: 'blur(50px)',
+                            height: '12%',
+                            background: 'linear-gradient(to top, #D84818 0%, #FF6800 60%, transparent 100%)',
+                            filter: 'blur(30px)',
+                            animation: 'lavaFloat2 10s ease-in-out infinite',
+                            transformOrigin: 'bottom center',
                         }}
                     />
-                    {/* Golden center peaks */}
+                    {/* Golden center */}
                     <div
                         style={{
                             position: 'absolute',
-                            bottom: '-10%',
-                            left: '20%',
-                            width: '60%',
-                            height: '55%',
-                            background: 'linear-gradient(to top, #FF9020 0%, #FFAA40 30%, transparent 100%)',
-                            filter: 'blur(45px)',
-                        }}
-                    />
-                    {/* Accent hot spots */}
-                    <div
-                        style={{
-                            position: 'absolute',
-                            bottom: '-5%',
-                            left: '30%',
-                            width: '40%',
-                            height: '40%',
-                            background: 'radial-gradient(ellipse at center bottom, #FFB850 0%, transparent 70%)',
-                            filter: 'blur(35px)',
+                            bottom: '-2%',
+                            left: '15%',
+                            width: '70%',
+                            height: '10%',
+                            background: 'linear-gradient(to top, #FF9020 0%, #FFAA40 50%, transparent 100%)',
+                            filter: 'blur(25px)',
+                            animation: 'lavaFloat3 12s ease-in-out infinite',
+                            transformOrigin: 'bottom center',
                         }}
                     />
                 </div>
