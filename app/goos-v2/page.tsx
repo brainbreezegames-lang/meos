@@ -98,7 +98,7 @@ const DEMO_SPACES: SpaceSummary[] = [
 // Files with IDs starting with these prefixes belong to that space
 // ============================================
 const SPACE_FILE_PREFIXES: Record<string, string[]> = {
-    'space-1': ['file-1', 'file-2', 'file-3', 'file-4', 'file-5', 'file-6', 'file-prompts'], // Portfolio - existing demo files
+    'space-1': ['file-1', 'file-2', 'file-3', 'file-4', 'file-5', 'file-6', 'file-prompts', 'game-snake'], // Portfolio - existing demo files
     'space-2': ['writing-'], // Writing space
     'space-3': ['photo-'], // Photography space
     'space-4': ['personal-'], // Personal space
@@ -880,6 +880,19 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         parentId: null,
         position: { x: 21, y: 35 },
         headerImage: 'https://images.unsplash.com/photo-1675271591211-930246f80c5d?w=1920&h=1080&fit=crop',
+    },
+    {
+        id: 'game-snake',
+        type: 'game',
+        title: 'Snake',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now()),
+        parentId: null,
+        position: { x: 29, y: 35 },
     },
 ];
 
@@ -3078,6 +3091,12 @@ function GoOSDemoContent() {
             return;
         }
 
+        // If it's a game, open the snake game
+        if (file.type === 'game') {
+            toggleApp('snake');
+            return;
+        }
+
         // It's a file, open the editor
         if (!openEditors.includes(fileId)) {
             setOpenEditors(prev => [...prev, fileId]);
@@ -3750,7 +3769,7 @@ function GoOSDemoContent() {
             )}
 
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
-            <FallingLetters />
+            <FallingLetters isReady={bootPhase === 'ready'} />
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
             {isDraggingFile && (
@@ -4798,12 +4817,6 @@ function GoOSDemoContent() {
                         onClick={() => toggleApp('analytics')}
                         isActive={appWindows.analytics}
                         label="Analytics"
-                    />
-                    <DockIcon
-                        icon={<Gamepad2 size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
-                        onClick={() => toggleApp('snake')}
-                        isActive={appWindows.snake}
-                        label="Snake"
                     />
                     <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     {/* Wallpaper Picker */}

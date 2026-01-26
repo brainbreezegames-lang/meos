@@ -288,6 +288,77 @@ function DownloadIcon() {
   );
 }
 
+// Game icon - Gamepad with colorful buttons
+function GameIcon() {
+  return (
+    <div
+      style={{
+        width: 52,
+        height: 52,
+        position: 'relative',
+      }}
+    >
+      {/* macOS-style rounded square background with gradient */}
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: 12,
+          background: 'linear-gradient(145deg, #34d058 0%, #28c840 50%, #1ea835 100%)',
+          boxShadow: `
+            0 1px 2px rgba(0, 0, 0, 0.06),
+            0 4px 8px rgba(40, 200, 64, 0.25),
+            0 8px 16px rgba(40, 200, 64, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25)
+          `,
+          border: '0.5px solid rgba(0, 0, 0, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {/* Gamepad icon */}
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Controller body */}
+          <path
+            d="M6 11C6 8.79086 7.79086 7 10 7H14C16.2091 7 18 8.79086 18 11V13C18 15.2091 16.2091 17 14 17H10C7.79086 17 6 15.2091 6 13V11Z"
+            fill="rgba(255,255,255,0.95)"
+          />
+          {/* D-pad */}
+          <rect x="8.5" y="10.5" width="3" height="1" rx="0.5" fill="#28c840" />
+          <rect x="9.5" y="9.5" width="1" height="3" rx="0.5" fill="#28c840" />
+          {/* Buttons */}
+          <circle cx="14" cy="10" r="0.8" fill="#ff7722" />
+          <circle cx="15.5" cy="11" r="0.8" fill="#3d2fa9" />
+          <circle cx="14" cy="12" r="0.8" fill="#22c55e" />
+          <circle cx="12.5" cy="11" r="0.8" fill="#f59e0b" />
+        </svg>
+      </div>
+      {/* Play indicator badge */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: -2,
+          right: -2,
+          width: 18,
+          height: 18,
+          borderRadius: 6,
+          background: 'linear-gradient(145deg, #ff8a4c 0%, #ff7722 100%)',
+          border: '2px solid #fff',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 5V19L19 12L8 5Z" fill="white" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 // Throttle function for performance
 function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
@@ -303,7 +374,7 @@ function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   }) as T;
 }
 
-export type FileType = 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download';
+export type FileType = 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download' | 'game';
 
 interface GoOSFileIconProps {
   id: string;
@@ -559,6 +630,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         return <EmbedIcon />;
       case 'download':
         return <DownloadIcon />;
+      case 'game':
+        return <GameIcon />;
       default:
         return <NoteIcon />;
     }

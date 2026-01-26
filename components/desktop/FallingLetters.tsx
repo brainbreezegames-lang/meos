@@ -10,15 +10,19 @@ interface LetterBody {
   scale: number;
 }
 
+interface FallingLettersProps {
+  isReady?: boolean; // Only show after boot is complete
+}
+
 // Letter configuration - g and o lowercase, O and S uppercase
 const LETTERS = [
   { char: 'g', scale: 1.0 },
-  { char: 'o', scale: 0.85 },
-  { char: 'O', scale: 1.1 },
-  { char: 'S', scale: 1.05 },
+  { char: 'o', scale: 0.9 },
+  { char: 'O', scale: 1.05 },
+  { char: 'S', scale: 1.0 },
 ];
 
-export function FallingLetters() {
+export function FallingLetters({ isReady = true }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
@@ -29,11 +33,13 @@ export function FallingLetters() {
   const [settled, setSettled] = useState(false);
   const rafRef = useRef<number | null>(null);
   const settleCheckRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitialized = useRef(false);
 
-  // Detect dark mode - check the actual theme-sketch dark class
+  // Detect dark mode
   useEffect(() => {
+    if (!mounted) return;
+
     const checkDarkMode = () => {
-      // Check for .dark class specifically on elements with theme-sketch
       const themeElement = document.querySelector('.theme-sketch');
       const hasDarkClass = themeElement?.classList.contains('dark') || false;
       setIsDark(hasDarkClass);
@@ -41,96 +47,100 @@ export function FallingLetters() {
 
     checkDarkMode();
 
-    // Watch for changes on the theme container
     const observer = new MutationObserver(checkDarkMode);
     const themeElement = document.querySelector('.theme-sketch');
     if (themeElement) {
       observer.observe(themeElement, { attributes: true, attributeFilter: ['class'] });
     }
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, [mounted]);
 
   // Initialize physics
   const initPhysics = useCallback(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || hasInitialized.current) return;
+    hasInitialized.current = true;
 
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    // Letter size - 2x bigger than before (was 0.45, now 0.9)
-    const baseSize = Math.min(height * 0.9, width * 0.7);
+    // Subtle letter size - much smaller than before
+    const baseSize = Math.min(height * 0.35, width * 0.25);
 
-    // Create engine with strong gravity
+    // Create engine with normal gravity
     const engine = Matter.Engine.create({
-      gravity: { x: 0, y: 2 }, // Stronger gravity for heavier feel
+      gravity: { x: 0, y: 1.5 },
     });
     engineRef.current = engine;
 
-    // Ground at the bottom of the screen
+    // Wall thickness
+    const wallThickness = 100;
+
+    // Ground at bottom
     const ground = Matter.Bodies.rectangle(
       width / 2,
-      height + 25, // Just below viewport
-      width * 3,
-      50,
-      {
-        isStatic: true,
-        friction: 1, // Maximum friction
-        restitution: 0.02, // Almost no bounce
-      }
+      height + wallThickness / 2 - 10,
+      width + wallThickness * 2,
+      wallThickness,
+      { isStatic: true, friction: 0.9, restitution: 0.05 }
     );
 
     // Left wall
     const leftWall = Matter.Bodies.rectangle(
-      -25,
+      -wallThickness / 2 + 10,
       height / 2,
-      50,
-      height * 3,
-      { isStatic: true, friction: 1 }
+      wallThickness,
+      height + wallThickness * 2,
+      { isStatic: true, friction: 0.8 }
     );
 
-    // Right boundary - keeps letters on left 60% of screen
-    const rightBound = Matter.Bodies.rectangle(
-      width * 0.65,
+    // Right wall - at 55% of screen to keep letters on left
+    const rightWall = Matter.Bodies.rectangle(
+      width * 0.55 + wallThickness / 2,
       height / 2,
-      50,
-      height * 3,
-      { isStatic: true, friction: 1 }
+      wallThickness,
+      height + wallThickness * 2,
+      { isStatic: true, friction: 0.8 }
     );
 
-    Matter.Composite.add(engine.world, [ground, leftWall, rightBound]);
+    // Top wall - keeps letters from escaping
+    const topWall = Matter.Bodies.rectangle(
+      width / 2,
+      -wallThickness / 2,
+      width + wallThickness * 2,
+      wallThickness,
+      { isStatic: true }
+    );
 
-    // Create letter bodies with HEAVY mass
+    Matter.Composite.add(engine.world, [ground, leftWall, rightWall, topWall]);
+
+    // Create letter bodies - START INSIDE THE SCREEN
     const letterBodies: LetterBody[] = LETTERS.map((letter, index) => {
       const size = baseSize * letter.scale;
 
-      // Starting positions - spread across left side, above viewport
-      const startX = 100 + Math.random() * (width * 0.4);
-      const startY = -200 - (index * 300) - Math.random() * 200;
+      // Start positions INSIDE the visible area - spread across left portion
+      const margin = size * 0.6;
+      const availableWidth = width * 0.45 - margin * 2;
+      const startX = margin + (availableWidth / (LETTERS.length + 1)) * (index + 1) + (Math.random() - 0.5) * 50;
+      const startY = 100 + Math.random() * 100; // Start near top but inside screen
 
-      // Create heavy rectangular body
       const body = Matter.Bodies.rectangle(
         startX,
         startY,
-        size * 0.65,  // Width approximation for letter
-        size * 0.85,  // Height approximation
+        size * 0.55,
+        size * 0.75,
         {
-          restitution: 0.02, // Almost no bounce
-          friction: 1, // High friction
-          frictionAir: 0.01, // Some air resistance
-          frictionStatic: 1, // High static friction to stay in place
-          mass: 500, // Very heavy
-          angle: (Math.random() - 0.5) * 0.2, // Slight initial rotation
-          chamfer: { radius: size * 0.05 },
+          restitution: 0.1,
+          friction: 0.8,
+          frictionAir: 0.02,
+          frictionStatic: 0.9,
+          mass: 100,
+          angle: (Math.random() - 0.5) * 0.15,
+          chamfer: { radius: size * 0.03 },
         }
       );
 
-      // Minimal initial angular velocity
-      Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.02);
+      Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.01);
 
       return {
         id: `letter-${index}`,
@@ -143,12 +153,10 @@ export function FallingLetters() {
     letterBodiesRef.current = letterBodies;
     Matter.Composite.add(engine.world, letterBodies.map(lb => lb.body));
 
-    // Create runner
     const runner = Matter.Runner.create();
     runnerRef.current = runner;
     Matter.Runner.run(runner, engine);
 
-    // Update positions on each frame
     const updatePositions = () => {
       const newPositions: { [key: string]: { x: number; y: number; angle: number } } = {};
 
@@ -166,19 +174,18 @@ export function FallingLetters() {
 
     updatePositions();
 
-    // Check if letters have settled (stopped moving)
+    // Check if settled
     settleCheckRef.current = setInterval(() => {
       const allSettled = letterBodiesRef.current.every(lb => {
         const velocity = lb.body.velocity;
         const angularVelocity = lb.body.angularVelocity;
-        return Math.abs(velocity.x) < 0.1 &&
-               Math.abs(velocity.y) < 0.1 &&
-               Math.abs(angularVelocity) < 0.01;
+        return Math.abs(velocity.x) < 0.05 &&
+               Math.abs(velocity.y) < 0.05 &&
+               Math.abs(angularVelocity) < 0.005;
       });
 
       if (allSettled) {
         setSettled(true);
-        // Stop EVERYTHING after settling to save resources
         if (rafRef.current) {
           cancelAnimationFrame(rafRef.current);
           rafRef.current = null;
@@ -215,41 +222,48 @@ export function FallingLetters() {
     }
     letterBodiesRef.current = [];
     setSettled(false);
+    hasInitialized.current = false;
   }, []);
 
-  // Initialize on mount
+  // Mount
   useEffect(() => {
     setMounted(true);
+    return () => cleanup();
+  }, [cleanup]);
 
-    // Small delay to ensure container is measured
-    const timer = setTimeout(() => {
-      initPhysics();
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      cleanup();
-    };
-  }, [initPhysics, cleanup]);
-
-  // Handle resize - reinitialize physics
+  // Initialize only when ready (after boot)
   useEffect(() => {
+    if (mounted && isReady && !hasInitialized.current) {
+      const timer = setTimeout(() => {
+        initPhysics();
+      }, 300); // Small delay after boot completes
+      return () => clearTimeout(timer);
+    }
+  }, [mounted, isReady, initPhysics]);
+
+  // Handle resize
+  useEffect(() => {
+    if (!isReady) return;
+
     const handleResize = () => {
       cleanup();
-      initPhysics();
+      setTimeout(() => initPhysics(), 100);
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [cleanup, initPhysics]);
+  }, [cleanup, initPhysics, isReady]);
 
-  if (!mounted) return null;
+  // Don't render until ready
+  if (!mounted || !isReady) return null;
 
-  // Letter size for rendering - 2x bigger
-  const baseSize = Math.min(window.innerHeight * 0.9, window.innerWidth * 0.7);
+  // Subtle letter size for rendering
+  const baseSize = Math.min(window.innerHeight * 0.35, window.innerWidth * 0.25);
 
-  // Single color for all letters - dark in light mode, light in dark mode
-  const letterColor = isDark ? '#f0ece4' : '#171412';
+  // Subtle color - semi-transparent
+  const letterColor = isDark
+    ? 'rgba(240, 236, 228, 0.12)' // Very subtle light in dark mode
+    : 'rgba(23, 20, 18, 0.08)';   // Very subtle dark in light mode
 
   return (
     <div
@@ -261,7 +275,7 @@ export function FallingLetters() {
         width: '100%',
         height: '100%',
         pointerEvents: 'none',
-        zIndex: 1, // Above wallpaper (0), below icons and windows
+        zIndex: 1,
         overflow: 'hidden',
       }}
       aria-hidden="true"
@@ -282,7 +296,7 @@ export function FallingLetters() {
               transform: `translate(-50%, -50%) rotate(${pos.angle}rad)`,
               fontSize: size,
               fontFamily: 'var(--font-instrument, "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif)',
-              fontWeight: 700,
+              fontWeight: 600, // Lighter weight
               color: letterColor,
               lineHeight: 1,
               userSelect: 'none',

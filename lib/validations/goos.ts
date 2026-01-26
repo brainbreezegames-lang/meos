@@ -10,6 +10,7 @@ export const goosFileTypeSchema = z.enum([
   'embed',       // YouTube, Vimeo, Spotify, Figma, etc.
   'download',    // Downloadable file
   'cv',          // Resume/CV document
+  'game',        // Interactive game (snake, etc.)
 ]);
 export type GoOSFileType = z.infer<typeof goosFileTypeSchema>;
 
