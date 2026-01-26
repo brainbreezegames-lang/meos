@@ -2729,9 +2729,14 @@ function GoOSDemoContent() {
         updatedAt: new Date(f.updatedAt),
         parentFolderId: f.parentId || undefined,
         position: f.position,
+        // Image file fields
         imageUrl: f.imageUrl || undefined,
         imageAlt: f.imageAlt || undefined,
         imageCaption: f.imageCaption || undefined,
+        // Link file fields
+        linkUrl: f.linkUrl || undefined,
+        linkTitle: f.linkTitle || undefined,
+        linkDescription: f.linkDescription || undefined,
     })), [spaceFilteredFiles]);
 
     // Convert goosFiles to DesktopItem format for PageView/PresentView
@@ -3091,7 +3096,7 @@ function GoOSDemoContent() {
         setActiveEditorId(fileId);
         setWindowZ(prev => ({ ...prev, [`editor-${fileId}`]: topZIndex + 1 }));
         setTopZIndex(prev => prev + 1);
-    }, [goosFiles, openEditors, openFolders, openImageViewers, topZIndex]);
+    }, [goosFiles, openEditors, openFolders, openImageViewers, openLinkBrowsers, topZIndex]);
 
     const closeFolder = useCallback((folderId: string) => {
         setOpenFolders(prev => prev.filter(id => id !== folderId));
