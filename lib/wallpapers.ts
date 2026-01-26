@@ -5,7 +5,7 @@
 // This file updates automatically during build.
 // ============================================================================
 
-export const WALLPAPER_COUNT = 36;
+export const WALLPAPER_COUNT = 39;
 
 // Generate wallpaper array automatically
 export const WALLPAPERS = [

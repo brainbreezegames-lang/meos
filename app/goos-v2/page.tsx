@@ -4014,12 +4014,12 @@ function GoOSDemoContent() {
                     <div
                         style={{
                             position: 'absolute',
-                            bottom: '-3%',
-                            left: '-10%',
-                            right: '-10%',
-                            height: '15%',
+                            bottom: '2%',
+                            left: '-15%',
+                            right: '-15%',
+                            height: '20%',
                             background: 'linear-gradient(to top, #8B1A1A 0%, #A82020 50%, transparent 100%)',
-                            filter: 'blur(35px)',
+                            filter: 'blur(60px)',
                             animation: 'lavaFloat1 8s ease-in-out infinite',
                             transformOrigin: 'bottom center',
                         }}
@@ -4028,12 +4028,12 @@ function GoOSDemoContent() {
                     <div
                         style={{
                             position: 'absolute',
-                            bottom: '-3%',
-                            left: '-5%',
-                            right: '-5%',
-                            height: '12%',
+                            bottom: '3%',
+                            left: '-10%',
+                            right: '-10%',
+                            height: '18%',
                             background: 'linear-gradient(to top, #D84818 0%, #FF6800 60%, transparent 100%)',
-                            filter: 'blur(30px)',
+                            filter: 'blur(55px)',
                             animation: 'lavaFloat2 10s ease-in-out infinite',
                             transformOrigin: 'bottom center',
                         }}
@@ -4042,12 +4042,12 @@ function GoOSDemoContent() {
                     <div
                         style={{
                             position: 'absolute',
-                            bottom: '-2%',
-                            left: '15%',
-                            width: '70%',
-                            height: '10%',
+                            bottom: '4%',
+                            left: '5%',
+                            right: '5%',
+                            height: '15%',
                             background: 'linear-gradient(to top, #FF9020 0%, #FFAA40 50%, transparent 100%)',
-                            filter: 'blur(25px)',
+                            filter: 'blur(50px)',
                             animation: 'lavaFloat3 12s ease-in-out infinite',
                             transformOrigin: 'bottom center',
                         }}
