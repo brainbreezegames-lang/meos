@@ -32,7 +32,7 @@ const COLLIDER_DATA: Record<string, Array<{
     { type: "ellipse", x: 0.49, y: 0.465625, radiusX: 0.2825, radiusY: 0.28750000000000003 }
   ],
   "HEAD": [
-    { type: "ellipse", x: 0.5, y: 0.5, radiusX: 0.067, radiusY: 0.067 }
+    { type: "ellipse", x: 0.5, y: 0.5, radiusX: 0.268, radiusY: 0.268 }
   ]
 };
 
@@ -336,9 +336,9 @@ export function FallingLetters({
                 src="/zinoHead.png"
                 alt=""
                 style={{
-                  // Keep same absolute size
-                  width: '13.3%',
-                  height: '13.3%',
+                  // 300% bigger
+                  width: '53.2%',
+                  height: '53.2%',
                   objectFit: 'contain',
                 }}
               />
