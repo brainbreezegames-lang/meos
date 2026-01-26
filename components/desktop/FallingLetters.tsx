@@ -14,12 +14,13 @@ interface FallingLettersProps {
   isReady?: boolean;
 }
 
-// Letter configuration - g and o lowercase, O and S uppercase
+// Letter configuration - HELLO in all caps
 const LETTERS = [
-  { char: 'g', scale: 1.0 },
-  { char: 'o', scale: 0.9 },
-  { char: 'O', scale: 1.05 },
-  { char: 'S', scale: 1.0 },
+  { char: 'H', scale: 1.0 },
+  { char: 'E', scale: 0.95 },
+  { char: 'L', scale: 0.9 },
+  { char: 'L', scale: 0.9 },
+  { char: 'O', scale: 1.0 },
 ];
 
 export function FallingLetters({ isReady = true }: FallingLettersProps) {
@@ -278,8 +279,8 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, [cleanup, initPhysics, isReady]);
 
-  // Don't render until ready
-  if (!mounted || !isReady || !visible) return null;
+  // Don't render until mounted and ready (but container must render for ref)
+  if (!mounted || !isReady) return null;
 
   // Letter size for rendering - BIG
   const baseSize = Math.min(window.innerHeight * 1.0, window.innerWidth * 0.7);
@@ -304,7 +305,7 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
       }}
       aria-hidden="true"
     >
-      {letterBodiesRef.current.map((lb) => {
+      {visible && letterBodiesRef.current.map((lb) => {
         const pos = positions[lb.id];
         if (!pos) return null;
 
