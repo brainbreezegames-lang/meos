@@ -2736,6 +2736,8 @@ function GoOSDemoContent() {
     // Wallpaper state - persisted to localStorage
     const [wallpaper, setWallpaper] = useState<string | null>(null); // No wallpaper by default
     const [showWallpaperPicker, setShowWallpaperPicker] = useState(false);
+    const [asciiFilter, setAsciiFilter] = useState(false); // ASCII art filter for wallpapers
+    const [asciiColorMode, setAsciiColorMode] = useState<'mono' | 'grey' | 'color'>('mono');
 
     // Load wallpaper from localStorage on mount
     useEffect(() => {
@@ -2743,12 +2745,27 @@ function GoOSDemoContent() {
         if (stored !== null) {
             setWallpaper(stored === 'null' ? null : stored);
         }
+        // Load ASCII filter settings
+        const storedAscii = localStorage.getItem('goos-ascii-filter');
+        if (storedAscii !== null) {
+            setAsciiFilter(storedAscii === 'true');
+        }
+        const storedAsciiColor = localStorage.getItem('goos-ascii-color');
+        if (storedAsciiColor) {
+            setAsciiColorMode(storedAsciiColor as 'mono' | 'grey' | 'color');
+        }
     }, []);
 
     // Save wallpaper to localStorage when changed
     useEffect(() => {
         localStorage.setItem('goos-wallpaper', wallpaper ?? 'null');
     }, [wallpaper]);
+
+    // Save ASCII filter to localStorage when changed
+    useEffect(() => {
+        localStorage.setItem('goos-ascii-filter', String(asciiFilter));
+        localStorage.setItem('goos-ascii-color', asciiColorMode);
+    }, [asciiFilter, asciiColorMode]);
 
     // Dark mode state
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -3933,15 +3950,22 @@ function GoOSDemoContent() {
                     draggable={false}
                 />
             ) : (
-                /* Animated liquid gradient background when no image */
-                <>
-                    <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                            background: 'var(--color-bg-base, #fbf9ef)',
-                            zIndex: 0,
-                        }}
-                    />
+                /* Solid background when no wallpaper */
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        background: 'var(--color-bg-base, #fbf9ef)',
+                        zIndex: 0,
+                    }}
+                />
+            )}
+
+            {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
+            <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
+
+            {/* LIQUID BACKGROUND - Above letters, below all UI elements */}
+            {!wallpaper && (
+                <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
                     <LiquidBackground
                         speed={0.6}
                         blur={100}
@@ -3955,11 +3979,8 @@ function GoOSDemoContent() {
                             "rgba(255, 160, 80, 0.3)",   // Deep orange
                         ]}
                     />
-                </>
+                </div>
             )}
-
-            {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
-            <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
             {isDraggingFile && (
