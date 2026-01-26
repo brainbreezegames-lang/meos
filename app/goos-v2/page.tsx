@@ -3967,10 +3967,10 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* WARM GRADIENT WALL - Sunset-like backdrop with ground plane */}
+            {/* WARM GRADIENT WALL - Rich sunset backdrop with ground plane */}
             {!wallpaper && (
                 <>
-                    {/* Wall gradient - warm orange glow on back wall */}
+                    {/* Wall gradient - rich warm glow, doesn't extend too high */}
                     <div
                         className="pointer-events-none"
                         style={{
@@ -3979,18 +3979,19 @@ function GoOSDemoContent() {
                             inset: 0,
                             background: `
                                 linear-gradient(to top,
-                                    #FF8C42 0%,
-                                    #FF9F5A 15%,
-                                    #FFB070 30%,
-                                    #FFCC99 50%,
-                                    transparent 75%
+                                    #FF6B00 0%,
+                                    #FF7A15 8%,
+                                    #FF8A2A 16%,
+                                    #FF9A40 24%,
+                                    #FFAA55 32%,
+                                    #FFBB70 40%,
+                                    transparent 50%
                                 )
                             `,
-                            filter: 'blur(60px)',
-                            opacity: 0.85,
+                            filter: 'blur(35px)',
                         }}
                     />
-                    {/* Ground plane - solid floor with hard edge */}
+                    {/* Ground plane - solid saturated floor */}
                     <div
                         className="pointer-events-none"
                         style={{
@@ -4002,26 +4003,12 @@ function GoOSDemoContent() {
                             height: '12vh',
                             background: `
                                 linear-gradient(to top,
-                                    #D85A20 0%,
-                                    #E86A30 40%,
-                                    #F07A40 70%,
-                                    #FF8A50 100%
+                                    #E85A10 0%,
+                                    #F06A20 30%,
+                                    #FF7A30 60%,
+                                    #FF8A40 100%
                                 )
                             `,
-                        }}
-                    />
-                    {/* Hard edge line where wall meets ground */}
-                    <div
-                        className="pointer-events-none"
-                        style={{
-                            position: 'fixed',
-                            zIndex: 7,
-                            bottom: '12vh',
-                            left: 0,
-                            right: 0,
-                            height: '2px',
-                            background: 'rgba(180, 80, 30, 0.4)',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                         }}
                     />
                 </>
