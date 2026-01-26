@@ -93,14 +93,14 @@ export function FallingLetters({
         slop: 0.01,
       };
 
-      // Stroke thickness - slightly smaller than visual (~14% of width)
-      const t = w * 0.14;
-      // Inset from edges
-      const inset = w * 0.08;
+      // Stroke thickness - much smaller than visual (~10% of width)
+      const t = w * 0.10;
+      // Inset from edges - generous inset
+      const inset = w * 0.12;
 
       if (char === 'HEAD') {
-        // Circle SMALLER than image - image is 90% of container, circle is 38%
-        const radius = w * 0.38;
+        // Circle much smaller than image - image is 90% of container, circle is 32%
+        const radius = w * 0.32;
         return Bodies.circle(x, y, radius, opts);
       }
 
@@ -109,7 +109,7 @@ export function FallingLetters({
           // H = left vertical + right vertical + crossbar
           const hw = w / 2;
           const hh = h / 2;
-          const barHeight = h * 0.85; // Shorter than full height
+          const barHeight = h * 0.70; // Much shorter than full height
 
           // Left vertical bar (inset from edge)
           const leftBar = Bodies.rectangle(
@@ -134,7 +134,7 @@ export function FallingLetters({
             x,
             y,
             w - inset*2 - t*2,
-            t * 0.8,
+            t * 0.7,
             opts
           );
 
@@ -148,8 +148,8 @@ export function FallingLetters({
           // E = vertical spine + 3 arms
           const hw = w / 2;
           const hh = h / 2;
-          const armLength = w * 0.55;
-          const spineHeight = h * 0.85;
+          const armLength = w * 0.45;
+          const spineHeight = h * 0.70;
 
           // Vertical spine (inset from left)
           const spine = Bodies.rectangle(
@@ -171,10 +171,10 @@ export function FallingLetters({
 
           // Middle arm (shorter)
           const midArm = Bodies.rectangle(
-            x - hw + inset + t/2 + (armLength * 0.7)/2,
+            x - hw + inset + t/2 + (armLength * 0.6)/2,
             y,
-            armLength * 0.7,
-            t * 0.75,
+            armLength * 0.6,
+            t * 0.7,
             opts
           );
 
@@ -197,8 +197,8 @@ export function FallingLetters({
           // L = vertical spine + bottom arm
           const hw = w / 2;
           const hh = h / 2;
-          const armLength = w * 0.55;
-          const spineHeight = h * 0.85;
+          const armLength = w * 0.45;
+          const spineHeight = h * 0.70;
 
           // Vertical spine (inset)
           const spine = Bodies.rectangle(
@@ -225,8 +225,8 @@ export function FallingLetters({
         }
 
         case 'O': {
-          // O = circle SMALLER than the letter outline
-          const radius = Math.min(w, h) * 0.36;
+          // O = circle much smaller than the letter outline
+          const radius = Math.min(w, h) * 0.30;
           return Bodies.circle(x, y, radius, opts);
         }
 
