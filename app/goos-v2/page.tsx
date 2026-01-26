@@ -3967,31 +3967,87 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* WARM GRADIENT WALL - Rich sunset backdrop with ground plane */}
+            {/* LAVA GLOW - Rich organic warm backdrop like Framer's liquid lava */}
             {!wallpaper && (
                 <>
-                    {/* Wall gradient - rich warm glow, doesn't extend too high */}
+                    {/* Base warm layer - deep burnt orange foundation */}
                     <div
                         className="pointer-events-none"
                         style={{
                             position: 'fixed',
                             zIndex: 4,
-                            inset: 0,
+                            bottom: '-10vh',
+                            left: '-10vw',
+                            width: '120vw',
+                            height: '55vh',
                             background: `
-                                linear-gradient(to top,
-                                    #FF6B00 0%,
-                                    #FF7A15 8%,
-                                    #FF8A2A 16%,
-                                    #FF9A40 24%,
-                                    #FFAA55 32%,
-                                    #FFBB70 40%,
-                                    transparent 50%
+                                radial-gradient(ellipse 120% 80% at 50% 100%,
+                                    #C73E00 0%,
+                                    #D94D00 25%,
+                                    #E55D00 50%,
+                                    transparent 80%
                                 )
                             `,
-                            filter: 'blur(35px)',
                         }}
                     />
-                    {/* Ground plane - solid saturated floor */}
+                    {/* Golden highlight - left side */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 5,
+                            bottom: '-5vh',
+                            left: '-5vw',
+                            width: '60vw',
+                            height: '45vh',
+                            background: `
+                                radial-gradient(ellipse 100% 90% at 30% 100%,
+                                    #FF8C00 0%,
+                                    #FFA020 30%,
+                                    transparent 70%
+                                )
+                            `,
+                        }}
+                    />
+                    {/* Bright orange center */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 5,
+                            bottom: '-5vh',
+                            left: '20vw',
+                            width: '60vw',
+                            height: '50vh',
+                            background: `
+                                radial-gradient(ellipse 100% 80% at 50% 100%,
+                                    #FF6D00 0%,
+                                    #FF7A10 35%,
+                                    transparent 70%
+                                )
+                            `,
+                        }}
+                    />
+                    {/* Yellow-gold highlight - right side */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 5,
+                            bottom: '-5vh',
+                            right: '-5vw',
+                            width: '55vw',
+                            height: '40vh',
+                            background: `
+                                radial-gradient(ellipse 100% 90% at 70% 100%,
+                                    #FF9500 0%,
+                                    #FFAB30 30%,
+                                    transparent 65%
+                                )
+                            `,
+                        }}
+                    />
+                    {/* Ground plane - saturated floor that creates natural hard edge */}
                     <div
                         className="pointer-events-none"
                         style={{
@@ -4000,29 +4056,15 @@ function GoOSDemoContent() {
                             bottom: 0,
                             left: '-5vw',
                             width: '110vw',
-                            height: '12vh',
+                            height: '11vh',
                             background: `
                                 linear-gradient(to top,
-                                    #E85A10 0%,
-                                    #F06A20 30%,
-                                    #FF7A30 60%,
-                                    #FF8A40 100%
+                                    #B83600 0%,
+                                    #CC4400 40%,
+                                    #DD5500 70%,
+                                    #E86000 100%
                                 )
                             `,
-                        }}
-                    />
-                    {/* Hard edge line - creates ground illusion */}
-                    <div
-                        className="pointer-events-none"
-                        style={{
-                            position: 'fixed',
-                            zIndex: 7,
-                            bottom: '12vh',
-                            left: 0,
-                            right: 0,
-                            height: '3px',
-                            background: 'linear-gradient(to right, transparent 0%, rgba(200, 100, 50, 0.6) 10%, rgba(200, 100, 50, 0.6) 90%, transparent 100%)',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.15)',
                         }}
                     />
                 </>
