@@ -5091,12 +5091,6 @@ function GoOSDemoContent() {
                                 isActive={appWindows.shell}
                                 label="Shell"
                             />
-                            <DockIcon
-                                icon={<Settings size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
-                                onClick={() => toggleApp('settings')}
-                                isActive={appWindows.settings}
-                                label="Settings"
-                            />
                             <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                             <DockIcon
                                 icon={<BookOpen size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
@@ -5104,12 +5098,6 @@ function GoOSDemoContent() {
                                 isActive={appWindows.guestbook}
                                 badge={guestbookEntries.length}
                                 label="Guestbook"
-                            />
-                            <DockIcon
-                                icon={<BarChart3 size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
-                                onClick={() => toggleApp('analytics')}
-                                isActive={appWindows.analytics}
-                                label="Analytics"
                             />
                             {/* Minimized Editors */}
                             {minimizedEditors.size > 0 && (
