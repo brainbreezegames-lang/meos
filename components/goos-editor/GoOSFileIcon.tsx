@@ -696,7 +696,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         userSelect: 'none',
         WebkitUserSelect: 'none',
         width: 80,
-        zIndex: isDragging ? 1000 : 1,
+        zIndex: isDragging ? 1000 : 10, // Above falling letters (z:1)
         opacity: isAppearing ? 0 : 1,
         transform: isDragging ? 'scale(1.05)' : 'scale(1)',
         background: isSelected
