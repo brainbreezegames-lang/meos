@@ -48,6 +48,7 @@ import {
     GoOSFolderWindow,
     GoOSCreateFileDialog,
     GoOSLinkBrowserWindow,
+    GoOSSnakeGame,
     type GoOSFile,
     type FileType,
 } from '@/components/goos-editor';
@@ -2715,6 +2716,7 @@ function GoOSDemoContent() {
         shell: false,
         guestbook: false,
         analytics: false,
+        snake: false,
     });
 
     const [windowZ, setWindowZ] = useState<Record<string, number>>({
@@ -2726,6 +2728,7 @@ function GoOSDemoContent() {
         shell: 605,
         guestbook: 606,
         analytics: 607,
+        snake: 608,
     });
 
     // Guestbook state
@@ -4751,6 +4754,15 @@ function GoOSDemoContent() {
                             >
                                 <GoOSAnalytics data={DEMO_ANALYTICS_DATA} />
                             </SketchWindow>
+
+                            {/* Snake Game */}
+                            <GoOSSnakeGame
+                                isOpen={appWindows.snake}
+                                zIndex={windowZ.snake}
+                                isActive={windowZ.snake === topZIndex}
+                                onClose={() => closeApp('snake')}
+                                onFocus={() => focusApp('snake')}
+                            />
                         </AnimatePresence>
                     </>
                 )}
@@ -4841,6 +4853,12 @@ function GoOSDemoContent() {
                         onClick={() => toggleApp('analytics')}
                         isActive={appWindows.analytics}
                         label="Analytics"
+                    />
+                    <DockIcon
+                        icon={<Gamepad2 size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
+                        onClick={() => toggleApp('snake')}
+                        isActive={appWindows.snake}
+                        label="Snake"
                     />
                     <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
                     {/* Wallpaper Picker */}

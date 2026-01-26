@@ -16,3 +16,4 @@ export { GoOSReadOnlyViewer } from './GoOSReadOnlyViewer';
 export { GoOSLockedContentModal } from './GoOSLockedContentModal';
 export { GoOSCreateFileDialog } from './GoOSCreateFileDialog';
 export { GoOSLinkBrowserWindow } from './GoOSLinkBrowserWindow';
+export { GoOSSnakeGame } from './GoOSSnakeGame';
