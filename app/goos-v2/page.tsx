@@ -3956,25 +3956,23 @@ function GoOSDemoContent() {
                     {/* ASCII overlay when enabled */}
                     {asciiFilter && (
                         <>
-                            {/* Dark backdrop for ASCII readability */}
+                            {/* Clean light backdrop */}
                             <div
                                 className="absolute inset-0 pointer-events-none"
                                 style={{
-                                    background: isDarkMode
-                                        ? 'rgba(23, 20, 18, 0.92)'
-                                        : 'rgba(251, 249, 239, 0.95)',
+                                    background: '#fffdf8',
                                     zIndex: 1,
                                 }}
                             />
                             <ASCIIFilter
                                 imageUrl={`/${wallpaper}.png`}
-                                columns={100}
+                                columns={80}
                                 colorMode={asciiColorMode}
-                                fontSize={14}
+                                fontSize={16}
                                 className="pointer-events-none select-none"
-                                monoColor={isDarkMode ? 'rgba(232, 228, 220, 0.95)' : 'rgba(35, 30, 25, 0.9)'}
-                                contrast={1.4}
-                                brightness={1.0}
+                                monoColor="rgba(80, 70, 60, 0.8)"
+                                contrast={1.6}
+                                brightness={0.9}
                             />
                         </>
                     )}
