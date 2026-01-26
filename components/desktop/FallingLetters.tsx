@@ -223,29 +223,18 @@ export function FallingLetters({
               fontSize: `${textSize}px`,
               opacity: 0,
               visibility: 'hidden',
-              // Font stack matching design system - using Outfit as requested for punchier look
-              fontFamily: 'var(--font-outfit, "Instrument Sans", sans-serif)',
-              color: 'var(--color-text-primary, #000000)', // Use CSS var for auto-dark mode or default black
+              // Font stack matching design system - using Averia Serif Libre as requested
+              fontFamily: 'var(--font-averia), Georgia, serif',
+              color: 'var(--text-primary)', // CSS variable handles instant theme switching
               whiteSpace: 'nowrap',
               lineHeight: 0.8,
-              fontWeight: 900 // EXTRA BOLD / BLACK
+              fontWeight: 700 // Bold for Averia
             }}
           >
             {char}
           </div>
         );
       })}
-      <style jsx>{`
-        /* Force white in dark mode if CSS vars aren't enough */
-        @media (prefers-color-scheme: dark) {
-          .will-change-transform {
-             color: #ffffff !important;
-          }
-        }
-        :global(.dark) .will-change-transform {
-           color: #ffffff !important;
-        }
-      `}</style>
     </div>
   );
 }
