@@ -308,23 +308,16 @@ export function FallingLetters({
             key={i}
             ref={(el) => { lettersRef.current[i] = el; }}
             data-char={item}
-            className="absolute top-0 left-0 leading-none will-change-transform pointer-events-none select-none"
+            className="absolute top-0 left-0 will-change-transform pointer-events-none select-none"
             style={{
-              fontSize: `${textSize}px`,
+              // All containers are square like the editor canvas
+              width: `${textSize}px`,
+              height: `${textSize}px`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               opacity: 0,
               visibility: 'hidden',
-              fontFamily: 'var(--font-averia), Georgia, serif',
-              color: 'var(--text-primary)',
-              whiteSpace: 'nowrap',
-              lineHeight: 0.85,
-              fontWeight: 700,
-              ...(item === 'HEAD' && {
-                width: `${textSize}px`,
-                height: `${textSize}px`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              })
             }}
           >
             {item === 'HEAD' ? (
@@ -338,7 +331,18 @@ export function FallingLetters({
                 }}
               />
             ) : (
-              item
+              <span
+                style={{
+                  fontSize: `${textSize * 0.85}px`,
+                  fontFamily: 'var(--font-averia), Georgia, serif',
+                  color: 'var(--text-primary)',
+                  whiteSpace: 'nowrap',
+                  lineHeight: 0.85,
+                  fontWeight: 700,
+                }}
+              >
+                {item}
+              </span>
             )}
           </div>
         );
