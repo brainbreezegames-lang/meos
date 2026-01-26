@@ -172,13 +172,14 @@ export function ParticleBackground({
         particle.x += particle.speedX;
         particle.y += particle.speedY;
 
-        // Mouse interaction
+        // Mouse interaction - use squared distance to avoid sqrt
         if (settings.respondToMouse) {
           const dx = mouseRef.current.x - particle.x;
           const dy = mouseRef.current.y - particle.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
 
-          if (dist < 100) {
+          if (distSq < 10000) { // 100^2
+            const dist = Math.sqrt(distSq);
             const force = (100 - dist) / 100 * 0.5;
             particle.x -= (dx / dist) * force;
             particle.y -= (dy / dist) * force;

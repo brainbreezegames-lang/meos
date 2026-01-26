@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
 
 export type WindowState = 'normal' | 'minimized' | 'maximized';
 
@@ -176,21 +176,36 @@ export function WindowProvider({ children }: WindowProviderProps) {
     return windows.filter(w => w.state === 'minimized');
   }, [windows]);
 
+  const contextValue = useMemo(() => ({
+    windows,
+    activeWindowId,
+    openWindow,
+    closeWindow,
+    minimizeWindow,
+    maximizeWindow,
+    restoreWindow,
+    focusWindow,
+    updateWindowPosition,
+    getWindowByItemId,
+    isItemOpen,
+    getMinimizedWindows,
+  }), [
+    windows,
+    activeWindowId,
+    openWindow,
+    closeWindow,
+    minimizeWindow,
+    maximizeWindow,
+    restoreWindow,
+    focusWindow,
+    updateWindowPosition,
+    getWindowByItemId,
+    isItemOpen,
+    getMinimizedWindows,
+  ]);
+
   return (
-    <WindowContext.Provider value={{
-      windows,
-      activeWindowId,
-      openWindow,
-      closeWindow,
-      minimizeWindow,
-      maximizeWindow,
-      restoreWindow,
-      focusWindow,
-      updateWindowPosition,
-      getWindowByItemId,
-      isItemOpen,
-      getMinimizedWindows,
-    }}>
+    <WindowContext.Provider value={contextValue}>
       {children}
     </WindowContext.Provider>
   );

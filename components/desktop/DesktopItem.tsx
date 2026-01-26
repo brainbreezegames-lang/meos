@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem as DesktopItemType } from '@/types';
@@ -12,17 +12,17 @@ interface DesktopItemProps {
   isEditing?: boolean;
 }
 
-export function DesktopItem({ item, onClick, isEditing = false }: DesktopItemProps) {
+export const DesktopItem = memo(function DesktopItem({ item, onClick, isEditing = false }: DesktopItemProps) {
   const prefersReducedMotion = useReducedMotion();
   const [showClickEffect, setShowClickEffect] = useState(false);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = useCallback((e: React.MouseEvent) => {
     // Trigger delight effects
     setShowClickEffect(true);
     haptic('light');
     setTimeout(() => setShowClickEffect(false), 600);
     onClick(e);
-  };
+  }, [onClick]);
 
   return (
     <motion.button
@@ -171,4 +171,4 @@ export function DesktopItem({ item, onClick, isEditing = false }: DesktopItemPro
       )}
     </motion.button>
   );
-}
+});

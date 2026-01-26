@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import type { Widget } from '@/types';
 import { ClockWidget } from './ClockWidget';
 import { BookWidget } from './BookWidget';
@@ -39,9 +39,17 @@ export function WidgetRenderer({
   onStickyNoteChange,
 }: WidgetRendererProps) {
   // Filter visible widgets (or show all if owner)
-  const visibleWidgets = isOwner
-    ? widgets
-    : widgets.filter(w => w.isVisible);
+  const visibleWidgets = useMemo(() =>
+    isOwner ? widgets : widgets.filter(w => w.isVisible),
+    [widgets, isOwner]
+  );
+
+  // Memoize callback creators to avoid new function refs
+  const getEditHandler = useCallback((widget: Widget) => () => onWidgetEdit?.(widget), [onWidgetEdit]);
+  const getDeleteHandler = useCallback((id: string) => () => onWidgetDelete?.(id), [onWidgetDelete]);
+  const getPositionHandler = useCallback((id: string) => (x: number, y: number) => onWidgetPositionChange?.(id, x, y), [onWidgetPositionChange]);
+  const getContextMenuHandler = useCallback((widget: Widget) => (e: React.MouseEvent) => onWidgetContextMenu?.(e, widget), [onWidgetContextMenu]);
+  const getStickyNoteHandler = useCallback((widgetId: string) => (content: string) => onStickyNoteChange?.(widgetId, content), [onStickyNoteChange]);
 
   return (
     <>
@@ -49,11 +57,10 @@ export function WidgetRenderer({
         const commonProps = {
           widget,
           isOwner,
-          onEdit: () => onWidgetEdit?.(widget),
-          onDelete: () => onWidgetDelete?.(widget.id),
-          onPositionChange: (x: number, y: number) =>
-            onWidgetPositionChange?.(widget.id, x, y),
-          onContextMenu: (e: React.MouseEvent) => onWidgetContextMenu?.(e, widget),
+          onEdit: getEditHandler(widget),
+          onDelete: getDeleteHandler(widget.id),
+          onPositionChange: getPositionHandler(widget.id),
+          onContextMenu: getContextMenuHandler(widget),
           isHighlighted: highlightedWidgetId === widget.id,
         };
 
@@ -77,7 +84,7 @@ export function WidgetRenderer({
               <StickyNoteWidget
                 key={widget.id}
                 {...commonProps}
-                onContentChange={(content) => onStickyNoteChange?.(widget.id, content)}
+                onContentChange={getStickyNoteHandler(widget.id)}
               />
             );
           default:

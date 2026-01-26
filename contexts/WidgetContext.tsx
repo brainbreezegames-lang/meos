@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import type { Widget, WidgetType } from '@/types';
 
 export interface WidgetContextType {
@@ -270,7 +270,7 @@ export function WidgetProvider({
     }
   }, [isOwner, localOnly, widgets, showToast]);
 
-  const value: WidgetContextType = {
+  const value = useMemo<WidgetContextType>(() => ({
     widgets,
     isLoading,
     error,
@@ -281,7 +281,18 @@ export function WidgetProvider({
     refreshWidgets,
     showToast,
     toast,
-  };
+  }), [
+    widgets,
+    isLoading,
+    error,
+    createWidget,
+    updateWidget,
+    deleteWidget,
+    moveWidget,
+    refreshWidgets,
+    showToast,
+    toast,
+  ]);
 
   return (
     <WidgetContext.Provider value={value}>

@@ -34,27 +34,43 @@ export function DockItem({ item, index, hoveredIndex, mouseX, dockRef, onHover }
   const scale = useSpring(1, springConfig);
   const translateY = useSpring(0, springConfig);
 
-  // Calculate distance-based scale
-  const getScale = useCallback(() => {
-    if (mouseX === null || !itemRef.current || !dockRef.current) return 1;
+  // Calculate distance-based scale - using refs to avoid layout thrashing
+  const itemCenterRef = useRef<number | null>(null);
 
-    const itemRect = itemRef.current.getBoundingClientRect();
-    const dockRect = dockRef.current.getBoundingClientRect();
-    const itemCenter = itemRect.left + itemRect.width / 2 - dockRect.left;
-    const distance = Math.abs(mouseX - itemCenter);
+  // Cache item center on mount and resize
+  useEffect(() => {
+    const updateCenter = () => {
+      if (itemRef.current && dockRef.current) {
+        const itemRect = itemRef.current.getBoundingClientRect();
+        const dockRect = dockRef.current.getBoundingClientRect();
+        itemCenterRef.current = itemRect.left + itemRect.width / 2 - dockRect.left;
+      }
+    };
+    updateCenter();
+    window.addEventListener('resize', updateCenter);
+    return () => window.removeEventListener('resize', updateCenter);
+  }, [dockRef]);
 
-    if (distance > MAGNIFICATION_RANGE) return 1;
+  useEffect(() => {
+    if (mouseX === null || itemCenterRef.current === null) {
+      scale.set(1);
+      translateY.set(0);
+      return;
+    }
+
+    const distance = Math.abs(mouseX - itemCenterRef.current);
+    if (distance > MAGNIFICATION_RANGE) {
+      scale.set(1);
+      translateY.set(0);
+      return;
+    }
 
     // Smooth falloff using cosine
     const scaleValue = 1 + (MAX_SIZE / BASE_SIZE - 1) * Math.cos((distance / MAGNIFICATION_RANGE) * (Math.PI / 2));
-    return Math.max(1, Math.min(MAX_SIZE / BASE_SIZE, scaleValue));
-  }, [mouseX, dockRef]);
-
-  useEffect(() => {
-    const newScale = getScale();
+    const newScale = Math.max(1, Math.min(MAX_SIZE / BASE_SIZE, scaleValue));
     scale.set(newScale);
     translateY.set(-(newScale - 1) * BASE_SIZE * 0.5);
-  }, [mouseX, hoveredIndex, getScale, scale, translateY]);
+  }, [mouseX, scale, translateY]);
 
   const handleClick = () => {
     // Trigger launch celebration

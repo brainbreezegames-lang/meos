@@ -130,7 +130,7 @@ export function CustomCursor({ settings }: CustomCursorProps) {
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [settings.clickRipple, settings.trail, prefersReducedMotion, position.x, position.y]);
+  }, [settings.clickRipple, settings.trail, prefersReducedMotion]);
 
   // Hide on mobile
   const [isMobile, setIsMobile] = useState(false);

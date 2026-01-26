@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { SPRING, fileIconPop, REDUCED_MOTION, DURATION } from '@/lib/animations';
+import { SPRING, fileIconPop, REDUCED_MOTION } from '@/lib/animations';
 
 interface DesktopIconProps {
     icon: React.ReactNode;
@@ -14,7 +14,7 @@ interface DesktopIconProps {
     className?: string;
 }
 
-export default function DesktopIcon({
+const DesktopIcon = memo(function DesktopIcon({
     icon,
     label,
     onOpen,
@@ -92,4 +92,6 @@ export default function DesktopIcon({
             </AnimatePresence>
         </motion.button>
     );
-}
+});
+
+export default DesktopIcon;
