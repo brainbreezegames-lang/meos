@@ -3960,33 +3960,84 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* Bottom lava glow - blends into background color #171412 */}
+            {/* Bottom lava glow - static CSS only, seamless fade */}
             {!wallpaper && (
-                <div
-                    className="pointer-events-none"
-                    style={{
-                        position: 'fixed',
-                        zIndex: 4,
-                        bottom: '-10vh',
-                        left: '-10vw',
-                        width: '120vw',
-                        height: '45vh',
-                        background: `
-                            /* Smooth fade from lava to background color #171412 (rgb 23,20,18) */
-                            linear-gradient(to top,
-                                #4a1508 0%,
-                                #3d1208 8%,
-                                #301008 18%,
-                                #260e0a 28%,
-                                #1f0f0c 40%,
-                                #1b100e 52%,
-                                #181210 65%,
-                                #171412 80%,
-                                #171412 100%
-                            )
-                        `,
-                    }}
-                />
+                <>
+                    {/* Main lava layer with soft gradients */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 4,
+                            bottom: '-15vh',
+                            left: '-15vw',
+                            width: '130vw',
+                            height: '55vh',
+                            background: `
+                                /* Base glow - very soft and wide with smooth multi-stop fade */
+                                linear-gradient(to top,
+                                    rgba(90, 20, 10, 0.95) 0%,
+                                    rgba(130, 35, 20, 0.7) 15%,
+                                    rgba(180, 50, 25, 0.4) 30%,
+                                    rgba(200, 60, 30, 0.2) 45%,
+                                    rgba(220, 80, 40, 0.08) 60%,
+                                    rgba(240, 100, 50, 0.02) 75%,
+                                    transparent 90%
+                                ),
+                                /* Deep red underlayer */
+                                radial-gradient(ellipse 80% 40% at 50% 100%, rgba(100, 20, 15, 0.8) 0%, rgba(120, 30, 20, 0.4) 40%, transparent 80%),
+                                /* Red-orange flame columns - soft multi-stop edges */
+                                radial-gradient(ellipse 25% 45% at 0% 100%, rgba(200, 48, 32, 0.6) 0%, rgba(200, 48, 32, 0.3) 40%, rgba(200, 48, 32, 0.1) 70%, transparent 100%),
+                                radial-gradient(ellipse 22% 42% at 15% 100%, rgba(216, 72, 24, 0.55) 0%, rgba(216, 72, 24, 0.25) 45%, transparent 100%),
+                                radial-gradient(ellipse 28% 48% at 30% 100%, rgba(184, 48, 32, 0.6) 0%, rgba(184, 48, 32, 0.25) 50%, transparent 100%),
+                                radial-gradient(ellipse 24% 44% at 45% 100%, rgba(208, 64, 32, 0.55) 0%, rgba(208, 64, 32, 0.2) 55%, transparent 100%),
+                                radial-gradient(ellipse 26% 46% at 60% 100%, rgba(200, 56, 24, 0.6) 0%, rgba(200, 56, 24, 0.25) 50%, transparent 100%),
+                                radial-gradient(ellipse 23% 43% at 75% 100%, rgba(216, 72, 24, 0.55) 0%, rgba(216, 72, 24, 0.2) 55%, transparent 100%),
+                                radial-gradient(ellipse 27% 47% at 90% 100%, rgba(184, 48, 32, 0.6) 0%, rgba(184, 48, 32, 0.25) 50%, transparent 100%),
+                                radial-gradient(ellipse 24% 44% at 100% 100%, rgba(192, 64, 32, 0.5) 0%, rgba(192, 64, 32, 0.2) 50%, transparent 100%),
+                                /* Orange mid layer */
+                                radial-gradient(ellipse 20% 38% at 8% 100%, rgba(232, 90, 0, 0.5) 0%, rgba(232, 90, 0, 0.2) 50%, transparent 100%),
+                                radial-gradient(ellipse 24% 42% at 22% 100%, rgba(255, 104, 0, 0.45) 0%, rgba(255, 104, 0, 0.15) 55%, transparent 100%),
+                                radial-gradient(ellipse 18% 35% at 38% 100%, rgba(240, 96, 0, 0.5) 0%, rgba(240, 96, 0, 0.18) 50%, transparent 100%),
+                                radial-gradient(ellipse 26% 45% at 52% 100%, rgba(255, 85, 0, 0.45) 0%, rgba(255, 85, 0, 0.15) 55%, transparent 100%),
+                                radial-gradient(ellipse 21% 40% at 68% 100%, rgba(255, 104, 0, 0.5) 0%, rgba(255, 104, 0, 0.18) 52%, transparent 100%),
+                                radial-gradient(ellipse 23% 42% at 82% 100%, rgba(232, 90, 0, 0.45) 0%, rgba(232, 90, 0, 0.15) 55%, transparent 100%),
+                                radial-gradient(ellipse 19% 37% at 95% 100%, rgba(255, 85, 0, 0.4) 0%, rgba(255, 85, 0, 0.12) 55%, transparent 100%),
+                                /* Bright peaks */
+                                radial-gradient(ellipse 16% 32% at 12% 100%, rgba(255, 128, 32, 0.4) 0%, rgba(255, 128, 32, 0.12) 60%, transparent 100%),
+                                radial-gradient(ellipse 19% 36% at 28% 100%, rgba(255, 144, 48, 0.35) 0%, rgba(255, 144, 48, 0.1) 60%, transparent 100%),
+                                radial-gradient(ellipse 14% 30% at 42% 100%, rgba(255, 128, 32, 0.4) 0%, rgba(255, 128, 32, 0.1) 60%, transparent 100%),
+                                radial-gradient(ellipse 20% 38% at 58% 100%, rgba(255, 120, 24, 0.35) 0%, rgba(255, 120, 24, 0.1) 60%, transparent 100%),
+                                radial-gradient(ellipse 17% 34% at 72% 100%, rgba(255, 144, 48, 0.4) 0%, rgba(255, 144, 48, 0.1) 60%, transparent 100%),
+                                radial-gradient(ellipse 15% 31% at 88% 100%, rgba(255, 128, 32, 0.35) 0%, rgba(255, 128, 32, 0.08) 60%, transparent 100%),
+                                /* Yellow-orange hotspots */
+                                radial-gradient(ellipse 12% 26% at 18% 100%, rgba(255, 170, 64, 0.35) 0%, rgba(255, 170, 64, 0.08) 65%, transparent 100%),
+                                radial-gradient(ellipse 15% 30% at 38% 100%, rgba(255, 184, 80, 0.3) 0%, rgba(255, 184, 80, 0.06) 65%, transparent 100%),
+                                radial-gradient(ellipse 13% 28% at 58% 100%, rgba(255, 170, 64, 0.35) 0%, rgba(255, 170, 64, 0.08) 65%, transparent 100%),
+                                radial-gradient(ellipse 11% 24% at 78% 100%, rgba(255, 184, 80, 0.3) 0%, rgba(255, 184, 80, 0.06) 65%, transparent 100%),
+                                /* Yellow cores - very subtle */
+                                radial-gradient(ellipse 8% 20% at 28% 100%, rgba(255, 200, 96, 0.3) 0%, rgba(255, 200, 96, 0.05) 70%, transparent 100%),
+                                radial-gradient(ellipse 10% 22% at 50% 100%, rgba(255, 208, 112, 0.25) 0%, rgba(255, 208, 112, 0.04) 70%, transparent 100%),
+                                radial-gradient(ellipse 8% 18% at 72% 100%, rgba(255, 200, 96, 0.3) 0%, rgba(255, 200, 96, 0.05) 70%, transparent 100%)
+                            `,
+                            filter: 'blur(8px)',
+                        }}
+                    />
+                    {/* Soft feather layer for seamless top edge blend */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 4,
+                            bottom: '15vh',
+                            left: '-10vw',
+                            width: '120vw',
+                            height: '25vh',
+                            background: 'linear-gradient(to top, rgba(180, 60, 30, 0.15) 0%, rgba(200, 70, 35, 0.06) 30%, rgba(220, 80, 40, 0.02) 60%, transparent 100%)',
+                            filter: 'blur(40px)',
+                        }}
+                    />
+                </>
             )}
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
