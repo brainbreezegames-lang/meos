@@ -133,8 +133,14 @@ export function ASCIIFilter({
     if (!imageUrl) return;
 
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    // Only use crossOrigin for external URLs
+    if (imageUrl.startsWith('http')) {
+      img.crossOrigin = 'anonymous';
+    }
     img.onload = () => convertToASCII(img);
+    img.onerror = () => {
+      console.error('ASCIIFilter: Failed to load image', imageUrl);
+    };
     img.src = imageUrl;
   }, [imageUrl, convertToASCII]);
 
@@ -185,6 +191,7 @@ export function ASCIIFilter({
           alignItems: 'center',
           justifyContent: 'center',
           background: 'transparent',
+          zIndex: 2,
         }}
       >
         {/* Hidden canvas for image processing */}
@@ -225,6 +232,7 @@ export function ASCIIFilter({
         alignItems: 'center',
         justifyContent: 'center',
         background: 'transparent',
+        zIndex: 2,
       }}
     >
       {/* Hidden canvas for image processing */}

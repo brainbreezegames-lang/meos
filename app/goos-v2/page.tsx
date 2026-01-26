@@ -3994,7 +3994,7 @@ function GoOSDemoContent() {
             {/* LAVA BACKGROUND - Rich flames rising from bottom */}
             {!wallpaper && (
                 <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-                    <LiquidBackground speed={0.7} blur={35} />
+                    <LiquidBackground speed={0.5} />
                 </div>
             )}
 
