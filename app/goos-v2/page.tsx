@@ -3957,8 +3957,8 @@ function GoOSDemoContent() {
                             className="absolute inset-0 pointer-events-none"
                             style={{
                                 zIndex: 1,
-                                backgroundImage: `radial-gradient(circle, var(--color-text-tertiary, rgba(120, 110, 100, 0.15)) 1px, transparent 1px)`,
-                                backgroundSize: '16px 16px',
+                                backgroundImage: `radial-gradient(circle, rgba(0, 0, 0, 0.12) 1px, transparent 1px)`,
+                                backgroundSize: '12px 12px',
                             }}
                         />
                     )}
