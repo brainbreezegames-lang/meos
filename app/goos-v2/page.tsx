@@ -5109,7 +5109,9 @@ function GoOSDemoContent() {
                     }
                 }}
                 onEdit={() => {
+                    console.log('🔧 Edit clicked, widget:', widgetContextMenu.widget);
                     if (widgetContextMenu.widget) {
+                        console.log('🔧 Setting editingWidget to:', widgetContextMenu.widget.widgetType);
                         setEditingWidget(widgetContextMenu.widget);
                         closeWidgetContextMenu();
                     }
