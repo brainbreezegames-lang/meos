@@ -54,6 +54,7 @@ import {
 import { GoOSProvider, useGoOS, type GoOSFileData } from '@/contexts/GoOSContext';
 import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
 import { WidgetRenderer, WIDGET_METADATA, WidgetContextMenu } from '@/components/widgets';
+import { ClockWidgetEditor } from '@/components/widgets/ClockWidgetEditor';
 import type { Widget } from '@/types';
 import { PresentView } from '@/components/views';
 import { PresentationView } from '@/components/presentation';
@@ -2845,6 +2846,7 @@ function GoOSDemoContent() {
     // Widget context
     const widgetContext = useWidgets();
     const { widgets, createWidget, updateWidget, deleteWidget } = widgetContext;
+    const [editingWidget, setEditingWidget] = useState<Widget | null>(null);
     const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
     const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
@@ -4214,7 +4216,7 @@ function GoOSDemoContent() {
                             widgets={widgets}
                             isOwner={true}
                             onWidgetEdit={(widget) => {
-                                console.log('Edit widget:', widget);
+                                setEditingWidget(widget);
                             }}
                             onWidgetDelete={(id) => {
                                 deleteWidget(id);
@@ -5289,6 +5291,21 @@ function GoOSDemoContent() {
                     showGoOSToast(`Deleted "${space?.name}"`, 'success');
                 }}
             />
+
+            {/* Clock Widget Editor */}
+            {editingWidget?.widgetType === 'clock' && (
+                <ClockWidgetEditor
+                    widget={editingWidget}
+                    isOpen={true}
+                    onClose={() => setEditingWidget(null)}
+                    onSave={(config) => {
+                        if (editingWidget) {
+                            updateWidget(editingWidget.id, { config });
+                            showGoOSToast('Clock settings saved', 'success');
+                        }
+                    }}
+                />
+            )}
         </div>
     );
 }
