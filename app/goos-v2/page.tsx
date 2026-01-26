@@ -5099,13 +5099,11 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="dock-container flex items-end px-2 py-1.5 rounded-[22px]"
+                            className="dock-container flex items-end px-3 py-2 rounded-[18px]"
                             style={{
-                                background: 'var(--bg-dock)',
-                                backdropFilter: 'var(--blur-dock)',
-                                WebkitBackdropFilter: 'var(--blur-dock)',
-                                border: '1px solid var(--dock-border-outer, var(--border-subtle))',
-                                boxShadow: 'var(--dock-shadow, var(--shadow-dock))',
+                                background: 'var(--dock-physical-bg, linear-gradient(180deg, #ffffff 0%, #f4f4f2 100%))',
+                                border: 'var(--dock-physical-border, 1px solid rgba(0, 0, 0, 0.06))',
+                                boxShadow: 'var(--dock-physical-shadow)',
                             }}
                         >
                             <RubberDuck />
@@ -5122,7 +5120,7 @@ function GoOSDemoContent() {
                                 isActive={appWindows.notes}
                                 label="Notes"
                             />
-                            <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
+                            <div className="dock-separator w-px h-7 mx-2" style={{ background: 'rgba(0,0,0,0.08)' }} />
                             <DockIcon
                                 icon={<MessageCircle size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                                 onClick={() => toggleApp('chat')}
@@ -5135,7 +5133,7 @@ function GoOSDemoContent() {
                                 isActive={appWindows.shell}
                                 label="Shell"
                             />
-                            <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
+                            <div className="dock-separator w-px h-7 mx-2" style={{ background: 'rgba(0,0,0,0.08)' }} />
                             <DockIcon
                                 icon={<BookOpen size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                                 onClick={() => toggleApp('guestbook')}
@@ -5146,7 +5144,7 @@ function GoOSDemoContent() {
                             {/* Minimized Editors */}
                             {minimizedEditors.size > 0 && (
                                 <>
-                                    <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
+                                    <div className="dock-separator w-px h-7 mx-2" style={{ background: 'rgba(0,0,0,0.08)' }} />
                                     {Array.from(minimizedEditors).map(fileId => {
                                         const file = goosFiles.find(f => f.id === fileId);
                                         if (!file) return null;

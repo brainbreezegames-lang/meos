@@ -337,6 +337,89 @@
    --z-modal: 700;
    --z-tooltip: 800;
    --z-status-widget: 350;
+
+   /* ─────────────────────────────────────────────────────────────────────────
+     1.17 SKEUOMORPHIC / PHYSICAL DESIGN (Braun/Rams inspired)
+
+     Premium physical objects: white plastic housings, depth, tactility.
+     Orange accent color used sparingly for indicators.
+     ───────────────────────────────────────────────────────────────────────── */
+
+   /* Physical housing colors */
+   --physical-housing: #f8f8f6;
+   --physical-housing-light: #ffffff;
+   --physical-housing-dark: #e8e8e4;
+   --physical-face: #fefefe;
+   --physical-face-cream: #fdfbf7;
+
+   /* Orange indicator (Braun signature) */
+   --indicator-orange: #ff6b00;
+   --indicator-orange-glow: rgba(255, 107, 0, 0.5);
+
+   /* Physical depth shadows - layered for realistic depth */
+   --shadow-physical-sm:
+      0 1px 1px rgba(0, 0, 0, 0.04),
+      0 2px 4px rgba(0, 0, 0, 0.04),
+      0 4px 8px rgba(0, 0, 0, 0.04);
+
+   --shadow-physical-md:
+      0 1px 2px rgba(0, 0, 0, 0.06),
+      0 4px 8px rgba(0, 0, 0, 0.06),
+      0 8px 16px rgba(0, 0, 0, 0.06),
+      0 16px 32px rgba(0, 0, 0, 0.04);
+
+   --shadow-physical-lg:
+      0 2px 4px rgba(0, 0, 0, 0.08),
+      0 8px 16px rgba(0, 0, 0, 0.08),
+      0 16px 32px rgba(0, 0, 0, 0.06),
+      0 32px 64px rgba(0, 0, 0, 0.04);
+
+   /* Inner shadows for recessed areas */
+   --shadow-inset-subtle: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+   --shadow-inset-medium: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+   --shadow-inset-ring: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+
+   /* Top highlight for physical objects */
+   --highlight-top: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+   --highlight-top-strong: inset 0 2px 0 rgba(255, 255, 255, 0.9);
+
+   /* Physical button states */
+   --shadow-button-raised:
+      0 1px 1px rgba(0, 0, 0, 0.06),
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 4px 8px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+   --shadow-button-pressed:
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      inset 0 1px 3px rgba(0, 0, 0, 0.1);
+
+   /* Physical dock styling */
+   --dock-physical-bg: linear-gradient(180deg, #ffffff 0%, #f4f4f2 100%);
+   --dock-physical-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.1),
+      0 16px 48px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+
+   --dock-physical-border: 1px solid rgba(0, 0, 0, 0.06);
+
+   /* Physical widget housing */
+   --widget-physical-bg: linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%);
+   --widget-physical-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 20px rgba(0, 0, 0, 0.08),
+      0 20px 48px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+   --widget-physical-border: 1px solid rgba(0, 0, 0, 0.05);
+
+   /* Clock face styling */
+   --clock-face-bg: linear-gradient(180deg, #ffffff 0%, #fafaf8 100%);
+   --clock-bezel-bg: linear-gradient(180deg, #f0f0ee 0%, #e4e4e0 100%);
+   --clock-hand-black: #1a1a1a;
+   --clock-hand-orange: var(--indicator-orange);
 }
 
 /* =============================================================================
