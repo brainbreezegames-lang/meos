@@ -16,7 +16,7 @@ export function FallingLetters({
   text = "HELLO",
   className,
   textSize = 280,
-  showColliders = true // Set to true for debugging
+  showColliders = true // DEBUG MODE ON - shows red collider shapes
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,7 +29,8 @@ export function FallingLetters({
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('[FallingLetters] Mounted, showColliders:', showColliders);
+  }, [showColliders]);
 
   useEffect(() => {
     if (!mounted || !isReady || !containerRef.current) return;
