@@ -3769,7 +3769,7 @@ function GoOSDemoContent() {
             )}
 
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
-            <FallingLetters isReady={bootPhase === 'ready'} textSize={280} />
+            <FallingLetters isReady={bootPhase === 'ready'} textSize={420} />
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
             {isDraggingFile && (

@@ -14,7 +14,7 @@ export function FallingLetters({
   isReady = true,
   text = "HELLO",
   className,
-  textSize = 280
+  textSize = 420
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -129,12 +129,9 @@ export function FallingLetters({
           return Body.create({ parts: [spine, bot], ...opts });
         }
         case 'O': {
-          // O: Hollow box approximation (top, bot, left, right)
-          const top = Bodies.rectangle(x, y - height / 2 + t / 2, width, t, opts);
-          const bot = Bodies.rectangle(x, y + height / 2 - t / 2, width, t, opts);
-          const left = Bodies.rectangle(x - width / 2 + t / 2, y, t, height, opts);
-          const right = Bodies.rectangle(x + width / 2 - t / 2, y, t, height, opts);
-          return Body.create({ parts: [top, bot, left, right], ...opts });
+          // O: Use a Circle for natural rolling behavior and to prevent internal sticking.
+          // Using a circle collider roughly fitting the O is the best "perfect" interaction.
+          return Bodies.circle(x, y, width / 2, opts);
         }
         default:
           return Bodies.rectangle(x, y, width, height, opts);
