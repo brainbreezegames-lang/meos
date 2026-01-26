@@ -3977,22 +3977,10 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* LIQUID BACKGROUND - Above letters, below all UI elements */}
+            {/* LAVA BACKGROUND - Rich flames rising from bottom */}
             {!wallpaper && (
                 <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-                    <LiquidBackground
-                        speed={0.6}
-                        blur={100}
-                        opacity={0.5}
-                        interactive={true}
-                        colors={[
-                            "rgba(255, 119, 34, 0.4)",   // Orange (accent)
-                            "rgba(255, 200, 150, 0.35)", // Warm peach
-                            "rgba(61, 47, 169, 0.25)",   // Purple (secondary)
-                            "rgba(255, 230, 200, 0.4)",  // Cream
-                            "rgba(255, 160, 80, 0.3)",   // Deep orange
-                        ]}
-                    />
+                    <LiquidBackground speed={0.7} blur={35} />
                 </div>
             )}
 
