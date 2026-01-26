@@ -1888,21 +1888,11 @@ const DockIcon = React.memo(({
                         className="w-full h-full flex items-center justify-center rounded-[12px] relative overflow-hidden"
                         style={{
                             background: isPressed
-                                ? 'linear-gradient(180deg, #f0f0ee 0%, #fafafa 100%)'
-                                : 'linear-gradient(180deg, #ffffff 0%, #f5f5f3 100%)',
+                                ? 'var(--dock-icon-pressed-bg)'
+                                : 'var(--dock-icon-bg)',
                             boxShadow: isPressed
-                                ? `
-                                    inset 0 1px 3px rgba(0, 0, 0, 0.1),
-                                    inset 0 0 0 1px rgba(0, 0, 0, 0.04),
-                                    0 1px 1px rgba(255, 255, 255, 0.5)
-                                `
-                                : `
-                                    0 1px 1px rgba(0, 0, 0, 0.04),
-                                    0 2px 4px rgba(0, 0, 0, 0.04),
-                                    0 4px 8px rgba(0, 0, 0, 0.03),
-                                    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-                                    inset 0 0 0 1px rgba(0, 0, 0, 0.04)
-                                `,
+                                ? 'var(--dock-icon-pressed-shadow)'
+                                : 'var(--dock-icon-shadow)',
                             transition: 'all 0.1s ease-out',
                         }}
                     >
@@ -1910,9 +1900,9 @@ const DockIcon = React.memo(({
                         <div
                             className="relative z-10"
                             style={{
-                                color: '#3a3a3a',
+                                color: 'var(--dock-icon-color)',
                                 transform: isPressed ? 'translateY(1px)' : 'none',
-                                transition: 'transform 0.1s ease-out',
+                                transition: 'transform 0.1s ease-out, color 0.3s ease',
                             }}
                         >
                             {icon}
@@ -1939,7 +1929,7 @@ const DockIcon = React.memo(({
                             className="absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-white text-[9px] font-bold px-1 z-20"
                             style={{
                                 background: 'var(--indicator-orange, #ff6b00)',
-                                boxShadow: '0 1px 4px rgba(255, 107, 0, 0.4), 0 0 0 2px #f4f4f2',
+                                boxShadow: '0 1px 4px rgba(255, 107, 0, 0.4), 0 0 0 2px var(--bg-dock, #f4f4f2)',
                             }}
                         >
                             {badge}
@@ -5150,15 +5140,10 @@ function GoOSDemoContent() {
                         <div
                             className="dock-container flex items-end px-3 py-2.5 rounded-[20px] relative"
                             style={{
-                                background: 'var(--dock-physical-bg, linear-gradient(180deg, #ffffff 0%, #f4f4f2 100%))',
-                                border: 'var(--dock-physical-border, 1px solid rgba(0, 0, 0, 0.06))',
-                                boxShadow: `
-                                    0 2px 4px rgba(0, 0, 0, 0.06),
-                                    0 8px 24px rgba(0, 0, 0, 0.1),
-                                    0 16px 48px rgba(0, 0, 0, 0.06),
-                                    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-                                    inset 0 -1px 0 rgba(0, 0, 0, 0.03)
-                                `,
+                                background: 'var(--dock-physical-bg)',
+                                border: 'var(--dock-physical-border)',
+                                boxShadow: 'var(--dock-physical-shadow)',
+                                transition: 'background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease',
                             }}
                         >
                             {/* Left corner detail - physical screw/rivet */}
@@ -5171,8 +5156,9 @@ function GoOSDemoContent() {
                                     width: 4,
                                     height: 4,
                                     borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #d8d8d6 0%, #e8e8e6 100%)',
+                                    background: 'var(--dock-corner-bg)',
                                     boxShadow: 'inset 0 0.5px 1px rgba(0,0,0,0.15)',
+                                    transition: 'background 0.3s ease',
                                 }}
                             />
                             {/* Right corner detail */}
@@ -5185,8 +5171,9 @@ function GoOSDemoContent() {
                                     width: 4,
                                     height: 4,
                                     borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #d8d8d6 0%, #e8e8e6 100%)',
+                                    background: 'var(--dock-corner-bg)',
                                     boxShadow: 'inset 0 0.5px 1px rgba(0,0,0,0.15)',
+                                    transition: 'background 0.3s ease',
                                 }}
                             />
                             <RubberDuck />
@@ -5210,8 +5197,9 @@ function GoOSDemoContent() {
                                     width: 2,
                                     height: 28,
                                     borderRadius: 1,
-                                    background: 'linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 100%)',
-                                    boxShadow: '1px 0 0 rgba(255,255,255,0.6)',
+                                    background: 'var(--dock-separator-bg)',
+                                    boxShadow: 'var(--dock-separator-shadow)',
+                                    transition: 'background 0.3s ease, box-shadow 0.3s ease',
                                 }}
                             />
                             <DockIcon
@@ -5233,8 +5221,9 @@ function GoOSDemoContent() {
                                     width: 2,
                                     height: 28,
                                     borderRadius: 1,
-                                    background: 'linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 100%)',
-                                    boxShadow: '1px 0 0 rgba(255,255,255,0.6)',
+                                    background: 'var(--dock-separator-bg)',
+                                    boxShadow: 'var(--dock-separator-shadow)',
+                                    transition: 'background 0.3s ease, box-shadow 0.3s ease',
                                 }}
                             />
                             <DockIcon
@@ -5254,8 +5243,9 @@ function GoOSDemoContent() {
                                     width: 2,
                                     height: 28,
                                     borderRadius: 1,
-                                    background: 'linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 100%)',
-                                    boxShadow: '1px 0 0 rgba(255,255,255,0.6)',
+                                    background: 'var(--dock-separator-bg)',
+                                    boxShadow: 'var(--dock-separator-shadow)',
+                                    transition: 'background 0.3s ease, box-shadow 0.3s ease',
                                 }}
                             />
                                     {Array.from(minimizedEditors).map(fileId => {

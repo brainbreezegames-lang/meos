@@ -391,6 +391,32 @@ html.theme-sketch {
         inset 0 0.5px 0 rgba(255, 255, 255, 0.8);
     --dock-inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
 
+    /* Physical dock styling - Braun-inspired light mode */
+    --dock-physical-bg: linear-gradient(180deg, #ffffff 0%, #f4f4f2 100%);
+    --dock-physical-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.06),
+        0 8px 24px rgba(0, 0, 0, 0.1),
+        0 16px 48px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    --dock-physical-border: 1px solid rgba(0, 0, 0, 0.06);
+    --dock-icon-bg: linear-gradient(180deg, #ffffff 0%, #f5f5f3 100%);
+    --dock-icon-pressed-bg: linear-gradient(180deg, #f0f0ee 0%, #fafafa 100%);
+    --dock-icon-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.04),
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        0 4px 8px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+    --dock-icon-pressed-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.1),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.04),
+        0 1px 1px rgba(255, 255, 255, 0.5);
+    --dock-icon-color: #3a3a3a;
+    --dock-corner-bg: linear-gradient(135deg, #d8d8d6 0%, #e8e8e6 100%);
+    --dock-separator-bg: linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 100%);
+    --dock-separator-shadow: 1px 0 0 rgba(255,255,255,0.6);
+
     /* Top nav glass - matching premium effect */
     --topnav-bg: rgba(251, 249, 239, 0.65);
     --topnav-blur: blur(16px) saturate(180%);
@@ -690,6 +716,32 @@ html.theme-sketch.dark {
     --blur-dock: blur(32px) saturate(120%);
     --dock-border-outer: oklch(30% 0.010 70);
     --dock-shadow: 0 -2px 16px rgba(20, 15, 10, 0.3), 0 0 1px rgba(255, 255, 255, 0.05);
+
+    /* Physical dock styling - Braun-inspired dark mode */
+    --dock-physical-bg: linear-gradient(180deg, #2a2a28 0%, #1e1e1c 100%);
+    --dock-physical-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 16px 48px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    --dock-physical-border: 1px solid rgba(255, 255, 255, 0.06);
+    --dock-icon-bg: linear-gradient(180deg, #3a3a38 0%, #2e2e2c 100%);
+    --dock-icon-pressed-bg: linear-gradient(180deg, #2a2a28 0%, #323230 100%);
+    --dock-icon-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.12),
+        0 4px 8px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --dock-icon-pressed-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 1px 1px rgba(255, 255, 255, 0.03);
+    --dock-icon-color: #e0e0dc;
+    --dock-corner-bg: linear-gradient(135deg, #4a4a48 0%, #3a3a38 100%);
+    --dock-separator-bg: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%);
+    --dock-separator-shadow: 1px 0 0 rgba(0,0,0,0.3);
 
     /* ========== TOP NAV - Dark mode: same as dock ========== */
     --topnav-bg: oklch(18% 0.012 70 / 0.92);
