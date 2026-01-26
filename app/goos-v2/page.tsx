@@ -3939,18 +3939,8 @@ function GoOSDemoContent() {
 
             {/* WALLPAPER BACKGROUND - With Space Theme Support */}
             {wallpaper ? (
-                asciiFilter ? (
-                    <ASCIIFilter
-                        imageUrl={`/${wallpaper}.png`}
-                        columns={160}
-                        rows={80}
-                        colorMode={asciiColorMode}
-                        fontSize={14}
-                        className="pointer-events-none select-none"
-                        backgroundColor={isDarkMode ? '#171412' : '#1a1815'}
-                        monoColor={isDarkMode ? '#e8e4dc' : '#d4d0c8'}
-                    />
-                ) : (
+                <>
+                    {/* Always render the wallpaper image */}
                     <img
                         src={`/${wallpaper}.png`}
                         alt=""
@@ -3959,10 +3949,36 @@ function GoOSDemoContent() {
                             objectFit: 'cover',
                             objectPosition: 'center',
                             zIndex: 0,
+                            opacity: asciiFilter ? 0 : 1,
                         }}
                         draggable={false}
                     />
-                )
+                    {/* ASCII overlay when enabled */}
+                    {asciiFilter && (
+                        <>
+                            {/* Dark backdrop for ASCII readability */}
+                            <div
+                                className="absolute inset-0 pointer-events-none"
+                                style={{
+                                    background: isDarkMode
+                                        ? 'rgba(23, 20, 18, 0.92)'
+                                        : 'rgba(251, 249, 239, 0.95)',
+                                    zIndex: 1,
+                                }}
+                            />
+                            <ASCIIFilter
+                                imageUrl={`/${wallpaper}.png`}
+                                columns={100}
+                                colorMode={asciiColorMode}
+                                fontSize={14}
+                                className="pointer-events-none select-none"
+                                monoColor={isDarkMode ? 'rgba(232, 228, 220, 0.95)' : 'rgba(35, 30, 25, 0.9)'}
+                                contrast={1.4}
+                                brightness={1.0}
+                            />
+                        </>
+                    )}
+                </>
             ) : (
                 /* Solid background when no wallpaper */
                 <div
