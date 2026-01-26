@@ -2677,8 +2677,6 @@ function GoOSDemoContent() {
     const [logoClicks, setLogoClicks] = useState(0);
     const [showEasterEgg, setShowEasterEgg] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
-    const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
-    const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
     // Boot sequence state: splash -> booting -> revealing -> ready
     const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'revealing' | 'ready'>('splash');
@@ -3988,23 +3986,33 @@ function GoOSDemoContent() {
                         animate={menuBarEntrance.animate}
                         exit={menuBarEntrance.exit}
                         transition={SPRING.smooth}
-                        className="h-7 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-[2000] select-none"
+                        className="flex items-center justify-between fixed top-0 left-0 right-0 select-none"
                         style={{
+                            height: 28,
+                            padding: '0 12px',
                             background: 'var(--topnav-bg)',
                             backdropFilter: 'var(--topnav-blur)',
                             WebkitBackdropFilter: 'var(--topnav-blur)',
                             borderBottom: 'var(--topnav-border)',
                             boxShadow: 'var(--topnav-shadow)',
+                            zIndex: 'var(--z-menubar, 400)',
+                            fontFamily: 'var(--font-body)',
                         }}
                     >
                         {/* Left: Logo + Space Switcher */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                             <motion.button
                                 onClick={handleLogoClick}
-                                whileHover={{ scale: 1.02 }}
+                                whileHover={{ opacity: 0.7 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="text-[13px] font-semibold relative"
-                                style={{ color: 'var(--text-secondary)' }}
+                                className="relative"
+                                style={{
+                                    fontFamily: 'var(--font-display)',
+                                    fontSize: '13px',
+                                    fontWeight: 600,
+                                    color: 'var(--color-text-primary)',
+                                    letterSpacing: '-0.01em',
+                                }}
                             >
                                 goOS
                                 <AnimatePresence>
@@ -4026,7 +4034,7 @@ function GoOSDemoContent() {
                                                 animate={{ opacity: 1, y: 24 }}
                                                 exit={{ opacity: 0 }}
                                                 className="absolute left-1/2 -translate-x-1/2 top-full text-white px-2 py-1 rounded text-xs whitespace-nowrap"
-                                                style={{ background: 'var(--accent-primary)' }}
+                                                style={{ background: 'var(--color-accent-primary)' }}
                                             >
                                                 You found the duck! 🦆
                                             </motion.div>
@@ -4034,6 +4042,16 @@ function GoOSDemoContent() {
                                     )}
                                 </AnimatePresence>
                             </motion.button>
+
+                            {/* Subtle divider */}
+                            <div
+                                style={{
+                                    width: 1,
+                                    height: 12,
+                                    background: 'var(--color-border-default)',
+                                    opacity: 0.5,
+                                }}
+                            />
 
                             {/* Space Switcher */}
                             <SpaceSwitcher
@@ -4049,198 +4067,71 @@ function GoOSDemoContent() {
                                 onCreateSpace={() => setShowCreateSpaceModal(true)}
                                 onManageSpaces={() => setShowManageSpacesDialog(true)}
                             />
-
-                            {/* Widgets Dropdown Menu */}
-                            <div className="relative">
-                                <motion.button
-                                    onClick={() => setShowWidgetsMenu(!showWidgetsMenu)}
-                                    whileHover={{ opacity: 0.8 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="text-[12px] font-medium"
-                                    style={{
-                                        color: 'var(--text-tertiary)',
-                                    }}
-                                >
-                                    Widgets
-                                </motion.button>
-                                <AnimatePresence>
-                                    {showWidgetsMenu && (
-                                        <>
-                                            {/* Backdrop to close menu */}
-                                            <div
-                                                className="fixed inset-0 z-[2000]"
-                                                onClick={() => setShowWidgetsMenu(false)}
-                                            />
-                                            <motion.div
-                                                initial={{ opacity: 0, y: -4 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -4 }}
-                                                transition={{ duration: 0.15 }}
-                                                className="absolute top-full left-0 mt-1 z-[2001] py-1"
-                                                style={{
-                                                    background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
-                                                    backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-                                                    WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-                                                    border: '1px solid var(--border-subtle)',
-                                                    borderRadius: 'var(--radius-md, 12px)',
-                                                    boxShadow: 'var(--shadow-lg)',
-                                                    minWidth: '160px',
-                                                }}
-                                            >
-                                                {Object.entries(WIDGET_METADATA).map(([type, meta]) => (
-                                                    <motion.button
-                                                        key={type}
-                                                        onClick={() => {
-                                                            handleAddWidget(type, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
-                                                            setShowWidgetsMenu(false);
-                                                        }}
-                                                        whileHover={{ backgroundColor: 'var(--color-bg-subtle)' }}
-                                                        className="w-full px-3 py-2 flex items-center gap-2 text-left"
-                                                        style={{
-                                                            background: 'transparent',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            fontSize: '12px',
-                                                            fontWeight: 500,
-                                                            color: 'var(--text-primary)',
-                                                        }}
-                                                    >
-                                                        <span className="text-base">{meta.icon}</span>
-                                                        <span>{meta.label}</span>
-                                                    </motion.button>
-                                                ))}
-                                            </motion.div>
-                                        </>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-
-                            {/* Settings Dropdown Menu */}
-                            <div className="relative">
-                                <motion.button
-                                    onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                                    whileHover={{ opacity: 0.8 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="text-[12px] font-medium"
-                                    style={{
-                                        color: 'var(--text-tertiary)',
-                                    }}
-                                >
-                                    Settings
-                                </motion.button>
-                                <AnimatePresence>
-                                    {showSettingsMenu && (
-                                        <>
-                                            {/* Backdrop to close menu */}
-                                            <div
-                                                className="fixed inset-0 z-[2000]"
-                                                onClick={() => setShowSettingsMenu(false)}
-                                            />
-                                            <motion.div
-                                                initial={{ opacity: 0, y: -4 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -4 }}
-                                                transition={{ duration: 0.15 }}
-                                                className="absolute top-full left-0 mt-1 z-[2001] py-1"
-                                                style={{
-                                                    background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
-                                                    backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-                                                    WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-                                                    border: '1px solid var(--border-subtle)',
-                                                    borderRadius: 'var(--radius-md, 12px)',
-                                                    boxShadow: 'var(--shadow-lg)',
-                                                    minWidth: '160px',
-                                                }}
-                                            >
-                                                <motion.button
-                                                    onClick={() => {
-                                                        toggleApp('analytics');
-                                                        setShowSettingsMenu(false);
-                                                    }}
-                                                    whileHover={{ backgroundColor: 'var(--color-bg-subtle)' }}
-                                                    className="w-full px-3 py-2 flex items-center gap-2 text-left"
-                                                    style={{
-                                                        background: 'transparent',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontSize: '12px',
-                                                        fontWeight: 500,
-                                                        color: 'var(--text-primary)',
-                                                    }}
-                                                >
-                                                    <BarChart3 size={14} strokeWidth={1.5} />
-                                                    <span>Analytics</span>
-                                                </motion.button>
-                                                <motion.button
-                                                    onClick={() => {
-                                                        toggleApp('settings');
-                                                        setShowSettingsMenu(false);
-                                                    }}
-                                                    whileHover={{ backgroundColor: 'var(--color-bg-subtle)' }}
-                                                    className="w-full px-3 py-2 flex items-center gap-2 text-left"
-                                                    style={{
-                                                        background: 'transparent',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontSize: '12px',
-                                                        fontWeight: 500,
-                                                        color: 'var(--text-primary)',
-                                                    }}
-                                                >
-                                                    <Settings size={14} strokeWidth={1.5} />
-                                                    <span>Preferences</span>
-                                                </motion.button>
-                                            </motion.div>
-                                        </>
-                                    )}
-                                </AnimatePresence>
-                            </div>
                         </div>
 
-                        {/* Right: Theme toggle + time */}
-                        <div className="flex items-center gap-2 text-sm justify-end" style={{ color: 'var(--text-tertiary)' }}>
-                            {/* Theme Toggle - Minimal icon */}
+                        {/* Right: Time only - clean and minimal */}
+                        <div className="flex items-center gap-3">
+                            {/* Theme Toggle - Ultra minimal */}
                             <motion.button
                                 onClick={toggleDarkMode}
-                                whileHover={{ opacity: 0.7 }}
+                                whileHover={{ opacity: 0.6 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="relative flex items-center justify-center w-5 h-5"
-                                style={{ color: 'var(--text-tertiary)' }}
+                                className="flex items-center justify-center"
+                                style={{
+                                    width: 18,
+                                    height: 18,
+                                    color: 'var(--color-text-muted)',
+                                    background: 'transparent',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                }}
                                 aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
                             >
                                 <AnimatePresence mode="wait">
                                     {isDarkMode ? (
                                         <motion.svg
                                             key="moon"
-                                            width="12"
-                                            height="12"
+                                            width="11"
+                                            height="11"
                                             viewBox="0 0 20 20"
                                             fill="currentColor"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.1 }}
+                                            initial={{ opacity: 0, rotate: -30 }}
+                                            animate={{ opacity: 1, rotate: 0 }}
+                                            exit={{ opacity: 0, rotate: 30 }}
+                                            transition={{ duration: 0.15 }}
                                         >
                                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                                         </motion.svg>
                                     ) : (
                                         <motion.svg
                                             key="sun"
-                                            width="12"
-                                            height="12"
+                                            width="11"
+                                            height="11"
                                             viewBox="0 0 20 20"
                                             fill="currentColor"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.1 }}
+                                            initial={{ opacity: 0, rotate: 30 }}
+                                            animate={{ opacity: 1, rotate: 0 }}
+                                            exit={{ opacity: 0, rotate: -30 }}
+                                            transition={{ duration: 0.15 }}
                                         >
                                             <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
                                         </motion.svg>
                                     )}
                                 </AnimatePresence>
                             </motion.button>
-                            <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>{time}</span>
+
+                            {/* Time - clean typography */}
+                            <span
+                                style={{
+                                    fontSize: '11px',
+                                    fontWeight: 500,
+                                    fontVariantNumeric: 'tabular-nums',
+                                    color: 'var(--color-text-secondary)',
+                                    letterSpacing: '0.01em',
+                                }}
+                            >
+                                {time}
+                            </span>
                         </div>
                     </motion.header>
                 )}

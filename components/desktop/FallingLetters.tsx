@@ -32,7 +32,7 @@ const COLLIDER_DATA: Record<string, Array<{
     { type: "ellipse", x: 0.49, y: 0.465625, radiusX: 0.2825, radiusY: 0.28750000000000003 }
   ],
   "HEAD": [
-    { type: "ellipse", x: 0.5, y: 0.5, radiusX: 0.40, radiusY: 0.40 }
+    { type: "ellipse", x: 0.5, y: 0.5, radiusX: 0.10, radiusY: 0.10 }
   ]
 };
 
@@ -48,7 +48,7 @@ export function FallingLetters({
   isReady = true,
   text = "HELLO",
   className,
-  textSize = 455, // 30% bigger than 350 (letters only, HEAD stays same)
+  textSize = 910, // 2x bigger letters
   showColliders = false // Set to true for debugging colliders
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -336,9 +336,9 @@ export function FallingLetters({
                 src="/zinoHead.png"
                 alt=""
                 style={{
-                  // 2x bigger than original
-                  width: '80%',
-                  height: '80%',
+                  // 50% smaller than before
+                  width: '20%',
+                  height: '20%',
                   objectFit: 'contain',
                 }}
               />
