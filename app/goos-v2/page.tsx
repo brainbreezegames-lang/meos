@@ -3967,12 +3967,23 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* LAVA BACKGROUND - Flames extending from below viewport with full edge coverage */}
+            {/* LAVA BACKGROUND - Container extends slightly beyond viewport edges */}
             {!wallpaper && (
                 <div
-                    className="absolute pointer-events-none"
-                    style={{ zIndex: 5, filter: 'blur(40px)', willChange: 'transform', top: 0, left: '-15%', right: '-15%', bottom: '-15%', overflow: 'visible' }}
+                    className="pointer-events-none"
+                    style={{
+                        position: 'fixed',
+                        zIndex: 5,
+                        filter: 'blur(40px)',
+                        willChange: 'transform',
+                        top: 0,
+                        left: '-5vw',
+                        width: '110vw',
+                        height: '105vh',
+                    }}
                 >
+                    {/* Solid base strip at bottom - guarantees no gaps */}
+                    <div style={{position:'absolute',bottom:0,left:0,right:0,height:'8%',background:'linear-gradient(to top,#6B1010 0%,#8B1A1A 60%,transparent 100%)'}}/>
                     <style>{`
                         @keyframes f1 { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-12px) scaleY(1.08)} }
                         @keyframes f2 { 0%,100%{transform:translateY(0) scaleY(1)} 45%{transform:translateY(-18px) scaleY(1.06)} }
