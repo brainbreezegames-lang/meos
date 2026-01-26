@@ -246,7 +246,8 @@ export function FallingLetters({
            color: #ffffff !important;
         }
       `}</style>
-      );
+    </div>
+  );
 }
 
-      export default FallingLetters;
+export default FallingLetters;
