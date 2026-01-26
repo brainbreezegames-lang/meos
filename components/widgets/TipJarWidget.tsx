@@ -94,22 +94,17 @@ export function TipJarWidget({ widget, isOwner, onEdit, onDelete, onPositionChan
   const [isDark, setIsDark] = useState(false);
   const [hoveredAmount, setHoveredAmount] = useState<number | null>(null);
 
-  // Detect dark mode
+  // Detect dark mode - dark class is on document.documentElement (html element)
   useEffect(() => {
     const checkDarkMode = () => {
-      const themeElement = document.querySelector('.theme-sketch');
-      const hasDarkClass = themeElement?.classList.contains('dark') || false;
+      const hasDarkClass = document.documentElement.classList.contains('dark');
       setIsDark(hasDarkClass);
     };
 
     checkDarkMode();
 
     const observer = new MutationObserver(checkDarkMode);
-    const themeElement = document.querySelector('.theme-sketch');
-    if (themeElement) {
-      observer.observe(themeElement, { attributes: true, attributeFilter: ['class'] });
-    }
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
     return () => observer.disconnect();
   }, []);

@@ -5271,6 +5271,7 @@ function GoOSDemoContent() {
                                                 onClick={() => restoreEditor(fileId)}
                                                 label={file.title || 'Untitled'}
                                                 isActive={false}
+                                                isDark={isDarkMode}
                                             />
                                         );
                                     })}
