@@ -41,6 +41,7 @@ interface FallingLettersProps {
   text?: string;
   className?: string;
   textSize?: number;
+  headSize?: number;
   showColliders?: boolean;
 }
 
@@ -49,8 +50,11 @@ export function FallingLetters({
   text = "HELLO",
   className,
   textSize = 5460, // 200% bigger (3x)
+  headSize,
   showColliders = false // Set to true for debugging colliders
 }: FallingLettersProps) {
+  // Use headSize if provided, otherwise default to textSize
+  const actualHeadSize = headSize ?? textSize;
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lettersRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -362,6 +366,7 @@ export function FallingLetters({
       {items.map((item, i) => {
         if (item === ' ') return null;
 
+        const itemSize = item === 'HEAD' ? actualHeadSize : textSize;
         return (
           <div
             key={i}
@@ -370,8 +375,8 @@ export function FallingLetters({
             className="absolute top-0 left-0 will-change-transform pointer-events-none select-none"
             style={{
               // All containers are square like the editor canvas
-              width: `${textSize}px`,
-              height: `${textSize}px`,
+              width: `${itemSize}px`,
+              height: `${itemSize}px`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

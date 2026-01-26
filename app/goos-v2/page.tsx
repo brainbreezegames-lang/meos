@@ -3948,7 +3948,7 @@ function GoOSDemoContent() {
             )}
 
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
-            <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
+            <FallingLetters isReady={bootPhase === 'ready'} textSize={672} headSize={336} />
 
             {/* Bottom lava glow - static CSS only, seamless fade */}
             {!wallpaper && (
