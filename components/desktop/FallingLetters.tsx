@@ -57,6 +57,10 @@ export function FallingLetters({
   const engineRef = useRef<Matter.Engine | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
   const [mounted, setMounted] = useState(false);
+  const physicsKilledRef = useRef(false);
+  const settledFramesRef = useRef(0);
+  const SETTLE_VELOCITY_THRESHOLD = 0.15; // Bodies moving slower than this are "settled"
+  const SETTLE_FRAMES_REQUIRED = 120; // ~2 seconds at 60fps before killing physics
 
   const items = React.useMemo(() => [...text.split(''), 'HEAD'], [text]);
 
@@ -73,6 +77,8 @@ export function FallingLetters({
         Matter.World.clear(engineRef.current.world, false);
         Matter.Engine.clear(engineRef.current);
       }
+      physicsKilledRef.current = false;
+      settledFramesRef.current = 0;
     };
     cleanup();
 
@@ -224,6 +230,11 @@ export function FallingLetters({
 
     let requestID: number;
     const updateLoop = () => {
+      // If physics already killed, stop the loop entirely
+      if (physicsKilledRef.current) {
+        return;
+      }
+
       bodiesWithNodes.forEach(({ body, node, width, height }) => {
         const { x, y } = body.position;
         const angle = body.angle;
@@ -232,6 +243,43 @@ export function FallingLetters({
         node.style.opacity = '1';
         node.style.visibility = 'visible';
       });
+
+      // Check if all bodies have settled (low velocity)
+      const allSettled = bodiesWithNodes.every(({ body }) => {
+        const speed = Math.sqrt(body.velocity.x ** 2 + body.velocity.y ** 2);
+        const angularSpeed = Math.abs(body.angularVelocity);
+        return speed < SETTLE_VELOCITY_THRESHOLD && angularSpeed < 0.01;
+      });
+
+      if (allSettled) {
+        settledFramesRef.current++;
+
+        // After enough settled frames, kill physics entirely
+        if (settledFramesRef.current >= SETTLE_FRAMES_REQUIRED) {
+          // Stop the physics engine
+          if (runnerRef.current) {
+            Runner.stop(runnerRef.current);
+            runnerRef.current = null;
+          }
+          if (engineRef.current) {
+            World.clear(engineRef.current.world, false);
+            Engine.clear(engineRef.current);
+            engineRef.current = null;
+          }
+
+          // Remove will-change to free up GPU memory
+          bodiesWithNodes.forEach(({ node }) => {
+            node.classList.remove('will-change-transform');
+          });
+
+          physicsKilledRef.current = true;
+          // Don't schedule another frame - we're done!
+          return;
+        }
+      } else {
+        // Reset counter if anything is still moving
+        settledFramesRef.current = 0;
+      }
 
       // Draw colliders in red
       if (ctx && showColliders && canvas) {
