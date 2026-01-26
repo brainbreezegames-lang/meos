@@ -636,6 +636,12 @@ html.theme-sketch.dark {
     --color-bg-white: var(--dark-bg-elevated);
     --color-bg-glass: oklch(18% 0.012 70 / 0.95);
     --color-bg-glass-heavy: oklch(18% 0.012 70 / 0.98);
+    --color-bg-elevated: oklch(22% 0.010 70 / 0.95);
+    --color-bg-overlay: oklch(18% 0.012 70 / 0.8);
+    --color-bg-subtle-hover: oklch(25% 0.008 70);
+
+    /* Shadows - Dark mode versions */
+    --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.06);
 
     /* ========== TEXT - Warm Off-White ========== */
     /* Slight warmth in text too - hue ~90-100 */

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WidgetWrapper } from './WidgetWrapper';
 import type { Widget } from '@/types';
 
@@ -27,12 +27,66 @@ const DEFAULT_CONFIG: ContactWidgetConfig = {
   successMessage: 'Thanks for reaching out!',
 };
 
-// Widget container styles matching the spec
-const WIDGET_CONTAINER = {
-  background: '#FDFBF7',
-  borderRadius: 24,
-  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
-  border: '1px solid rgba(255,255,255,0.5)',
+// Braun-inspired theme colors
+const THEMES = {
+  light: {
+    housing: 'linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.1),
+      0 20px 48px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03)
+    `,
+    textPrimary: '#1a1a1a',
+    textSecondary: '#666666',
+    textMuted: '#888888',
+    inputBg: '#ffffff',
+    inputBorder: 'rgba(0, 0, 0, 0.08)',
+    buttonBg: 'linear-gradient(180deg, #ffffff 0%, #f5f5f3 100%)',
+    buttonShadow: `
+      0 1px 2px rgba(0, 0, 0, 0.05),
+      0 2px 4px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.04)
+    `,
+    submitBg: 'linear-gradient(145deg, #333, #222)',
+    submitDisabledBg: '#eee',
+    headerBorder: 'rgba(0, 0, 0, 0.06)',
+    dotBg: '#e8e4e0',
+    envelopeBody: 'url(#envelopeGradLight)',
+    envelopeFlap: 'url(#flapGradLight)',
+    envelopeShadow: '#e0ded8',
+  },
+  dark: {
+    housing: 'linear-gradient(180deg, #2a2a28 0%, #1e1e1c 100%)',
+    housingShadow: `
+      0 2px 4px rgba(0, 0, 0, 0.2),
+      0 8px 24px rgba(0, 0, 0, 0.3),
+      0 20px 48px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+    `,
+    textPrimary: '#f0f0ec',
+    textSecondary: '#a0a09c',
+    textMuted: '#707068',
+    inputBg: '#3a3a38',
+    inputBorder: 'rgba(255, 255, 255, 0.08)',
+    buttonBg: 'linear-gradient(180deg, #3a3a38 0%, #2e2e2c 100%)',
+    buttonShadow: `
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 2px 4px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04)
+    `,
+    submitBg: 'linear-gradient(145deg, #ff7722, #e5691e)',
+    submitDisabledBg: '#3a3a38',
+    headerBorder: 'rgba(255, 255, 255, 0.06)',
+    dotBg: '#3a3a38',
+    envelopeBody: 'url(#envelopeGradDark)',
+    envelopeFlap: 'url(#flapGradDark)',
+    envelopeShadow: '#2a2a28',
+  },
 };
 
 export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionChange, onContextMenu, isHighlighted, onSubmit }: ContactWidgetProps) {
@@ -40,8 +94,25 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  // Detect dark mode - dark class is on document.documentElement (html element)
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const hasDarkClass = document.documentElement.classList.contains('dark');
+      setIsDark(hasDarkClass);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
 
   const config: ContactWidgetConfig = { ...DEFAULT_CONFIG, ...(widget.config as Partial<ContactWidgetConfig>) };
+  const theme = isDark ? THEMES.dark : THEMES.light;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,12 +151,14 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
       isHighlighted={isHighlighted}
     >
       {!isExpanded ? (
-        /* Medium widget: 180x180 - collapsed state */
+        /* Medium widget: 180x180 - Braun physical style */
         <div
           style={{
-            ...WIDGET_CONTAINER,
             width: 180,
             height: 180,
+            borderRadius: 20,
+            background: theme.housing,
+            boxShadow: theme.housingShadow,
             padding: 16,
             display: 'flex',
             flexDirection: 'column',
@@ -93,44 +166,70 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
             justifyContent: 'center',
             gap: 12,
             cursor: 'pointer',
+            position: 'relative',
+            transition: 'all 0.3s ease',
           }}
           onClick={() => setIsExpanded(true)}
         >
+          {/* Corner detail */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              width: 4,
+              height: 4,
+              borderRadius: '50%',
+              background: theme.dotBg,
+              transition: 'all 0.3s ease',
+            }}
+          />
+
           {/* 3D Envelope icon */}
           <div style={{ marginBottom: 4 }}>
             <svg width="48" height="40" viewBox="0 0 48 40" fill="none">
+              <defs>
+                <linearGradient id="envelopeGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#f8f7f4"/>
+                  <stop offset="100%" stopColor="#e8e7e2"/>
+                </linearGradient>
+                <linearGradient id="flapGradLight" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff"/>
+                  <stop offset="100%" stopColor="#f0efea"/>
+                </linearGradient>
+                <linearGradient id="envelopeGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#4a4a48"/>
+                  <stop offset="100%" stopColor="#3a3a38"/>
+                </linearGradient>
+                <linearGradient id="flapGradDark" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="#5a5a58"/>
+                  <stop offset="100%" stopColor="#4a4a48"/>
+                </linearGradient>
+              </defs>
               {/* Envelope body */}
               <path
                 d="M4 8C4 6 6 4 8 4H40C42 4 44 6 44 8V32C44 34 42 36 40 36H8C6 36 4 34 4 32V8Z"
-                fill="url(#envelopeGrad)"
+                fill={theme.envelopeBody}
               />
+              {/* Orange accent band - Braun signature */}
+              <rect x="4" y="20" width="40" height="4" fill="#ff6b00" opacity="0.9" />
               {/* Envelope flap shadow */}
               <path
                 d="M4 8L24 22L44 8"
                 fill="none"
-                stroke="#e0ded8"
+                stroke={theme.envelopeShadow}
                 strokeWidth="1"
               />
               {/* Envelope flap */}
               <path
                 d="M4 8C4 6 6 4 8 4H40C42 4 44 6 44 8L24 22L4 8Z"
-                fill="url(#flapGrad)"
+                fill={theme.envelopeFlap}
               />
               {/* Highlight on flap */}
               <path
                 d="M8 6H40L24 18L8 6Z"
-                fill="rgba(255,255,255,0.3)"
+                fill={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.3)'}
               />
-              <defs>
-                <linearGradient id="envelopeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#f8f7f4"/>
-                  <stop offset="100%" stopColor="#e8e7e2"/>
-                </linearGradient>
-                <linearGradient id="flapGrad" x1="50%" y1="0%" x2="50%" y2="100%">
-                  <stop offset="0%" stopColor="#ffffff"/>
-                  <stop offset="100%" stopColor="#f0efea"/>
-                </linearGradient>
-              </defs>
             </svg>
           </div>
 
@@ -139,9 +238,10 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
             style={{
               fontSize: 14,
               fontWeight: 600,
-              color: '#333',
+              color: theme.textPrimary,
               textAlign: 'center',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              transition: 'color 0.3s ease',
             }}
           >
             {widget.title || 'Get in Touch'}
@@ -151,9 +251,10 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
           <span
             style={{
               fontSize: 11,
-              color: '#888',
+              color: theme.textMuted,
               textAlign: 'center',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              transition: 'color 0.3s ease',
             }}
           >
             {config.emailTo || 'hello@example.com'}
@@ -165,29 +266,47 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
               padding: '8px 16px',
               borderRadius: 12,
               border: 'none',
-              background: 'linear-gradient(145deg, #f8f7f4, #eeeee8)',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.8)',
+              background: theme.buttonBg,
+              boxShadow: theme.buttonShadow,
               fontSize: 12,
               fontWeight: 600,
-              color: '#555',
+              color: theme.textSecondary,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
             }}
           >
             Send Message
           </button>
         </div>
       ) : (
-        /* Expanded form */
+        /* Expanded form - Braun physical style */
         <div
           style={{
-            ...WIDGET_CONTAINER,
             width: 280,
-            padding: 0,
+            borderRadius: 20,
+            background: theme.housing,
+            boxShadow: theme.housingShadow,
             overflow: 'hidden',
+            position: 'relative',
+            transition: 'all 0.3s ease',
           }}
         >
+          {/* Corner detail */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              width: 4,
+              height: 4,
+              borderRadius: '50%',
+              background: theme.dotBg,
+              zIndex: 10,
+              transition: 'all 0.3s ease',
+            }}
+          />
+
           {isSuccess ? (
             <div
               style={{
@@ -213,7 +332,7 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                   <polyline points="20 6 9 17 4 12"/>
                 </svg>
               </div>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#333', textAlign: 'center' }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: theme.textPrimary, textAlign: 'center', transition: 'color 0.3s ease' }}>
                 {config.successMessage}
               </span>
             </div>
@@ -223,18 +342,19 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
               <div
                 style={{
                   padding: '14px 16px',
-                  borderBottom: '1px solid rgba(0,0,0,0.06)',
+                  borderBottom: `1px solid ${theme.headerBorder}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  transition: 'border-color 0.3s ease',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={theme.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                     <polyline points="22,6 12,13 2,6"/>
                   </svg>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#333' }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: theme.textPrimary, transition: 'color 0.3s ease' }}>
                     {widget.title || 'Contact'}
                   </span>
                 </div>
@@ -245,11 +365,12 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     background: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
-                    color: '#888',
+                    color: theme.textMuted,
                     borderRadius: 6,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    transition: 'color 0.3s ease',
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -272,12 +393,13 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                       padding: '10px 12px',
                       marginBottom: 10,
                       borderRadius: 10,
-                      border: '1px solid rgba(0,0,0,0.08)',
-                      background: '#fff',
-                      color: '#333',
+                      border: `1px solid ${theme.inputBorder}`,
+                      background: theme.inputBg,
+                      color: theme.textPrimary,
                       fontSize: 13,
                       outline: 'none',
                       boxSizing: 'border-box',
+                      transition: 'all 0.3s ease',
                     }}
                   />
                 )}
@@ -294,12 +416,13 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                       padding: '10px 12px',
                       marginBottom: 10,
                       borderRadius: 10,
-                      border: '1px solid rgba(0,0,0,0.08)',
-                      background: '#fff',
-                      color: '#333',
+                      border: `1px solid ${theme.inputBorder}`,
+                      background: theme.inputBg,
+                      color: theme.textPrimary,
                       fontSize: 13,
                       outline: 'none',
                       boxSizing: 'border-box',
+                      transition: 'all 0.3s ease',
                     }}
                   />
                 )}
@@ -316,13 +439,14 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                       padding: '10px 12px',
                       marginBottom: 14,
                       borderRadius: 10,
-                      border: '1px solid rgba(0,0,0,0.08)',
-                      background: '#fff',
-                      color: '#333',
+                      border: `1px solid ${theme.inputBorder}`,
+                      background: theme.inputBg,
+                      color: theme.textPrimary,
                       fontSize: 13,
                       outline: 'none',
                       resize: 'none',
                       boxSizing: 'border-box',
+                      transition: 'all 0.3s ease',
                     }}
                   />
                 )}
@@ -336,9 +460,9 @@ export function ContactWidget({ widget, isOwner, onEdit, onDelete, onPositionCha
                     borderRadius: 12,
                     border: 'none',
                     background: isValid
-                      ? 'linear-gradient(145deg, #333, #222)'
-                      : '#eee',
-                    color: isValid ? '#fff' : '#999',
+                      ? theme.submitBg
+                      : theme.submitDisabledBg,
+                    color: isValid ? '#fff' : theme.textMuted,
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: isValid ? 'pointer' : 'not-allowed',
