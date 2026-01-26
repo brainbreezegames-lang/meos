@@ -74,7 +74,7 @@ export type GoOSFileType = 'note' | 'case-study' | 'folder' | 'image' | 'link' |
 export type PublishStatus = 'draft' | 'published';
 export type AccessLevel = 'free' | 'paid' | 'email';
 export type EmbedType = 'youtube' | 'vimeo' | 'spotify' | 'figma' | 'loom' | 'codepen' | 'other';
-export type WidgetType = 'clock' | 'book' | 'tipjar' | 'contact' | 'links' | 'feedback' | 'status';
+export type WidgetType = 'clock' | 'book' | 'tipjar' | 'contact' | 'links' | 'feedback' | 'status' | 'sticky-note';
 export type ViewMode = 'desktop' | 'page' | 'present';
 
 // goOS Widget

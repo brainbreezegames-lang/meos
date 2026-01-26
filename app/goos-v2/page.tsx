@@ -925,6 +925,23 @@ const INITIAL_DEMO_WIDGETS = [
         createdAt: new Date(),
         updatedAt: new Date(),
     },
+    {
+        id: 'demo-widget-sticky',
+        desktopId: 'goos-demo',
+        widgetType: 'sticky-note' as const,
+        positionX: 8,
+        positionY: 14,
+        title: null,
+        isVisible: true,
+        config: {
+            content: 'Welcome to goOS! ✨\n\nDouble-click icons to explore.\nDrag to rearrange.',
+            color: 'cream',
+            rotation: -3,
+        },
+        order: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
 ];
 
 // ============================================
@@ -4251,13 +4268,6 @@ function GoOSDemoContent() {
                 {/* Desktop View Mode - only show when viewMode is 'desktop' */}
                 {viewMode === 'desktop' && (
                     <>
-                        {/* Sticky Notes (Left side) */}
-                        <div className="fixed top-16 left-4 z-[30] flex flex-col gap-3">
-                            <StickyNote color="blue" rotation={-3}>
-                                <span className="text-lg" style={{ color: goOS.colors.text.primary }}>goOS Demo</span>
-                            </StickyNote>
-                        </div>
-
                         {/* Decorative Plant (Right side) */}
                         <motion.div
                             className="fixed top-16 right-6 z-[30] text-4xl select-none"
@@ -4383,6 +4393,9 @@ function GoOSDemoContent() {
                                     localStorage.setItem('goos-feedback', JSON.stringify(feedbacks));
                                     showGoOSToast('Feedback saved, thank you!', 'success');
                                 }
+                            }}
+                            onStickyNoteChange={(widgetId, content) => {
+                                updateWidget(widgetId, { config: { content } });
                             }}
                         />
 

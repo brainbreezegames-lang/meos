@@ -6,6 +6,7 @@ export { ContactWidget, CONTACT_WIDGET_DEFAULT_CONFIG } from './ContactWidget';
 export { LinksWidget, LINKS_WIDGET_DEFAULT_CONFIG } from './LinksWidget';
 export { FeedbackWidget, FEEDBACK_WIDGET_DEFAULT_CONFIG } from './FeedbackWidget';
 export { StatusWidget, STATUS_WIDGET_DEFAULT_CONFIG } from './StatusWidget';
+export { StickyNoteWidget } from './StickyNoteWidget';
 export { WidgetRenderer } from './WidgetRenderer';
 export { WidgetContextMenu } from './WidgetContextMenu';
 
@@ -18,6 +19,7 @@ import { ContactWidget } from './ContactWidget';
 import { LinksWidget } from './LinksWidget';
 import { FeedbackWidget } from './FeedbackWidget';
 import { StatusWidget } from './StatusWidget';
+import { StickyNoteWidget } from './StickyNoteWidget';
 
 export const WIDGET_COMPONENTS: Record<WidgetType, React.ComponentType<{
   widget: Widget;
@@ -32,6 +34,7 @@ export const WIDGET_COMPONENTS: Record<WidgetType, React.ComponentType<{
   links: LinksWidget,
   feedback: FeedbackWidget,
   status: StatusWidget,
+  'sticky-note': StickyNoteWidget,
 };
 
 // Widget metadata for UI
@@ -74,5 +77,10 @@ export const WIDGET_METADATA: Record<WidgetType, {
     label: 'Availability',
     icon: '✦',
     description: 'Show your availability status',
+  },
+  'sticky-note': {
+    label: 'Sticky Note',
+    icon: '📝',
+    description: 'Handwritten notes with cozy typography',
   },
 };

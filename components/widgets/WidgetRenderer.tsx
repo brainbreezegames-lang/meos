@@ -9,6 +9,7 @@ import { ContactWidget } from './ContactWidget';
 import { LinksWidget } from './LinksWidget';
 import { FeedbackWidget } from './FeedbackWidget';
 import { StatusWidget } from './StatusWidget';
+import { StickyNoteWidget } from './StickyNoteWidget';
 
 interface WidgetRendererProps {
   widgets: Widget[];
@@ -21,6 +22,7 @@ interface WidgetRendererProps {
   onTip?: (amount: number) => Promise<void>;
   onContact?: (data: { name?: string; email: string; message: string }) => Promise<void>;
   onFeedback?: (feedback: string) => Promise<void>;
+  onStickyNoteChange?: (widgetId: string, content: string) => void;
 }
 
 export function WidgetRenderer({
@@ -34,6 +36,7 @@ export function WidgetRenderer({
   onTip,
   onContact,
   onFeedback,
+  onStickyNoteChange,
 }: WidgetRendererProps) {
   // Filter visible widgets (or show all if owner)
   const visibleWidgets = isOwner
@@ -69,6 +72,14 @@ export function WidgetRenderer({
             return <FeedbackWidget key={widget.id} {...commonProps} onSubmit={onFeedback} />;
           case 'status':
             return <StatusWidget key={widget.id} {...commonProps} />;
+          case 'sticky-note':
+            return (
+              <StickyNoteWidget
+                key={widget.id}
+                {...commonProps}
+                onContentChange={(content) => onStickyNoteChange?.(widget.id, content)}
+              />
+            );
           default:
             return null;
         }
