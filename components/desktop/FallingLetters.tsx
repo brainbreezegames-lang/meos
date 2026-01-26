@@ -1,188 +1,201 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState, useRef } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import Matter from "matter-js";
 
 interface FallingLettersProps {
   isReady?: boolean;
+  text?: string;
+  className?: string; // allow overriding styles
+  textSize?: number;
 }
 
-// Letter configuration - positioned at bottom left like OGAKI
-const LETTERS = [
-  { char: 'H', finalX: 2, finalY: 82, size: 1.0, rotation: -2 },
-  { char: 'E', finalX: 15, finalY: 78, size: 0.9, rotation: 3 },
-  { char: 'L', finalX: 5, finalY: 55, size: 0.85, rotation: -1 },
-  { char: 'L', finalX: 18, finalY: 52, size: 0.85, rotation: 2 },
-  { char: 'O', finalX: 8, finalY: 28, size: 0.95, rotation: -3 },
-];
-
-function FallingLetter({
-  char,
-  finalX,
-  finalY,
-  size,
-  rotation,
-  delay,
-  baseSize,
-  letterColor,
-  shouldAnimate,
-}: {
-  char: string;
-  finalX: number;
-  finalY: number;
-  size: number;
-  rotation: number;
-  delay: number;
-  baseSize: number;
-  letterColor: string;
-  shouldAnimate: boolean;
-}) {
-  const controls = useAnimation();
-  const hasStarted = useRef(false);
-
-  useEffect(() => {
-    if (shouldAnimate && !hasStarted.current) {
-      hasStarted.current = true;
-
-      // Start the falling animation after delay
-      const timer = setTimeout(async () => {
-        await controls.start({
-          y: `${finalY}vh`,
-          rotate: rotation,
-          opacity: 1,
-          transition: {
-            y: {
-              type: 'spring',
-              stiffness: 100,
-              damping: 15,
-              mass: 2,
-            },
-            rotate: {
-              type: 'spring',
-              stiffness: 80,
-              damping: 12,
-            },
-            opacity: {
-              duration: 0.3,
-            },
-          },
-        });
-      }, delay);
-
-      return () => clearTimeout(timer);
-    }
-  }, [shouldAnimate, controls, finalY, rotation, delay]);
-
-  const fontSize = baseSize * size;
-
-  return (
-    <motion.div
-      initial={{
-        y: '-20vh',
-        rotate: rotation + (Math.random() - 0.5) * 20,
-        opacity: 0,
-      }}
-      animate={controls}
-      style={{
-        position: 'absolute',
-        left: `${finalX}vw`,
-        fontSize: fontSize,
-        fontFamily: 'var(--font-instrument, "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif)',
-        fontWeight: 800,
-        color: letterColor,
-        lineHeight: 0.85,
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-      }}
-    >
-      {char}
-    </motion.div>
-  );
-}
-
-export function FallingLetters({ isReady = true }: FallingLettersProps) {
+export function FallingLetters({
+  isReady = true,
+  text = "HELLO",
+  className,
+  textSize = 120
+}: FallingLettersProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lettersRef = useRef<(HTMLDivElement | null)[]>([]);
+  const engineRef = useRef<Matter.Engine | null>(null);
+  const runnerRef = useRef<Matter.Runner | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-  const [shouldAnimate, setShouldAnimate] = useState(false);
 
-  // Detect dark mode
-  useEffect(() => {
-    if (!mounted) return;
-
-    const checkDarkMode = () => {
-      const themeElement = document.querySelector('.theme-sketch');
-      const hasDarkClass = themeElement?.classList.contains('dark') || false;
-      setIsDark(hasDarkClass);
-    };
-
-    checkDarkMode();
-
-    const observer = new MutationObserver(checkDarkMode);
-    const themeElement = document.querySelector('.theme-sketch');
-    if (themeElement) {
-      observer.observe(themeElement, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    return () => observer.disconnect();
-  }, [mounted]);
-
-  // Mount
+  // Handle client-side mounting
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Trigger animation when ready
   useEffect(() => {
-    if (mounted && isReady) {
-      const timer = setTimeout(() => {
-        setShouldAnimate(true);
-      }, 400);
-      return () => clearTimeout(timer);
+    if (!mounted || !isReady || !containerRef.current) return;
+
+    // cleanup previous instances
+    const cleanup = () => {
+      if (runnerRef.current) Matter.Runner.stop(runnerRef.current);
+      if (engineRef.current) {
+        Matter.World.clear(engineRef.current.world, false);
+        Matter.Engine.clear(engineRef.current);
+      }
+    };
+    cleanup();
+
+    const Engine = Matter.Engine,
+      World = Matter.World,
+      Bodies = Matter.Bodies,
+      Runner = Matter.Runner,
+      Mouse = Matter.Mouse,
+      MouseConstraint = Matter.MouseConstraint;
+
+    const engine = Engine.create();
+    engineRef.current = engine;
+
+    // Standard gravity
+    engine.gravity.y = 1;
+
+    const containerWidth = containerRef.current.clientWidth;
+    const containerHeight = containerRef.current.clientHeight;
+
+    // Boundaries: Ground and Walls
+    const ground = Bodies.rectangle(
+      containerWidth / 2,
+      containerHeight + 100, // positioned center, so +100 means just below viewport
+      containerWidth * 2,
+      200,
+      { isStatic: true, label: "Ground", render: { visible: false } }
+    );
+
+    const leftWall = Bodies.rectangle(
+      -100,
+      containerHeight / 2,
+      200,
+      containerHeight * 4,
+      { isStatic: true, label: "LeftWall", render: { visible: false } }
+    );
+
+    const rightWall = Bodies.rectangle(
+      containerWidth + 100,
+      containerHeight / 2,
+      200,
+      containerHeight * 4,
+      { isStatic: true, label: "RightWall", render: { visible: false } }
+    );
+
+    World.add(engine.world, [ground, leftWall, rightWall]);
+
+    // Create bodies for each letter
+    const validLetterNodes = lettersRef.current.filter(n => n !== null);
+
+    const bodiesWithNodes = validLetterNodes.map((node, i) => {
+      if (!node) return null;
+
+      const rect = node.getBoundingClientRect();
+      const spread = Math.min(containerWidth * 0.8, 800);
+      const startX = (containerWidth - spread) / 2 + (Math.random() * spread);
+      const startY = -rect.height - (Math.random() * 500) - (i * 150); // Staggered fall
+
+      const body = Bodies.rectangle(startX, startY, rect.width, rect.height, {
+        restitution: 0.6, // Bounciness
+        friction: 0.1,
+        density: 0.001,
+        angle: (Math.random() - 0.5) * 0.5,
+        label: node.textContent || "letter"
+      });
+
+      return { body, node, width: rect.width, height: rect.height };
+    }).filter(item => item !== null) as { body: Matter.Body, node: HTMLDivElement, width: number, height: number }[];
+
+    if (bodiesWithNodes.length > 0) {
+      World.add(engine.world, bodiesWithNodes.map(b => b.body));
     }
-  }, [mounted, isReady]);
+
+    // Add Mouse Interaction
+    const mouse = Mouse.create(containerRef.current);
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse: mouse,
+      constraint: {
+        stiffness: 0.1,
+        render: { visible: false }
+      }
+    });
+
+    // Remove default mouse scrolling interference
+    // Cast to any because mousewheel event type is missing in some definitions
+    mouse.element.removeEventListener("mousewheel", (mouse as any).mousewheel);
+    mouse.element.removeEventListener("DOMMouseScroll", (mouse as any).mousewheel);
+
+    World.add(engine.world, mouseConstraint);
+
+    const runner = Runner.create();
+    runnerRef.current = runner;
+    Runner.run(runner, engine);
+
+    // Sync loop
+    let requestID: number;
+    const updateLoop = () => {
+      bodiesWithNodes.forEach(({ body, node, width, height }) => {
+        const { x, y } = body.position;
+        const angle = body.angle;
+
+        // CSS transform to match physics body
+        node.style.transform = `translate3d(${x - width / 2}px, ${y - height / 2}px, 0) rotate(${angle}rad)`;
+        node.style.opacity = '1';
+        node.style.visibility = 'visible';
+      });
+      requestID = requestAnimationFrame(updateLoop);
+    };
+
+    updateLoop();
+
+    return () => {
+      cancelAnimationFrame(requestID);
+      cleanup();
+    };
+  }, [mounted, isReady, text, textSize]); // Re-init if these change
 
   if (!mounted || !isReady) return null;
 
-  // Base size relative to viewport
-  const baseSize = Math.min(
-    typeof window !== 'undefined' ? window.innerHeight * 0.25 : 250,
-    typeof window !== 'undefined' ? window.innerWidth * 0.15 : 200,
-    280
-  );
-
-  // Solid color - visible but subtle
-  const letterColor = isDark
-    ? 'rgba(255, 255, 255, 0.08)'
-    : 'rgba(0, 0, 0, 0.06)';
+  // Use passed className or default to fixed full screen
+  const containerClass = className || "fixed inset-0 z-[1] overflow-hidden pointer-events-none";
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden',
-      }}
+      ref={containerRef}
+      className={containerClass}
       aria-hidden="true"
     >
-      {LETTERS.map((letter, index) => (
-        <FallingLetter
-          key={`${letter.char}-${index}`}
-          char={letter.char}
-          finalX={letter.finalX}
-          finalY={letter.finalY}
-          size={letter.size}
-          rotation={letter.rotation}
-          delay={index * 120}
-          baseSize={baseSize}
-          letterColor={letterColor}
-          shouldAnimate={shouldAnimate}
-        />
-      ))}
+      {text.split('').map((char, i) => {
+        if (char === ' ') return null;
+
+        return (
+          <div
+            key={i}
+            ref={(el) => { lettersRef.current[i] = el; }}
+            className="absolute top-0 left-0 font-extrabold leading-none cursor-grab active:cursor-grabbing will-change-transform pointer-events-auto select-none"
+            style={{
+              fontSize: `${textSize}px`,
+              opacity: 0,
+              visibility: 'hidden',
+              // Font stack matching design system
+              fontFamily: 'var(--font-instrument, "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif)',
+              color: 'rgba(0, 0, 0, 0.1)', // subtle dark by default
+              whiteSpace: 'nowrap',
+              lineHeight: 0.8
+            }}
+          >
+            {char}
+          </div>
+        );
+      })}
+      {/* Dark mode override via style tag or css var - 
+          Since we are in a component, let's just use CSS variable if available or simple opacity. 
+          The previous component had dark mode logic. Let's try to preserve it via CSS mixing 
+      */}
+      <style jsx>{`
+        div[class*="dark"] .cursor-grab {
+          color: rgba(255, 255, 255, 0.1) !important;
+        }
+      `}</style>
     </div>
   );
 }

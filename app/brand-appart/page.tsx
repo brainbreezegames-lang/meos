@@ -12,7 +12,9 @@ import {
     Star
 } from "lucide-react";
 
-const ANIMATION_EASE = [0.16, 1, 0.3, 1]; // Expo out for premium feel
+const ANIMATION_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]; // Expo out for premium feel
+
+import { FallingLetters } from "@/components/desktop/FallingLetters";
 
 export default function BrandAppartPage() {
     const containerRef = useRef(null);
@@ -84,6 +86,17 @@ export default function BrandAppartPage() {
                     >
                         big<br />results
                     </motion.h1>
+
+                    {/* Falling Physics Text */}
+                    <div className="absolute inset-0 z-0 flex justify-center pointer-events-none">
+                        <div className="w-full h-full max-w-[1400px] pointer-events-auto">
+                            <FallingLetters
+                                text="HELLO"
+                                textSize={180}
+                                className="w-full h-full"
+                            />
+                        </div>
+                    </div>
 
                     <div className="relative z-10 flex flex-col items-center">
                         <div className="overflow-hidden">
