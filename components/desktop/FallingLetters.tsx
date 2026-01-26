@@ -14,13 +14,13 @@ interface FallingLettersProps {
   isReady?: boolean;
 }
 
-// Letter configuration - HELLO in all caps
+// Letter configuration - HELLO arranged like OGAKI reference
 const LETTERS = [
-  { char: 'H', scale: 1.0 },
-  { char: 'E', scale: 0.95 },
-  { char: 'L', scale: 0.9 },
-  { char: 'L', scale: 0.9 },
-  { char: 'O', scale: 1.0 },
+  { char: 'H', scale: 1.0, column: 0 },
+  { char: 'E', scale: 0.85, column: 1 },
+  { char: 'L', scale: 0.9, column: 0 },
+  { char: 'L', scale: 0.85, column: 1 },
+  { char: 'O', scale: 1.0, column: 0 },
 ];
 
 export function FallingLetters({ isReady = true }: FallingLettersProps) {
@@ -66,12 +66,12 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    // Letter size - BIG (was 0.7, now ~1.0 for 2x effect)
-    const baseSize = Math.min(height * 1.0, width * 0.7);
+    // Letter size - sized like reference (~300px base)
+    const baseSize = Math.min(280, height * 0.35, width * 0.2);
 
-    // Create engine
+    // Create engine with lower gravity for smoother fall
     const engine = Matter.Engine.create({
-      gravity: { x: 0, y: 0.5 },
+      gravity: { x: 0, y: 0.4 },
     });
     engineRef.current = engine;
 
@@ -80,64 +80,61 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
     // Ground at bottom
     const ground = Matter.Bodies.rectangle(
       width / 2,
-      height + wallThickness / 2 - 30,
+      height + wallThickness / 2 - 20,
       width + wallThickness * 2,
       wallThickness,
-      { isStatic: true, friction: 0.95, restitution: 0.02 }
+      { isStatic: true, friction: 1, restitution: 0 }
     );
 
     // Left wall
     const leftWall = Matter.Bodies.rectangle(
-      -wallThickness / 2 + 30,
-      height / 2,
-      wallThickness,
-      height + wallThickness * 2,
-      { isStatic: true, friction: 0.9 }
-    );
-
-    // Right wall - at 60% of screen
-    const rightWall = Matter.Bodies.rectangle(
-      width * 0.6 + wallThickness / 2,
-      height / 2,
-      wallThickness,
-      height + wallThickness * 2,
-      { isStatic: true, friction: 0.9 }
-    );
-
-    // Top wall
-    const topWall = Matter.Bodies.rectangle(
-      width / 2,
       -wallThickness / 2,
-      width + wallThickness * 2,
+      height / 2,
       wallThickness,
-      { isStatic: true }
+      height + wallThickness * 2,
+      { isStatic: true, friction: 1 }
     );
 
-    Matter.Composite.add(engine.world, [ground, leftWall, rightWall, topWall]);
+    // Right wall - at 45% of screen to keep letters on left
+    const rightWall = Matter.Bodies.rectangle(
+      width * 0.45 + wallThickness / 2,
+      height / 2,
+      wallThickness,
+      height + wallThickness * 2,
+      { isStatic: true, friction: 1 }
+    );
 
-    // Create letter bodies - RANDOM positions each time, clustered together
+    Matter.Composite.add(engine.world, [ground, leftWall, rightWall]);
+
+    // Create letter bodies - positioned in columns to prevent overlap
+    const columnWidth = baseSize * 0.7;
     const letterBodies: LetterBody[] = LETTERS.map((letter, index) => {
       const size = baseSize * letter.scale;
 
-      // Random X position in left portion of screen (clustered, not spread)
-      const startX = 100 + Math.random() * (width * 0.35);
-      // Random Y position near top
-      const startY = 60 + Math.random() * 120;
+      // X position based on column - spread out to prevent overlap
+      const columnOffset = letter.column * columnWidth;
+      const startX = 50 + columnOffset + (Math.random() * 20);
+
+      // Y position - stagger start positions
+      const startY = -100 - (index * (size * 0.9));
+
+      // Collision box matches visual size closely
+      const boxWidth = size * 0.6;
+      const boxHeight = size * 0.85;
 
       const body = Matter.Bodies.rectangle(
         startX,
         startY,
-        size * 0.5,
-        size * 0.7,
+        boxWidth,
+        boxHeight,
         {
-          restitution: 0.02,
-          friction: 0.95,
-          frictionAir: 0.05,
-          frictionStatic: 0.95,
-          mass: 200,
-          angle: (Math.random() - 0.5) * 0.1, // Slight random angle
-          chamfer: { radius: size * 0.02 },
-          isStatic: true,
+          restitution: 0,
+          friction: 1,
+          frictionAir: 0.02,
+          frictionStatic: 1,
+          mass: 100,
+          angle: 0,
+          chamfer: { radius: 2 },
         }
       );
 
@@ -152,76 +149,56 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
     letterBodiesRef.current = letterBodies;
     Matter.Composite.add(engine.world, letterBodies.map(lb => lb.body));
 
-    // Show letters immediately (static)
-    const initialPositions: { [key: string]: { x: number; y: number; angle: number } } = {};
-    letterBodies.forEach((lb) => {
-      initialPositions[lb.id] = {
-        x: lb.body.position.x,
-        y: lb.body.position.y,
-        angle: lb.body.angle,
-      };
-    });
-    setPositions(initialPositions);
+    // Start the runner immediately
+    const runner = Matter.Runner.create();
+    runnerRef.current = runner;
+    Matter.Runner.run(runner, engine);
+
     setVisible(true);
 
-    // DELAY before starting the fall
-    setTimeout(() => {
-      // Make bodies dynamic (start falling)
-      letterBodies.forEach((lb) => {
-        Matter.Body.setStatic(lb.body, false);
-        // Add tiny random rotation for natural look
-        Matter.Body.setAngularVelocity(lb.body, (Math.random() - 0.5) * 0.005);
+    // Update positions on each frame
+    const updatePositions = () => {
+      const newPositions: { [key: string]: { x: number; y: number; angle: number } } = {};
+
+      letterBodiesRef.current.forEach((lb) => {
+        newPositions[lb.id] = {
+          x: lb.body.position.x,
+          y: lb.body.position.y,
+          angle: lb.body.angle,
+        };
       });
 
-      // Start the runner
-      const runner = Matter.Runner.create();
-      runnerRef.current = runner;
-      Matter.Runner.run(runner, engine);
+      setPositions(newPositions);
+      rafRef.current = requestAnimationFrame(updatePositions);
+    };
 
-      // Update positions on each frame
-      const updatePositions = () => {
-        const newPositions: { [key: string]: { x: number; y: number; angle: number } } = {};
+    updatePositions();
 
-        letterBodiesRef.current.forEach((lb) => {
-          newPositions[lb.id] = {
-            x: lb.body.position.x,
-            y: lb.body.position.y,
-            angle: lb.body.angle,
-          };
-        });
+    // Check if settled
+    settleCheckRef.current = setInterval(() => {
+      const allSettled = letterBodiesRef.current.every(lb => {
+        const velocity = lb.body.velocity;
+        const angularVelocity = lb.body.angularVelocity;
+        return Math.abs(velocity.x) < 0.05 &&
+               Math.abs(velocity.y) < 0.05 &&
+               Math.abs(angularVelocity) < 0.005;
+      });
 
-        setPositions(newPositions);
-        rafRef.current = requestAnimationFrame(updatePositions);
-      };
-
-      updatePositions();
-
-      // Check if settled
-      settleCheckRef.current = setInterval(() => {
-        const allSettled = letterBodiesRef.current.every(lb => {
-          const velocity = lb.body.velocity;
-          const angularVelocity = lb.body.angularVelocity;
-          return Math.abs(velocity.x) < 0.03 &&
-                 Math.abs(velocity.y) < 0.03 &&
-                 Math.abs(angularVelocity) < 0.003;
-        });
-
-        if (allSettled) {
-          setSettled(true);
-          if (rafRef.current) {
-            cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
-          }
-          if (runnerRef.current) {
-            Matter.Runner.stop(runnerRef.current);
-          }
-          if (settleCheckRef.current) {
-            clearInterval(settleCheckRef.current);
-            settleCheckRef.current = null;
-          }
+      if (allSettled) {
+        setSettled(true);
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
         }
-      }, 500);
-    }, 800); // 800ms delay before falling starts
+        if (runnerRef.current) {
+          Matter.Runner.stop(runnerRef.current);
+        }
+        if (settleCheckRef.current) {
+          clearInterval(settleCheckRef.current);
+          settleCheckRef.current = null;
+        }
+      }
+    }, 500);
 
   }, []);
 
@@ -261,7 +238,7 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
     if (mounted && isReady && !hasInitialized.current) {
       const timer = setTimeout(() => {
         initPhysics();
-      }, 200);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [mounted, isReady, initPhysics]);
@@ -279,16 +256,18 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, [cleanup, initPhysics, isReady]);
 
-  // Don't render until mounted and ready (but container must render for ref)
+  // Don't render until mounted and ready
   if (!mounted || !isReady) return null;
 
-  // Letter size for rendering - BIG
-  const baseSize = Math.min(window.innerHeight * 1.0, window.innerWidth * 0.7);
+  // Letter size for rendering
+  const height = window.innerHeight;
+  const width = window.innerWidth;
+  const baseSize = Math.min(280, height * 0.35, width * 0.2);
 
-  // Subtle color
+  // Solid color - no transparency, but subtle
   const letterColor = isDark
-    ? 'rgba(240, 236, 228, 0.15)'
-    : 'rgba(23, 20, 18, 0.1)';
+    ? 'rgba(255, 255, 255, 0.12)'
+    : 'rgba(0, 0, 0, 0.08)';
 
   return (
     <div
@@ -321,14 +300,12 @@ export function FallingLetters({ isReady = true }: FallingLettersProps) {
               transform: `translate(-50%, -50%) rotate(${pos.angle}rad)`,
               fontSize: size,
               fontFamily: 'var(--font-instrument, "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif)',
-              fontWeight: 600,
+              fontWeight: 700,
               color: letterColor,
               lineHeight: 1,
               userSelect: 'none',
               WebkitUserSelect: 'none',
               willChange: settled ? 'auto' : 'transform',
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
             }}
           >
             {lb.letter}
