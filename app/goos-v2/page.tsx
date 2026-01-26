@@ -47,6 +47,7 @@ import {
     GoOSFileContextMenu,
     GoOSFolderWindow,
     GoOSCreateFileDialog,
+    GoOSLinkBrowserWindow,
     type GoOSFile,
     type FileType,
 } from '@/components/goos-editor';
@@ -2780,6 +2781,7 @@ function GoOSDemoContent() {
     const [openFolders, setOpenFolders] = useState<string[]>([]); // Folder windows
     const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
     const [openImageViewers, setOpenImageViewers] = useState<string[]>([]); // Image viewer windows
+    const [openLinkBrowsers, setOpenLinkBrowsers] = useState<string[]>([]); // Link browser windows
     const [isDraggingFile, setIsDraggingFile] = useState(false); // For drag-drop visual feedback
 
     // New file type creation dialog state
@@ -3068,6 +3070,16 @@ function GoOSDemoContent() {
                 setOpenImageViewers(prev => [...prev, fileId]);
             }
             setWindowZ(prev => ({ ...prev, [`image-${fileId}`]: topZIndex + 1 }));
+            setTopZIndex(prev => prev + 1);
+            return;
+        }
+
+        // If it's a link, open in browser window
+        if (file.type === 'link' && file.linkUrl) {
+            if (!openLinkBrowsers.includes(fileId)) {
+                setOpenLinkBrowsers(prev => [...prev, fileId]);
+            }
+            setWindowZ(prev => ({ ...prev, [`link-${fileId}`]: topZIndex + 1 }));
             setTopZIndex(prev => prev + 1);
             return;
         }
@@ -4146,6 +4158,7 @@ function GoOSDemoContent() {
                                                 onContextMenu={(e) => handleFileContextMenu(e, file.id)}
                                                 onRename={(newTitle) => renameFile(file.id, newTitle)}
                                                 imageUrl={file.imageUrl}
+                                                linkUrl={file.linkUrl}
                                             />
                                         </div>
                                     </motion.div>
@@ -4405,6 +4418,29 @@ function GoOSDemoContent() {
                                             </div>
                                         )}
                                     </motion.div>
+                                );
+                            })}
+                        </AnimatePresence>
+
+                        {/* goOS Link Browser Windows */}
+                        <AnimatePresence>
+                            {openLinkBrowsers.map((linkId) => {
+                                const linkFile = goosFiles.find(f => f.id === linkId);
+                                if (!linkFile || linkFile.type !== 'link' || !linkFile.linkUrl) return null;
+                                return (
+                                    <GoOSLinkBrowserWindow
+                                        key={linkFile.id}
+                                        id={linkFile.id}
+                                        url={linkFile.linkUrl}
+                                        title={linkFile.title}
+                                        zIndex={windowZ[`link-${linkFile.id}`] || topZIndex}
+                                        isActive={windowZ[`link-${linkFile.id}`] === topZIndex}
+                                        onClose={() => setOpenLinkBrowsers(prev => prev.filter(id => id !== linkFile.id))}
+                                        onFocus={() => {
+                                            setWindowZ(prev => ({ ...prev, [`link-${linkFile.id}`]: topZIndex + 1 }));
+                                            setTopZIndex(prev => prev + 1);
+                                        }}
+                                    />
                                 );
                             })}
                         </AnimatePresence>

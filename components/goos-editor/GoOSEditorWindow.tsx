@@ -26,6 +26,10 @@ export interface GoOSFile {
   imageUrl?: string;
   imageAlt?: string;
   imageCaption?: string;
+  // Link file fields
+  linkUrl?: string;
+  linkTitle?: string;
+  linkDescription?: string;
 }
 
 interface GoOSEditorWindowProps {

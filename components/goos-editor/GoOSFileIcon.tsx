@@ -324,6 +324,8 @@ interface GoOSFileIconProps {
   onDrag?: (info: { x: number; y: number }, fileId: string) => void;
   // Image-specific props
   imageUrl?: string;
+  // Link-specific props
+  linkUrl?: string;
 }
 
 export const GoOSFileIcon = memo(function GoOSFileIcon({
@@ -344,6 +346,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   onDragStart: onDragStartProp,
   onDrag,
   imageUrl,
+  linkUrl,
 }: GoOSFileIconProps) {
   const isLocked = accessLevel === 'locked';
   const [renameValue, setRenameValue] = useState(title);
@@ -387,8 +390,120 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     [onDrag]
   );
 
+  // Get favicon URL from a link URL
+  const getFaviconUrl = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      // Use Google's favicon service for high-quality favicons
+      return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=128`;
+    } catch {
+      return null;
+    }
+  };
+
   const getIcon = () => {
     switch (type) {
+      case 'link':
+        // Beautiful macOS-style app icon with favicon
+        const faviconUrl = linkUrl ? getFaviconUrl(linkUrl) : null;
+        return (
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              position: 'relative',
+            }}
+          >
+            {/* macOS-style rounded square background with gradient */}
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 12,
+                background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 50%, #e8e8e8 100%)',
+                boxShadow: `
+                  0 1px 2px rgba(0, 0, 0, 0.06),
+                  0 4px 8px rgba(0, 0, 0, 0.08),
+                  0 8px 16px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8)
+                `,
+                border: '0.5px solid rgba(0, 0, 0, 0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+            >
+              {faviconUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={faviconUrl}
+                  alt=""
+                  style={{
+                    width: 32,
+                    height: 32,
+                    objectFit: 'contain',
+                  }}
+                  draggable={false}
+                  onError={(e) => {
+                    // Hide broken image and show fallback
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              {/* Fallback icon - shown if no favicon or on error */}
+              <div
+                style={{
+                  display: faviconUrl ? 'none' : 'flex',
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'linear-gradient(145deg, #5C6BC0 0%, #3949AB 100%)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10 6H7C5.89543 6 5 6.89543 5 8V10M10 18H7C5.89543 18 5 17.1046 5 16V14M14 6H17C18.1046 6 19 6.89543 19 8V10M14 18H17C18.1046 18 19 17.1046 19 16V14M8 12H16"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            </div>
+            {/* Small link indicator badge */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: -2,
+                right: -2,
+                width: 18,
+                height: 18,
+                borderRadius: 6,
+                background: 'linear-gradient(145deg, #ff8a4c 0%, #ff7722 100%)',
+                border: '2px solid #fff',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M7 17L17 7M17 7H8M17 7V16"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        );
       case 'image':
         // Show actual image thumbnail
         if (imageUrl) {
@@ -440,6 +555,10 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         return <FolderIcon />;
       case 'cv':
         return <CVIcon />;
+      case 'embed':
+        return <EmbedIcon />;
+      case 'download':
+        return <DownloadIcon />;
       default:
         return <NoteIcon />;
     }

@@ -192,6 +192,8 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
                 position={{ x: 0, y: 0 }}
                 onClick={onFileClick}
                 onDoubleClick={() => onFileDoubleClick(file.id)}
+                imageUrl={file.imageUrl}
+                linkUrl={file.linkUrl}
               />
             ))}
           </div>

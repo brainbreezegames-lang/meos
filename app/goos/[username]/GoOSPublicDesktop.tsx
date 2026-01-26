@@ -302,6 +302,8 @@ function GoOSDesktopContent({ desktop, isOwner }: { desktop: DesktopData; isOwne
             onRename={(title) => handleRename(file.id, title)}
             onDragStart={() => {}}
             isDraggedOver={false}
+            imageUrl={file.imageUrl}
+            linkUrl={file.linkUrl}
           />
         ))}
       </div>
