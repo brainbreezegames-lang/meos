@@ -3,6 +3,39 @@
 import React, { useEffect, useRef, useState } from "react";
 import Matter from "matter-js";
 
+// Custom collider data from the editor (percentages 0-1 of bounding box)
+const COLLIDER_DATA: Record<string, Array<{
+  type: 'rect' | 'ellipse';
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  radiusX?: number;
+  radiusY?: number;
+}>> = {
+  "H": [
+    { type: "rect", x: 0.26, y: 0.178125, width: 0.13, height: 0.56 },
+    { type: "rect", x: 0.335, y: 0.413125, width: 0.295, height: 0.0675 },
+    { type: "rect", x: 0.6075, y: 0.178125, width: 0.13249999999999995, height: 0.5650000000000001 }
+  ],
+  "E": [
+    { type: "rect", x: 0.315, y: 0.180625, width: 0.15000000000000002, height: 0.5599999999999999 },
+    { type: "rect", x: 0.4325, y: 0.400625, width: 0.2025, height: 0.10250000000000004 },
+    { type: "rect", x: 0.4275, y: 0.178125, width: 0.28, height: 0.08249999999999999 },
+    { type: "rect", x: 0.425, y: 0.638125, width: 0.30750000000000005, height: 0.10249999999999992 }
+  ],
+  "L": [
+    { type: "rect", x: 0.3325, y: 0.180625, width: 0.13, height: 0.565 },
+    { type: "rect", x: 0.3075, y: 0.610625, width: 0.4275, height: 0.14 }
+  ],
+  "O": [
+    { type: "ellipse", x: 0.49, y: 0.465625, radiusX: 0.2825, radiusY: 0.28750000000000003 }
+  ],
+  "HEAD": [
+    { type: "ellipse", x: 0.495, y: 0.495625, radiusX: 0.495, radiusY: 0.495 }
+  ]
+};
+
 interface FallingLettersProps {
   isReady?: boolean;
   text?: string;
@@ -16,7 +49,7 @@ export function FallingLetters({
   text = "HELLO",
   className,
   textSize = 280,
-  showColliders = true // DEBUG MODE
+  showColliders = false // Set to true to debug colliders
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -83,7 +116,7 @@ export function FallingLetters({
 
     World.add(engine.world, [ground, leftWall, rightWall]);
 
-    // Create letter colliders - SMALLER than visual to avoid overlap
+    // Create letter colliders from custom editor data
     const createLetterBody = (x: number, y: number, char: string, w: number, h: number) => {
       const opts: Matter.IBodyDefinition = {
         restitution: 0.05,
@@ -93,146 +126,48 @@ export function FallingLetters({
         slop: 0.01,
       };
 
-      // Stroke thickness - much smaller than visual (~10% of width)
-      const t = w * 0.10;
-      // Inset from edges - generous inset
-      const inset = w * 0.12;
+      const key = char === 'HEAD' ? 'HEAD' : char.toUpperCase();
+      const shapes = COLLIDER_DATA[key];
 
-      if (char === 'HEAD') {
-        // Circle much smaller than image - image is 90% of container, circle is 32%
-        const radius = w * 0.32;
-        return Bodies.circle(x, y, radius, opts);
+      if (!shapes || shapes.length === 0) {
+        // Fallback to simple rectangle
+        return Bodies.rectangle(x, y, w * 0.7, h * 0.7, opts);
       }
 
-      switch (char.toUpperCase()) {
-        case 'H': {
-          // H = left vertical + right vertical + crossbar
-          const hw = w / 2;
-          const hh = h / 2;
-          const barHeight = h * 0.70; // Much shorter than full height
+      // Convert editor shapes to Matter.js bodies
+      // Editor coords: x,y are percentages (0-1) of bounding box
+      // For rect: x,y is top-left corner
+      // For ellipse: x,y is center
+      const parts: Matter.Body[] = [];
 
-          // Left vertical bar (inset from edge)
-          const leftBar = Bodies.rectangle(
-            x - hw + inset + t/2,
-            y,
-            t,
-            barHeight,
-            opts
-          );
+      shapes.forEach(shape => {
+        if (shape.type === 'rect') {
+          // Convert top-left percentage to center position relative to body center
+          const rectCenterX = x + (shape.x + (shape.width || 0) / 2 - 0.5) * w;
+          const rectCenterY = y + (shape.y + (shape.height || 0) / 2 - 0.5) * h;
+          const rectW = (shape.width || 0) * w;
+          const rectH = (shape.height || 0) * h;
 
-          // Right vertical bar (inset from edge)
-          const rightBar = Bodies.rectangle(
-            x + hw - inset - t/2,
-            y,
-            t,
-            barHeight,
-            opts
-          );
+          parts.push(Bodies.rectangle(rectCenterX, rectCenterY, rectW, rectH, opts));
+        } else if (shape.type === 'ellipse') {
+          // Convert center percentage to position relative to body center
+          const ellipseCenterX = x + (shape.x - 0.5) * w;
+          const ellipseCenterY = y + (shape.y - 0.5) * h;
+          // Use average radius for circle approximation
+          const radius = ((shape.radiusX || 0) + (shape.radiusY || 0)) / 2 * Math.min(w, h);
 
-          // Crossbar (narrower)
-          const crossbar = Bodies.rectangle(
-            x,
-            y,
-            w - inset*2 - t*2,
-            t * 0.7,
-            opts
-          );
-
-          return Body.create({
-            parts: [leftBar, rightBar, crossbar],
-            ...opts
-          });
+          parts.push(Bodies.circle(ellipseCenterX, ellipseCenterY, radius, opts));
         }
+      });
 
-        case 'E': {
-          // E = vertical spine + 3 arms
-          const hw = w / 2;
-          const hh = h / 2;
-          const armLength = w * 0.45;
-          const spineHeight = h * 0.70;
-
-          // Vertical spine (inset from left)
-          const spine = Bodies.rectangle(
-            x - hw + inset + t/2,
-            y,
-            t,
-            spineHeight,
-            opts
-          );
-
-          // Top arm
-          const topArm = Bodies.rectangle(
-            x - hw + inset + t/2 + armLength/2,
-            y - hh + inset + t/2,
-            armLength,
-            t,
-            opts
-          );
-
-          // Middle arm (shorter)
-          const midArm = Bodies.rectangle(
-            x - hw + inset + t/2 + (armLength * 0.6)/2,
-            y,
-            armLength * 0.6,
-            t * 0.7,
-            opts
-          );
-
-          // Bottom arm
-          const botArm = Bodies.rectangle(
-            x - hw + inset + t/2 + armLength/2,
-            y + hh - inset - t/2,
-            armLength,
-            t,
-            opts
-          );
-
-          return Body.create({
-            parts: [spine, topArm, midArm, botArm],
-            ...opts
-          });
-        }
-
-        case 'L': {
-          // L = vertical spine + bottom arm
-          const hw = w / 2;
-          const hh = h / 2;
-          const armLength = w * 0.45;
-          const spineHeight = h * 0.70;
-
-          // Vertical spine (inset)
-          const spine = Bodies.rectangle(
-            x - hw + inset + t/2,
-            y,
-            t,
-            spineHeight,
-            opts
-          );
-
-          // Bottom arm
-          const botArm = Bodies.rectangle(
-            x - hw + inset + t/2 + armLength/2,
-            y + hh - inset - t/2,
-            armLength,
-            t,
-            opts
-          );
-
-          return Body.create({
-            parts: [spine, botArm],
-            ...opts
-          });
-        }
-
-        case 'O': {
-          // O = circle much smaller than the letter outline
-          const radius = Math.min(w, h) * 0.30;
-          return Bodies.circle(x, y, radius, opts);
-        }
-
-        default:
-          return Bodies.rectangle(x, y, w * 0.7, h * 0.7, opts);
+      if (parts.length === 1) {
+        return parts[0];
       }
+
+      return Body.create({
+        parts,
+        ...opts
+      });
     };
 
     const validLetterNodes = lettersRef.current.filter(n => n !== null);
@@ -394,11 +329,11 @@ export function FallingLetters({
           >
             {item === 'HEAD' ? (
               <img
-                src="/zinoHead.svg"
+                src="/zinoHead.png"
                 alt=""
                 style={{
-                  width: '90%',
-                  height: '90%',
+                  width: '100%',
+                  height: '100%',
                   objectFit: 'contain',
                 }}
               />
