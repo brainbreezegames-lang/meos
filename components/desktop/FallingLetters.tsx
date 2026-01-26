@@ -8,7 +8,7 @@ interface FallingLettersProps {
   text?: string;
   className?: string;
   textSize?: number;
-  showColliders?: boolean; // DEBUG: show red collider outlines
+  showColliders?: boolean;
 }
 
 export function FallingLetters({
@@ -16,7 +16,7 @@ export function FallingLetters({
   text = "HELLO",
   className,
   textSize = 280,
-  showColliders = true // DEBUG MODE ON - shows red collider shapes
+  showColliders = true // DEBUG MODE
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,8 +29,7 @@ export function FallingLetters({
 
   useEffect(() => {
     setMounted(true);
-    console.log('[FallingLetters] Mounted, showColliders:', showColliders);
-  }, [showColliders]);
+  }, []);
 
   useEffect(() => {
     if (!mounted || !isReady || !containerRef.current) return;
@@ -44,13 +43,12 @@ export function FallingLetters({
     };
     cleanup();
 
-    const { Engine, World, Bodies, Body, Runner, Vertices } = Matter;
+    const { Engine, World, Bodies, Body, Runner, Composite } = Matter;
 
     const engine = Engine.create();
     engineRef.current = engine;
 
     engine.gravity.y = 1;
-    // Optimized iterations - balance between accuracy and performance
     engine.positionIterations = 10;
     engine.velocityIterations = 8;
 
@@ -64,7 +62,7 @@ export function FallingLetters({
       containerHeight + wallThickness / 2,
       containerWidth * 2,
       wallThickness,
-      { isStatic: true, friction: 0.8, restitution: 0.1 }
+      { isStatic: true, friction: 0.8, restitution: 0.05 }
     );
 
     const leftWall = Bodies.rectangle(
@@ -85,9 +83,9 @@ export function FallingLetters({
 
     World.add(engine.world, [ground, leftWall, rightWall]);
 
-    // Create precise letter colliders using vertices
+    // Create letter colliders using COMPOUND BODIES (multiple parts)
     const createLetterBody = (x: number, y: number, char: string, w: number, h: number) => {
-      const opts = {
+      const opts: Matter.IBodyDefinition = {
         restitution: 0.05,
         friction: 0.6,
         frictionStatic: 0.8,
@@ -95,96 +93,141 @@ export function FallingLetters({
         slop: 0.01,
       };
 
-      // Stroke thickness relative to letter size (serif font ~20%)
-      const t = w * 0.20;
+      // Stroke thickness for serif font (~18-20% of width)
+      const t = w * 0.19;
 
       if (char === 'HEAD') {
-        // Perfect circle for the head
-        return Bodies.circle(x, y, w * 0.45, opts);
+        // Circle exactly matching the image size (90% of container)
+        const radius = (w * 0.9) / 2;
+        return Bodies.circle(x, y, radius, opts);
       }
 
       switch (char.toUpperCase()) {
         case 'H': {
-          // H shape: two verticals + crossbar
-          // Using fromVertices for precise shape
+          // H = left vertical + right vertical + crossbar (3 rectangles)
           const hw = w / 2;
           const hh = h / 2;
-          const st = t / 2; // half stroke
 
-          const hVerts = [
-            // Left vertical (going clockwise from top-left)
-            { x: -hw, y: -hh },
-            { x: -hw + t, y: -hh },
-            { x: -hw + t, y: -st },
-            // Crossbar top
-            { x: hw - t, y: -st },
-            { x: hw - t, y: -hh },
-            // Right vertical top
-            { x: hw, y: -hh },
-            { x: hw, y: hh },
-            { x: hw - t, y: hh },
-            { x: hw - t, y: st },
-            // Crossbar bottom
-            { x: -hw + t, y: st },
-            { x: -hw + t, y: hh },
-            { x: -hw, y: hh },
-          ];
+          // Left vertical bar
+          const leftBar = Bodies.rectangle(
+            x - hw + t/2,
+            y,
+            t,
+            h,
+            opts
+          );
 
-          return Bodies.fromVertices(x, y, [hVerts], opts);
+          // Right vertical bar
+          const rightBar = Bodies.rectangle(
+            x + hw - t/2,
+            y,
+            t,
+            h,
+            opts
+          );
+
+          // Crossbar (horizontal middle)
+          const crossbar = Bodies.rectangle(
+            x,
+            y,
+            w - t*2,
+            t * 0.9,
+            opts
+          );
+
+          return Body.create({
+            parts: [leftBar, rightBar, crossbar],
+            ...opts
+          });
         }
 
         case 'E': {
-          // E shape: spine + three arms
+          // E = vertical spine + top arm + middle arm + bottom arm
           const hw = w / 2;
           const hh = h / 2;
-          const armLen = w * 0.75;
+          const armLength = w * 0.7;
 
-          const eVerts = [
-            // Start top-left, go clockwise
-            { x: -hw, y: -hh },
-            { x: -hw + armLen, y: -hh },
-            { x: -hw + armLen, y: -hh + t },
-            { x: -hw + t, y: -hh + t },
-            // Down to middle arm
-            { x: -hw + t, y: -t/2 },
-            { x: -hw + armLen * 0.7, y: -t/2 },
-            { x: -hw + armLen * 0.7, y: t/2 },
-            { x: -hw + t, y: t/2 },
-            // Down to bottom arm
-            { x: -hw + t, y: hh - t },
-            { x: -hw + armLen, y: hh - t },
-            { x: -hw + armLen, y: hh },
-            { x: -hw, y: hh },
-          ];
+          // Vertical spine (left side)
+          const spine = Bodies.rectangle(
+            x - hw + t/2,
+            y,
+            t,
+            h,
+            opts
+          );
 
-          return Bodies.fromVertices(x, y, [eVerts], opts);
+          // Top arm
+          const topArm = Bodies.rectangle(
+            x - hw + t/2 + armLength/2,
+            y - hh + t/2,
+            armLength,
+            t,
+            opts
+          );
+
+          // Middle arm (slightly shorter)
+          const midArm = Bodies.rectangle(
+            x - hw + t/2 + (armLength * 0.8)/2,
+            y,
+            armLength * 0.8,
+            t * 0.85,
+            opts
+          );
+
+          // Bottom arm
+          const botArm = Bodies.rectangle(
+            x - hw + t/2 + armLength/2,
+            y + hh - t/2,
+            armLength,
+            t,
+            opts
+          );
+
+          return Body.create({
+            parts: [spine, topArm, midArm, botArm],
+            ...opts
+          });
         }
 
         case 'L': {
-          // L shape: vertical + horizontal
+          // L = vertical spine + bottom arm
           const hw = w / 2;
           const hh = h / 2;
-          const armLen = w * 0.8;
+          const armLength = w * 0.7;
 
-          const lVerts = [
-            { x: -hw, y: -hh },
-            { x: -hw + t, y: -hh },
-            { x: -hw + t, y: hh - t },
-            { x: -hw + armLen, y: hh - t },
-            { x: -hw + armLen, y: hh },
-            { x: -hw, y: hh },
-          ];
+          // Vertical spine
+          const spine = Bodies.rectangle(
+            x - hw + t/2,
+            y,
+            t,
+            h,
+            opts
+          );
 
-          return Bodies.fromVertices(x, y, [lVerts], opts);
+          // Bottom arm
+          const botArm = Bodies.rectangle(
+            x - hw + t/2 + armLength/2,
+            y + hh - t/2,
+            armLength,
+            t,
+            opts
+          );
+
+          return Body.create({
+            parts: [spine, botArm],
+            ...opts
+          });
         }
 
         case 'O': {
-          // O is best as a circle for smooth rolling
-          return Bodies.circle(x, y, Math.min(w, h) * 0.45, opts);
+          // O = circle sized to match the letter
+          // O letter is typically 85-90% of the bounding box
+          const radius = Math.min(w, h) * 0.42;
+          return Bodies.circle(x, y, radius, opts);
         }
 
         default:
-          return Bodies.rectangle(x, y, w * 0.9, h * 0.9, opts);
+          return Bodies.rectangle(x, y, w * 0.85, h * 0.85, opts);
       }
     };
 
@@ -194,8 +237,6 @@ export function FallingLetters({
       if (!node) return null;
 
       const rect = node.getBoundingClientRect();
-      const containerRect = containerRef.current!.getBoundingClientRect();
-
       const physWidth = rect.width;
       const physHeight = rect.height;
 
@@ -223,7 +264,6 @@ export function FallingLetters({
     runnerRef.current = runner;
     Runner.run(runner, engine);
 
-    // Debug canvas for collider visualization
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
 
@@ -234,7 +274,6 @@ export function FallingLetters({
 
     let requestID: number;
     const updateLoop = () => {
-      // Update letter positions
       bodiesWithNodes.forEach(({ body, node, width, height }) => {
         const { x, y } = body.position;
         const angle = body.angle;
@@ -244,18 +283,18 @@ export function FallingLetters({
         node.style.visibility = 'visible';
       });
 
-      // Draw colliders in red for debugging
+      // Draw colliders in red
       if (ctx && showColliders && canvas) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.9)';
         ctx.lineWidth = 2;
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.15)';
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
 
         bodiesWithNodes.forEach(({ body }) => {
           const parts = body.parts;
 
           parts.forEach((part, partIndex) => {
-            // Skip the parent compound body (index 0 for compound bodies)
+            // Skip parent body in compound (index 0)
             if (parts.length > 1 && partIndex === 0) return;
 
             const vertices = part.vertices;
@@ -273,11 +312,12 @@ export function FallingLetters({
           });
         });
 
-        // Draw walls for reference
+        // Draw boundary lines
         ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
         ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
 
-        // Ground line
+        // Ground
         ctx.beginPath();
         ctx.moveTo(0, containerHeight);
         ctx.lineTo(containerWidth, containerHeight);
@@ -288,6 +328,8 @@ export function FallingLetters({
         ctx.moveTo(containerWidth * 0.5, 0);
         ctx.lineTo(containerWidth * 0.5, containerHeight);
         ctx.stroke();
+
+        ctx.setLineDash([]);
       }
 
       requestID = requestAnimationFrame(updateLoop);
@@ -311,7 +353,6 @@ export function FallingLetters({
       className={containerClass}
       aria-hidden="true"
     >
-      {/* Debug canvas for collider visualization */}
       {showColliders && (
         <canvas
           ref={canvasRef}
