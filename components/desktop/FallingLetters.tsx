@@ -53,8 +53,8 @@ export function FallingLetters({
     engine.gravity.y = 1;
 
     // HUMAN: High precision to prevent overlap
-    engine.positionIterations = 20;
-    engine.velocityIterations = 20;
+    engine.positionIterations = 30;
+    engine.velocityIterations = 30;
 
     const containerWidth = containerRef.current.clientWidth;
     const containerHeight = containerRef.current.clientHeight;
@@ -146,8 +146,9 @@ export function FallingLetters({
       if (!node) return null;
 
       const rect = node.getBoundingClientRect();
-      const physWidth = rect.width * 0.85;
-      const physHeight = rect.height * 0.85;
+      // EXACT SIZE MATCHING to preventing overlap
+      const physWidth = rect.width;
+      const physHeight = rect.height;
 
       const minX = physWidth / 2 + 50;
       const maxX = Math.max(minX + 10, containerWidth * 0.35);

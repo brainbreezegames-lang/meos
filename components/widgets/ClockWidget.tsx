@@ -365,11 +365,11 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
             }}
           />
 
-          {/* Digital time display */}
+          {/* Timezone display - centered */}
           <div
             style={{
               position: 'absolute',
-              bottom: 24,
+              bottom: 32,
               left: '50%',
               transform: 'translateX(-50%)',
               textAlign: 'center',
@@ -377,25 +377,10 @@ export function ClockWidget({ widget, isOwner, onEdit, onDelete, onPositionChang
           >
             <div
               style={{
-                fontSize: 26,
-                fontWeight: 600,
-                fontFamily: 'var(--font-display, -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif)',
-                color: theme.timeColor,
-                letterSpacing: '-0.02em',
-                lineHeight: 1,
-                fontVariantNumeric: 'tabular-nums',
-                transition: 'color 0.4s ease',
-              }}
-            >
-              {hours}:{minutes}
-            </div>
-            <div
-              style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 600,
                 color: theme.timezoneColor,
-                letterSpacing: '0.04em',
-                marginTop: 3,
+                letterSpacing: '0.05em',
                 textTransform: 'uppercase',
                 transition: 'color 0.4s ease',
               }}
