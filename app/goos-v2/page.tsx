@@ -3967,56 +3967,59 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* LAVA BACKGROUND - 28 individual flame columns rising from bottom */}
+            {/* LAVA BACKGROUND - Organic flame columns with random positioning */}
             {!wallpaper && (
                 <div
                     className="absolute inset-0 pointer-events-none overflow-hidden"
                     style={{ zIndex: 5, filter: 'blur(40px)', willChange: 'transform' }}
                 >
                     <style>{`
-                        @keyframes flame1 { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-12px) scaleY(1.08)} }
-                        @keyframes flame2 { 0%,100%{transform:translateY(0) scaleY(1)} 45%{transform:translateY(-18px) scaleY(1.06)} }
-                        @keyframes flame3 { 0%,100%{transform:translateY(0) scaleY(1)} 55%{transform:translateY(-10px) scaleY(1.1)} }
-                        @keyframes flame4 { 0%,100%{transform:translateY(0) scaleY(1)} 35%{transform:translateY(-22px) scaleY(1.04)} }
-                        @keyframes flame5 { 0%,100%{transform:translateY(0) scaleY(1)} 65%{transform:translateY(-8px) scaleY(1.12)} }
-                        @keyframes flame6 { 0%,100%{transform:translateY(0) scaleY(1)} 40%{transform:translateY(-15px) scaleY(1.07)} }
-                        @media (prefers-reduced-motion: reduce) {
-                            [data-flame] { animation: none !important; }
-                        }
+                        @keyframes f1 { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-12px) scaleY(1.08)} }
+                        @keyframes f2 { 0%,100%{transform:translateY(0) scaleY(1)} 45%{transform:translateY(-18px) scaleY(1.06)} }
+                        @keyframes f3 { 0%,100%{transform:translateY(0) scaleY(1)} 55%{transform:translateY(-10px) scaleY(1.1)} }
+                        @keyframes f4 { 0%,100%{transform:translateY(0) scaleY(1)} 35%{transform:translateY(-22px) scaleY(1.04)} }
+                        @keyframes f5 { 0%,100%{transform:translateY(0) scaleY(1)} 65%{transform:translateY(-8px) scaleY(1.12)} }
+                        @keyframes f6 { 0%,100%{transform:translateY(0) scaleY(1)} 40%{transform:translateY(-15px) scaleY(1.07)} }
+                        @keyframes f7 { 0%,100%{transform:translateY(0) scaleY(1)} 48%{transform:translateY(-14px) scaleY(1.09)} }
+                        @keyframes f8 { 0%,100%{transform:translateY(0) scaleY(1)} 58%{transform:translateY(-20px) scaleY(1.05)} }
+                        @media (prefers-reduced-motion: reduce) { [data-f] { animation: none !important; } }
                     `}</style>
-                    {/* Deep reds - back layer (full coverage from -10% to 105%) */}
-                    <div data-flame style={{position:'absolute',bottom:'-8%',left:'-10%',width:'18%',height:'22%',background:'linear-gradient(to top,#8B1A1A,#A02525 70%,transparent)',animation:'flame1 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-8%',left:'5%',width:'14%',height:'19%',background:'linear-gradient(to top,#922020,#B03030 65%,transparent)',animation:'flame3 10s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-8%',left:'18%',width:'16%',height:'24%',background:'linear-gradient(to top,#7D1515,#9A2020 75%,transparent)',animation:'flame2 12s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-8%',left:'32%',width:'15%',height:'21%',background:'linear-gradient(to top,#851919,#A32323 68%,transparent)',animation:'flame5 9s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-8%',left:'48%',width:'14%',height:'23%',background:'linear-gradient(to top,#881818,#A52828 72%,transparent)',animation:'flame4 11s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-8%',left:'62%',width:'16%',height:'20%',background:'linear-gradient(to top,#7A1212,#952222 66%,transparent)',animation:'flame6 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-8%',left:'78%',width:'15%',height:'25%',background:'linear-gradient(to top,#8F1C1C,#AA2A2A 74%,transparent)',animation:'flame1 10s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-8%',left:'92%',width:'18%',height:'21%',background:'linear-gradient(to top,#821616,#9D2020 70%,transparent)',animation:'flame3 13s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    {/* Oranges - middle layer */}
-                    <div data-flame style={{position:'absolute',bottom:'-6%',left:'-5%',width:'14%',height:'24%',background:'linear-gradient(to top,#C54010,#E85515 72%,transparent)',animation:'flame2 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-6%',left:'8%',width:'15%',height:'28%',background:'linear-gradient(to top,#D04812,#F06018 76%,transparent)',animation:'flame5 9s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-6%',left:'22%',width:'16%',height:'32%',background:'linear-gradient(to top,#CC4510,#EE5A15 80%,transparent)',animation:'flame1 11s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-6%',left:'36%',width:'17%',height:'36%',background:'linear-gradient(to top,#D55015,#FF6820 84%,transparent)',animation:'flame3 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-6%',left:'50%',width:'15%',height:'30%',background:'linear-gradient(to top,#CA4212,#E85818 75%,transparent)',animation:'flame6 10s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-6%',left:'64%',width:'14%',height:'26%',background:'linear-gradient(to top,#D24A14,#F26220 70%,transparent)',animation:'flame4 12s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-6%',left:'78%',width:'16%',height:'28%',background:'linear-gradient(to top,#C84010,#E55515 73%,transparent)',animation:'flame2 9s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-6%',left:'92%',width:'15%',height:'25%',background:'linear-gradient(to top,#D55218,#F5681C 78%,transparent)',animation:'flame5 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    {/* Bright oranges - front layer */}
-                    <div data-flame style={{position:'absolute',bottom:'-4%',left:'0%',width:'12%',height:'22%',background:'linear-gradient(to top,#FF6B00,#FF8525 72%,transparent)',animation:'flame4 6s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-4%',left:'12%',width:'14%',height:'28%',background:'linear-gradient(to top,#FF7010,#FF9030 77%,transparent)',animation:'flame6 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-4%',left:'26%',width:'15%',height:'34%',background:'linear-gradient(to top,#FF7800,#FFA040 82%,transparent)',animation:'flame1 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-4%',left:'40%',width:'16%',height:'40%',background:'linear-gradient(to top,#FF8200,#FFB050 86%,transparent)',animation:'flame3 9s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-4%',left:'54%',width:'14%',height:'32%',background:'linear-gradient(to top,#FF7500,#FF9535 79%,transparent)',animation:'flame2 6s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-4%',left:'68%',width:'13%',height:'26%',background:'linear-gradient(to top,#FF6800,#FF8828 74%,transparent)',animation:'flame5 10s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-4%',left:'82%',width:'15%',height:'30%',background:'linear-gradient(to top,#FF7208,#FF9232 78%,transparent)',animation:'flame4 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-4%',left:'96%',width:'14%',height:'24%',background:'linear-gradient(to top,#FF6E05,#FF8E28 75%,transparent)',animation:'flame6 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    {/* Golden/yellow highlights - top layer */}
-                    <div data-flame style={{position:'absolute',bottom:'-3%',left:'18%',width:'12%',height:'24%',background:'linear-gradient(to top,#FF9020,#FFB848 74%,transparent)',animation:'flame2 5s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-3%',left:'32%',width:'14%',height:'32%',background:'linear-gradient(to top,#FFA030,#FFC858 80%,transparent)',animation:'flame6 7s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-3%',left:'46%',width:'15%',height:'38%',background:'linear-gradient(to top,#FFAA40,#FFD868 85%,transparent)',animation:'flame1 6s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-3%',left:'60%',width:'13%',height:'28%',background:'linear-gradient(to top,#FF9828,#FFC050 77%,transparent)',animation:'flame3 8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-flame style={{position:'absolute',bottom:'-3%',left:'74%',width:'12%',height:'22%',background:'linear-gradient(to top,#FF9520,#FFB445 73%,transparent)',animation:'flame5 6s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    {/* Deep reds - scattered randomly */}
+                    <div data-f style={{position:'absolute',bottom:'-8%',left:'-8%',width:'19%',height:'23%',background:'linear-gradient(to top,#8B1A1A,#A02525 70%,transparent)',animation:'f1 8.2s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-9%',left:'7%',width:'11%',height:'18%',background:'linear-gradient(to top,#922020,#B03030 65%,transparent)',animation:'f4 11.3s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-7%',left:'15%',width:'17%',height:'26%',background:'linear-gradient(to top,#7D1515,#9A2020 75%,transparent)',animation:'f7 9.7s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-10%',left:'28%',width:'13%',height:'20%',background:'linear-gradient(to top,#851919,#A32323 68%,transparent)',animation:'f2 12.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-8%',left:'42%',width:'16%',height:'24%',background:'linear-gradient(to top,#881818,#A52828 72%,transparent)',animation:'f5 8.5s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-9%',left:'55%',width:'14%',height:'21%',background:'linear-gradient(to top,#7A1212,#952222 66%,transparent)',animation:'f8 10.2s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-7%',left:'68%',width:'18%',height:'25%',background:'linear-gradient(to top,#8F1C1C,#AA2A2A 74%,transparent)',animation:'f3 13.1s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-8%',left:'83%',width:'12%',height:'19%',background:'linear-gradient(to top,#821616,#9D2020 70%,transparent)',animation:'f6 9.4s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-9%',left:'94%',width:'16%',height:'22%',background:'linear-gradient(to top,#8A1919,#A42424 71%,transparent)',animation:'f1 11.7s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    {/* Oranges - overlapping organically */}
+                    <div data-f style={{position:'absolute',bottom:'-6%',left:'-4%',width:'15%',height:'27%',background:'linear-gradient(to top,#C54010,#E85515 72%,transparent)',animation:'f3 7.3s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-7%',left:'9%',width:'13%',height:'31%',background:'linear-gradient(to top,#D04812,#F06018 76%,transparent)',animation:'f6 8.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-5%',left:'19%',width:'18%',height:'35%',background:'linear-gradient(to top,#CC4510,#EE5A15 80%,transparent)',animation:'f2 10.5s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-6%',left:'33%',width:'16%',height:'38%',background:'linear-gradient(to top,#D55015,#FF6820 84%,transparent)',animation:'f7 7.9s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-7%',left:'46%',width:'14%',height:'29%',background:'linear-gradient(to top,#CA4212,#E85818 75%,transparent)',animation:'f4 9.2s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-5%',left:'58%',width:'17%',height:'33%',background:'linear-gradient(to top,#D24A14,#F26220 78%,transparent)',animation:'f1 11.4s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-6%',left:'72%',width:'15%',height:'26%',background:'linear-gradient(to top,#C84010,#E55515 73%,transparent)',animation:'f8 8.1s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-7%',left:'85%',width:'13%',height:'30%',background:'linear-gradient(to top,#D55218,#F5681C 77%,transparent)',animation:'f5 6.7s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-5%',left:'96%',width:'14%',height:'24%',background:'linear-gradient(to top,#CB4511,#EC5916 74%,transparent)',animation:'f3 10.3s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    {/* Bright oranges - varied heights and positions */}
+                    <div data-f style={{position:'absolute',bottom:'-4%',left:'-2%',width:'11%',height:'24%',background:'linear-gradient(to top,#FF6B00,#FF8525 72%,transparent)',animation:'f5 5.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-5%',left:'8%',width:'14%',height:'32%',background:'linear-gradient(to top,#FF7010,#FF9030 77%,transparent)',animation:'f2 7.4s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-3%',left:'21%',width:'16%',height:'37%',background:'linear-gradient(to top,#FF7800,#FFA040 82%,transparent)',animation:'f8 6.2s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-4%',left:'35%',width:'18%',height:'42%',background:'linear-gradient(to top,#FF8200,#FFB050 86%,transparent)',animation:'f4 8.6s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-5%',left:'50%',width:'13%',height:'34%',background:'linear-gradient(to top,#FF7500,#FF9535 79%,transparent)',animation:'f7 5.5s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-3%',left:'62%',width:'15%',height:'28%',background:'linear-gradient(to top,#FF6800,#FF8828 74%,transparent)',animation:'f1 9.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-4%',left:'76%',width:'17%',height:'36%',background:'linear-gradient(to top,#FF7208,#FF9232 78%,transparent)',animation:'f6 7.1s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-5%',left:'91%',width:'14%',height:'29%',background:'linear-gradient(to top,#FF6E05,#FF8E28 75%,transparent)',animation:'f3 6.4s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    {/* Golden/yellow highlights - brightest spots */}
+                    <div data-f style={{position:'absolute',bottom:'-2%',left:'12%',width:'13%',height:'26%',background:'linear-gradient(to top,#FF9020,#FFB848 74%,transparent)',animation:'f4 4.7s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-3%',left:'28%',width:'15%',height:'34%',background:'linear-gradient(to top,#FFA030,#FFC858 80%,transparent)',animation:'f1 6.3s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-2%',left:'42%',width:'17%',height:'40%',background:'linear-gradient(to top,#FFAA40,#FFD868 85%,transparent)',animation:'f7 5.1s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-3%',left:'57%',width:'14%',height:'30%',background:'linear-gradient(to top,#FF9828,#FFC050 77%,transparent)',animation:'f5 7.6s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-2%',left:'70%',width:'12%',height:'24%',background:'linear-gradient(to top,#FF9520,#FFB445 73%,transparent)',animation:'f2 5.9s ease-in-out infinite',transformOrigin:'bottom'}}/>
+                    <div data-f style={{position:'absolute',bottom:'-3%',left:'82%',width:'16%',height:'32%',background:'linear-gradient(to top,#FFA235,#FFCA5A 79%,transparent)',animation:'f8 6.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
                 </div>
             )}
 
