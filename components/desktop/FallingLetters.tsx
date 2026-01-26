@@ -6,26 +6,27 @@ import Matter from "matter-js";
 interface FallingLettersProps {
   isReady?: boolean;
   text?: string;
-  className?: string; // allow overriding styles
+  className?: string;
   textSize?: number;
+  showColliders?: boolean; // DEBUG: show red collider outlines
 }
 
 export function FallingLetters({
   isReady = true,
   text = "HELLO",
   className,
-  textSize = 336
+  textSize = 280,
+  showColliders = true // Set to true for debugging
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const lettersRef = useRef<(HTMLDivElement | null)[]>([]);
   const engineRef = useRef<Matter.Engine | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // Combine text characters with the special head item
   const items = React.useMemo(() => [...text.split(''), 'HEAD'], [text]);
 
-  // Handle client-side mounting
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -33,7 +34,6 @@ export function FallingLetters({
   useEffect(() => {
     if (!mounted || !isReady || !containerRef.current) return;
 
-    // cleanup previous instances
     const cleanup = () => {
       if (runnerRef.current) Matter.Runner.stop(runnerRef.current);
       if (engineRef.current) {
@@ -43,215 +43,252 @@ export function FallingLetters({
     };
     cleanup();
 
-    const Engine = Matter.Engine,
-      World = Matter.World,
-      Bodies = Matter.Bodies,
-      Body = Matter.Body,
-      Runner = Matter.Runner;
+    const { Engine, World, Bodies, Body, Runner, Vertices } = Matter;
 
     const engine = Engine.create();
     engineRef.current = engine;
 
-    // Standard gravity
     engine.gravity.y = 1;
-
-    // HUMAN: High precision to prevent overlap
-    engine.positionIterations = 30;
-    engine.velocityIterations = 30;
+    // Optimized iterations - balance between accuracy and performance
+    engine.positionIterations = 10;
+    engine.velocityIterations = 8;
 
     const containerWidth = containerRef.current.clientWidth;
     const containerHeight = containerRef.current.clientHeight;
 
-    // Boundaries: Ground and Walls
     const wallThickness = 200;
 
-    // Ground - exactly at bottom edge
     const ground = Bodies.rectangle(
       containerWidth / 2,
-      containerHeight + (wallThickness / 2),
-      containerWidth,
+      containerHeight + wallThickness / 2,
+      containerWidth * 2,
       wallThickness,
-      { isStatic: true, label: "Ground", render: { visible: false }, friction: 1 }
+      { isStatic: true, friction: 0.8, restitution: 0.1 }
     );
 
-    // Left Wall - exactly at left edge
     const leftWall = Bodies.rectangle(
-      0 - (wallThickness / 2),
+      -wallThickness / 2,
       containerHeight / 2,
       wallThickness,
-      containerHeight * 4,
-      { isStatic: true, label: "LeftWall", render: { visible: false }, friction: 0 }
+      containerHeight * 3,
+      { isStatic: true, friction: 0.3 }
     );
 
-    // Right Wall - exactly at right edge
     const rightWall = Bodies.rectangle(
-      containerWidth + (wallThickness / 2),
+      containerWidth * 0.5 + wallThickness / 2,
       containerHeight / 2,
       wallThickness,
-      containerHeight * 4,
-      { isStatic: true, label: "RightWall", render: { visible: false }, friction: 0 }
+      containerHeight * 3,
+      { isStatic: true, friction: 0.3 }
     );
 
     World.add(engine.world, [ground, leftWall, rightWall]);
 
-    // -------------------------------------------------------------------------
-    // CUSTOM LETTER BODIES
-    // Helper to create compound bodies for standard sans-serif block letters
-    // -------------------------------------------------------------------------
-    const createLetterBody = (x: number, y: number, char: string, width: number, height: number) => {
+    // Create precise letter colliders using vertices
+    const createLetterBody = (x: number, y: number, char: string, w: number, h: number) => {
       const opts = {
-        restitution: 0.1, // Almost no bounce
-        friction: 1,      // maximal friction to stop sliding/interpenetration
-        frictionStatic: 1,
-        density: 1,       // Very heavy
-        label: char,
-        slop: 0.05        // Reduce slop to force hard collisions
+        restitution: 0.05,
+        friction: 0.6,
+        frictionStatic: 0.8,
+        density: 0.002,
+        slop: 0.01,
       };
 
-      // SPECIAL ZINO HEAD -> CIRCLE COLLIDER
-      if (char === 'HEAD') {
-        // Using a circle collider roughly fitting the O is the best "perfect" interaction.
-        // Circle radius = width / 2
-        return Bodies.circle(x, y, width / 2, opts);
-      }
+      // Stroke thickness relative to letter size (serif font ~20%)
+      const t = w * 0.20;
 
-      // Averia Serif is organic and thinner than a slab serif.
-      // Thickness of the strokes is roughly 15-18% of the width.
-      const t = width * 0.18;
-      const serifWidth = t * 2.5;
-      const serifHeight = t * 0.6;
+      if (char === 'HEAD') {
+        // Perfect circle for the head
+        return Bodies.circle(x, y, w * 0.45, opts);
+      }
 
       switch (char.toUpperCase()) {
         case 'H': {
-          // H: Two verticals + Crossbar + 4 Serifs
-          const leftX = x - width / 2 + t / 2;
-          const rightX = x + width / 2 - t / 2;
+          // H shape: two verticals + crossbar
+          // Using fromVertices for precise shape
+          const hw = w / 2;
+          const hh = h / 2;
+          const st = t / 2; // half stroke
 
-          // Vertical bars (slightly shorter to make room for serif height if we wanted exactness, but overlapping is safer)
-          const left = Bodies.rectangle(leftX, y, t, height, opts);
-          const right = Bodies.rectangle(rightX, y, t, height, opts);
-          const cross = Bodies.rectangle(x, y, width - 2 * t, t * 0.8, opts); // Crossbar is usually thinner
+          const hVerts = [
+            // Left vertical (going clockwise from top-left)
+            { x: -hw, y: -hh },
+            { x: -hw + t, y: -hh },
+            { x: -hw + t, y: -st },
+            // Crossbar top
+            { x: hw - t, y: -st },
+            { x: hw - t, y: -hh },
+            // Right vertical top
+            { x: hw, y: -hh },
+            { x: hw, y: hh },
+            { x: hw - t, y: hh },
+            { x: hw - t, y: st },
+            // Crossbar bottom
+            { x: -hw + t, y: st },
+            { x: -hw + t, y: hh },
+            { x: -hw, y: hh },
+          ];
 
-          // Serifs (Top-Left, Bottom-Left, Top-Right, Bottom-Right)
-          const tl = Bodies.rectangle(leftX, y - height / 2 + serifHeight / 2, serifWidth, serifHeight, opts);
-          const bl = Bodies.rectangle(leftX, y + height / 2 - serifHeight / 2, serifWidth, serifHeight, opts);
-          const tr = Bodies.rectangle(rightX, y - height / 2 + serifHeight / 2, serifWidth, serifHeight, opts);
-          const br = Bodies.rectangle(rightX, y + height / 2 - serifHeight / 2, serifWidth, serifHeight, opts);
-
-          return Body.create({ parts: [left, right, cross, tl, bl, tr, br], ...opts });
+          return Bodies.fromVertices(x, y, [hVerts], opts);
         }
+
         case 'E': {
-          // E: Spine + 3 Arms + Serifs
-          const spineX = x - width / 2 + t / 2;
+          // E shape: spine + three arms
+          const hw = w / 2;
+          const hh = h / 2;
+          const armLen = w * 0.75;
 
-          const spine = Bodies.rectangle(spineX, y, t, height, opts);
+          const eVerts = [
+            // Start top-left, go clockwise
+            { x: -hw, y: -hh },
+            { x: -hw + armLen, y: -hh },
+            { x: -hw + armLen, y: -hh + t },
+            { x: -hw + t, y: -hh + t },
+            // Down to middle arm
+            { x: -hw + t, y: -t/2 },
+            { x: -hw + armLen * 0.7, y: -t/2 },
+            { x: -hw + armLen * 0.7, y: t/2 },
+            { x: -hw + t, y: t/2 },
+            // Down to bottom arm
+            { x: -hw + t, y: hh - t },
+            { x: -hw + armLen, y: hh - t },
+            { x: -hw + armLen, y: hh },
+            { x: -hw, y: hh },
+          ];
 
-          // Arms - Top, Middle, Bottom
-          // Use width * 0.9 for arms to account for visual length
-          const top = Bodies.rectangle(x + t / 2, y - height / 2 + t / 2, width - t, t, opts);
-          const mid = Bodies.rectangle(x + t / 2, y, width - t * 1.5, t * 0.9, opts); // Middle arm often shorter/thinner
-          const bot = Bodies.rectangle(x + t / 2, y + height / 2 - t / 2, width - t, t, opts);
-
-          // Serifs on Spine (Top and Bottom left) extend leftwards? Actually Averia E has serifs on the right tips of arms
-          // Vertical serifs at end of arms
-          const armSerifH = t * 2.5;
-          const armSerifW = t * 0.6;
-
-          const topSerif = Bodies.rectangle(x + width / 2 - armSerifW / 2, y - height / 2 + armSerifH / 2, armSerifW, armSerifH, opts);
-          const botSerif = Bodies.rectangle(x + width / 2 - armSerifW / 2, y + height / 2 - armSerifH / 2, armSerifW, armSerifH, opts);
-          // Main spine serifs (top/bottom left)
-          const spineTopSerif = Bodies.rectangle(spineX, y - height / 2 + serifHeight / 2, serifWidth, serifHeight, opts);
-          const spineBotSerif = Bodies.rectangle(spineX, y + height / 2 - serifHeight / 2, serifWidth, serifHeight, opts);
-
-          return Body.create({ parts: [spine, top, mid, bot, topSerif, botSerif, spineTopSerif, spineBotSerif], ...opts });
+          return Bodies.fromVertices(x, y, [eVerts], opts);
         }
+
         case 'L': {
-          // L: Spine + Bottom Arm
-          const spineX = x - width / 2 + t / 2;
+          // L shape: vertical + horizontal
+          const hw = w / 2;
+          const hh = h / 2;
+          const armLen = w * 0.8;
 
-          const spine = Bodies.rectangle(spineX, y, t, height, opts);
-          const bot = Bodies.rectangle(x + t / 2, y + height / 2 - t / 2, width - t, t, opts);
+          const lVerts = [
+            { x: -hw, y: -hh },
+            { x: -hw + t, y: -hh },
+            { x: -hw + t, y: hh - t },
+            { x: -hw + armLen, y: hh - t },
+            { x: -hw + armLen, y: hh },
+            { x: -hw, y: hh },
+          ];
 
-          // Serifs
-          const spineTopSerif = Bodies.rectangle(spineX, y - height / 2 + serifHeight / 2, serifWidth, serifHeight, opts);
-          const spineBotSerif = Bodies.rectangle(spineX, y + height / 2 - serifHeight / 2, serifWidth, serifHeight, opts); // Corner serif
-
-          // End of arm serif (vertical blip)
-          const armSerifH = t * 2.5;
-          const armSerifW = t * 0.6;
-          const armTipSerif = Bodies.rectangle(x + width / 2 - armSerifW / 2, y + height / 2 - armSerifH / 2, armSerifW, armSerifH, opts);
-
-          return Body.create({ parts: [spine, bot, spineTopSerif, spineBotSerif, armTipSerif], ...opts });
+          return Bodies.fromVertices(x, y, [lVerts], opts);
         }
+
         case 'O': {
-          // O: Use a Circle for natural rolling behavior and to prevent internal sticking.
-          return Bodies.circle(x, y, width / 2, opts);
+          // O is best as a circle for smooth rolling
+          return Bodies.circle(x, y, Math.min(w, h) * 0.45, opts);
         }
+
         default:
-          return Bodies.rectangle(x, y, width, height, opts);
+          return Bodies.rectangle(x, y, w * 0.9, h * 0.9, opts);
       }
     };
 
-
-    // Create bodies for each letter
     const validLetterNodes = lettersRef.current.filter(n => n !== null);
-
-    // We must ensure the filtering of refs matches our items list logic
-    // Refs are assigned by index. If ' ' return null in map, that index is skipped in ref array assignment?
-    // No, if map returns null, the index 'i' in map still increments, so refs[i] might be undefined if we don't render it?
-    // Let's look at the render loop: if char === ' ' return null;
-    // So for that index i, no ref callback is called. lettersRef.current[i] will be undefined/null.
-    // So filtering n !== null works.
 
     const bodiesWithNodes = validLetterNodes.map((node, i) => {
       if (!node) return null;
 
       const rect = node.getBoundingClientRect();
+      const containerRect = containerRef.current!.getBoundingClientRect();
+
       const physWidth = rect.width;
       const physHeight = rect.height;
 
-      const minX = physWidth / 2 + 50;
-      const maxX = Math.max(minX + 10, containerWidth * 0.35);
+      const minX = physWidth / 2 + 30;
+      const maxX = Math.max(minX + 50, containerWidth * 0.3);
 
       const startX = minX + Math.random() * (maxX - minX);
-      const startY = -physHeight - (Math.random() * 800) - (i * 300);
+      const startY = -physHeight - (Math.random() * 400) - (i * 250);
 
-      // Determine char identity from node. For the Head, we tag it in dataset or just check content
-      // But we can also access the 'items' array if we are careful about index alignment.
-      // Filtering ' ' out of validLetterNodes makes indices disjoint from 'items'.
-      // Better to read attribute from DOM.
-      const char = node.getAttribute('data-char') || node.textContent || "?";
-
+      const char = node.getAttribute('data-char') || "?";
       const body = createLetterBody(startX, startY, char, physWidth, physHeight);
 
-      // Random initial rotation
-      Matter.Body.setAngle(body, (Math.random() - 0.5) * 0.5);
+      if (body) {
+        Body.setAngle(body, (Math.random() - 0.5) * 0.3);
+      }
 
-      return { body, node, width: rect.width, height: rect.height };
-    }).filter(item => item !== null) as { body: Matter.Body, node: HTMLDivElement, width: number, height: number }[];
+      return body ? { body, node, width: physWidth, height: physHeight, char } : null;
+    }).filter(item => item !== null) as { body: Matter.Body, node: HTMLDivElement, width: number, height: number, char: string }[];
 
     if (bodiesWithNodes.length > 0) {
       World.add(engine.world, bodiesWithNodes.map(b => b.body));
     }
 
-    // NO MOUSE INTERACTION
-
-    const runner = Runner.create();
+    const runner = Runner.create({ delta: 1000 / 60 });
     runnerRef.current = runner;
     Runner.run(runner, engine);
 
-    // Sync loop
+    // Debug canvas for collider visualization
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+
+    if (canvas && ctx && showColliders) {
+      canvas.width = containerWidth;
+      canvas.height = containerHeight;
+    }
+
     let requestID: number;
     const updateLoop = () => {
+      // Update letter positions
       bodiesWithNodes.forEach(({ body, node, width, height }) => {
         const { x, y } = body.position;
         const angle = body.angle;
 
-        // CSS transform to match physics body
         node.style.transform = `translate3d(${x - width / 2}px, ${y - height / 2}px, 0) rotate(${angle}rad)`;
         node.style.opacity = '1';
         node.style.visibility = 'visible';
       });
+
+      // Draw colliders in red for debugging
+      if (ctx && showColliders && canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.15)';
+
+        bodiesWithNodes.forEach(({ body }) => {
+          const parts = body.parts;
+
+          parts.forEach((part, partIndex) => {
+            // Skip the parent compound body (index 0 for compound bodies)
+            if (parts.length > 1 && partIndex === 0) return;
+
+            const vertices = part.vertices;
+
+            ctx.beginPath();
+            ctx.moveTo(vertices[0].x, vertices[0].y);
+
+            for (let j = 1; j < vertices.length; j++) {
+              ctx.lineTo(vertices[j].x, vertices[j].y);
+            }
+
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          });
+        });
+
+        // Draw walls for reference
+        ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
+        ctx.lineWidth = 1;
+
+        // Ground line
+        ctx.beginPath();
+        ctx.moveTo(0, containerHeight);
+        ctx.lineTo(containerWidth, containerHeight);
+        ctx.stroke();
+
+        // Right wall
+        ctx.beginPath();
+        ctx.moveTo(containerWidth * 0.5, 0);
+        ctx.lineTo(containerWidth * 0.5, containerHeight);
+        ctx.stroke();
+      }
+
       requestID = requestAnimationFrame(updateLoop);
     };
 
@@ -261,7 +298,7 @@ export function FallingLetters({
       cancelAnimationFrame(requestID);
       cleanup();
     };
-  }, [mounted, isReady, items, textSize]); // Depend on items now
+  }, [mounted, isReady, items, textSize, showColliders]);
 
   if (!mounted || !isReady) return null;
 
@@ -273,6 +310,15 @@ export function FallingLetters({
       className={containerClass}
       aria-hidden="true"
     >
+      {/* Debug canvas for collider visualization */}
+      {showColliders && (
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 pointer-events-none"
+          style={{ zIndex: 9999 }}
+        />
+      )}
+
       {items.map((item, i) => {
         if (item === ' ') return null;
 
@@ -281,20 +327,19 @@ export function FallingLetters({
             key={i}
             ref={(el) => { lettersRef.current[i] = el; }}
             data-char={item}
-            className="absolute top-0 left-0 font-extrabold leading-none will-change-transform pointer-events-none select-none"
+            className="absolute top-0 left-0 leading-none will-change-transform pointer-events-none select-none"
             style={{
               fontSize: `${textSize}px`,
               opacity: 0,
               visibility: 'hidden',
-              // Font stack matching design system - using Averia Serif Libre as requested
               fontFamily: 'var(--font-averia), Georgia, serif',
-              color: 'var(--text-primary)', // CSS variable handles instant theme switching
+              color: 'var(--text-primary)',
               whiteSpace: 'nowrap',
-              lineHeight: 0.8,
-              fontWeight: 700, // Bold for Averia
+              lineHeight: 0.85,
+              fontWeight: 700,
               ...(item === 'HEAD' && {
-                width: '1em',
-                height: '1em',
+                width: `${textSize}px`,
+                height: `${textSize}px`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -302,15 +347,13 @@ export function FallingLetters({
             }}
           >
             {item === 'HEAD' ? (
-              // Zino Head SVG
               <img
                 src="/zinoHead.svg"
-                alt="Head"
+                alt=""
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  width: '90%',
+                  height: '90%',
                   objectFit: 'contain',
-                  borderRadius: '50%'
                 }}
               />
             ) : (
