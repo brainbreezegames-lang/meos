@@ -1803,6 +1803,7 @@ const DockIcon = React.memo(({
     label?: string;
 }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const [isPressed, setIsPressed] = useState(false);
     const [justClicked, setJustClicked] = useState(false);
     const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -1817,6 +1818,7 @@ const DockIcon = React.memo(({
     const handleMouseLeave = useCallback(() => {
         hoverTimeoutRef.current = setTimeout(() => {
             setIsHovered(false);
+            setIsPressed(false);
         }, 30);
     }, []);
 
@@ -1838,43 +1840,42 @@ const DockIcon = React.memo(({
     return (
         <div
             className="relative"
-            style={{ padding: '6px 3px' }}
+            style={{ padding: '4px 2px' }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             <motion.div
                 animate={{
-                    scale: justClicked ? [1, 0.8, 1.15, 0.95, 1.02, 1] : isHovered ? 1.12 : 1,
-                    y: justClicked ? [0, 4, -20, -12, -14, -10] : isHovered ? -10 : 0,
-                    rotate: justClicked ? [0, -8, 8, -3, 1, 0] : 0,
+                    scale: justClicked ? [1, 0.92, 1.08, 0.98, 1] : isPressed ? 0.95 : isHovered ? 1.06 : 1,
+                    y: justClicked ? [0, 2, -12, -6, -4] : isHovered ? -4 : 0,
                 }}
                 transition={SPRING.dock}
                 style={{
-                    width: 48,
-                    height: 48,
+                    width: 44,
+                    height: 44,
                     position: 'relative',
                     transformOrigin: 'bottom center',
                 }}
             >
                 <button
                     onClick={handleClick}
+                    onMouseDown={() => setIsPressed(true)}
+                    onMouseUp={() => setIsPressed(false)}
                     className="w-full h-full focus:outline-none relative"
                 >
                     {/* Tooltip */}
                     <AnimatePresence>
                         {isHovered && label && (
                             <motion.div
-                                initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                                initial={{ opacity: 0, y: 6, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 4, scale: 0.95 }}
                                 transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                                className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
+                                className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
                                 style={{
-                                    background: 'rgba(30, 28, 26, 0.88)',
+                                    background: '#1a1a1a',
                                     color: '#fff',
-                                    boxShadow: '0 4px 16px rgba(0,0,0,0.25), 0 0 0 0.5px rgba(255,255,255,0.08)',
-                                    backdropFilter: 'blur(16px) saturate(180%)',
-                                    WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.15)',
                                 }}
                             >
                                 {label}
@@ -1882,45 +1883,51 @@ const DockIcon = React.memo(({
                         )}
                     </AnimatePresence>
 
-                    {/* Glass container - always has blur, opacity changes smoothly */}
+                    {/* Physical button - Braun-inspired raised plastic */}
                     <div
-                        className="dock-icon-glass w-full h-full flex items-center justify-center rounded-[13px] relative overflow-hidden"
+                        className="w-full h-full flex items-center justify-center rounded-[12px] relative overflow-hidden"
                         style={{
-                            // Always apply backdrop-filter for smooth transition
-                            backdropFilter: 'blur(12px) saturate(180%)',
-                            WebkitBackdropFilter: 'blur(12px) saturate(180%)',
-                            // Use CSS transitions for smooth opacity/background changes
-                            background: isActive
-                                ? 'rgba(255, 255, 255, 0.55)'
-                                : isHovered
-                                    ? 'rgba(255, 255, 255, 0.5)'
-                                    : 'rgba(255, 255, 255, 0)',
-                            boxShadow: isHovered || isActive
+                            background: isPressed
+                                ? 'linear-gradient(180deg, #f0f0ee 0%, #fafafa 100%)'
+                                : 'linear-gradient(180deg, #ffffff 0%, #f5f5f3 100%)',
+                            boxShadow: isPressed
                                 ? `
-                                    0 0 0 1px rgba(255, 255, 255, 0.4),
-                                    0 2px 8px rgba(0, 0, 0, 0.08),
-                                    0 8px 20px rgba(0, 0, 0, 0.06),
-                                    inset 0 1px 1px rgba(255, 255, 255, 0.7),
-                                    inset 0 -0.5px 1px rgba(0, 0, 0, 0.04)
+                                    inset 0 1px 3px rgba(0, 0, 0, 0.1),
+                                    inset 0 0 0 1px rgba(0, 0, 0, 0.04),
+                                    0 1px 1px rgba(255, 255, 255, 0.5)
                                 `
-                                : 'none',
-                            transition: 'background 0.2s ease-out, box-shadow 0.2s ease-out',
+                                : `
+                                    0 1px 1px rgba(0, 0, 0, 0.04),
+                                    0 2px 4px rgba(0, 0, 0, 0.04),
+                                    0 4px 8px rgba(0, 0, 0, 0.03),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                                    inset 0 0 0 1px rgba(0, 0, 0, 0.04)
+                                `,
+                            transition: 'all 0.1s ease-out',
                         }}
                     >
-                        {/* Top reflection - smooth fade */}
-                        <div
-                            className="absolute inset-x-0 top-0 h-[60%] rounded-t-[13px] pointer-events-none"
-                            style={{
-                                background: 'linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 100%)',
-                                opacity: isHovered || isActive ? 1 : 0,
-                                transition: 'opacity 0.2s ease-out',
-                            }}
-                        />
-
                         {/* Icon */}
-                        <div className="relative z-10">
+                        <div
+                            className="relative z-10"
+                            style={{
+                                color: '#3a3a3a',
+                                transform: isPressed ? 'translateY(1px)' : 'none',
+                                transition: 'transform 0.1s ease-out',
+                            }}
+                        >
                             {icon}
                         </div>
+
+                        {/* Orange indicator dot - Braun signature */}
+                        {isActive && (
+                            <div
+                                className="absolute top-1.5 right-1.5 w-[6px] h-[6px] rounded-full"
+                                style={{
+                                    background: 'var(--indicator-orange, #ff6b00)',
+                                    boxShadow: '0 0 4px var(--indicator-orange-glow, rgba(255, 107, 0, 0.5))',
+                                }}
+                            />
+                        )}
                     </div>
 
                     {/* Badge */}
@@ -1929,28 +1936,14 @@ const DockIcon = React.memo(({
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={SPRING.bouncy}
-                            className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-20"
+                            className="absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-white text-[9px] font-bold px-1 z-20"
                             style={{
-                                background: 'linear-gradient(135deg, #ff6b4a 0%, #ff4757 100%)',
-                                boxShadow: '0 2px 6px rgba(255, 71, 87, 0.4), 0 0 0 2px var(--bg-dock, #fff)',
+                                background: 'var(--indicator-orange, #ff6b00)',
+                                boxShadow: '0 1px 4px rgba(255, 107, 0, 0.4), 0 0 0 2px #f4f4f2',
                             }}
                         >
                             {badge}
                         </motion.span>
-                    )}
-
-                    {/* Active indicator */}
-                    {isActive && (
-                        <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={SPRING.bouncy}
-                            className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full"
-                            style={{
-                                background: 'var(--color-text-primary, #171412)',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                            }}
-                        />
                     )}
                 </button>
             </motion.div>
