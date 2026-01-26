@@ -261,9 +261,8 @@ export function FallingLetters() {
         width: '100%',
         height: '100%',
         pointerEvents: 'none',
-        zIndex: -1, // Behind EVERYTHING - pure background decoration
+        zIndex: 1, // Above wallpaper (0), below icons and windows
         overflow: 'hidden',
-        isolation: 'isolate', // Create stacking context
       }}
       aria-hidden="true"
     >

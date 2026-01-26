@@ -1403,7 +1403,7 @@ const StickyNote = React.memo(({
                 minWidth: '100px',
                 padding: '14px 12px 18px 12px',
                 borderRadius: '2px',
-                zIndex: isDragging ? 100 : isHovered ? 50 : 1,
+                zIndex: isDragging ? 100 : isHovered ? 50 : 10, // Above falling letters (z:1)
                 boxShadow: isDragging
                     ? '8px 8px 16px rgba(0,0,0,0.15)'
                     : isHovered
