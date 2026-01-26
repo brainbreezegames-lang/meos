@@ -4011,6 +4011,20 @@ function GoOSDemoContent() {
                             `,
                         }}
                     />
+                    {/* Hard edge line - creates ground illusion */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 7,
+                            bottom: '12vh',
+                            left: 0,
+                            right: 0,
+                            height: '3px',
+                            background: 'linear-gradient(to right, transparent 0%, rgba(200, 100, 50, 0.6) 10%, rgba(200, 100, 50, 0.6) 90%, transparent 100%)',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.15)',
+                        }}
+                    />
                 </>
             )}
 
