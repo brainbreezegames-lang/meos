@@ -49,7 +49,7 @@ export function FallingLetters({
   text = "HELLO",
   className,
   textSize = 280,
-  showColliders = true // DEBUG: show red colliders
+  showColliders = false // Set to true for debugging colliders
 }: FallingLettersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -117,6 +117,8 @@ export function FallingLetters({
     World.add(engine.world, [ground, leftWall, rightWall]);
 
     // Create letter colliders from custom editor data
+    // IMPORTANT: Create parts relative to origin (0,0), then move body to desired position
+    // This prevents Matter.js center-of-mass calculation from shifting colliders
     const createLetterBody = (x: number, y: number, char: string, w: number, h: number) => {
       const opts: Matter.IBodyDefinition = {
         restitution: 0.05,
@@ -138,21 +140,22 @@ export function FallingLetters({
       // Editor coords: x,y are percentages (0-1) of bounding box
       // For rect: x,y is top-left corner
       // For ellipse: x,y is center
+      // Create parts relative to origin (0,0), NOT world position
       const parts: Matter.Body[] = [];
 
       shapes.forEach(shape => {
         if (shape.type === 'rect') {
-          // Convert top-left percentage to center position relative to body center
-          const rectCenterX = x + (shape.x + (shape.width || 0) / 2 - 0.5) * w;
-          const rectCenterY = y + (shape.y + (shape.height || 0) / 2 - 0.5) * h;
+          // Convert top-left percentage to center position relative to origin
+          const rectCenterX = (shape.x + (shape.width || 0) / 2 - 0.5) * w;
+          const rectCenterY = (shape.y + (shape.height || 0) / 2 - 0.5) * h;
           const rectW = (shape.width || 0) * w;
           const rectH = (shape.height || 0) * h;
 
           parts.push(Bodies.rectangle(rectCenterX, rectCenterY, rectW, rectH, opts));
         } else if (shape.type === 'ellipse') {
-          // Convert center percentage to position relative to body center
-          const ellipseCenterX = x + (shape.x - 0.5) * w;
-          const ellipseCenterY = y + (shape.y - 0.5) * h;
+          // Convert center percentage to position relative to origin
+          const ellipseCenterX = (shape.x - 0.5) * w;
+          const ellipseCenterY = (shape.y - 0.5) * h;
           // Use average radius for circle approximation
           const radius = ((shape.radiusX || 0) + (shape.radiusY || 0)) / 2 * Math.min(w, h);
 
@@ -161,13 +164,21 @@ export function FallingLetters({
       });
 
       if (parts.length === 1) {
+        // For single part, move it to desired position
+        Body.setPosition(parts[0], { x, y });
         return parts[0];
       }
 
-      return Body.create({
+      // Create compound body - parts are relative to (0,0)
+      const compoundBody = Body.create({
         parts,
         ...opts
       });
+
+      // Now move the entire compound body to the desired world position
+      Body.setPosition(compoundBody, { x, y });
+
+      return compoundBody;
     };
 
     const validLetterNodes = lettersRef.current.filter(n => n !== null);
