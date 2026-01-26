@@ -3967,65 +3967,64 @@ function GoOSDemoContent() {
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
             <FallingLetters isReady={bootPhase === 'ready'} textSize={336} />
 
-            {/* LAVA BACKGROUND - Container extends slightly beyond viewport edges */}
+            {/* WARM GRADIENT WALL - Sunset-like backdrop with ground plane */}
             {!wallpaper && (
-                <div
-                    className="pointer-events-none"
-                    style={{
-                        position: 'fixed',
-                        zIndex: 5,
-                        filter: 'blur(40px)',
-                        willChange: 'transform',
-                        top: 0,
-                        left: '-5vw',
-                        width: '110vw',
-                        height: '105vh',
-                    }}
-                >
-                    {/* Solid base strip at bottom - guarantees no gaps */}
-                    <div style={{position:'absolute',bottom:0,left:0,right:0,height:'8%',background:'linear-gradient(to top,#6B1010 0%,#8B1A1A 60%,transparent 100%)'}}/>
-                    <style>{`
-                        @keyframes f1 { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-12px) scaleY(1.08)} }
-                        @keyframes f2 { 0%,100%{transform:translateY(0) scaleY(1)} 45%{transform:translateY(-18px) scaleY(1.06)} }
-                        @keyframes f3 { 0%,100%{transform:translateY(0) scaleY(1)} 55%{transform:translateY(-10px) scaleY(1.1)} }
-                        @keyframes f4 { 0%,100%{transform:translateY(0) scaleY(1)} 35%{transform:translateY(-22px) scaleY(1.04)} }
-                        @keyframes f5 { 0%,100%{transform:translateY(0) scaleY(1)} 65%{transform:translateY(-8px) scaleY(1.12)} }
-                        @keyframes f6 { 0%,100%{transform:translateY(0) scaleY(1)} 40%{transform:translateY(-15px) scaleY(1.07)} }
-                        @keyframes f7 { 0%,100%{transform:translateY(0) scaleY(1)} 48%{transform:translateY(-14px) scaleY(1.09)} }
-                        @keyframes f8 { 0%,100%{transform:translateY(0) scaleY(1)} 58%{transform:translateY(-20px) scaleY(1.05)} }
-                        @media (prefers-reduced-motion: reduce) { [data-f] { animation: none !important; } }
-                    `}</style>
-                    {/* Base layer - deep reds for solid coverage at bottom and edges */}
-                    <div data-f style={{position:'absolute',bottom:'0%',left:'-2%',width:'28%',height:'26%',background:'linear-gradient(to top,#8B1A1A,#A02525 70%,transparent)',animation:'f1 8.2s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'-2%',left:'14%',width:'22%',height:'24%',background:'linear-gradient(to top,#922020,#B03030 65%,transparent)',animation:'f4 11.3s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'0%',left:'28%',width:'24%',height:'28%',background:'linear-gradient(to top,#7D1515,#9A2020 75%,transparent)',animation:'f7 9.7s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'-3%',left:'42%',width:'20%',height:'25%',background:'linear-gradient(to top,#851919,#A32323 68%,transparent)',animation:'f2 12.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'-1%',left:'56%',width:'22%',height:'27%',background:'linear-gradient(to top,#881818,#A52828 72%,transparent)',animation:'f5 8.5s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'-2%',left:'70%',width:'20%',height:'24%',background:'linear-gradient(to top,#7A1212,#952222 66%,transparent)',animation:'f8 10.2s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'0%',left:'84%',width:'26%',height:'28%',background:'linear-gradient(to top,#8F1C1C,#AA2A2A 74%,transparent)',animation:'f3 13.1s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    {/* Oranges - overlapping for rich color */}
-                    <div data-f style={{position:'absolute',bottom:'2%',left:'0%',width:'24%',height:'32%',background:'linear-gradient(to top,#C54010,#E85515 72%,transparent)',animation:'f3 7.3s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'0%',left:'16%',width:'20%',height:'36%',background:'linear-gradient(to top,#D04812,#F06018 76%,transparent)',animation:'f6 8.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'1%',left:'30%',width:'22%',height:'40%',background:'linear-gradient(to top,#CC4510,#EE5A15 80%,transparent)',animation:'f2 10.5s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'-1%',left:'46%',width:'20%',height:'42%',background:'linear-gradient(to top,#D55015,#FF6820 84%,transparent)',animation:'f7 7.9s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'0%',left:'60%',width:'18%',height:'34%',background:'linear-gradient(to top,#CA4212,#E85818 75%,transparent)',animation:'f4 9.2s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'1%',left:'74%',width:'22%',height:'38%',background:'linear-gradient(to top,#D24A14,#F26220 78%,transparent)',animation:'f1 11.4s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'2%',left:'88%',width:'22%',height:'35%',background:'linear-gradient(to top,#D55218,#F5681C 77%,transparent)',animation:'f5 6.7s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    {/* Bright oranges - varied heights */}
-                    <div data-f style={{position:'absolute',bottom:'3%',left:'4%',width:'18%',height:'30%',background:'linear-gradient(to top,#FF6B00,#FF8525 72%,transparent)',animation:'f5 5.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'2%',left:'18%',width:'20%',height:'38%',background:'linear-gradient(to top,#FF7010,#FF9030 77%,transparent)',animation:'f2 7.4s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'3%',left:'34%',width:'22%',height:'44%',background:'linear-gradient(to top,#FF7800,#FFA040 82%,transparent)',animation:'f8 6.2s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'2%',left:'50%',width:'24%',height:'48%',background:'linear-gradient(to top,#FF8200,#FFB050 86%,transparent)',animation:'f4 8.6s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'1%',left:'66%',width:'18%',height:'40%',background:'linear-gradient(to top,#FF7500,#FF9535 79%,transparent)',animation:'f7 5.5s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'3%',left:'80%',width:'20%',height:'36%',background:'linear-gradient(to top,#FF6800,#FF8828 74%,transparent)',animation:'f1 9.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'2%',left:'94%',width:'18%',height:'42%',background:'linear-gradient(to top,#FF7208,#FF9232 78%,transparent)',animation:'f6 7.1s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    {/* Golden/yellow highlights - brightest spots */}
-                    <div data-f style={{position:'absolute',bottom:'4%',left:'20%',width:'18%',height:'32%',background:'linear-gradient(to top,#FF9020,#FFB848 74%,transparent)',animation:'f4 4.7s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'3%',left:'38%',width:'20%',height:'40%',background:'linear-gradient(to top,#FFA030,#FFC858 80%,transparent)',animation:'f1 6.3s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'4%',left:'54%',width:'22%',height:'46%',background:'linear-gradient(to top,#FFAA40,#FFD868 85%,transparent)',animation:'f7 5.1s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'3%',left:'70%',width:'18%',height:'36%',background:'linear-gradient(to top,#FF9828,#FFC050 77%,transparent)',animation:'f5 7.6s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                    <div data-f style={{position:'absolute',bottom:'4%',left:'86%',width:'20%',height:'38%',background:'linear-gradient(to top,#FFA235,#FFCA5A 79%,transparent)',animation:'f8 6.8s ease-in-out infinite',transformOrigin:'bottom'}}/>
-                </div>
+                <>
+                    {/* Wall gradient - warm orange glow on back wall */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 4,
+                            inset: 0,
+                            background: `
+                                linear-gradient(to top,
+                                    #FF8C42 0%,
+                                    #FF9F5A 15%,
+                                    #FFB070 30%,
+                                    #FFCC99 50%,
+                                    transparent 75%
+                                )
+                            `,
+                            filter: 'blur(60px)',
+                            opacity: 0.85,
+                        }}
+                    />
+                    {/* Ground plane - solid floor with hard edge */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 6,
+                            bottom: 0,
+                            left: '-5vw',
+                            width: '110vw',
+                            height: '12vh',
+                            background: `
+                                linear-gradient(to top,
+                                    #D85A20 0%,
+                                    #E86A30 40%,
+                                    #F07A40 70%,
+                                    #FF8A50 100%
+                                )
+                            `,
+                        }}
+                    />
+                    {/* Hard edge line where wall meets ground */}
+                    <div
+                        className="pointer-events-none"
+                        style={{
+                            position: 'fixed',
+                            zIndex: 7,
+                            bottom: '12vh',
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            background: 'rgba(180, 80, 30, 0.4)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        }}
+                    />
+                </>
             )}
 
             {/* DROP ZONE INDICATOR - Shows when dragging files over desktop */}
