@@ -17,14 +17,14 @@ interface LiquidBackgroundProps {
   interactive?: boolean;
 }
 
-// Lava flame colors - deep oranges and reds
+// Rich lava flame colors - fully saturated
 const DEFAULT_COLORS = [
-  "rgba(255, 80, 0, 0.9)",    // Bright orange
-  "rgba(255, 120, 30, 0.85)", // Orange
-  "rgba(255, 60, 0, 0.8)",    // Red-orange
-  "rgba(255, 160, 50, 0.75)", // Light orange
-  "rgba(200, 40, 0, 0.7)",    // Deep red
-  "rgba(255, 100, 20, 0.8)",  // Fire orange
+  "rgba(255, 60, 0, 1)",      // Intense red-orange
+  "rgba(255, 100, 0, 1)",     // Bright orange
+  "rgba(255, 140, 20, 1)",    // Golden orange
+  "rgba(255, 80, 0, 1)",      // Fire orange
+  "rgba(255, 120, 30, 1)",    // Warm orange
+  "rgba(255, 50, 0, 1)",      // Deep red-orange
 ];
 
 export function LiquidBackground({
@@ -163,16 +163,6 @@ export function LiquidBackground({
         zIndex: 0,
       }}
     >
-      {/* Dark gradient overlay - black at top, transparent at bottom */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(to bottom, rgba(15, 10, 5, 0.98) 0%, rgba(20, 12, 8, 0.85) 30%, rgba(30, 15, 10, 0.4) 60%, transparent 100%)",
-          zIndex: 2,
-        }}
-      />
-
       {/* Blur container for flames */}
       <div
         style={{
@@ -191,22 +181,22 @@ export function LiquidBackground({
             style={{
               position: "absolute",
               ...flamePositions[i % flamePositions.length],
-              background: `radial-gradient(ellipse 50% 80% at 50% 100%, ${color}, transparent 70%)`,
+              background: `radial-gradient(ellipse 60% 70% at 50% 100%, ${color}, transparent 65%)`,
               transformOrigin: "bottom center",
               willChange: "transform",
             }}
           />
         ))}
 
-        {/* Extra glow layer at bottom */}
+        {/* Extra rich glow layer at bottom */}
         <div
           style={{
             position: "absolute",
             bottom: 0,
             left: "-10%",
             right: "-10%",
-            height: "50%",
-            background: "radial-gradient(ellipse 100% 100% at 50% 100%, rgba(255, 100, 20, 0.6), transparent 70%)",
+            height: "60%",
+            background: "radial-gradient(ellipse 120% 80% at 50% 100%, rgba(255, 80, 0, 0.9), transparent 65%)",
           }}
         />
       </div>
@@ -238,18 +228,6 @@ export function LiquidBackground({
         />
       )}
 
-      {/* Subtle noise texture */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          opacity: 0.04,
-          mixBlendMode: "overlay",
-          pointerEvents: "none",
-          zIndex: 3,
-        }}
-      />
     </div>
   );
 }
