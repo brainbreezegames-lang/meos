@@ -82,6 +82,7 @@ import { CommandPalette } from '@/components/command-palette/CommandPalette';
 import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
+import { LiquidBackground } from '@/components/desktop/LiquidBackground';
 
 // ============================================
 // DEMO SPACES (for SpaceSwitcher demo)
@@ -3932,16 +3933,29 @@ function GoOSDemoContent() {
                     draggable={false}
                 />
             ) : (
-                /* Simple dot pattern background when no image */
-                <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                        background: 'var(--color-bg-base, #fbf9ef)',
-                        backgroundImage: 'radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)',
-                        backgroundSize: '24px 24px',
-                        zIndex: 0,
-                    }}
-                />
+                /* Animated liquid gradient background when no image */
+                <>
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            background: 'var(--color-bg-base, #fbf9ef)',
+                            zIndex: 0,
+                        }}
+                    />
+                    <LiquidBackground
+                        speed={0.6}
+                        blur={100}
+                        opacity={0.5}
+                        interactive={true}
+                        colors={[
+                            "rgba(255, 119, 34, 0.4)",   // Orange (accent)
+                            "rgba(255, 200, 150, 0.35)", // Warm peach
+                            "rgba(61, 47, 169, 0.25)",   // Purple (secondary)
+                            "rgba(255, 230, 200, 0.4)",  // Cream
+                            "rgba(255, 160, 80, 0.3)",   // Deep orange
+                        ]}
+                    />
+                </>
             )}
 
             {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
