@@ -3,46 +3,51 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useEditContextSafe } from '@/contexts/EditContext';
-import { SPRING, fadeInUp, REDUCED_MOTION, buttonPress } from '@/lib/animations';
+import { SPRING, REDUCED_MOTION } from '@/lib/animations';
 
-// Sticky note colors - warm, refined palette that works in light and dark mode
-// Using CSS variables for dark mode adaptation
+// Sticky note colors - warm, refined palette
 const STICKY_COLORS = {
   yellow: {
-    bg: 'var(--sticky-yellow-bg, #fef3c7)',
-    text: 'var(--sticky-yellow-text, #78350f)',
-    darkBg: '#4a3f2a',
-    darkText: '#fef3c7'
+    bg: '#fffef5',
+    headerBg: '#fef9e7',
+    text: '#78350f',
+    lineColor: 'rgba(120, 53, 15, 0.12)',
+    accentColor: '#f59e0b',
   },
   blue: {
-    bg: 'var(--sticky-blue-bg, #dbeafe)',
-    text: 'var(--sticky-blue-text, #1e3a5f)',
-    darkBg: '#2a3a4f',
-    darkText: '#dbeafe'
+    bg: '#f8fbff',
+    headerBg: '#eef5fc',
+    text: '#1e3a5f',
+    lineColor: 'rgba(30, 58, 95, 0.12)',
+    accentColor: '#3b82f6',
   },
   green: {
-    bg: 'var(--sticky-green-bg, #dcfce7)',
-    text: 'var(--sticky-green-text, #14532d)',
-    darkBg: '#2a4035',
-    darkText: '#dcfce7'
+    bg: '#f5fff8',
+    headerBg: '#edfcf2',
+    text: '#14532d',
+    lineColor: 'rgba(20, 83, 45, 0.12)',
+    accentColor: '#22c55e',
   },
   pink: {
-    bg: 'var(--sticky-pink-bg, #fce7f3)',
-    text: 'var(--sticky-pink-text, #831843)',
-    darkBg: '#4a2a3f',
-    darkText: '#fce7f3'
+    bg: '#fff8fb',
+    headerBg: '#fceff4',
+    text: '#831843',
+    lineColor: 'rgba(131, 24, 67, 0.12)',
+    accentColor: '#ec4899',
   },
   purple: {
-    bg: 'var(--sticky-purple-bg, #ede9fe)',
-    text: 'var(--sticky-purple-text, #3b0764)',
-    darkBg: '#3a2f4a',
-    darkText: '#ede9fe'
+    bg: '#faf8ff',
+    headerBg: '#f3f0fc',
+    text: '#3b0764',
+    lineColor: 'rgba(59, 7, 100, 0.12)',
+    accentColor: '#8b5cf6',
   },
   orange: {
-    bg: 'var(--sticky-orange-bg, #ffedd5)',
-    text: 'var(--sticky-orange-text, #7c2d12)',
-    darkBg: '#4a3525',
-    darkText: '#ffedd5'
+    bg: '#fffaf5',
+    headerBg: '#fef4eb',
+    text: '#7c2d12',
+    lineColor: 'rgba(124, 45, 18, 0.12)',
+    accentColor: '#f97316',
   },
 } as const;
 
@@ -184,12 +189,6 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
     setShowColorPicker(false);
   }, [note.id, onUpdate]);
 
-  const getShadow = () => {
-    return isDragging
-      ? '0 12px 40px rgba(23, 20, 18, 0.2), 0 4px 12px rgba(23, 20, 18, 0.1)'
-      : '0 4px 12px rgba(23, 20, 18, 0.12), 0 1px 3px rgba(23, 20, 18, 0.08)';
-  };
-
   return (
     <>
       <motion.div
@@ -208,76 +207,239 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
         initial={prefersReducedMotion ? REDUCED_MOTION.fade.initial : { scale: 0.5, opacity: 0, y: 20 }}
         animate={prefersReducedMotion
           ? REDUCED_MOTION.fade.animate
-          : { scale: isDragging ? 1.08 : 1, opacity: 1, y: isDragging ? -8 : 0 }
+          : { scale: isDragging ? 1.05 : 1, opacity: 1, y: isDragging ? -4 : 0 }
         }
         exit={prefersReducedMotion ? REDUCED_MOTION.fade.exit : { scale: 0.5, opacity: 0, y: 10 }}
         transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.bouncy}
       >
-        {/* Pin */}
+        {/* Push pin */}
         <div
-          className="absolute -top-2 left-3 text-base z-10"
           style={{
-            filter: 'drop-shadow(0 1px 2px rgba(23,20,18,0.2))',
+            position: 'absolute',
+            top: -6,
+            left: 16,
+            zIndex: 10,
           }}
         >
-          📌
+          {/* Pin head */}
+          <div
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: '50%',
+              background: 'linear-gradient(145deg, #e74c3c 0%, #c0392b 100%)',
+              boxShadow: `
+                0 2px 4px rgba(0, 0, 0, 0.3),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.2)
+              `,
+              position: 'relative',
+            }}
+          >
+            {/* Pin highlight */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 3,
+                left: 4,
+                width: 5,
+                height: 5,
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.4)',
+              }}
+            />
+          </div>
+          {/* Pin needle shadow */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 14,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 2,
+              height: 6,
+              background: 'linear-gradient(180deg, #888 0%, transparent 100%)',
+              opacity: 0.3,
+            }}
+          />
         </div>
 
-        {/* Note body */}
+        {/* Note body - paper style */}
         <div
-          className="relative overflow-hidden"
           style={{
-            width: '180px',
-            minHeight: '120px',
-            padding: '28px 12px 12px 12px',
+            width: 160,
+            minHeight: 140,
             background: colors.bg,
-            borderRadius: '4px',
-            border: 'none',
-            boxShadow: getShadow(),
-            fontFamily: '"Marker Felt", "Comic Sans MS", cursive',
-            fontSize: '14px',
-            lineHeight: '1.4',
-            color: colors.text,
+            borderRadius: 2,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: isDragging
+              ? `
+                0 15px 35px rgba(0, 0, 0, 0.2),
+                0 5px 15px rgba(0, 0, 0, 0.1),
+                -1px 0 0 rgba(0, 0, 0, 0.03)
+              `
+              : `
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                0 1px 3px rgba(0, 0, 0, 0.08),
+                -1px 0 0 rgba(0, 0, 0, 0.03)
+              `,
           }}
         >
-          {isEditing ? (
-            <textarea
-              ref={textareaRef}
-              value={localContent}
-              onChange={(e) => setLocalContent(e.target.value.slice(0, 140))}
-              onBlur={handleBlur}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') {
-                  setLocalContent(note.content);
-                  setIsEditing(false);
-                }
-              }}
-              className="w-full h-full bg-transparent border-none outline-none resize-none"
-              style={{
-                fontFamily: 'inherit',
-                fontSize: 'inherit',
-                lineHeight: 'inherit',
-                color: 'inherit',
-                minHeight: '80px',
-              }}
-              maxLength={140}
-              placeholder="Write something..."
-            />
-          ) : (
-            <p className="whitespace-pre-wrap break-words">
-              {note.content || (isOwner ? 'Double-click to edit...' : '')}
-            </p>
-          )}
-
-          {/* Character count when editing */}
-          {isEditing && (
+          {/* Header section */}
+          <div
+            style={{
+              padding: '12px 12px 8px 12px',
+              background: colors.headerBg,
+              borderBottom: `1px solid ${colors.lineColor}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            {/* Checkbox icon */}
             <div
-              className="absolute bottom-1 right-2 text-xs opacity-50"
-              style={{ fontSize: '10px' }}
+              style={{
+                width: 18,
+                height: 18,
+                borderRadius: 3,
+                border: `2px solid ${colors.accentColor}`,
+                background: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
             >
-              {localContent.length}/140
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                style={{ opacity: 0.9 }}
+              >
+                <path
+                  d="M2 6L5 9L10 3"
+                  stroke={colors.accentColor}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </div>
-          )}
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: colors.text,
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Todo List
+            </span>
+          </div>
+
+          {/* Content area with ruled lines */}
+          <div
+            style={{
+              position: 'relative',
+              padding: '10px 12px 12px 12px',
+              minHeight: 80,
+            }}
+          >
+            {/* Ruled lines */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                backgroundImage: `repeating-linear-gradient(
+                  to bottom,
+                  transparent,
+                  transparent 21px,
+                  ${colors.lineColor} 21px,
+                  ${colors.lineColor} 22px
+                )`,
+                backgroundPosition: '0 10px',
+              }}
+            />
+
+            {isEditing ? (
+              <textarea
+                ref={textareaRef}
+                value={localContent}
+                onChange={(e) => setLocalContent(e.target.value.slice(0, 140))}
+                onBlur={handleBlur}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setLocalContent(note.content);
+                    setIsEditing(false);
+                  }
+                }}
+                className="w-full h-full bg-transparent border-none outline-none resize-none"
+                style={{
+                  fontFamily: '"Marker Felt", "Comic Sans MS", "Bradley Hand", cursive',
+                  fontSize: 15,
+                  lineHeight: '22px',
+                  color: colors.accentColor,
+                  fontWeight: 700,
+                  position: 'relative',
+                  zIndex: 1,
+                  minHeight: '66px',
+                }}
+                maxLength={140}
+                placeholder="Write something..."
+              />
+            ) : (
+              <p
+                style={{
+                  fontFamily: '"Marker Felt", "Comic Sans MS", "Bradley Hand", cursive',
+                  fontSize: 15,
+                  lineHeight: '22px',
+                  color: colors.accentColor,
+                  fontWeight: 700,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  position: 'relative',
+                  zIndex: 1,
+                  minHeight: '44px',
+                }}
+              >
+                {note.content || (isOwner ? 'Double-click to edit...' : '')}
+              </p>
+            )}
+
+            {/* Character count when editing */}
+            {isEditing && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 4,
+                  right: 8,
+                  fontSize: 9,
+                  color: colors.text,
+                  opacity: 0.4,
+                  zIndex: 2,
+                }}
+              >
+                {localContent.length}/140
+              </div>
+            )}
+          </div>
+
+          {/* Paper fold effect in corner */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              width: 20,
+              height: 20,
+              background: `linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.06) 50%)`,
+              pointerEvents: 'none',
+            }}
+          />
         </div>
 
         {/* Delete button (owner only, on hover) */}
@@ -289,13 +451,14 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
             }}
             className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
             style={{
-              background: 'rgba(255, 59, 48, 0.9)',
+              background: 'rgba(239, 68, 68, 0.95)',
               color: 'white',
               fontSize: '12px',
               fontWeight: 'bold',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
             }}
           >
-            ×
+            x
           </button>
         )}
       </motion.div>
@@ -314,10 +477,10 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
                 left: `${visualPos.x}%`,
                 top: `${visualPos.y + 8}%`,
                 transform: 'translateX(-50%)',
-                background: 'rgba(30, 30, 30, 0.95)',
+                background: 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(0, 0, 0, 0.08)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
               }}
               initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
@@ -329,12 +492,12 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
                   onClick={() => handleColorChange(color)}
                   className="w-6 h-6 rounded-full transition-transform hover:scale-110"
                   style={{
-                    background: STICKY_COLORS[color].bg,
-                    border: note.color === color ? '2px solid white' : '1px solid rgba(0,0,0,0.2)',
+                    background: STICKY_COLORS[color].accentColor,
+                    border: note.color === color ? '2px solid #333' : '1px solid rgba(0,0,0,0.15)',
                   }}
                 />
               ))}
-              <div className="w-px h-6 bg-white/20 mx-1" />
+              <div className="w-px h-6 bg-black/10 mx-1" />
               <button
                 onClick={() => {
                   onDelete?.(note.id);
@@ -342,12 +505,12 @@ export function StickyNote({ note, onUpdate, onDelete, onBringToFront }: StickyN
                 }}
                 className="w-6 h-6 rounded-full flex items-center justify-center transition-transform hover:scale-110"
                 style={{
-                  background: 'rgba(255, 59, 48, 0.9)',
+                  background: 'rgba(239, 68, 68, 0.9)',
                   color: 'white',
-                  fontSize: '14px',
+                  fontSize: '12px',
                 }}
               >
-                🗑
+                x
               </button>
             </motion.div>
           </>
@@ -438,12 +601,14 @@ export function StickyNotesContainer({ notes, onNotesChange, maxNotes = 5 }: Sti
           onClick={addNote}
           className="fixed bottom-24 right-4 w-10 h-10 rounded-full flex items-center justify-center z-[100]"
           style={{
-            background: 'rgba(255, 252, 121, 0.9)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+            background: 'linear-gradient(145deg, #fffef5, #fef9e7)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255,255,255,0.8)',
             fontSize: '20px',
+            color: '#78350f',
+            border: '1px solid rgba(0,0,0,0.08)',
           }}
-          whileHover={prefersReducedMotion ? {} : { scale: 1.15 }}
-          whileTap={prefersReducedMotion ? {} : { scale: 0.85 }}
+          whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+          whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
           title="Add sticky note"
         >
           +
