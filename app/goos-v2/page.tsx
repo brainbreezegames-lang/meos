@@ -2678,6 +2678,7 @@ function GoOSDemoContent() {
     const [showEasterEgg, setShowEasterEgg] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
+    const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
     // Boot sequence state: splash -> booting -> revealing -> ready
     const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'revealing' | 'ready'>('splash');
@@ -4113,6 +4114,87 @@ function GoOSDemoContent() {
                                     )}
                                 </AnimatePresence>
                             </div>
+
+                            {/* Settings Dropdown Menu */}
+                            <div className="relative">
+                                <motion.button
+                                    onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                                    whileHover={{ opacity: 0.8 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="text-[12px] font-medium"
+                                    style={{
+                                        color: 'var(--text-tertiary)',
+                                    }}
+                                >
+                                    Settings
+                                </motion.button>
+                                <AnimatePresence>
+                                    {showSettingsMenu && (
+                                        <>
+                                            {/* Backdrop to close menu */}
+                                            <div
+                                                className="fixed inset-0 z-[2000]"
+                                                onClick={() => setShowSettingsMenu(false)}
+                                            />
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -4 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -4 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="absolute top-full left-0 mt-1 z-[2001] py-1"
+                                                style={{
+                                                    background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+                                                    backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+                                                    WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+                                                    border: '1px solid var(--border-subtle)',
+                                                    borderRadius: 'var(--radius-md, 12px)',
+                                                    boxShadow: 'var(--shadow-lg)',
+                                                    minWidth: '160px',
+                                                }}
+                                            >
+                                                <motion.button
+                                                    onClick={() => {
+                                                        toggleApp('analytics');
+                                                        setShowSettingsMenu(false);
+                                                    }}
+                                                    whileHover={{ backgroundColor: 'var(--color-bg-subtle)' }}
+                                                    className="w-full px-3 py-2 flex items-center gap-2 text-left"
+                                                    style={{
+                                                        background: 'transparent',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        fontSize: '12px',
+                                                        fontWeight: 500,
+                                                        color: 'var(--text-primary)',
+                                                    }}
+                                                >
+                                                    <BarChart3 size={14} strokeWidth={1.5} />
+                                                    <span>Analytics</span>
+                                                </motion.button>
+                                                <motion.button
+                                                    onClick={() => {
+                                                        toggleApp('settings');
+                                                        setShowSettingsMenu(false);
+                                                    }}
+                                                    whileHover={{ backgroundColor: 'var(--color-bg-subtle)' }}
+                                                    className="w-full px-3 py-2 flex items-center gap-2 text-left"
+                                                    style={{
+                                                        background: 'transparent',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        fontSize: '12px',
+                                                        fontWeight: 500,
+                                                        color: 'var(--text-primary)',
+                                                    }}
+                                                >
+                                                    <Settings size={14} strokeWidth={1.5} />
+                                                    <span>Preferences</span>
+                                                </motion.button>
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
 
                         {/* Right: Theme toggle + time */}
@@ -4928,30 +5010,11 @@ function GoOSDemoContent() {
                         >
                             <RubberDuck />
                             <DockIcon
-                                icon={<Folder size={22} fill="var(--icon-fill)" stroke="var(--icon-stroke)" strokeWidth={1.5} />}
-                                onClick={() => toggleApp('nest')}
-                                isActive={appWindows.nest}
-                                label="Nest"
-                            />
-                            <DockIcon
-                                icon={<div className="w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-bold" style={{ background: 'var(--border-subtle)', color: 'var(--text-primary)' }}>23</div>}
-                                onClick={() => { }}
-                                label="Calendar"
-                            />
-                            <DockIcon
                                 icon={<Mail size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                                 onClick={() => toggleApp('quackmail')}
                                 isActive={appWindows.quackmail}
                                 badge={3}
                                 label="Mail"
-                            />
-                            <DockIcon
-                                icon={<Camera size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
-                                onClick={() => {
-                                    const photoItem = items.find(i => i.label === 'Photography');
-                                    if (photoItem) windowContext.openWindow(photoItem.id);
-                                }}
-                                label="Photos"
                             />
                             <DockIcon
                                 icon={<FileText size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
@@ -4991,102 +5054,6 @@ function GoOSDemoContent() {
                                 onClick={() => toggleApp('analytics')}
                                 isActive={appWindows.analytics}
                                 label="Analytics"
-                            />
-                            <div className="dock-separator w-px h-6 bg-white/10 mx-1" />
-                            {/* Wallpaper Picker */}
-                            <div className="relative" data-wallpaper-picker>
-                                <DockIcon
-                                    icon={<ImageIcon size={22} stroke="#f47a3e" strokeWidth={1.5} />}
-                                    onClick={() => {
-                                        playSound(showWallpaperPicker ? 'collapse' : 'expand');
-                                        setShowWallpaperPicker(!showWallpaperPicker);
-                                    }}
-                                    isActive={showWallpaperPicker}
-                                    label="Wallpaper"
-                                />
-                                <AnimatePresence>
-                                    {showWallpaperPicker && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                            transition={{ duration: 0.15 }}
-                                            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 p-3 rounded-xl"
-                                            data-wallpaper-picker
-                                            style={{
-                                                background: 'var(--bg-elevated)',
-                                                border: '1px solid var(--border-subtle)',
-                                                boxShadow: goOS.shadows.solid,
-                                                zIndex: 5000,
-                                            }}
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <div className="text-xs font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                                                Choose Wallpaper
-                                            </div>
-                                            <div className="grid grid-cols-3 gap-2" style={{ width: 240, maxHeight: 280, overflowY: 'auto' }}>
-                                                {WALLPAPERS.map((wp) => (
-                                                    <button
-                                                        key={wp.id || 'none'}
-                                                        onClick={() => {
-                                                            playSound('click');
-                                                            setWallpaper(wp.id);
-                                                            setShowWallpaperPicker(false);
-                                                        }}
-                                                        className="relative rounded-lg overflow-hidden transition-all"
-                                                        style={{
-                                                            width: 72,
-                                                            height: 48,
-                                                            border: wallpaper === wp.id
-                                                                ? '2px solid var(--accent-primary)'
-                                                                : '1px solid var(--border-subtle)',
-                                                            background: wp.preview ? 'transparent' : 'var(--bg-surface)',
-                                                        }}
-                                                    >
-                                                        {wp.preview ? (
-                                                            <img
-                                                                src={wp.preview}
-                                                                alt={wp.label}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div
-                                                                className="w-full h-full flex items-center justify-center text-xs"
-                                                                style={{
-                                                                    backgroundImage: 'radial-gradient(var(--text-tertiary) 1px, transparent 1px)',
-                                                                    backgroundSize: '8px 8px',
-                                                                    color: 'var(--text-tertiary)',
-                                                                }}
-                                                            >
-                                                                None
-                                                            </div>
-                                                        )}
-                                                        {wallpaper === wp.id && (
-                                                            <div
-                                                                className="absolute inset-0 flex items-center justify-center"
-                                                                style={{ background: 'rgba(0,0,0,0.3)' }}
-                                                            >
-                                                                <div
-                                                                    className="w-4 h-4 rounded-full flex items-center justify-center"
-                                                                    style={{ background: goOS.colors.accent.primary }}
-                                                                >
-                                                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                                                        <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                            <DockIcon
-                                icon={<PenLine size={24} stroke={goOS.icon.accent} strokeWidth={1.5} />}
-                                onClick={() => createFile('note')}
-                                label="New Note"
                             />
                             {/* Minimized Editors */}
                             {minimizedEditors.size > 0 && (
@@ -5162,8 +5129,98 @@ function GoOSDemoContent() {
                 onNewDownload={() => handleOpenCreateFileDialog('download', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onPaste={pasteFile}
                 onArrangeIcons={arrangeIcons}
+                onChangeWallpaper={() => setShowWallpaperPicker(true)}
                 canPaste={!!clipboard}
             />
+
+            {/* Wallpaper Picker Modal */}
+            <AnimatePresence>
+                {showWallpaperPicker && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="fixed inset-0 z-[9000] flex items-center justify-center"
+                        style={{ background: 'rgba(0,0,0,0.4)' }}
+                        onClick={() => setShowWallpaperPicker(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            transition={{ duration: 0.15 }}
+                            className="p-4 rounded-2xl"
+                            style={{
+                                background: 'var(--bg-elevated)',
+                                border: '1px solid var(--border-subtle)',
+                                boxShadow: 'var(--shadow-lg)',
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+                                Choose Wallpaper
+                            </div>
+                            <div className="grid grid-cols-4 gap-2" style={{ width: 340, maxHeight: 320, overflowY: 'auto' }}>
+                                {WALLPAPERS.map((wp) => (
+                                    <button
+                                        key={wp.id || 'none'}
+                                        onClick={() => {
+                                            playSound('click');
+                                            setWallpaper(wp.id);
+                                            setShowWallpaperPicker(false);
+                                        }}
+                                        className="relative rounded-lg overflow-hidden transition-all hover:ring-2 hover:ring-offset-1"
+                                        style={{
+                                            width: 76,
+                                            height: 52,
+                                            border: wallpaper === wp.id
+                                                ? '2px solid var(--accent-primary)'
+                                                : '1px solid var(--border-subtle)',
+                                            background: wp.preview ? 'transparent' : 'var(--bg-surface)',
+                                            ringColor: 'var(--accent-primary)',
+                                        }}
+                                    >
+                                        {wp.preview ? (
+                                            <img
+                                                src={wp.preview}
+                                                alt={wp.label}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div
+                                                className="w-full h-full flex items-center justify-center text-xs"
+                                                style={{
+                                                    backgroundImage: 'radial-gradient(var(--text-tertiary) 1px, transparent 1px)',
+                                                    backgroundSize: '8px 8px',
+                                                    color: 'var(--text-tertiary)',
+                                                }}
+                                            >
+                                                None
+                                            </div>
+                                        )}
+                                        {wallpaper === wp.id && (
+                                            <div
+                                                className="absolute inset-0 flex items-center justify-center"
+                                                style={{ background: 'rgba(0,0,0,0.3)' }}
+                                            >
+                                                <div
+                                                    className="w-5 h-5 rounded-full flex items-center justify-center"
+                                                    style={{ background: 'var(--accent-primary)' }}
+                                                >
+                                                    <svg width="12" height="10" viewBox="0 0 10 8" fill="none">
+                                                        <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* File Creation Dialog */}
             <GoOSCreateFileDialog

@@ -12,6 +12,7 @@ import {
   Image,
   Link,
   FileUser,
+  ImageIcon,
 } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
 import { SPRING, contextMenu as contextMenuVariants, TRANSITION } from '@/lib/animations';
@@ -52,6 +53,7 @@ interface GoOSDesktopContextMenuProps {
   onPaste?: () => void;
   onRefresh?: () => void;
   onArrangeIcons?: () => void;
+  onChangeWallpaper?: () => void;
   canPaste?: boolean;
 }
 
@@ -68,6 +70,7 @@ export function GoOSDesktopContextMenu({
   onPaste,
   onRefresh,
   onArrangeIcons,
+  onChangeWallpaper,
   canPaste = false,
 }: GoOSDesktopContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -102,7 +105,13 @@ export function GoOSDesktopContextMenu({
         { id: 'refresh', label: 'Refresh', icon: <RefreshCw size={14} strokeWidth={1.5} />, shortcut: '⌘R', onClick: () => onRefresh?.() },
       ],
     },
-  ], [onNewNote, onNewCaseStudy, onNewFolder, onNewCV, onNewImage, onNewLink, onPaste, onArrangeIcons, onRefresh, canPaste]);
+    {
+      id: 'appearance',
+      items: [
+        { id: 'change-wallpaper', label: 'Change Wallpaper', icon: <ImageIcon size={14} strokeWidth={1.5} />, onClick: () => onChangeWallpaper?.() },
+      ],
+    },
+  ], [onNewNote, onNewCaseStudy, onNewFolder, onNewCV, onNewImage, onNewLink, onPaste, onArrangeIcons, onRefresh, onChangeWallpaper, canPaste]);
 
   // Calculate menu height
   const estimatedHeight = useMemo(() => {
