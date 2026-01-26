@@ -66,16 +66,16 @@ const THEME = {
     // Outer bezel - warm cream with depth
     bezelGradient: 'linear-gradient(145deg, #fdfcfa 0%, #f5f3ef 40%, #ebe8e3 100%)',
     bezelShadow: `
-      0 10px 40px rgba(120, 100, 80, 0.15),
-      0 4px 12px rgba(120, 100, 80, 0.08),
-      inset 0 2px 3px rgba(255, 255, 255, 0.95),
-      inset 0 -3px 6px rgba(180, 160, 140, 0.08)
+      0 5px 20px rgba(120, 100, 80, 0.08),
+      0 2px 6px rgba(120, 100, 80, 0.04),
+      inset 0 1px 2px rgba(255, 255, 255, 0.9),
+      inset 0 -2px 4px rgba(180, 160, 140, 0.04)
     `,
     // Inner face - clean cream white
     faceGradient: 'linear-gradient(180deg, #faf9f7 0%, #f3f1ed 100%)',
     faceShadow: `
-      inset 0 2px 12px rgba(100, 80, 60, 0.06),
-      inset 0 1px 3px rgba(100, 80, 60, 0.04)
+      inset 0 1px 6px rgba(100, 80, 60, 0.03),
+      inset 0 1px 2px rgba(100, 80, 60, 0.02)
     `,
     // Tick marks
     tickMain: '#6b5c4d',
@@ -84,7 +84,7 @@ const THEME = {
     hourHand: 'linear-gradient(180deg, #3d3428 0%, #2a241c 100%)',
     minuteHand: 'linear-gradient(180deg, #4a4036 0%, #3d3428 100%)',
     centerPin: 'linear-gradient(145deg, #5c5040 0%, #3d3428 100%)',
-    centerPinShadow: '0 2px 4px rgba(60, 50, 40, 0.4)',
+    centerPinShadow: '0 1px 2px rgba(60, 50, 40, 0.2)',
     // Text
     timeColor: '#2a241c',
     timezoneColor: '#7a6c5c',
