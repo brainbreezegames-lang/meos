@@ -58,6 +58,7 @@ import { WidgetRenderer, WIDGET_METADATA, WidgetContextMenu } from '@/components
 import { ClockWidgetEditor } from '@/components/widgets/ClockWidgetEditor';
 import type { Widget } from '@/types';
 import { PresentView } from '@/components/views';
+import { DrawingApp } from '@/components/apps/DrawingApp';
 import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
@@ -2852,6 +2853,7 @@ function GoOSDemoContent() {
         guestbook: false,
         analytics: false,
         snake: false,
+        canvas: false,
     });
 
     const [windowZ, setWindowZ] = useState<Record<string, number>>({
@@ -2864,6 +2866,7 @@ function GoOSDemoContent() {
         guestbook: 606,
         analytics: 607,
         snake: 608,
+        canvas: 609,
     });
 
     // Guestbook state
@@ -4574,6 +4577,43 @@ function GoOSDemoContent() {
                             })}
                         </AnimatePresence>
 
+                        {/* Canvas App Desktop Icon - Standalone drawing app */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.5, y: 30 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ ...SPRING.bouncy, delay: 0.3 }}
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+                        >
+                            <div style={{ pointerEvents: 'auto' }}>
+                                <GoOSDesktopIcon
+                                    id="canvas-app"
+                                    label="Canvas"
+                                    icon={
+                                        <div style={{
+                                            width: 48,
+                                            height: 48,
+                                            borderRadius: 12,
+                                            background: 'linear-gradient(135deg, #ff6b00 0%, #ff8533 50%, #ffaa00 100%)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            boxShadow: '0 4px 12px rgba(255, 107, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.3)',
+                                        }}>
+                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                                                <path d="M2 2l7.586 7.586"/>
+                                                <circle cx="11" cy="11" r="2"/>
+                                            </svg>
+                                        </div>
+                                    }
+                                    onClick={() => toggleApp('canvas')}
+                                    isActive={appWindows.canvas}
+                                    position={{ x: 85, y: 45 }}
+                                />
+                            </div>
+                        </motion.div>
+
                         {/* goOS Widgets - fully functional */}
                         <WidgetRenderer
                             widgets={widgets}
@@ -5123,6 +5163,28 @@ function GoOSDemoContent() {
                                 onClose={() => closeApp('snake')}
                                 onFocus={() => focusApp('snake')}
                             />
+
+                            {/* Canvas - Drawing App */}
+                            <SketchWindow
+                                id="canvas"
+                                title="Canvas"
+                                icon={
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                                        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                                    </svg>
+                                }
+                                isOpen={appWindows.canvas}
+                                zIndex={windowZ.canvas}
+                                defaultX={getWindowX(120)}
+                                defaultY={50}
+                                width={800}
+                                height={600}
+                                onClose={() => closeApp('canvas')}
+                                onFocus={() => focusApp('canvas')}
+                            >
+                                <DrawingApp isDark={isDarkMode} />
+                            </SketchWindow>
                         </AnimatePresence>
                     </>
                 )}
