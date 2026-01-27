@@ -25,45 +25,7 @@ const COLORS = [
 
 const STROKE_WIDTHS = [2, 4, 8, 12, 20];
 
-// Braun-inspired theme
-const THEMES = {
-  light: {
-    toolbarBg: 'linear-gradient(180deg, #ffffff 0%, #f8f8f6 100%)',
-    toolbarShadow: '0 2px 8px rgba(0,0,0,0.08), inset 0 -1px 0 rgba(0,0,0,0.04)',
-    toolbarBorder: 'rgba(0,0,0,0.06)',
-    canvasBg: '#ffffff',
-    buttonBg: 'linear-gradient(180deg, #ffffff 0%, #f5f5f3 100%)',
-    buttonActiveBg: 'linear-gradient(180deg, #f0f0ee 0%, #e8e8e6 100%)',
-    buttonShadow: '0 1px 2px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
-    buttonActiveShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)',
-    textPrimary: '#1a1a1a',
-    textSecondary: '#666666',
-    textMuted: '#999999',
-    divider: 'rgba(0,0,0,0.08)',
-    accent: '#ff6b00',
-  },
-  dark: {
-    toolbarBg: 'linear-gradient(180deg, #2a2a28 0%, #1e1e1c 100%)',
-    toolbarShadow: '0 2px 8px rgba(0,0,0,0.3), inset 0 -1px 0 rgba(255,255,255,0.04)',
-    toolbarBorder: 'rgba(255,255,255,0.06)',
-    canvasBg: '#1a1a18',
-    buttonBg: 'linear-gradient(180deg, #3a3a38 0%, #2e2e2c 100%)',
-    buttonActiveBg: 'linear-gradient(180deg, #4a4a48 0%, #3e3e3c 100%)',
-    buttonShadow: '0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
-    buttonActiveShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)',
-    textPrimary: '#f0f0ec',
-    textSecondary: '#a0a09c',
-    textMuted: '#707068',
-    divider: 'rgba(255,255,255,0.08)',
-    accent: '#ff7722',
-  },
-};
-
-interface DrawingAppProps {
-  isDark?: boolean;
-}
-
-export function DrawingApp({ isDark = false }: DrawingAppProps) {
+export function DrawingApp() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -76,8 +38,22 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showStrokePicker, setShowStrokePicker] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+  const [isDark, setIsDark] = useState(false);
 
-  const theme = isDark ? THEMES.dark : THEMES.light;
+  // Detect dark mode from document.documentElement
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const hasDarkClass = document.documentElement.classList.contains('dark');
+      setIsDark(hasDarkClass);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Resize canvas to fit container
   useEffect(() => {
@@ -96,6 +72,11 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
+  // Get canvas background color from CSS variable
+  const getCanvasBg = useCallback(() => {
+    return isDark ? '#1e1e1c' : '#ffffff';
+  }, [isDark]);
+
   // Redraw canvas when strokes change
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -104,8 +85,8 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.fillStyle = theme.canvasBg;
+    // Clear canvas with theme-appropriate background
+    ctx.fillStyle = getCanvasBg();
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw all strokes
@@ -145,7 +126,7 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
     });
 
     ctx.globalCompositeOperation = 'source-over';
-  }, [strokes, currentStroke, canvasSize, theme.canvasBg]);
+  }, [strokes, currentStroke, canvasSize, getCanvasBg, isDark]);
 
   const getPointerPosition = useCallback((e: React.MouseEvent | React.TouchEvent): Point => {
     const canvas = canvasRef.current;
@@ -228,12 +209,10 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
     toolName,
     icon,
     label,
-    isColorButton = false,
   }: {
     toolName?: Tool;
     icon: React.ReactNode;
     label: string;
-    isColorButton?: boolean;
   }) => {
     const isActive = toolName ? tool === toolName : false;
 
@@ -241,19 +220,21 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
       <button
         onClick={() => toolName && setTool(toolName)}
         title={label}
+        className="drawing-tool-button"
+        data-active={isActive}
         style={{
           width: 36,
           height: 36,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: 8,
+          borderRadius: 'var(--radius-sm)',
           border: 'none',
-          background: isActive ? theme.buttonActiveBg : theme.buttonBg,
-          boxShadow: isActive ? theme.buttonActiveShadow : theme.buttonShadow,
+          background: isActive ? 'var(--dock-icon-pressed-bg)' : 'var(--dock-icon-bg)',
+          boxShadow: isActive ? 'var(--dock-icon-pressed-shadow)' : 'var(--dock-icon-shadow)',
           cursor: 'pointer',
-          color: isActive ? theme.accent : theme.textSecondary,
-          transition: 'all 0.15s ease',
+          color: isActive ? 'var(--color-accent-primary)' : 'var(--text-secondary)',
+          transition: 'var(--transition-fast)',
         }}
       >
         {icon}
@@ -269,11 +250,11 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: theme.canvasBg,
+        background: 'var(--bg-elevated)',
         overflow: 'hidden',
       }}
     >
-      {/* Toolbar */}
+      {/* Toolbar - Braun-inspired physical styling */}
       <div
         style={{
           height: 56,
@@ -281,9 +262,9 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          background: theme.toolbarBg,
-          borderBottom: `1px solid ${theme.toolbarBorder}`,
-          boxShadow: theme.toolbarShadow,
+          background: 'var(--dock-physical-bg)',
+          borderBottom: 'var(--dock-physical-border)',
+          boxShadow: 'var(--dock-physical-shadow)',
         }}
       >
         {/* Drawing Tools */}
@@ -323,7 +304,7 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
         </div>
 
         {/* Divider */}
-        <div style={{ width: 1, height: 24, background: theme.divider }} />
+        <div style={{ width: 1, height: 24, background: 'var(--color-border-default)' }} />
 
         {/* Color Picker */}
         <div style={{ position: 'relative' }}>
@@ -336,10 +317,10 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: 8,
+              borderRadius: 'var(--radius-sm)',
               border: 'none',
-              background: theme.buttonBg,
-              boxShadow: theme.buttonShadow,
+              background: 'var(--dock-icon-bg)',
+              boxShadow: 'var(--dock-icon-shadow)',
               cursor: 'pointer',
               padding: 6,
             }}
@@ -350,7 +331,7 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
                 height: '100%',
                 borderRadius: 4,
                 background: color,
-                border: `2px solid ${theme.divider}`,
+                border: '2px solid var(--color-border-default)',
               }}
             />
           </button>
@@ -366,14 +347,14 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
                   top: '100%',
                   left: 0,
                   marginTop: 8,
-                  padding: 8,
-                  background: theme.toolbarBg,
-                  borderRadius: 12,
-                  border: `1px solid ${theme.toolbarBorder}`,
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                  padding: 10,
+                  background: 'var(--dock-physical-bg)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border-subtle)',
+                  boxShadow: 'var(--shadow-lg)',
                   display: 'grid',
                   gridTemplateColumns: 'repeat(6, 1fr)',
-                  gap: 4,
+                  gap: 6,
                   zIndex: 100,
                 }}
               >
@@ -387,11 +368,11 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
                     style={{
                       width: 28,
                       height: 28,
-                      borderRadius: 6,
+                      borderRadius: 'var(--radius-sm)',
                       background: c,
-                      border: color === c ? `2px solid ${theme.accent}` : `1px solid ${theme.divider}`,
+                      border: color === c ? '2px solid var(--color-accent-primary)' : '1px solid var(--color-border-default)',
                       cursor: 'pointer',
-                      transition: 'transform 0.1s ease',
+                      transition: 'var(--transition-fast)',
                     }}
                   />
                 ))}
@@ -411,10 +392,10 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: 8,
+              borderRadius: 'var(--radius-sm)',
               border: 'none',
-              background: theme.buttonBg,
-              boxShadow: theme.buttonShadow,
+              background: 'var(--dock-icon-bg)',
+              boxShadow: 'var(--dock-icon-shadow)',
               cursor: 'pointer',
             }}
           >
@@ -423,7 +404,7 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
                 width: Math.min(strokeWidth * 2, 20),
                 height: Math.min(strokeWidth * 2, 20),
                 borderRadius: '50%',
-                background: theme.textPrimary,
+                background: 'var(--text-primary)',
               }}
             />
           </button>
@@ -439,11 +420,11 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
                   top: '100%',
                   left: 0,
                   marginTop: 8,
-                  padding: 8,
-                  background: theme.toolbarBg,
-                  borderRadius: 12,
-                  border: `1px solid ${theme.toolbarBorder}`,
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                  padding: 10,
+                  background: 'var(--dock-physical-bg)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border-subtle)',
+                  boxShadow: 'var(--shadow-lg)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 4,
@@ -463,10 +444,11 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderRadius: 6,
-                      background: strokeWidth === w ? theme.buttonActiveBg : 'transparent',
+                      borderRadius: 'var(--radius-sm)',
+                      background: strokeWidth === w ? 'var(--dock-icon-pressed-bg)' : 'transparent',
                       border: 'none',
                       cursor: 'pointer',
+                      transition: 'var(--transition-fast)',
                     }}
                   >
                     <div
@@ -474,7 +456,7 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
                         width: 40,
                         height: w,
                         borderRadius: w / 2,
-                        background: theme.textPrimary,
+                        background: 'var(--text-primary)',
                       }}
                     />
                   </button>
@@ -485,7 +467,7 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
         </div>
 
         {/* Divider */}
-        <div style={{ width: 1, height: 24, background: theme.divider }} />
+        <div style={{ width: 1, height: 24, background: 'var(--color-border-default)' }} />
 
         {/* Actions */}
         <button
@@ -498,13 +480,14 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 8,
+            borderRadius: 'var(--radius-sm)',
             border: 'none',
-            background: theme.buttonBg,
-            boxShadow: theme.buttonShadow,
+            background: 'var(--dock-icon-bg)',
+            boxShadow: 'var(--dock-icon-shadow)',
             cursor: undoStack.length === 0 ? 'not-allowed' : 'pointer',
             opacity: undoStack.length === 0 ? 0.4 : 1,
-            color: theme.textSecondary,
+            color: 'var(--text-secondary)',
+            transition: 'var(--transition-fast)',
           }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -523,13 +506,14 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 8,
+            borderRadius: 'var(--radius-sm)',
             border: 'none',
-            background: theme.buttonBg,
-            boxShadow: theme.buttonShadow,
+            background: 'var(--dock-icon-bg)',
+            boxShadow: 'var(--dock-icon-shadow)',
             cursor: strokes.length === 0 ? 'not-allowed' : 'pointer',
             opacity: strokes.length === 0 ? 0.4 : 1,
-            color: theme.textSecondary,
+            color: 'var(--text-secondary)',
+            transition: 'var(--transition-fast)',
           }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -548,18 +532,19 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
           title="Export as PNG"
           style={{
             height: 32,
-            padding: '0 12px',
+            padding: '0 14px',
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            borderRadius: 8,
+            borderRadius: 'var(--radius-sm)',
             border: 'none',
-            background: `linear-gradient(145deg, ${theme.accent}, ${isDark ? '#e5691e' : '#e55500'})`,
-            boxShadow: `0 2px 8px ${theme.accent}40`,
+            background: 'linear-gradient(145deg, var(--color-accent-primary), var(--accent-dark))',
+            boxShadow: '0 2px 8px rgba(255, 119, 34, 0.35)',
             cursor: 'pointer',
-            color: '#ffffff',
+            color: 'var(--text-inverse)',
             fontSize: 12,
             fontWeight: 600,
+            transition: 'var(--transition-fast)',
           }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -604,13 +589,13 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
               opacity: 0.4,
             }}
           >
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={theme.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 19l7-7 3 3-7 7-3-3z"/>
               <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
               <path d="M2 2l7.586 7.586"/>
               <circle cx="11" cy="11" r="2"/>
             </svg>
-            <p style={{ marginTop: 12, fontSize: 13, color: theme.textMuted }}>
+            <p style={{ marginTop: 12, fontSize: 13, color: 'var(--text-tertiary)' }}>
               Click and drag to start drawing
             </p>
           </div>
