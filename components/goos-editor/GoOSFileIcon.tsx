@@ -689,9 +689,9 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       const newX = dragStartRef.current.elemX + deltaXPercent;
       const newY = dragStartRef.current.elemY + deltaYPercent;
 
-      // Clamp to keep on screen (0-95% for x, 0-90% for y to account for icon size)
-      const clampedX = Math.max(0, Math.min(95, newX));
-      const clampedY = Math.max(0, Math.min(90, newY));
+      // Free dragging - minimal clamp just to keep partially visible
+      const clampedX = Math.max(-5, Math.min(100, newX));
+      const clampedY = Math.max(-5, Math.min(100, newY));
 
       // Update both state and ref (ref is used in mouseUp to avoid stale closure)
       setLocalPosition({ x: clampedX, y: clampedY });

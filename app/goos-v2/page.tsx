@@ -1370,9 +1370,9 @@ const GoOSDesktopIcon = React.memo(({
             const newX = dragStartRef.current.elemX + deltaXPercent;
             const newY = dragStartRef.current.elemY + deltaYPercent;
 
-            // Clamp to keep on screen (with margin for icon size)
-            const clampedX = Math.max(2, Math.min(92, newX));
-            const clampedY = Math.max(8, Math.min(85, newY));
+            // Free dragging - minimal clamp just to keep partially visible
+            const clampedX = Math.max(-5, Math.min(100, newX));
+            const clampedY = Math.max(-5, Math.min(100, newY));
 
             // Update both state and ref
             setLocalPosition({ x: clampedX, y: clampedY });
@@ -4590,16 +4590,16 @@ function GoOSDemoContent() {
                                     label="Canvas"
                                     icon={
                                         <div style={{
-                                            width: 48,
-                                            height: 48,
-                                            borderRadius: 12,
+                                            width: 56,
+                                            height: 56,
+                                            borderRadius: 10,
                                             background: 'linear-gradient(135deg, #ff6b00 0%, #ff8533 50%, #ffaa00 100%)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            boxShadow: '0 4px 12px rgba(255, 107, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.3)',
+                                            margin: -1,
                                         }}>
-                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M12 19l7-7 3 3-7 7-3-3z"/>
                                                 <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
                                                 <path d="M2 2l7.586 7.586"/>

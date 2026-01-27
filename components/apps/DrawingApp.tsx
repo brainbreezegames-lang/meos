@@ -162,6 +162,8 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
   }, []);
 
   const startDrawing = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (tool === 'select' || tool === 'pan' || tool === 'text') return;
 
     const point = getPointerPosition(e);
@@ -175,6 +177,7 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
   }, [tool, color, strokeWidth, getPointerPosition]);
 
   const draw = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
     if (!isDrawing || !currentStroke) return;
 
     const point = getPointerPosition(e);
@@ -187,7 +190,8 @@ export function DrawingApp({ isDark = false }: DrawingAppProps) {
     });
   }, [isDrawing, currentStroke, getPointerPosition]);
 
-  const stopDrawing = useCallback(() => {
+  const stopDrawing = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+    e?.stopPropagation();
     if (!isDrawing || !currentStroke) return;
 
     setIsDrawing(false);
