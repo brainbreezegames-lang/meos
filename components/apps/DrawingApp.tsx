@@ -556,12 +556,31 @@ export function DrawingApp() {
         </button>
       </div>
 
-      {/* Canvas */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      {/* Canvas - stopPropagation on pointer events to prevent window drag */}
+      <div
+        style={{ flex: 1, position: 'relative', overflow: 'hidden' }}
+        onPointerDownCapture={(e) => e.stopPropagation()}
+      >
         <canvas
           ref={canvasRef}
           width={canvasSize.width}
           height={canvasSize.height}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            startDrawing(e as unknown as React.MouseEvent);
+          }}
+          onPointerMove={(e) => {
+            e.stopPropagation();
+            draw(e as unknown as React.MouseEvent);
+          }}
+          onPointerUp={(e) => {
+            e.stopPropagation();
+            stopDrawing(e as unknown as React.MouseEvent);
+          }}
+          onPointerLeave={(e) => {
+            e.stopPropagation();
+            stopDrawing(e as unknown as React.MouseEvent);
+          }}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}

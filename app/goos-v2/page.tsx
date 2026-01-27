@@ -2833,6 +2833,25 @@ function GoOSDemoContent() {
         });
     }, []);
 
+    // Canvas app icon position - persisted to localStorage
+    const [canvasPosition, setCanvasPosition] = useState<{ x: number; y: number }>(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const saved = localStorage.getItem('goos-canvas-position');
+                if (saved) return JSON.parse(saved);
+            } catch (e) {
+                console.warn('Failed to parse canvas position:', e);
+            }
+        }
+        return { x: 85, y: 45 }; // Default position
+    });
+
+    // Handle canvas icon position change
+    const handleCanvasPositionChange = useCallback((position: { x: number; y: number }) => {
+        setCanvasPosition(position);
+        localStorage.setItem('goos-canvas-position', JSON.stringify(position));
+    }, []);
+
     // Theme-aware colors via CSS variables (no JS dependency on isDarkMode)
     const iconColors = getIconColors();
     const stickyColors = getStickyColors();
@@ -4609,7 +4628,8 @@ function GoOSDemoContent() {
                                     }
                                     onClick={() => toggleApp('canvas')}
                                     isActive={appWindows.canvas}
-                                    position={{ x: 85, y: 45 }}
+                                    position={canvasPosition}
+                                    onPositionChange={(pos) => handleCanvasPositionChange(pos)}
                                 />
                             </div>
                         </motion.div>
@@ -5183,7 +5203,7 @@ function GoOSDemoContent() {
                                 onClose={() => closeApp('canvas')}
                                 onFocus={() => focusApp('canvas')}
                             >
-                                <DrawingApp isDark={isDarkMode} />
+                                <DrawingApp />
                             </SketchWindow>
                         </AnimatePresence>
                     </>
