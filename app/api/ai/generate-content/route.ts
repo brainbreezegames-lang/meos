@@ -24,41 +24,45 @@ const requestSchema = z.object({
   userPrompt: z.string(),
 });
 
-async function callOpenRouter(systemPrompt: string, userPrompt: string): Promise<string> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-001';
+async function callGemini(systemPrompt: string, userPrompt: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 
   if (!apiKey) {
-    throw new Error('OPENROUTER_API_KEY is not configured');
+    throw new Error('GEMINI_API_KEY is not configured');
   }
 
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'https://meos-delta.vercel.app',
-      'X-Title': 'goOS Onboarding',
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.8,
-      max_tokens: 2000,
-    }),
-  });
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: `${systemPrompt}\n\n${userPrompt}` }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.8,
+          maxOutputTokens: 2000,
+        },
+      }),
+    }
+  );
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('OpenRouter error:', error);
-    throw new Error(`OpenRouter API error: ${response.status}`);
+    console.error('Gemini error:', error);
+    throw new Error(`Gemini API error: ${response.status}`);
   }
 
   const data = await response.json();
-  return data.choices[0]?.message?.content || '';
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
 function extractJSON(text: string): string {
@@ -85,13 +89,13 @@ export async function POST(request: NextRequest) {
     let content: GeneratedContent;
 
     // Check if AI is configured
-    if (!process.env.OPENROUTER_API_KEY) {
-      console.warn('OPENROUTER_API_KEY not configured, using fallback content');
+    if (!process.env.GEMINI_API_KEY) {
+      console.warn('GEMINI_API_KEY not configured, using fallback content');
       content = generateFallbackContent(intent as ParsedIntent);
     } else {
       try {
-        // Call OpenRouter for content generation
-        const aiResponse = await callOpenRouter(
+        // Call Gemini for content generation
+        const aiResponse = await callGemini(
           CONTENT_GENERATOR_SYSTEM_PROMPT,
           buildContentGeneratorPrompt(
             intent.userType,
