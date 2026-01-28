@@ -2051,20 +2051,29 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
             onMouseDown={onFocus}
             className="fixed flex flex-col overflow-hidden"
             style={{
-                ...(centered ? {
+                ...(isMaximized ? {
+                    inset: 0,
+                    margin: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    borderRadius: 0,
+                } : centered ? {
                     inset: 0,
                     margin: 'auto',
+                    width,
+                    height,
+                    borderRadius: 'var(--radius-lg, 20px)',
                 } : {
                     left: defaultX,
                     top: defaultY,
+                    width,
+                    height,
+                    borderRadius: 'var(--radius-lg, 20px)',
                 }),
-                width,
-                height,
                 zIndex,
                 background: 'var(--color-bg-base)',
-                border: '1px solid var(--color-border-default)',
-                borderRadius: 'var(--radius-lg, 20px)',
-                boxShadow: 'var(--shadow-window)',
+                border: isMaximized ? 'none' : '1px solid var(--color-border-default)',
+                boxShadow: isMaximized ? 'none' : 'var(--shadow-window)',
                 ...WILL_CHANGE.transformOpacity,
             }}
         >
@@ -2121,7 +2130,8 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                         )}
                     </motion.button>
                     <motion.button
-                        title="Maximize"
+                        title={isMaximized ? "Restore" : "Maximize"}
+                        onClick={handleMaximize}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         className="flex items-center justify-center"
@@ -2136,7 +2146,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                         }}
                     >
                         {isHoveredTraffic && (
-                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(0, 70, 0, 0.8)' }}>+</span>
+                            <span style={{ fontSize: 9, lineHeight: 1, color: 'rgba(0, 70, 0, 0.8)' }}>{isMaximized ? '−' : '+'}</span>
                         )}
                     </motion.button>
                 </div>

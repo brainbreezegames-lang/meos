@@ -143,9 +143,8 @@ export function DrawingApp() {
 
     for (let i = 0; i < allStrokes.length; i++) {
       const stroke = allStrokes[i];
-      if (!stroke || !stroke.points || stroke.points.length < 2) continue;
+      if (!stroke || !stroke.points || stroke.points.length === 0) continue;
 
-      ctx.beginPath();
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.lineWidth = stroke.width;
@@ -153,16 +152,35 @@ export function DrawingApp() {
       if (stroke.tool === 'eraser') {
         ctx.globalCompositeOperation = 'destination-out';
         ctx.strokeStyle = 'rgba(0,0,0,1)';
+        ctx.fillStyle = 'rgba(0,0,0,1)';
       } else if (stroke.tool === 'highlighter') {
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = stroke.color + '60';
+        ctx.fillStyle = stroke.color + '60';
         ctx.lineWidth = stroke.width * 3;
       } else {
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = stroke.color;
+        ctx.fillStyle = stroke.color;
       }
 
+      // Single point - draw a dot
+      if (stroke.points.length === 1) {
+        ctx.beginPath();
+        ctx.arc(stroke.points[0].x, stroke.points[0].y, stroke.width / 2, 0, Math.PI * 2);
+        ctx.fill();
+        continue;
+      }
+
+      ctx.beginPath();
       ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+
+      // Two points - draw a simple line
+      if (stroke.points.length === 2) {
+        ctx.lineTo(stroke.points[1].x, stroke.points[1].y);
+        ctx.stroke();
+        continue;
+      }
 
       // Smooth curve with quadratic bezier
       for (let j = 1; j < stroke.points.length - 1; j++) {
