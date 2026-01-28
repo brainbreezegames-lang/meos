@@ -56,19 +56,26 @@ Return JSON:
 const PLANNING_PROMPT = `Based on this deep understanding of the user:
 {context}
 
-Design their workspace. For EACH component, explain WHY it exists for THIS specific person.
+Design a COMPREHENSIVE workspace tailored specifically for them. Think about what they actually need to succeed.
 
 Available components:
 - note: Rich text document (About, Services, Blog posts, etc.)
 - case-study: Portfolio piece with sections (Challenge, Approach, Results)
 - folder: Container to organize files
-- Widgets: status (availability), contact (inquiry form), book (scheduling), links (social profiles)
+
+IMPORTANT: Create 4-6 items that are SPECIFIC to this user. Don't be lazy - think about what THEY need:
+- An About/Introduction that reflects their personality and niche
+- Portfolio folders matching their SPECIFIC work (e.g., "Wedding Shoots" not "Projects")
+- Case studies for their type of work
+- Service descriptions if relevant
+- Blog/writing if they mentioned content creation
 
 Rules:
-- Create 2-4 items maximum. Quality over quantity.
-- Every item must have a CLEAR PURPOSE for THIS user
-- Content descriptions should be specific to their situation
-- Folder names should match their work (not generic "Projects")
+- Create 4-6 items. Be thorough, not lazy.
+- Every item must have a CLEAR PURPOSE for THIS specific user
+- Names should be SPECIFIC (not generic like "Projects" or "Work")
+- Content descriptions should reference their actual situation
+- Order items logically (introduction first, then portfolio, then contact)
 
 Return JSON:
 {
@@ -76,16 +83,14 @@ Return JSON:
     "summary": "One sentence describing what you're building and why",
     "items": [
       {
-        "type": "note|case-study|folder|widget",
-        "widgetType": "status|contact|book|links (only if type is widget)",
+        "type": "note|case-study|folder",
         "name": "Specific name for this user",
         "purpose": "Why THIS user needs this (1-2 sentences)",
         "contentBrief": "What should be inside, specific to their situation",
-        "priority": 1-4 (order to create)
+        "priority": 1-6 (order to create)
       }
     ]
   },
-  "statusMessage": "What their status widget should say",
   "reasoning": "Brief explanation of your overall design decisions"
 }`;
 
@@ -185,59 +190,115 @@ function extractJSON(text: string): unknown {
   throw new Error('No valid JSON found in response');
 }
 
-// Fallback when AI is unavailable
+// Fallback when AI is unavailable - create comprehensive workspace
 function createFallbackResponse(prompt: string) {
   // Extract basic info from prompt
   const lowerPrompt = prompt.toLowerCase();
   let profession = 'creative professional';
   let niche = 'your work';
+  let folderName = 'Portfolio';
+  let serviceName = 'Services';
 
   if (lowerPrompt.includes('photographer')) {
     profession = 'photographer';
     niche = 'photography';
+    folderName = lowerPrompt.includes('wedding') ? 'Wedding Gallery' : 'Photo Gallery';
+    serviceName = 'Photography Services';
   } else if (lowerPrompt.includes('designer')) {
     profession = 'designer';
     niche = 'design';
+    folderName = lowerPrompt.includes('ui') || lowerPrompt.includes('product') ? 'Product Work' : 'Design Projects';
+    serviceName = 'Design Services';
   } else if (lowerPrompt.includes('developer') || lowerPrompt.includes('engineer')) {
     profession = 'developer';
     niche = 'development';
+    folderName = 'Code Projects';
+    serviceName = 'Development Services';
   } else if (lowerPrompt.includes('writer') || lowerPrompt.includes('author')) {
     profession = 'writer';
     niche = 'writing';
+    folderName = 'Published Work';
+    serviceName = 'Writing Services';
   }
 
+  const timestamp = Date.now();
+
   return {
-    understanding: `I understand you're a ${profession}. Let me set up a workspace to showcase ${niche} and help visitors connect with you.`,
+    understanding: `I understand you're a ${profession}. Let me set up a comprehensive workspace to showcase ${niche} and help visitors connect with you.`,
     items: [
       {
-        id: `item-${Date.now()}-about`,
+        id: `item-${timestamp}-about`,
         type: 'file',
         fileType: 'note',
         title: 'About Me',
         content: `<h1>Hey, I'm [Your Name]</h1>
-<p>I'm a ${profession} passionate about creating meaningful work.</p>
+<p>I'm a ${profession} passionate about creating meaningful work in ${niche}.</p>
 <p>My approach combines creativity with purpose—every project is an opportunity to solve problems and create something valuable.</p>
+<h2>What I Do</h2>
+<p>I help clients achieve their goals through thoughtful, intentional ${niche}. Whether you need a complete solution or guidance on your next project, I'm here to help.</p>
 <p><strong>Let's work together.</strong></p>`,
         purpose: 'Introduce yourself to visitors',
       },
       {
-        id: `item-${Date.now()}-work`,
+        id: `item-${timestamp}-folder`,
+        type: 'file',
+        fileType: 'folder',
+        title: folderName,
+        content: '',
+        purpose: `Organize your ${niche} work`,
+      },
+      {
+        id: `item-${timestamp}-case`,
         type: 'file',
         fileType: 'case-study',
         title: 'Featured Project',
         content: `<h1>Featured Project</h1>
 <h2>Overview</h2>
-<p>Describe your project and what made it special.</p>
+<p>A brief description of what this project was about and why it mattered.</p>
 <h2>The Challenge</h2>
-<p>What problem were you solving?</p>
+<p>What problem were you solving? What were the constraints?</p>
 <h2>The Approach</h2>
-<p>How did you tackle it?</p>
+<p>How did you tackle this challenge? What made your approach unique?</p>
 <h2>Results</h2>
-<p>What was the impact?</p>`,
-        purpose: 'Showcase your best work',
+<p>What was the impact? Include metrics if possible.</p>`,
+        purpose: 'Showcase your best work with context',
+      },
+      {
+        id: `item-${timestamp}-services`,
+        type: 'file',
+        fileType: 'note',
+        title: serviceName,
+        content: `<h1>${serviceName}</h1>
+<p>Here's how I can help you:</p>
+<h2>What I Offer</h2>
+<ul>
+<li><strong>Consultation</strong> - Let's discuss your project and goals</li>
+<li><strong>Full Projects</strong> - End-to-end ${niche} solutions</li>
+<li><strong>Collaboration</strong> - Working alongside your team</li>
+</ul>
+<h2>Process</h2>
+<p>Every project starts with understanding your needs. From there, we'll work together to create something you'll love.</p>
+<p><strong>Ready to start? Get in touch.</strong></p>`,
+        purpose: 'Explain what you offer',
+      },
+      {
+        id: `item-${timestamp}-contact`,
+        type: 'file',
+        fileType: 'note',
+        title: 'Get in Touch',
+        content: `<h1>Let's Connect</h1>
+<p>I'm always excited to hear about new projects and opportunities.</p>
+<h2>How to Reach Me</h2>
+<ul>
+<li><strong>Email:</strong> hello@example.com</li>
+<li><strong>Twitter:</strong> @yourhandle</li>
+<li><strong>LinkedIn:</strong> /in/yourprofile</li>
+</ul>
+<p>Whether you have a project in mind or just want to say hi, I'd love to hear from you.</p>`,
+        purpose: 'Make it easy for visitors to contact you',
       },
     ],
-    summary: `Setting up a workspace for a ${profession}`,
+    summary: `Setting up a comprehensive workspace for a ${profession}`,
   };
 }
 
@@ -289,6 +350,11 @@ export async function POST(request: NextRequest) {
             summary: fallback.summary,
             reasoning: 'Using quick setup mode',
             itemCount: fallback.items.length,
+            items: fallback.items.map(item => ({
+              name: item.title,
+              type: item.fileType,
+              purpose: item.purpose,
+            })),
           });
 
           send('phase', { phase: 'building', message: 'Creating your components...' });
@@ -312,6 +378,7 @@ export async function POST(request: NextRequest) {
         send('understanding', {
           summary: understanding.understanding,
           identity: understanding.identity,
+          goals: understanding.goals,
           tone: understanding.tone,
         });
 
@@ -325,9 +392,21 @@ export async function POST(request: NextRequest) {
         try {
           plan = extractJSON(planningRaw) as Record<string, unknown>;
         } catch {
-          send('error', { message: 'Failed to plan workspace' });
-          controller.close();
-          return;
+          // Fall back to default plan instead of erroring
+          const fb = createFallbackResponse(prompt);
+          plan = {
+            plan: {
+              summary: fb.summary,
+              items: fb.items.map((item, i) => ({
+                type: item.fileType,
+                name: item.title,
+                purpose: item.purpose,
+                contentBrief: item.purpose,
+                priority: i + 1,
+              })),
+            },
+            reasoning: 'Using a recommended workspace layout',
+          };
         }
 
         const planData = plan.plan as { summary: string; items: Array<Record<string, unknown>> };
@@ -336,7 +415,11 @@ export async function POST(request: NextRequest) {
           summary: planData.summary,
           reasoning: plan.reasoning,
           itemCount: planData.items.length,
-          statusMessage: plan.statusMessage,
+          items: planData.items.map(item => ({
+            name: item.name,
+            type: item.type,
+            purpose: item.purpose,
+          })),
         });
 
         // ========== PHASE 3: BUILDING ==========
@@ -358,31 +441,33 @@ export async function POST(request: NextRequest) {
           // Generate content for non-widget items
           let content = '';
           if (item.type !== 'widget' && item.type !== 'folder') {
-            const contentPrompt = CONTENT_PROMPT
-              .replace('{context}', JSON.stringify(understanding, null, 2))
-              .replace('{name}', item.name as string)
-              .replace('{type}', item.type as string)
-              .replace('{purpose}', item.purpose as string)
-              .replace('{brief}', item.contentBrief as string)
-              .replace('{tone}', understanding.tone as string);
+            try {
+              const contentPrompt = CONTENT_PROMPT
+                .replace('{context}', JSON.stringify(understanding, null, 2))
+                .replace('{name}', item.name as string)
+                .replace('{type}', item.type as string)
+                .replace('{purpose}', item.purpose as string)
+                .replace('{brief}', item.contentBrief as string)
+                .replace('{tone}', understanding.tone as string);
 
-            content = await callOpenRouter(contentPrompt);
+              content = await callOpenRouter(contentPrompt);
 
-            // Clean up any markdown code blocks from content
-            content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
+              // Clean up any markdown code blocks from content
+              content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
+            } catch (contentError) {
+              console.error(`Content generation failed for ${item.name}:`, contentError);
+              // Graceful fallback — create with placeholder content
+              content = `<h1>${item.name}</h1><p>Add your content here to personalize this section.</p>`;
+            }
           }
 
           const builtItem = {
             id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            type: item.type === 'widget' ? 'widget' : 'file',
-            fileType: item.type !== 'widget' ? item.type : undefined,
-            widgetType: item.type === 'widget' ? item.widgetType : undefined,
+            type: 'file',
+            fileType: item.type,
             title: item.name,
             content,
             purpose: item.purpose,
-            config: item.type === 'widget' && item.widgetType === 'status'
-              ? { text: plan.statusMessage }
-              : {},
           };
 
           builtItems.push(builtItem);

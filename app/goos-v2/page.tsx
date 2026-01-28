@@ -3257,7 +3257,8 @@ function GoOSDemoContent() {
     const handleOnboardingError = useCallback((message: string) => {
         console.error('Onboarding error:', message);
         showGoOSToast(`Honk! ${message}`, 'error');
-    }, [showGoOSToast]);
+        onboarding.cancelOnboarding();
+    }, [showGoOSToast, onboarding]);
 
     // Reset to demo desktop
     const handleResetDesktop = useCallback(() => {
