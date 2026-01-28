@@ -3220,7 +3220,21 @@ function GoOSDemoContent() {
             setHasCleared(true);
         }
 
-        if (item.type === 'file' && item.fileType) {
+        if (item.type === 'widget' && item.widgetType) {
+            // Create widget using the widget context
+            try {
+                const widgetPos = {
+                    x: 80,
+                    y: 10 + fileCreationIndexRef.current * 12,
+                };
+                await createWidget(item.widgetType as WidgetType, widgetPos);
+                console.log(`Created widget: ${item.widgetType} (${item.title})`);
+                playSound('bubble');
+            } catch (err) {
+                console.error(`Failed to create widget ${item.widgetType}:`, err);
+            }
+            fileCreationIndexRef.current++;
+        } else if (item.type === 'file' && item.fileType) {
             const position = POSITIONS[fileCreationIndexRef.current % POSITIONS.length];
             console.log(`Creating ${item.title} at position:`, position, 'with content length:', item.content?.length || 0);
 
@@ -3241,8 +3255,7 @@ function GoOSDemoContent() {
             }
             fileCreationIndexRef.current++;
         }
-        // TODO: Add widget creation when widget context supports it
-    }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, hasCleared]);
+    }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, hasCleared, createWidget]);
 
     // Handle AI onboarding completion
     const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {

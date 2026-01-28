@@ -58,24 +58,43 @@ const PLANNING_PROMPT = `Based on this deep understanding of the user:
 
 Design a COMPREHENSIVE workspace tailored specifically for them. Think about what they actually need to succeed.
 
-Available components:
-- note: Rich text document (About, Services, Blog posts, etc.)
-- case-study: Portfolio piece with sections (Challenge, Approach, Results)
-- folder: Container to organize files
+Available component types:
 
-IMPORTANT: Create 4-6 items that are SPECIFIC to this user. Don't be lazy - think about what THEY need:
+FILES (rich content):
+- note: Rich text document (About Me, Services, Blog posts, Process, Pricing, etc.)
+- case-study: Portfolio piece with structured sections (Challenge, Approach, Results)
+- folder: Container to organize related files together
+- embed: Embedded external content (portfolio site, YouTube showreel, Figma prototype, etc.)
+
+WIDGETS (interactive elements — use when the user needs functional tools, not just content):
+- widget: Interactive widget. You MUST set "widgetType" to one of:
+  - "status" — Availability status badge (e.g., "Available for projects", "Booked through Q2")
+  - "contact" — Contact form for visitor inquiries
+  - "book" — Booking widget for scheduling calls or meetings
+  - "links" — Collection of social media and external links
+  - "tipjar" — Support/tip jar for fans and followers
+  - "feedback" — Collect visitor feedback and testimonials
+
+IMPORTANT: Create 4-8 items that are SPECIFIC to this user. Mix files AND widgets based on their needs:
 - An About/Introduction that reflects their personality and niche
-- Portfolio folders matching their SPECIFIC work (e.g., "Wedding Shoots" not "Projects")
+- Portfolio content matching their SPECIFIC work (e.g., "Wedding Shoots" not "Projects")
 - Case studies for their type of work
+- Widgets for functional needs: booking calls → book widget, show availability → status widget, share links → links widget
 - Service descriptions if relevant
 - Blog/writing if they mentioned content creation
 
+If the user asks for something that can't be built with available components (custom calculator, store, interactive tool):
+- Create a note as a thoughtful placeholder that acknowledges the need
+- Describe what the tool would do and suggest a workaround
+- Never promise features that don't exist — be honest and helpful
+
 Rules:
-- Create 4-6 items. Be thorough, not lazy.
+- Create 4-8 items. Be thorough, not lazy.
+- Include at least 1 widget if the user has any functional needs (booking, contact, availability, links)
 - Every item must have a CLEAR PURPOSE for THIS specific user
 - Names should be SPECIFIC (not generic like "Projects" or "Work")
 - Content descriptions should reference their actual situation
-- Order items logically (introduction first, then portfolio, then contact)
+- Order items logically (introduction first, then portfolio, then widgets/contact last)
 
 Return JSON:
 {
@@ -83,11 +102,12 @@ Return JSON:
     "summary": "One sentence describing what you're building and why",
     "items": [
       {
-        "type": "note|case-study|folder",
+        "type": "note|case-study|folder|embed|widget",
+        "widgetType": "status|contact|book|links|tipjar|feedback (ONLY when type is widget, omit otherwise)",
         "name": "Specific name for this user",
         "purpose": "Why THIS user needs this (1-2 sentences)",
         "contentBrief": "What should be inside, specific to their situation",
-        "priority": 1-6 (order to create)
+        "priority": 1-8 (order to create)
       }
     ]
   },
@@ -461,14 +481,24 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          const builtItem = {
-            id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            type: 'file',
-            fileType: item.type,
-            title: item.name,
-            content,
-            purpose: item.purpose,
-          };
+          const isWidget = item.type === 'widget';
+          const builtItem = isWidget
+            ? {
+                id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                type: 'widget' as const,
+                widgetType: item.widgetType as string,
+                title: item.name,
+                content: '',
+                purpose: item.purpose,
+              }
+            : {
+                id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                type: 'file' as const,
+                fileType: item.type,
+                title: item.name,
+                content,
+                purpose: item.purpose,
+              };
 
           builtItems.push(builtItem);
 

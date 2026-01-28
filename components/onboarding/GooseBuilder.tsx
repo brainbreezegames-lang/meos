@@ -13,6 +13,12 @@ import {
   RefreshCw,
   Layout,
   MessageSquare,
+  Clock,
+  CalendarCheck,
+  Heart,
+  Link2,
+  Star,
+  Globe,
 } from 'lucide-react';
 import { SPRING, DURATION } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
@@ -84,14 +90,22 @@ const PHASE_CONFIG: Record<Phase, { label: string; color: string }> = {
   error: { label: 'Something went wrong', color: '#ef4444' },
 };
 
-const FILE_ICON_MAP: Record<string, typeof FileText> = {
+const ICON_MAP: Record<string, typeof FileText> = {
+  // File types
   note: FileText,
   'case-study': FileText,
   folder: Folder,
-  status: Layout,
+  embed: Globe,
+  // Widget types
+  status: Star,
   contact: MessageSquare,
-  links: Layout,
-  book: Layout,
+  links: Link2,
+  book: CalendarCheck,
+  tipjar: Heart,
+  feedback: MessageSquare,
+  clock: Clock,
+  // Fallback for "widget" type in plan items
+  widget: Layout,
 };
 
 const PROGRESS_PHASES: Phase[] = ['understanding', 'planning', 'building', 'complete'];
@@ -500,7 +514,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                           {plan.items.map((planItem, idx) => {
                             const isCreated = createdItems.some(ci => ci.title === planItem.name);
                             const isBuilding = currentlyBuilding === planItem.name;
-                            const Icon = FILE_ICON_MAP[planItem.type] || FileText;
+                            const Icon = ICON_MAP[planItem.type] || FileText;
 
                             return (
                               <motion.div
@@ -688,7 +702,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                 <div className="flex-1 overflow-y-auto px-5 pb-5 space-y-2 min-h-0">
                   <AnimatePresence mode="popLayout">
                     {createdItems.map((item, index) => {
-                      const Icon = FILE_ICON_MAP[item.widgetType || item.fileType || 'note'] || FileText;
+                      const Icon = ICON_MAP[item.widgetType || item.fileType || 'note'] || FileText;
                       return (
                         <motion.div
                           key={item.id}
