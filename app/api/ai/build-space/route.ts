@@ -3,10 +3,11 @@ import { NextRequest } from 'next/server';
 /**
  * Streaming endpoint for intelligent space building
  * Uses Server-Sent Events to stream AI reasoning and progress in real-time
+ * Powered by OpenRouter (Kimi-k2 model)
  */
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2:free';
 
 // Phase 1: Deep Understanding Prompt
 const UNDERSTANDING_PROMPT = `You are analyzing a user's request to build their personal workspace. Extract DEEP understanding, not surface-level parsing.
@@ -113,27 +114,33 @@ For case-studies, include sections: Overview, Challenge, Approach, Results
 
 Return just the HTML content, nothing else.`;
 
-async function callGemini(prompt: string, retries = 2): Promise<string> {
-  if (!GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY not configured');
+async function callOpenRouter(prompt: string, retries = 2): Promise<string> {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY not configured');
   }
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 2000,
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'HTTP-Referer': 'https://meos-delta.vercel.app',
+          'X-Title': 'MeOS Space Builder',
+        },
+        body: JSON.stringify({
+          model: OPENROUTER_MODEL,
+          messages: [
+            {
+              role: 'user',
+              content: prompt,
             },
-          }),
-        }
-      );
+          ],
+          temperature: 0.7,
+          max_tokens: 2000,
+        }),
+      });
 
       if (response.status === 429) {
         // Rate limited - wait and retry
@@ -147,12 +154,12 @@ async function callGemini(prompt: string, retries = 2): Promise<string> {
 
       if (!response.ok) {
         const error = await response.text();
-        console.error('Gemini error:', error);
+        console.error('OpenRouter error:', error);
         throw new Error(`AI service error: ${response.status}`);
       }
 
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      return data.choices?.[0]?.message?.content || '';
     } catch (err) {
       if (attempt === retries) throw err;
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -260,7 +267,7 @@ export async function POST(request: NextRequest) {
 
         try {
           const understandingPrompt = UNDERSTANDING_PROMPT.replace('{input}', prompt);
-          const understandingRaw = await callGemini(understandingPrompt);
+          const understandingRaw = await callOpenRouter(understandingPrompt);
           understanding = extractJSON(understandingRaw) as Record<string, unknown>;
         } catch (aiError) {
           console.error('AI understanding failed, using fallback:', aiError);
@@ -312,7 +319,7 @@ export async function POST(request: NextRequest) {
         send('phase', { phase: 'planning', message: 'Designing your space...' });
 
         const planningPrompt = PLANNING_PROMPT.replace('{context}', JSON.stringify(understanding, null, 2));
-        const planningRaw = await callGemini(planningPrompt);
+        const planningRaw = await callOpenRouter(planningPrompt);
 
         let plan: Record<string, unknown>;
         try {
@@ -359,7 +366,7 @@ export async function POST(request: NextRequest) {
               .replace('{brief}', item.contentBrief as string)
               .replace('{tone}', understanding.tone as string);
 
-            content = await callGemini(contentPrompt);
+            content = await callOpenRouter(contentPrompt);
 
             // Clean up any markdown code blocks from content
             content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();

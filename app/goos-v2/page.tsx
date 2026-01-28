@@ -85,7 +85,7 @@ import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
 import { Launchpad, LaunchpadDockIcon } from '@/components/desktop/Launchpad';
 // Dock icons are now real PNG images at /icons/dock/
-import { OnboardingPrompt, StreamingBuild } from '@/components/onboarding';
+import { OnboardingPrompt, GooseBuilder } from '@/components/onboarding';
 import { useAIOnboarding, StreamingBuildItem } from '@/hooks/useAIOnboarding';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 
@@ -3171,51 +3171,62 @@ function GoOSDemoContent() {
         return { x: 20, y: 20 };
     }, []);
 
-    // Handle AI onboarding completion - create files from streaming build
-    const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
-        console.log('Onboarding complete, creating items:', items);
+    // Track file creation index for positioning
+    const fileCreationIndexRef = useRef(0);
 
-        // Spread items across desktop with good spacing
-        const POSITIONS = [
-            { x: 5, y: 20 },
-            { x: 20, y: 20 },
-            { x: 35, y: 20 },
-            { x: 5, y: 45 },
-            { x: 20, y: 45 },
-            { x: 35, y: 45 },
-            { x: 5, y: 70 },
-            { x: 20, y: 70 },
-        ];
+    // Spread items across desktop with good spacing
+    const POSITIONS = useMemo(() => [
+        { x: 5, y: 20 },
+        { x: 20, y: 20 },
+        { x: 35, y: 20 },
+        { x: 5, y: 45 },
+        { x: 20, y: 45 },
+        { x: 35, y: 45 },
+        { x: 5, y: 70 },
+        { x: 20, y: 70 },
+    ], []);
 
-        // Create files sequentially with proper spacing
-        let fileIndex = 0;
-        for (const item of items) {
-            if (item.type === 'file' && item.fileType) {
-                const position = POSITIONS[fileIndex % POSITIONS.length];
-                console.log(`Creating ${item.title} at position:`, position, 'with content length:', item.content?.length || 0);
+    // Handle streaming item creation - creates files as they arrive from AI
+    const handleItemCreated = useCallback(async (item: StreamingBuildItem, remaining: number) => {
+        console.log('Item created:', item.title, 'remaining:', remaining);
 
-                try {
-                    const newFile = await createGoOSFile(item.fileType as FileType, null, position);
-                    if (newFile) {
-                        // Always update with title, and content if available
-                        const updateData: { title: string; content?: string } = { title: item.title };
-                        if (item.content && item.content.length > 0) {
-                            updateData.content = item.content;
-                        }
-                        await updateGoOSFile(newFile.id, updateData);
-                        console.log(`Created file: ${item.title}`, newFile.id);
+        if (item.type === 'file' && item.fileType) {
+            const position = POSITIONS[fileCreationIndexRef.current % POSITIONS.length];
+            console.log(`Creating ${item.title} at position:`, position, 'with content length:', item.content?.length || 0);
+
+            try {
+                const newFile = await createGoOSFile(item.fileType as FileType, null, position);
+                if (newFile) {
+                    // Always update with title, and content if available
+                    const updateData: { title: string; content?: string } = { title: item.title };
+                    if (item.content && item.content.length > 0) {
+                        updateData.content = item.content;
                     }
-                } catch (err) {
-                    console.error(`Failed to create ${item.title}:`, err);
+                    await updateGoOSFile(newFile.id, updateData);
+                    console.log(`Created file: ${item.title}`, newFile.id);
+                    playSound('bubble');
                 }
-                fileIndex++;
+            } catch (err) {
+                console.error(`Failed to create ${item.title}:`, err);
             }
-            // TODO: Add widget creation when widget context supports it
+            fileCreationIndexRef.current++;
         }
+        // TODO: Add widget creation when widget context supports it
+    }, [POSITIONS, createGoOSFile, updateGoOSFile]);
 
+    // Handle AI onboarding completion
+    const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
+        console.log('Onboarding complete with', items.length, 'items');
+        fileCreationIndexRef.current = 0; // Reset for next onboarding
         onboarding.completeOnboarding();
-        showGoOSToast('Your space is ready!', 'success');
-    }, [onboarding, createGoOSFile, updateGoOSFile, showGoOSToast]);
+        showGoOSToast('Your nest is ready! 🪿', 'success');
+    }, [onboarding, showGoOSToast]);
+
+    // Handle AI onboarding error
+    const handleOnboardingError = useCallback((message: string) => {
+        console.error('Onboarding error:', message);
+        showGoOSToast(`Honk! ${message}`, 'error');
+    }, [showGoOSToast]);
 
     // Drag-drop handlers for image files
     const handleDesktopDragOver = useCallback((e: React.DragEvent) => {
@@ -5844,11 +5855,12 @@ function GoOSDemoContent() {
                 onSubmit={onboarding.submitPrompt}
             />
 
-            <StreamingBuild
+            <GooseBuilder
                 isActive={onboarding.isBuilding}
                 prompt={onboarding.prompt || ''}
+                onItemCreated={handleItemCreated}
                 onComplete={handleOnboardingComplete}
-                onCancel={onboarding.cancelOnboarding}
+                onError={handleOnboardingError}
             />
 
             {/* Command Palette */}
