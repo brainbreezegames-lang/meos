@@ -2867,7 +2867,7 @@ function GoOSDemoContent() {
     // AI Onboarding
     const onboarding = useAIOnboarding();
     const [hasOnboarded, setHasOnboarded] = useState(false);
-    const [hasCleared, setHasCleared] = useState(false); // Track if we've cleared for this session
+    const hasClearedRef = useRef(false); // Track if we've cleared for this session
 
     // Boot sequence state: splash -> booting -> revealing -> ready
     const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'revealing' | 'ready'>('splash');
@@ -3369,53 +3369,57 @@ function GoOSDemoContent() {
         { x: 20, y: 70 },
     ], []);
 
-    // Handle streaming item creation - creates files as they arrive from AI
+    // Handle streaming item creation - creates files as they arrive from AI.
+    // Uses refs for clear-once logic to avoid stale closure issues (this callback
+    // is captured by GooseBuilder's SSE reader at start time).
     const handleItemCreated = useCallback(async (item: StreamingBuildItem, remaining: number) => {
-        console.log('Item created:', item.title, 'remaining:', remaining);
+        console.log('[onboarding] Item created:', item.title, 'type:', item.type, 'fileType:', item.fileType, 'remaining:', remaining);
 
-        // Clear demo files on first item creation
-        if (!hasCleared && fileCreationIndexRef.current === 0) {
-            console.log('Clearing demo files for onboarding...');
+        // Clear demo files on first item creation (ref-based to avoid stale closure)
+        if (!hasClearedRef.current && fileCreationIndexRef.current === 0) {
+            console.log('[onboarding] Clearing demo files for onboarding...');
             clearGoOSFiles();
-            setHasCleared(true);
+            hasClearedRef.current = true;
         }
 
         if (item.type === 'widget' && item.widgetType) {
-            // Create widget using the widget context
             try {
                 const widgetPos = {
                     x: 80,
                     y: 10 + fileCreationIndexRef.current * 12,
                 };
                 await createWidget(item.widgetType as WidgetType, widgetPos);
-                console.log(`Created widget: ${item.widgetType} (${item.title})`);
+                console.log(`[onboarding] Created widget: ${item.widgetType} (${item.title})`);
                 playSound('bubble');
             } catch (err) {
-                console.error(`Failed to create widget ${item.widgetType}:`, err);
+                console.error(`[onboarding] Failed to create widget ${item.widgetType}:`, err);
             }
             fileCreationIndexRef.current++;
         } else if (item.type === 'file' && item.fileType) {
             const position = POSITIONS[fileCreationIndexRef.current % POSITIONS.length];
-            console.log(`Creating ${item.title} at position:`, position, 'with content length:', item.content?.length || 0);
+            console.log(`[onboarding] Creating file "${item.title}" at position:`, position, 'content length:', item.content?.length || 0);
 
             try {
                 const newFile = await createGoOSFile(item.fileType as FileType, null, position);
                 if (newFile) {
-                    // Always update with title, and content if available
                     const updateData: { title: string; content?: string } = { title: item.title };
                     if (item.content && item.content.length > 0) {
                         updateData.content = item.content;
                     }
                     await updateGoOSFile(newFile.id, updateData);
-                    console.log(`Created file: ${item.title}`, newFile.id);
+                    console.log(`[onboarding] Created file: "${item.title}" id=${newFile.id}`);
                     playSound('bubble');
+                } else {
+                    console.error(`[onboarding] createGoOSFile returned null for "${item.title}"`);
                 }
             } catch (err) {
-                console.error(`Failed to create ${item.title}:`, err);
+                console.error(`[onboarding] Failed to create "${item.title}":`, err);
             }
             fileCreationIndexRef.current++;
+        } else {
+            console.warn(`[onboarding] Skipped item "${item.title}" — type=${item.type}, fileType=${item.fileType}, widgetType=${item.widgetType}`);
         }
-    }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, hasCleared, createWidget]);
+    }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, createWidget]);
 
     // Handle AI onboarding completion
     const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
@@ -3438,7 +3442,7 @@ function GoOSDemoContent() {
         console.log('Resetting to demo desktop...');
         resetGoOSFiles(INITIAL_GOOS_FILES);
         setHasOnboarded(false);
-        setHasCleared(false);
+        hasClearedRef.current = false;
         fileCreationIndexRef.current = 0;
         onboarding.resetOnboarding();
         playSound('expand');

@@ -281,7 +281,7 @@ export function GoOSProvider({
       title,
       content,
       status: 'draft',
-      accessLevel: 'public',
+      accessLevel: 'free',
       publishedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),

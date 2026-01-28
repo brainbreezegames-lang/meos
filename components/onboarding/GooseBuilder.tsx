@@ -157,6 +157,35 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
   const hasCompletedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Use refs for callbacks to avoid stale closures in the SSE reader loop.
+  // The SSE loop captures startBuild → handleEvent at creation time. Without refs,
+  // any state change that recreates these callbacks leaves the loop with stale versions.
+  const onItemCreatedRef = useRef(onItemCreated);
+  const onCompleteRef = useRef(onComplete);
+  const onErrorRef = useRef(onError);
+  onItemCreatedRef.current = onItemCreated;
+  onCompleteRef.current = onComplete;
+  onErrorRef.current = onError;
+
+  // Queue for serializing item creation — prevents race conditions where
+  // concurrent onItemCreated calls cause clearGoOSFiles to wipe newly-created files
+  const itemQueueRef = useRef<Array<{ item: BuildItem; remaining: number }>>([]);
+  const processingRef = useRef(false);
+
+  const processItemQueue = useCallback(async () => {
+    if (processingRef.current) return;
+    processingRef.current = true;
+    while (itemQueueRef.current.length > 0) {
+      const { item, remaining } = itemQueueRef.current.shift()!;
+      try {
+        await onItemCreatedRef.current(item, remaining);
+      } catch (err) {
+        console.error('Failed to create item:', item.title, err);
+      }
+    }
+    processingRef.current = false;
+  }, []);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [understanding, plan, createdItems, currentlyBuilding]);
@@ -200,7 +229,9 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
         setCreatedItems(prev => [...prev, item]);
         setCurrentlyBuilding(null);
         setCurrentPurpose(null);
-        onItemCreated(item, remaining);
+        // Enqueue item creation to process sequentially (avoids race conditions)
+        itemQueueRef.current.push({ item, remaining });
+        processItemQueue();
         playSound('bubble');
         break;
       }
@@ -214,7 +245,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
           setShowConfetti(true);
           const items = data.items as BuildItem[];
           const summary = data.summary as string;
-          setTimeout(() => onComplete(items, summary), 2500);
+          setTimeout(() => onCompleteRef.current(items, summary), 2500);
         }
         break;
       }
@@ -225,7 +256,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
         break;
       }
     }
-  }, [onItemCreated, onComplete]);
+  }, [processItemQueue]);
 
   const startBuild = useCallback(async () => {
     setPhase('connecting');
