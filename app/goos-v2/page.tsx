@@ -1794,6 +1794,8 @@ TypewriterText.displayName = 'TypewriterText';
 // DOCK ICON - Premium glass hover with smooth transitions
 // ============================================
 
+const DOCK_ICON_SIZE = 52; // macOS-style icon size
+
 const DockIcon = React.memo(({
     icon,
     onClick,
@@ -1845,19 +1847,18 @@ const DockIcon = React.memo(({
     return (
         <div
             className="relative"
-            style={{ padding: '4px 2px' }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             <motion.div
                 animate={{
-                    scale: justClicked ? [1, 0.92, 1.08, 0.98, 1] : isPressed ? 0.95 : isHovered ? 1.06 : 1,
-                    y: justClicked ? [0, 2, -12, -6, -4] : isHovered ? -4 : 0,
+                    scale: justClicked ? [1, 0.88, 1.12, 0.96, 1] : isPressed ? 0.92 : isHovered ? 1.15 : 1,
+                    y: justClicked ? [0, 4, -16, -8, 0] : isHovered ? -8 : 0,
                 }}
                 transition={SPRING.dock}
                 style={{
-                    width: 44,
-                    height: 44,
+                    width: DOCK_ICON_SIZE,
+                    height: DOCK_ICON_SIZE,
                     position: 'relative',
                     transformOrigin: 'bottom center',
                 }}
@@ -1867,20 +1868,24 @@ const DockIcon = React.memo(({
                     onMouseDown={() => setIsPressed(true)}
                     onMouseUp={() => setIsPressed(false)}
                     className="w-full h-full focus:outline-none relative"
+                    style={{
+                        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.25)) drop-shadow(0 2px 4px rgba(0,0,0,0.15))',
+                    }}
                 >
                     {/* Tooltip */}
                     <AnimatePresence>
                         {isHovered && label && (
                             <motion.div
-                                initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                                initial={{ opacity: 0, y: 8, scale: 0.9 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 4, scale: 0.95 }}
                                 transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                                className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap z-50 pointer-events-none"
+                                className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap z-50 pointer-events-none"
                                 style={{
-                                    background: '#1a1a1a',
+                                    background: 'rgba(30, 30, 30, 0.95)',
+                                    backdropFilter: 'blur(12px)',
                                     color: '#fff',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.15)',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.3), 0 0 0 0.5px rgba(255,255,255,0.1)',
                                 }}
                             >
                                 {label}
@@ -1888,31 +1893,15 @@ const DockIcon = React.memo(({
                         )}
                     </AnimatePresence>
 
-                    {/* Icon container - transparent to show macOS icon shapes */}
+                    {/* Icon - full size, no container background */}
                     <div
-                        className="w-full h-full flex items-center justify-center rounded-[12px] relative overflow-hidden"
+                        className="w-full h-full"
+                        style={{
+                            transform: isPressed ? 'scale(0.92)' : 'none',
+                            transition: 'transform 0.1s ease-out',
+                        }}
                     >
-                        {/* Icon */}
-                        <div
-                            className="relative z-10 w-full h-full flex items-center justify-center"
-                            style={{
-                                transform: isPressed ? 'translateY(1px) scale(0.95)' : 'none',
-                                transition: 'transform 0.1s ease-out',
-                            }}
-                        >
-                            {icon}
-                        </div>
-
-                        {/* Orange indicator dot - Braun signature */}
-                        {isActive && (
-                            <div
-                                className="absolute top-1.5 right-1.5 w-[6px] h-[6px] rounded-full"
-                                style={{
-                                    background: 'var(--indicator-orange, #ff6b00)',
-                                    boxShadow: '0 0 4px var(--indicator-orange-glow, rgba(255, 107, 0, 0.5))',
-                                }}
-                            />
-                        )}
+                        {icon}
                     </div>
 
                     {/* Badge */}
@@ -1921,10 +1910,10 @@ const DockIcon = React.memo(({
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={SPRING.bouncy}
-                            className="absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-white text-[9px] font-bold px-1 z-20"
+                            className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-white text-[10px] font-bold px-1 z-20"
                             style={{
-                                background: 'var(--indicator-orange, #ff6b00)',
-                                boxShadow: '0 1px 4px rgba(255, 107, 0, 0.4), 0 0 0 2px var(--bg-dock, #f4f4f2)',
+                                background: '#FF3B30',
+                                boxShadow: '0 2px 6px rgba(255, 59, 48, 0.5), 0 0 0 2px rgba(255,255,255,0.9)',
                             }}
                         >
                             {badge}
@@ -1932,6 +1921,20 @@ const DockIcon = React.memo(({
                     )}
                 </button>
             </motion.div>
+
+            {/* Active indicator dot - below icon like macOS */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{
+                    opacity: isActive ? 1 : 0,
+                    scale: isActive ? 1 : 0
+                }}
+                transition={SPRING.snappy}
+                className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full"
+                style={{
+                    background: 'rgba(0,0,0,0.5)',
+                }}
+            />
         </div>
     );
 });
@@ -5338,102 +5341,71 @@ function GoOSDemoContent() {
                         className="fixed bottom-4 left-1/2 z-[3000]"
                     >
                         <div
-                            className="dock-container flex items-end px-3 py-2.5 rounded-[20px] relative"
+                            className="dock-container flex items-end gap-1 px-2 py-2 rounded-[18px] relative"
                             style={{
-                                background: 'var(--dock-physical-bg)',
-                                border: 'var(--dock-physical-border)',
-                                boxShadow: 'var(--dock-physical-shadow)',
-                                transition: 'background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease',
+                                background: 'rgba(255, 255, 255, 0.25)',
+                                backdropFilter: 'blur(24px)',
+                                WebkitBackdropFilter: 'blur(24px)',
+                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                             }}
                         >
-                            {/* Left corner detail - physical screw/rivet */}
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    left: 10,
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    width: 4,
-                                    height: 4,
-                                    borderRadius: '50%',
-                                    background: 'var(--dock-corner-bg)',
-                                    boxShadow: 'inset 0 0.5px 1px rgba(0,0,0,0.15)',
-                                    transition: 'background 0.3s ease',
-                                }}
-                            />
-                            {/* Right corner detail */}
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    right: 10,
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    width: 4,
-                                    height: 4,
-                                    borderRadius: '50%',
-                                    background: 'var(--dock-corner-bg)',
-                                    boxShadow: 'inset 0 0.5px 1px rgba(0,0,0,0.15)',
-                                    transition: 'background 0.3s ease',
-                                }}
-                            />
                             <RubberDuck />
                             <DockIcon
-                                icon={<Image src="/icons/dock/launchpad.png" alt="Launchpad" width={44} height={44} className="object-cover" draggable={false} />}
+                                icon={<Image src="/icons/dock/launchpad.png" alt="Launchpad" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
                                 onClick={() => setLaunchpadOpen(true)}
                                 isActive={launchpadOpen}
                                 label="Launchpad"
                             />
                             <DockIcon
-                                icon={<Image src="/icons/dock/mail.png" alt="Mail" width={44} height={44} className="object-cover" draggable={false} />}
+                                icon={<Image src="/icons/dock/mail.png" alt="Mail" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
                                 onClick={() => toggleApp('quackmail')}
                                 isActive={appWindows.quackmail}
                                 badge={3}
                                 label="Mail"
                             />
                             <DockIcon
-                                icon={<Image src="/icons/dock/notes.png" alt="Notes" width={44} height={44} className="object-cover" draggable={false} />}
+                                icon={<Image src="/icons/dock/notes.png" alt="Notes" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
                                 onClick={() => toggleApp('notes')}
                                 isActive={appWindows.notes}
                                 label="Notes"
                             />
                             {/* Physical separator - recessed groove */}
                             <div
-                                className="dock-separator mx-2"
+                                className="dock-separator mx-1"
                                 style={{
-                                    width: 2,
-                                    height: 28,
+                                    width: 1,
+                                    height: 36,
                                     borderRadius: 1,
-                                    background: 'var(--dock-separator-bg)',
-                                    boxShadow: 'var(--dock-separator-shadow)',
-                                    transition: 'background 0.3s ease, box-shadow 0.3s ease',
+                                    background: 'rgba(0,0,0,0.15)',
+                                    transition: 'background 0.3s ease',
                                 }}
                             />
                             <DockIcon
-                                icon={<Image src="/icons/dock/messages.png" alt="Chat" width={44} height={44} className="object-cover" draggable={false} />}
+                                icon={<Image src="/icons/dock/messages.png" alt="Chat" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
                                 onClick={() => toggleApp('chat')}
                                 isActive={appWindows.chat}
                                 label="Chat"
                             />
                             <DockIcon
-                                icon={<Image src="/icons/dock/terminal.png" alt="Shell" width={44} height={44} className="object-cover" draggable={false} />}
+                                icon={<Image src="/icons/dock/terminal.png" alt="Shell" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
                                 onClick={() => toggleApp('shell')}
                                 isActive={appWindows.shell}
                                 label="Shell"
                             />
                             {/* Physical separator - recessed groove */}
                             <div
-                                className="dock-separator mx-2"
+                                className="dock-separator mx-1"
                                 style={{
-                                    width: 2,
-                                    height: 28,
+                                    width: 1,
+                                    height: 36,
                                     borderRadius: 1,
-                                    background: 'var(--dock-separator-bg)',
-                                    boxShadow: 'var(--dock-separator-shadow)',
-                                    transition: 'background 0.3s ease, box-shadow 0.3s ease',
+                                    background: 'rgba(0,0,0,0.15)',
+                                    transition: 'background 0.3s ease',
                                 }}
                             />
                             <DockIcon
-                                icon={<Image src="/icons/dock/guestbook.png" alt="Guestbook" width={44} height={44} className="object-cover" draggable={false} />}
+                                icon={<Image src="/icons/dock/guestbook.png" alt="Guestbook" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
                                 onClick={() => toggleApp('guestbook')}
                                 isActive={appWindows.guestbook}
                                 badge={guestbookEntries.length}
@@ -5444,14 +5416,13 @@ function GoOSDemoContent() {
                                 <>
                                     {/* Physical separator - recessed groove */}
                             <div
-                                className="dock-separator mx-2"
+                                className="dock-separator mx-1"
                                 style={{
-                                    width: 2,
-                                    height: 28,
+                                    width: 1,
+                                    height: 36,
                                     borderRadius: 1,
-                                    background: 'var(--dock-separator-bg)',
-                                    boxShadow: 'var(--dock-separator-shadow)',
-                                    transition: 'background 0.3s ease, box-shadow 0.3s ease',
+                                    background: 'rgba(0,0,0,0.15)',
+                                    transition: 'background 0.3s ease',
                                 }}
                             />
                                     {Array.from(minimizedEditors).map(fileId => {
@@ -5461,8 +5432,8 @@ function GoOSDemoContent() {
                                             <DockIcon
                                                 key={`minimized-${fileId}`}
                                                 icon={file.type === 'case-study'
-                                                    ? <Image src="/icons/dock/presentation.png" alt="Presentation" width={44} height={44} className="object-cover" draggable={false} />
-                                                    : <Image src="/icons/dock/file.png" alt="File" width={44} height={44} className="object-cover" draggable={false} />
+                                                    ? <Image src="/icons/dock/presentation.png" alt="Presentation" width={52} height={52} className="w-full h-full object-contain" draggable={false} />
+                                                    : <Image src="/icons/dock/file.png" alt="File" width={52} height={52} className="w-full h-full object-contain" draggable={false} />
                                                 }
                                                 onClick={() => restoreEditor(fileId)}
                                                 label={file.title || 'Untitled'}
