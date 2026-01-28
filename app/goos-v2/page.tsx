@@ -84,6 +84,15 @@ import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
 import { Launchpad, LaunchpadDockIcon } from '@/components/desktop/Launchpad';
+import {
+    MailDockIcon,
+    NotesDockIcon,
+    ChatDockIcon,
+    TerminalDockIcon,
+    GuestbookDockIcon,
+    PresentationDockIcon,
+    FileDockIcon,
+} from '@/lib/icons/dock-icons';
 import { OnboardingPrompt, BuildAnimation } from '@/components/onboarding';
 import { useAIOnboarding } from '@/hooks/useAIOnboarding';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
@@ -5393,14 +5402,14 @@ function GoOSDemoContent() {
                                 label="Launchpad"
                             />
                             <DockIcon
-                                icon={<Mail size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
+                                icon={<MailDockIcon size={36} />}
                                 onClick={() => toggleApp('quackmail')}
                                 isActive={appWindows.quackmail}
                                 badge={3}
                                 label="Mail"
                             />
                             <DockIcon
-                                icon={<FileText size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
+                                icon={<NotesDockIcon size={36} />}
                                 onClick={() => toggleApp('notes')}
                                 isActive={appWindows.notes}
                                 label="Notes"
@@ -5418,13 +5427,13 @@ function GoOSDemoContent() {
                                 }}
                             />
                             <DockIcon
-                                icon={<MessageCircle size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
+                                icon={<ChatDockIcon size={36} />}
                                 onClick={() => toggleApp('chat')}
                                 isActive={appWindows.chat}
                                 label="Chat"
                             />
                             <DockIcon
-                                icon={<Terminal size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
+                                icon={<TerminalDockIcon size={36} />}
                                 onClick={() => toggleApp('shell')}
                                 isActive={appWindows.shell}
                                 label="Shell"
@@ -5442,7 +5451,7 @@ function GoOSDemoContent() {
                                 }}
                             />
                             <DockIcon
-                                icon={<BookOpen size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
+                                icon={<GuestbookDockIcon size={36} />}
                                 onClick={() => toggleApp('guestbook')}
                                 isActive={appWindows.guestbook}
                                 badge={guestbookEntries.length}
@@ -5470,8 +5479,8 @@ function GoOSDemoContent() {
                                             <DockIcon
                                                 key={`minimized-${fileId}`}
                                                 icon={file.type === 'case-study'
-                                                    ? <Presentation size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />
-                                                    : <FileText size={24} stroke={goOS.icon.stroke} strokeWidth={1.5} />
+                                                    ? <PresentationDockIcon size={36} />
+                                                    : <FileDockIcon size={36} />
                                                 }
                                                 onClick={() => restoreEditor(fileId)}
                                                 label={file.title || 'Untitled'}
