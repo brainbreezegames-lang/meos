@@ -33,6 +33,7 @@ import {
     BookOpen,
     PenLine,
     Presentation,
+    RotateCcw,
 } from 'lucide-react';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
@@ -584,6 +585,24 @@ const GoOSEditorWindow = dynamic(
 // Lazy load CV window component
 const GoOSCVWindow = dynamic(
     () => import('@/components/goos-editor/cv/GoOSCVWindow').then(mod => ({ default: mod.GoOSCVWindow })),
+    {
+        loading: () => <PlayfulLoader />,
+        ssr: false
+    }
+);
+
+// Lazy load Board editor component
+const GoOSBoardEditor = dynamic(
+    () => import('@/components/goos-editor/GoOSBoardEditor').then(mod => ({ default: mod.GoOSBoardEditor })),
+    {
+        loading: () => <PlayfulLoader />,
+        ssr: false
+    }
+);
+
+// Lazy load Sheet editor component
+const GoOSSheetEditor = dynamic(
+    () => import('@/components/goos-editor/GoOSSheetEditor').then(mod => ({ default: mod.GoOSSheetEditor })),
     {
         loading: () => <PlayfulLoader />,
         ssr: false
@@ -2687,6 +2706,8 @@ function GoOSDemoContent() {
 
     // AI Onboarding
     const onboarding = useAIOnboarding();
+    const [hasOnboarded, setHasOnboarded] = useState(false);
+    const [hasCleared, setHasCleared] = useState(false); // Track if we've cleared for this session
 
     // Boot sequence state: splash -> booting -> revealing -> ready
     const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'revealing' | 'ready'>('splash');
@@ -2934,6 +2955,8 @@ function GoOSDemoContent() {
         deleteFile: deleteGoOSFile,
         duplicateFile: duplicateGoOSFile,
         moveFile: moveGoOSFile,
+        clearFiles: clearGoOSFiles,
+        resetFiles: resetGoOSFiles,
         autoSave: goosAutoSave,
         publishFile: publishGoOSFile,
         unpublishFile: unpublishGoOSFile,
@@ -3190,6 +3213,13 @@ function GoOSDemoContent() {
     const handleItemCreated = useCallback(async (item: StreamingBuildItem, remaining: number) => {
         console.log('Item created:', item.title, 'remaining:', remaining);
 
+        // Clear demo files on first item creation
+        if (!hasCleared && fileCreationIndexRef.current === 0) {
+            console.log('Clearing demo files for onboarding...');
+            clearGoOSFiles();
+            setHasCleared(true);
+        }
+
         if (item.type === 'file' && item.fileType) {
             const position = POSITIONS[fileCreationIndexRef.current % POSITIONS.length];
             console.log(`Creating ${item.title} at position:`, position, 'with content length:', item.content?.length || 0);
@@ -3212,12 +3242,13 @@ function GoOSDemoContent() {
             fileCreationIndexRef.current++;
         }
         // TODO: Add widget creation when widget context supports it
-    }, [POSITIONS, createGoOSFile, updateGoOSFile]);
+    }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, hasCleared]);
 
     // Handle AI onboarding completion
     const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
         console.log('Onboarding complete with', items.length, 'items');
         fileCreationIndexRef.current = 0; // Reset for next onboarding
+        setHasOnboarded(true);
         onboarding.completeOnboarding();
         showGoOSToast('Your nest is ready! 🪿', 'success');
     }, [onboarding, showGoOSToast]);
@@ -3227,6 +3258,18 @@ function GoOSDemoContent() {
         console.error('Onboarding error:', message);
         showGoOSToast(`Honk! ${message}`, 'error');
     }, [showGoOSToast]);
+
+    // Reset to demo desktop
+    const handleResetDesktop = useCallback(() => {
+        console.log('Resetting to demo desktop...');
+        resetGoOSFiles(INITIAL_GOOS_FILES);
+        setHasOnboarded(false);
+        setHasCleared(false);
+        fileCreationIndexRef.current = 0;
+        onboarding.resetOnboarding();
+        playSound('expand');
+        showGoOSToast('Desktop reset! 🪿', 'success');
+    }, [resetGoOSFiles, onboarding, showGoOSToast]);
 
     // Drag-drop handlers for image files
     const handleDesktopDragOver = useCallback((e: React.DragEvent) => {
@@ -4487,6 +4530,34 @@ function GoOSDemoContent() {
                                                         {showFallingLetters ? 'On' : 'Off'}
                                                     </span>
                                                 </button>
+                                                {hasOnboarded && (
+                                                    <>
+                                                        <div style={{ height: '1px', background: 'var(--color-border-subtle)', margin: '4px 8px' }} />
+                                                        <button
+                                                            onClick={() => { handleResetDesktop(); setShowSettingsMenu(false); }}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '6px 12px',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '8px',
+                                                                background: 'transparent',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                fontSize: '13px',
+                                                                fontWeight: 400,
+                                                                color: 'var(--color-text-primary)',
+                                                                textAlign: 'left',
+                                                                transition: 'background 0.1s ease',
+                                                            }}
+                                                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
+                                                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                                        >
+                                                            <RotateCcw size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
+                                                            <span>Reset Desktop</span>
+                                                        </button>
+                                                    </>
+                                                )}
                                             </motion.div>
                                         </>
                                     )}
@@ -4883,6 +4954,64 @@ function GoOSDemoContent() {
                                                 isActive={activeEditorId === file.id}
                                                 zIndex={windowZ[`editor-${file.id}`] || topZIndex}
                                                 isOwner={true}
+                                            />
+                                        );
+                                    }
+
+                                    // Render Board Editor for board files
+                                    if (file.type === 'board') {
+                                        return (
+                                            <GoOSBoardEditor
+                                                key={file.id}
+                                                file={file as any}
+                                                onClose={() => closeEditor(file.id)}
+                                                onMinimize={() => minimizeEditor(file.id)}
+                                                onMaximize={() => toggleMaximizeEditor(file.id)}
+                                                isMaximized={maximizedEditors.has(file.id)}
+                                                onUpdate={(updates) => {
+                                                    if (updates.content !== undefined || updates.title !== undefined) {
+                                                        goosAutoSave(file.id, updates.content ?? file.content, updates.title);
+                                                    }
+                                                    if (updates.status !== undefined) {
+                                                        if (updates.status === 'published') {
+                                                            publishGoOSFile(file.id);
+                                                            celebrate();
+                                                        } else {
+                                                            unpublishGoOSFile(file.id);
+                                                        }
+                                                    }
+                                                }}
+                                                isActive={activeEditorId === file.id}
+                                                zIndex={windowZ[`editor-${file.id}`] || topZIndex}
+                                            />
+                                        );
+                                    }
+
+                                    // Render Sheet Editor for sheet files
+                                    if (file.type === 'sheet') {
+                                        return (
+                                            <GoOSSheetEditor
+                                                key={file.id}
+                                                file={file as any}
+                                                onClose={() => closeEditor(file.id)}
+                                                onMinimize={() => minimizeEditor(file.id)}
+                                                onMaximize={() => toggleMaximizeEditor(file.id)}
+                                                isMaximized={maximizedEditors.has(file.id)}
+                                                onUpdate={(updates) => {
+                                                    if (updates.content !== undefined || updates.title !== undefined) {
+                                                        goosAutoSave(file.id, updates.content ?? file.content, updates.title);
+                                                    }
+                                                    if (updates.status !== undefined) {
+                                                        if (updates.status === 'published') {
+                                                            publishGoOSFile(file.id);
+                                                            celebrate();
+                                                        } else {
+                                                            unpublishGoOSFile(file.id);
+                                                        }
+                                                    }
+                                                }}
+                                                isActive={activeEditorId === file.id}
+                                                zIndex={windowZ[`editor-${file.id}`] || topZIndex}
                                             />
                                         );
                                     }
@@ -5521,6 +5650,12 @@ function GoOSDemoContent() {
                 }}
                 onNewCV={() => {
                     createFile('cv', { x: desktopContextMenu.x, y: desktopContextMenu.y });
+                }}
+                onNewBoard={() => {
+                    createFile('board', { x: desktopContextMenu.x, y: desktopContextMenu.y });
+                }}
+                onNewSheet={() => {
+                    createFile('sheet', { x: desktopContextMenu.x, y: desktopContextMenu.y });
                 }}
                 onNewImage={() => handleOpenCreateFileDialog('image', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}

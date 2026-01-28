@@ -12,6 +12,10 @@ export const FILE_TYPE_TO_WINDOW: Record<GoOSFileType, WindowType> = {
   'link': 'browser',      // BrowserWindow - URL preview
   'embed': 'default',     // MultiWindow - embed block
   'download': 'default',  // MultiWindow - download block
+  'cv': 'document',       // CV/Resume document
+  'game': 'default',      // Interactive game
+  'board': 'board',       // Kanban board
+  'sheet': 'sheet',       // Spreadsheet
 };
 
 /**
@@ -32,6 +36,10 @@ export const FILE_TYPE_ICONS: Record<GoOSFileType, string> = {
   'link': '🔗',
   'embed': '▶️',
   'download': '📥',
+  'cv': '📋',
+  'game': '🎮',
+  'board': '📋',
+  'sheet': '📊',
 };
 
 /**
@@ -45,6 +53,10 @@ export const FILE_TYPE_LABELS: Record<GoOSFileType, string> = {
   'link': 'Link',
   'embed': 'Embed',
   'download': 'Download',
+  'cv': 'CV',
+  'game': 'Game',
+  'board': 'Board',
+  'sheet': 'Sheet',
 };
 
 /**

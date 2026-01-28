@@ -13,6 +13,8 @@ import {
   Link,
   FileUser,
   ImageIcon,
+  Kanban,
+  Table,
 } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
 import { SPRING, contextMenu as contextMenuVariants, TRANSITION } from '@/lib/animations';
@@ -48,6 +50,8 @@ interface GoOSDesktopContextMenuProps {
   onNewCaseStudy: () => void;
   onNewFolder: () => void;
   onNewCV?: () => void;
+  onNewBoard?: () => void;
+  onNewSheet?: () => void;
   onNewImage?: () => void;
   onNewLink?: () => void;
   onPaste?: () => void;
@@ -65,6 +69,8 @@ export function GoOSDesktopContextMenu({
   onNewCaseStudy,
   onNewFolder,
   onNewCV,
+  onNewBoard,
+  onNewSheet,
   onNewImage,
   onNewLink,
   onPaste,
@@ -87,6 +93,8 @@ export function GoOSDesktopContextMenu({
         { id: 'new-note', label: 'Note', icon: <FileText size={14} strokeWidth={1.5} />, shortcut: '⌘N', onClick: onNewNote },
         { id: 'new-case-study', label: 'Case Study', icon: <Presentation size={14} strokeWidth={1.5} />, onClick: onNewCaseStudy },
         { id: 'new-cv', label: 'CV', icon: <FileUser size={14} strokeWidth={1.5} />, onClick: () => onNewCV?.() },
+        { id: 'new-board', label: 'Board', icon: <Kanban size={14} strokeWidth={1.5} />, onClick: () => onNewBoard?.() },
+        { id: 'new-sheet', label: 'Sheet', icon: <Table size={14} strokeWidth={1.5} />, onClick: () => onNewSheet?.() },
         { id: 'new-folder', label: 'Folder', icon: <FolderPlus size={14} strokeWidth={1.5} />, onClick: onNewFolder },
       ],
     },
@@ -111,7 +119,7 @@ export function GoOSDesktopContextMenu({
         { id: 'change-wallpaper', label: 'Change Wallpaper', icon: <ImageIcon size={14} strokeWidth={1.5} />, onClick: () => onChangeWallpaper?.() },
       ],
     },
-  ], [onNewNote, onNewCaseStudy, onNewFolder, onNewCV, onNewImage, onNewLink, onPaste, onArrangeIcons, onRefresh, onChangeWallpaper, canPaste]);
+  ], [onNewNote, onNewCaseStudy, onNewFolder, onNewCV, onNewBoard, onNewSheet, onNewImage, onNewLink, onPaste, onArrangeIcons, onRefresh, onChangeWallpaper, canPaste]);
 
   // Calculate menu height
   const estimatedHeight = useMemo(() => {

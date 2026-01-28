@@ -359,6 +359,109 @@ function GameIcon() {
   );
 }
 
+// Board icon - Kanban columns with cards, blue accent
+function BoardIcon() {
+  return (
+    <div
+      style={{
+        width: 52,
+        height: 52,
+        position: 'relative',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: 12,
+          background: 'linear-gradient(145deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)',
+          boxShadow: `
+            0 1px 2px rgba(0, 0, 0, 0.06),
+            0 4px 8px rgba(59, 130, 246, 0.25),
+            0 8px 16px rgba(59, 130, 246, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25)
+          `,
+          border: '0.5px solid rgba(0, 0, 0, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 8,
+          gap: 3,
+        }}
+      >
+        {/* Three kanban columns */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+          <div style={{ height: 3, borderRadius: 1, background: 'rgba(255,255,255,0.9)' }} />
+          <div style={{ height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.6)' }} />
+          <div style={{ height: 6, borderRadius: 2, background: 'rgba(255,255,255,0.4)' }} />
+          <div style={{ height: 10, borderRadius: 2, background: 'rgba(255,255,255,0.5)' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+          <div style={{ height: 3, borderRadius: 1, background: 'rgba(255,255,255,0.9)' }} />
+          <div style={{ height: 10, borderRadius: 2, background: 'rgba(255,255,255,0.5)' }} />
+          <div style={{ height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.6)' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+          <div style={{ height: 3, borderRadius: 1, background: 'rgba(255,255,255,0.9)' }} />
+          <div style={{ height: 6, borderRadius: 2, background: 'rgba(255,255,255,0.4)' }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Sheet icon - Spreadsheet grid with cells, green accent
+function SheetIcon() {
+  return (
+    <div
+      style={{
+        width: 52,
+        height: 52,
+        position: 'relative',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: 12,
+          background: 'linear-gradient(145deg, #4ade80 0%, #22c55e 50%, #16a34a 100%)',
+          boxShadow: `
+            0 1px 2px rgba(0, 0, 0, 0.06),
+            0 4px 8px rgba(34, 197, 94, 0.25),
+            0 8px 16px rgba(34, 197, 94, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25)
+          `,
+          border: '0.5px solid rgba(0, 0, 0, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 9,
+        }}
+      >
+        {/* Grid of cells */}
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Header row */}
+          <rect x="1" y="1" width="22" height="5" rx="1" fill="rgba(255,255,255,0.85)" />
+          {/* Grid lines */}
+          <line x1="8" y1="1" x2="8" y2="23" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5" />
+          <line x1="15" y1="1" x2="15" y2="23" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5" />
+          {/* Rows */}
+          <rect x="1" y="7.5" width="6" height="4" rx="0.5" fill="rgba(255,255,255,0.5)" />
+          <rect x="9" y="7.5" width="5" height="4" rx="0.5" fill="rgba(255,255,255,0.4)" />
+          <rect x="16" y="7.5" width="7" height="4" rx="0.5" fill="rgba(255,255,255,0.35)" />
+          <rect x="1" y="13" width="6" height="4" rx="0.5" fill="rgba(255,255,255,0.4)" />
+          <rect x="9" y="13" width="5" height="4" rx="0.5" fill="rgba(255,255,255,0.5)" />
+          <rect x="16" y="13" width="7" height="4" rx="0.5" fill="rgba(255,255,255,0.3)" />
+          <rect x="1" y="18.5" width="6" height="4" rx="0.5" fill="rgba(255,255,255,0.35)" />
+          <rect x="9" y="18.5" width="5" height="4" rx="0.5" fill="rgba(255,255,255,0.45)" />
+          <rect x="16" y="18.5" width="7" height="4" rx="0.5" fill="rgba(255,255,255,0.4)" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 // Throttle function for performance
 function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
@@ -374,7 +477,7 @@ function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   }) as T;
 }
 
-export type FileType = 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download' | 'game';
+export type FileType = 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download' | 'game' | 'board' | 'sheet';
 
 interface GoOSFileIconProps {
   id: string;
@@ -632,6 +735,10 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         return <DownloadIcon />;
       case 'game':
         return <GameIcon />;
+      case 'board':
+        return <BoardIcon />;
+      case 'sheet':
+        return <SheetIcon />;
       default:
         return <NoteIcon />;
     }

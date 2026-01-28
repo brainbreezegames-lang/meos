@@ -11,8 +11,102 @@ export const goosFileTypeSchema = z.enum([
   'download',    // Downloadable file
   'cv',          // Resume/CV document
   'game',        // Interactive game (snake, etc.)
+  'board',       // Kanban board
+  'sheet',       // Spreadsheet
 ]);
 export type GoOSFileType = z.infer<typeof goosFileTypeSchema>;
+
+// === Board (Kanban) Schemas ===
+
+export const boardCardChecklistItemSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  checked: z.boolean(),
+});
+export type BoardCardChecklistItem = z.infer<typeof boardCardChecklistItemSchema>;
+
+export const boardCardColorSchema = z.enum(['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'gray']);
+export type BoardCardColor = z.infer<typeof boardCardColorSchema>;
+
+export const boardCardSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  checklist: z.array(boardCardChecklistItemSchema).optional(),
+  color: boardCardColorSchema.optional(),
+  order: z.number(),
+});
+export type BoardCard = z.infer<typeof boardCardSchema>;
+
+export const boardColumnSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  cards: z.array(boardCardSchema),
+  order: z.number(),
+});
+export type BoardColumn = z.infer<typeof boardColumnSchema>;
+
+export const boardContentSchema = z.object({
+  columns: z.array(boardColumnSchema),
+});
+export type BoardContent = z.infer<typeof boardContentSchema>;
+
+// Default board content for new files
+export function getDefaultBoardContent(): BoardContent {
+  return {
+    columns: [
+      { id: crypto.randomUUID(), title: 'To Do', cards: [], order: 0 },
+      { id: crypto.randomUUID(), title: 'In Progress', cards: [], order: 1 },
+      { id: crypto.randomUUID(), title: 'Done', cards: [], order: 2 },
+    ],
+  };
+}
+
+// === Sheet (Spreadsheet) Schemas ===
+
+export const sheetCellTypeSchema = z.enum(['text', 'number', 'currency', 'date', 'checkbox', 'formula']);
+export type SheetCellType = z.infer<typeof sheetCellTypeSchema>;
+
+export const sheetCellSchema = z.object({
+  value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+  type: sheetCellTypeSchema.optional(),
+  format: z.string().optional(), // For custom formatting
+  formula: z.string().optional(), // Original formula if type is formula
+});
+export type SheetCell = z.infer<typeof sheetCellSchema>;
+
+export const sheetRowSchema = z.array(sheetCellSchema.nullable());
+export type SheetRow = z.infer<typeof sheetRowSchema>;
+
+export const sheetColumnMetaSchema = z.object({
+  width: z.number().optional(),
+  hidden: z.boolean().optional(),
+});
+export type SheetColumnMeta = z.infer<typeof sheetColumnMetaSchema>;
+
+export const sheetRowMetaSchema = z.object({
+  height: z.number().optional(),
+  hidden: z.boolean().optional(),
+});
+export type SheetRowMeta = z.infer<typeof sheetRowMetaSchema>;
+
+export const sheetContentSchema = z.object({
+  data: z.array(sheetRowSchema), // 2D array of cells
+  columnMeta: z.record(z.string(), sheetColumnMetaSchema).optional(), // Column index -> meta
+  rowMeta: z.record(z.string(), sheetRowMetaSchema).optional(), // Row index -> meta
+  frozenRows: z.number().optional(),
+  frozenColumns: z.number().optional(),
+});
+export type SheetContent = z.infer<typeof sheetContentSchema>;
+
+// Default sheet content for new files
+export function getDefaultSheetContent(): SheetContent {
+  // Create a 10x10 empty grid
+  const data: SheetRow[] = Array(10).fill(null).map(() =>
+    Array(10).fill(null)
+  );
+  return { data };
+}
 
 // === CV Schemas ===
 

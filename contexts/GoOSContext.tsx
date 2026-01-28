@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import type { GoOSFile, GoOSFileType, PublishStatus } from '@/lib/validations/goos';
-import { getDefaultCVContent } from '@/lib/validations/goos';
+import { getDefaultCVContent, getDefaultBoardContent, getDefaultSheetContent } from '@/lib/validations/goos';
 import { playSound } from '@/lib/sounds';
 
 // Types
@@ -62,6 +62,10 @@ interface GoOSContextType {
   deleteFile: (id: string) => Promise<boolean>;
   duplicateFile: (id: string) => Promise<GoOSFileData | null>;
   moveFile: (id: string, newParentId: string | null) => Promise<void>;
+
+  // Bulk operations (for onboarding)
+  clearFiles: () => void;
+  resetFiles: (files: GoOSFileData[]) => void;
 
   // New file type creators
   createImageFile: (url: string, options?: { caption?: string; alt?: string; parentId?: string | null; position?: { x: number; y: number } }) => Promise<GoOSFileData | null>;
@@ -261,10 +265,13 @@ export function GoOSProvider({
     const position = customPosition
       ? findNonOverlappingPosition(basePosition, parentId)
       : basePosition; // getNextPosition already calls findNonOverlappingPosition
-    const title = type === 'folder' ? 'New Folder' : type === 'cv' ? 'My CV' : `Untitled ${type}`;
+    const title = type === 'folder' ? 'New Folder' : type === 'cv' ? 'My CV' : type === 'board' ? 'Untitled Board' : type === 'sheet' ? 'Untitled Sheet' : `Untitled ${type}`;
 
-    // Set default content for CV files
-    const content = type === 'cv' ? JSON.stringify(getDefaultCVContent()) : '';
+    // Set default content for structured file types
+    const content = type === 'cv' ? JSON.stringify(getDefaultCVContent())
+      : type === 'board' ? JSON.stringify(getDefaultBoardContent())
+      : type === 'sheet' ? JSON.stringify(getDefaultSheetContent())
+      : '';
 
     // Create file object
     const newId = localOnly ? `local-${Date.now()}` : `temp-${Date.now()}`;
@@ -1087,6 +1094,16 @@ export function GoOSProvider({
     }
   }, [localOnly, viewMode, files, showToast]);
 
+  // Clear all files (for onboarding - start fresh)
+  const clearFiles = useCallback(() => {
+    setFiles([]);
+  }, []);
+
+  // Reset files to a specific set (for onboarding reset)
+  const resetFiles = useCallback((newFiles: GoOSFileData[]) => {
+    setFiles(newFiles);
+  }, []);
+
   // Refetch files when spaceId changes
   useEffect(() => {
     if (!localOnly && spaceId) {
@@ -1112,6 +1129,8 @@ export function GoOSProvider({
     deleteFile,
     duplicateFile,
     moveFile,
+    clearFiles,
+    resetFiles,
     createImageFile,
     createLinkFile,
     createEmbedFile,
