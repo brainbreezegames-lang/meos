@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { ArrowUp, Loader2 } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
 
 interface OnboardingPromptProps {
@@ -12,48 +12,34 @@ interface OnboardingPromptProps {
   isLoading?: boolean;
 }
 
-// Quick start presets with goose personality
+// Quick start presets
 const PRESETS = [
   {
-    label: 'Designer',
-    emoji: '🎨',
+    label: 'Designer portfolio',
     prompt: "I'm a UI/UX designer specializing in product design for startups. I create interfaces that are both beautiful and functional.",
   },
   {
-    label: 'Photographer',
-    emoji: '📸',
-    prompt: "I'm a wedding and portrait photographer capturing authentic moments. I work with couples and families who value storytelling.",
+    label: 'Writing space',
+    prompt: "I'm a writer sharing essays about technology and culture. I publish a weekly newsletter and am working on my first book.",
   },
   {
-    label: 'Developer',
-    emoji: '⌨️',
+    label: 'Developer hub',
     prompt: "I'm a full-stack developer building web apps and open source tools. I focus on React, TypeScript, and developer experience.",
   },
   {
-    label: 'Writer',
-    emoji: '✍️',
-    prompt: "I'm a writer sharing essays about technology and culture. I publish a weekly newsletter and am working on my first book.",
+    label: 'Creative studio',
+    prompt: "I'm a creative professional doing photography, design, and visual storytelling. I work with brands and individuals.",
   },
-];
-
-// Goose-themed placeholder texts
-const PLACEHOLDERS = [
-  "I'm a wedding photographer based in LA. I specialize in candid, documentary-style photos that capture real emotions...",
-  "I'm a freelance designer who makes brands look less boring. Currently obsessed with weird typography...",
-  "I build apps that people actually want to use. TypeScript enthusiast, coffee dependent...",
-  "I write about the internet and why it's simultaneously the best and worst thing ever...",
 ];
 
 export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false }: OnboardingPromptProps) {
   const [prompt, setPrompt] = useState('');
-  const [placeholder] = useState(() => PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)]);
-  const [hoveredPreset, setHoveredPreset] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (isOpen && textareaRef.current) {
       playSound('expand');
-      setTimeout(() => textareaRef.current?.focus(), 300);
+      setTimeout(() => textareaRef.current?.focus(), 400);
     }
   }, [isOpen]);
 
@@ -102,105 +88,85 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
         >
-          {/* Warm, inviting background with subtle texture */}
+          {/* Background image */}
           <motion.div
             className="absolute inset-0"
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+            transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
             style={{
-              background: `
-                radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 237, 213, 0.4) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(254, 243, 199, 0.3) 0%, transparent 50%),
-                linear-gradient(180deg, #fffbf5 0%, #faf7f2 100%)
-              `,
+              backgroundImage: 'url(/bg21.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
             }}
           />
 
-          {/* Floating goose decoration */}
-          <motion.div
-            className="absolute top-[10%] right-[15%] text-6xl select-none pointer-events-none"
-            initial={{ opacity: 0, y: 20, rotate: -10 }}
-            animate={{
-              opacity: 0.15,
-              y: [0, -8, 0],
-              rotate: [-10, -5, -10]
+          {/* Subtle overlay for text readability */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.15) 100%)',
             }}
-            transition={{
-              opacity: { delay: 0.3, duration: 0.5 },
-              y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-              rotate: { duration: 6, repeat: Infinity, ease: "easeInOut" }
-            }}
-          >
-            🪿
-          </motion.div>
+          />
 
-          {/* Content */}
-          <div className="relative z-10 w-full max-w-lg px-6">
-            {/* Header with personality */}
-            <motion.div
-              className="mb-8"
+          {/* Content - all centered */}
+          <div className="relative z-10 w-full max-w-2xl px-6 flex flex-col items-center text-center">
+            {/* Logo/Title */}
+            <motion.h1
+              className="mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.2, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              style={{
+                fontSize: 'clamp(4rem, 12vw, 7rem)',
+                fontWeight: 300,
+                fontStyle: 'italic',
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                color: '#fff',
+                textShadow: '0 2px 20px rgba(0,0,0,0.15)',
+                letterSpacing: '-0.02em',
+              }}
             >
-              {/* Goose greeting */}
-              <motion.div
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4"
-                style={{
-                  background: 'rgba(251, 191, 36, 0.15)',
-                  border: '1px solid rgba(251, 191, 36, 0.3)',
-                }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-              >
-                <span className="text-sm">🪿</span>
-                <span
-                  className="text-xs font-medium tracking-wide"
-                  style={{ color: '#b45309' }}
-                >
-                  HONK! Let&apos;s build your nest
-                </span>
-              </motion.div>
+              goOS
+            </motion.h1>
 
-              <h1
-                className="text-[2rem] leading-tight font-semibold tracking-tight mb-3"
-                style={{
-                  color: '#1c1917',
-                  fontFamily: 'var(--font-display, system-ui)',
-                }}
-              >
-                Who are you?
-              </h1>
-              <p
-                className="text-base leading-relaxed"
-                style={{ color: '#78716c' }}
-              >
-                Tell me what you do, and I&apos;ll create a space that&apos;s actually
-                <span className="italic"> yours</span>—not another boring template.
-              </p>
-            </motion.div>
+            {/* Subtitle */}
+            <motion.p
+              className="mb-10 max-w-lg"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              style={{
+                fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.9)',
+                textShadow: '0 1px 10px rgba(0,0,0,0.2)',
+                lineHeight: 1.6,
+              }}
+            >
+              Your personal space on the internet. Describe what you&apos;re building, and watch your workspace come to life.
+            </motion.p>
 
             {/* Input card */}
             <motion.div
-              className="mb-6"
+              className="w-full mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.4, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
             >
               <div
-                className="rounded-2xl overflow-hidden shadow-sm"
+                className="relative rounded-2xl overflow-hidden"
                 style={{
-                  background: '#fff',
-                  border: '1px solid rgba(0, 0, 0, 0.06)',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                  background: 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05)',
                 }}
               >
                 <textarea
@@ -208,56 +174,34 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={placeholder}
+                  placeholder="Tell me about your work..."
                   disabled={isLoading}
-                  rows={4}
-                  className="w-full px-5 py-4 bg-transparent text-base resize-none outline-none placeholder:text-stone-400"
+                  rows={3}
+                  className="w-full px-6 py-5 bg-transparent text-lg resize-none outline-none placeholder:text-stone-400"
                   style={{
                     color: '#1c1917',
-                    lineHeight: 1.7,
+                    lineHeight: 1.6,
                   }}
                 />
 
-                {/* Action bar */}
-                <div
-                  className="flex items-center justify-between px-5 py-3"
-                  style={{
-                    background: 'rgba(250, 250, 249, 0.7)',
-                    borderTop: '1px solid rgba(0, 0, 0, 0.04)'
-                  }}
-                >
-                  <span
-                    className="text-xs"
-                    style={{ color: '#a8a29e' }}
-                  >
-                    {prompt.length < 10
-                      ? `${10 - prompt.length} more characters...`
-                      : '↵ Enter to create'}
-                  </span>
+                {/* Submit button inside card */}
+                <div className="absolute bottom-4 right-4">
                   <motion.button
                     onClick={handleSubmit}
                     disabled={!canSubmit || isLoading}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-all"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-all"
                     style={{
-                      background: canSubmit
-                        ? 'linear-gradient(135deg, #1c1917 0%, #292524 100%)'
-                        : '#f5f5f4',
-                      color: canSubmit ? '#fafaf9' : '#a8a29e',
-                      boxShadow: canSubmit ? '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none',
+                      background: canSubmit ? '#1c1917' : 'rgba(0,0,0,0.08)',
+                      color: canSubmit ? '#fff' : '#a8a29e',
+                      boxShadow: canSubmit ? '0 2px 8px rgba(0, 0, 0, 0.2)' : 'none',
                     }}
-                    whileHover={canSubmit && !isLoading ? { scale: 1.02, y: -1 } : {}}
-                    whileTap={canSubmit && !isLoading ? { scale: 0.98 } : {}}
+                    whileHover={canSubmit && !isLoading ? { scale: 1.05 } : {}}
+                    whileTap={canSubmit && !isLoading ? { scale: 0.95 } : {}}
                   >
                     {isLoading ? (
-                      <>
-                        <Loader2 size={14} className="animate-spin" />
-                        <span>Thinking...</span>
-                      </>
+                      <Loader2 size={18} className="animate-spin" />
                     ) : (
-                      <>
-                        <Sparkles size={14} />
-                        <span>Create my space</span>
-                      </>
+                      <ArrowUp size={18} />
                     )}
                   </motion.button>
                 </div>
@@ -266,76 +210,77 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
 
             {/* Presets */}
             <motion.div
+              className="flex flex-wrap justify-center gap-3 mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.5, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
             >
-              <p
-                className="text-xs mb-3 font-medium"
-                style={{ color: '#a8a29e' }}
+              {PRESETS.map((preset, index) => (
+                <motion.button
+                  key={preset.label}
+                  onClick={() => handlePresetClick(preset.prompt)}
+                  disabled={isLoading}
+                  className="px-5 py-2.5 rounded-full text-sm font-medium transition-all"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    color: '#44403c',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.5)',
+                  }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.55 + index * 0.05, duration: 0.4 }}
+                  whileHover={{
+                    scale: 1.02,
+                    y: -2,
+                    background: 'rgba(255, 255, 255, 0.9)',
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {preset.label}
+                </motion.button>
+              ))}
+            </motion.div>
+
+            {/* Bottom hint */}
+            <motion.div
+              className="flex items-center gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+              style={{ color: 'rgba(255, 255, 255, 0.8)' }}
+            >
+              <span className="text-sm">Press</span>
+              <span
+                className="px-2 py-0.5 rounded text-xs font-medium"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.25)',
+                  backdropFilter: 'blur(4px)',
+                }}
               >
-                or pick a starting point
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {PRESETS.map((preset, index) => (
-                  <motion.button
-                    key={preset.label}
-                    onClick={() => handlePresetClick(preset.prompt)}
-                    onMouseEnter={() => setHoveredPreset(preset.label)}
-                    onMouseLeave={() => setHoveredPreset(null)}
-                    disabled={isLoading}
-                    className="relative text-left px-4 py-3 rounded-xl text-sm transition-all"
-                    style={{
-                      background: hoveredPreset === preset.label
-                        ? 'rgba(255, 255, 255, 0.9)'
-                        : 'rgba(255, 255, 255, 0.6)',
-                      border: '1px solid',
-                      borderColor: hoveredPreset === preset.label
-                        ? 'rgba(0, 0, 0, 0.1)'
-                        : 'rgba(0, 0, 0, 0.04)',
-                      boxShadow: hoveredPreset === preset.label
-                        ? '0 2px 8px rgba(0, 0, 0, 0.06)'
-                        : 'none',
-                    }}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 + index * 0.05, duration: 0.4 }}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">{preset.emoji}</span>
-                      <span
-                        className="font-medium"
-                        style={{ color: '#1c1917' }}
-                      >
-                        {preset.label}
-                      </span>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
+                Enter
+              </span>
+              <span className="text-sm">to build your space</span>
             </motion.div>
 
             {/* Skip link */}
-            <motion.div
-              className="mt-8 text-center"
+            <motion.button
+              onClick={() => {
+                playSound('collapse');
+                onClose();
+              }}
+              disabled={isLoading}
+              className="mt-8 text-sm transition-all"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.8 }}
+              style={{ color: 'rgba(255, 255, 255, 0.6)' }}
+              whileHover={{ color: 'rgba(255, 255, 255, 0.9)' }}
             >
-              <button
-                onClick={() => {
-                  playSound('collapse');
-                  onClose();
-                }}
-                disabled={isLoading}
-                className="text-sm transition-all hover:text-stone-600"
-                style={{ color: '#a8a29e' }}
-              >
-                Skip — I&apos;ll figure it out myself
-              </button>
-            </motion.div>
+              Skip — start with empty workspace
+            </motion.button>
           </div>
         </motion.div>
       )}
