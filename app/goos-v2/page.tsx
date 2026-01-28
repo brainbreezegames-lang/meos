@@ -2015,6 +2015,12 @@ const TrafficLightButton = ({
 function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, height, onClose, onFocus, children, noDrag, centered }: SketchWindowProps) {
     const [isClosing, setIsClosing] = useState(false);
     const [isHoveredTraffic, setIsHoveredTraffic] = useState(false);
+    const [isMaximized, setIsMaximized] = useState(false);
+
+    const handleMaximize = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsMaximized(!isMaximized);
+    };
 
     const handleClose = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -2045,9 +2051,13 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
             onMouseDown={onFocus}
             className="fixed flex flex-col overflow-hidden"
             style={{
-                left: centered ? '50%' : defaultX,
-                top: centered ? '50%' : defaultY,
-                transform: centered ? 'translate(-50%, -50%)' : undefined,
+                ...(centered ? {
+                    inset: 0,
+                    margin: 'auto',
+                } : {
+                    left: defaultX,
+                    top: defaultY,
+                }),
                 width,
                 height,
                 zIndex,
@@ -4351,6 +4361,33 @@ function GoOSDemoContent() {
                                                 >
                                                     <Settings size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
                                                     <span>Preferences</span>
+                                                </button>
+                                                <div style={{ height: '1px', background: 'var(--color-border-subtle)', margin: '4px 8px' }} />
+                                                <button
+                                                    onClick={() => setShowFallingLetters(!showFallingLetters)}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '6px 12px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        background: 'transparent',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        fontSize: '13px',
+                                                        fontWeight: 400,
+                                                        color: 'var(--color-text-primary)',
+                                                        textAlign: 'left',
+                                                        transition: 'background 0.1s ease',
+                                                    }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                                >
+                                                    <FileText size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
+                                                    <span>Falling Letters</span>
+                                                    <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
+                                                        {showFallingLetters ? 'On' : 'Off'}
+                                                    </span>
                                                 </button>
                                             </motion.div>
                                         </>
