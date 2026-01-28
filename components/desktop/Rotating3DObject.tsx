@@ -1,4 +1,5 @@
 "use client";
+// Force redeploy: 2026-01-28
 
 import React, { useRef, useMemo, Suspense, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
