@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, Source_Code_Pro, Averia_Serif_Libre, Instrument_Sans, Gochi_Hand, Inter, Outfit } from "next/font/google";
+import { IBM_Plex_Sans, Source_Code_Pro, Averia_Serif_Libre, Instrument_Sans, Instrument_Serif, Gochi_Hand, Inter, Outfit } from "next/font/google";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { CommentProvider } from "@/contexts/CommentContext";
 import "./globals.css";
@@ -46,6 +46,12 @@ const instrumentSans = Instrument_Sans({
   variable: "--font-instrument",
 });
 
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-instrument-serif",
+});
+
 // Brand Appart Design System Fonts
 const inter = Inter({
   subsets: ["latin"],
@@ -77,7 +83,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} ${averiaSerifLibre.variable} ${instrumentSans.variable} ${gochiHand.variable} ${inter.variable} ${outfit.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
+      <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} ${averiaSerifLibre.variable} ${instrumentSans.variable} ${instrumentSerif.variable} ${gochiHand.variable} ${inter.variable} ${outfit.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
 
 
         <SessionProvider>
