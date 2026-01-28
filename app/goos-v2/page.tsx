@@ -3173,26 +3173,42 @@ function GoOSDemoContent() {
 
     // Handle AI onboarding completion - create files from streaming build
     const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
-        // Generate positions for items
-        const getPosition = (index: number) => ({
-            x: 5 + (index % 4) * 15,
-            y: 25 + Math.floor(index / 4) * 18,
-        });
+        console.log('Onboarding complete, creating items:', items);
 
-        // Create files sequentially
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
+        // Spread items across desktop with good spacing
+        const POSITIONS = [
+            { x: 5, y: 20 },
+            { x: 20, y: 20 },
+            { x: 35, y: 20 },
+            { x: 5, y: 45 },
+            { x: 20, y: 45 },
+            { x: 35, y: 45 },
+            { x: 5, y: 70 },
+            { x: 20, y: 70 },
+        ];
+
+        // Create files sequentially with proper spacing
+        let fileIndex = 0;
+        for (const item of items) {
             if (item.type === 'file' && item.fileType) {
-                const position = getPosition(i);
-                const newFile = await createGoOSFile(item.fileType as FileType, null, position);
-                if (newFile && item.content) {
-                    await updateGoOSFile(newFile.id, {
-                        title: item.title,
-                        content: item.content,
-                    });
-                } else if (newFile) {
-                    await updateGoOSFile(newFile.id, { title: item.title });
+                const position = POSITIONS[fileIndex % POSITIONS.length];
+                console.log(`Creating ${item.title} at position:`, position, 'with content length:', item.content?.length || 0);
+
+                try {
+                    const newFile = await createGoOSFile(item.fileType as FileType, null, position);
+                    if (newFile) {
+                        // Always update with title, and content if available
+                        const updateData: { title: string; content?: string } = { title: item.title };
+                        if (item.content && item.content.length > 0) {
+                            updateData.content = item.content;
+                        }
+                        await updateGoOSFile(newFile.id, updateData);
+                        console.log(`Created file: ${item.title}`, newFile.id);
+                    }
+                } catch (err) {
+                    console.error(`Failed to create ${item.title}:`, err);
                 }
+                fileIndex++;
             }
             // TODO: Add widget creation when widget context supports it
         }

@@ -68,7 +68,7 @@ export function StreamingBuild({ isActive, prompt, onComplete, onCancel }: Strea
   const [error, setError] = useState<string | null>(null);
 
   const logsEndRef = useRef<HTMLDivElement>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const hasStartedRef = useRef(false);
   const hasCompletedRef = useRef(false);
 
   const addLog = useCallback((type: LogEntry['type'], content: string, detail?: string) => {
@@ -86,9 +86,72 @@ export function StreamingBuild({ isActive, prompt, onComplete, onCancel }: Strea
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
+  const handleEvent = useCallback((eventType: string, data: Record<string, unknown>) => {
+    console.log('SSE Event:', eventType, data);
+
+    switch (eventType) {
+      case 'phase':
+        const newPhase = data.phase as Phase;
+        setPhase(newPhase);
+        if (data.message) {
+          addLog('phase', data.message as string);
+        }
+        playSound('bubble');
+        break;
+
+      case 'understanding':
+        setUnderstanding(data.summary as string);
+        addLog('thought', 'I understand now', data.summary as string);
+        playSound('bubble');
+        break;
+
+      case 'plan':
+        setPlanSummary(data.summary as string);
+        addLog('thought', data.summary as string, data.reasoning as string);
+        playSound('bubble');
+        break;
+
+      case 'building':
+        setCurrentlyBuilding(data.name as string);
+        addLog('action', `Creating ${data.name}`, data.purpose as string);
+        break;
+
+      case 'created':
+        const item = data.item as BuildItem;
+        setCreatedItems(prev => [...prev, item]);
+        setCurrentlyBuilding(null);
+        addLog('created', `Created ${item.title}`);
+        playSound('bubble');
+        break;
+
+      case 'complete':
+        if (!hasCompletedRef.current) {
+          hasCompletedRef.current = true;
+          setPhase('complete');
+          addLog('phase', 'Your space is ready!');
+          playSound('expand');
+
+          const items = data.items as BuildItem[];
+          const summary = data.summary as string;
+
+          setTimeout(() => {
+            onComplete(items, summary);
+          }, 1500);
+        }
+        break;
+
+      case 'error':
+        setPhase('error');
+        setError(data.message as string);
+        addLog('error', data.message as string);
+        break;
+    }
+  }, [addLog, onComplete]);
+
   // Start streaming when active
   useEffect(() => {
-    if (!isActive || !prompt || hasCompletedRef.current) return;
+    if (!isActive || !prompt || hasStartedRef.current) return;
+    hasStartedRef.current = true;
 
     // Reset state
     setPhase('idle');
@@ -102,6 +165,8 @@ export function StreamingBuild({ isActive, prompt, onComplete, onCancel }: Strea
 
     const startBuild = async () => {
       try {
+        addLog('phase', 'Starting...');
+
         const response = await fetch('/api/ai/build-space', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -109,6 +174,8 @@ export function StreamingBuild({ isActive, prompt, onComplete, onCancel }: Strea
         });
 
         if (!response.ok) {
+          const errText = await response.text();
+          console.error('API Error:', errText);
           throw new Error('Failed to start build');
         }
 
@@ -125,28 +192,32 @@ export function StreamingBuild({ isActive, prompt, onComplete, onCancel }: Strea
           if (done) break;
 
           buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || '';
 
-          for (const line of lines) {
-            if (line.startsWith('event: ')) {
-              const eventType = line.slice(7);
-              const dataLine = lines[lines.indexOf(line) + 1];
-              if (dataLine?.startsWith('data: ')) {
-                try {
-                  const data = JSON.parse(dataLine.slice(6));
-                  handleEvent(eventType, data);
-                } catch (e) {
-                  console.error('Failed to parse event data:', e);
-                }
+          // SSE format: event: X\ndata: Y\n\n
+          const messages = buffer.split('\n\n');
+          buffer = messages.pop() || ''; // Keep incomplete message in buffer
+
+          for (const message of messages) {
+            if (!message.trim()) continue;
+
+            const lines = message.split('\n');
+            let eventType = 'message';
+            let eventData = '';
+
+            for (const line of lines) {
+              if (line.startsWith('event: ')) {
+                eventType = line.slice(7).trim();
+              } else if (line.startsWith('data: ')) {
+                eventData = line.slice(6);
               }
-            } else if (line.startsWith('data: ')) {
-              // Handle data without explicit event type
+            }
+
+            if (eventData) {
               try {
-                const data = JSON.parse(line.slice(6));
-                if (data.phase) handleEvent('phase', data);
+                const data = JSON.parse(eventData);
+                handleEvent(eventType, data);
               } catch (e) {
-                // Ignore parse errors for incomplete data
+                console.error('Failed to parse SSE data:', e, eventData);
               }
             }
           }
@@ -159,70 +230,20 @@ export function StreamingBuild({ isActive, prompt, onComplete, onCancel }: Strea
       }
     };
 
-    const handleEvent = (eventType: string, data: Record<string, unknown>) => {
-      switch (eventType) {
-        case 'phase':
-          const newPhase = data.phase as Phase;
-          setPhase(newPhase);
-          addLog('phase', data.message as string);
-          playSound('bubble');
-          break;
-
-        case 'understanding':
-          setUnderstanding(data.summary as string);
-          addLog('thought', 'I understand now', data.summary as string);
-          playSound('bubble');
-          break;
-
-        case 'plan':
-          setPlanSummary(data.summary as string);
-          addLog('thought', data.summary as string, data.reasoning as string);
-          playSound('bubble');
-          break;
-
-        case 'building':
-          setCurrentlyBuilding(data.name as string);
-          addLog('action', `Creating ${data.name}`, data.purpose as string);
-          break;
-
-        case 'created':
-          const item = data.item as BuildItem;
-          setCreatedItems(prev => [...prev, item]);
-          setCurrentlyBuilding(null);
-          addLog('created', `Created ${item.title}`);
-          playSound('bubble');
-          break;
-
-        case 'complete':
-          if (!hasCompletedRef.current) {
-            hasCompletedRef.current = true;
-            setPhase('complete');
-            addLog('phase', 'Your space is ready!');
-            playSound('expand');
-
-            const items = data.items as BuildItem[];
-            const summary = data.summary as string;
-
-            setTimeout(() => {
-              onComplete(items, summary);
-            }, 1500);
-          }
-          break;
-
-        case 'error':
-          setPhase('error');
-          setError(data.message as string);
-          addLog('error', data.message as string);
-          break;
-      }
-    };
-
     startBuild();
 
     return () => {
-      eventSourceRef.current?.close();
+      // Cleanup if needed
     };
-  }, [isActive, prompt, addLog, onComplete]);
+  }, [isActive, prompt, addLog, handleEvent]);
+
+  // Reset when not active
+  useEffect(() => {
+    if (!isActive) {
+      hasStartedRef.current = false;
+      hasCompletedRef.current = false;
+    }
+  }, [isActive]);
 
   const PhaseIcon = PHASE_INFO[phase].icon;
 
@@ -274,7 +295,7 @@ export function StreamingBuild({ isActive, prompt, onComplete, onCancel }: Strea
 
             {/* Progress steps */}
             <div className="flex gap-2 mb-6">
-              {(['understanding', 'planning', 'building', 'complete'] as Phase[]).map((p, i) => {
+              {(['understanding', 'planning', 'building', 'complete'] as Phase[]).map((p) => {
                 const phaseOrder = ['understanding', 'planning', 'building', 'complete'];
                 const currentOrder = phaseOrder.indexOf(phase);
                 const thisOrder = phaseOrder.indexOf(p);
@@ -427,12 +448,28 @@ export function StreamingBuild({ isActive, prompt, onComplete, onCancel }: Strea
                 </AnimatePresence>
 
                 {/* Placeholder when no items yet */}
-                {createdItems.length === 0 && (
+                {createdItems.length === 0 && phase !== 'error' && (
                   <div className="text-center py-8">
                     <Sparkles size={24} className="mx-auto mb-2 opacity-30" />
                     <p className="text-sm" style={{ color: '#a3a3a3' }}>
                       Components will appear here
                     </p>
+                  </div>
+                )}
+
+                {/* Error state */}
+                {phase === 'error' && (
+                  <div className="text-center py-8">
+                    <p className="text-sm" style={{ color: '#ef4444' }}>
+                      {error || 'Something went wrong'}
+                    </p>
+                    <button
+                      onClick={onCancel}
+                      className="mt-4 text-sm underline"
+                      style={{ color: '#737373' }}
+                    >
+                      Try again
+                    </button>
                   </div>
                 )}
               </div>
