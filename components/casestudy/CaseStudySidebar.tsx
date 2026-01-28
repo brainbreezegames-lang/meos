@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Circle, Target, Lightbulb, Layers, CheckCircle2, Zap } from 'lucide-react';
+import { ArrowLeft, Circle, Target, Lightbulb, Layers, CheckCircle2, Zap, Search, Users, Crosshair, Compass, PenTool } from 'lucide-react';
 import { caseStudyTokens, type TableOfContentsEntry } from '@/lib/casestudy/types';
 
 interface CaseStudySidebarProps {
@@ -12,30 +12,23 @@ interface CaseStudySidebarProps {
   isPastHero?: boolean;
 }
 
-// Map section titles to icons based on common patterns
+// Map section titles to icons based on common UX case study patterns
 function getSectionIcon(title: string, index: number) {
-  const titleLower = title.toLowerCase();
+  const t = title.toLowerCase();
 
-  if (titleLower.includes('overview') || titleLower.includes('intro') || titleLower.includes('about')) {
-    return Circle;
-  }
-  if (titleLower.includes('challenge') || titleLower.includes('problem')) {
-    return Target;
-  }
-  if (titleLower.includes('solution') || titleLower.includes('approach') || titleLower.includes('idea')) {
-    return Lightbulb;
-  }
-  if (titleLower.includes('process') || titleLower.includes('design') || titleLower.includes('build')) {
-    return Layers;
-  }
-  if (titleLower.includes('result') || titleLower.includes('outcome') || titleLower.includes('impact')) {
-    return CheckCircle2;
-  }
-  if (titleLower.includes('feature') || titleLower.includes('highlight')) {
-    return Zap;
-  }
+  if (t.includes('overview') || t.includes('intro') || t.includes('about')) return Circle;
+  if (t.includes('current') || t.includes('landscape') || t.includes('space')) return Compass;
+  if (t.includes('research') || t.includes('discovery') || t.includes('insight')) return Search;
+  if (t.includes('stakeholder') || t.includes('persona') || t.includes('user')) return Users;
+  if (t.includes('problem') || t.includes('challenge')) return Target;
+  if (t.includes('opportunity') || t.includes('how might')) return Lightbulb;
+  if (t.includes('approach') || t.includes('scope') || t.includes('strategy')) return Crosshair;
+  if (t.includes('exploration') || t.includes('design') || t.includes('prototype')) return PenTool;
+  if (t.includes('solution') || t.includes('final')) return Layers;
+  if (t.includes('process') || t.includes('build')) return Layers;
+  if (t.includes('result') || t.includes('outcome') || t.includes('impact')) return CheckCircle2;
+  if (t.includes('feature') || t.includes('highlight')) return Zap;
 
-  // Default rotation of icons based on index
   const defaultIcons = [Circle, Target, Lightbulb, Layers, CheckCircle2, Zap];
   return defaultIcons[index % defaultIcons.length];
 }

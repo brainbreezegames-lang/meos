@@ -819,71 +819,189 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
     {
         id: 'file-2',
         type: 'case-study',
-        title: 'Reforge Robotics',
-        headerImage: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&h=1080&fit=crop',
-        content: `<img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&h=1080&fit=crop" alt="Robotics hero" />
+        title: 'Pulse',
+        headerImage: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=1920&h=1080&fit=crop',
+        content: `<img src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=1920&h=1080&fit=crop" alt="Podcast microphone hero" />
 
 <h2>Overview</h2>
 
-<p>In my recent side time, I built a brand design studio, called "BOWEN," with only me and my partner. Reforge Robotics is one of the first clients we worked with to build their brand from 0 to 1 development and deployment. The result of this collaboration is a fully-fleshed out brand guidelines, a website, and ongoing marketing collateral. This project is still ongoing as of now.</p>
+<h4>Rethinking Podcast Listening</h4>
 
-<h4>Deliverables</h4>
+<p>A podcast app focused on bridging the gap between listeners and creators through in-episode polls, feedback tools, and discussion prompts, supported by a streamlined and accessible playback experience.</p>
 
-<p>Website ↗</p>
+<p>Most podcast apps are built around playback — play, pause, skip, repeat. This project explores a different direction: what if podcast listening felt more like a conversation than consumption?</p>
 
-<img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=1920&h=1080&fit=crop" alt="Robot arm in factory" />
+<p>I led the research and product thinking, translating insights into a clear problem statement, MVP scope, and interaction strategy. I was also responsible for the information architecture, core UX flows, and UI design across the app.</p>
 
-<h2>The Logo</h2>
+<p>Given the short timeline, I intentionally limited the scope to test a single idea well, using in-episode polls and discussion prompts to introduce engagement as a behavior.</p>
 
-<h4>The Challenge</h4>
+<div data-block-type="info-grid">
+<dl>
+<dt>Timeline</dt><dd>7 — 11 April, 2025</dd>
+<dt>Type</dt><dd>Design Sprint</dd>
+<dt>Tools</dt><dd>Figma, FigJam, Google Forms</dd>
+<dt>Role</dt><dd>Product Designer</dd>
+</dl>
+</div>
 
-<p>Building a bold look for an even bolder company. Reforge Robotics needed a visual identity that communicated innovation, precision, and forward-thinking technology while remaining approachable and memorable.</p>
+<img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1920&h=1080&fit=crop" alt="UX research workspace with sticky notes and whiteboard" />
 
-<p>We explored dozens of concepts, from abstract geometric forms to more literal robotic interpretations. The final direction emerged from the intersection of industrial strength and elegant simplicity.</p>
+<h2>Current Space</h2>
 
-<img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=800&fit=crop" alt="Logo concept R" />
-<img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=800&fit=crop" alt="Technology abstract" />
+<h4>The Current Podcast Landscape</h4>
 
-<p>The mark represents the fusion of human ingenuity and machine precision. The angular forms suggest forward momentum while maintaining a sense of stability and trust.</p>
+<p>Podcast listening today is dominated by a few big players, each winning for very different reasons. While most people use mainstream apps for convenience, power users often migrate to niche platforms that offer deeper control. By benchmarking the platforms, I found the following key insights.</p>
 
-<img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&h=1080&fit=crop" alt="Robotics lab" />
+<p><strong>Spotify</strong> is popular for its recommendation algorithm and discovery. Users rely on it to surface new podcasts without much effort, especially if they already use Spotify for music.</p>
 
-<h2>The Brand</h2>
+<p><strong>Apple Podcasts</strong> benefits heavily from the Apple ecosystem. It comes pre-installed, syncs well across devices, and feels familiar to iOS users.</p>
 
-<h4>Visual System</h4>
+<h3>Power-User Favorites</h3>
 
-<p>The brand system extends beyond the logo to create a cohesive visual language. We developed a comprehensive color palette rooted in industrial blues and metallic accents, balanced with warm neutrals for approachability.</p>
+<p><strong>PocketCasts</strong> is loved for its clean UI, advanced playback controls, and features like silence trimming and episode archiving.</p>
 
-<img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1920&h=1080&fit=crop" alt="Tech brand colors" />
+<p><strong>Overcast</strong> attracts users who care about audio control, smart speed, and a no-frills listening experience.</p>
 
-<p>Typography plays a crucial role in establishing the brand's voice. We paired a geometric sans-serif for headlines with a highly legible body font, creating a balance between innovation and clarity.</p>
+<div data-block-type="callout" data-variant="insight">
+<p><strong>Key finding:</strong> While people love certain features of certain apps, podcast listening is completely passive. No platform offers meaningful in-episode interaction.</p>
+</div>
 
-<img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1920&h=1080&fit=crop" alt="Robot detail" />
-<img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=1920&h=1080&fit=crop" alt="Industrial robotics" />
+<img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1920&h=1080&fit=crop" alt="Multiple phone screens showing app interfaces" />
 
-<h2>UI & Visual</h2>
+<h2>Research</h2>
 
-<h4>Digital Experience</h4>
+<h4>Delving Into Research</h4>
 
-<p>The website serves as the primary touchpoint for potential clients and partners. We designed an experience that showcases Reforge's capabilities while maintaining the sophisticated, professional tone established in the brand guidelines.</p>
+<p>Early research focused on understanding how people currently experience podcasts and where that experience breaks down. I combined secondary research, app analysis, and informal surveys to uncover behavioral gaps.</p>
 
-<img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&h=1080&fit=crop" alt="Website mockup" />
+<h3>How do people experience podcasts today?</h3>
 
-<p>Interactive elements and subtle animations bring the brand to life on screen, creating moments of delight without compromising usability or performance.</p>
+<p>Listeners consume podcasts passively, often while multitasking. Listening is treated as background activity, with little opportunity to react, respond, or reflect in the moment. This makes podcasts feel personal, but also isolating.</p>
 
-<img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1920&h=1080&fit=crop" alt="UI components" />
+<h3>Why don't people engage today?</h3>
 
-<h2>Final Delivery</h2>
+<p>Most podcast apps don't support interaction during listening. Existing engagement happens outside the episode — on platforms like X, Reddit, or YouTube comments. This breaks context and creates friction between listening and responding.</p>
 
-<h4>Brand Guidelines</h4>
+<h3>When do listeners want to engage?</h3>
 
-<p>The complete brand package includes comprehensive guidelines covering logo usage, color specifications, typography hierarchies, photography direction, and voice & tone principles.</p>
+<p>Engagement doesn't happen constantly. It tends to occur at specific moments:<br/>→ when a strong opinion is shared<br/>→ when a question is asked<br/>→ when listeners feel represented or challenged</p>
 
-<img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&h=1080&fit=crop" alt="Brand book" />
+<h3>What is missing from the current experience?</h3>
 
-<p>This living document ensures consistency across all touchpoints as Reforge continues to grow and evolve. The system is designed to be both rigorous and flexible, providing clear guardrails while allowing room for creative expression.</p>
+<p>While users have no way to respond, react, or participate within the listening experience itself, they did not explicitly ask for interaction features. In fact, many were neutral or unsure when asked about engagement during listening.</p>
 
-<img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&h=1080&fit=crop" alt="Final presentation" />`,
+<img src="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=1920&h=1080&fit=crop" alt="Design research with post-it notes on whiteboard" />
+
+<h2>Stakeholders</h2>
+
+<h4>Stakeholder Pain Points</h4>
+
+<p>Looking closer, this space really comes down to three stakeholders, each facing a distinct disconnect.</p>
+
+<div data-block-type="card-grid">
+<div data-card data-icon="🎧">
+<span data-card-title>Audience</span>
+<span data-card-desc>Podcast listeners spend hours with content but have no simple way to react or feel involved while listening, making the experience feel isolated.</span>
+</div>
+<div data-card data-icon="🎙">
+<span data-card-title>Podcaster</span>
+<span data-card-desc>Creators lack immediate, in-context feedback, making it hard to understand what resonates with their audience beyond download numbers.</span>
+</div>
+<div data-card data-icon="📡">
+<span data-card-title>Platforms</span>
+<span data-card-desc>Platforms struggle to differentiate beyond playback and discovery, with limited ways to foster deeper engagement or community around shows.</span>
+</div>
+</div>
+
+<h2>Problem Statement</h2>
+
+<h4>Core Problem</h4>
+
+<blockquote>Podcast listening today is designed as a one-way experience, leaving both listeners and creators disconnected during the moments that matter most.</blockquote>
+
+<h2>Opportunity</h2>
+
+<h4>How Can We Build Something Great?</h4>
+
+<p>Podcast listening is often done while multitasking — walking, commuting, working, or resting. Any solution that required too much attention would immediately break the experience people already value. This led me to ask a different set of questions:</p>
+
+<blockquote>"What if podcast listening didn't have to be one-way?"</blockquote>
+
+<blockquote>"What is the smallest possible action a listener could take while still feeling involved?"</blockquote>
+
+<img src="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1920&h=1080&fit=crop" alt="UX wireframes and design sketches on desk" />
+
+<h2>Approach</h2>
+
+<h4>Scoping Down</h4>
+
+<p>From earlier competitive study, I noticed that users consistently valued specific features across different podcast apps. Rather than reinventing everything, I narrowed the scope and grouped these patterns into three core categories.</p>
+
+<h3>Must Have</h3>
+
+<ul>
+<li>Resume listening and accurate playback memory</li>
+<li>Basic listening history and progress tracking</li>
+<li>Core playback controls including skip, speed, and seek</li>
+</ul>
+
+<h3>Should Have</h3>
+
+<ul>
+<li>Episode organization through folders or simple grouping</li>
+<li>Silence trimming and intro or outro skipping</li>
+<li>Personalized recommendations based on listening habits</li>
+<li>Quick discovery through categories and smart surfacing</li>
+</ul>
+
+<h3>Could Have</h3>
+
+<ul>
+<li>In-episode polls</li>
+<li>Episode discussion prompts</li>
+<li>Feedback and ideas from listeners</li>
+</ul>
+
+<div data-block-type="callout" data-variant="insight">
+<p><strong>Design principle:</strong> Not every popular feature was treated as essential. I intentionally deprioritized power-user optimizations unless they supported the core listening experience. The "Could Have" category represents the core differentiator of the product.</p>
+</div>
+
+<img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1920&h=1080&fit=crop" alt="Mobile app design on phone screen" />
+
+<h2>Explorations</h2>
+
+<h4>Design Decisions</h4>
+
+<p>After a few explorations, I realized the app needed two layers of navigation serving different purposes. The primary navigation (Home, Library, Discover) supports discovery and quick access without pulling attention away. Inside the player screen, a secondary navigation layer surfaces listening-specific actions like playback controls, timestamps, annotations, and queue.</p>
+
+<h3>Home Screen</h3>
+
+<p>The home screen is built around continuity. I prioritized Resume Listening and Up Next so users can jump back in instantly, while discovery stays lightweight through a single Spotlight pick and categories.</p>
+
+<h3>Library</h3>
+
+<p>I treated the Library as a place for intent, not discovery. This is where users come back to continue, manage, and revisit content they already care about.</p>
+
+<h3>Player Controls</h3>
+
+<p>Rather than overwhelming the core experience, I deliberately surfaced advanced controls like custom speed, silence trimming, and volume boost as optional tools for power users who need deeper control or accessibility support.</p>
+
+<img src="https://images.unsplash.com/photo-1512486130939-2c4f79e0a294?w=1920&h=1080&fit=crop" alt="Mobile UI screen designs" />
+<img src="https://images.unsplash.com/photo-1545235617-9465d2a55698?w=1920&h=1080&fit=crop" alt="Typography and design system components" />
+
+<h2>Solution</h2>
+
+<h4>The Final Experience</h4>
+
+<p>I treated interaction as optional, not mandatory, knowing most listeners are hands-free while listening.</p>
+
+<p>Creator polls are lightweight and time-aware, allowing listeners to respond when it's convenient, not disruptive. Discussions are separated from playback to avoid interrupting passive listening, while still giving engaged users a clear place to respond.</p>
+
+<div data-block-type="callout" data-variant="success">
+<p><strong>Outcome:</strong> The final design introduces a new interaction paradigm for podcast apps — one that respects the passive nature of listening while creating intentional, low-friction moments for participation. Polls, prompts, and feedback tools are woven into the timeline rather than bolted on top.</p>
+</div>
+
+<img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1920&h=1080&fit=crop" alt="Final design presentation on laptop" />`,
         status: 'published',
         accessLevel: 'free',
         publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),

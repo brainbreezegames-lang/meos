@@ -10,6 +10,8 @@ import type {
   ContentBlock,
   ContentBlockType,
   ImageData,
+  InfoGridItem,
+  CardGridItem,
   TableOfContentsEntry,
 } from './types';
 
@@ -347,8 +349,68 @@ export function parseCaseStudyContent(
       continue;
     }
 
-    // Div - check for nested content
+    // Div - check for custom block types and nested content
     if (tagName === 'div') {
+      const blockType = node.getAttribute('data-block-type');
+
+      // Info grid block (project metadata)
+      if (blockType === 'info-grid') {
+        const items: InfoGridItem[] = [];
+        const dtElements = node.querySelectorAll('dt');
+        const ddElements = node.querySelectorAll('dd');
+        for (let j = 0; j < dtElements.length; j++) {
+          items.push({
+            label: dtElements[j].textContent?.trim() || '',
+            value: ddElements[j]?.textContent?.trim() || '',
+          });
+        }
+        if (items.length > 0) {
+          contentBlocks.push({
+            id: `block-${blockIndex++}`,
+            type: 'info-grid',
+            content: items,
+          });
+        }
+        continue;
+      }
+
+      // Callout block (highlighted insight)
+      if (blockType === 'callout') {
+        const variant = (node.getAttribute('data-variant') || 'insight') as 'insight' | 'warning' | 'success';
+        const text = node.innerHTML?.trim() || '';
+        if (text) {
+          contentBlocks.push({
+            id: `block-${blockIndex++}`,
+            type: 'callout',
+            content: text,
+            variant,
+          });
+        }
+        continue;
+      }
+
+      // Card grid block (stakeholder cards, feature cards)
+      if (blockType === 'card-grid') {
+        const cards: CardGridItem[] = [];
+        const cardElements = node.querySelectorAll('[data-card]');
+        for (let j = 0; j < cardElements.length; j++) {
+          const card = cardElements[j];
+          cards.push({
+            icon: card.getAttribute('data-icon') || undefined,
+            title: card.querySelector('[data-card-title]')?.textContent?.trim() || '',
+            description: card.querySelector('[data-card-desc]')?.textContent?.trim() || '',
+          });
+        }
+        if (cards.length > 0) {
+          contentBlocks.push({
+            id: `block-${blockIndex++}`,
+            type: 'card-grid',
+            content: cards,
+          });
+        }
+        continue;
+      }
+
       // Check for image inside div
       const img = node.querySelector('img');
       if (img) {

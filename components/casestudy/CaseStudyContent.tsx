@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
-import { caseStudyTokens, type ContentBlock, type ImageData } from '@/lib/casestudy/types';
+import { caseStudyTokens, type ContentBlock, type ImageData, type InfoGridItem, type CardGridItem } from '@/lib/casestudy/types';
 
 interface CaseStudyContentProps {
   blocks: ContentBlock[];
@@ -112,6 +112,160 @@ function ContentImageGrid({ images }: { images: ImageData[] }) {
             }}
           />
         </figure>
+      ))}
+    </div>
+  );
+}
+
+// Info grid — project metadata displayed as a ruled definition list
+function ContentInfoGrid({ items }: { items: InfoGridItem[] }) {
+  const { colors, fonts, typography } = caseStudyTokens;
+
+  return (
+    <dl
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)`,
+        gap: 0,
+        margin: 0,
+        marginTop: 48,
+        marginBottom: 56,
+        padding: '28px 0 0',
+        borderTop: `1px solid ${colors.border}`,
+      }}
+    >
+      {items.map((item, i) => (
+        <div
+          key={i}
+          style={{
+            paddingRight: 24,
+          }}
+        >
+          <dt
+            style={{
+              fontFamily: fonts.ui,
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: colors.textMuted,
+              marginBottom: 8,
+            }}
+          >
+            {item.label}
+          </dt>
+          <dd
+            style={{
+              margin: 0,
+              fontFamily: fonts.body,
+              fontSize: 15,
+              fontWeight: 500,
+              lineHeight: 1.5,
+              color: colors.text,
+            }}
+          >
+            {item.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+// Callout — highlighted insight with left accent and tinted background
+function ContentCallout({ html, variant = 'insight' }: { html: string; variant?: 'insight' | 'warning' | 'success' }) {
+  const { colors, fonts } = caseStudyTokens;
+
+  const accentMap = {
+    insight: colors.accent,
+    warning: 'var(--cs-warning, #e8a317)',
+    success: 'var(--cs-success, #16a34a)',
+  };
+
+  const bgMap = {
+    insight: 'var(--cs-callout-bg, rgba(255, 119, 34, 0.04))',
+    warning: 'var(--cs-callout-warning-bg, rgba(232, 163, 23, 0.04))',
+    success: 'var(--cs-callout-success-bg, rgba(22, 163, 74, 0.04))',
+  };
+
+  return (
+    <aside
+      style={{
+        position: 'relative',
+        marginTop: 48,
+        marginBottom: 48,
+        padding: '28px 32px',
+        background: bgMap[variant],
+        borderRadius: 2,
+        borderLeft: `3px solid ${accentMap[variant]}`,
+      }}
+      dangerouslySetInnerHTML={{ __html: html }}
+      className="cs-callout"
+    />
+  );
+}
+
+// Card grid — stakeholder or feature cards in an even row
+function ContentCardGrid({ cards }: { cards: CardGridItem[] }) {
+  const { colors, fonts, typography } = caseStudyTokens;
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${Math.min(cards.length, 3)}, 1fr)`,
+        gap: 20,
+        marginTop: 40,
+        marginBottom: 48,
+      }}
+    >
+      {cards.map((card, i) => (
+        <div
+          key={i}
+          style={{
+            padding: '28px 24px',
+            background: colors.surface,
+            borderRadius: 14,
+            border: `1px solid ${colors.border}`,
+          }}
+        >
+          {card.icon && (
+            <span
+              style={{
+                display: 'block',
+                fontSize: 28,
+                marginBottom: 16,
+                lineHeight: 1,
+              }}
+            >
+              {card.icon}
+            </span>
+          )}
+          <p
+            style={{
+              fontFamily: fonts.body,
+              fontSize: 15,
+              fontWeight: 600,
+              color: colors.text,
+              marginBottom: 10,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {card.title}
+          </p>
+          <p
+            style={{
+              fontFamily: fonts.body,
+              fontSize: 14,
+              fontWeight: 400,
+              lineHeight: 1.6,
+              color: colors.textMuted,
+              margin: 0,
+            }}
+          >
+            {card.description}
+          </p>
+        </div>
       ))}
     </div>
   );
@@ -293,6 +447,15 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
     case 'image-grid':
       return <ContentImageGrid images={block.content as ImageData[]} />;
 
+    case 'info-grid':
+      return <ContentInfoGrid items={block.content as InfoGridItem[]} />;
+
+    case 'callout':
+      return <ContentCallout html={block.content as string} variant={block.variant} />;
+
+    case 'card-grid':
+      return <ContentCardGrid cards={block.content as CardGridItem[]} />;
+
     default:
       return null;
   }
@@ -417,6 +580,22 @@ export function CaseStudyContent({
         /* Emphasis */
         .casestudy-content em {
           font-style: italic;
+        }
+
+        /* Callout block inner typography */
+        .cs-callout p {
+          font-family: ${fonts.body};
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 1.65;
+          color: ${colors.text};
+          margin: 0 0 12px;
+        }
+        .cs-callout p:last-child {
+          margin-bottom: 0;
+        }
+        .cs-callout strong {
+          font-weight: 600;
         }
       `}</style>
     </motion.article>

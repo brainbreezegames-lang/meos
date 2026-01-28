@@ -642,6 +642,8 @@ export function GoOSBoardEditor({
   const [detailCard, setDetailCard] = useState<BoardCard | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Track the column the dragged card came from, to avoid repeated moves
+  const dragSourceColumnRef = useRef<string | null>(null);
   const dragControls = useDragControls();
   const prefersReducedMotion = useReducedMotion();
 
@@ -742,85 +744,97 @@ export function GoOSBoardEditor({
 
   // ─── DnD Handlers ─────────────────────────────────────
   const handleDragStart = (event: DragStartEvent) => {
+    const columnId = findColumnByCardId(event.active.id);
+    dragSourceColumnRef.current = columnId;
     setActiveCardId(event.active.id);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
-    if (!over) return;
+    if (!over || active.id === over.id) return;
 
-    const activeColumnId = findColumnByCardId(active.id);
-    if (!activeColumnId) return;
-
-    // Determine target column
-    let overColumnId: string | null = null;
     const overData = over.data.current as { type?: string; columnId?: string } | undefined;
 
+    // Determine which column the "over" target belongs to
+    let overColumnId: string | null = null;
     if (overData?.type === 'column') {
-      // Dropped over a column droppable
       overColumnId = overData.columnId || null;
     } else if (overData?.type === 'card') {
-      // Dropped over another card — find its column
-      overColumnId = overData.columnId || findColumnByCardId(over.id);
+      overColumnId = overData.columnId || null;
     }
+    if (!overColumnId) return;
 
-    if (!overColumnId || activeColumnId === overColumnId) return;
-
-    // Move card to the new column
     setBoardContent((prev) => {
-      const sourceCol = prev.columns.find((c) => c.id === activeColumnId);
-      const targetCol = prev.columns.find((c) => c.id === overColumnId);
-      if (!sourceCol || !targetCol) return prev;
-
-      const card = sourceCol.cards.find((c) => c.id === active.id);
-      if (!card) return prev;
-
-      // Check if card is already in target (avoid duplicates from rapid events)
-      if (targetCol.cards.some((c) => c.id === active.id)) return prev;
-
-      // Find insertion index
-      let insertIndex = targetCol.cards.length;
-      if (overData?.type === 'card') {
-        const overIndex = targetCol.cards.findIndex((c) => c.id === over.id);
-        if (overIndex >= 0) insertIndex = overIndex;
+      // Find which column currently holds the active card
+      let activeColIndex = -1;
+      let activeCardIndex = -1;
+      for (let ci = 0; ci < prev.columns.length; ci++) {
+        const idx = prev.columns[ci].cards.findIndex((c) => c.id === active.id);
+        if (idx >= 0) { activeColIndex = ci; activeCardIndex = idx; break; }
       }
+      if (activeColIndex < 0) return prev;
 
-      const newTargetCards = [...targetCol.cards];
-      newTargetCards.splice(insertIndex, 0, card);
+      const targetColIndex = prev.columns.findIndex((c) => c.id === overColumnId);
+      if (targetColIndex < 0) return prev;
 
-      return {
-        columns: prev.columns.map((col) => {
-          if (col.id === activeColumnId) return { ...col, cards: col.cards.filter((c) => c.id !== active.id) };
-          if (col.id === overColumnId) return { ...col, cards: newTargetCards };
-          return col;
-        }),
-      };
+      // Same column — no cross-column move needed here (handled in dragEnd)
+      if (activeColIndex === targetColIndex) return prev;
+
+      // Move card from source to target column
+      const card = prev.columns[activeColIndex].cards[activeCardIndex];
+      const newColumns = prev.columns.map((col, ci) => {
+        if (ci === activeColIndex) {
+          return { ...col, cards: col.cards.filter((c) => c.id !== active.id) };
+        }
+        if (ci === targetColIndex) {
+          const newCards = [...col.cards];
+          // If hovering over a specific card, insert at that position
+          if (overData?.type === 'card') {
+            const overIdx = newCards.findIndex((c) => c.id === over.id);
+            if (overIdx >= 0) {
+              newCards.splice(overIdx, 0, card);
+            } else {
+              newCards.push(card);
+            }
+          } else {
+            newCards.push(card);
+          }
+          return { ...col, cards: newCards };
+        }
+        return col;
+      });
+
+      return { columns: newColumns };
     });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    dragSourceColumnRef.current = null;
     setActiveCardId(null);
-    if (!over) return;
+    if (!over || active.id === over.id) return;
 
     const overData = over.data.current as { type?: string; columnId?: string } | undefined;
 
     // Card reordering within same column
     if (overData?.type === 'card') {
-      const activeColumnId = findColumnByCardId(active.id);
-      const overColumnId = overData.columnId || findColumnByCardId(over.id);
+      setBoardContent((prev) => {
+        // Find column containing the active card
+        let colIndex = -1;
+        for (let ci = 0; ci < prev.columns.length; ci++) {
+          if (prev.columns[ci].cards.some((c) => c.id === active.id)) { colIndex = ci; break; }
+        }
+        if (colIndex < 0) return prev;
 
-      if (activeColumnId && activeColumnId === overColumnId && active.id !== over.id) {
-        setBoardContent((prev) => ({
-          columns: prev.columns.map((col) => {
-            if (col.id !== activeColumnId) return col;
-            const oldIndex = col.cards.findIndex((c) => c.id === active.id);
-            const newIndex = col.cards.findIndex((c) => c.id === over.id);
-            if (oldIndex < 0 || newIndex < 0) return col;
-            return { ...col, cards: arrayMove(col.cards, oldIndex, newIndex) };
-          }),
-        }));
-      }
+        const col = prev.columns[colIndex];
+        const oldIndex = col.cards.findIndex((c) => c.id === active.id);
+        const newIndex = col.cards.findIndex((c) => c.id === over.id);
+        if (oldIndex < 0 || newIndex < 0 || oldIndex === newIndex) return prev;
+
+        const newColumns = [...prev.columns];
+        newColumns[colIndex] = { ...col, cards: arrayMove(col.cards, oldIndex, newIndex) };
+        return { columns: newColumns };
+      });
     }
   };
 

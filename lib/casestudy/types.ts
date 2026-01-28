@@ -23,7 +23,10 @@ export type ContentBlockType =
   | 'quote'          // Blockquote
   | 'list'           // UL/OL
   | 'code'           // Code block
-  | 'divider';       // HR
+  | 'divider'        // HR
+  | 'info-grid'      // Project metadata grid (timeline, tools, role, etc.)
+  | 'callout'        // Highlighted insight or key finding
+  | 'card-grid';     // Stakeholder/feature cards in a grid
 
 // Image data with layout hint
 export interface ImageData {
@@ -33,15 +36,29 @@ export interface ImageData {
   layout: 'full-width' | 'content-width';
 }
 
+// Info grid item (for project metadata)
+export interface InfoGridItem {
+  label: string;
+  value: string;
+}
+
+// Card grid item (for stakeholders, features, etc.)
+export interface CardGridItem {
+  icon?: string;     // Emoji or icon name
+  title: string;
+  description: string;
+}
+
 // A single content block in the parsed case study
 export interface ContentBlock {
   id: string;
   type: ContentBlockType;
-  content: string | ImageData | ImageData[];
+  content: string | ImageData | ImageData[] | InfoGridItem[] | CardGridItem[];
   isLead?: boolean;        // First paragraph after title (larger text)
   sectionId?: string;      // ID for scroll anchoring (H2 blocks)
   level?: 1 | 2 | 3;       // Heading level
   listType?: 'ul' | 'ol';  // For list blocks
+  variant?: 'insight' | 'warning' | 'success'; // For callout styling
 }
 
 // Fully parsed case study ready for rendering
