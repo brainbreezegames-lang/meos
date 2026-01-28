@@ -141,12 +141,13 @@ interface Rotating3DObjectProps {
 export function Rotating3DObject({ className }: Rotating3DObjectProps) {
   return (
     <div
-      className={className || "fixed inset-0 z-0 overflow-hidden pointer-events-none"}
+      className={className || "fixed inset-0 overflow-hidden pointer-events-none"}
       style={{
         width: "50%",
         left: 0,
         top: 0,
         bottom: 0,
+        zIndex: 1,
       }}
       aria-hidden="true"
     >
