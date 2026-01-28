@@ -132,12 +132,17 @@ export function DrawingApp() {
     ctx.stroke();
 
     // Draw strokes - filter out any invalid entries
-    const validStrokes = strokes.filter((s): s is Stroke => s !== null && s !== undefined && Array.isArray(s.points));
-    const allStrokes = currentStrokeRef.current && Array.isArray(currentStrokeRef.current.points)
-      ? [...validStrokes, currentStrokeRef.current]
+    const validStrokes = strokes.filter((s): s is Stroke =>
+      s != null && typeof s === 'object' && Array.isArray(s.points)
+    );
+
+    const currentStroke = currentStrokeRef.current;
+    const allStrokes = (currentStroke && Array.isArray(currentStroke.points))
+      ? [...validStrokes, currentStroke]
       : validStrokes;
 
-    for (const stroke of allStrokes) {
+    for (let i = 0; i < allStrokes.length; i++) {
+      const stroke = allStrokes[i];
       if (!stroke || !stroke.points || stroke.points.length < 2) continue;
 
       ctx.beginPath();
@@ -160,26 +165,31 @@ export function DrawingApp() {
       ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
 
       // Smooth curve with quadratic bezier
-      for (let i = 1; i < stroke.points.length - 1; i++) {
-        const xc = (stroke.points[i].x + stroke.points[i + 1].x) / 2;
-        const yc = (stroke.points[i].y + stroke.points[i + 1].y) / 2;
-        ctx.quadraticCurveTo(stroke.points[i].x, stroke.points[i].y, xc, yc);
+      for (let j = 1; j < stroke.points.length - 1; j++) {
+        const xc = (stroke.points[j].x + stroke.points[j + 1].x) / 2;
+        const yc = (stroke.points[j].y + stroke.points[j + 1].y) / 2;
+        ctx.quadraticCurveTo(stroke.points[j].x, stroke.points[j].y, xc, yc);
       }
 
       const last = stroke.points[stroke.points.length - 1];
       ctx.lineTo(last.x, last.y);
       ctx.stroke();
-    });
+    }
 
     ctx.globalCompositeOperation = 'source-over';
 
-    // Draw shapes
-    const allShapes = currentShapeRef.current
-      ? [...shapes, currentShapeRef.current]
-      : shapes;
+    // Draw shapes - filter out any invalid entries
+    const validShapes = shapes.filter((s): s is Shape => s != null && typeof s === 'object');
 
-    allShapes.forEach((shape) => {
-      if (!shape) return;
+    const currentShape = currentShapeRef.current;
+    const allShapes = currentShape
+      ? [...validShapes, currentShape]
+      : validShapes;
+
+    for (let i = 0; i < allShapes.length; i++) {
+      const shape = allShapes[i];
+      if (!shape || !shape.start || !shape.end) continue;
+
       ctx.strokeStyle = shape.color;
       ctx.lineWidth = shape.width;
       ctx.lineCap = 'round';
@@ -209,7 +219,7 @@ export function DrawingApp() {
         ctx.lineTo(end.x - headLen * Math.cos(angle + Math.PI / 6), end.y - headLen * Math.sin(angle + Math.PI / 6));
       }
       ctx.stroke();
-    });
+    }
 
     ctx.restore();
   }, [strokes, shapes, zoom, pan, isDark]);
@@ -282,7 +292,7 @@ export function DrawingApp() {
 
     if (isShapeTool(tool) && currentShapeRef.current) {
       currentShapeRef.current = { ...currentShapeRef.current, end: point };
-    } else if (currentStrokeRef.current) {
+    } else if (currentStrokeRef.current && currentStrokeRef.current.points) {
       // Simple distance check to avoid too many points
       const last = lastPointRef.current;
       const dist = Math.sqrt((point.x - last.x) ** 2 + (point.y - last.y) ** 2);
@@ -309,14 +319,17 @@ export function DrawingApp() {
 
     if (isShapeTool(tool) && currentShapeRef.current) {
       const shapeToAdd = { ...currentShapeRef.current };
+      currentShapeRef.current = null;
       setUndoStack((prev) => [...prev, { strokes, shapes }]);
       setShapes((prev) => [...prev, shapeToAdd]);
-      currentShapeRef.current = null;
     } else if (currentStrokeRef.current && currentStrokeRef.current.points && currentStrokeRef.current.points.length > 1) {
-      const strokeToAdd = { ...currentStrokeRef.current, points: [...currentStrokeRef.current.points] };
+      const strokeToAdd = {
+        ...currentStrokeRef.current,
+        points: [...currentStrokeRef.current.points]
+      };
+      currentStrokeRef.current = null;
       setUndoStack((prev) => [...prev, { strokes, shapes }]);
       setStrokes((prev) => [...prev, strokeToAdd]);
-      currentStrokeRef.current = null;
     } else {
       currentStrokeRef.current = null;
     }
