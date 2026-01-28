@@ -842,6 +842,14 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 </dl>
 </div>
 
+<div data-block-type="tool-badges">
+<span data-tool>Figma</span>
+<span data-tool>FigJam</span>
+<span data-tool>Google Forms</span>
+<span data-tool>Notion</span>
+<span data-tool>Miro</span>
+</div>
+
 <hr />
 
 <h2>Current Space</h2>
@@ -892,6 +900,10 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 
 <p>While users have no way to respond, react, or participate within the listening experience itself, they did not explicitly ask for interaction features. In fact, many were neutral or unsure when asked about engagement during listening.</p>
 
+<div data-block-type="key-takeaway">
+<p><strong>Key Takeaway:</strong> The biggest opportunity wasn't adding features — it was rethinking what "engagement" means in a passive listening context. Users don't ask for interaction because they've never experienced it done well.</p>
+</div>
+
 <h2>Stakeholders</h2>
 
 <h4>Stakeholder Pain Points</h4>
@@ -934,6 +946,14 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 <h2>Approach</h2>
 
 <h4>Scoping Down</h4>
+
+<div data-block-type="process-stepper">
+<div data-step data-label="Research"><span data-step-label>Research</span><span data-step-desc>Surveys, competitive analysis, user interviews</span></div>
+<div data-step data-label="Define"><span data-step-label>Define</span><span data-step-desc>Problem framing, stakeholder mapping, HMW</span></div>
+<div data-step data-label="Scope"><span data-step-label>Scope</span><span data-step-desc>Feature prioritization, MVP definition</span></div>
+<div data-step data-label="Design"><span data-step-label>Design</span><span data-step-desc>Wireframes, UI, interaction patterns</span></div>
+<div data-step data-label="Validate"><span data-step-label>Validate</span><span data-step-desc>Concept testing, iteration, refinement</span></div>
+</div>
 
 <p>From earlier competitive study, I noticed that users consistently valued specific features across different podcast apps. Rather than reinventing everything, I narrowed the scope and grouped these patterns into three core categories.</p>
 
@@ -996,6 +1016,10 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 
 <p>Discussions are separated from playback to avoid interrupting passive listening, while still giving engaged users a clear place to respond.</p>
 
+<div data-block-type="key-takeaway">
+<p><strong>Key Takeaway:</strong> Every design decision was filtered through one question: does this respect the listener's current context? If a feature required active attention, it was either made optional or removed entirely.</p>
+</div>
+
 <h2>Solution</h2>
 
 <h4>The Final Experience</h4>
@@ -1003,6 +1027,11 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 <p>The final design introduces a new interaction paradigm for podcast apps — one that respects the passive nature of listening while creating intentional, low-friction moments for participation.</p>
 
 <p>Polls, prompts, and feedback tools are woven into the timeline rather than bolted on top. The result is an experience that feels participatory without ever demanding attention.</p>
+
+<div data-block-type="comparison">
+<div data-before data-label="Traditional Podcast Apps">One-way passive listening. No interaction during episodes. Engagement happens outside the app on social media and forums.</div>
+<div data-after data-label="Pulse">Two-way participatory listening. In-episode polls and prompts. Engagement woven into the timeline without disrupting flow.</div>
+</div>
 
 <div data-block-type="callout" data-variant="success">
 <p><strong>Outcome:</strong> By scoping tightly and designing for context, Pulse demonstrates that podcast engagement doesn't require reinventing the listening experience — it just requires meeting listeners where they already are.</p>

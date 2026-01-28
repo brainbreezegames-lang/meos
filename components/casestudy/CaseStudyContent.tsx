@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
-import { caseStudyTokens, type ContentBlock, type ImageData, type InfoGridItem, type CardGridItem } from '@/lib/casestudy/types';
+import { caseStudyTokens, type ContentBlock, type ImageData, type InfoGridItem, type CardGridItem, type ProcessStepperItem, type ComparisonData } from '@/lib/casestudy/types';
 
 interface CaseStudyContentProps {
   blocks: ContentBlock[];
@@ -271,8 +271,267 @@ function ContentCardGrid({ cards }: { cards: CardGridItem[] }) {
   );
 }
 
+// Process stepper — numbered design phases connected by a timeline
+function ContentProcessStepper({ steps }: { steps: ProcessStepperItem[] }) {
+  const { colors, fonts } = caseStudyTokens;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: 0,
+        marginTop: 48,
+        marginBottom: 56,
+        position: 'relative',
+      }}
+    >
+      {steps.map((step, i) => (
+        <div
+          key={i}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            position: 'relative',
+          }}
+        >
+          {/* Connector line */}
+          {i < steps.length - 1 && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 18,
+                left: '50%',
+                right: '-50%',
+                height: 2,
+                background: colors.border,
+                zIndex: 0,
+              }}
+            />
+          )}
+
+          {/* Step number circle */}
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: colors.text,
+              color: colors.surface,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: fonts.ui,
+              fontSize: 13,
+              fontWeight: 700,
+              position: 'relative',
+              zIndex: 1,
+              flexShrink: 0,
+            }}
+          >
+            {String(step.number).padStart(2, '0')}
+          </div>
+
+          {/* Label */}
+          <p
+            style={{
+              fontFamily: fonts.body,
+              fontSize: 14,
+              fontWeight: 600,
+              color: colors.text,
+              marginTop: 14,
+              textAlign: 'center',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {step.label}
+          </p>
+
+          {/* Description */}
+          {step.description && (
+            <p
+              style={{
+                fontFamily: fonts.body,
+                fontSize: 12,
+                fontWeight: 400,
+                color: colors.textMuted,
+                marginTop: 6,
+                textAlign: 'center',
+                lineHeight: 1.5,
+                maxWidth: 140,
+              }}
+            >
+              {step.description}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Key takeaway — distinct learning summary block
+function ContentKeyTakeaway({ html }: { html: string }) {
+  const { colors, fonts } = caseStudyTokens;
+
+  return (
+    <aside
+      style={{
+        position: 'relative',
+        marginTop: 48,
+        marginBottom: 48,
+        padding: '28px 32px 28px 32px',
+        background: colors.surfaceAlt,
+        borderRadius: 12,
+        border: `1px solid ${colors.border}`,
+      }}
+    >
+      <div
+        style={{
+          fontFamily: fonts.ui,
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: colors.textMuted,
+          marginBottom: 14,
+        }}
+      >
+        Key Takeaway
+      </div>
+      <div
+        dangerouslySetInnerHTML={{ __html: html }}
+        className="cs-key-takeaway"
+      />
+    </aside>
+  );
+}
+
+// Tool badges — row of tool/technology pill badges
+function ContentToolBadges({ tools }: { tools: string[] }) {
+  const { colors, fonts } = caseStudyTokens;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginTop: 24,
+        marginBottom: 40,
+      }}
+    >
+      {tools.map((tool, i) => (
+        <span
+          key={i}
+          style={{
+            fontFamily: fonts.ui,
+            fontSize: 12,
+            fontWeight: 600,
+            color: colors.text,
+            background: colors.surfaceAlt,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 100,
+            padding: '6px 16px',
+            letterSpacing: '0.01em',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {tool}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// Comparison — before/after side-by-side
+function ContentComparison({ data }: { data: ComparisonData }) {
+  const { colors, fonts } = caseStudyTokens;
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 20,
+        marginTop: 48,
+        marginBottom: 56,
+      }}
+    >
+      {/* Before */}
+      <div
+        style={{
+          padding: '28px 24px',
+          background: colors.surfaceAlt,
+          borderRadius: 14,
+          border: `1px solid ${colors.border}`,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: fonts.ui,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: colors.textMuted,
+            marginBottom: 16,
+          }}
+        >
+          {data.beforeLabel}
+        </div>
+        <div
+          style={{
+            fontFamily: fonts.body,
+            fontSize: 15,
+            fontWeight: 400,
+            lineHeight: 1.65,
+            color: colors.text,
+          }}
+          dangerouslySetInnerHTML={{ __html: data.beforeContent }}
+        />
+      </div>
+
+      {/* After */}
+      <div
+        style={{
+          padding: '28px 24px',
+          background: colors.surface,
+          borderRadius: 14,
+          border: `2px solid ${colors.accent}`,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: fonts.ui,
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: colors.accent,
+            marginBottom: 16,
+          }}
+        >
+          {data.afterLabel}
+        </div>
+        <div
+          style={{
+            fontFamily: fonts.body,
+            fontSize: 15,
+            fontWeight: 400,
+            lineHeight: 1.65,
+            color: colors.text,
+          }}
+          dangerouslySetInnerHTML={{ __html: data.afterContent }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // Render a single content block
-function ContentBlockRenderer({ block }: { block: ContentBlock }) {
+function ContentBlockRenderer({ block, phaseNumber }: { block: ContentBlock; phaseNumber?: number }) {
   const { colors, fonts, typography, spacing } = caseStudyTokens;
 
   switch (block.type) {
@@ -329,8 +588,25 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
             marginBottom: 28,
             maxWidth: 640,
             scrollMarginTop: 100,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 16,
           }}
         >
+          {phaseNumber != null && (
+            <span
+              style={{
+                fontFamily: fonts.ui,
+                fontSize: 13,
+                fontWeight: 700,
+                color: colors.accent,
+                letterSpacing: '0.04em',
+                flexShrink: 0,
+              }}
+            >
+              {String(phaseNumber).padStart(2, '0')}
+            </span>
+          )}
           {block.content as string}
         </h3>
       );
@@ -456,6 +732,18 @@ function ContentBlockRenderer({ block }: { block: ContentBlock }) {
     case 'card-grid':
       return <ContentCardGrid cards={block.content as CardGridItem[]} />;
 
+    case 'process-stepper':
+      return <ContentProcessStepper steps={block.content as ProcessStepperItem[]} />;
+
+    case 'key-takeaway':
+      return <ContentKeyTakeaway html={block.content as string} />;
+
+    case 'tool-badges':
+      return <ContentToolBadges tools={block.content as string[]} />;
+
+    case 'comparison':
+      return <ContentComparison data={block.content as ComparisonData} />;
+
     default:
       return null;
   }
@@ -470,6 +758,19 @@ export function CaseStudyContent({
 }: CaseStudyContentProps) {
   const prefersReducedMotion = useReducedMotion();
   const { colors, fonts, typography, spacing } = caseStudyTokens;
+
+  // Compute phase numbers for heading-2 blocks
+  const phaseMap = useMemo(() => {
+    const map = new Map<string, number>();
+    let phase = 0;
+    for (const block of blocks) {
+      if (block.type === 'heading-2') {
+        phase++;
+        map.set(block.id, phase);
+      }
+    }
+    return map;
+  }, [blocks]);
 
   return (
     <motion.article
@@ -550,7 +851,7 @@ export function CaseStudyContent({
           key={block.id}
           variants={prefersReducedMotion ? {} : itemVariants}
         >
-          <ContentBlockRenderer block={block} />
+          <ContentBlockRenderer block={block} phaseNumber={phaseMap.get(block.id)} />
         </motion.div>
       ))}
 
@@ -595,6 +896,22 @@ export function CaseStudyContent({
           margin-bottom: 0;
         }
         .cs-callout strong {
+          font-weight: 600;
+        }
+
+        /* Key takeaway block inner typography */
+        .cs-key-takeaway p {
+          font-family: ${fonts.body};
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 1.65;
+          color: ${colors.text};
+          margin: 0 0 12px;
+        }
+        .cs-key-takeaway p:last-child {
+          margin-bottom: 0;
+        }
+        .cs-key-takeaway strong {
           font-weight: 600;
         }
       `}</style>

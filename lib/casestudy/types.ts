@@ -13,20 +13,24 @@ export interface TableOfContentsEntry {
 
 // Content block types for the case study layout
 export type ContentBlockType =
-  | 'section-label'  // H4 → uppercase muted label
-  | 'heading-1'      // H1 main heading
-  | 'heading-2'      // H2 section heading
-  | 'heading-3'      // H3 sub-heading
-  | 'paragraph'      // Body text
-  | 'image'          // Single image
-  | 'image-grid'     // Multiple consecutive images
-  | 'quote'          // Blockquote
-  | 'list'           // UL/OL
-  | 'code'           // Code block
-  | 'divider'        // HR
-  | 'info-grid'      // Project metadata grid (timeline, tools, role, etc.)
-  | 'callout'        // Highlighted insight or key finding
-  | 'card-grid';     // Stakeholder/feature cards in a grid
+  | 'section-label'    // H4 → uppercase muted label
+  | 'heading-1'        // H1 main heading
+  | 'heading-2'        // H2 section heading
+  | 'heading-3'        // H3 sub-heading
+  | 'paragraph'        // Body text
+  | 'image'            // Single image
+  | 'image-grid'       // Multiple consecutive images
+  | 'quote'            // Blockquote
+  | 'list'             // UL/OL
+  | 'code'             // Code block
+  | 'divider'          // HR
+  | 'info-grid'        // Project metadata grid (timeline, tools, role, etc.)
+  | 'callout'          // Highlighted insight or key finding
+  | 'card-grid'        // Stakeholder/feature cards in a grid
+  | 'process-stepper'  // Numbered process steps timeline
+  | 'key-takeaway'     // Key learning summary block
+  | 'tool-badges'      // Row of tool/technology badges
+  | 'comparison';      // Before/after side-by-side comparison
 
 // Image data with layout hint
 export interface ImageData {
@@ -49,11 +53,26 @@ export interface CardGridItem {
   description: string;
 }
 
+// Process stepper item (numbered design phases)
+export interface ProcessStepperItem {
+  number: number;
+  label: string;
+  description?: string;
+}
+
+// Before/after comparison data
+export interface ComparisonData {
+  beforeLabel: string;
+  beforeContent: string;
+  afterLabel: string;
+  afterContent: string;
+}
+
 // A single content block in the parsed case study
 export interface ContentBlock {
   id: string;
   type: ContentBlockType;
-  content: string | ImageData | ImageData[] | InfoGridItem[] | CardGridItem[];
+  content: string | string[] | ImageData | ImageData[] | InfoGridItem[] | CardGridItem[] | ProcessStepperItem[] | ComparisonData;
   isLead?: boolean;        // First paragraph after title (larger text)
   sectionId?: string;      // ID for scroll anchoring (H2 blocks)
   level?: 1 | 2 | 3;       // Heading level

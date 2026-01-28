@@ -486,72 +486,202 @@ export function parseNoteToSlidesSimple(note: NoteInput): Slide[] {
     },
   });
 
-  // Parse HTML content into ordered blocks
+  // Parse HTML content into ordered blocks using DOMParser for proper div handling
   const blocks: { type: string; content: string; items?: string[]; src?: string; alt?: string }[] = [];
 
-  // Tokenize the content - find all elements in order
-  const tokenRegex = /<(h1|h2|h3|p|img|blockquote|ul|ol|hr)[^>]*>[\s\S]*?<\/\1>|<(img|hr)[^>]*\/?>/gi;
-  const tokens = content.match(tokenRegex) || [];
+  if (typeof DOMParser !== 'undefined') {
+    // Use DOMParser for reliable parsing of nested elements
+    const domParser = new DOMParser();
+    const doc = domParser.parseFromString(`<div>${content}</div>`, 'text/html');
+    const container = doc.body.firstChild as HTMLElement;
 
-  for (const token of tokens) {
-    // Heading 1 - Section break
-    if (token.match(/^<h1/i)) {
-      const text = stripHtml(token);
-      if (text) blocks.push({ type: 'h1', content: text });
-    }
-    // Heading 2 - Slide heading
-    else if (token.match(/^<h2/i)) {
-      const text = stripHtml(token);
-      if (text) blocks.push({ type: 'h2', content: text });
-    }
-    // Heading 3 - Sub-heading
-    else if (token.match(/^<h3/i)) {
-      const text = stripHtml(token);
-      if (text) blocks.push({ type: 'h3', content: text });
-    }
-    // Paragraph - may contain image
-    else if (token.match(/^<p/i)) {
-      // Check for image inside paragraph
-      const imgMatch = token.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i);
-      const altMatch = token.match(/alt=["']([^"']*)["']/i);
+    if (container) {
+      for (const child of Array.from(container.children)) {
+        const tagName = child.tagName.toLowerCase();
+        const text = child.textContent?.trim() || '';
 
-      if (imgMatch) {
-        // If paragraph has only image, extract it
-        const textOnly = stripHtml(token.replace(/<img[^>]*>/gi, ''));
-        if (!textOnly.trim()) {
-          blocks.push({ type: 'image', content: '', src: imgMatch[1], alt: altMatch?.[1] || '' });
-        } else {
-          // Image with caption text
-          blocks.push({ type: 'image', content: textOnly, src: imgMatch[1], alt: altMatch?.[1] || '' });
+        switch (tagName) {
+          case 'h1':
+            if (text) blocks.push({ type: 'h1', content: text });
+            break;
+          case 'h2':
+            if (text) blocks.push({ type: 'h2', content: text });
+            break;
+          case 'h3':
+            if (text) blocks.push({ type: 'h3', content: text });
+            break;
+          case 'h4':
+            // Section labels become subheadings
+            if (text) blocks.push({ type: 'h3', content: text });
+            break;
+          case 'p': {
+            const img = child.querySelector('img');
+            if (img && !text.replace(img.textContent || '', '').trim()) {
+              blocks.push({
+                type: 'image',
+                content: '',
+                src: img.getAttribute('src') || '',
+                alt: img.getAttribute('alt') || '',
+              });
+            } else if (text) {
+              blocks.push({ type: 'p', content: text });
+            }
+            break;
+          }
+          case 'img':
+            blocks.push({
+              type: 'image',
+              content: '',
+              src: child.getAttribute('src') || '',
+              alt: child.getAttribute('alt') || '',
+            });
+            break;
+          case 'blockquote':
+            if (text) blocks.push({ type: 'quote', content: text });
+            break;
+          case 'ul':
+          case 'ol': {
+            const items = Array.from(child.querySelectorAll('li'))
+              .map(li => li.textContent?.trim() || '')
+              .filter(Boolean);
+            if (items.length > 0) blocks.push({ type: 'list', content: '', items });
+            break;
+          }
+          case 'hr':
+            blocks.push({ type: 'hr', content: '' });
+            break;
+          case 'figure': {
+            const figImg = child.querySelector('img');
+            if (figImg) {
+              blocks.push({
+                type: 'image',
+                content: '',
+                src: figImg.getAttribute('src') || '',
+                alt: child.querySelector('figcaption')?.textContent?.trim() || figImg.getAttribute('alt') || '',
+              });
+            }
+            break;
+          }
+          case 'div': {
+            const blockType = child.getAttribute('data-block-type');
+            if (blockType === 'info-grid') {
+              // Convert info-grid to a list of "Label: Value" items
+              const dts = child.querySelectorAll('dt');
+              const dds = child.querySelectorAll('dd');
+              const items: string[] = [];
+              for (let j = 0; j < dts.length; j++) {
+                const label = dts[j].textContent?.trim() || '';
+                const value = dds[j]?.textContent?.trim() || '';
+                if (label && value) items.push(`${label}: ${value}`);
+              }
+              if (items.length > 0) blocks.push({ type: 'list', content: '', items });
+            } else if (blockType === 'callout') {
+              // Callout becomes a quote slide
+              if (text) blocks.push({ type: 'quote', content: text });
+            } else if (blockType === 'card-grid') {
+              // Card grid becomes a list of card titles + descriptions
+              const cards = child.querySelectorAll('[data-card]');
+              const items: string[] = [];
+              for (let j = 0; j < cards.length; j++) {
+                const title = cards[j].querySelector('[data-card-title]')?.textContent?.trim() || '';
+                const desc = cards[j].querySelector('[data-card-desc]')?.textContent?.trim() || '';
+                if (title) items.push(desc ? `${title} — ${desc}` : title);
+              }
+              if (items.length > 0) blocks.push({ type: 'list', content: '', items });
+            } else if (blockType === 'process-stepper') {
+              // Process stepper becomes a numbered list
+              const steps = child.querySelectorAll('[data-step]');
+              const items: string[] = [];
+              for (let j = 0; j < steps.length; j++) {
+                const label = steps[j].getAttribute('data-label') ||
+                  steps[j].querySelector('[data-step-label]')?.textContent?.trim() || `Step ${j + 1}`;
+                const desc = steps[j].querySelector('[data-step-desc]')?.textContent?.trim() || '';
+                items.push(desc ? `${label} — ${desc}` : label);
+              }
+              if (items.length > 0) blocks.push({ type: 'list', content: '', items });
+            } else if (blockType === 'key-takeaway') {
+              // Key takeaway becomes a quote slide
+              if (text) blocks.push({ type: 'quote', content: text });
+            } else if (blockType === 'tool-badges') {
+              // Tool badges become a paragraph listing tools
+              const toolEls = child.querySelectorAll('[data-tool]');
+              const tools: string[] = [];
+              if (toolEls.length > 0) {
+                for (let j = 0; j < toolEls.length; j++) {
+                  const t = toolEls[j].textContent?.trim();
+                  if (t) tools.push(t);
+                }
+              }
+              if (tools.length > 0) {
+                blocks.push({ type: 'p', content: `Tools: ${tools.join(', ')}` });
+              }
+            } else if (blockType === 'comparison') {
+              // Comparison becomes two paragraphs
+              const beforeEl = child.querySelector('[data-before]');
+              const afterEl = child.querySelector('[data-after]');
+              if (beforeEl) {
+                const label = beforeEl.getAttribute('data-label') || 'Before';
+                blocks.push({ type: 'p', content: `${label}: ${beforeEl.textContent?.trim() || ''}` });
+              }
+              if (afterEl) {
+                const label = afterEl.getAttribute('data-label') || 'After';
+                blocks.push({ type: 'p', content: `${label}: ${afterEl.textContent?.trim() || ''}` });
+              }
+            } else {
+              // Generic div - treat as paragraph if has text
+              if (text) blocks.push({ type: 'p', content: text });
+            }
+            break;
+          }
         }
-      } else {
+      }
+    }
+  } else {
+    // Fallback: regex-based tokenization for SSR
+    const tokenRegex = /<(h1|h2|h3|p|img|blockquote|ul|ol|hr)[^>]*>[\s\S]*?<\/\1>|<(img|hr)[^>]*\/?>/gi;
+    const tokens = content.match(tokenRegex) || [];
+
+    for (const token of tokens) {
+      if (token.match(/^<h1/i)) {
         const text = stripHtml(token);
-        if (text) blocks.push({ type: 'p', content: text });
+        if (text) blocks.push({ type: 'h1', content: text });
+      } else if (token.match(/^<h2/i)) {
+        const text = stripHtml(token);
+        if (text) blocks.push({ type: 'h2', content: text });
+      } else if (token.match(/^<h3/i)) {
+        const text = stripHtml(token);
+        if (text) blocks.push({ type: 'h3', content: text });
+      } else if (token.match(/^<p/i)) {
+        const imgMatch = token.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i);
+        const altMatch = token.match(/alt=["']([^"']*)["']/i);
+        if (imgMatch) {
+          const textOnly = stripHtml(token.replace(/<img[^>]*>/gi, ''));
+          if (!textOnly.trim()) {
+            blocks.push({ type: 'image', content: '', src: imgMatch[1], alt: altMatch?.[1] || '' });
+          } else {
+            blocks.push({ type: 'image', content: textOnly, src: imgMatch[1], alt: altMatch?.[1] || '' });
+          }
+        } else {
+          const text = stripHtml(token);
+          if (text) blocks.push({ type: 'p', content: text });
+        }
+      } else if (token.match(/^<img/i)) {
+        const srcMatch = token.match(/src=["']([^"']+)["']/i);
+        const altMatch = token.match(/alt=["']([^"']*)["']/i);
+        if (srcMatch) {
+          blocks.push({ type: 'image', content: '', src: srcMatch[1], alt: altMatch?.[1] || '' });
+        }
+      } else if (token.match(/^<blockquote/i)) {
+        const text = stripHtml(token);
+        if (text) blocks.push({ type: 'quote', content: text });
+      } else if (token.match(/^<(ul|ol)/i)) {
+        const items = [...token.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)]
+          .map(m => stripHtml(m[1]))
+          .filter(Boolean);
+        if (items.length > 0) blocks.push({ type: 'list', content: '', items });
+      } else if (token.match(/^<hr/i)) {
+        blocks.push({ type: 'hr', content: '' });
       }
-    }
-    // Standalone image
-    else if (token.match(/^<img/i)) {
-      const srcMatch = token.match(/src=["']([^"']+)["']/i);
-      const altMatch = token.match(/alt=["']([^"']*)["']/i);
-      if (srcMatch) {
-        blocks.push({ type: 'image', content: '', src: srcMatch[1], alt: altMatch?.[1] || '' });
-      }
-    }
-    // Blockquote
-    else if (token.match(/^<blockquote/i)) {
-      const text = stripHtml(token);
-      if (text) blocks.push({ type: 'quote', content: text });
-    }
-    // Lists
-    else if (token.match(/^<(ul|ol)/i)) {
-      const items = [...token.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)]
-        .map(m => stripHtml(m[1]))
-        .filter(Boolean);
-      if (items.length > 0) blocks.push({ type: 'list', content: '', items });
-    }
-    // Horizontal rule
-    else if (token.match(/^<hr/i)) {
-      blocks.push({ type: 'hr', content: '' });
     }
   }
 

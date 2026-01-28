@@ -237,9 +237,18 @@ export function CaseStudySidebar({
                     transition: 'all 0.2s ease',
                   }}
                   aria-current={isActive ? 'true' : undefined}
-                  aria-label={entry.title}
+                  aria-label={`${String(index + 1).padStart(2, '0')} ${entry.title}`}
                 >
-                  <Icon size={18} strokeWidth={isActive ? 2 : 1.5} />
+                  <span
+                    style={{
+                      fontFamily: fonts.ui,
+                      fontSize: 12,
+                      fontWeight: isActive ? 700 : 600,
+                      letterSpacing: '0.02em',
+                    }}
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
                 </button>
 
                 {/* Hover label */}

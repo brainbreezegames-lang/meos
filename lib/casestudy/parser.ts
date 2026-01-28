@@ -12,6 +12,8 @@ import type {
   ImageData,
   InfoGridItem,
   CardGridItem,
+  ProcessStepperItem,
+  ComparisonData,
   TableOfContentsEntry,
 } from './types';
 
@@ -406,6 +408,89 @@ export function parseCaseStudyContent(
             id: `block-${blockIndex++}`,
             type: 'card-grid',
             content: cards,
+          });
+        }
+        continue;
+      }
+
+      // Process stepper block (numbered design phases)
+      if (blockType === 'process-stepper') {
+        const steps: ProcessStepperItem[] = [];
+        const stepElements = node.querySelectorAll('[data-step]');
+        for (let j = 0; j < stepElements.length; j++) {
+          const step = stepElements[j];
+          steps.push({
+            number: j + 1,
+            label: step.getAttribute('data-label') || step.querySelector('[data-step-label]')?.textContent?.trim() || `Step ${j + 1}`,
+            description: step.querySelector('[data-step-desc]')?.textContent?.trim() || step.textContent?.trim() || '',
+          });
+        }
+        if (steps.length > 0) {
+          contentBlocks.push({
+            id: `block-${blockIndex++}`,
+            type: 'process-stepper',
+            content: steps,
+          });
+        }
+        continue;
+      }
+
+      // Key takeaway block
+      if (blockType === 'key-takeaway') {
+        const text = node.innerHTML?.trim() || '';
+        if (text) {
+          contentBlocks.push({
+            id: `block-${blockIndex++}`,
+            type: 'key-takeaway',
+            content: text,
+          });
+        }
+        continue;
+      }
+
+      // Tool badges block
+      if (blockType === 'tool-badges') {
+        const tools: string[] = [];
+        const toolElements = node.querySelectorAll('[data-tool]');
+        if (toolElements.length > 0) {
+          for (let j = 0; j < toolElements.length; j++) {
+            const toolName = toolElements[j].textContent?.trim() || '';
+            if (toolName) tools.push(toolName);
+          }
+        } else {
+          // Fallback: split comma-separated text or data-tools attribute
+          const toolsAttr = node.getAttribute('data-tools');
+          if (toolsAttr) {
+            tools.push(...toolsAttr.split(',').map(t => t.trim()).filter(Boolean));
+          } else {
+            const text = node.textContent?.trim() || '';
+            if (text) tools.push(...text.split(',').map(t => t.trim()).filter(Boolean));
+          }
+        }
+        if (tools.length > 0) {
+          contentBlocks.push({
+            id: `block-${blockIndex++}`,
+            type: 'tool-badges',
+            content: tools,
+          });
+        }
+        continue;
+      }
+
+      // Comparison block (before/after)
+      if (blockType === 'comparison') {
+        const beforeEl = node.querySelector('[data-before]');
+        const afterEl = node.querySelector('[data-after]');
+        if (beforeEl && afterEl) {
+          contentBlocks.push({
+            id: `block-${blockIndex++}`,
+            type: 'comparison',
+            content: {
+              beforeLabel: beforeEl.getAttribute('data-label') || 'Before',
+              beforeContent: beforeEl.innerHTML?.trim() || beforeEl.textContent?.trim() || '',
+              afterLabel: afterEl.getAttribute('data-label') || 'After',
+              afterContent: afterEl.innerHTML?.trim() || afterEl.textContent?.trim() || '',
+            } as ComparisonData,
           });
         }
         continue;
