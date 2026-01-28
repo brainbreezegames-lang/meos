@@ -82,7 +82,8 @@ import { playSound } from '@/lib/sounds';
 import { CommandPalette } from '@/components/command-palette/CommandPalette';
 import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
-import { FallingLetters } from '@/components/desktop/FallingLetters';
+// import { FallingLetters } from '@/components/desktop/FallingLetters'; // Temporarily disabled for 3D wallpaper test
+const Rotating3DObject = dynamic(() => import('@/components/desktop/Rotating3DObject'), { ssr: false });
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 
 // ============================================
@@ -3969,8 +3970,10 @@ function GoOSDemoContent() {
                 />
             )}
 
-            {/* FALLING LETTERS - Physics-based "goOS" letters in background */}
-            <FallingLetters isReady={bootPhase === 'ready'} textSize={470} headSize={336} />
+            {/* 3D ROTATING OBJECT - Glossy interlocking shapes as wallpaper */}
+            {/* Note: FallingLetters temporarily disabled for 3D test */}
+            {/* <FallingLetters isReady={bootPhase === 'ready'} textSize={470} headSize={336} /> */}
+            {bootPhase === 'ready' && <Rotating3DObject />}
 
             {/* Bottom lava glow - static CSS only, seamless fade */}
             {!wallpaper && (
