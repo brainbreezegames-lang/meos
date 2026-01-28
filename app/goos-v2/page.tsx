@@ -85,8 +85,8 @@ import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
 import { Launchpad, LaunchpadDockIcon } from '@/components/desktop/Launchpad';
 // Dock icons are now real PNG images at /icons/dock/
-import { OnboardingPrompt, BuildAnimation } from '@/components/onboarding';
-import { useAIOnboarding } from '@/hooks/useAIOnboarding';
+import { OnboardingPrompt, StreamingBuild } from '@/components/onboarding';
+import { useAIOnboarding, StreamingBuildItem } from '@/hooks/useAIOnboarding';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 
 // ============================================
@@ -3171,14 +3171,20 @@ function GoOSDemoContent() {
         return { x: 20, y: 20 };
     }, []);
 
-    // Handle AI onboarding completion - create files from build sequence
-    const handleOnboardingComplete = useCallback(async () => {
-        if (!onboarding.buildSequence?.items) return;
+    // Handle AI onboarding completion - create files from streaming build
+    const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
+        // Generate positions for items
+        const getPosition = (index: number) => ({
+            x: 5 + (index % 4) * 15,
+            y: 25 + Math.floor(index / 4) * 18,
+        });
 
         // Create files sequentially
-        for (const item of onboarding.buildSequence.items) {
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
             if (item.type === 'file' && item.fileType) {
-                const newFile = await createGoOSFile(item.fileType as FileType, null, item.position);
+                const position = getPosition(i);
+                const newFile = await createGoOSFile(item.fileType as FileType, null, position);
                 if (newFile && item.content) {
                     await updateGoOSFile(newFile.id, {
                         title: item.title,
@@ -5820,16 +5826,13 @@ function GoOSDemoContent() {
                 isOpen={onboarding.isPromptOpen}
                 onClose={onboarding.cancelOnboarding}
                 onSubmit={onboarding.submitPrompt}
-                isLoading={onboarding.isLoading}
             />
 
-            <BuildAnimation
+            <StreamingBuild
                 isActive={onboarding.isBuilding}
-                items={onboarding.buildSequence?.items || []}
-                summary={onboarding.intent?.summary || 'Setting up your space...'}
-                understanding={onboarding.intent?.understanding}
-                usedAI={onboarding.usedAI}
+                prompt={onboarding.prompt || ''}
                 onComplete={handleOnboardingComplete}
+                onCancel={onboarding.cancelOnboarding}
             />
 
             {/* Command Palette */}
