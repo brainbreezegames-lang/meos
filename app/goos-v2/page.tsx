@@ -84,15 +84,7 @@ import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
 import { Launchpad, LaunchpadDockIcon } from '@/components/desktop/Launchpad';
-import {
-    MailDockIcon,
-    NotesDockIcon,
-    ChatDockIcon,
-    TerminalDockIcon,
-    GuestbookDockIcon,
-    PresentationDockIcon,
-    FileDockIcon,
-} from '@/lib/icons/dock-icons';
+// Dock icons are now real PNG images at /icons/dock/
 import { OnboardingPrompt, BuildAnimation } from '@/components/onboarding';
 import { useAIOnboarding } from '@/hooks/useAIOnboarding';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
@@ -5396,20 +5388,20 @@ function GoOSDemoContent() {
                             />
                             <RubberDuck />
                             <DockIcon
-                                icon={<LaunchpadDockIcon size={22} />}
+                                icon={<Image src="/icons/dock/launchpad.png" alt="Launchpad" width={36} height={36} className="object-contain" draggable={false} />}
                                 onClick={() => setLaunchpadOpen(true)}
                                 isActive={launchpadOpen}
                                 label="Launchpad"
                             />
                             <DockIcon
-                                icon={<MailDockIcon size={36} />}
+                                icon={<Image src="/icons/dock/mail.png" alt="Mail" width={36} height={36} className="object-contain" draggable={false} />}
                                 onClick={() => toggleApp('quackmail')}
                                 isActive={appWindows.quackmail}
                                 badge={3}
                                 label="Mail"
                             />
                             <DockIcon
-                                icon={<NotesDockIcon size={36} />}
+                                icon={<Image src="/icons/dock/notes.png" alt="Notes" width={36} height={36} className="object-contain" draggable={false} />}
                                 onClick={() => toggleApp('notes')}
                                 isActive={appWindows.notes}
                                 label="Notes"
@@ -5427,13 +5419,13 @@ function GoOSDemoContent() {
                                 }}
                             />
                             <DockIcon
-                                icon={<ChatDockIcon size={36} />}
+                                icon={<Image src="/icons/dock/messages.png" alt="Chat" width={36} height={36} className="object-contain" draggable={false} />}
                                 onClick={() => toggleApp('chat')}
                                 isActive={appWindows.chat}
                                 label="Chat"
                             />
                             <DockIcon
-                                icon={<TerminalDockIcon size={36} />}
+                                icon={<Image src="/icons/dock/terminal.png" alt="Shell" width={36} height={36} className="object-contain" draggable={false} />}
                                 onClick={() => toggleApp('shell')}
                                 isActive={appWindows.shell}
                                 label="Shell"
@@ -5451,7 +5443,7 @@ function GoOSDemoContent() {
                                 }}
                             />
                             <DockIcon
-                                icon={<GuestbookDockIcon size={36} />}
+                                icon={<Image src="/icons/dock/guestbook.png" alt="Guestbook" width={36} height={36} className="object-contain" draggable={false} />}
                                 onClick={() => toggleApp('guestbook')}
                                 isActive={appWindows.guestbook}
                                 badge={guestbookEntries.length}
@@ -5479,13 +5471,12 @@ function GoOSDemoContent() {
                                             <DockIcon
                                                 key={`minimized-${fileId}`}
                                                 icon={file.type === 'case-study'
-                                                    ? <PresentationDockIcon size={36} />
-                                                    : <FileDockIcon size={36} />
+                                                    ? <Image src="/icons/dock/presentation.png" alt="Presentation" width={36} height={36} className="object-contain" draggable={false} />
+                                                    : <Image src="/icons/dock/file.png" alt="File" width={36} height={36} className="object-contain" draggable={false} />
                                                 }
                                                 onClick={() => restoreEditor(fileId)}
                                                 label={file.title || 'Untitled'}
                                                 isActive={false}
-                                                isDark={isDarkMode}
                                             />
                                         );
                                     })}
