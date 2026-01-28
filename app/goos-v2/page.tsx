@@ -83,6 +83,7 @@ import { CommandPalette } from '@/components/command-palette/CommandPalette';
 import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
+import { Launchpad, LaunchpadDockIcon } from '@/components/desktop/Launchpad';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 
 // ============================================
@@ -3035,6 +3036,9 @@ function GoOSDemoContent() {
     // Command palette state
     const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
+    // Launchpad state
+    const [launchpadOpen, setLaunchpadOpen] = useState(false);
+
     // Zen focus mode - true when any window is maximized OR in page/present view
     const isZenMode = maximizedEditors.size > 0 || viewMode === 'page' || viewMode === 'present';
 
@@ -5326,6 +5330,12 @@ function GoOSDemoContent() {
                             />
                             <RubberDuck />
                             <DockIcon
+                                icon={<LaunchpadDockIcon size={22} />}
+                                onClick={() => setLaunchpadOpen(true)}
+                                isActive={launchpadOpen}
+                                label="Launchpad"
+                            />
+                            <DockIcon
                                 icon={<Mail size={22} stroke="var(--icon-stroke)" strokeWidth={1.5} />}
                                 onClick={() => toggleApp('quackmail')}
                                 isActive={appWindows.quackmail}
@@ -5767,6 +5777,25 @@ function GoOSDemoContent() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Launchpad */}
+            <Launchpad
+                isOpen={launchpadOpen}
+                onClose={() => setLaunchpadOpen(false)}
+                items={goosFiles.map(f => ({
+                    id: f.id,
+                    type: f.type,
+                    title: f.title,
+                    thumbnailUrl: f.headerImage,
+                }))}
+                onItemClick={(itemId, itemType) => {
+                    if (itemType === 'game') {
+                        setAppWindows(prev => ({ ...prev, snake: true }));
+                    } else {
+                        openFile(itemId);
+                    }
+                }}
+            />
 
             {/* Command Palette */}
             <CommandPalette
