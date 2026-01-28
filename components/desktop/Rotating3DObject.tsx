@@ -181,6 +181,10 @@ export function Rotating3DObject({ className }: Rotating3DObjectProps) {
       }}
       aria-hidden="true"
     >
+      {/* Debug indicator - remove after testing */}
+      <div style={{ position: 'absolute', top: 20, left: 20, color: '#ff7722', fontSize: 14, fontWeight: 'bold', zIndex: 9999 }}>
+        3D Loading...
+      </div>
       <CanvasErrorBoundary>
         <Suspense fallback={null}>
           <Canvas
