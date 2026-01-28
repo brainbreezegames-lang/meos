@@ -820,10 +820,8 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         id: 'file-2',
         type: 'case-study',
         title: 'Pulse',
-        headerImage: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=1920&h=1080&fit=crop',
-        content: `<img src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=1920&h=1080&fit=crop" alt="Podcast microphone hero" />
-
-<h2>Overview</h2>
+        headerImage: null,
+        content: `<h2>Overview</h2>
 
 <h4>Rethinking Podcast Listening</h4>
 
@@ -844,13 +842,13 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 </dl>
 </div>
 
-<img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1920&h=1080&fit=crop" alt="UX research workspace with sticky notes and whiteboard" />
+<hr />
 
 <h2>Current Space</h2>
 
 <h4>The Current Podcast Landscape</h4>
 
-<p>Podcast listening today is dominated by a few big players, each winning for very different reasons. While most people use mainstream apps for convenience, power users often migrate to niche platforms that offer deeper control. By benchmarking the platforms, I found the following key insights.</p>
+<p>Podcast listening today is dominated by a few big players, each winning for very different reasons. While most people use mainstream apps for convenience, power users often migrate to niche platforms that offer deeper control.</p>
 
 <p><strong>Spotify</strong> is popular for its recommendation algorithm and discovery. Users rely on it to surface new podcasts without much effort, especially if they already use Spotify for music.</p>
 
@@ -865,8 +863,6 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 <div data-block-type="callout" data-variant="insight">
 <p><strong>Key finding:</strong> While people love certain features of certain apps, podcast listening is completely passive. No platform offers meaningful in-episode interaction.</p>
 </div>
-
-<img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1920&h=1080&fit=crop" alt="Multiple phone screens showing app interfaces" />
 
 <h2>Research</h2>
 
@@ -884,13 +880,17 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 
 <h3>When do listeners want to engage?</h3>
 
-<p>Engagement doesn't happen constantly. It tends to occur at specific moments:<br/>→ when a strong opinion is shared<br/>→ when a question is asked<br/>→ when listeners feel represented or challenged</p>
+<p>Engagement doesn't happen constantly. It tends to occur at specific moments:</p>
+
+<ul>
+<li>When a strong opinion is shared</li>
+<li>When a question is asked</li>
+<li>When listeners feel represented or challenged</li>
+</ul>
 
 <h3>What is missing from the current experience?</h3>
 
 <p>While users have no way to respond, react, or participate within the listening experience itself, they did not explicitly ask for interaction features. In fact, many were neutral or unsure when asked about engagement during listening.</p>
-
-<img src="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=1920&h=1080&fit=crop" alt="Design research with post-it notes on whiteboard" />
 
 <h2>Stakeholders</h2>
 
@@ -927,9 +927,9 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 
 <blockquote>"What if podcast listening didn't have to be one-way?"</blockquote>
 
-<blockquote>"What is the smallest possible action a listener could take while still feeling involved?"</blockquote>
+<blockquote>"What if listeners could influence what comes next?"</blockquote>
 
-<img src="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1920&h=1080&fit=crop" alt="UX wireframes and design sketches on desk" />
+<blockquote>"What is the smallest possible action a listener could take while still feeling involved?"</blockquote>
 
 <h2>Approach</h2>
 
@@ -939,6 +939,8 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 
 <h3>Must Have</h3>
 
+<p>Non-negotiable features essential for the product to function.</p>
+
 <ul>
 <li>Resume listening and accurate playback memory</li>
 <li>Basic listening history and progress tracking</li>
@@ -946,6 +948,8 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 </ul>
 
 <h3>Should Have</h3>
+
+<p>Important features that add significant value but aren't critical for immediate success.</p>
 
 <ul>
 <li>Episode organization through folders or simple grouping</li>
@@ -956,6 +960,8 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 
 <h3>Could Have</h3>
 
+<p>The core differentiator — validated through concept testing.</p>
+
 <ul>
 <li>In-episode polls</li>
 <li>Episode discussion prompts</li>
@@ -963,10 +969,8 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 </ul>
 
 <div data-block-type="callout" data-variant="insight">
-<p><strong>Design principle:</strong> Not every popular feature was treated as essential. I intentionally deprioritized power-user optimizations unless they supported the core listening experience. The "Could Have" category represents the core differentiator of the product.</p>
+<p><strong>Design principle:</strong> Not every popular feature was treated as essential. I intentionally deprioritized power-user optimizations unless they supported the core listening experience.</p>
 </div>
-
-<img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1920&h=1080&fit=crop" alt="Mobile app design on phone screen" />
 
 <h2>Explorations</h2>
 
@@ -986,22 +990,31 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
 
 <p>Rather than overwhelming the core experience, I deliberately surfaced advanced controls like custom speed, silence trimming, and volume boost as optional tools for power users who need deeper control or accessibility support.</p>
 
-<img src="https://images.unsplash.com/photo-1512486130939-2c4f79e0a294?w=1920&h=1080&fit=crop" alt="Mobile UI screen designs" />
-<img src="https://images.unsplash.com/photo-1545235617-9465d2a55698?w=1920&h=1080&fit=crop" alt="Typography and design system components" />
+<h3>Interaction Design</h3>
+
+<p>I treated interaction as optional, not mandatory, knowing most listeners are hands-free while listening. Creator polls are lightweight and time-aware, allowing listeners to respond when it's convenient, not disruptive.</p>
+
+<p>Discussions are separated from playback to avoid interrupting passive listening, while still giving engaged users a clear place to respond.</p>
 
 <h2>Solution</h2>
 
 <h4>The Final Experience</h4>
 
-<p>I treated interaction as optional, not mandatory, knowing most listeners are hands-free while listening.</p>
+<p>The final design introduces a new interaction paradigm for podcast apps — one that respects the passive nature of listening while creating intentional, low-friction moments for participation.</p>
 
-<p>Creator polls are lightweight and time-aware, allowing listeners to respond when it's convenient, not disruptive. Discussions are separated from playback to avoid interrupting passive listening, while still giving engaged users a clear place to respond.</p>
+<p>Polls, prompts, and feedback tools are woven into the timeline rather than bolted on top. The result is an experience that feels participatory without ever demanding attention.</p>
 
 <div data-block-type="callout" data-variant="success">
-<p><strong>Outcome:</strong> The final design introduces a new interaction paradigm for podcast apps — one that respects the passive nature of listening while creating intentional, low-friction moments for participation. Polls, prompts, and feedback tools are woven into the timeline rather than bolted on top.</p>
+<p><strong>Outcome:</strong> By scoping tightly and designing for context, Pulse demonstrates that podcast engagement doesn't require reinventing the listening experience — it just requires meeting listeners where they already are.</p>
 </div>
 
-<img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=1920&h=1080&fit=crop" alt="Final design presentation on laptop" />`,
+<div data-block-type="info-grid">
+<dl>
+<dt>Designed by</dt><dd>Riddhiman Paul</dd>
+<dt>Year</dt><dd>2025</dd>
+<dt>Status</dt><dd>Concept</dd>
+</dl>
+</div>`,
         status: 'published',
         accessLevel: 'free',
         publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
