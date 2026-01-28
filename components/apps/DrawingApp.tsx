@@ -102,27 +102,27 @@ export function DrawingApp() {
 
     // Draw all completed strokes
     for (const stroke of strokes) {
-      drawStroke(ctx, stroke);
+      if (stroke && stroke.points) drawStroke(ctx, stroke);
     }
 
     // Draw current stroke being drawn
-    if (currentStrokeRef.current) {
+    if (currentStrokeRef.current && currentStrokeRef.current.points) {
       drawStroke(ctx, currentStrokeRef.current);
     }
 
     // Draw all completed shapes
     for (const shape of shapes) {
-      drawShape(ctx, shape);
+      if (shape && shape.start && shape.end) drawShape(ctx, shape);
     }
 
     // Draw current shape being drawn
-    if (currentShapeRef.current) {
+    if (currentShapeRef.current && currentShapeRef.current.start) {
       drawShape(ctx, currentShapeRef.current);
     }
   }, [strokes, shapes, isDark]);
 
   const drawStroke = (ctx: CanvasRenderingContext2D, stroke: Stroke) => {
-    if (!stroke.points || stroke.points.length === 0) return;
+    if (!stroke || !stroke.points || stroke.points.length === 0) return;
 
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -162,6 +162,7 @@ export function DrawingApp() {
   };
 
   const drawShape = (ctx: CanvasRenderingContext2D, shape: Shape) => {
+    if (!shape || !shape.start || !shape.end) return;
     ctx.strokeStyle = shape.color;
     ctx.lineWidth = shape.width;
     ctx.lineCap = 'round';
@@ -249,13 +250,15 @@ export function DrawingApp() {
     if (!isDrawing) return;
     setIsDrawing(false);
 
-    if (isShapeTool(tool) && currentShapeRef.current) {
+    if (isShapeTool(tool) && currentShapeRef.current && currentShapeRef.current.start && currentShapeRef.current.end) {
+      const shapeToAdd = { ...currentShapeRef.current };
       setUndoStack(prev => [...prev, { strokes, shapes }]);
-      setShapes(prev => [...prev, currentShapeRef.current!]);
+      setShapes(prev => [...prev, shapeToAdd]);
       currentShapeRef.current = null;
-    } else if (currentStrokeRef.current && currentStrokeRef.current.points.length > 0) {
+    } else if (currentStrokeRef.current && currentStrokeRef.current.points && currentStrokeRef.current.points.length > 0) {
+      const strokeToAdd = { ...currentStrokeRef.current, points: [...currentStrokeRef.current.points] };
       setUndoStack(prev => [...prev, { strokes, shapes }]);
-      setStrokes(prev => [...prev, currentStrokeRef.current!]);
+      setStrokes(prev => [...prev, strokeToAdd]);
       currentStrokeRef.current = null;
     }
   };
@@ -286,7 +289,8 @@ export function DrawingApp() {
 
   const ToolBtn = ({ t, icon, label }: { t: Tool; icon: React.ReactNode; label: string }) => (
     <button
-      onClick={() => setTool(t)}
+      onClick={(e) => { e.stopPropagation(); setTool(t); }}
+      onPointerDown={(e) => e.stopPropagation()}
       title={label}
       style={{
         width: 32, height: 32,
