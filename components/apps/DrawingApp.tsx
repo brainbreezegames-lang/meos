@@ -131,13 +131,14 @@ export function DrawingApp() {
     }
     ctx.stroke();
 
-    // Draw strokes
-    const allStrokes = currentStrokeRef.current
-      ? [...strokes, currentStrokeRef.current]
-      : strokes;
+    // Draw strokes - filter out any invalid entries
+    const validStrokes = strokes.filter((s): s is Stroke => s !== null && s !== undefined && Array.isArray(s.points));
+    const allStrokes = currentStrokeRef.current && Array.isArray(currentStrokeRef.current.points)
+      ? [...validStrokes, currentStrokeRef.current]
+      : validStrokes;
 
-    allStrokes.forEach((stroke) => {
-      if (!stroke || !stroke.points || stroke.points.length < 2) return;
+    for (const stroke of allStrokes) {
+      if (!stroke || !stroke.points || stroke.points.length < 2) continue;
 
       ctx.beginPath();
       ctx.lineCap = 'round';

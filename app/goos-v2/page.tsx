@@ -3973,7 +3973,7 @@ function GoOSDemoContent() {
             {/* 3D ROTATING OBJECT - Glossy interlocking shapes as wallpaper */}
             {/* Note: FallingLetters temporarily disabled for 3D test */}
             {/* <FallingLetters isReady={bootPhase === 'ready'} textSize={470} headSize={336} /> */}
-            {bootPhase === 'ready' && <Rotating3DObject />}
+            <Rotating3DObject />
 
             {/* Bottom lava glow - static CSS only, seamless fade */}
             {!wallpaper && (
