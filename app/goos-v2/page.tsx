@@ -82,8 +82,7 @@ import { playSound } from '@/lib/sounds';
 import { CommandPalette } from '@/components/command-palette/CommandPalette';
 import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
-// import { FallingLetters } from '@/components/desktop/FallingLetters'; // Temporarily disabled for 3D wallpaper test
-const Rotating3DObject = dynamic(() => import('@/components/desktop/Rotating3DObject'), { ssr: false });
+import { FallingLetters } from '@/components/desktop/FallingLetters';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 
 // ============================================
@@ -1961,6 +1960,8 @@ interface SketchWindowProps {
     onClose: () => void;
     onFocus: () => void;
     children: React.ReactNode;
+    noDrag?: boolean;
+    centered?: boolean;
 }
 
 // Traffic light button with hover icon reveal
@@ -2011,7 +2012,7 @@ const TrafficLightButton = ({
     );
 };
 
-function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, height, onClose, onFocus, children }: SketchWindowProps) {
+function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, height, onClose, onFocus, children, noDrag, centered }: SketchWindowProps) {
     const [isClosing, setIsClosing] = useState(false);
     const [isHoveredTraffic, setIsHoveredTraffic] = useState(false);
 
@@ -2029,7 +2030,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
     // Using unified windowStyles values - calm-tech 2025
     return (
         <motion.div
-            drag
+            drag={!noDrag}
             dragMomentum={false}
             initial={fadeInScale.initial}
             animate={isClosing
@@ -2044,8 +2045,9 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
             onMouseDown={onFocus}
             className="fixed flex flex-col overflow-hidden"
             style={{
-                left: defaultX,
-                top: defaultY,
+                left: centered ? '50%' : defaultX,
+                top: centered ? '50%' : defaultY,
+                transform: centered ? 'translate(-50%, -50%)' : undefined,
                 width,
                 height,
                 zIndex,
@@ -2058,7 +2060,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
         >
             {/* Title Bar - unified 48px height, subtle border */}
             <div
-                className="flex items-center justify-between px-4 select-none cursor-move flex-shrink-0"
+                className={`flex items-center justify-between px-4 select-none flex-shrink-0 ${noDrag ? 'cursor-default' : 'cursor-move'}`}
                 style={{
                     height: 48,
                     background: 'var(--color-bg-base)',
@@ -2723,6 +2725,7 @@ function GoOSDemoContent() {
     const [showWallpaperPicker, setShowWallpaperPicker] = useState(false);
     const [asciiFilter, setAsciiFilter] = useState(false); // ASCII art filter for wallpapers
     const [asciiColorMode, setAsciiColorMode] = useState<'mono' | 'grey' | 'color'>('mono');
+    const [showFallingLetters, setShowFallingLetters] = useState(false); // Falling letters off by default
 
     // Load wallpaper from localStorage on mount
     useEffect(() => {
@@ -2739,6 +2742,11 @@ function GoOSDemoContent() {
         if (storedAsciiColor) {
             setAsciiColorMode(storedAsciiColor as 'mono' | 'grey' | 'color');
         }
+        // Load falling letters setting
+        const storedFallingLetters = localStorage.getItem('goos-falling-letters');
+        if (storedFallingLetters !== null) {
+            setShowFallingLetters(storedFallingLetters === 'true');
+        }
     }, []);
 
     // Save wallpaper to localStorage when changed
@@ -2751,6 +2759,11 @@ function GoOSDemoContent() {
         localStorage.setItem('goos-ascii-filter', String(asciiFilter));
         localStorage.setItem('goos-ascii-color', asciiColorMode);
     }, [asciiFilter, asciiColorMode]);
+
+    // Save falling letters setting to localStorage when changed
+    useEffect(() => {
+        localStorage.setItem('goos-falling-letters', String(showFallingLetters));
+    }, [showFallingLetters]);
 
     // Dark mode state
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -3970,10 +3983,10 @@ function GoOSDemoContent() {
                 />
             )}
 
-            {/* 3D ROTATING OBJECT - Glossy interlocking shapes as wallpaper */}
-            {/* Note: FallingLetters temporarily disabled for 3D test */}
-            {/* <FallingLetters isReady={bootPhase === 'ready'} textSize={470} headSize={336} /> */}
-            <Rotating3DObject />
+            {/* FALLING LETTERS - Physics-based "HELLO" letters (toggleable in settings) */}
+            {showFallingLetters && bootPhase === 'ready' && (
+                <FallingLetters isReady={true} textSize={470} headSize={336} />
+            )}
 
             {/* Bottom lava glow - static CSS only, seamless fade */}
             {!wallpaper && (
@@ -5187,7 +5200,7 @@ function GoOSDemoContent() {
                                 onFocus={() => focusApp('snake')}
                             />
 
-                            {/* Canvas - Drawing App */}
+                            {/* Canvas - Drawing App (non-draggable, centered) */}
                             <SketchWindow
                                 id="canvas"
                                 title="Canvas"
@@ -5199,12 +5212,14 @@ function GoOSDemoContent() {
                                 }
                                 isOpen={appWindows.canvas}
                                 zIndex={windowZ.canvas}
-                                defaultX={getWindowX(120)}
-                                defaultY={50}
-                                width={800}
-                                height={600}
+                                defaultX={0}
+                                defaultY={0}
+                                width={900}
+                                height={650}
                                 onClose={() => closeApp('canvas')}
                                 onFocus={() => focusApp('canvas')}
+                                noDrag
+                                centered
                             >
                                 <DrawingApp />
                             </SketchWindow>

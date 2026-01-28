@@ -335,9 +335,14 @@ export function DrawingApp() {
     // Don't call redraw() manually - let useEffect handle it
   }, [isPanning, tool, strokes, shapes]);
 
-  // Zoom with wheel
+  // Zoom with wheel - only when not drawing
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+
+    // Don't zoom while actively drawing
+    if (isDrawingRef.current) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -491,7 +496,7 @@ export function DrawingApp() {
         <div style={{ flex: 1 }} />
 
         {/* Zoom indicator */}
-        <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginRight: 8 }}>{Math.round(zoom * 100)}% v2</span>
+        <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginRight: 8 }}>{Math.round(zoom * 100)}%</span>
 
         {/* Export */}
         <button onClick={exportCanvas} style={{ height: 28, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 5, borderRadius: 6, border: 'none', background: 'var(--color-accent-primary)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
