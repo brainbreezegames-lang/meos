@@ -1,9 +1,31 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, Suspense, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Float } from "@react-three/drei";
 import * as THREE from "three";
+
+// Error boundary for Three.js canvas
+class CanvasErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return null; // Silently fail - don't show error in production
+    }
+    return this.props.children;
+  }
+}
 
 // Create a rounded bracket/C-shape geometry
 function createBracketShape(
@@ -139,6 +161,14 @@ interface Rotating3DObjectProps {
 }
 
 export function Rotating3DObject({ className }: Rotating3DObjectProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <div
       className={className || "fixed inset-0 overflow-hidden pointer-events-none"}
@@ -151,24 +181,28 @@ export function Rotating3DObject({ className }: Rotating3DObjectProps) {
       }}
       aria-hidden="true"
     >
-      <Canvas
-        camera={{ position: [0, 0, 8], fov: 45 }}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: "high-performance",
-        }}
-        style={{ background: "transparent" }}
-      >
-        <ambientLight intensity={0.4} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-        <directionalLight position={[-10, -10, -5]} intensity={0.3} color="#ffaa77" />
-        <pointLight position={[0, 5, 5]} intensity={0.5} color="#ffffff" />
+      <CanvasErrorBoundary>
+        <Suspense fallback={null}>
+          <Canvas
+            camera={{ position: [0, 0, 8], fov: 45 }}
+            gl={{
+              antialias: true,
+              alpha: true,
+              powerPreference: "high-performance",
+            }}
+            style={{ background: "transparent" }}
+          >
+            <ambientLight intensity={0.4} />
+            <directionalLight position={[10, 10, 5]} intensity={1} />
+            <directionalLight position={[-10, -10, -5]} intensity={0.3} color="#ffaa77" />
+            <pointLight position={[0, 5, 5]} intensity={0.5} color="#ffffff" />
 
-        <RotatingGroup />
+            <RotatingGroup />
 
-        <Environment preset="studio" />
-      </Canvas>
+            <Environment preset="studio" />
+          </Canvas>
+        </Suspense>
+      </CanvasErrorBoundary>
     </div>
   );
 }
