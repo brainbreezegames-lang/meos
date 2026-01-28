@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Sparkles, Loader2 } from 'lucide-react';
-import { SPRING } from '@/lib/animations';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowUp, Loader2 } from 'lucide-react';
 
 interface OnboardingPromptProps {
   isOpen: boolean;
@@ -12,43 +11,17 @@ interface OnboardingPromptProps {
   isLoading?: boolean;
 }
 
-// Floating orb component for ambient background
-const FloatingOrb = ({ delay, size, x, y, color }: {
-  delay: number;
-  size: number;
-  x: string;
-  y: string;
-  color: string;
-}) => (
-  <motion.div
-    className="absolute rounded-full pointer-events-none"
-    style={{
-      width: size,
-      height: size,
-      left: x,
-      top: y,
-      background: color,
-      filter: 'blur(60px)',
-    }}
-    animate={{
-      y: [0, -30, 0, 20, 0],
-      x: [0, 15, -10, 5, 0],
-      scale: [1, 1.1, 0.95, 1.05, 1],
-      opacity: [0.4, 0.6, 0.5, 0.55, 0.4],
-    }}
-    transition={{
-      duration: 12,
-      repeat: Infinity,
-      ease: 'easeInOut',
-      delay,
-    }}
-  />
-);
+// Quick start presets
+const PRESETS = [
+  { label: 'Designer portfolio', prompt: "I'm a designer looking to showcase my portfolio, case studies, and take on freelance clients" },
+  { label: 'Writing space', prompt: "I'm a writer who wants to share my articles, build a newsletter, and connect with readers" },
+  { label: 'Developer hub', prompt: "I'm a developer showcasing my projects, open source work, and technical blog" },
+  { label: 'Creative studio', prompt: "I run a creative studio and want to display our work, team, and services" },
+];
 
 export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false }: OnboardingPromptProps) {
   const [prompt, setPrompt] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const prefersReducedMotion = useReducedMotion();
 
   // Focus textarea when opened
   useEffect(() => {
@@ -68,6 +41,13 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isLoading, onClose]);
 
+  // Reset on close
+  useEffect(() => {
+    if (!isOpen) {
+      setPrompt('');
+    }
+  }, [isOpen]);
+
   const handleSubmit = () => {
     if (prompt.trim().length >= 10 && !isLoading) {
       onSubmit(prompt.trim());
@@ -75,114 +55,122 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSubmit();
     }
   };
 
-  const canSubmit = prompt.trim().length >= 10;
+  const handlePresetClick = (presetPrompt: string) => {
+    setPrompt(presetPrompt);
+    // Auto-submit after a brief delay
+    setTimeout(() => {
+      onSubmit(presetPrompt);
+    }, 100);
+  };
 
-  // Example prompts
-  const examples = [
-    "I'm a freelance motion designer looking to showcase my work and take on new clients",
-    "Writer building a space for my newsletter and blog posts",
-    "Product designer sharing case studies and my design process",
-    "Developer with side projects and open source contributions",
-  ];
+  const canSubmit = prompt.trim().length >= 10;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Background */}
-          <motion.div
+          {/* Sky background */}
+          <div
             className="absolute inset-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
             style={{
-              background: 'linear-gradient(145deg, #1a1714 0%, #0d0b09 50%, #151210 100%)',
+              background: 'linear-gradient(180deg, #a8c4d9 0%, #d4c4b0 50%, #e8d5c4 100%)',
             }}
           />
 
-          {/* Floating orbs */}
-          {!prefersReducedMotion && (
-            <>
-              <FloatingOrb delay={0} size={400} x="10%" y="20%" color="rgba(255, 119, 34, 0.15)" />
-              <FloatingOrb delay={2} size={300} x="70%" y="60%" color="rgba(139, 92, 246, 0.12)" />
-              <FloatingOrb delay={4} size={350} x="50%" y="10%" color="rgba(236, 72, 153, 0.1)" />
-              <FloatingOrb delay={1} size={250} x="80%" y="30%" color="rgba(34, 197, 94, 0.1)" />
-            </>
-          )}
-
-          {/* Subtle grid pattern */}
+          {/* Cloud texture overlay */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.03]"
+            className="absolute inset-0 opacity-60"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+                radial-gradient(ellipse 80% 50% at 20% 30%, rgba(255,255,255,0.8) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 70% 20%, rgba(255,255,255,0.6) 0%, transparent 50%),
+                radial-gradient(ellipse 90% 60% at 50% 80%, rgba(255,255,255,0.7) 0%, transparent 40%),
+                radial-gradient(ellipse 50% 30% at 80% 60%, rgba(255,255,255,0.5) 0%, transparent 50%),
+                radial-gradient(ellipse 70% 50% at 10% 70%, rgba(255,255,255,0.6) 0%, transparent 45%)
               `,
-              backgroundSize: '60px 60px',
             }}
           />
 
-          {/* Content */}
-          <div className="relative z-10 w-full max-w-2xl px-6">
-            {/* Header */}
-            <motion.div
-              className="text-center mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, ...SPRING.smooth }}
-            >
+          {/* Floating particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(8)].map((_, i) => (
               <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+                key={i}
+                className="absolute w-2 h-2 rounded-full bg-white/30"
                 style={{
-                  background: 'rgba(255, 119, 34, 0.1)',
-                  border: '1px solid rgba(255, 119, 34, 0.2)',
+                  left: `${10 + i * 12}%`,
+                  top: `${20 + (i % 3) * 25}%`,
                 }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Sparkles size={14} className="text-orange-400" />
-                <span className="text-xs font-medium text-orange-300/90">AI-Powered Setup</span>
-              </motion.div>
-
-              <h1
-                className="text-4xl md:text-5xl font-bold mb-4 tracking-tight"
-                style={{
-                  background: 'linear-gradient(135deg, #fff 0%, #a8a29e 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  lineHeight: 1.1,
+                animate={{
+                  y: [0, -20, 0],
+                  opacity: [0.3, 0.6, 0.3],
                 }}
-              >
-                Describe your space
-              </h1>
-              <p className="text-white/50 text-lg max-w-md mx-auto">
-                Tell us about yourself and what you want to build. We&apos;ll create the perfect setup.
-              </p>
-            </motion.div>
+                transition={{
+                  duration: 4 + i * 0.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: i * 0.4,
+                }}
+              />
+            ))}
+          </div>
 
-            {/* Input area */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
+          {/* Content */}
+          <div className="relative z-10 w-full max-w-2xl px-6 flex flex-col items-center">
+            {/* Logo */}
+            <motion.h1
+              className="text-6xl md:text-7xl font-light italic mb-6"
+              style={{
+                color: '#fff',
+                textShadow: '0 2px 20px rgba(0,0,0,0.1)',
+                fontFamily: 'Georgia, serif',
+              }}
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, ...SPRING.smooth }}
+              transition={{ delay: 0.1 }}
+            >
+              goOS
+            </motion.h1>
+
+            {/* Tagline */}
+            <motion.p
+              className="text-center text-lg md:text-xl mb-10 max-w-lg"
+              style={{
+                color: 'rgba(255,255,255,0.9)',
+                textShadow: '0 1px 10px rgba(0,0,0,0.1)',
+                lineHeight: 1.5,
+              }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              Your personal space on the internet. Describe what you&apos;re building, and watch your workspace come to life.
+            </motion.p>
+
+            {/* Input card */}
+            <motion.div
+              className="w-full"
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 25 }}
             >
               <div
                 className="relative rounded-2xl overflow-hidden"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+                  background: 'rgba(255,255,255,0.95)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
                 }}
               >
                 <textarea
@@ -190,100 +178,104 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="I'm a freelance designer who wants to showcase my portfolio, share case studies, and let clients book calls with me..."
+                  placeholder="Tell me about your work..."
                   disabled={isLoading}
-                  className="w-full h-40 px-6 py-5 bg-transparent text-white/90 placeholder-white/30 text-base resize-none outline-none"
+                  rows={3}
+                  className="w-full px-6 py-5 bg-transparent text-gray-800 placeholder-gray-400 text-lg resize-none outline-none"
                   style={{
-                    caretColor: '#ff7722',
                     lineHeight: 1.6,
                   }}
                 />
 
-                {/* Character count & submit */}
-                <div className="flex items-center justify-between px-6 py-4 border-t border-white/5">
-                  <span className="text-xs text-white/30">
-                    {prompt.length < 10 ? `${10 - prompt.length} more characters` : `${prompt.length} characters`}
-                  </span>
-
+                {/* Submit button */}
+                <div className="absolute bottom-4 right-4">
                   <motion.button
                     onClick={handleSubmit}
                     disabled={!canSubmit || isLoading}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-all"
                     style={{
-                      background: canSubmit
-                        ? 'linear-gradient(135deg, #ff7722 0%, #ff5500 100%)'
-                        : 'rgba(255, 255, 255, 0.05)',
-                      color: canSubmit ? '#fff' : 'rgba(255, 255, 255, 0.3)',
-                      boxShadow: canSubmit ? '0 4px 16px rgba(255, 119, 34, 0.3)' : 'none',
+                      background: canSubmit ? '#8b7355' : '#e5e5e5',
+                      color: canSubmit ? '#fff' : '#a0a0a0',
                     }}
-                    whileHover={canSubmit && !isLoading ? { scale: 1.02 } : {}}
-                    whileTap={canSubmit && !isLoading ? { scale: 0.98 } : {}}
+                    whileHover={canSubmit && !isLoading ? { scale: 1.05 } : {}}
+                    whileTap={canSubmit && !isLoading ? { scale: 0.95 } : {}}
                   >
                     {isLoading ? (
-                      <>
-                        <Loader2 size={16} className="animate-spin" />
-                        Building...
-                      </>
+                      <Loader2 size={18} className="animate-spin" />
                     ) : (
-                      <>
-                        Build my space
-                        <ArrowRight size={16} />
-                      </>
+                      <ArrowUp size={18} />
                     )}
                   </motion.button>
                 </div>
               </div>
-
-              {/* Keyboard hint */}
-              <p className="text-center text-xs text-white/20 mt-3">
-                Press <kbd className="px-1.5 py-0.5 rounded bg-white/5 text-white/30">⌘</kbd> + <kbd className="px-1.5 py-0.5 rounded bg-white/5 text-white/30">Enter</kbd> to submit
-              </p>
             </motion.div>
 
-            {/* Example prompts */}
+            {/* Preset buttons */}
             <motion.div
-              className="mt-10"
+              className="flex flex-wrap justify-center gap-3 mt-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.5 }}
             >
-              <p className="text-xs text-white/30 mb-3 text-center">Try one of these:</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {examples.map((example, i) => (
-                  <motion.button
-                    key={i}
-                    onClick={() => setPrompt(example)}
-                    className="px-3 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 transition-colors"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.05)',
-                    }}
-                    whileHover={{ scale: 1.02, borderColor: 'rgba(255, 255, 255, 0.1)' }}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + i * 0.05 }}
-                  >
-                    {example.slice(0, 50)}...
-                  </motion.button>
-                ))}
-              </div>
+              {PRESETS.map((preset, i) => (
+                <motion.button
+                  key={preset.label}
+                  onClick={() => handlePresetClick(preset.prompt)}
+                  disabled={isLoading}
+                  className="px-5 py-2.5 rounded-full text-sm font-medium transition-all"
+                  style={{
+                    background: 'rgba(255,255,255,0.7)',
+                    color: '#6b5c4c',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.5)',
+                  }}
+                  whileHover={{
+                    background: 'rgba(255,255,255,0.9)',
+                    scale: 1.02,
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.05 }}
+                >
+                  {preset.label}
+                </motion.button>
+              ))}
             </motion.div>
 
-            {/* Skip option */}
-            <motion.div
-              className="mt-8 text-center"
+            {/* Hint */}
+            <motion.p
+              className="mt-10 text-sm"
+              style={{ color: 'rgba(255,255,255,0.7)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.7 }}
             >
-              <button
-                onClick={onClose}
-                disabled={isLoading}
-                className="text-sm text-white/30 hover:text-white/50 transition-colors"
+              Press{' '}
+              <kbd
+                className="px-2 py-1 rounded text-xs font-medium"
+                style={{
+                  background: 'rgba(255,255,255,0.3)',
+                  color: 'rgba(255,255,255,0.9)',
+                }}
               >
-                Skip for now
-              </button>
-            </motion.div>
+                Enter
+              </kbd>
+              {' '}to build your space
+            </motion.p>
+
+            {/* Skip link */}
+            <motion.button
+              onClick={onClose}
+              disabled={isLoading}
+              className="mt-6 text-sm transition-opacity hover:opacity-100"
+              style={{ color: 'rgba(255,255,255,0.5)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+            >
+              Skip for now
+            </motion.button>
           </div>
         </motion.div>
       )}
