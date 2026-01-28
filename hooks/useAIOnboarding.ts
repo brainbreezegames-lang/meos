@@ -9,6 +9,7 @@ interface OnboardingState {
   intent: ParsedIntent | null;
   content: GeneratedContent | null;
   buildSequence: BuildSequence | null;
+  usedAI: boolean; // Track if real AI was used vs templates
 }
 
 // Grid positions for items (percentage-based)
@@ -93,6 +94,7 @@ export function useAIOnboarding() {
     intent: null,
     content: null,
     buildSequence: null,
+    usedAI: false,
   });
 
   const startOnboarding = useCallback(() => {
@@ -106,6 +108,7 @@ export function useAIOnboarding() {
       intent: null,
       content: null,
       buildSequence: null,
+      usedAI: false,
     });
   }, []);
 
@@ -130,7 +133,8 @@ export function useAIOnboarding() {
       }
 
       const intent = intentData.data as ParsedIntent;
-      setState(prev => ({ ...prev, intent, phase: 'generating' }));
+      const usedAI = intentData.meta?.usedAI ?? false;
+      setState(prev => ({ ...prev, intent, usedAI, phase: 'generating' }));
 
       // Step 2: Generate content
       const contentResponse = await fetch('/api/ai/generate-content', {
@@ -180,6 +184,7 @@ export function useAIOnboarding() {
       intent: null,
       content: null,
       buildSequence: null,
+      usedAI: false,
     });
   }, []);
 

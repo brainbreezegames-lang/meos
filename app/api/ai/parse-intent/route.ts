@@ -119,12 +119,25 @@ export async function POST(request: NextRequest) {
         console.error('AI parsing failed, using fallback:', aiError);
         // Use fallback template-based approach
         intent = generateFallbackIntent(prompt);
+        // Return with fallback indicator
+        return NextResponse.json({
+          success: true,
+          data: intent,
+          meta: {
+            usedAI: false,
+            fallbackReason: 'AI parsing failed',
+          },
+        });
       }
     }
 
     return NextResponse.json({
       success: true,
       data: intent,
+      meta: {
+        usedAI: !!process.env.GEMINI_API_KEY,
+        model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+      },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

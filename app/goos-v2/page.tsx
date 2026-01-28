@@ -5828,6 +5828,7 @@ function GoOSDemoContent() {
                 items={onboarding.buildSequence?.items || []}
                 summary={onboarding.intent?.summary || 'Setting up your space...'}
                 understanding={onboarding.intent?.understanding}
+                usedAI={onboarding.usedAI}
                 onComplete={handleOnboardingComplete}
             />
 

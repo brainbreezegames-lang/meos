@@ -258,9 +258,9 @@ export function detectTemplate(input: string): BaseTemplate {
  */
 export function extractUserType(input: string): string {
   const patterns = [
-    /i(?:'m| am) (?:a |an )?([a-z\s]+?)(?:\.|,|who|based|and|working)/i,
-    /([a-z\s]+?) (?:looking|wanting|need)/i,
-    /^([a-z\s]+?) here/i,
+    /i(?:'m| am) (?:a |an )?([a-z\s-]+?)(?:\.|,|who|based|and|working|specializ)/i,
+    /([a-z\s-]+?) (?:looking|wanting|need)/i,
+    /^([a-z\s-]+?) here/i,
   ];
 
   for (const pattern of patterns) {
@@ -274,23 +274,156 @@ export function extractUserType(input: string): string {
 }
 
 /**
+ * Extract specific niche/specialty from input
+ */
+function extractNiche(input: string): string | null {
+  const patterns = [
+    /specializ(?:e|ing) in ([a-z\s,]+?)(?:\.|,|and|who)/i,
+    /focus(?:ed|ing)? on ([a-z\s,]+?)(?:\.|,|and)/i,
+    /(?:do|create|make|build) ([a-z\s,]+?)(?:\.|,|for|that)/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = input.match(pattern);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  return null;
+}
+
+/**
+ * Extract location from input
+ */
+function extractLocation(input: string): string | null {
+  const match = input.match(/(?:based in|from|in) ([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Create personalized folder names based on user input
+ */
+function createPersonalizedFolders(input: string, template: BaseTemplate): Array<{ name: string; reason: string }> {
+  const lowercaseInput = input.toLowerCase();
+
+  // Check for specific mentions to create personalized folders
+  const folderSuggestions: Array<{ keywords: string[]; folder: { name: string; reason: string } }> = [
+    { keywords: ['wedding', 'weddings'], folder: { name: 'Weddings', reason: 'Showcase your wedding photography work' } },
+    { keywords: ['portrait', 'portraits'], folder: { name: 'Portraits', reason: 'Display your portrait sessions' } },
+    { keywords: ['engagement', 'couples'], folder: { name: 'Engagement Sessions', reason: 'Feature your engagement photo shoots' } },
+    { keywords: ['startup', 'startups'], folder: { name: 'Startup Projects', reason: 'Showcase your work with startups' } },
+    { keywords: ['app', 'apps', 'mobile'], folder: { name: 'App Designs', reason: 'Display your app design work' } },
+    { keywords: ['brand', 'branding'], folder: { name: 'Brand Work', reason: 'Showcase your branding projects' } },
+    { keywords: ['web', 'website'], folder: { name: 'Web Projects', reason: 'Feature your web design work' } },
+    { keywords: ['product'], folder: { name: 'Product Design', reason: 'Showcase your product design work' } },
+    { keywords: ['newsletter', 'essays'], folder: { name: 'Writing', reason: 'Organize your published writing' } },
+    { keywords: ['open source', 'github'], folder: { name: 'Open Source', reason: 'Highlight your open source contributions' } },
+    { keywords: ['client', 'clients'], folder: { name: 'Client Work', reason: 'Organize your client projects' } },
+  ];
+
+  const folders: Array<{ name: string; reason: string }> = [];
+
+  for (const { keywords, folder } of folderSuggestions) {
+    if (keywords.some(k => lowercaseInput.includes(k))) {
+      folders.push(folder);
+      if (folders.length >= 2) break;
+    }
+  }
+
+  // If no specific folders found, use template defaults
+  if (folders.length === 0) {
+    return TEMPLATE_CONFIGS[template].folders;
+  }
+
+  return folders;
+}
+
+/**
+ * Create personalized notes based on user input
+ */
+function createPersonalizedNotes(input: string, userType: string, template: BaseTemplate): Array<{ title: string; type: FileType; reason: string }> {
+  const niche = extractNiche(input);
+  const notes: Array<{ title: string; type: FileType; reason: string }> = [];
+
+  // Always add an About note with personalized title
+  if (userType.length > 3) {
+    notes.push({
+      title: `About Me`,
+      type: 'note',
+      reason: `Tell visitors about your work as a ${userType}`,
+    });
+  } else {
+    notes.push({
+      title: 'About Me',
+      type: 'note',
+      reason: 'Introduce yourself and your work',
+    });
+  }
+
+  // Add a featured work note based on what they do
+  if (niche) {
+    notes.push({
+      title: `${niche.charAt(0).toUpperCase() + niche.slice(1)} Showcase`,
+      type: 'case-study',
+      reason: `Highlight your best ${niche} work`,
+    });
+  } else {
+    // Fallback to template notes
+    const templateNotes = TEMPLATE_CONFIGS[template].notes.filter(n => n.type === 'case-study');
+    if (templateNotes.length > 0) {
+      notes.push(templateNotes[0]);
+    } else {
+      notes.push({
+        title: 'Featured Work',
+        type: 'case-study',
+        reason: 'Showcase your best project',
+      });
+    }
+  }
+
+  return notes;
+}
+
+/**
  * Generate fallback intent (when AI is unavailable)
  */
 export function generateFallbackIntent(input: string): ParsedIntent {
   const template = detectTemplate(input);
   const config = TEMPLATE_CONFIGS[template];
   const userType = extractUserType(input);
+  const niche = extractNiche(input);
+  const location = extractLocation(input);
+
+  // Create personalized folders and notes based on input
+  const folders = createPersonalizedFolders(input, template);
+  const notes = createPersonalizedNotes(input, userType, template);
+
+  // Create personalized understanding
+  let understanding = `I see you're a ${userType}`;
+  if (niche) {
+    understanding += ` specializing in ${niche}`;
+  }
+  if (location) {
+    understanding += ` based in ${location}`;
+  }
+  understanding += `. I'll set up a space to showcase your work and help visitors connect with you.`;
+
+  // Create personalized status
+  let statusText = config.statusText;
+  if (niche) {
+    statusText = `Taking on ${niche} projects`;
+  }
 
   return {
     userType,
     baseTemplate: config.baseTemplate,
-    understanding: config.understanding,
+    understanding,
     widgets: config.widgets,
-    folders: config.folders,
-    notes: config.notes,
-    statusText: config.statusText,
+    folders,
+    notes,
+    statusText,
     tone: config.tone,
-    summary: `Setting up a ${template} space for ${userType}`,
+    summary: `Creating a ${template} space for ${userType}`,
   };
 }
 
@@ -302,11 +435,29 @@ export function generateFallbackContent(intent: ParsedIntent): GeneratedContent 
   const content: GeneratedContent = {};
 
   for (const note of intent.notes) {
+    // Check if we have a matching template
     if (templateContent[note.title]) {
       content[note.title] = templateContent[note.title];
-    } else {
+    } else if (note.title === 'About Me' || note.title.startsWith('About')) {
+      // Personalized About content
+      content[note.title] = `<h1>Hey, I'm [Your Name]</h1>
+<p>I'm a ${intent.userType} passionate about creating work that makes a difference.</p>
+<p>My approach combines creativity with purpose—every project is an opportunity to solve problems and create something meaningful.</p>
+<p><strong>Let's work together.</strong></p>`;
+    } else if (note.type === 'case-study') {
+      // Personalized case study content
       content[note.title] = `<h1>${note.title}</h1>
-<p>Add your content here. This is your space to share your story.</p>`;
+<h2>The Challenge</h2>
+<p>Describe the problem you solved and why it mattered.</p>
+<h2>The Approach</h2>
+<p>Explain your process and the key decisions you made.</p>
+<h2>The Results</h2>
+<p>Share the impact and outcomes of your work.</p>`;
+    } else {
+      // Generic but helpful placeholder
+      content[note.title] = `<h1>${note.title}</h1>
+<p>Share your story here. What makes your work unique? What drives you?</p>
+<p>This is your space—make it yours.</p>`;
     }
   }
 

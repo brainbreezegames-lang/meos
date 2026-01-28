@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, FileText, Folder, Layout, MessageSquare } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
@@ -11,6 +11,7 @@ interface BuildAnimationProps {
   items: BuildItem[];
   summary: string;
   understanding?: string;
+  usedAI?: boolean;
   onComplete: () => void;
 }
 
@@ -27,22 +28,35 @@ const ICON_MAP: Record<string, typeof FileText> = {
   'case-study': FileText,
 };
 
-export function BuildAnimation({ isActive, items, summary, understanding, onComplete }: BuildAnimationProps) {
+export function BuildAnimation({ isActive, items, summary, understanding, usedAI = false, onComplete }: BuildAnimationProps) {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [showUnderstanding, setShowUnderstanding] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
+  // Use refs to prevent multiple calls and track callback
+  const hasCompletedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  // Reset state when isActive changes
+  useEffect(() => {
+    if (!isActive) {
+      setCurrentIndex(-1);
+      setShowUnderstanding(false);
+      setIsComplete(false);
+      hasCompletedRef.current = false;
+    }
+  }, [isActive]);
+
   // Show understanding first, then start building
   useEffect(() => {
-    if (!isActive || items.length === 0) return;
+    if (!isActive || items.length === 0 || hasCompletedRef.current) return;
 
-    // Show understanding message first
     const understandingTimeout = setTimeout(() => {
       setShowUnderstanding(true);
       playSound('bubble');
     }, 300);
 
-    // Start building after understanding is shown
     const buildTimeout = setTimeout(() => {
       setCurrentIndex(0);
       playSound('bubble');
@@ -56,7 +70,7 @@ export function BuildAnimation({ isActive, items, summary, understanding, onComp
 
   // Progress through items
   useEffect(() => {
-    if (currentIndex < 0 || currentIndex >= items.length) return;
+    if (currentIndex < 0 || currentIndex >= items.length || hasCompletedRef.current) return;
 
     const item = items[currentIndex];
     const delay = item.delay || 600;
@@ -67,16 +81,20 @@ export function BuildAnimation({ isActive, items, summary, understanding, onComp
       if (currentIndex < items.length - 1) {
         setCurrentIndex(currentIndex + 1);
       } else {
-        setTimeout(() => {
+        // Mark as complete and call callback ONCE
+        if (!hasCompletedRef.current) {
+          hasCompletedRef.current = true;
           setIsComplete(true);
           playSound('expand');
-          setTimeout(onComplete, 1500);
-        }, 800);
+          setTimeout(() => {
+            onCompleteRef.current();
+          }, 1500);
+        }
       }
     }, delay);
 
     return () => clearTimeout(timeout);
-  }, [currentIndex, items, onComplete]);
+  }, [currentIndex, items]);
 
   const getItemIcon = (item: BuildItem) => {
     const iconType = item.type === 'widget' ? item.widgetType : item.fileType;
@@ -129,18 +147,37 @@ export function BuildAnimation({ isActive, items, summary, understanding, onComp
                       border: '1px solid #e5e5e5',
                     }}
                   >
-                    <p
-                      className="text-xs uppercase tracking-wide mb-2 font-medium"
-                      style={{ color: '#a3a3a3' }}
-                    >
-                      What I understood
-                    </p>
+                    <div className="flex items-center justify-between mb-2">
+                      <p
+                        className="text-xs uppercase tracking-wide font-medium"
+                        style={{ color: '#a3a3a3' }}
+                      >
+                        What I understood
+                      </p>
+                      <span
+                        className="text-[10px] px-2 py-0.5 rounded-full"
+                        style={{
+                          background: usedAI ? '#dcfce7' : '#fef3c7',
+                          color: usedAI ? '#166534' : '#92400e',
+                        }}
+                      >
+                        {usedAI ? 'AI-powered' : 'Template mode'}
+                      </span>
+                    </div>
                     <p
                       className="text-sm leading-relaxed"
                       style={{ color: '#525252' }}
                     >
                       {understanding}
                     </p>
+                    {!usedAI && (
+                      <p
+                        className="text-xs mt-2"
+                        style={{ color: '#a3a3a3' }}
+                      >
+                        For fully personalized results, configure GEMINI_API_KEY
+                      </p>
+                    )}
                   </div>
                 </motion.div>
               )}
