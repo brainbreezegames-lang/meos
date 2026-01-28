@@ -113,34 +113,53 @@ For case-studies, include sections: Overview, Challenge, Approach, Results
 
 Return just the HTML content, nothing else.`;
 
-async function callGemini(prompt: string): Promise<string> {
+async function callGemini(prompt: string, retries = 2): Promise<string> {
   if (!GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY not configured');
   }
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2000,
-        },
-      }),
-    }
-  );
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 2000,
+            },
+          }),
+        }
+      );
 
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('Gemini error:', error);
-    throw new Error(`Gemini API error: ${response.status}`);
+      if (response.status === 429) {
+        // Rate limited - wait and retry
+        if (attempt < retries) {
+          console.log(`Rate limited, waiting before retry ${attempt + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
+          continue;
+        }
+        throw new Error('AI service is busy. Please try again in a moment.');
+      }
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('Gemini error:', error);
+        throw new Error(`AI service error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } catch (err) {
+      if (attempt === retries) throw err;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
   }
 
-  const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  throw new Error('AI service unavailable');
 }
 
 function extractJSON(text: string): unknown {
@@ -157,6 +176,62 @@ function extractJSON(text: string): unknown {
   }
 
   throw new Error('No valid JSON found in response');
+}
+
+// Fallback when AI is unavailable
+function createFallbackResponse(prompt: string) {
+  // Extract basic info from prompt
+  const lowerPrompt = prompt.toLowerCase();
+  let profession = 'creative professional';
+  let niche = 'your work';
+
+  if (lowerPrompt.includes('photographer')) {
+    profession = 'photographer';
+    niche = 'photography';
+  } else if (lowerPrompt.includes('designer')) {
+    profession = 'designer';
+    niche = 'design';
+  } else if (lowerPrompt.includes('developer') || lowerPrompt.includes('engineer')) {
+    profession = 'developer';
+    niche = 'development';
+  } else if (lowerPrompt.includes('writer') || lowerPrompt.includes('author')) {
+    profession = 'writer';
+    niche = 'writing';
+  }
+
+  return {
+    understanding: `I understand you're a ${profession}. Let me set up a workspace to showcase ${niche} and help visitors connect with you.`,
+    items: [
+      {
+        id: `item-${Date.now()}-about`,
+        type: 'file',
+        fileType: 'note',
+        title: 'About Me',
+        content: `<h1>Hey, I'm [Your Name]</h1>
+<p>I'm a ${profession} passionate about creating meaningful work.</p>
+<p>My approach combines creativity with purpose—every project is an opportunity to solve problems and create something valuable.</p>
+<p><strong>Let's work together.</strong></p>`,
+        purpose: 'Introduce yourself to visitors',
+      },
+      {
+        id: `item-${Date.now()}-work`,
+        type: 'file',
+        fileType: 'case-study',
+        title: 'Featured Project',
+        content: `<h1>Featured Project</h1>
+<h2>Overview</h2>
+<p>Describe your project and what made it special.</p>
+<h2>The Challenge</h2>
+<p>What problem were you solving?</p>
+<h2>The Approach</h2>
+<p>How did you tackle it?</p>
+<h2>Results</h2>
+<p>What was the impact?</p>`,
+        purpose: 'Showcase your best work',
+      },
+    ],
+    summary: `Setting up a workspace for a ${profession}`,
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -177,17 +252,52 @@ export async function POST(request: NextRequest) {
           return;
         }
 
+        let useFallback = false;
+        let understanding: Record<string, unknown> = {};
+
         // ========== PHASE 1: UNDERSTANDING ==========
         send('phase', { phase: 'understanding', message: 'Understanding your needs...' });
 
-        const understandingPrompt = UNDERSTANDING_PROMPT.replace('{input}', prompt);
-        const understandingRaw = await callGemini(understandingPrompt);
-
-        let understanding: Record<string, unknown>;
         try {
+          const understandingPrompt = UNDERSTANDING_PROMPT.replace('{input}', prompt);
+          const understandingRaw = await callGemini(understandingPrompt);
           understanding = extractJSON(understandingRaw) as Record<string, unknown>;
-        } catch {
-          send('error', { message: 'Failed to understand request' });
+        } catch (aiError) {
+          console.error('AI understanding failed, using fallback:', aiError);
+          useFallback = true;
+        }
+
+        if (useFallback) {
+          // Use fallback when AI fails
+          const fallback = createFallbackResponse(prompt);
+
+          send('understanding', {
+            summary: fallback.understanding,
+            identity: { profession: 'professional' },
+            tone: 'professional',
+          });
+
+          send('phase', { phase: 'planning', message: 'Designing your space...' });
+          send('plan', {
+            summary: fallback.summary,
+            reasoning: 'Using quick setup mode',
+            itemCount: fallback.items.length,
+          });
+
+          send('phase', { phase: 'building', message: 'Creating your components...' });
+
+          for (const item of fallback.items) {
+            send('building', { name: item.title, type: item.fileType, purpose: item.purpose });
+            await new Promise(resolve => setTimeout(resolve, 400));
+            send('created', { item, remaining: 0 });
+          }
+
+          send('complete', {
+            items: fallback.items,
+            summary: fallback.summary,
+            understanding: fallback.understanding,
+          });
+
           controller.close();
           return;
         }
