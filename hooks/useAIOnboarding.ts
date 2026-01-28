@@ -14,16 +14,16 @@ interface OnboardingState {
 // Grid positions for items (percentage-based)
 const GRID_POSITIONS = {
   widgets: [
-    { x: 82, y: 15 },  // Top right
-    { x: 82, y: 35 },  // Right side
-    { x: 82, y: 55 },  // Right side lower
+    { x: 82, y: 15 },
+    { x: 82, y: 35 },
+    { x: 82, y: 55 },
   ],
   folders: [
-    { x: 5, y: 25 },   // Left side
-    { x: 18, y: 25 },  // Left side
+    { x: 5, y: 25 },
+    { x: 18, y: 25 },
   ],
   notes: [
-    { x: 5, y: 45 },   // Below folders
+    { x: 5, y: 45 },
     { x: 18, y: 45 },
     { x: 31, y: 45 },
     { x: 5, y: 65 },
@@ -34,36 +34,35 @@ const GRID_POSITIONS = {
 
 function generateBuildSequence(intent: ParsedIntent, content: GeneratedContent): BuildSequence {
   const items: BuildItem[] = [];
-  let delay = 0;
-  const BASE_DELAY = 250;
+  const BASE_DELAY = 400;
 
   // Add widgets first
-  intent.widgets.forEach((widgetType, index) => {
+  intent.widgets.forEach((widget, index) => {
     const pos = GRID_POSITIONS.widgets[index] || { x: 82, y: 15 + index * 20 };
     items.push({
-      id: `widget-${widgetType}-${Date.now()}-${index}`,
+      id: `widget-${widget.type}-${Date.now()}-${index}`,
       type: 'widget',
-      widgetType: widgetType,
-      title: widgetType.charAt(0).toUpperCase() + widgetType.slice(1),
+      widgetType: widget.type,
+      title: widget.type.charAt(0).toUpperCase() + widget.type.slice(1),
+      reason: widget.reason,
       position: pos,
-      config: widgetType === 'status' ? { text: intent.statusText } : {},
+      config: widget.type === 'status' ? { text: intent.statusText } : {},
       delay: BASE_DELAY,
     });
-    delay += BASE_DELAY;
   });
 
   // Add folders
-  intent.folders.forEach((folderName, index) => {
+  intent.folders.forEach((folder, index) => {
     const pos = GRID_POSITIONS.folders[index] || { x: 5 + index * 13, y: 25 };
     items.push({
-      id: `folder-${folderName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}-${index}`,
+      id: `folder-${folder.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}-${index}`,
       type: 'file',
       fileType: 'folder',
-      title: folderName,
+      title: folder.name,
+      reason: folder.reason,
       position: pos,
       delay: BASE_DELAY,
     });
-    delay += BASE_DELAY;
   });
 
   // Add notes/files
@@ -74,16 +73,16 @@ function generateBuildSequence(intent: ParsedIntent, content: GeneratedContent):
       type: 'file',
       fileType: note.type as BuildItem['fileType'],
       title: note.title,
+      reason: note.reason,
       content: content[note.title] || '',
       position: pos,
       delay: BASE_DELAY,
     });
-    delay += BASE_DELAY;
   });
 
   return {
     items,
-    totalDuration: delay + 1000, // Extra buffer for completion
+    totalDuration: items.length * BASE_DELAY + 2000,
   };
 }
 

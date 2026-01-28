@@ -14,11 +14,19 @@ const requestSchema = z.object({
 const intentSchema = z.object({
   userType: z.string(),
   baseTemplate: z.enum(['portfolio', 'business', 'writing', 'creative', 'personal', 'developer', 'agency']),
-  widgets: z.array(z.enum(['status', 'clock', 'contact', 'book', 'tipjar', 'links', 'feedback'])),
-  folders: z.array(z.string()),
+  understanding: z.string(),
+  widgets: z.array(z.object({
+    type: z.enum(['status', 'clock', 'contact', 'book', 'tipjar', 'links', 'feedback']),
+    reason: z.string(),
+  })),
+  folders: z.array(z.object({
+    name: z.string(),
+    reason: z.string(),
+  })),
   notes: z.array(z.object({
     title: z.string(),
     type: z.enum(['note', 'case-study', 'folder', 'image', 'link', 'embed', 'download', 'cv']),
+    reason: z.string(),
   })),
   statusText: z.string(),
   tone: z.enum(['professional', 'casual', 'creative', 'minimal', 'playful']),

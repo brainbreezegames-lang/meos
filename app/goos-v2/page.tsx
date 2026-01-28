@@ -5866,6 +5866,7 @@ function GoOSDemoContent() {
                 isActive={onboarding.isBuilding}
                 items={onboarding.buildSequence?.items || []}
                 summary={onboarding.intent?.summary || 'Setting up your space...'}
+                understanding={onboarding.intent?.understanding}
                 onComplete={handleOnboardingComplete}
             />
 

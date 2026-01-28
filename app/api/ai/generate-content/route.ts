@@ -11,11 +11,19 @@ const requestSchema = z.object({
   intent: z.object({
     userType: z.string(),
     baseTemplate: z.string(),
-    widgets: z.array(z.string()),
-    folders: z.array(z.string()),
+    understanding: z.string(),
+    widgets: z.array(z.object({
+      type: z.string(),
+      reason: z.string(),
+    })),
+    folders: z.array(z.object({
+      name: z.string(),
+      reason: z.string(),
+    })),
     notes: z.array(z.object({
       title: z.string(),
       type: z.string(),
+      reason: z.string(),
     })),
     statusText: z.string(),
     tone: z.string(),

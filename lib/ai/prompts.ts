@@ -42,45 +42,51 @@ TONES:
 - playful: Fun, energetic, quirky
 
 Instructions:
-1. Analyze the user's prompt to understand their profession, goals, and style
-2. Select the most appropriate base template
-3. Choose relevant widgets (usually 2-4)
-4. Suggest folders for organization (usually 1-3)
-5. Suggest notes/files to create (usually 3-6)
-6. Determine the right tone
-7. Write a brief status message that fits their vibe
+1. DEEPLY analyze the user's prompt - extract their profession, specific work they do, clients they serve, and their unique positioning
+2. Select the base template that best fits their needs
+3. Choose 2-3 widgets that would genuinely help them (not just defaults)
+4. Create folders that match THEIR specific work categories (e.g. a wedding photographer needs "Weddings", "Portraits" not generic "Projects")
+5. Create notes that are SPECIFIC to their work - titles should reflect what THEY would actually name things
+6. Match the tone to how they described themselves
+7. Write a status message in THEIR voice based on how they wrote
+
+CRITICAL: Every element must feel personalized to THIS specific person. If they say "wedding photographer", folders should be "Weddings", "Engagement Sessions", "Couples". If they say "UI designer for startups", folders should be "Startup Projects", "Design Systems". Never use generic names like "Projects" or "Work".
 
 Return ONLY valid JSON in this exact format:
 {
-  "userType": "string describing their profession/type",
+  "userType": "string describing their profession/type (e.g. 'wedding photographer', 'startup UI designer')",
   "baseTemplate": "one of the template options",
-  "widgets": ["array", "of", "widget", "types"],
-  "folders": ["array", "of", "folder", "names"],
-  "notes": [
-    { "title": "Note Title", "type": "note" },
-    { "title": "Case Study Title", "type": "case-study" }
+  "understanding": "2-3 sentences explaining what you understood from their prompt. Be specific - mention their niche, style, clients, or goals you detected.",
+  "widgets": [
+    { "type": "status", "reason": "Why this widget helps them specifically" },
+    { "type": "contact", "reason": "Why this widget helps them specifically" }
   ],
-  "statusText": "Their availability/status message",
+  "folders": [
+    { "name": "Specific Folder Name", "reason": "Why this organization makes sense for them" }
+  ],
+  "notes": [
+    { "title": "Specific Note Title", "type": "note", "reason": "Why they need this specific document" }
+  ],
+  "statusText": "Status message written in THEIR voice",
   "tone": "one of the tone options",
   "summary": "Brief one-line summary of what you're building for them"
 }`;
 
-export const CONTENT_GENERATOR_SYSTEM_PROMPT = `You are a creative copywriter helping set up a personal workspace. Generate sample content for notes that feels personal, not generic.
+export const CONTENT_GENERATOR_SYSTEM_PROMPT = `You are helping a creative professional write the actual content for their personal workspace. Your job is to write REAL, SPECIFIC content based on what they told you about themselves.
 
 Guidelines:
-- Write in first person
-- Keep each note under 150 words
-- Use [brackets] for things they should customize (like [your name], [your city])
-- Match the tone specified
-- Be specific to their profession/type
-- Make it feel like a real person wrote it, not a template
-- Use markdown-compatible HTML: <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>
+- Write in first person AS IF YOU ARE THEM
+- Reference specific details from their prompt (their niche, style, clients, approach)
+- Keep each note 100-200 words - enough to be useful, not filler
+- Use [Your Name] only for their name, but fill in EVERYTHING else based on what they said
+- If they said "wedding photographer" write about wedding photography specifically
+- If they said "UI designer for startups" write about startup design specifically
+- Match their energy - casual person = casual writing, professional = polished
+- Use HTML: <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>
 
-Return ONLY valid JSON where keys are note titles and values are HTML content:
-{
-  "About Me": "<h1>Hey, I'm [Your Name]</h1><p>I'm a [profession] based in [city]...</p>",
-  "Services": "<h2>What I Do</h2><ul><li>Service one</li><li>Service two</li></ul>"
-}`;
+CRITICAL: The content must feel like THEY wrote it based on THEIR unique situation. Not generic templates. If you don't have info, make educated guesses based on their profession rather than using placeholders.
+
+Return ONLY valid JSON where keys are note titles and values are HTML content.`;
 
 export function buildIntentParserPrompt(userInput: string): string {
   return `User prompt: "${userInput}"
@@ -92,19 +98,21 @@ export function buildContentGeneratorPrompt(
   userType: string,
   tone: string,
   userInput: string,
-  notes: Array<{ title: string; type: string }>
+  notes: Array<{ title: string; type: string; reason?: string }>
 ): string {
   const noteList = notes
     .filter(n => n.type === 'note' || n.type === 'case-study')
-    .map(n => `- ${n.title} (${n.type})`)
+    .map(n => `- "${n.title}" (${n.type})${n.reason ? ` - Purpose: ${n.reason}` : ''}`)
     .join('\n');
 
   return `User type: ${userType}
 Tone: ${tone}
 User's original description: "${userInput}"
 
-Generate content for these notes:
+Generate personalized content for these specific documents:
 ${noteList}
+
+Remember: Write as if you ARE this person. Use their specific niche, style, and situation. Make it feel real and useful, not templated.
 
 Return the JSON with content for each note.`;
 }

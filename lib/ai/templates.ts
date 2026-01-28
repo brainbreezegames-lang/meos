@@ -3,7 +3,7 @@
  * Used when AI is unavailable or as base configurations
  */
 
-import type { ParsedIntent, GeneratedContent, BaseTemplate } from './types';
+import type { ParsedIntent, GeneratedContent, BaseTemplate, WidgetType, FileType } from './types';
 
 // Keywords that map to templates
 const TEMPLATE_KEYWORDS: Record<BaseTemplate, string[]> = {
@@ -16,88 +16,131 @@ const TEMPLATE_KEYWORDS: Record<BaseTemplate, string[]> = {
   agency: ['agency', 'team', 'company', 'firm', 'collective', 'group'],
 };
 
-// Default configurations per template
-const TEMPLATE_CONFIGS: Record<BaseTemplate, Omit<ParsedIntent, 'userType' | 'summary'>> = {
+// Default configurations per template with explanations
+interface TemplateConfig {
+  baseTemplate: BaseTemplate;
+  understanding: string;
+  widgets: Array<{ type: WidgetType; reason: string }>;
+  folders: Array<{ name: string; reason: string }>;
+  notes: Array<{ title: string; type: FileType; reason: string }>;
+  statusText: string;
+  tone: 'professional' | 'casual' | 'creative' | 'minimal' | 'playful';
+}
+
+const TEMPLATE_CONFIGS: Record<BaseTemplate, TemplateConfig> = {
   portfolio: {
     baseTemplate: 'portfolio',
-    widgets: ['status', 'contact', 'links'],
-    folders: ['Projects', 'Archive'],
+    understanding: 'I see you\'re a creative professional looking to showcase your work. You\'ll need a space to display projects, share your story, and make it easy for potential clients to reach you.',
+    widgets: [
+      { type: 'status', reason: 'Let visitors know if you\'re available for new projects' },
+      { type: 'contact', reason: 'Make it easy for potential clients to reach out' },
+    ],
+    folders: [
+      { name: 'Projects', reason: 'A place to organize your portfolio pieces by project' },
+    ],
     notes: [
-      { title: 'About Me', type: 'note' },
-      { title: 'Featured Project', type: 'case-study' },
-      { title: 'Services', type: 'note' },
+      { title: 'About Me', type: 'note', reason: 'Tell your story and what makes your work unique' },
+      { title: 'Featured Work', type: 'case-study', reason: 'Showcase your best project with context and results' },
     ],
     statusText: 'Available for projects',
     tone: 'creative',
   },
   business: {
     baseTemplate: 'business',
-    widgets: ['status', 'contact', 'book'],
-    folders: ['Client Work'],
+    understanding: 'You\'re running a service-based business and need a professional space to present your offerings, build trust, and convert visitors into clients.',
+    widgets: [
+      { type: 'status', reason: 'Show your current availability for new clients' },
+      { type: 'contact', reason: 'Capture leads and make booking easy' },
+    ],
+    folders: [
+      { name: 'Client Work', reason: 'Showcase successful projects and testimonials' },
+    ],
     notes: [
-      { title: 'About', type: 'note' },
-      { title: 'Services', type: 'note' },
-      { title: 'Process', type: 'note' },
+      { title: 'About', type: 'note', reason: 'Build trust by sharing your background and approach' },
+      { title: 'Services', type: 'note', reason: 'Clearly outline what you offer and how you help' },
     ],
     statusText: 'Open for new clients',
     tone: 'professional',
   },
   writing: {
     baseTemplate: 'writing',
-    widgets: ['status', 'links', 'feedback'],
-    folders: ['Essays', 'Drafts'],
+    understanding: 'You\'re a writer looking to share your work, build an audience, and connect with readers. Your space should feel personal and make your writing the focus.',
+    widgets: [
+      { type: 'status', reason: 'Share what you\'re currently working on' },
+      { type: 'links', reason: 'Connect readers to your newsletter, social, or publications' },
+    ],
+    folders: [
+      { name: 'Essays', reason: 'Organize your published pieces by topic or date' },
+    ],
     notes: [
-      { title: 'About Me', type: 'note' },
-      { title: 'Latest Post', type: 'note' },
-      { title: 'Newsletter', type: 'note' },
+      { title: 'About Me', type: 'note', reason: 'Let readers know who you are and what you write about' },
+      { title: 'Latest Post', type: 'note', reason: 'Feature your most recent or best piece' },
     ],
     statusText: 'Writing new things',
     tone: 'casual',
   },
   creative: {
     baseTemplate: 'creative',
-    widgets: ['status', 'contact', 'tipjar'],
-    folders: ['Experiments', 'Collaborations'],
+    understanding: 'You\'re a multi-disciplinary creative who doesn\'t fit into one box. Your space should be flexible enough to hold different types of work and experiments.',
+    widgets: [
+      { type: 'status', reason: 'Share what you\'re currently making' },
+      { type: 'contact', reason: 'Open doors for collaborations and commissions' },
+    ],
+    folders: [
+      { name: 'Work', reason: 'A flexible space for all your different projects' },
+    ],
     notes: [
-      { title: 'Hello', type: 'note' },
-      { title: 'Current Project', type: 'case-study' },
-      { title: 'Influences', type: 'note' },
+      { title: 'Hello', type: 'note', reason: 'Introduce yourself and what you\'re about' },
+      { title: 'Current Project', type: 'case-study', reason: 'Show what you\'re working on now' },
     ],
     statusText: 'Making things',
     tone: 'playful',
   },
   personal: {
     baseTemplate: 'personal',
-    widgets: ['status', 'links', 'clock'],
+    understanding: 'You want a simple personal space - a home base on the internet to share who you are and link to your other profiles and projects.',
+    widgets: [
+      { type: 'status', reason: 'A quick update on what you\'re up to' },
+      { type: 'links', reason: 'Connect all your profiles in one place' },
+    ],
     folders: [],
     notes: [
-      { title: 'Hey there', type: 'note' },
-      { title: 'What I\'m up to', type: 'note' },
+      { title: 'Hey there', type: 'note', reason: 'A simple introduction to who you are' },
+      { title: 'Now', type: 'note', reason: 'Share what you\'re focused on right now' },
     ],
     statusText: 'Doing my thing',
     tone: 'casual',
   },
   developer: {
     baseTemplate: 'developer',
-    widgets: ['status', 'links', 'contact'],
-    folders: ['Projects', 'Open Source'],
+    understanding: 'You\'re a developer looking to showcase your technical skills, projects, and maybe attract job opportunities or collaborators.',
+    widgets: [
+      { type: 'status', reason: 'Show if you\'re open to work or collaborations' },
+      { type: 'links', reason: 'Link to GitHub, LinkedIn, and other dev profiles' },
+    ],
+    folders: [
+      { name: 'Projects', reason: 'Showcase your code work and side projects' },
+    ],
     notes: [
-      { title: 'About', type: 'note' },
-      { title: 'Tech Stack', type: 'note' },
-      { title: 'Featured Project', type: 'case-study' },
+      { title: 'About', type: 'note', reason: 'Share your background and what you build' },
+      { title: 'Featured Project', type: 'case-study', reason: 'Deep dive into your best technical work' },
     ],
     statusText: 'Building cool stuff',
     tone: 'minimal',
   },
   agency: {
     baseTemplate: 'agency',
-    widgets: ['status', 'contact', 'book'],
-    folders: ['Case Studies', 'Team'],
+    understanding: 'You\'re representing a team or agency. Your space needs to showcase collective work, introduce the team, and feel trustworthy to potential clients.',
+    widgets: [
+      { type: 'status', reason: 'Show your team\'s current capacity' },
+      { type: 'contact', reason: 'Make it easy for clients to start a conversation' },
+    ],
+    folders: [
+      { name: 'Case Studies', reason: 'Detailed breakdowns of your best client work' },
+    ],
     notes: [
-      { title: 'Who We Are', type: 'note' },
-      { title: 'Services', type: 'note' },
-      { title: 'Our Process', type: 'note' },
-      { title: 'Client Work', type: 'case-study' },
+      { title: 'Who We Are', type: 'note', reason: 'Tell your agency\'s story and values' },
+      { title: 'Services', type: 'note', reason: 'Clearly outline how you help clients' },
     ],
     statusText: 'Taking on new projects',
     tone: 'professional',
@@ -109,156 +152,84 @@ const CONTENT_TEMPLATES: Record<BaseTemplate, Record<string, string>> = {
   portfolio: {
     'About Me': `<h1>Hey, I'm [Your Name]</h1>
 <p>I'm a designer who believes great work comes from genuine curiosity and relentless iteration. Currently based in [City], I spend my days crafting digital experiences that feel both intuitive and delightful.</p>
-<p>When I'm not pushing pixels, you'll find me [your hobby] or exploring [your interest].</p>
+<p>When I'm not pushing pixels, you'll find me exploring new places or getting lost in a good book.</p>
 <p><strong>Let's make something together.</strong></p>`,
-    'Featured Project': `<h1>[Project Name]</h1>
+    'Featured Work': `<h1>Project Name</h1>
 <h2>Overview</h2>
 <p>A brief description of what this project is and why it matters. What problem did you solve?</p>
 <h2>The Challenge</h2>
 <p>Describe the constraints, goals, and context that shaped your approach.</p>
-<h2>The Solution</h2>
-<p>Walk through your process and the key decisions you made along the way.</p>
 <h2>Results</h2>
 <p>Share the impact—metrics, feedback, or outcomes that demonstrate success.</p>`,
-    'Services': `<h2>What I Do</h2>
-<ul>
-<li><strong>Brand Identity</strong> — Logos, visual systems, guidelines</li>
-<li><strong>UI/UX Design</strong> — Interfaces that work beautifully</li>
-<li><strong>Creative Direction</strong> — Vision and strategy for projects</li>
-</ul>
-<p>Every project starts with understanding your goals. <strong>Let's talk.</strong></p>`,
   },
   business: {
     'About': `<h1>Hello, I'm [Your Name]</h1>
-<p>I help businesses [your value proposition]. With [X] years of experience in [your field], I've worked with companies like [notable clients] to achieve [outcomes].</p>
-<p>My approach combines strategic thinking with hands-on execution to deliver results that matter.</p>`,
+<p>I help businesses achieve their goals through strategic thinking and hands-on execution. With years of experience in my field, I've worked with companies of all sizes to deliver results that matter.</p>
+<p>My approach combines deep understanding of your needs with practical solutions that work.</p>`,
     'Services': `<h2>How I Can Help</h2>
 <ul>
-<li><strong>[Service 1]</strong> — Brief description of what this includes</li>
-<li><strong>[Service 2]</strong> — Brief description of what this includes</li>
-<li><strong>[Service 3]</strong> — Brief description of what this includes</li>
+<li><strong>Strategy</strong> — Clear direction and actionable plans</li>
+<li><strong>Execution</strong> — Hands-on implementation that delivers</li>
+<li><strong>Growth</strong> — Sustainable results that last</li>
 </ul>
-<h2>Pricing</h2>
-<p>Projects typically start at $[X]. Book a call to discuss your needs.</p>`,
-    'Process': `<h2>How We'll Work Together</h2>
-<ol>
-<li><strong>Discovery</strong> — We start with a conversation to understand your goals</li>
-<li><strong>Strategy</strong> — I develop a clear plan tailored to your needs</li>
-<li><strong>Execution</strong> — We work together to bring it to life</li>
-<li><strong>Refinement</strong> — Iterate based on feedback and results</li>
-</ol>`,
+<p>Every engagement starts with understanding your goals. Let's talk.</p>`,
   },
   writing: {
     'About Me': `<h1>Hi, I'm [Your Name]</h1>
-<p>I write about [your topics]. My work has appeared in [publications] and reached [audience size] readers.</p>
-<p>I believe [your writing philosophy]. Every piece I write aims to [your goal].</p>
+<p>I write about the things that fascinate me—ideas worth exploring and stories worth telling.</p>
+<p>My goal is simple: write things that make people think, feel, or see the world a little differently.</p>
 <p>Subscribe to get new essays in your inbox.</p>`,
-    'Latest Post': `<h1>[Post Title]</h1>
-<p><em>Published [date]</em></p>
+    'Latest Post': `<h1>The Title Goes Here</h1>
 <p>Your opening hook goes here. Make it count—this is what pulls readers in.</p>
-<h2>The main idea</h2>
 <p>Develop your argument or story here. Use examples, anecdotes, and evidence to support your point.</p>
-<h2>What this means</h2>
-<p>Connect the dots. Help readers understand why this matters to them.</p>
 <p><em>Thanks for reading. Hit reply if this resonated.</em></p>`,
-    'Newsletter': `<h1>The [Newsletter Name]</h1>
-<p>Every [frequency], I share [what you share].</p>
-<p>Join [X] readers who get [benefit] straight to their inbox.</p>
-<ul>
-<li>No spam, ever</li>
-<li>Unsubscribe anytime</li>
-<li>Free forever</li>
-</ul>`,
   },
   creative: {
     'Hello': `<h1>Hey</h1>
 <p>I'm [Your Name]. I make things.</p>
-<p>Sometimes they're [type of work]. Other times they're [other type]. Mostly I'm just following my curiosity and seeing where it leads.</p>
-<p>This space is where I share what I'm working on, thinking about, and inspired by.</p>
-<p>Come say hi: [your email]</p>`,
-    'Current Project': `<h1>[Project Name]</h1>
-<p>Right now I'm exploring [concept/medium/idea].</p>
+<p>Sometimes they're digital. Other times they're physical. Mostly I'm just following my curiosity and seeing where it leads.</p>
+<p>This space is where I share what I'm working on and thinking about.</p>`,
+    'Current Project': `<h1>What I'm Making Now</h1>
+<p>Right now I'm exploring something new.</p>
 <h2>The spark</h2>
-<p>What got you started on this? What question are you trying to answer?</p>
+<p>What got me started on this and what question I'm trying to answer.</p>
 <h2>The process</h2>
-<p>How are you approaching it? What are you learning?</p>
-<h2>What's next</h2>
-<p>Where is this going? What comes after?</p>`,
-    'Influences': `<h1>Things I Love</h1>
-<p>A running list of people, places, and things that shape how I see and make.</p>
-<ul>
-<li><strong>[Person/Thing]</strong> — Why they inspire you</li>
-<li><strong>[Person/Thing]</strong> — Why they inspire you</li>
-<li><strong>[Person/Thing]</strong> — Why they inspire you</li>
-</ul>
-<p><em>Last updated: [date]</em></p>`,
+<p>How I'm approaching it and what I'm learning along the way.</p>`,
   },
   personal: {
     'Hey there': `<h1>Hi, I'm [Your Name]</h1>
 <p>Welcome to my corner of the internet.</p>
-<p>I'm a [what you do] based in [location]. I'm passionate about [your interests] and always up for [what you enjoy].</p>
-<p>Connect with me on [platform] or drop me a line at [email].</p>`,
-    'What I\'m up to': `<h1>Now</h1>
-<p><em>Updated [date]</em></p>
+<p>I'm passionate about the things I love and always up for interesting conversations.</p>
+<p>Feel free to reach out.</p>`,
+    'Now': `<h1>Now</h1>
 <h2>Working on</h2>
-<p>[Current projects or focus areas]</p>
-<h2>Reading</h2>
-<p>[Books, articles, or content you're consuming]</p>
+<p>Current projects and focus areas.</p>
 <h2>Excited about</h2>
-<p>[Things you're looking forward to]</p>`,
+<p>Things I'm looking forward to.</p>`,
   },
   developer: {
     'About': `<h1>Hey, I'm [Your Name]</h1>
-<p>I'm a [role] who loves building [what you build]. Currently [working at / freelancing / building].</p>
-<p>I'm passionate about [your technical interests] and believe in [your philosophy on code/building].</p>
-<p>Check out my work on <a href="https://github.com/yourusername">GitHub</a> or reach out to chat.</p>`,
-    'Tech Stack': `<h2>Tools I Use</h2>
-<ul>
-<li><strong>Languages</strong> — TypeScript, Python, [others]</li>
-<li><strong>Frontend</strong> — React, Next.js, [others]</li>
-<li><strong>Backend</strong> — Node.js, [others]</li>
-<li><strong>Database</strong> — PostgreSQL, [others]</li>
-<li><strong>Infrastructure</strong> — Vercel, AWS, [others]</li>
-</ul>
-<p>Always learning. Currently exploring [new tech].</p>`,
-    'Featured Project': `<h1>[Project Name]</h1>
-<p><a href="https://github.com/you/project">GitHub</a> · <a href="https://project.com">Live Demo</a></p>
+<p>I'm a developer who loves building things that matter. Currently focused on creating great user experiences and solving interesting problems.</p>
+<p>Check out my work on GitHub or reach out to chat.</p>`,
+    'Featured Project': `<h1>Project Name</h1>
 <h2>What it does</h2>
 <p>Brief explanation of the project and its purpose.</p>
 <h2>How it works</h2>
 <p>Technical overview of the architecture and key decisions.</p>
 <h2>Lessons learned</h2>
-<p>What you discovered building this.</p>`,
+<p>What I discovered building this.</p>`,
   },
   agency: {
-    'Who We Are': `<h1>[Agency Name]</h1>
-<p>We're a [type] studio helping [clients] achieve [outcomes].</p>
-<p>Founded in [year], we've partnered with brands like [notable clients] to create work that [impact].</p>
-<p>Our team brings together expertise in [disciplines] to deliver results that matter.</p>`,
+    'Who We Are': `<h1>We're [Agency Name]</h1>
+<p>A studio helping ambitious brands achieve their goals.</p>
+<p>Our team brings together expertise across disciplines to deliver results that matter.</p>`,
     'Services': `<h2>What We Do</h2>
 <ul>
-<li><strong>[Service 1]</strong> — Detailed description</li>
-<li><strong>[Service 2]</strong> — Detailed description</li>
-<li><strong>[Service 3]</strong> — Detailed description</li>
+<li><strong>Strategy</strong> — Clear direction and planning</li>
+<li><strong>Design</strong> — Beautiful, functional solutions</li>
+<li><strong>Development</strong> — Built to last</li>
 </ul>
-<h2>Engagement Models</h2>
-<p>We work on projects, retainers, or embedded partnerships. Let's find the right fit.</p>`,
-    'Our Process': `<h2>How We Work</h2>
-<ol>
-<li><strong>Discover</strong> — Deep dive into your business, users, and goals</li>
-<li><strong>Define</strong> — Align on strategy, scope, and success metrics</li>
-<li><strong>Design</strong> — Create and iterate on solutions</li>
-<li><strong>Deliver</strong> — Launch, measure, and optimize</li>
-</ol>`,
-    'Client Work': `<h1>[Client Name] Case Study</h1>
-<h2>The Brief</h2>
-<p>What the client needed and why.</p>
-<h2>Our Approach</h2>
-<p>How we tackled the challenge.</p>
-<h2>The Work</h2>
-<p>What we delivered and key highlights.</p>
-<h2>Results</h2>
-<p>Impact and outcomes achieved.</p>`,
+<p>Let's find the right fit for your project.</p>`,
   },
 };
 
@@ -286,7 +257,6 @@ export function detectTemplate(input: string): BaseTemplate {
  * Extract user type from input (simple extraction)
  */
 export function extractUserType(input: string): string {
-  // Common patterns to extract profession
   const patterns = [
     /i(?:'m| am) (?:a |an )?([a-z\s]+?)(?:\.|,|who|based|and|working)/i,
     /([a-z\s]+?) (?:looking|wanting|need)/i,
@@ -300,7 +270,6 @@ export function extractUserType(input: string): string {
     }
   }
 
-  // Fallback: use first few words
   return input.split(/[.,!?]/).join('').split(' ').slice(0, 4).join(' ');
 }
 
@@ -314,7 +283,13 @@ export function generateFallbackIntent(input: string): ParsedIntent {
 
   return {
     userType,
-    ...config,
+    baseTemplate: config.baseTemplate,
+    understanding: config.understanding,
+    widgets: config.widgets,
+    folders: config.folders,
+    notes: config.notes,
+    statusText: config.statusText,
+    tone: config.tone,
     summary: `Setting up a ${template} space for ${userType}`,
   };
 }
@@ -330,7 +305,6 @@ export function generateFallbackContent(intent: ParsedIntent): GeneratedContent 
     if (templateContent[note.title]) {
       content[note.title] = templateContent[note.title];
     } else {
-      // Generate generic content for unknown titles
       content[note.title] = `<h1>${note.title}</h1>
 <p>Add your content here. This is your space to share your story.</p>`;
     }

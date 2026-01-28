@@ -14,11 +14,23 @@ export type BaseTemplate = 'portfolio' | 'business' | 'writing' | 'creative' | '
 export interface ParsedIntent {
   userType: string;
   baseTemplate: BaseTemplate;
-  widgets: WidgetType[];
-  folders: string[];
+  // Analysis of what the AI understood
+  understanding: string;
+  // Widgets with explanations
+  widgets: Array<{
+    type: WidgetType;
+    reason: string;
+  }>;
+  // Folders with explanations
+  folders: Array<{
+    name: string;
+    reason: string;
+  }>;
+  // Notes with explanations
   notes: Array<{
     title: string;
     type: FileType;
+    reason: string;
   }>;
   statusText: string;
   tone: UserTone;
@@ -41,6 +53,7 @@ export interface BuildItem {
   fileType?: FileType;
   widgetType?: WidgetType;
   title: string;
+  reason?: string; // AI's explanation for why this item is being created
   content?: string;
   position: { x: number; y: number };
   parentId?: string | null;
