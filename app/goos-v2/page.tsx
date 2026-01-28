@@ -84,6 +84,8 @@ import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
 import { FallingLetters } from '@/components/desktop/FallingLetters';
 import { Launchpad, LaunchpadDockIcon } from '@/components/desktop/Launchpad';
+import { OnboardingPrompt, BuildAnimation } from '@/components/onboarding';
+import { useAIOnboarding } from '@/hooks/useAIOnboarding';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 
 // ============================================
@@ -2689,6 +2691,9 @@ function GoOSDemoContent() {
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
     const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
+    // AI Onboarding
+    const onboarding = useAIOnboarding();
+
     // Boot sequence state: splash -> booting -> revealing -> ready
     const [bootPhase, setBootPhase] = useState<'splash' | 'booting' | 'revealing' | 'ready'>('splash');
     const [bootMessage, setBootMessage] = useState(0);
@@ -3171,6 +3176,30 @@ function GoOSDemoContent() {
         }
         return { x: 20, y: 20 };
     }, []);
+
+    // Handle AI onboarding completion - create files from build sequence
+    const handleOnboardingComplete = useCallback(async () => {
+        if (!onboarding.buildSequence?.items) return;
+
+        // Create files sequentially
+        for (const item of onboarding.buildSequence.items) {
+            if (item.type === 'file' && item.fileType) {
+                const newFile = await createGoOSFile(item.fileType as FileType, null, item.position);
+                if (newFile && item.content) {
+                    await updateGoOSFile(newFile.id, {
+                        title: item.title,
+                        content: item.content,
+                    });
+                } else if (newFile) {
+                    await updateGoOSFile(newFile.id, { title: item.title });
+                }
+            }
+            // TODO: Add widget creation when widget context supports it
+        }
+
+        onboarding.completeOnboarding();
+        showGoOSToast('Your space is ready!', 'success');
+    }, [onboarding, createGoOSFile, updateGoOSFile, showGoOSToast]);
 
     // Drag-drop handlers for image files
     const handleDesktopDragOver = useCallback((e: React.DragEvent) => {
@@ -4255,6 +4284,34 @@ function GoOSDemoContent() {
                                                     minWidth: '140px',
                                                 }}
                                             >
+                                                {/* AI Setup Option */}
+                                                <button
+                                                    onClick={() => {
+                                                        onboarding.startOnboarding();
+                                                        setShowWidgetsMenu(false);
+                                                    }}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '6px 12px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        background: 'transparent',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        fontSize: '13px',
+                                                        fontWeight: 500,
+                                                        color: 'var(--color-accent-primary)',
+                                                        textAlign: 'left',
+                                                        transition: 'background 0.1s ease',
+                                                    }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                                >
+                                                    <span style={{ fontSize: '14px' }}>✨</span>
+                                                    <span>AI Setup</span>
+                                                </button>
+                                                <div style={{ height: 1, background: 'var(--color-border-subtle)', margin: '4px 8px' }} />
                                                 {Object.entries(WIDGET_METADATA).map(([type, meta]) => (
                                                     <button
                                                         key={type}
@@ -5795,6 +5852,21 @@ function GoOSDemoContent() {
                         openFile(itemId);
                     }
                 }}
+            />
+
+            {/* AI Onboarding */}
+            <OnboardingPrompt
+                isOpen={onboarding.isPromptOpen}
+                onClose={onboarding.cancelOnboarding}
+                onSubmit={onboarding.submitPrompt}
+                isLoading={onboarding.isLoading}
+            />
+
+            <BuildAnimation
+                isActive={onboarding.isBuilding}
+                items={onboarding.buildSequence?.items || []}
+                summary={onboarding.intent?.summary || 'Setting up your space...'}
+                onComplete={handleOnboardingComplete}
             />
 
             {/* Command Palette */}
