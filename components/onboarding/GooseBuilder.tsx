@@ -393,11 +393,15 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
               backgroundPosition: 'center',
             }}
           />
-          {/* Darker overlay for dark panel contrast */}
+          {/* Solid dark base to fully cover desktop */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'rgba(0,0,0,0.88)' }}
+          />
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.78) 100%)',
+              background: 'linear-gradient(135deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.2) 100%)',
             }}
           />
 

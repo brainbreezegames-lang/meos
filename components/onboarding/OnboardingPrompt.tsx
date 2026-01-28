@@ -122,11 +122,15 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
             }}
           />
 
-          {/* Dark overlay for premium feel */}
+          {/* Solid dark base to fully cover desktop, then gradient for depth */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'rgba(0,0,0,0.88)' }}
+          />
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.50) 40%, rgba(0,0,0,0.70) 100%)',
+              background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 100%)',
             }}
           />
 

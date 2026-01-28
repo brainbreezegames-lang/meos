@@ -6,6 +6,7 @@ import { NextRequest } from 'next/server';
  * Powered by OpenRouter (Kimi-k2 model)
  */
 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2:free';
 
@@ -139,59 +140,94 @@ For case-studies, include sections: Overview, Challenge, Approach, Results
 
 Return just the HTML content, nothing else.`;
 
-async function callOpenRouter(prompt: string, retries = 2): Promise<string> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY not configured');
+// Primary: Gemini API (more reliable)
+async function callGemini(prompt: string): Promise<string> {
+  if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2000,
+        },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('Gemini error:', response.status, error);
+    throw new Error(`Gemini error: ${response.status}`);
   }
 
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Empty Gemini response');
+  return text;
+}
+
+// Fallback: OpenRouter API
+async function callOpenRouter(prompt: string): Promise<string> {
+  if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not configured');
+
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://meos-delta.vercel.app',
+      'X-Title': 'MeOS Space Builder',
+    },
+    body: JSON.stringify({
+      model: OPENROUTER_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 2000,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('OpenRouter error:', response.status, error);
+    throw new Error(`OpenRouter error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// Try Gemini first, then OpenRouter, with retries
+async function callAI(prompt: string, retries = 1): Promise<string> {
   for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'HTTP-Referer': 'https://meos-delta.vercel.app',
-          'X-Title': 'MeOS Space Builder',
-        },
-        body: JSON.stringify({
-          model: OPENROUTER_MODEL,
-          messages: [
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          temperature: 0.7,
-          max_tokens: 2000,
-        }),
-      });
-
-      if (response.status === 429) {
-        // Rate limited - wait and retry
-        if (attempt < retries) {
-          console.log(`Rate limited, waiting before retry ${attempt + 1}...`);
-          await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
-          continue;
-        }
-        throw new Error('AI service is busy. Please try again in a moment.');
+    // Try Gemini first
+    if (GEMINI_API_KEY) {
+      try {
+        return await callGemini(prompt);
+      } catch (err) {
+        console.error(`Gemini attempt ${attempt} failed:`, err);
       }
+    }
 
-      if (!response.ok) {
-        const error = await response.text();
-        console.error('OpenRouter error:', error);
-        throw new Error(`AI service error: ${response.status}`);
+    // Try OpenRouter as fallback
+    if (OPENROUTER_API_KEY) {
+      try {
+        return await callOpenRouter(prompt);
+      } catch (err) {
+        console.error(`OpenRouter attempt ${attempt} failed:`, err);
       }
+    }
 
-      const data = await response.json();
-      return data.choices?.[0]?.message?.content || '';
-    } catch (err) {
-      if (attempt === retries) throw err;
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    if (attempt < retries) {
+      await new Promise(resolve => setTimeout(resolve, 1500 * (attempt + 1)));
     }
   }
 
-  throw new Error('AI service unavailable');
+  throw new Error('All AI providers failed');
 }
 
 function extractJSON(text: string): unknown {
@@ -395,7 +431,7 @@ export async function POST(request: NextRequest) {
 
         try {
           const understandingPrompt = UNDERSTANDING_PROMPT.replace('{input}', prompt);
-          const understandingRaw = await callOpenRouter(understandingPrompt);
+          const understandingRaw = await callAI(understandingPrompt);
           understanding = extractJSON(understandingRaw) as Record<string, unknown>;
         } catch (aiError) {
           console.error('AI understanding failed, using fallback:', aiError);
@@ -456,7 +492,7 @@ export async function POST(request: NextRequest) {
         send('phase', { phase: 'planning', message: 'Designing your space...' });
 
         const planningPrompt = PLANNING_PROMPT.replace('{context}', JSON.stringify(understanding, null, 2));
-        const planningRaw = await callOpenRouter(planningPrompt);
+        const planningRaw = await callAI(planningPrompt);
 
         let plan: Record<string, unknown>;
         try {
@@ -520,7 +556,7 @@ export async function POST(request: NextRequest) {
                 .replace('{brief}', item.contentBrief as string)
                 .replace('{tone}', understanding.tone as string);
 
-              content = await callOpenRouter(contentPrompt);
+              content = await callAI(contentPrompt);
 
               // Clean up any markdown code blocks from content
               content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
