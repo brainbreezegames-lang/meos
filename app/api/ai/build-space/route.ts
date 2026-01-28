@@ -241,38 +241,50 @@ function createFallbackResponse(prompt: string) {
     serviceName = 'Writing Services';
   }
 
+  // Detect functional needs from prompt
+  const wantsBooking = lowerPrompt.includes('book') || lowerPrompt.includes('call') || lowerPrompt.includes('meeting') || lowerPrompt.includes('schedule');
+  const wantsContact = lowerPrompt.includes('contact') || lowerPrompt.includes('reach') || lowerPrompt.includes('hire') || lowerPrompt.includes('inquir');
+  const wantsLinks = lowerPrompt.includes('link') || lowerPrompt.includes('social') || lowerPrompt.includes('twitter') || lowerPrompt.includes('instagram');
+  const wantsStatus = lowerPrompt.includes('available') || lowerPrompt.includes('status') || lowerPrompt.includes('freelance') || lowerPrompt.includes('open for');
+
   const timestamp = Date.now();
 
-  return {
-    understanding: `I understand you're a ${profession}. Let me set up a comprehensive workspace to showcase ${niche} and help visitors connect with you.`,
-    items: [
-      {
-        id: `item-${timestamp}-about`,
-        type: 'file',
-        fileType: 'note',
-        title: 'About Me',
-        content: `<h1>Hey, I'm [Your Name]</h1>
+  const items: Array<{
+    id: string;
+    type: 'file' | 'widget';
+    fileType?: string;
+    widgetType?: string;
+    title: string;
+    content: string;
+    purpose: string;
+  }> = [
+    {
+      id: `item-${timestamp}-about`,
+      type: 'file',
+      fileType: 'note',
+      title: 'About Me',
+      content: `<h1>Hey, I'm [Your Name]</h1>
 <p>I'm a ${profession} passionate about creating meaningful work in ${niche}.</p>
 <p>My approach combines creativity with purpose—every project is an opportunity to solve problems and create something valuable.</p>
 <h2>What I Do</h2>
 <p>I help clients achieve their goals through thoughtful, intentional ${niche}. Whether you need a complete solution or guidance on your next project, I'm here to help.</p>
 <p><strong>Let's work together.</strong></p>`,
-        purpose: 'Introduce yourself to visitors',
-      },
-      {
-        id: `item-${timestamp}-folder`,
-        type: 'file',
-        fileType: 'folder',
-        title: folderName,
-        content: '',
-        purpose: `Organize your ${niche} work`,
-      },
-      {
-        id: `item-${timestamp}-case`,
-        type: 'file',
-        fileType: 'case-study',
-        title: 'Featured Project',
-        content: `<h1>Featured Project</h1>
+      purpose: 'Introduce yourself to visitors',
+    },
+    {
+      id: `item-${timestamp}-folder`,
+      type: 'file',
+      fileType: 'folder',
+      title: folderName,
+      content: '',
+      purpose: `Organize your ${niche} work`,
+    },
+    {
+      id: `item-${timestamp}-case`,
+      type: 'file',
+      fileType: 'case-study',
+      title: 'Featured Project',
+      content: `<h1>Featured Project</h1>
 <h2>Overview</h2>
 <p>A brief description of what this project was about and why it mattered.</p>
 <h2>The Challenge</h2>
@@ -281,14 +293,14 @@ function createFallbackResponse(prompt: string) {
 <p>How did you tackle this challenge? What made your approach unique?</p>
 <h2>Results</h2>
 <p>What was the impact? Include metrics if possible.</p>`,
-        purpose: 'Showcase your best work with context',
-      },
-      {
-        id: `item-${timestamp}-services`,
-        type: 'file',
-        fileType: 'note',
-        title: serviceName,
-        content: `<h1>${serviceName}</h1>
+      purpose: 'Showcase your best work with context',
+    },
+    {
+      id: `item-${timestamp}-services`,
+      type: 'file',
+      fileType: 'note',
+      title: serviceName,
+      content: `<h1>${serviceName}</h1>
 <p>Here's how I can help you:</p>
 <h2>What I Offer</h2>
 <ul>
@@ -299,25 +311,60 @@ function createFallbackResponse(prompt: string) {
 <h2>Process</h2>
 <p>Every project starts with understanding your needs. From there, we'll work together to create something you'll love.</p>
 <p><strong>Ready to start? Get in touch.</strong></p>`,
-        purpose: 'Explain what you offer',
-      },
-      {
-        id: `item-${timestamp}-contact`,
-        type: 'file',
-        fileType: 'note',
-        title: 'Get in Touch',
-        content: `<h1>Let's Connect</h1>
-<p>I'm always excited to hear about new projects and opportunities.</p>
-<h2>How to Reach Me</h2>
-<ul>
-<li><strong>Email:</strong> hello@example.com</li>
-<li><strong>Twitter:</strong> @yourhandle</li>
-<li><strong>LinkedIn:</strong> /in/yourprofile</li>
-</ul>
-<p>Whether you have a project in mind or just want to say hi, I'd love to hear from you.</p>`,
-        purpose: 'Make it easy for visitors to contact you',
-      },
-    ],
+      purpose: 'Explain what you offer',
+    },
+  ];
+
+  // Add widgets based on detected needs
+  if (wantsStatus) {
+    items.push({
+      id: `item-${timestamp}-status`,
+      type: 'widget',
+      widgetType: 'status',
+      title: 'Availability Status',
+      content: '',
+      purpose: 'Show visitors you\'re available for work',
+    });
+  }
+
+  if (wantsBooking) {
+    items.push({
+      id: `item-${timestamp}-book`,
+      type: 'widget',
+      widgetType: 'book',
+      title: 'Book a Call',
+      content: '',
+      purpose: 'Let visitors schedule meetings with you',
+    });
+  }
+
+  if (wantsContact || !wantsBooking) {
+    items.push({
+      id: `item-${timestamp}-contact`,
+      type: 'widget',
+      widgetType: 'contact',
+      title: 'Get in Touch',
+      content: '',
+      purpose: 'Make it easy for visitors to contact you',
+    });
+  }
+
+  if (wantsLinks) {
+    items.push({
+      id: `item-${timestamp}-links`,
+      type: 'widget',
+      widgetType: 'links',
+      title: 'My Links',
+      content: '',
+      purpose: 'Share your social media and external profiles',
+    });
+  }
+
+  return {
+    understanding: `I understand you're a ${profession}. Let me set up a comprehensive workspace to showcase ${niche} and help visitors connect with you.`,
+    identity: { profession, niche, personality: 'professional', experienceHint: 'mid' },
+    goals: { primary: `Showcase ${niche} and connect with visitors`, successLooksLike: 'A professional workspace that represents your work' },
+    items,
     summary: `Setting up a comprehensive workspace for a ${profession}`,
   };
 }
@@ -361,7 +408,8 @@ export async function POST(request: NextRequest) {
 
           send('understanding', {
             summary: fallback.understanding,
-            identity: { profession: 'professional' },
+            identity: fallback.identity,
+            goals: fallback.goals,
             tone: 'professional',
           });
 
@@ -372,17 +420,19 @@ export async function POST(request: NextRequest) {
             itemCount: fallback.items.length,
             items: fallback.items.map(item => ({
               name: item.title,
-              type: item.fileType,
+              type: item.type === 'widget' ? 'widget' : (item.fileType || 'note'),
               purpose: item.purpose,
             })),
           });
 
           send('phase', { phase: 'building', message: 'Creating your components...' });
 
-          for (const item of fallback.items) {
-            send('building', { name: item.title, type: item.fileType, purpose: item.purpose });
+          for (let i = 0; i < fallback.items.length; i++) {
+            const item = fallback.items[i];
+            const itemType = item.type === 'widget' ? 'widget' : (item.fileType || 'note');
+            send('building', { name: item.title, type: itemType, purpose: item.purpose });
             await new Promise(resolve => setTimeout(resolve, 400));
-            send('created', { item, remaining: 0 });
+            send('created', { item, remaining: fallback.items.length - i - 1 });
           }
 
           send('complete', {
