@@ -319,7 +319,6 @@ export function DrawingApp() {
 
     if (isShapeTool(tool) && currentShapeRef.current) {
       const shapeToAdd = { ...currentShapeRef.current };
-      currentShapeRef.current = null;
       setUndoStack((prev) => [...prev, { strokes, shapes }]);
       setShapes((prev) => [...prev, shapeToAdd]);
     } else if (currentStrokeRef.current && currentStrokeRef.current.points && currentStrokeRef.current.points.length > 1) {
@@ -327,14 +326,14 @@ export function DrawingApp() {
         ...currentStrokeRef.current,
         points: [...currentStrokeRef.current.points]
       };
-      currentStrokeRef.current = null;
       setUndoStack((prev) => [...prev, { strokes, shapes }]);
       setStrokes((prev) => [...prev, strokeToAdd]);
-    } else {
-      currentStrokeRef.current = null;
     }
-    redraw();
-  }, [isPanning, tool, strokes, shapes, redraw]);
+    // Clear refs after state updates are queued
+    currentStrokeRef.current = null;
+    currentShapeRef.current = null;
+    // Don't call redraw() manually - let useEffect handle it
+  }, [isPanning, tool, strokes, shapes]);
 
   // Zoom with wheel
   const handleWheel = useCallback((e: React.WheelEvent) => {
@@ -492,7 +491,7 @@ export function DrawingApp() {
         <div style={{ flex: 1 }} />
 
         {/* Zoom indicator */}
-        <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginRight: 8 }}>{Math.round(zoom * 100)}%</span>
+        <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginRight: 8 }}>{Math.round(zoom * 100)}% v2</span>
 
         {/* Export */}
         <button onClick={exportCanvas} style={{ height: 28, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 5, borderRadius: 6, border: 'none', background: 'var(--color-accent-primary)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
