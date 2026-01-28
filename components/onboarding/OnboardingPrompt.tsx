@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUp, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
 
 interface OnboardingPromptProps {
@@ -11,21 +11,6 @@ interface OnboardingPromptProps {
   onSubmit: (prompt: string) => void;
   isLoading?: boolean;
 }
-
-// ============================================================================
-// Dark Theme Palette — shared with GooseBuilder
-// ============================================================================
-
-const PALETTE = {
-  accent: '#F97316',
-  accentLight: '#FB923C',
-  textPrimary: 'rgba(255, 255, 255, 0.92)',
-  textSecondary: 'rgba(255, 255, 255, 0.55)',
-  textMuted: 'rgba(255, 255, 255, 0.30)',
-  divider: 'rgba(255, 255, 255, 0.06)',
-} as const;
-
-const SERIF = 'Georgia, "Times New Roman", serif';
 
 // Quick start presets
 const PRESETS = [
@@ -108,48 +93,33 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+          style={{ background: '#0a0a0a' }}
         >
-          {/* Background image */}
-          <motion.div
-            className="absolute inset-0"
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
+          {/* Subtle radial glow — no photo, just atmosphere */}
+          <div
+            className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: 'url(/bg21.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(249,115,22,0.04) 0%, transparent 70%)',
             }}
           />
 
-          {/* Solid dark base to fully cover desktop, then gradient for depth */}
-          <div
-            className="absolute inset-0"
-            style={{ background: 'rgba(0,0,0,0.88)' }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 100%)',
-            }}
-          />
+          {/* Content */}
+          <div className="relative z-10 w-full max-w-xl px-6 flex flex-col items-center">
 
-          {/* Content - all centered */}
-          <div className="relative z-10 w-full max-w-2xl px-6 flex flex-col items-center text-center">
-            {/* Logo/Title */}
+            {/* Logo — editorial serif italic, dramatic scale */}
             <motion.h1
-              className="mb-4"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.15, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
               style={{
-                fontSize: 'clamp(4rem, 12vw, 7rem)',
-                fontWeight: 300,
+                fontSize: 'clamp(4.5rem, 14vw, 8rem)',
+                fontWeight: 400,
                 fontStyle: 'italic',
-                fontFamily: SERIF,
-                color: PALETTE.textPrimary,
-                textShadow: '0 2px 30px rgba(0,0,0,0.3)',
-                letterSpacing: '-0.02em',
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                color: '#fff',
+                letterSpacing: '-0.03em',
+                lineHeight: 0.9,
+                marginBottom: '1.5rem',
               }}
             >
               goOS
@@ -157,35 +127,34 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
 
             {/* Subtitle */}
             <motion.p
-              className="mb-10 max-w-lg"
+              className="text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.25, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
               style={{
-                fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
-                fontWeight: 400,
-                color: PALETTE.textSecondary,
-                textShadow: '0 1px 10px rgba(0,0,0,0.3)',
+                fontSize: '1.125rem',
+                color: 'rgba(255,255,255,0.45)',
                 lineHeight: 1.6,
+                maxWidth: '28rem',
               }}
             >
-              Your personal space on the internet. Describe what you&apos;re building, and watch your workspace come to life.
+              Your personal space on the internet.
+              <br />
+              Describe yourself to get started.
             </motion.p>
 
-            {/* Input card — dark glass */}
+            {/* Input area — solid dark card, no glass */}
             <motion.div
               className="w-full mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.35, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
             >
               <div
-                className="relative rounded-2xl overflow-hidden"
+                className="relative rounded-2xl"
                 style={{
-                  background: 'rgba(12, 10, 9, 0.85)',
-                  backdropFilter: 'blur(40px) saturate(150%)',
-                  WebkitBackdropFilter: 'blur(40px) saturate(150%)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.06)',
+                  background: '#141414',
+                  border: '1px solid rgba(255,255,255,0.06)',
                 }}
               >
                 <textarea
@@ -193,111 +162,118 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Tell me about your work..."
+                  placeholder="I'm a photographer who captures authentic moments at weddings..."
                   disabled={isLoading}
                   rows={3}
-                  className="w-full px-6 py-5 bg-transparent text-lg resize-none outline-none placeholder:text-white/25"
+                  className="w-full px-5 pt-5 pb-14 bg-transparent text-base resize-none outline-none placeholder:text-white/20"
                   style={{
-                    color: PALETTE.textPrimary,
+                    color: 'rgba(255,255,255,0.9)',
                     lineHeight: 1.6,
-                    caretColor: PALETTE.accent,
+                    caretColor: '#F97316',
                   }}
                 />
 
-                {/* Submit button inside card */}
-                <div className="absolute bottom-4 right-4">
+                {/* Bottom bar with submit */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-5 py-3"
+                  style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+                >
+                  <span
+                    className="text-xs"
+                    style={{ color: 'rgba(255,255,255,0.2)' }}
+                  >
+                    {prompt.length > 0 && prompt.trim().length < 10
+                      ? 'Keep going...'
+                      : 'Press Enter to build'}
+                  </span>
+
                   <motion.button
                     onClick={handleSubmit}
                     disabled={!canSubmit || isLoading}
-                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-all"
+                    className="flex items-center gap-2 rounded-full transition-all"
                     style={{
-                      background: canSubmit ? PALETTE.accent : 'rgba(255,255,255,0.06)',
-                      color: canSubmit ? '#0c0a09' : PALETTE.textMuted,
-                      boxShadow: canSubmit ? '0 2px 12px rgba(249, 115, 22, 0.3)' : 'none',
+                      padding: canSubmit ? '8px 18px' : '8px 12px',
+                      background: canSubmit ? '#F97316' : 'rgba(255,255,255,0.05)',
+                      color: canSubmit ? '#0a0a0a' : 'rgba(255,255,255,0.2)',
                     }}
-                    whileHover={canSubmit && !isLoading ? { scale: 1.05 } : {}}
-                    whileTap={canSubmit && !isLoading ? { scale: 0.95 } : {}}
+                    whileHover={canSubmit && !isLoading ? { scale: 1.03 } : {}}
+                    whileTap={canSubmit && !isLoading ? { scale: 0.97 } : {}}
                   >
                     {isLoading ? (
-                      <Loader2 size={18} className="animate-spin" />
+                      <Loader2 size={16} className="animate-spin" />
                     ) : (
-                      <ArrowUp size={18} />
+                      <>
+                        {canSubmit && (
+                          <span className="text-sm font-medium">Build</span>
+                        )}
+                        <ArrowRight size={16} />
+                      </>
                     )}
                   </motion.button>
                 </div>
               </div>
             </motion.div>
 
-            {/* Presets — dark glass pills */}
+            {/* Section label — Cliento style */}
+            <motion.p
+              className="text-xs font-medium uppercase tracking-widest mb-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              style={{ color: 'rgba(255,255,255,0.2)' }}
+            >
+              Quick start
+            </motion.p>
+
+            {/* Presets — simple dark pills, orange dot indicator */}
             <motion.div
-              className="flex flex-wrap justify-center gap-3 mb-12"
-              initial={{ opacity: 0, y: 20 }}
+              className="flex flex-wrap justify-center gap-2.5 mb-16"
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.55, duration: 0.5 }}
             >
               {PRESETS.map((preset, index) => (
                 <motion.button
                   key={preset.label}
                   onClick={() => handlePresetClick(preset.prompt)}
                   disabled={isLoading}
-                  className="px-5 py-2.5 rounded-full text-sm font-medium transition-all"
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-full text-sm transition-all"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    color: PALETTE.textSecondary,
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: '#141414',
+                    color: 'rgba(255,255,255,0.5)',
+                    border: '1px solid rgba(255,255,255,0.06)',
                   }}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.55 + index * 0.05, duration: 0.4 }}
+                  transition={{ delay: 0.6 + index * 0.05, duration: 0.4 }}
                   whileHover={{
-                    scale: 1.02,
-                    y: -2,
-                    borderColor: 'rgba(249, 115, 22, 0.3)',
-                    color: PALETTE.textPrimary,
+                    borderColor: 'rgba(249,115,22,0.25)',
+                    color: 'rgba(255,255,255,0.85)',
                   }}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={{ scale: 0.97 }}
                 >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                    style={{ background: '#F97316' }}
+                  />
                   {preset.label}
                 </motion.button>
               ))}
             </motion.div>
 
-            {/* Bottom hint */}
-            <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
-              style={{ color: PALETTE.textMuted }}
-            >
-              <span className="text-sm">Press</span>
-              <span
-                className="px-2 py-0.5 rounded text-xs font-medium"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: PALETTE.textSecondary,
-                }}
-              >
-                Enter
-              </span>
-              <span className="text-sm">to build your space</span>
-            </motion.div>
-
-            {/* Skip link */}
+            {/* Skip */}
             <motion.button
               onClick={() => {
                 playSound('collapse');
                 onClose();
               }}
               disabled={isLoading}
-              className="mt-8 text-sm transition-all"
+              className="text-sm transition-all"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              style={{ color: PALETTE.textMuted }}
-              whileHover={{ color: PALETTE.accent }}
+              style={{ color: 'rgba(255,255,255,0.2)' }}
+              whileHover={{ color: '#F97316' }}
             >
               Skip — start with empty workspace
             </motion.button>
