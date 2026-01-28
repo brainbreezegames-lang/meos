@@ -78,16 +78,54 @@ interface PlanData {
 }
 
 // ============================================================================
+// Dark Theme Palette
+// ============================================================================
+
+const PALETTE = {
+  // Surfaces
+  panelBg: 'rgba(12, 10, 9, 0.94)',
+  panelBgAlt: 'rgba(15, 13, 11, 0.90)',
+  cardBg: 'rgba(255, 255, 255, 0.04)',
+  cardBorder: 'rgba(255, 255, 255, 0.07)',
+
+  // Accent
+  accent: '#F97316',
+  accentLight: '#FB923C',
+  accentSubtle: 'rgba(249, 115, 22, 0.10)',
+  accentBorder: 'rgba(249, 115, 22, 0.18)',
+
+  // Text
+  textPrimary: 'rgba(255, 255, 255, 0.92)',
+  textSecondary: 'rgba(255, 255, 255, 0.55)',
+  textMuted: 'rgba(255, 255, 255, 0.30)',
+
+  // Semantic
+  success: '#22c55e',
+  successSubtle: 'rgba(34, 197, 94, 0.10)',
+  successBorder: 'rgba(34, 197, 94, 0.18)',
+  error: '#ef4444',
+  errorSubtle: 'rgba(239, 68, 68, 0.08)',
+  errorBorder: 'rgba(239, 68, 68, 0.18)',
+
+  // Misc
+  divider: 'rgba(255, 255, 255, 0.06)',
+  inactive: 'rgba(255, 255, 255, 0.08)',
+  tagBg: 'rgba(255, 255, 255, 0.06)',
+} as const;
+
+const SERIF = 'Georgia, "Times New Roman", serif';
+
+// ============================================================================
 // Constants
 // ============================================================================
 
 const PHASE_CONFIG: Record<Phase, { label: string; color: string }> = {
-  connecting: { label: 'Getting ready', color: '#a8a29e' },
-  understanding: { label: 'Understanding you', color: '#8b5cf6' },
-  planning: { label: 'Designing your space', color: '#3b82f6' },
-  building: { label: 'Creating your workspace', color: '#f59e0b' },
-  complete: { label: 'All done!', color: '#22c55e' },
-  error: { label: 'Something went wrong', color: '#ef4444' },
+  connecting: { label: 'Getting ready', color: PALETTE.textMuted },
+  understanding: { label: 'Understanding you', color: PALETTE.accent },
+  planning: { label: 'Designing your space', color: PALETTE.accentLight },
+  building: { label: 'Creating your workspace', color: PALETTE.accent },
+  complete: { label: 'All done!', color: PALETTE.success },
+  error: { label: 'Something went wrong', color: PALETTE.error },
 };
 
 const ICON_MAP: Record<string, typeof FileText> = {
@@ -343,7 +381,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
         >
-          {/* Background — same as OnboardingPrompt for visual continuity */}
+          {/* Background — same image as OnboardingPrompt for visual continuity */}
           <motion.div
             className="absolute inset-0"
             initial={{ scale: 1.05 }}
@@ -355,10 +393,11 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
               backgroundPosition: 'center',
             }}
           />
+          {/* Darker overlay for dark panel contrast */}
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(135deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.5) 100%)',
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.78) 100%)',
             }}
           />
 
@@ -373,15 +412,15 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2, ...SPRING.smooth }}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.93)',
-                  backdropFilter: 'blur(24px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                  boxShadow: '0 8px 40px rgba(0, 0, 0, 0.15), 0 2px 12px rgba(0, 0, 0, 0.08)',
+                  background: PALETTE.panelBg,
+                  backdropFilter: 'blur(40px) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(40px) saturate(150%)',
+                  boxShadow: '0 8px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.06)',
                 }}
               >
                 {/* Header */}
                 <div className="p-5 sm:p-6 pb-4">
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-3 mb-5">
                     <motion.span
                       className="text-3xl select-none"
                       animate={
@@ -398,7 +437,16 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                       🪿
                     </motion.span>
                     <div>
-                      <h2 className="text-lg font-semibold" style={{ color: '#1c1917' }}>
+                      <h2
+                        className="text-xl"
+                        style={{
+                          color: PALETTE.textPrimary,
+                          fontFamily: SERIF,
+                          fontStyle: 'italic',
+                          fontWeight: 400,
+                          letterSpacing: '-0.01em',
+                        }}
+                      >
                         {phase === 'complete' ? 'Your space is ready' : 'Building your space'}
                       </h2>
                       <motion.p
@@ -406,7 +454,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                         initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="text-sm"
-                        style={{ color: '#78716c' }}
+                        style={{ color: PALETTE.textSecondary }}
                       >
                         {gooseMessage}
                       </motion.p>
@@ -423,13 +471,13 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                       return (
                         <motion.div
                           key={p}
-                          className="flex-1 h-1.5 rounded-full"
+                          className="flex-1 h-1 rounded-full"
                           animate={{
                             backgroundColor: done
-                              ? '#22c55e'
+                              ? (phase === 'complete' ? PALETTE.success : PALETTE.accent)
                               : current
                                 ? PHASE_CONFIG[p].color
-                                : 'rgba(0,0,0,0.06)',
+                                : PALETTE.inactive,
                           }}
                           transition={{ duration: 0.4 }}
                         />
@@ -450,33 +498,33 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                         transition={spring}
                         className="rounded-xl p-4"
                         style={{
-                          background: 'rgba(139, 92, 246, 0.05)',
-                          border: '1px solid rgba(139, 92, 246, 0.1)',
+                          background: PALETTE.accentSubtle,
+                          border: `1px solid ${PALETTE.accentBorder}`,
                         }}
                       >
                         <div className="flex items-center gap-2 mb-2">
-                          <Brain size={14} style={{ color: '#8b5cf6' }} />
-                          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#8b5cf6' }}>
+                          <Brain size={14} style={{ color: PALETTE.accent }} />
+                          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: PALETTE.accent }}>
                             Understanding
                           </span>
                         </div>
-                        <p className="text-sm leading-relaxed" style={{ color: '#44403c' }}>
+                        <p className="text-sm leading-relaxed" style={{ color: PALETTE.textPrimary }}>
                           {understanding.summary}
                         </p>
                         {(understanding.identity || understanding.goals || understanding.tone) && (
                           <div className="mt-3 flex flex-wrap gap-2">
                             {understanding.identity?.profession && (
-                              <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium" style={{ background: 'rgba(139,92,246,0.08)', color: '#7c3aed' }}>
+                              <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium" style={{ background: PALETTE.tagBg, color: PALETTE.accent }}>
                                 {understanding.identity.profession}
                               </span>
                             )}
                             {understanding.goals?.primary && (
-                              <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium" style={{ background: 'rgba(59,130,246,0.08)', color: '#2563eb' }}>
+                              <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium" style={{ background: PALETTE.tagBg, color: PALETTE.accentLight }}>
                                 {understanding.goals.primary}
                               </span>
                             )}
                             {understanding.tone && (
-                              <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium" style={{ background: 'rgba(245,158,11,0.08)', color: '#d97706' }}>
+                              <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium" style={{ background: PALETTE.tagBg, color: PALETTE.textSecondary }}>
                                 {understanding.tone} tone
                               </span>
                             )}
@@ -495,17 +543,17 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                         transition={{ ...spring, delay: 0.1 }}
                         className="rounded-xl p-4"
                         style={{
-                          background: 'rgba(59, 130, 246, 0.05)',
-                          border: '1px solid rgba(59, 130, 246, 0.1)',
+                          background: PALETTE.cardBg,
+                          border: `1px solid ${PALETTE.cardBorder}`,
                         }}
                       >
                         <div className="flex items-center gap-2 mb-2">
-                          <Compass size={14} style={{ color: '#3b82f6' }} />
-                          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#3b82f6' }}>
+                          <Compass size={14} style={{ color: PALETTE.accentLight }} />
+                          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: PALETTE.accentLight }}>
                             Plan
                           </span>
                         </div>
-                        <p className="text-sm mb-3" style={{ color: '#44403c' }}>
+                        <p className="text-sm mb-3" style={{ color: PALETTE.textSecondary }}>
                           {plan.summary}
                         </p>
 
@@ -532,14 +580,14 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                                       animate={{ scale: 1 }}
                                       transition={bounce}
                                     >
-                                      <Check size={14} style={{ color: '#22c55e' }} />
+                                      <Check size={14} style={{ color: PALETTE.success }} />
                                     </motion.div>
                                   ) : isBuilding ? (
-                                    <Loader2 size={14} className="animate-spin" style={{ color: '#f59e0b' }} />
+                                    <Loader2 size={14} className="animate-spin" style={{ color: PALETTE.accent }} />
                                   ) : (
                                     <div
                                       className="w-3.5 h-3.5 rounded-full border-2"
-                                      style={{ borderColor: '#d6d3d1' }}
+                                      style={{ borderColor: PALETTE.textMuted }}
                                     />
                                   )}
                                 </div>
@@ -547,17 +595,17 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                                 {/* Item details */}
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-1.5">
-                                    <Icon size={12} style={{ color: '#78716c' }} />
+                                    <Icon size={12} style={{ color: PALETTE.textMuted }} />
                                     <span
                                       className="text-sm font-medium"
                                       style={{
-                                        color: isCreated ? '#22c55e' : isBuilding ? '#1c1917' : '#57534e',
+                                        color: isCreated ? PALETTE.success : isBuilding ? PALETTE.textPrimary : PALETTE.textSecondary,
                                       }}
                                     >
                                       {planItem.name}
                                     </span>
                                   </div>
-                                  <p className="text-xs mt-0.5 leading-relaxed" style={{ color: '#a8a29e' }}>
+                                  <p className="text-xs mt-0.5 leading-relaxed" style={{ color: PALETTE.textMuted }}>
                                     {planItem.purpose}
                                   </p>
                                 </div>
@@ -578,9 +626,9 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                         exit={{ opacity: 0, y: -8 }}
                         className="flex items-center gap-2 py-1"
                       >
-                        <Loader2 size={14} className="animate-spin" style={{ color: '#f59e0b' }} />
-                        <span className="text-sm" style={{ color: '#78716c' }}>
-                          Writing content for <strong style={{ color: '#44403c' }}>{currentlyBuilding}</strong>...
+                        <Loader2 size={14} className="animate-spin" style={{ color: PALETTE.accent }} />
+                        <span className="text-sm" style={{ color: PALETTE.textSecondary }}>
+                          Writing content for <strong style={{ color: PALETTE.textPrimary }}>{currentlyBuilding}</strong>...
                         </span>
                       </motion.div>
                     )}
@@ -594,24 +642,24 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                         animate={{ opacity: 1, y: 0 }}
                         className="rounded-xl p-4"
                         style={{
-                          background: 'rgba(239, 68, 68, 0.05)',
-                          border: '1px solid rgba(239, 68, 68, 0.1)',
+                          background: PALETTE.errorSubtle,
+                          border: `1px solid ${PALETTE.errorBorder}`,
                         }}
                       >
                         <div className="flex items-center gap-2 mb-2">
-                          <AlertCircle size={14} style={{ color: '#ef4444' }} />
-                          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#ef4444' }}>
+                          <AlertCircle size={14} style={{ color: PALETTE.error }} />
+                          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: PALETTE.error }}>
                             Error
                           </span>
                         </div>
-                        <p className="text-sm mb-3" style={{ color: '#44403c' }}>
+                        <p className="text-sm mb-3" style={{ color: PALETTE.textSecondary }}>
                           {error || 'Something went wrong. The goose got confused.'}
                         </p>
                         <div className="flex gap-3">
                           <button
                             onClick={handleRetry}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-80"
-                            style={{ background: '#1c1917', color: '#fff' }}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:brightness-110"
+                            style={{ background: PALETTE.accent, color: '#0c0a09' }}
                           >
                             <RefreshCw size={14} />
                             Try again
@@ -619,7 +667,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                           <button
                             onClick={handleCancel}
                             className="px-4 py-2 rounded-lg text-sm font-medium transition-all hover:opacity-70"
-                            style={{ color: '#78716c' }}
+                            style={{ color: PALETTE.textMuted }}
                           >
                             Cancel
                           </button>
@@ -637,8 +685,8 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                         transition={bounce}
                         className="rounded-xl p-5 text-center"
                         style={{
-                          background: 'rgba(34, 197, 94, 0.05)',
-                          border: '1px solid rgba(34, 197, 94, 0.1)',
+                          background: PALETTE.successSubtle,
+                          border: `1px solid ${PALETTE.successBorder}`,
                         }}
                       >
                         <motion.div
@@ -646,14 +694,14 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                           animate={{ scale: 1 }}
                           transition={bounce}
                           className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center"
-                          style={{ background: 'rgba(34, 197, 94, 0.12)' }}
+                          style={{ background: 'rgba(34, 197, 94, 0.15)' }}
                         >
-                          <Check size={24} style={{ color: '#22c55e' }} />
+                          <Check size={24} style={{ color: PALETTE.success }} />
                         </motion.div>
-                        <p className="text-sm font-medium" style={{ color: '#1c1917' }}>
+                        <p className="text-sm font-medium" style={{ color: PALETTE.textPrimary }}>
                           {createdItems.length} item{createdItems.length !== 1 ? 's' : ''} created for your workspace
                         </p>
-                        <p className="text-xs mt-1" style={{ color: '#78716c' }}>
+                        <p className="text-xs mt-1" style={{ color: PALETTE.textSecondary }}>
                           Opening your space in a moment...
                         </p>
                       </motion.div>
@@ -663,11 +711,11 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
 
                 {/* Footer — cancel button */}
                 {phase !== 'complete' && phase !== 'error' && (
-                  <div className="px-5 sm:px-6 py-4" style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                  <div className="px-5 sm:px-6 py-4" style={{ borderTop: `1px solid ${PALETTE.divider}` }}>
                     <button
                       onClick={handleCancel}
                       className="text-sm transition-opacity hover:opacity-70"
-                      style={{ color: '#a8a29e' }}
+                      style={{ color: PALETTE.textMuted }}
                     >
                       Cancel
                     </button>
@@ -682,17 +730,20 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, ...SPRING.smooth }}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.88)',
-                  backdropFilter: 'blur(24px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                  boxShadow: '0 8px 40px rgba(0, 0, 0, 0.12)',
+                  background: PALETTE.panelBgAlt,
+                  backdropFilter: 'blur(40px) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(40px) saturate(150%)',
+                  boxShadow: '0 8px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.05)',
                 }}
               >
                 <div className="p-5 pb-3">
-                  <h3 className="text-xs uppercase tracking-wider font-semibold" style={{ color: '#a8a29e' }}>
+                  <h3
+                    className="text-xs uppercase tracking-wider font-semibold"
+                    style={{ color: PALETTE.accent }}
+                  >
                     Your workspace
                   </h3>
-                  <p className="text-xs mt-1" style={{ color: '#d6d3d1' }}>
+                  <p className="text-xs mt-1" style={{ color: PALETTE.textMuted }}>
                     {createdItems.length > 0
                       ? `${createdItems.length} item${createdItems.length !== 1 ? 's' : ''} created`
                       : 'Items will appear here'}
@@ -711,22 +762,21 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           transition={{ delay: index * 0.06, ...bounce }}
                           className="flex items-center gap-3 p-3 rounded-xl"
-                          style={{ background: 'rgba(0, 0, 0, 0.03)' }}
+                          style={{ background: PALETTE.cardBg }}
                         >
                           <div
                             className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                             style={{
-                              background: '#fff',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                              background: PALETTE.accentSubtle,
                             }}
                           >
-                            <Icon size={18} style={{ color: '#57534e' }} />
+                            <Icon size={18} style={{ color: PALETTE.accent }} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate" style={{ color: '#1c1917' }}>
+                            <p className="text-sm font-medium truncate" style={{ color: PALETTE.textPrimary }}>
                               {item.title}
                             </p>
-                            <p className="text-xs truncate" style={{ color: '#a8a29e' }}>
+                            <p className="text-xs truncate" style={{ color: PALETTE.textMuted }}>
                               {item.purpose || (item.type === 'widget' ? item.widgetType : item.fileType)}
                             </p>
                           </div>
@@ -735,7 +785,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                             animate={{ scale: 1 }}
                             transition={bounce}
                           >
-                            <Check size={16} style={{ color: '#22c55e' }} />
+                            <Check size={16} style={{ color: PALETTE.success }} />
                           </motion.div>
                         </motion.div>
                       );
@@ -752,7 +802,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                       >
                         🪿
                       </motion.span>
-                      <p className="text-sm" style={{ color: '#a8a29e' }}>
+                      <p className="text-sm" style={{ color: PALETTE.textMuted }}>
                         Your workspace items will appear here as they&apos;re created
                       </p>
                     </div>
@@ -765,9 +815,9 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="px-5 py-4"
-                    style={{ borderTop: '1px solid rgba(0,0,0,0.04)' }}
+                    style={{ borderTop: `1px solid ${PALETTE.divider}` }}
                   >
-                    <p className="text-xs leading-relaxed" style={{ color: '#78716c' }}>
+                    <p className="text-xs leading-relaxed italic" style={{ color: PALETTE.textMuted }}>
                       {plan.reasoning}
                     </p>
                   </motion.div>
