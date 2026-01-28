@@ -7,9 +7,6 @@ import {
 import { generateFallbackContent } from '@/lib/ai/templates';
 import type { ParsedIntent, GeneratedContent } from '@/lib/ai/types';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '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';
-const AI_MODEL = process.env.AI_MODEL || 'google/gemini-2.0-flash-001';
-
 const requestSchema = z.object({
   intent: z.object({
     userType: z.string(),
@@ -28,16 +25,23 @@ const requestSchema = z.object({
 });
 
 async function callOpenRouter(systemPrompt: string, userPrompt: string): Promise<string> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const model = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-001';
+
+  if (!apiKey) {
+    throw new Error('OPENROUTER_API_KEY is not configured');
+  }
+
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://meos-delta.vercel.app',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'https://meos-delta.vercel.app',
       'X-Title': 'goOS Onboarding',
     },
     body: JSON.stringify({
-      model: AI_MODEL,
+      model,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
@@ -80,32 +84,38 @@ export async function POST(request: NextRequest) {
 
     let content: GeneratedContent;
 
-    try {
-      // Call OpenRouter for content generation
-      const aiResponse = await callOpenRouter(
-        CONTENT_GENERATOR_SYSTEM_PROMPT,
-        buildContentGeneratorPrompt(
-          intent.userType,
-          intent.tone,
-          userPrompt,
-          intent.notes
-        )
-      );
-
-      // Extract and parse JSON
-      const jsonStr = extractJSON(aiResponse);
-      content = JSON.parse(jsonStr);
-
-      // Ensure all notes have content
-      for (const note of intent.notes) {
-        if (!content[note.title]) {
-          content[note.title] = `<h1>${note.title}</h1><p>Add your content here.</p>`;
-        }
-      }
-    } catch (aiError) {
-      console.error('AI content generation failed, using fallback:', aiError);
-      // Use fallback template-based content
+    // Check if AI is configured
+    if (!process.env.OPENROUTER_API_KEY) {
+      console.warn('OPENROUTER_API_KEY not configured, using fallback content');
       content = generateFallbackContent(intent as ParsedIntent);
+    } else {
+      try {
+        // Call OpenRouter for content generation
+        const aiResponse = await callOpenRouter(
+          CONTENT_GENERATOR_SYSTEM_PROMPT,
+          buildContentGeneratorPrompt(
+            intent.userType,
+            intent.tone,
+            userPrompt,
+            intent.notes
+          )
+        );
+
+        // Extract and parse JSON
+        const jsonStr = extractJSON(aiResponse);
+        content = JSON.parse(jsonStr);
+
+        // Ensure all notes have content
+        for (const note of intent.notes) {
+          if (!content[note.title]) {
+            content[note.title] = `<h1>${note.title}</h1><p>Add your content here.</p>`;
+          }
+        }
+      } catch (aiError) {
+        console.error('AI content generation failed, using fallback:', aiError);
+        // Use fallback template-based content
+        content = generateFallbackContent(intent as ParsedIntent);
+      }
     }
 
     return NextResponse.json({
