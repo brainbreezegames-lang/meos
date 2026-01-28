@@ -137,7 +137,7 @@ export function DrawingApp() {
       : strokes;
 
     allStrokes.forEach((stroke) => {
-      if (stroke.points.length < 2) return;
+      if (!stroke || !stroke.points || stroke.points.length < 2) return;
 
       ctx.beginPath();
       ctx.lineCap = 'round';
@@ -178,6 +178,7 @@ export function DrawingApp() {
       : shapes;
 
     allShapes.forEach((shape) => {
+      if (!shape) return;
       ctx.strokeStyle = shape.color;
       ctx.lineWidth = shape.width;
       ctx.lineCap = 'round';
@@ -306,12 +307,14 @@ export function DrawingApp() {
     isDrawingRef.current = false;
 
     if (isShapeTool(tool) && currentShapeRef.current) {
+      const shapeToAdd = { ...currentShapeRef.current };
       setUndoStack((prev) => [...prev, { strokes, shapes }]);
-      setShapes((prev) => [...prev, currentShapeRef.current!]);
+      setShapes((prev) => [...prev, shapeToAdd]);
       currentShapeRef.current = null;
-    } else if (currentStrokeRef.current && currentStrokeRef.current.points.length > 1) {
+    } else if (currentStrokeRef.current && currentStrokeRef.current.points && currentStrokeRef.current.points.length > 1) {
+      const strokeToAdd = { ...currentStrokeRef.current, points: [...currentStrokeRef.current.points] };
       setUndoStack((prev) => [...prev, { strokes, shapes }]);
-      setStrokes((prev) => [...prev, currentStrokeRef.current!]);
+      setStrokes((prev) => [...prev, strokeToAdd]);
       currentStrokeRef.current = null;
     } else {
       currentStrokeRef.current = null;
