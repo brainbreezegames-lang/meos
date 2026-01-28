@@ -32,14 +32,11 @@ const COLORS = [
 ];
 
 const STROKE_WIDTHS = [2, 4, 8, 12, 20];
-const MIN_ZOOM = 0.1;
-const MAX_ZOOM = 5;
 
 export function DrawingApp() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Drawing state
   const [tool, setTool] = useState<Tool>('pen');
   const [color, setColor] = useState('#1a1a1a');
   const [strokeWidth, setStrokeWidth] = useState(4);
@@ -48,20 +45,11 @@ export function DrawingApp() {
   const [undoStack, setUndoStack] = useState<{ strokes: Stroke[]; shapes: Shape[] }[]>([]);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showStrokePicker, setShowStrokePicker] = useState(false);
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
   const [isDark, setIsDark] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
 
-  // Infinite canvas state
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
-
-  // Drawing refs (avoid stale closure issues)
-  const isDrawingRef = useRef(false);
   const currentStrokeRef = useRef<Stroke | null>(null);
   const currentShapeRef = useRef<Shape | null>(null);
-  const lastPointRef = useRef<Point>({ x: 0, y: 0 });
 
   // Detect dark mode
   useEffect(() => {
@@ -74,341 +62,227 @@ export function DrawingApp() {
     return () => observer.disconnect();
   }, []);
 
-  // Resize canvas
+  // Resize canvas to fill container
   useEffect(() => {
-    const updateSize = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setCanvasSize({ width: Math.floor(rect.width), height: Math.floor(rect.height) });
-      }
-    };
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
-  // Convert screen coordinates to world coordinates
-  const screenToWorld = useCallback((screenX: number, screenY: number): Point => {
-    return {
-      x: (screenX - pan.x) / zoom,
-      y: (screenY - pan.y) / zoom,
+    const resize = () => {
+      const rect = container.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.scale(dpr, dpr);
+      redraw();
     };
-  }, [zoom, pan]);
 
-  // Draw everything
+    resize();
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+    return () => resizeObserver.disconnect();
+  }, [strokes, shapes, isDark]);
+
   const redraw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear with background
+    const dpr = window.devicePixelRatio || 1;
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+
+    // Clear canvas
     ctx.fillStyle = isDark ? '#1e1e1c' : '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, width, height);
 
-    // Draw grid for infinite canvas feel
-    ctx.save();
-    ctx.translate(pan.x, pan.y);
-    ctx.scale(zoom, zoom);
-
-    // Grid
-    const gridSize = 50;
-    const startX = Math.floor(-pan.x / zoom / gridSize) * gridSize - gridSize;
-    const startY = Math.floor(-pan.y / zoom / gridSize) * gridSize - gridSize;
-    const endX = startX + (canvas.width / zoom) + gridSize * 2;
-    const endY = startY + (canvas.height / zoom) + gridSize * 2;
-
-    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-    ctx.lineWidth = 1 / zoom;
-    ctx.beginPath();
-    for (let x = startX; x < endX; x += gridSize) {
-      ctx.moveTo(x, startY);
-      ctx.lineTo(x, endY);
+    // Draw all completed strokes
+    for (const stroke of strokes) {
+      drawStroke(ctx, stroke);
     }
-    for (let y = startY; y < endY; y += gridSize) {
-      ctx.moveTo(startX, y);
-      ctx.lineTo(endX, y);
+
+    // Draw current stroke being drawn
+    if (currentStrokeRef.current) {
+      drawStroke(ctx, currentStrokeRef.current);
     }
-    ctx.stroke();
 
-    // Draw strokes - filter out any invalid entries
-    const validStrokes = strokes.filter((s): s is Stroke =>
-      s != null && typeof s === 'object' && Array.isArray(s.points)
-    );
+    // Draw all completed shapes
+    for (const shape of shapes) {
+      drawShape(ctx, shape);
+    }
 
-    const currentStroke = currentStrokeRef.current;
-    const allStrokes = (currentStroke && Array.isArray(currentStroke.points))
-      ? [...validStrokes, currentStroke]
-      : validStrokes;
+    // Draw current shape being drawn
+    if (currentShapeRef.current) {
+      drawShape(ctx, currentShapeRef.current);
+    }
+  }, [strokes, shapes, isDark]);
 
-    for (let i = 0; i < allStrokes.length; i++) {
-      const stroke = allStrokes[i];
-      if (!stroke || !stroke.points || stroke.points.length === 0) continue;
+  const drawStroke = (ctx: CanvasRenderingContext2D, stroke: Stroke) => {
+    if (!stroke.points || stroke.points.length === 0) return;
 
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (stroke.tool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.strokeStyle = 'rgba(0,0,0,1)';
       ctx.lineWidth = stroke.width;
+    } else if (stroke.tool === 'highlighter') {
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.strokeStyle = stroke.color + '80';
+      ctx.lineWidth = stroke.width * 3;
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = stroke.width;
+    }
 
-      if (stroke.tool === 'eraser') {
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.strokeStyle = 'rgba(0,0,0,1)';
-        ctx.fillStyle = 'rgba(0,0,0,1)';
-      } else if (stroke.tool === 'highlighter') {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = stroke.color + '60';
-        ctx.fillStyle = stroke.color + '60';
-        ctx.lineWidth = stroke.width * 3;
-      } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = stroke.color;
-        ctx.fillStyle = stroke.color;
+    ctx.beginPath();
+    ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+
+    if (stroke.points.length === 1) {
+      ctx.lineTo(stroke.points[0].x + 0.1, stroke.points[0].y);
+    } else if (stroke.points.length === 2) {
+      ctx.lineTo(stroke.points[1].x, stroke.points[1].y);
+    } else {
+      for (let i = 1; i < stroke.points.length - 1; i++) {
+        const xc = (stroke.points[i].x + stroke.points[i + 1].x) / 2;
+        const yc = (stroke.points[i].y + stroke.points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(stroke.points[i].x, stroke.points[i].y, xc, yc);
       }
-
-      // Single point - draw a dot
-      if (stroke.points.length === 1) {
-        ctx.beginPath();
-        ctx.arc(stroke.points[0].x, stroke.points[0].y, stroke.width / 2, 0, Math.PI * 2);
-        ctx.fill();
-        continue;
-      }
-
-      ctx.beginPath();
-      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-
-      // Two points - draw a simple line
-      if (stroke.points.length === 2) {
-        ctx.lineTo(stroke.points[1].x, stroke.points[1].y);
-        ctx.stroke();
-        continue;
-      }
-
-      // Smooth curve with quadratic bezier
-      for (let j = 1; j < stroke.points.length - 1; j++) {
-        const xc = (stroke.points[j].x + stroke.points[j + 1].x) / 2;
-        const yc = (stroke.points[j].y + stroke.points[j + 1].y) / 2;
-        ctx.quadraticCurveTo(stroke.points[j].x, stroke.points[j].y, xc, yc);
-      }
-
       const last = stroke.points[stroke.points.length - 1];
       ctx.lineTo(last.x, last.y);
-      ctx.stroke();
     }
-
+    ctx.stroke();
     ctx.globalCompositeOperation = 'source-over';
+  };
 
-    // Draw shapes - filter out any invalid entries
-    const validShapes = shapes.filter((s): s is Shape => s != null && typeof s === 'object');
+  const drawShape = (ctx: CanvasRenderingContext2D, shape: Shape) => {
+    ctx.strokeStyle = shape.color;
+    ctx.lineWidth = shape.width;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
 
-    const currentShape = currentShapeRef.current;
-    const allShapes = currentShape
-      ? [...validShapes, currentShape]
-      : validShapes;
+    const { start, end, type } = shape;
 
-    for (let i = 0; i < allShapes.length; i++) {
-      const shape = allShapes[i];
-      if (!shape || !shape.start || !shape.end) continue;
-
-      ctx.strokeStyle = shape.color;
-      ctx.lineWidth = shape.width;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-
-      const { start, end, type } = shape;
-
-      if (type === 'rectangle') {
-        ctx.rect(start.x, start.y, end.x - start.x, end.y - start.y);
-      } else if (type === 'ellipse') {
-        const cx = (start.x + end.x) / 2;
-        const cy = (start.y + end.y) / 2;
-        const rx = Math.abs(end.x - start.x) / 2;
-        const ry = Math.abs(end.y - start.y) / 2;
-        if (rx > 0 && ry > 0) ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-      } else if (type === 'line') {
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-      } else if (type === 'arrow') {
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        const angle = Math.atan2(end.y - start.y, end.x - start.x);
-        const headLen = 15;
-        ctx.lineTo(end.x - headLen * Math.cos(angle - Math.PI / 6), end.y - headLen * Math.sin(angle - Math.PI / 6));
-        ctx.moveTo(end.x, end.y);
-        ctx.lineTo(end.x - headLen * Math.cos(angle + Math.PI / 6), end.y - headLen * Math.sin(angle + Math.PI / 6));
-      }
-      ctx.stroke();
+    if (type === 'rectangle') {
+      ctx.rect(start.x, start.y, end.x - start.x, end.y - start.y);
+    } else if (type === 'ellipse') {
+      const cx = (start.x + end.x) / 2;
+      const cy = (start.y + end.y) / 2;
+      const rx = Math.abs(end.x - start.x) / 2;
+      const ry = Math.abs(end.y - start.y) / 2;
+      if (rx > 0 && ry > 0) ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+    } else if (type === 'line') {
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(end.x, end.y);
+    } else if (type === 'arrow') {
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(end.x, end.y);
+      const angle = Math.atan2(end.y - start.y, end.x - start.x);
+      const headLen = 15;
+      ctx.lineTo(end.x - headLen * Math.cos(angle - Math.PI / 6), end.y - headLen * Math.sin(angle - Math.PI / 6));
+      ctx.moveTo(end.x, end.y);
+      ctx.lineTo(end.x - headLen * Math.cos(angle + Math.PI / 6), end.y - headLen * Math.sin(angle + Math.PI / 6));
     }
+    ctx.stroke();
+  };
 
-    ctx.restore();
-  }, [strokes, shapes, zoom, pan, isDark]);
-
-  // Redraw on state change
   useEffect(() => {
     redraw();
-  }, [redraw, canvasSize]);
+  }, [redraw]);
 
   const isShapeTool = (t: Tool) => ['rectangle', 'ellipse', 'line', 'arrow'].includes(t);
 
-  const getPointerPos = useCallback((e: React.PointerEvent): Point => {
+  const getPos = (e: React.PointerEvent): Point => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-    const screenX = e.clientX - rect.left;
-    const screenY = e.clientY - rect.top;
-    return screenToWorld(screenX, screenY);
-  }, [screenToWorld]);
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+  };
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    e.stopPropagation();
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    // Middle mouse or space+click for panning
-    if (e.button === 1 || (e.button === 0 && e.altKey)) {
-      setIsPanning(true);
-      panStart.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
-      canvas.style.cursor = 'grabbing';
-      return;
-    }
-
-    const point = getPointerPos(e);
-    isDrawingRef.current = true;
-    lastPointRef.current = point;
+  const handlePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    const pos = getPos(e);
+    setIsDrawing(true);
 
     if (isShapeTool(tool)) {
       currentShapeRef.current = {
         type: tool as Shape['type'],
-        start: point,
-        end: point,
+        start: pos,
+        end: pos,
         color,
         width: strokeWidth,
       };
     } else {
       currentStrokeRef.current = {
-        points: [point],
+        points: [pos],
         color: tool === 'eraser' ? '#ffffff' : color,
         width: tool === 'eraser' ? strokeWidth * 3 : strokeWidth,
         tool: tool as Stroke['tool'],
       };
     }
     redraw();
-  }, [tool, color, strokeWidth, getPointerPos, pan, redraw]);
+  };
 
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    e.stopPropagation();
-
-    if (isPanning) {
-      const dx = e.clientX - panStart.current.x;
-      const dy = e.clientY - panStart.current.y;
-      setPan({ x: panStart.current.panX + dx, y: panStart.current.panY + dy });
-      return;
-    }
-
-    if (!isDrawingRef.current) return;
-
-    const point = getPointerPos(e);
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDrawing) return;
+    const pos = getPos(e);
 
     if (isShapeTool(tool) && currentShapeRef.current) {
-      currentShapeRef.current = { ...currentShapeRef.current, end: point };
-    } else if (currentStrokeRef.current && currentStrokeRef.current.points) {
-      // Simple distance check to avoid too many points
-      const last = lastPointRef.current;
-      const dist = Math.sqrt((point.x - last.x) ** 2 + (point.y - last.y) ** 2);
-      if (dist > 2 / zoom) {
-        currentStrokeRef.current.points.push(point);
-        lastPointRef.current = point;
-      }
+      currentShapeRef.current.end = pos;
+    } else if (currentStrokeRef.current) {
+      currentStrokeRef.current.points.push(pos);
     }
     redraw();
-  }, [isPanning, tool, getPointerPos, zoom, redraw]);
+  };
 
-  const handlePointerUp = useCallback((e?: React.PointerEvent) => {
-    e?.stopPropagation();
-    const canvas = canvasRef.current;
-
-    if (isPanning) {
-      setIsPanning(false);
-      if (canvas) canvas.style.cursor = 'crosshair';
-      return;
-    }
-
-    if (!isDrawingRef.current) return;
-    isDrawingRef.current = false;
+  const handlePointerUp = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
 
     if (isShapeTool(tool) && currentShapeRef.current) {
-      const shapeToAdd = { ...currentShapeRef.current };
-      setUndoStack((prev) => [...prev, { strokes, shapes }]);
-      setShapes((prev) => [...prev, shapeToAdd]);
-    } else if (currentStrokeRef.current && currentStrokeRef.current.points && currentStrokeRef.current.points.length > 1) {
-      const strokeToAdd = {
-        ...currentStrokeRef.current,
-        points: [...currentStrokeRef.current.points]
-      };
-      setUndoStack((prev) => [...prev, { strokes, shapes }]);
-      setStrokes((prev) => [...prev, strokeToAdd]);
+      setUndoStack(prev => [...prev, { strokes, shapes }]);
+      setShapes(prev => [...prev, currentShapeRef.current!]);
+      currentShapeRef.current = null;
+    } else if (currentStrokeRef.current && currentStrokeRef.current.points.length > 0) {
+      setUndoStack(prev => [...prev, { strokes, shapes }]);
+      setStrokes(prev => [...prev, currentStrokeRef.current!]);
+      currentStrokeRef.current = null;
     }
-    // Clear refs after state updates are queued
-    currentStrokeRef.current = null;
-    currentShapeRef.current = null;
-    // Don't call redraw() manually - let useEffect handle it
-  }, [isPanning, tool, strokes, shapes]);
+  };
 
-  // Zoom with wheel - only when not drawing
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Don't zoom while actively drawing
-    if (isDrawingRef.current) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * zoomFactor));
-
-    // Zoom toward mouse position
-    const worldX = (mouseX - pan.x) / zoom;
-    const worldY = (mouseY - pan.y) / zoom;
-    const newPanX = mouseX - worldX * newZoom;
-    const newPanY = mouseY - worldY * newZoom;
-
-    setZoom(newZoom);
-    setPan({ x: newPanX, y: newPanY });
-  }, [zoom, pan]);
-
-  const undo = useCallback(() => {
+  const undo = () => {
     if (undoStack.length === 0) return;
     const prev = undoStack[undoStack.length - 1];
-    setUndoStack((s) => s.slice(0, -1));
+    setUndoStack(s => s.slice(0, -1));
     setStrokes(prev.strokes);
     setShapes(prev.shapes);
-  }, [undoStack]);
+  };
 
-  const clearCanvas = useCallback(() => {
+  const clearCanvas = () => {
     if (strokes.length === 0 && shapes.length === 0) return;
-    setUndoStack((prev) => [...prev, { strokes, shapes }]);
+    setUndoStack(prev => [...prev, { strokes, shapes }]);
     setStrokes([]);
     setShapes([]);
-  }, [strokes, shapes]);
+  };
 
-  const resetView = useCallback(() => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  }, []);
-
-  const exportCanvas = useCallback(() => {
+  const exportCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const link = document.createElement('a');
     link.download = 'drawing.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
-  }, []);
+  };
 
   const ToolBtn = ({ t, icon, label }: { t: Tool; icon: React.ReactNode; label: string }) => (
     <button
@@ -442,9 +316,9 @@ export function DrawingApp() {
   );
 
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--color-bg-base)', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--color-bg-base)' }}>
       {/* Toolbar */}
-      <div style={{ height: 44, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 6, borderBottom: '1px solid var(--color-border-subtle)', background: 'var(--color-bg-base)', flexShrink: 0 }}>
+      <div style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, borderBottom: '1px solid var(--color-border-subtle)', background: 'var(--color-bg-base)', flexShrink: 0 }}>
         {/* Drawing tools */}
         <div style={{ display: 'flex', gap: 2, background: 'var(--color-bg-subtle)', borderRadius: 8, padding: 4 }}>
           <ToolBtn t="pen" label="Pen" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>} />
@@ -509,12 +383,8 @@ export function DrawingApp() {
         {/* Actions */}
         <ActionBtn onClick={undo} disabled={undoStack.length === 0} label="Undo" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>} />
         <ActionBtn onClick={clearCanvas} disabled={strokes.length === 0 && shapes.length === 0} label="Clear" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>} />
-        <ActionBtn onClick={resetView} label="Reset View" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>} />
 
         <div style={{ flex: 1 }} />
-
-        {/* Zoom indicator */}
-        <span style={{ fontSize: 11, color: 'var(--text-tertiary)', marginRight: 8 }}>{Math.round(zoom * 100)}%</span>
 
         {/* Export */}
         <button onClick={exportCanvas} style={{ height: 28, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 5, borderRadius: 6, border: 'none', background: 'var(--color-accent-primary)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
@@ -523,25 +393,16 @@ export function DrawingApp() {
         </button>
       </div>
 
-      {/* Infinite Canvas */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      {/* Canvas */}
+      <div ref={containerRef} style={{ flex: 1, overflow: 'hidden' }}>
         <canvas
           ref={canvasRef}
-          width={canvasSize.width}
-          height={canvasSize.height}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
-          onWheel={handleWheel}
-          style={{ cursor: isPanning ? 'grabbing' : 'crosshair', touchAction: 'none' }}
+          style={{ cursor: 'crosshair', touchAction: 'none', display: 'block' }}
         />
-
-        {strokes.length === 0 && shapes.length === 0 && (
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none', opacity: 0.4 }}>
-            <p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Scroll to zoom, Alt+drag to pan</p>
-          </div>
-        )}
       </div>
     </div>
   );
