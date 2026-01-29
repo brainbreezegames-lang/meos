@@ -8,7 +8,6 @@ import { NextRequest } from 'next/server';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2:free';
-const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
 // Phase 1: Deep Understanding Prompt
 const UNDERSTANDING_PROMPT = `You are analyzing a user's request to build their personal workspace. Extract DEEP understanding, not surface-level parsing.
@@ -315,29 +314,82 @@ async function callAI(prompt: string, retries = 1, maxTokens = 2000): Promise<st
   throw new Error('All AI providers failed');
 }
 
-// Search Unsplash for a landscape wallpaper matching a keyword
-async function searchUnsplashWallpaper(query: string): Promise<string | null> {
-  if (!UNSPLASH_ACCESS_KEY) return null;
-  try {
-    const params = new URLSearchParams({
-      query,
-      orientation: 'landscape',
-      per_page: '1',
-    });
-    const response = await fetch(
-      `https://api.unsplash.com/search/photos?${params}`,
-      { headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` } }
-    );
-    if (!response.ok) return null;
-    const data = await response.json();
-    const photo = data.results?.[0];
-    if (!photo) return null;
-    // Use raw URL with high-quality params for wallpaper
-    return `${photo.urls.raw}&w=2560&h=1440&fit=crop&q=85`;
-  } catch (err) {
-    console.error('Unsplash search failed:', err);
-    return null;
+// Curated Unsplash wallpapers mapped to keywords — no API key needed
+const WALLPAPER_CATALOG: Array<{ keywords: string[]; url: string }> = [
+  // Design / Creative
+  { keywords: ['design', 'creative', 'ui', 'ux', 'graphic', 'minimal', 'workspace', 'studio'],
+    url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=2560&h=1440&fit=crop&q=85' },
+  // Technology / Code / Developer
+  { keywords: ['code', 'developer', 'engineer', 'programming', 'tech', 'software', 'data', 'cyber', 'hacker'],
+    url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=2560&h=1440&fit=crop&q=85' },
+  // Food / Bakery / Chef / Restaurant
+  { keywords: ['food', 'bakery', 'baker', 'chef', 'restaurant', 'cook', 'culinary', 'kitchen', 'cafe', 'coffee'],
+    url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=2560&h=1440&fit=crop&q=85' },
+  // Photography / Camera
+  { keywords: ['photo', 'camera', 'film', 'cinema', 'video', 'visual', 'shoot'],
+    url: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=2560&h=1440&fit=crop&q=85' },
+  // Music / Audio
+  { keywords: ['music', 'audio', 'sound', 'band', 'dj', 'producer', 'singer', 'instrument', 'piano', 'guitar'],
+    url: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=2560&h=1440&fit=crop&q=85' },
+  // Books / Writing / Literature
+  { keywords: ['book', 'write', 'writer', 'author', 'blog', 'journal', 'read', 'library', 'literature', 'poet', 'story'],
+    url: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=2560&h=1440&fit=crop&q=85' },
+  // Travel / Adventure
+  { keywords: ['travel', 'adventure', 'explore', 'wander', 'backpack', 'tourist', 'nomad', 'trip', 'journey'],
+    url: 'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=2560&h=1440&fit=crop&q=85' },
+  // Architecture / Buildings
+  { keywords: ['architect', 'building', 'interior', 'house', 'real estate', 'construction', 'urban', 'city'],
+    url: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=2560&h=1440&fit=crop&q=85' },
+  // Art / Gallery / Painting
+  { keywords: ['art', 'gallery', 'paint', 'illustrat', 'draw', 'sculpt', 'canvas', 'museum', 'craft'],
+    url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=2560&h=1440&fit=crop&q=85' },
+  // Fitness / Sports / Health
+  { keywords: ['fitness', 'gym', 'sport', 'health', 'yoga', 'workout', 'training', 'wellness', 'coach'],
+    url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=2560&h=1440&fit=crop&q=85' },
+  // Fashion / Style
+  { keywords: ['fashion', 'style', 'clothing', 'model', 'brand', 'apparel', 'textile', 'boutique'],
+    url: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=2560&h=1440&fit=crop&q=85' },
+  // Education / Student / Learning
+  { keywords: ['student', 'education', 'learn', 'teach', 'school', 'university', 'study', 'academic', 'tutor'],
+    url: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=2560&h=1440&fit=crop&q=85' },
+  // Business / Finance / Consulting
+  { keywords: ['business', 'finance', 'consulting', 'startup', 'entrepreneur', 'corporate', 'marketing', 'agency'],
+    url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=2560&h=1440&fit=crop&q=85' },
+  // Nature / Garden / Botanical
+  { keywords: ['nature', 'garden', 'plant', 'botanical', 'flower', 'outdoor', 'landscape', 'forest', 'green'],
+    url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=2560&h=1440&fit=crop&q=85' },
+  // Ocean / Marine / Surf
+  { keywords: ['ocean', 'sea', 'marine', 'surf', 'beach', 'coast', 'water', 'dive', 'sail'],
+    url: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=2560&h=1440&fit=crop&q=85' },
+  // Space / Astronomy / Science
+  { keywords: ['space', 'star', 'astro', 'science', 'cosmos', 'galaxy', 'night sky', 'research'],
+    url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2560&h=1440&fit=crop&q=85' },
+  // Gaming / Esports
+  { keywords: ['game', 'gaming', 'esport', 'streamer', 'twitch', 'neon', 'rgb'],
+    url: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=2560&h=1440&fit=crop&q=85' },
+  // Pet / Animal / Vet
+  { keywords: ['pet', 'animal', 'dog', 'cat', 'vet', 'veterinar'],
+    url: 'https://images.unsplash.com/photo-1444212477490-ca407925329e?w=2560&h=1440&fit=crop&q=85' },
+];
+
+// Generic fallbacks — beautiful wallpapers for anything not matched
+const FALLBACK_WALLPAPERS = [
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2560&h=1440&fit=crop&q=85', // Alpine peaks
+  'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=2560&h=1440&fit=crop&q=85', // Sand dunes
+  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=2560&h=1440&fit=crop&q=85', // Abstract blue
+  'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=2560&h=1440&fit=crop&q=85', // Gradient mesh
+  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2560&h=1440&fit=crop&q=85', // Starry peaks
+];
+
+function findWallpaperForKeyword(keyword: string): string {
+  const lower = keyword.toLowerCase();
+  for (const entry of WALLPAPER_CATALOG) {
+    if (entry.keywords.some(kw => lower.includes(kw) || kw.includes(lower))) {
+      return entry.url;
+    }
   }
+  // Return a random fallback
+  return FALLBACK_WALLPAPERS[Math.floor(Math.random() * FALLBACK_WALLPAPERS.length)];
 }
 
 function extractJSON(text: string): unknown {
@@ -607,14 +659,11 @@ export async function POST(request: NextRequest) {
             send('created', { item, remaining: fallback.items.length - i - 1 });
           }
 
-          // Search Unsplash for a wallpaper based on the user's niche
-          const fallbackWallpaperUrl = await searchUnsplashWallpaper(fallback.identity.niche);
-
           send('complete', {
             items: fallback.items,
             summary: fallback.summary,
             understanding: fallback.understanding,
-            wallpaper: fallbackWallpaperUrl ? { url: fallbackWallpaperUrl } : null,
+            wallpaper: { url: findWallpaperForKeyword(fallback.identity.niche) },
           });
 
           controller.close();
@@ -793,15 +842,15 @@ export async function POST(request: NextRequest) {
         }
 
         // ========== WALLPAPER ==========
-        const wallpaperKeyword = (understanding.wallpaperKeyword as string) || (understanding.identity as Record<string, string>)?.niche || '';
-        const wallpaperUrl = wallpaperKeyword ? await searchUnsplashWallpaper(wallpaperKeyword) : null;
+        const wallpaperKeyword = (understanding.wallpaperKeyword as string) || (understanding.identity as Record<string, string>)?.niche || 'creative';
+        const wallpaperUrl = findWallpaperForKeyword(wallpaperKeyword);
 
         // ========== COMPLETE ==========
         send('complete', {
           items: builtItems,
           summary: planData.summary,
           understanding: understanding.understanding,
-          wallpaper: wallpaperUrl ? { url: wallpaperUrl } : null,
+          wallpaper: { url: wallpaperUrl },
         });
 
         controller.close();
