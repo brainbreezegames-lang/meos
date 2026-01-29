@@ -3481,13 +3481,14 @@ function GoOSDemoContent() {
 
     // Handle AI onboarding completion
     const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string, wallpaperData?: { url: string } | null) => {
-        console.log('Onboarding complete with', items.length, 'items');
+        console.log('[onboarding] Complete with', items.length, 'items, wallpaper:', wallpaperData);
         fileCreationIndexRef.current = 0;
         createdFoldersRef.current = {};
         setHasOnboarded(true);
         onboarding.completeOnboarding();
         // Set personalized wallpaper from Unsplash if provided
         if (wallpaperData?.url) {
+            console.log('[onboarding] Setting wallpaper:', wallpaperData.url);
             setWallpaper(wallpaperData.url);
         }
         showGoOSToast('Your nest is ready! 🪿', 'success');
@@ -4336,6 +4337,10 @@ function GoOSDemoContent() {
                         zIndex: 0,
                     }}
                     draggable={false}
+                    onError={(e) => {
+                        console.error('[wallpaper] Failed to load image:', wallpaper);
+                        (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                 />
                 {/* Dark overlay for readability (30% opacity) */}
                 <div

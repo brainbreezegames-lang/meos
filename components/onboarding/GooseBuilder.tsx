@@ -157,6 +157,8 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
   const [, setCurrentPurpose] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [thinkingLines, setThinkingLines] = useState<string[]>([]);
+  const [promptKeywords, setPromptKeywords] = useState<string[]>([]);
 
   const hasStartedRef = useRef(false);
   const hasCompletedRef = useRef(false);
@@ -198,7 +200,10 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
         const p = data.phase as Phase;
         setPhase(p);
         setStatusMessage(pickLine(p));
-        playSound('bubble');
+        // Phase-specific sounds
+        if (p === 'understanding') playSound('bubble');
+        else if (p === 'planning') playSound('bubble');
+        else if (p === 'building') playSound('pop');
         break;
       }
       case 'understanding': {
@@ -247,7 +252,11 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
           const items = data.items as BuildItem[];
           const summary = data.summary as string;
           const wallpaper = data.wallpaper as { url: string } | null | undefined;
-          setTimeout(() => onCompleteRef.current(items, summary, wallpaper), 2500);
+          console.log('[GooseBuilder] Complete event — wallpaper:', wallpaper);
+          setTimeout(() => {
+            console.log('[GooseBuilder] Calling onComplete with wallpaper:', wallpaper);
+            onCompleteRef.current(items, summary, wallpaper);
+          }, 2500);
         }
         break;
       }
@@ -255,6 +264,18 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
         setPhase('error');
         setError(data.message as string);
         setStatusMessage(pickLine('error'));
+        break;
+      }
+      case 'thinking': {
+        const text = data.text as string;
+        if (text) {
+          setThinkingLines(prev => [...prev.slice(-4), text]); // Keep last 5 lines
+          playSound('clickSoft');
+        }
+        break;
+      }
+      case 'prompt_keywords': {
+        setPromptKeywords((data.keywords as string[]) || []);
         break;
       }
     }
@@ -276,13 +297,9 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
       const decoder = new TextDecoder();
       let buffer = '';
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const messages = buffer.split('\n\n');
-        buffer = messages.pop() || '';
-
+      const processSSEBuffer = (raw: string) => {
+        const messages = raw.split('\n\n');
+        const remainder = messages.pop() || '';
         for (const msg of messages) {
           if (!msg.trim()) continue;
           const lines = msg.split('\n');
@@ -300,6 +317,20 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
             }
           }
         }
+        return remainder;
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        buffer = processSSEBuffer(buffer);
+      }
+
+      // Flush remaining buffer — the stream may close before the final \n\n
+      buffer += decoder.decode(); // flush TextDecoder
+      if (buffer.trim()) {
+        processSSEBuffer(buffer + '\n\n');
       }
     } catch (err) {
       console.error('Stream error:', err);
