@@ -48,7 +48,8 @@ interface GooseBuilderProps {
   isActive: boolean;
   prompt: string;
   onItemCreated: (item: BuildItem, remaining: number) => void;
-  onComplete: (items: BuildItem[], summary: string, wallpaper?: { url: string } | null) => void;
+  onComplete: (items: BuildItem[], summary: string) => void;
+  onWallpaper: (url: string) => void;
   onError: (message: string) => void;
 }
 
@@ -145,7 +146,7 @@ function pickLine(phase: Phase): string {
 // Component
 // ============================================================================
 
-export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onError }: GooseBuilderProps) {
+export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWallpaper, onError }: GooseBuilderProps) {
   const prefersReducedMotion = useReducedMotion();
 
   const [phase, setPhase] = useState<Phase>('connecting');
@@ -167,9 +168,11 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
   // Use refs for callbacks to avoid stale closures in the SSE reader loop.
   const onItemCreatedRef = useRef(onItemCreated);
   const onCompleteRef = useRef(onComplete);
+  const onWallpaperRef = useRef(onWallpaper);
   const onErrorRef = useRef(onError);
   onItemCreatedRef.current = onItemCreated;
   onCompleteRef.current = onComplete;
+  onWallpaperRef.current = onWallpaper;
   onErrorRef.current = onError;
 
   // Queue for serializing item creation — prevents race conditions
@@ -241,6 +244,14 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
         playSound('bubble');
         break;
       }
+      case 'wallpaper': {
+        const url = data.url as string;
+        if (url) {
+          console.log('[GooseBuilder] Wallpaper event — setting immediately:', url);
+          onWallpaperRef.current(url);
+        }
+        break;
+      }
       case 'complete': {
         if (!hasCompletedRef.current) {
           hasCompletedRef.current = true;
@@ -251,11 +262,8 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
           setShowConfetti(true);
           const items = data.items as BuildItem[];
           const summary = data.summary as string;
-          const wallpaper = data.wallpaper as { url: string } | null | undefined;
-          console.log('[GooseBuilder] Complete event — wallpaper:', wallpaper);
           setTimeout(() => {
-            console.log('[GooseBuilder] Calling onComplete with wallpaper:', wallpaper);
-            onCompleteRef.current(items, summary, wallpaper);
+            onCompleteRef.current(items, summary);
           }, 2500);
         }
         break;

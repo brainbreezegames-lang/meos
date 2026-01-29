@@ -3480,17 +3480,18 @@ function GoOSDemoContent() {
     }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, createWidget, goosContext]);
 
     // Handle AI onboarding completion
-    const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string, wallpaperData?: { url: string } | null) => {
-        console.log('[onboarding] Complete with', items.length, 'items, wallpaper:', wallpaperData);
+    // Set wallpaper immediately when the AI picks one (before build finishes)
+    const handleOnboardingWallpaper = useCallback((url: string) => {
+        console.log('[onboarding] Setting wallpaper early:', url);
+        setWallpaper(url);
+    }, []);
+
+    const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
+        console.log('[onboarding] Complete with', items.length, 'items');
         fileCreationIndexRef.current = 0;
         createdFoldersRef.current = {};
         setHasOnboarded(true);
         onboarding.completeOnboarding();
-        // Set personalized wallpaper from Unsplash if provided
-        if (wallpaperData?.url) {
-            console.log('[onboarding] Setting wallpaper:', wallpaperData.url);
-            setWallpaper(wallpaperData.url);
-        }
         showGoOSToast('Your nest is ready! 🪿', 'success');
     }, [onboarding, showGoOSToast]);
 
@@ -6096,6 +6097,7 @@ function GoOSDemoContent() {
                 prompt={onboarding.prompt || ''}
                 onItemCreated={handleItemCreated}
                 onComplete={handleOnboardingComplete}
+                onWallpaper={handleOnboardingWallpaper}
                 onError={handleOnboardingError}
             />
 

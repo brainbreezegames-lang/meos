@@ -652,6 +652,9 @@ export async function POST(request: NextRequest) {
 
           send('thinking', { text: 'Setting up a great starting point for you...', phase: 'understanding' });
 
+          // Send wallpaper immediately so it loads while building
+          send('wallpaper', { url: findWallpaperForKeyword(fallback.identity.niche) });
+
           send('prompt_keywords', {
             keywords: [
               fallback.identity.profession,
@@ -686,7 +689,6 @@ export async function POST(request: NextRequest) {
             items: fallback.items,
             summary: fallback.summary,
             understanding: fallback.understanding,
-            wallpaper: { url: findWallpaperForKeyword(fallback.identity.niche) },
           });
 
           controller.close();
@@ -699,6 +701,10 @@ export async function POST(request: NextRequest) {
           goals: understanding.goals,
           tone: understanding.tone,
         });
+
+        // Send wallpaper immediately so it loads while building
+        const wallpaperKeyword = (understanding.wallpaperKeyword as string) || (understanding.identity as Record<string, string>)?.niche || 'creative';
+        send('wallpaper', { url: findWallpaperForKeyword(wallpaperKeyword) });
 
         send('prompt_keywords', {
           keywords: [
@@ -887,16 +893,11 @@ export async function POST(request: NextRequest) {
           await new Promise(resolve => setTimeout(resolve, 400));
         }
 
-        // ========== WALLPAPER ==========
-        const wallpaperKeyword = (understanding.wallpaperKeyword as string) || (understanding.identity as Record<string, string>)?.niche || 'creative';
-        const wallpaperUrl = findWallpaperForKeyword(wallpaperKeyword);
-
         // ========== COMPLETE ==========
         send('complete', {
           items: builtItems,
           summary: planData.summary,
           understanding: understanding.understanding,
-          wallpaper: { url: wallpaperUrl },
         });
 
         controller.close();
