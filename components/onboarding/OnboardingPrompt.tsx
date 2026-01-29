@@ -93,13 +93,18 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-          style={{ background: '#0a0a0a' }}
+          style={{
+            backgroundImage: 'url(/bg21.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundColor: '#0a0a0a',
+          }}
         >
-          {/* Subtle radial glow — no photo, just atmosphere */}
+          {/* Dark overlay for text readability */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(249,115,22,0.04) 0%, transparent 70%)',
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 100%)',
             }}
           />
 
