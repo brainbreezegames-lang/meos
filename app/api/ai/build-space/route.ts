@@ -234,10 +234,12 @@ Return ONLY valid JSON in this exact format:
   "frozenRows": 1
 }`;
 
-// Primary: Gemini API (more reliable)
 // OpenRouter API (Kimi K2.5)
-async function callOpenRouter(prompt: string, maxTokens = 2000): Promise<string> {
+async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string> {
   if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not configured');
+
+  const startTime = Date.now();
+  console.log(`[AI] Calling Kimi K2.5 (max_tokens=${maxTokens})...`);
 
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -255,18 +257,29 @@ async function callOpenRouter(prompt: string, maxTokens = 2000): Promise<string>
     }),
   });
 
+  const elapsed = Date.now() - startTime;
+
   if (!response.ok) {
     const error = await response.text();
-    console.error('OpenRouter error:', response.status, error);
+    console.error(`[AI] OpenRouter error (${elapsed}ms):`, response.status, error);
     throw new Error(`OpenRouter error: ${response.status}`);
   }
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content || '';
+  const content = data.choices?.[0]?.message?.content || '';
+
+  console.log(`[AI] Response received (${elapsed}ms, ${content.length} chars, finish=${data.choices?.[0]?.finish_reason})`);
+
+  if (!content || content.trim().length === 0) {
+    console.error('[AI] Empty response from Kimi K2.5');
+    throw new Error('Empty response from Kimi K2.5');
+  }
+
+  return content;
 }
 
 // Call Kimi K2.5 via OpenRouter with retries
-async function callAI(prompt: string, retries = 1, maxTokens = 2000): Promise<string> {
+async function callAI(prompt: string, retries = 1, maxTokens = 4000): Promise<string> {
   if (!OPENROUTER_API_KEY) {
     throw new Error('OPENROUTER_API_KEY not configured');
   }
@@ -803,8 +816,11 @@ export async function POST(request: NextRequest) {
 
         try {
           const understandingPrompt = UNDERSTANDING_PROMPT.replace('{input}', prompt);
+          console.log('[AI] Phase 1: Understanding...');
           const understandingRaw = await callAI(understandingPrompt);
+          console.log(`[AI] Understanding raw: ${understandingRaw.length} chars`);
           understanding = extractJSON(understandingRaw) as Record<string, unknown>;
+          console.log('[AI] Understanding parsed OK:', Object.keys(understanding).join(', '));
 
           // Extract insights to share
           const identity = understanding.identity as Record<string, string>;
@@ -887,7 +903,9 @@ export async function POST(request: NextRequest) {
 
         // Send wallpaper immediately so it loads while building
         const wallpaperKeyword = (understanding.wallpaperKeyword as string) || (understanding.identity as Record<string, string>)?.niche || 'creative';
-        send('wallpaper', { url: findWallpaperForKeyword(wallpaperKeyword) });
+        const wallpaperUrl = findWallpaperForKeyword(wallpaperKeyword);
+        console.log(`[AI] Wallpaper keyword="${wallpaperKeyword}" → url="${wallpaperUrl.substring(0, 80)}..."`);
+        send('wallpaper', { url: wallpaperUrl });
 
         send('prompt_keywords', {
           keywords: [
@@ -903,7 +921,9 @@ export async function POST(request: NextRequest) {
         send('thinking', { text: 'Designing something tailored for you...', phase: 'planning' });
 
         const planningPrompt = PLANNING_PROMPT.replace('{context}', JSON.stringify(understanding, null, 2));
-        const planningRaw = await callAI(planningPrompt);
+        console.log('[AI] Phase 2: Planning...');
+        const planningRaw = await callAI(planningPrompt, 1, 6000);
+        console.log(`[AI] Planning raw: ${planningRaw.length} chars`);
 
         let plan: Record<string, unknown>;
         try {
@@ -1026,6 +1046,7 @@ export async function POST(request: NextRequest) {
           } else {
             // HTML content for notes, case-studies, embeds
             try {
+              console.log(`[AI] Generating content for "${item.name}" (type=${item.type})...`);
               const contentPrompt = CONTENT_PROMPT
                 .replace('{context}', JSON.stringify(understanding, null, 2))
                 .replace('{name}', item.name as string)
@@ -1038,8 +1059,9 @@ export async function POST(request: NextRequest) {
 
               // Clean up any markdown code blocks from content
               content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
+              console.log(`[AI] Content for "${item.name}": ${content.length} chars`);
             } catch (contentError) {
-              console.error(`Content generation failed for ${item.name}:`, contentError);
+              console.error(`[AI] Content generation failed for ${item.name}:`, contentError);
               content = `<h1>${item.name}</h1><p>Add your content here to personalize this section.</p>`;
             }
           }
