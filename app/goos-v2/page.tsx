@@ -609,6 +609,15 @@ const GoOSSheetEditor = dynamic(
     }
 );
 
+// Lazy load Custom App window component (iframe-based renderer)
+const GoOSCustomAppWindow = dynamic(
+    () => import('@/components/goos-editor/GoOSCustomAppWindow').then(mod => ({ default: mod.GoOSCustomAppWindow })),
+    {
+        loading: () => <PlayfulLoader />,
+        ssr: false
+    }
+);
+
 // Lazy load heavy view components (conditionally rendered, not needed on initial load)
 const DrawingApp = dynamic(
     () => import('@/components/apps/DrawingApp').then(mod => ({ default: mod.DrawingApp })),
@@ -5199,6 +5208,35 @@ function GoOSDemoContent() {
                                     if (file.type === 'sheet') {
                                         return (
                                             <GoOSSheetEditor
+                                                key={file.id}
+                                                file={file as any}
+                                                onClose={() => closeEditor(file.id)}
+                                                onMinimize={() => minimizeEditor(file.id)}
+                                                onMaximize={() => toggleMaximizeEditor(file.id)}
+                                                isMaximized={maximizedEditors.has(file.id)}
+                                                onUpdate={(updates) => {
+                                                    if (updates.content !== undefined || updates.title !== undefined) {
+                                                        goosAutoSave(file.id, updates.content ?? file.content, updates.title);
+                                                    }
+                                                    if (updates.status !== undefined) {
+                                                        if (updates.status === 'published') {
+                                                            publishGoOSFile(file.id);
+                                                            celebrate();
+                                                        } else {
+                                                            unpublishGoOSFile(file.id);
+                                                        }
+                                                    }
+                                                }}
+                                                isActive={activeEditorId === file.id}
+                                                zIndex={windowZ[`editor-${file.id}`] || topZIndex}
+                                            />
+                                        );
+                                    }
+
+                                    // Render Custom App Window for custom-app files
+                                    if (file.type === 'custom-app') {
+                                        return (
+                                            <GoOSCustomAppWindow
                                                 key={file.id}
                                                 file={file as any}
                                                 onClose={() => closeEditor(file.id)}

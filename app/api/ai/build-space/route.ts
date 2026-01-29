@@ -68,6 +68,7 @@ FILES (rich content):
 - board: Kanban board with columns and cards — use for plans, workflows, task tracking, learning paths, project pipelines. Pre-fill with REAL useful cards.
 - sheet: Spreadsheet with rows and columns — use for data tables, word lists, price lists, schedules, trackers. Pre-fill with REAL data (at least 10-20 rows).
 - link: URL shortcut on the desktop — use for useful external resources, tools, references. You MUST provide a real valid linkUrl for each link item.
+- custom-app: Self-contained interactive HTML app (inline CSS + JS). Use for tools, utilities, mini-apps that need genuine interactivity: Pomodoro timer, habit tracker, invoice calculator, CRM dashboard, unit converter, color picker, mood journal, workout logger, recipe scaler, budget planner, etc. ONLY use custom-app when the user needs real interactivity (buttons, inputs, state changes, timers). For static content, use note or case-study instead.
 
 WIDGETS (interactive elements — use when the user needs functional tools, not just content):
 - widget: Interactive widget. You MUST set "widgetType" to one of:
@@ -90,10 +91,7 @@ IMPORTANT: Create 6-12 items that are SPECIFIC to this user. Mix files AND widge
 - Link items for useful external resources (tools, references, communities, etc.)
 - Use folders to group related items (e.g., "Resources" folder with links inside, or "Portfolio" folder with case studies)
 
-If the user asks for something that can't be built with available components (custom calculator, store, interactive tool):
-- Create a note as a thoughtful placeholder that acknowledges the need
-- Describe what the tool would do and suggest a workaround
-- Never promise features that don't exist — be honest and helpful
+If the user asks for interactive tools or mini-apps (calculator, timer, tracker, CRM, planner, etc.), use the "custom-app" type. These generate fully functional self-contained HTML/CSS/JS applications that run inside the desktop.
 
 SPATIAL LAYOUT: Items will be placed on a 4x4 desktop grid (16 positions). Consider visual grouping:
 - Place introductory items (About, Bio) in the top-left area (priority 1-2)
@@ -121,7 +119,7 @@ Return JSON:
     "summary": "One sentence describing what you're building and why",
     "items": [
       {
-        "type": "note|case-study|folder|embed|board|sheet|link|widget",
+        "type": "note|case-study|folder|embed|board|sheet|link|custom-app|widget",
         "widgetType": "status|contact|book|links|tipjar|feedback (ONLY when type is widget, omit otherwise)",
         "name": "Short descriptive name (2-4 words)",
         "purpose": "Why THIS user needs this (1 sentence)",
@@ -233,6 +231,48 @@ Return ONLY valid JSON in this exact format:
   ],
   "frozenRows": 1
 }`;
+
+// Phase 3d: Content for custom apps (self-contained HTML/CSS/JS)
+const CUSTOM_APP_CONTENT_PROMPT = `Generate a complete, self-contained interactive HTML application.
+
+User context:
+{context}
+
+App to create:
+- Name: {name}
+- Purpose: {purpose}
+- Brief: {brief}
+
+Requirements:
+1. Return ONLY the HTML content that goes inside <body> — no <html>, <head>, or <body> tags
+2. Include ALL CSS in a single <style> tag at the very top
+3. Include ALL JavaScript in a single <script> tag at the very bottom
+4. The app must be FULLY FUNCTIONAL with real interactivity — no placeholders, no "coming soon"
+5. Use modern CSS (flexbox, grid, custom properties, transitions)
+6. Use vanilla JavaScript only — no frameworks, no imports, no CDN links, no external resources
+7. Use these CSS variables for theming so the app matches the desktop:
+   - var(--color-bg-base) — main background
+   - var(--color-bg-elevated) — cards, panels, modals
+   - var(--color-bg-subtle) — secondary backgrounds, hover states
+   - var(--color-text-primary) — main text color
+   - var(--color-text-secondary) — secondary text
+   - var(--color-text-muted) — muted/placeholder text
+   - var(--color-accent-primary) — buttons, active states, highlights (orange #ff7722)
+   - var(--color-accent-secondary) — secondary accent (purple #3d2fa9)
+   - var(--color-success) — success states
+   - var(--color-error) — error/danger states
+   - var(--color-border-default) — borders
+   - var(--color-border-subtle) — subtle borders
+   - var(--radius-sm) / var(--radius-md) / var(--radius-lg) — border radius (6px/10px/12px)
+8. Design for a window approximately 640x480px but make it responsive
+9. Use smooth CSS transitions (0.15s-0.2s ease) for hover states and interactions
+10. Include meaningful default data so the app feels alive on first open (pre-filled entries, sample data, realistic defaults)
+11. Typography: use system font stack, clear hierarchy with font-weight and size contrast
+12. Make buttons feel tactile: subtle hover lift, active press, appropriate cursor
+13. Keep the code under 4000 lines total
+14. The aesthetic should be warm, polished, and premium — think Apple/macOS quality
+
+IMPORTANT: Return ONLY the raw HTML content (style tag + markup + script tag). No markdown code fences, no explanation, no comments outside the code.`;
 
 // OpenRouter API (Kimi K2.5)
 async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string> {
@@ -1042,6 +1082,33 @@ export async function POST(request: NextRequest) {
                 ],
                 frozenRows: 1,
               });
+            }
+          } else if (itemType === 'custom-app') {
+            // Generate self-contained HTML/CSS/JS app
+            try {
+              console.log(`[AI] Generating custom app for "${item.name}"...`);
+              const appPrompt = CUSTOM_APP_CONTENT_PROMPT
+                .replace('{context}', JSON.stringify(understanding, null, 2))
+                .replace('{name}', item.name as string)
+                .replace('{purpose}', item.purpose as string)
+                .replace('{brief}', item.contentBrief as string);
+
+              content = await callAI(appPrompt, 1, 8000);
+
+              // Clean up any markdown code blocks from content
+              content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
+              console.log(`[AI] Custom app for "${item.name}": ${content.length} chars`);
+            } catch (contentError) {
+              console.error(`[AI] Custom app generation failed for ${item.name}:`, contentError);
+              content = `<style>
+  .fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center; gap: 12px; padding: 32px; }
+  .fallback h2 { color: var(--color-text-primary, #171412); font-size: 20px; font-weight: 600; margin: 0; }
+  .fallback p { color: var(--color-text-muted, #8a8680); margin: 0; max-width: 280px; line-height: 1.5; }
+</style>
+<div class="fallback">
+  <h2>${item.name}</h2>
+  <p>This app is being set up. Edit the content to add your custom HTML, CSS, and JavaScript.</p>
+</div>`;
             }
           } else {
             // HTML content for notes, case-studies, embeds

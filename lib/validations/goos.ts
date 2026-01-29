@@ -13,6 +13,7 @@ export const goosFileTypeSchema = z.enum([
   'game',        // Interactive game (snake, etc.)
   'board',       // Kanban board
   'sheet',       // Spreadsheet
+  'custom-app',  // AI-generated interactive HTML app
 ]);
 export type GoOSFileType = z.infer<typeof goosFileTypeSchema>;
 

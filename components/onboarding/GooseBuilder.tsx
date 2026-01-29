@@ -89,7 +89,7 @@ interface PlanData {
 
 const ICON_MAP: Record<string, typeof FileText> = {
   note: FileText, 'case-study': FileText, folder: Folder, embed: Globe,
-  board: Kanban, sheet: Table2, link: Link2,
+  board: Kanban, sheet: Table2, link: Link2, 'custom-app': Layout,
   status: Star, contact: MessageSquare, links: Link2, book: CalendarCheck,
   tipjar: Heart, feedback: MessageSquare, clock: Clock, widget: Layout,
 };

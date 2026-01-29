@@ -269,12 +269,13 @@ export function GoOSProvider({
     const position = customPosition
       ? findNonOverlappingPosition(basePosition, parentId)
       : basePosition; // getNextPosition already calls findNonOverlappingPosition
-    const title = type === 'folder' ? 'New Folder' : type === 'cv' ? 'My CV' : type === 'board' ? 'Untitled Board' : type === 'sheet' ? 'Untitled Sheet' : `Untitled ${type}`;
+    const title = type === 'folder' ? 'New Folder' : type === 'cv' ? 'My CV' : type === 'board' ? 'Untitled Board' : type === 'sheet' ? 'Untitled Sheet' : type === 'custom-app' ? 'Untitled App' : `Untitled ${type}`;
 
     // Set default content for structured file types
     const content = type === 'cv' ? JSON.stringify(getDefaultCVContent())
       : type === 'board' ? JSON.stringify(getDefaultBoardContent())
       : type === 'sheet' ? JSON.stringify(getDefaultSheetContent())
+      : type === 'custom-app' ? '<style>\n  .app { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; gap: 16px; padding: 32px; }\n  h1 { color: var(--color-text-primary); font-size: 24px; font-weight: 600; }\n  p { color: var(--color-text-muted); }\n</style>\n<div class="app">\n  <h1>My App</h1>\n  <p>Edit the HTML to build your custom app.</p>\n</div>'
       : '';
 
     // Create file object
