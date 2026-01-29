@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowUp, Loader2 } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
 
 interface OnboardingPromptProps {
@@ -32,14 +32,92 @@ const PRESETS = [
   },
 ];
 
+// Typewriter example prompts — cycles through these to inspire users
+const TYPEWRITER_EXAMPLES = [
+  "I'm a wedding photographer based in Portland. I want to showcase my portfolio and let couples book me...",
+  "I'm learning Japanese and want a study space with vocab lists, a learning plan, and useful resources...",
+  "I run a small bakery and need a digital menu, contact form, and links to my Instagram and Yelp...",
+  "I'm a freelance illustrator. I need a portfolio, pricing guide, and a way for clients to reach me...",
+  "I'm a student organizing my thesis research — notes, reading lists, and a project timeline...",
+  "I teach yoga online. I want class schedules, a booking system, and links to my YouTube channel...",
+];
+
+// ============================================================================
+// Typewriter Hook
+// ============================================================================
+
+function useTypewriter(examples: string[], typingSpeed = 45, pauseDuration = 2200, erasingSpeed = 20) {
+  const [displayText, setDisplayText] = useState('');
+  const [isActive, setIsActive] = useState(true);
+  const indexRef = useRef(0);
+  const charRef = useRef(0);
+  const phaseRef = useRef<'typing' | 'pausing' | 'erasing'>('typing');
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stop = useCallback(() => {
+    setIsActive(false);
+    setDisplayText('');
+    if (timerRef.current) clearTimeout(timerRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    const tick = () => {
+      const currentExample = examples[indexRef.current % examples.length];
+
+      if (phaseRef.current === 'typing') {
+        charRef.current++;
+        setDisplayText(currentExample.slice(0, charRef.current));
+
+        if (charRef.current >= currentExample.length) {
+          phaseRef.current = 'pausing';
+          timerRef.current = setTimeout(tick, pauseDuration);
+        } else {
+          timerRef.current = setTimeout(tick, typingSpeed + Math.random() * 30);
+        }
+      } else if (phaseRef.current === 'pausing') {
+        phaseRef.current = 'erasing';
+        timerRef.current = setTimeout(tick, erasingSpeed);
+      } else if (phaseRef.current === 'erasing') {
+        charRef.current -= 2;
+        if (charRef.current <= 0) {
+          charRef.current = 0;
+          setDisplayText('');
+          indexRef.current = (indexRef.current + 1) % examples.length;
+          phaseRef.current = 'typing';
+          timerRef.current = setTimeout(tick, 400);
+        } else {
+          setDisplayText(currentExample.slice(0, charRef.current));
+          timerRef.current = setTimeout(tick, erasingSpeed);
+        }
+      }
+    };
+
+    // Start after a brief delay
+    timerRef.current = setTimeout(tick, 800);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [isActive, examples, typingSpeed, pauseDuration, erasingSpeed]);
+
+  return { displayText, stop, isActive };
+}
+
+// ============================================================================
+// Component
+// ============================================================================
+
 export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false }: OnboardingPromptProps) {
   const [prompt, setPrompt] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const typewriter = useTypewriter(TYPEWRITER_EXAMPLES);
+  const [userHasInteracted, setUserHasInteracted] = useState(false);
 
   useEffect(() => {
     if (isOpen && textareaRef.current) {
       playSound('expand');
-      setTimeout(() => textareaRef.current?.focus(), 400);
     }
   }, [isOpen]);
 
@@ -57,8 +135,24 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
   useEffect(() => {
     if (!isOpen) {
       setPrompt('');
+      setUserHasInteracted(false);
     }
   }, [isOpen]);
+
+  const handleTextareaFocus = useCallback(() => {
+    if (!userHasInteracted) {
+      setUserHasInteracted(true);
+      typewriter.stop();
+    }
+  }, [userHasInteracted, typewriter]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (!userHasInteracted) {
+      setUserHasInteracted(true);
+      typewriter.stop();
+    }
+    setPrompt(e.target.value);
+  }, [userHasInteracted, typewriter]);
 
   const handleSubmit = () => {
     if (prompt.trim().length >= 10 && !isLoading) {
@@ -76,6 +170,8 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
 
   const handlePresetClick = (presetPrompt: string) => {
     playSound('bubble');
+    setUserHasInteracted(true);
+    typewriter.stop();
     setPrompt(presetPrompt);
     setTimeout(() => {
       onSubmit(presetPrompt);
@@ -84,203 +180,257 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
 
   const canSubmit = prompt.trim().length >= 10;
 
+  // Shared text shadow for readability on the sky background
+  const softShadow = '0 1px 12px rgba(0,0,0,0.35), 0 0px 4px rgba(0,0,0,0.2)';
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[10000] flex flex-col overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
           style={{
             backgroundImage: 'url(/bg21.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundColor: '#0a0a0a',
+            backgroundColor: '#b8cce0',
           }}
         >
-          {/* Dark overlay for text readability */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 100%)',
-            }}
-          />
+          {/* Layout: push content toward lower-center like the reference */}
+          <div className="relative z-10 flex-1 flex flex-col items-center justify-end pb-[12vh] px-6">
 
-          {/* Content */}
-          <div className="relative z-10 w-full max-w-xl px-6 flex flex-col items-center">
-
-            {/* Logo — editorial serif italic, dramatic scale */}
+            {/* Logo — large, warm, serif italic */}
             <motion.h1
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.1, duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
               style={{
-                fontSize: 'clamp(4.5rem, 14vw, 8rem)',
-                fontWeight: 400,
+                fontSize: 'clamp(4rem, 12vw, 7rem)',
+                fontWeight: 300,
                 fontStyle: 'italic',
                 fontFamily: 'Georgia, "Times New Roman", serif',
                 color: '#fff',
-                letterSpacing: '-0.03em',
-                lineHeight: 0.9,
-                marginBottom: '1.5rem',
+                letterSpacing: '-0.035em',
+                lineHeight: 0.95,
+                marginBottom: '0.75rem',
+                textShadow: softShadow,
               }}
             >
               goOS
             </motion.h1>
 
-            {/* Subtitle */}
+            {/* Subtitle — friendly, approachable */}
             <motion.p
-              className="text-center mb-12"
+              className="text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.2, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
               style={{
-                fontSize: '1.125rem',
-                color: 'rgba(255,255,255,0.45)',
-                lineHeight: 1.6,
-                maxWidth: '28rem',
+                fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+                color: 'rgba(255,255,255,0.85)',
+                lineHeight: 1.5,
+                maxWidth: '30rem',
+                textShadow: '0 1px 8px rgba(0,0,0,0.25)',
+                marginBottom: '2.5rem',
               }}
             >
               Your personal space on the internet.
               <br />
-              Describe yourself to get started.
+              Describe what you&apos;re building, and watch your workspace come to life.
             </motion.p>
 
-            {/* Input area — solid dark card, no glass */}
+            {/* Prompt input — white card, warm and clean */}
             <motion.div
-              className="w-full mb-8"
-              initial={{ opacity: 0, y: 20 }}
+              className="w-full"
+              style={{ maxWidth: 600 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              transition={{ delay: 0.3, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             >
               <div
-                className="relative rounded-2xl"
+                className="relative rounded-2xl overflow-hidden"
                 style={{
-                  background: '#141414',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  background: 'rgba(255,255,255,0.95)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  boxShadow: '0 4px 32px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)',
                 }}
               >
+                {/* Typewriter overlay — shows when user hasn't interacted yet */}
+                {!userHasInteracted && typewriter.isActive && (
+                  <div
+                    className="absolute top-0 left-0 right-0 px-5 pt-5 pointer-events-none"
+                    style={{ zIndex: 1 }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 16,
+                        lineHeight: 1.6,
+                        color: 'rgba(0,0,0,0.32)',
+                        fontFamily: 'var(--font-body, system-ui)',
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {typewriter.displayText}
+                      <motion.span
+                        animate={{ opacity: [1, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }}
+                        style={{
+                          display: 'inline-block',
+                          width: 2,
+                          height: 18,
+                          background: 'rgba(0,0,0,0.25)',
+                          marginLeft: 1,
+                          verticalAlign: 'text-bottom',
+                          borderRadius: 1,
+                        }}
+                      />
+                    </span>
+                  </div>
+                )}
+
                 <textarea
                   ref={textareaRef}
                   value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  onChange={handleChange}
+                  onFocus={handleTextareaFocus}
                   onKeyDown={handleKeyDown}
-                  placeholder="I'm a photographer who captures authentic moments at weddings..."
+                  placeholder={userHasInteracted ? 'What will you build today?' : ''}
                   disabled={isLoading}
                   rows={3}
-                  className="w-full px-5 pt-5 pb-14 bg-transparent text-base resize-none outline-none placeholder:text-white/20"
+                  className="w-full px-5 pt-5 pb-14 bg-transparent text-base resize-none outline-none"
                   style={{
-                    color: 'rgba(255,255,255,0.9)',
+                    color: 'rgba(0,0,0,0.85)',
                     lineHeight: 1.6,
                     caretColor: '#F97316',
-                  }}
+                    fontFamily: 'var(--font-body, system-ui)',
+                    fontSize: 16,
+                    position: 'relative',
+                    zIndex: 2,
+                    '::placeholder': { color: 'rgba(0,0,0,0.3)' },
+                  } as React.CSSProperties}
                 />
 
-                {/* Bottom bar with submit */}
+                {/* Bottom bar */}
                 <div
                   className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-5 py-3"
-                  style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+                  style={{
+                    borderTop: '1px solid rgba(0,0,0,0.06)',
+                    zIndex: 3,
+                  }}
                 >
-                  <span
-                    className="text-xs"
-                    style={{ color: 'rgba(255,255,255,0.2)' }}
-                  >
+                  <span className="text-xs" style={{ color: 'rgba(0,0,0,0.3)' }}>
                     {prompt.length > 0 && prompt.trim().length < 10
                       ? 'Keep going...'
-                      : 'Press Enter to build'}
+                      : ''}
                   </span>
 
                   <motion.button
                     onClick={handleSubmit}
                     disabled={!canSubmit || isLoading}
-                    className="flex items-center gap-2 rounded-full transition-all"
+                    className="flex items-center justify-center rounded-xl transition-all"
                     style={{
-                      padding: canSubmit ? '8px 18px' : '8px 12px',
-                      background: canSubmit ? '#F97316' : 'rgba(255,255,255,0.05)',
-                      color: canSubmit ? '#0a0a0a' : 'rgba(255,255,255,0.2)',
+                      width: 36,
+                      height: 36,
+                      background: canSubmit ? '#1a1a1a' : 'rgba(0,0,0,0.06)',
+                      color: canSubmit ? '#fff' : 'rgba(0,0,0,0.2)',
+                      cursor: canSubmit ? 'pointer' : 'default',
+                      border: 'none',
                     }}
-                    whileHover={canSubmit && !isLoading ? { scale: 1.03 } : {}}
-                    whileTap={canSubmit && !isLoading ? { scale: 0.97 } : {}}
+                    whileHover={canSubmit && !isLoading ? { scale: 1.06 } : {}}
+                    whileTap={canSubmit && !isLoading ? { scale: 0.94 } : {}}
                   >
                     {isLoading ? (
                       <Loader2 size={16} className="animate-spin" />
                     ) : (
-                      <>
-                        {canSubmit && (
-                          <span className="text-sm font-medium">Build</span>
-                        )}
-                        <ArrowRight size={16} />
-                      </>
+                      <ArrowUp size={18} strokeWidth={2.5} />
                     )}
                   </motion.button>
                 </div>
               </div>
             </motion.div>
 
-            {/* Section label — Cliento style */}
-            <motion.p
-              className="text-xs font-medium uppercase tracking-widest mb-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              style={{ color: 'rgba(255,255,255,0.2)' }}
-            >
-              Quick start
-            </motion.p>
-
-            {/* Presets — simple dark pills, orange dot indicator */}
+            {/* Presets — translucent pills over the sky */}
             <motion.div
-              className="flex flex-wrap justify-center gap-2.5 mb-16"
+              className="flex flex-wrap justify-center gap-2 mt-6"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.5 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
             >
               {PRESETS.map((preset, index) => (
                 <motion.button
                   key={preset.label}
                   onClick={() => handlePresetClick(preset.prompt)}
                   disabled={isLoading}
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-full text-sm transition-all"
+                  className="px-4 py-2 rounded-full text-sm transition-all"
                   style={{
-                    background: '#141414',
-                    color: 'rgba(255,255,255,0.5)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    background: 'rgba(255,255,255,0.18)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    color: 'rgba(255,255,255,0.9)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                    cursor: 'pointer',
+                    fontWeight: 500,
                   }}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + index * 0.05, duration: 0.4 }}
+                  transition={{ delay: 0.55 + index * 0.06, duration: 0.4 }}
                   whileHover={{
-                    borderColor: 'rgba(249,115,22,0.25)',
-                    color: 'rgba(255,255,255,0.85)',
+                    background: 'rgba(255,255,255,0.3)',
+                    borderColor: 'rgba(255,255,255,0.35)',
                   }}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.96 }}
                 >
-                  <span
-                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ background: '#F97316' }}
-                  />
                   {preset.label}
                 </motion.button>
               ))}
             </motion.div>
 
-            {/* Skip */}
-            <motion.button
-              onClick={() => {
-                playSound('collapse');
-                onClose();
-              }}
-              disabled={isLoading}
-              className="text-sm transition-all"
+            {/* Bottom hint */}
+            <motion.p
+              className="mt-8 text-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              style={{ color: 'rgba(255,255,255,0.2)' }}
-              whileHover={{ color: '#F97316' }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+              style={{
+                color: 'rgba(255,255,255,0.55)',
+                textShadow: '0 1px 6px rgba(0,0,0,0.2)',
+              }}
             >
-              Skip — start with empty workspace
+              Press <kbd style={{
+                display: 'inline-block',
+                padding: '2px 8px',
+                borderRadius: 6,
+                background: 'rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                fontSize: 12,
+                fontWeight: 600,
+                marginInline: 4,
+              }}>Enter</kbd> to build your space
+            </motion.p>
+
+            {/* Skip link */}
+            <motion.button
+              onClick={() => { playSound('collapse'); onClose(); }}
+              disabled={isLoading}
+              className="mt-4 text-sm transition-all"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9 }}
+              style={{
+                color: 'rgba(255,255,255,0.4)',
+                textShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              whileHover={{ color: 'rgba(255,255,255,0.7)' }}
+            >
+              or start with an empty workspace
             </motion.button>
           </div>
         </motion.div>

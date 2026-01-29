@@ -83,20 +83,19 @@ interface PlanData {
 }
 
 // ============================================================================
-// Palette — dark floating panel
+// Palette — uses design system CSS variables (light/dark aware)
 // ============================================================================
 
 const C = {
-  bg: '#0a0a0a',
-  panel: 'rgba(18,18,18,0.92)',
-  card: 'rgba(255,255,255,0.04)',
-  border: 'rgba(255,255,255,0.08)',
-  accent: '#F97316',
-  text: 'rgba(255,255,255,0.9)',
-  textSub: 'rgba(255,255,255,0.5)',
-  textMuted: 'rgba(255,255,255,0.25)',
-  success: '#22c55e',
-  error: '#ef4444',
+  panel: 'var(--color-bg-elevated, rgba(255,255,255,0.92))',
+  card: 'var(--color-bg-subtle, rgba(0,0,0,0.03))',
+  border: 'var(--color-border-default, rgba(0,0,0,0.08))',
+  accent: 'var(--color-accent-primary, #ff7722)',
+  text: 'var(--color-text-primary, #171412)',
+  textSub: 'var(--color-text-secondary, #4a4744)',
+  textMuted: 'var(--color-text-muted, #8e827c)',
+  success: 'var(--color-success, #22c55e)',
+  error: 'var(--color-error, #ff3c34)',
 } as const;
 
 // ============================================================================
@@ -381,7 +380,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
             backdropFilter: 'blur(40px)',
             WebkitBackdropFilter: 'blur(40px)',
             border: `1px solid ${C.border}`,
-            boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.04)',
+            boxShadow: 'var(--shadow-xl, 0 16px 48px rgba(23,20,18,0.15))',
           }}
         >
           {/* Animated glow border during building */}
@@ -424,7 +423,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                     style={{
                       fontSize: '0.9375rem',
                       color: C.text,
-                      fontFamily: 'Georgia, "Times New Roman", serif',
+                      fontFamily: 'var(--font-display, Georgia, serif)',
                       fontStyle: 'italic',
                       fontWeight: 400,
                       letterSpacing: '-0.01em',
@@ -450,7 +449,9 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
               {phase !== 'complete' && (
                 <button
                   onClick={handleCancel}
-                  className="flex-shrink-0 p-1 rounded-lg transition-colors hover:bg-white/5"
+                  className="flex-shrink-0 p-1 rounded-lg transition-colors"
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--color-bg-subtle, rgba(0,0,0,0.04))'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                   aria-label="Cancel build"
                 >
                   <X size={14} style={{ color: C.textMuted }} />
@@ -459,7 +460,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
             </div>
 
             {/* Progress bar */}
-            <div className="relative h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="relative h-1 rounded-full overflow-hidden" style={{ background: 'var(--color-bg-subtle, rgba(0,0,0,0.04))' }}>
               <motion.div
                 className="absolute inset-y-0 left-0 rounded-full"
                 animate={{
@@ -500,13 +501,13 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                   {(understanding.identity?.profession || understanding.tone) && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {understanding.identity?.profession && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ background: 'rgba(255,255,255,0.04)', color: C.textSub }}>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ background: 'var(--color-bg-subtle, rgba(0,0,0,0.04))', color: C.textSub }}>
                           <span className="w-1 h-1 rounded-full" style={{ background: C.accent }} />
                           {understanding.identity.profession}
                         </span>
                       )}
                       {understanding.tone && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px]" style={{ background: 'rgba(255,255,255,0.04)', color: C.textSub }}>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px]" style={{ background: 'var(--color-bg-subtle, rgba(0,0,0,0.04))', color: C.textSub }}>
                           {understanding.tone}
                         </span>
                       )}
@@ -617,7 +618,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                     <button
                       onClick={handleRetry}
                       className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all hover:brightness-110"
-                      style={{ background: C.accent, color: '#0a0a0a' }}
+                      style={{ background: C.accent, color: 'var(--color-text-on-accent, #fff)' }}
                     >
                       <RefreshCw size={12} />
                       Try again
@@ -649,7 +650,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
                     animate={{ scale: 1 }}
                     transition={bounce}
                     className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center"
-                    style={{ background: 'rgba(34,197,94,0.1)' }}
+                    style={{ background: 'color-mix(in srgb, var(--color-success, #22c55e) 12%, transparent)' }}
                   >
                     <Check size={20} style={{ color: C.success }} />
                   </motion.div>
