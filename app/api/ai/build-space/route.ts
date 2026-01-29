@@ -7,7 +7,7 @@ import { NextRequest } from 'next/server';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2:free';
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2.5';
 
 // Phase 1: Deep Understanding Prompt
 const UNDERSTANDING_PROMPT = `You are analyzing a user's request to build their personal workspace. Extract DEEP understanding, not surface-level parsing.
@@ -296,24 +296,24 @@ async function callOpenRouter(prompt: string, maxTokens = 2000): Promise<string>
   return data.choices?.[0]?.message?.content || '';
 }
 
-// Try Gemini first, then OpenRouter, with retries
+// Try OpenRouter (Kimi K2.5) first, then Gemini as fallback, with retries
 async function callAI(prompt: string, retries = 1, maxTokens = 2000): Promise<string> {
   for (let attempt = 0; attempt <= retries; attempt++) {
-    // Try Gemini first
-    if (GEMINI_API_KEY) {
-      try {
-        return await callGemini(prompt, maxTokens);
-      } catch (err) {
-        console.error(`Gemini attempt ${attempt} failed:`, err);
-      }
-    }
-
-    // Try OpenRouter as fallback
+    // Try OpenRouter (Kimi K2.5) first
     if (OPENROUTER_API_KEY) {
       try {
         return await callOpenRouter(prompt, maxTokens);
       } catch (err) {
         console.error(`OpenRouter attempt ${attempt} failed:`, err);
+      }
+    }
+
+    // Try Gemini as fallback
+    if (GEMINI_API_KEY) {
+      try {
+        return await callGemini(prompt, maxTokens);
+      } catch (err) {
+        console.error(`Gemini attempt ${attempt} failed:`, err);
       }
     }
 
