@@ -47,7 +47,7 @@ export default function TopNav() {
                         <Link
                             key={item}
                             href="#"
-                            className="text-[13px] text-[var(--color-text-tertiary,#9a938a)] px-2.5 py-1 rounded-md hover:text-[var(--color-text-primary,#1c1c1c)] transition-colors duration-150"
+                            className="text-[13px] text-[var(--color-text-tertiary,#9a938a)] px-2.5 py-1 rounded-md hover:text-[var(--color-text-primary,#171412)] transition-colors duration-150"
                         >
                             {item}
                         </Link>
@@ -89,7 +89,7 @@ export default function TopNav() {
                                 <input
                                     autoFocus
                                     placeholder="Search..."
-                                    className="flex-1 bg-transparent border-none outline-none text-[14px] text-[var(--color-text-primary,#1c1c1c)] placeholder:text-[var(--color-text-tertiary,#9a938a)]"
+                                    className="flex-1 bg-transparent border-none outline-none text-[14px] text-[var(--color-text-primary,#171412)] placeholder:text-[var(--color-text-tertiary,#9a938a)]"
                                 />
                                 <button
                                     onClick={() => setIsSearchOpen(false)}
@@ -134,7 +134,7 @@ export default function TopNav() {
                     className="text-[12px] font-medium px-3 py-1.5 rounded-lg transition-all duration-150 active:scale-[0.98]"
                     style={{
                         background: 'rgba(23, 20, 18, 0.06)',
-                        color: 'var(--color-text-primary, #1c1c1c)',
+                        color: 'var(--color-text-primary, #171412)',
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(23, 20, 18, 0.1)'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(23, 20, 18, 0.06)'}

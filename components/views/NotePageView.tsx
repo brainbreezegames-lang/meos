@@ -21,15 +21,15 @@ import type { ThemeId } from '@/contexts/ThemeContext';
 // Brand Appart design tokens (aligned with useWidgetTheme)
 const tokens = {
   colors: {
-    background: 'var(--color-bg-base)',    // Brand cream
+    background: '#fbf9ef',    // Brand cream
     text: {
-      primary: 'var(--color-text-primary)',     // Brand base
-      secondary: 'var(--color-text-muted)',   // Brand grey
+      primary: '#171412',     // Brand base
+      secondary: '#8e827c',   // Brand grey
       muted: 'rgba(23, 20, 18, 0.4)',
     },
     border: 'rgba(23, 20, 18, 0.1)',
     overlay: 'rgba(23, 20, 18, 0.3)',
-    accent: 'var(--color-accent-primary)',        // Brand orange
+    accent: '#ff7722',        // Brand orange
   },
   fonts: {
     display: 'var(--font-display)',

@@ -143,12 +143,12 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
 
             {/* Title */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-              <Sparkles size={14} style={{ color: 'var(--color-accent-primary)' }} />
+              <Sparkles size={14} style={{ color: 'var(--color-accent-primary, #ff7722)' }} />
               <span
                 style={{
                   fontSize: '13px',
                   fontWeight: 500,
-                  color: 'var(--color-text-primary, #1c1c1c)',
+                  color: 'var(--color-text-primary, #171412)',
                   fontFamily: 'var(--font-body)',
                 }}
               >
@@ -162,8 +162,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                 onClick={() => setShowArchived(!showArchived)}
                 className="p-1.5 rounded-md transition-all duration-150"
                 style={{
-                  color: showArchived ? 'var(--color-accent-primary)' : 'var(--text-tertiary, #888)',
-                  background: showArchived ? 'var(--color-accent-primary-subtle, rgba(30, 82, 241,0.1))' : 'transparent',
+                  color: showArchived ? 'var(--color-accent-primary, #ff7722)' : 'var(--text-tertiary, #888)',
+                  background: showArchived ? 'var(--color-accent-primary-subtle, rgba(255,119,34,0.1))' : 'transparent',
                 }}
               >
                 <Archive size={15} />
@@ -173,8 +173,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                   onClick={() => setIsAddingEntry(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-150"
                   style={{
-                    background: 'var(--color-accent-primary)',
-                    color: 'var(--color-text-on-accent, #fcfbf8)',
+                    background: 'var(--color-accent-primary, #ff7722)',
+                    color: 'var(--color-text-on-accent, #fbf9ef)',
                   }}
                 >
                   <Plus size={13} />
@@ -187,7 +187,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
           {/* Content */}
           <div
             className="flex-1 overflow-y-auto"
-            style={{ background: 'var(--color-bg-base, #fcfbf8)' }}
+            style={{ background: 'var(--color-bg-base, #fbf9ef)' }}
           >
             {/* Add Entry Form */}
             <AnimatePresence>
@@ -266,8 +266,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                           disabled={!newEntry.title.trim()}
                           className="px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all disabled:opacity-40"
                           style={{
-                            background: 'var(--color-accent-primary)',
-                            color: 'var(--color-text-on-accent, #fcfbf8)',
+                            background: 'var(--color-accent-primary, #ff7722)',
+                            color: 'var(--color-text-on-accent, #fbf9ef)',
                           }}
                         >
                           Add
@@ -304,7 +304,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                           className="absolute left-0 top-3 w-6 h-6 rounded-full flex items-center justify-center"
                           style={{
                             background: selectedEntryId === entry.id
-                              ? 'var(--color-accent-primary)'
+                              ? 'var(--color-accent-primary, #ff7722)'
                               : 'var(--bg-elevated, white)',
                             border: selectedEntryId === entry.id
                               ? 'none'
@@ -322,9 +322,9 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                           className="rounded-xl cursor-pointer transition-all duration-200"
                           style={{
                             background: 'var(--bg-elevated, white)',
-                            border: `1px solid ${selectedEntryId === entry.id ? 'var(--color-accent-primary)' : 'var(--border-light, rgba(0,0,0,0.06))'}`,
+                            border: `1px solid ${selectedEntryId === entry.id ? 'var(--color-accent-primary, #ff7722)' : 'var(--border-light, rgba(0,0,0,0.06))'}`,
                             boxShadow: selectedEntryId === entry.id
-                              ? '0 4px 12px var(--color-accent-primary-subtle, rgba(30, 82, 241,0.15))'
+                              ? '0 4px 12px var(--color-accent-primary-subtle, rgba(255,119,34,0.15))'
                               : '0 1px 3px rgba(0,0,0,0.04)',
                           }}
                           onClick={() => setSelectedEntryId(selectedEntryId === entry.id ? null : entry.id)}
@@ -400,7 +400,7 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                                   className="p-3 rounded-lg"
                                   style={{
                                     background: 'var(--bg-secondary, #fafafa)',
-                                    borderLeft: '3px solid var(--color-accent-primary)',
+                                    borderLeft: '3px solid var(--color-accent-primary, #ff7722)',
                                   }}
                                 >
                                   <p
@@ -466,10 +466,10 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
                   style={{
-                    background: 'linear-gradient(135deg, var(--color-accent-primary-subtle, rgba(30, 82, 241,0.1)) 0%, var(--color-accent-primary-subtle, rgba(30, 82, 241,0.05)) 100%)',
+                    background: 'linear-gradient(135deg, var(--color-accent-primary-subtle, rgba(255,119,34,0.1)) 0%, var(--color-accent-primary-subtle, rgba(255,119,34,0.05)) 100%)',
                   }}
                 >
-                  <Sparkles size={24} style={{ color: 'var(--color-accent-primary)' }} />
+                  <Sparkles size={24} style={{ color: 'var(--color-accent-primary, #ff7722)' }} />
                 </div>
                 <h3
                   style={{
@@ -501,8 +501,8 @@ export function WorkbenchWindow({ window: windowInstance, item }: WorkbenchWindo
                     onClick={() => setIsAddingEntry(true)}
                     className="mt-5 flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium"
                     style={{
-                      background: 'var(--color-accent-primary)',
-                      color: 'var(--color-text-on-accent, #fcfbf8)',
+                      background: 'var(--color-accent-primary, #ff7722)',
+                      color: 'var(--color-text-on-accent, #fbf9ef)',
                     }}
                   >
                     <Plus size={15} />

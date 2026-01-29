@@ -1,73 +1,64 @@
 {
   "name": "Appart",
   "id": "appart",
-  "description": "Warm creative studio — cream, blue, confident",
+  "description": "Warm creative studio — cream, orange, confident",
 
   "colors": {
     "bg": {
-      "base": "#fcfbf8",
-      "baseGradient": "linear-gradient(180deg, #fcfbf8 0%, #f7f4ed 100%)",
+      "base": "#fbf9ef",
+      "baseGradient": "linear-gradient(180deg, #fbf9ef 0%, #f5f3e9 100%)",
       "elevated": "rgba(255, 255, 255, 0.85)",
-      "overlay": "rgba(252, 251, 248, 0.8)",
-      "subtle": "#f7f4ed",
-      "subtleHover": "#eceae4",
-      "inverse": "#1c1c1c"
+      "overlay": "rgba(251, 249, 239, 0.8)",
+      "subtle": "#f2f0e7",
+      "subtleHover": "#ebe9df",
+      "inverse": "#171412"
     },
 
     "text": {
-      "primary": "#1c1c1c",
-      "secondary": "#5f5f5d",
-      "muted": "#8d8d8b",
+      "primary": "#171412",
+      "secondary": "#4a4744",
+      "muted": "#8e827c",
       "inverse": "#ffffff",
-      "onAccent": "#f0f8ff"
+      "onAccent": "#ffffff"
     },
 
     "accent": {
-      "primary": "#1e52f1",
-      "primaryHover": "#0e42dd",
-      "primaryActive": "#0c39c0",
-      "primarySubtle": "rgba(30, 82, 241, 0.1)",
-      "primaryMuted": "rgba(30, 82, 241, 0.06)",
-      "primaryLight": "rgba(30, 82, 241, 0.15)",
-      "primaryMedium": "rgba(30, 82, 241, 0.2)",
-      "primaryGlow": "rgba(30, 82, 241, 0.4)",
-      "secondary": "#243e8f",
-      "secondaryHover": "#1f367a",
-      "secondarySubtle": "rgba(36, 62, 143, 0.1)"
+      "primary": "#ff7722",
+      "primaryHover": "#e5691e",
+      "primaryActive": "#cc5d1a",
+      "primarySubtle": "rgba(255, 119, 34, 0.1)",
+      "primaryGlow": "rgba(255, 119, 34, 0.4)",
+      "secondary": "#3d2fa9",
+      "secondaryHover": "#352994",
+      "secondarySubtle": "rgba(61, 47, 169, 0.1)"
     },
 
     "semantic": {
-      "success": "#157f3c",
-      "successSubtle": "rgba(21, 127, 60, 0.12)",
-      "successBg": "#d0f0da",
-      "successFg": "#14522d",
-      "warning": "#de5e02",
-      "warningSubtle": "rgba(222, 94, 2, 0.12)",
-      "warningBg": "#fbe2c6",
-      "warningFg": "#78270d",
-      "error": "#d10505",
-      "errorSubtle": "rgba(209, 5, 5, 0.1)",
-      "errorBg": "#f9d4d2",
-      "errorFg": "#811d1d"
+      "success": "#22c55e",
+      "successSubtle": "rgba(34, 197, 94, 0.15)",
+      "warning": "#ffc765",
+      "warningSubtle": "rgba(255, 199, 101, 0.2)",
+      "error": "#ff3c34",
+      "errorSubtle": "rgba(255, 60, 52, 0.1)"
     },
 
     "border": {
-      "default": "#eceae4",
-      "subtle": "rgba(28, 28, 28, 0.05)",
-      "strong": "rgba(28, 28, 28, 0.15)"
+      "default": "rgba(23, 20, 18, 0.08)",
+      "subtle": "rgba(23, 20, 18, 0.05)",
+      "strong": "rgba(23, 20, 18, 0.15)"
     },
 
     "shadow": {
-      "color": "rgba(28, 28, 28, 0.08)",
-      "colorMedium": "rgba(28, 28, 28, 0.12)",
-      "colorStrong": "rgba(28, 28, 28, 0.15)"
+      "color": "rgba(23, 20, 18, 0.08)",
+      "colorMedium": "rgba(23, 20, 18, 0.12)",
+      "colorStrong": "rgba(23, 20, 18, 0.15)"
     },
 
     "traffic": {
       "close": "#ff5f57",
       "minimize": "#ffbd2e",
       "maximize": "#28c840",
-      "inactive": "rgba(28, 28, 28, 0.15)"
+      "inactive": "rgba(23, 20, 18, 0.15)"
     }
   },
 
@@ -97,15 +88,15 @@
     "blurMedium": "20px",
     "blurHeavy": "24px",
 
-    "shadowSmall": "0 2px 8px rgba(28, 28, 28, 0.06)",
-    "shadowMedium": "0 4px 20px rgba(28, 28, 28, 0.08)",
-    "shadowLarge": "0 8px 32px rgba(28, 28, 28, 0.12)",
-    "shadowXl": "0 16px 48px rgba(28, 28, 28, 0.15)",
+    "shadowSmall": "0 2px 8px rgba(23, 20, 18, 0.06)",
+    "shadowMedium": "0 4px 20px rgba(23, 20, 18, 0.08)",
+    "shadowLarge": "0 8px 32px rgba(23, 20, 18, 0.12)",
+    "shadowXl": "0 16px 48px rgba(23, 20, 18, 0.15)",
 
-    "shadowWindow": "0 2px 4px rgba(28, 28, 28, 0.04), 0 12px 32px rgba(28, 28, 28, 0.12), 0 24px 60px rgba(28, 28, 28, 0.08)",
-    "shadowDock": "0 8px 32px rgba(28, 28, 28, 0.12)",
-    "shadowDropdown": "0 8px 30px rgba(28, 28, 28, 0.15)",
-    "shadowTooltip": "0 4px 12px rgba(28, 28, 28, 0.2)",
+    "shadowWindow": "0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08)",
+    "shadowDock": "0 8px 32px rgba(23, 20, 18, 0.12)",
+    "shadowDropdown": "0 8px 30px rgba(23, 20, 18, 0.15)",
+    "shadowTooltip": "0 4px 12px rgba(23, 20, 18, 0.2)",
 
     "transitionFast": "150ms",
     "transitionMedium": "200ms",

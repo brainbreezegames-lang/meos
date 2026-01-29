@@ -163,7 +163,7 @@ export function CaseStudyPageView({
 
         /* Selection color - warm orange tint */
         ::selection {
-          background: rgba(30, 82, 241, 0.15);
+          background: rgba(255, 119, 34, 0.15);
         }
       `}</style>
     </div>

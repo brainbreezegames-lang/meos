@@ -1791,7 +1791,7 @@ StickyNote.displayName = 'StickyNote';
 // CONFETTI BURST - for celebrations
 // ============================================
 const ConfettiBurst = React.memo(({ isActive, onComplete }: { isActive: boolean; onComplete?: () => void }) => {
-    const confettiColors = ['var(--color-accent-primary)', '#3d2fa9', '#22c55e', '#f59e0b', '#ec4899', '#06b6d4'];
+    const confettiColors = ['#ff7722', '#3d2fa9', '#22c55e', '#f59e0b', '#ec4899', '#06b6d4'];
     const particles = useMemo(() =>
         Array.from({ length: 50 }, (_, i) => ({
             id: i,
@@ -2359,7 +2359,7 @@ function SketchWindow({ title, icon, isOpen, zIndex, defaultX, defaultY, width, 
                     <span style={{
                         fontSize: 13,
                         fontWeight: 500,
-                        color: 'var(--color-text-primary, #1c1c1c)',
+                        color: 'var(--color-text-primary, #171412)',
                         letterSpacing: '-0.01em',
                         opacity: 0.7
                     }}>{title}</span>
@@ -2742,7 +2742,7 @@ const GoOSAnalytics = React.memo(({ data }: { data: typeof DEMO_ANALYTICS_DATA }
                     </h4>
                     <div className="space-y-2.5">
                         {data.sources.map((source, i) => {
-                            const colors = ['var(--color-accent-primary)', '#3d2fa9', '#1a1a1a', '#e56a1f', '#6b6b6b'];
+                            const colors = ['#ff7722', '#3d2fa9', '#1a1a1a', '#e56a1f', '#6b6b6b'];
                             return (
                                 <div key={source.name}>
                                     <div className="flex items-center justify-between text-sm mb-1">
@@ -4220,13 +4220,13 @@ function GoOSDemoContent() {
                             <div className="text-center">
                                 <h1
                                     className="text-4xl font-bold tracking-tight mb-2"
-                                    style={{ color: 'var(--text-primary, #1c1c1c)' }}
+                                    style={{ color: 'var(--text-primary, #171412)' }}
                                 >
                                     goOS
                                 </h1>
                                 <p
                                     className="text-sm"
-                                    style={{ color: 'var(--text-muted, #8d8d8b)' }}
+                                    style={{ color: 'var(--text-muted, #8e827c)' }}
                                 >
                                     Your personal web desktop
                                 </p>
@@ -4238,9 +4238,9 @@ function GoOSDemoContent() {
                                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                                 className="mt-4 px-6 py-3 rounded-full text-sm font-medium"
                                 style={{
-                                    background: 'var(--color-accent-primary)',
+                                    background: 'var(--color-accent-primary, #ff7722)',
                                     color: '#fff',
-                                    boxShadow: 'var(--shadow-badge, 0 4px 20px rgba(30, 82, 241, 0.3))',
+                                    boxShadow: 'var(--shadow-badge, 0 4px 20px rgba(255, 119, 34, 0.3))',
                                 }}
                             >
                                 Click anywhere to start
@@ -4282,7 +4282,7 @@ function GoOSDemoContent() {
                                     key={i}
                                     className="absolute w-2 h-2 rounded-full"
                                     style={{
-                                        background: 'var(--color-accent-primary)',
+                                        background: 'var(--color-accent-primary, #ff7722)',
                                         opacity: 0.15,
                                         left: `${15 + i * 15}%`,
                                         top: `${30 + (i % 3) * 20}%`,
@@ -4357,7 +4357,7 @@ function GoOSDemoContent() {
                                         }}
                                         className="text-3xl font-bold tracking-tight"
                                         style={{
-                                            color: 'var(--text-primary, #1c1c1c)',
+                                            color: 'var(--text-primary, #171412)',
                                             textShadow: '0 2px 10px rgba(0,0,0,0.08)',
                                         }}
                                     >
@@ -4385,7 +4385,7 @@ function GoOSDemoContent() {
                                     }}
                                     className="absolute inset-y-0 w-1/2 rounded-full"
                                     style={{
-                                        background: 'linear-gradient(90deg, transparent, var(--color-accent-primary), transparent)',
+                                        background: 'linear-gradient(90deg, transparent, var(--color-accent-primary, #ff7722), transparent)',
                                     }}
                                 />
                             </motion.div>
@@ -4399,7 +4399,7 @@ function GoOSDemoContent() {
                                     exit={{ opacity: 0, y: -8 }}
                                     transition={{ duration: 0.25 }}
                                     className="text-sm font-medium"
-                                    style={{ color: 'var(--text-muted, #8d8d8b)' }}
+                                    style={{ color: 'var(--text-muted, #8e827c)' }}
                                 >
                                     {bootMessages[bootMessage]}
                                 </motion.p>
@@ -4463,7 +4463,7 @@ function GoOSDemoContent() {
                 <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                        background: isDarkMode ? 'var(--color-text-primary)' : 'var(--color-bg-base, #fcfbf8)',
+                        background: isDarkMode ? '#171412' : 'var(--color-bg-base, #fbf9ef)',
                         backgroundImage: isDarkMode
                             ? `radial-gradient(circle, rgba(255, 255, 255, 0.06) 1.5px, transparent 1.5px)`
                             : `radial-gradient(circle, rgba(23, 20, 18, 0.08) 1.5px, transparent 1.5px)`,
@@ -4563,8 +4563,8 @@ function GoOSDemoContent() {
                 <div
                     className="absolute inset-0 pointer-events-none z-[9999]"
                     style={{
-                        background: 'rgba(30, 82, 241, 0.05)',
-                        border: '3px dashed rgba(30, 82, 241, 0.4)',
+                        background: 'rgba(255, 119, 34, 0.05)',
+                        border: '3px dashed rgba(255, 119, 34, 0.4)',
                         borderRadius: 12,
                         margin: 8,
                     }}
@@ -6255,20 +6255,20 @@ function GoOSDemoContent() {
                         >
                             {guidedTourStep === 0 && (
                                 <>
-                                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1c1c1c)' }}>
+                                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #171412)' }}>
                                         Your space is ready!
                                     </p>
-                                    <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary, #8d8d8b)', lineHeight: 1.5 }}>
+                                    <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary, #8e827c)', lineHeight: 1.5 }}>
                                         Double-click any file to open it. Right-click for more options. Drag files to rearrange.
                                     </p>
                                 </>
                             )}
                             {guidedTourStep === 1 && (
                                 <>
-                                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1c1c1c)' }}>
+                                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #171412)' }}>
                                         Make it yours
                                     </p>
-                                    <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary, #8d8d8b)', lineHeight: 1.5 }}>
+                                    <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary, #8e827c)', lineHeight: 1.5 }}>
                                         Edit any file to personalize content. Use the dock below to create new files or change your wallpaper.
                                     </p>
                                 </>
@@ -6282,7 +6282,7 @@ function GoOSDemoContent() {
                                             animate={{
                                                 width: guidedTourStep === i ? 16 : 6,
                                                 background: guidedTourStep === i
-                                                    ? 'var(--color-accent-primary)'
+                                                    ? 'var(--color-accent-primary, #ff7722)'
                                                     : 'var(--color-border-default, rgba(0,0,0,0.12))',
                                             }}
                                             transition={SPRING.snappy}

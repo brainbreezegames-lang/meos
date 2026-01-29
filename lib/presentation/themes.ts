@@ -39,11 +39,11 @@ export const themes: Record<string, PresentationTheme> = {
     name: 'Paper',
     description: 'Warm and inviting, like a beautiful book',
     colors: {
-      background: '#fcfbf8',      // Warm cream from design system
+      background: '#FBF9EF',      // Warm cream from design system
       surface: '#FFFFFF',
-      text: '#1c1c1c',            // Text primary from design system
+      text: '#171412',            // Text primary from design system
       textMuted: '#7A746C',       // Text muted from design system
-      accent: '#1e52f1',          // Accent from design system
+      accent: '#FF7722',          // Accent from design system
       accentMuted: '#FFF0E5',     // Accent subtle from design system
     },
     fonts: {

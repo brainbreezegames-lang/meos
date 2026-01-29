@@ -23,12 +23,12 @@
 
 /* Text Selection - warm accent with visible dark text */
 .cv-document ::selection {
-  background: rgba(30, 82, 241, 0.25);
+  background: rgba(255, 119, 34, 0.25);
   color: var(--cv-text, #1a1a1a);
 }
 
 .cv-document ::-moz-selection {
-  background: rgba(30, 82, 241, 0.25);
+  background: rgba(255, 119, 34, 0.25);
   color: var(--cv-text, #1a1a1a);
 }
 
@@ -434,9 +434,9 @@ html.dark .cv-document {
   --cv-text: oklch(94% 0.008 95);
   --cv-text-muted: oklch(65% 0.006 90);
   --cv-border: oklch(35% 0.010 70);
-  --cv-link: #70a7ff;
-  --cv-edit-bg: rgba(30, 82, 241, 0.12);
-  --cv-edit-border: rgba(30, 82, 241, 0.4);
+  --cv-link: #ff8833;
+  --cv-edit-bg: rgba(255, 119, 34, 0.12);
+  --cv-edit-border: rgba(255, 119, 34, 0.4);
 
   background: var(--cv-background);
   color: var(--cv-text);

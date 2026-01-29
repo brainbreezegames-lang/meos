@@ -164,7 +164,7 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                 width: 520,
                 maxWidth: '90vw',
                 borderRadius: 'var(--radius-lg, 18px)',
-                background: 'var(--color-bg-base, #fcfbf8)',
+                background: 'var(--color-bg-base, #fbf9ef)',
                 boxShadow: 'var(--shadow-window)',
                 border: 'var(--window-border, 1px solid var(--color-border-default, rgba(23, 20, 18, 0.08)))',
               }}
@@ -229,7 +229,7 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                 {/* Title */}
                 <span
                   className="absolute left-1/2 -translate-x-1/2 text-[13px] font-medium select-none"
-                  style={{ color: 'var(--color-text-primary, #1c1c1c)' }}
+                  style={{ color: 'var(--color-text-primary, #171412)' }}
                 >
                   Settings
                 </span>

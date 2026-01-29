@@ -175,8 +175,8 @@ export function WidgetWrapper({
             position: 'absolute',
             inset: -4,
             borderRadius: 'inherit',
-            border: '2px solid var(--color-accent-primary)',
-            boxShadow: '0 0 0 4px rgba(30, 82, 241, 0.15), 0 0 20px rgba(30, 82, 241, 0.2)',
+            border: '2px solid var(--color-accent-primary, #ff7722)',
+            boxShadow: '0 0 0 4px rgba(255, 119, 34, 0.15), 0 0 20px rgba(255, 119, 34, 0.2)',
             pointerEvents: 'none',
             zIndex: -1,
           }}

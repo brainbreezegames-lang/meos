@@ -7,15 +7,15 @@ import { FILE_TYPE_ICONS, FILE_TYPE_LABELS } from '@/lib/goos/fileTypeMapping';
 // Brand Appart design tokens (aligned with useWidgetTheme)
 const pageStyles = {
   colors: {
-    background: 'var(--color-bg-base)',    // Brand cream
-    paper: 'var(--color-bg-base)',
+    background: '#fbf9ef',    // Brand cream
+    paper: '#fbf9ef',
     text: {
-      primary: 'var(--color-text-primary)',     // Brand base
-      secondary: 'var(--color-text-muted)',   // Brand grey
-      muted: 'var(--color-text-muted)',
+      primary: '#171412',     // Brand base
+      secondary: '#8e827c',   // Brand grey
+      muted: '#8e827c',
     },
-    accent: 'var(--color-accent-primary)',        // Brand orange
-    border: 'var(--color-text-primary)',
+    accent: '#ff7722',        // Brand orange
+    border: '#171412',
     divider: 'rgba(23, 20, 18, 0.1)',
   },
   shadows: {

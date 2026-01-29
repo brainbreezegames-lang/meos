@@ -121,7 +121,7 @@ export interface RelatedStudy {
 export const caseStudyTokens = {
   colors: {
     // Use CSS variables to support dark mode
-    background: 'var(--cs-background, #fcfbf8)',
+    background: 'var(--cs-background, #fbf9ef)',
     surface: 'var(--cs-surface, #ffffff)',
     surfaceAlt: 'var(--cs-surface-alt, #f5f3e8)',
     // Text colors - rich blacks and warm grays
@@ -129,7 +129,7 @@ export const caseStudyTokens = {
     textMuted: 'var(--cs-text-muted, #6b6b6b)',
     textLight: 'var(--cs-text-light, #999999)',
     // Accent colors - bold and vibrant
-    accent: 'var(--cs-accent, #1e52f1)',        // Warm orange
+    accent: 'var(--cs-accent, #ff7722)',        // Warm orange
     accentAlt: 'var(--cs-accent-alt, #3d2fa9)', // Deep purple
     // Borders
     border: 'var(--cs-border, rgba(0, 0, 0, 0.08))',

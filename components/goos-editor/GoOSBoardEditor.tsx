@@ -600,7 +600,7 @@ function DroppableColumn({
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = 'var(--color-accent-primary)';
           e.currentTarget.style.color = 'var(--color-accent-primary)';
-          e.currentTarget.style.background = 'var(--color-accent-primary-muted)';
+          e.currentTarget.style.background = 'rgba(255, 119, 34, 0.04)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.borderColor = 'var(--color-border-default)';

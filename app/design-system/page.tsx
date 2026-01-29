@@ -73,8 +73,8 @@ export default function DesignSystemPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const bg = isDark ? '#0d0c0b' : '#fcfbf8';
-  const text = isDark ? '#f5f3eb' : '#1c1c1c';
+  const bg = isDark ? '#0d0c0b' : '#fbf9ef';
+  const text = isDark ? '#f5f3eb' : '#171412';
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(23,20,18,0.08)';
   const cardBg = isDark ? 'rgba(255,255,255,0.05)' : '#ffffff';
 
@@ -84,7 +84,7 @@ export default function DesignSystemPage() {
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: isDark ? 'rgba(13,12,11,0.85)' : 'rgba(251,249,239,0.85)', backdropFilter: 'blur(20px)', borderBottom: `1px solid ${border}` }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #1e52f1 0%, #0e42dd 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(30, 82, 241,0.3)' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #ff7722 0%, #e5691e 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(255,119,34,0.3)' }}>
               <Code size={20} color="white" strokeWidth={2.5} />
             </div>
             <div>
@@ -96,7 +96,7 @@ export default function DesignSystemPage() {
             <button onClick={() => setIsDark(!isDark)} style={{ width: 40, height: 40, borderRadius: 10, border: 'none', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(23,20,18,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'inherit' }}>
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <a href="/goos-v2" style={{ padding: '10px 16px', borderRadius: 10, background: '#1e52f1', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <a href="/goos-v2" style={{ padding: '10px 16px', borderRadius: 10, background: '#ff7722', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
               View Live <ExternalLink size={14} />
             </a>
           </div>
@@ -114,7 +114,7 @@ export default function DesignSystemPage() {
                 <button
                   key={section.id}
                   onClick={() => scrollToSection(section.id)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 8, border: 'none', background: isActive ? (isDark ? 'rgba(30, 82, 241,0.15)' : 'rgba(30, 82, 241,0.1)') : 'transparent', color: isActive ? '#1e52f1' : 'inherit', opacity: isActive ? 1 : 0.7, cursor: 'pointer', fontSize: 13, fontWeight: isActive ? 600 : 500, textAlign: 'left', width: '100%' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 8, border: 'none', background: isActive ? (isDark ? 'rgba(255,119,34,0.15)' : 'rgba(255,119,34,0.1)') : 'transparent', color: isActive ? '#ff7722' : 'inherit', opacity: isActive ? 1 : 0.7, cursor: 'pointer', fontSize: 13, fontWeight: isActive ? 600 : 500, textAlign: 'left', width: '100%' }}
                 >
                   <Icon size={16} />
                   {section.label}
@@ -133,31 +133,31 @@ export default function DesignSystemPage() {
           <Section id="colors" title="Colors" desc="Warm, natural palette" refs={sectionRefs}>
             <Subsection title="Backgrounds">
               <ColorGrid isDark={isDark} colors={[
-                { name: 'bg-base', light: '#fcfbf8', dark: '#0d0c0b', token: '--color-bg-base' },
+                { name: 'bg-base', light: '#fbf9ef', dark: '#0d0c0b', token: '--color-bg-base' },
                 { name: 'bg-elevated', light: 'rgba(255,255,255,0.85)', dark: 'rgba(30,28,26,0.85)', token: '--color-bg-elevated' },
-                { name: 'bg-subtle', light: '#f7f4ed', dark: '#1a1917', token: '--color-bg-subtle' },
+                { name: 'bg-subtle', light: '#f2f0e7', dark: '#1a1917', token: '--color-bg-subtle' },
                 { name: 'bg-subtle-hover', light: '#ebe9df', dark: '#252320', token: '--color-bg-subtle-hover' },
-                { name: 'bg-inverse', light: '#1c1c1c', dark: '#f5f3eb', token: '--color-bg-inverse' },
+                { name: 'bg-inverse', light: '#171412', dark: '#f5f3eb', token: '--color-bg-inverse' },
                 { name: 'bg-white', light: '#ffffff', dark: '#1e1c1a', token: '--color-bg-white' },
                 { name: 'bg-overlay', light: 'rgba(251,249,239,0.8)', dark: 'rgba(13,12,11,0.8)', token: '--color-bg-overlay' },
               ]} />
             </Subsection>
             <Subsection title="Text">
               <ColorGrid isDark={isDark} colors={[
-                { name: 'text-primary', light: '#1c1c1c', dark: '#f5f3eb', token: '--color-text-primary' },
-                { name: 'text-secondary', light: '#5f5f5d', dark: '#a8a29e', token: '--color-text-secondary' },
-                { name: 'text-muted', light: '#8d8d8b', dark: '#6b6561', token: '--color-text-muted' },
-                { name: 'text-inverse', light: '#ffffff', dark: '#1c1c1c', token: '--color-text-inverse' },
+                { name: 'text-primary', light: '#171412', dark: '#f5f3eb', token: '--color-text-primary' },
+                { name: 'text-secondary', light: '#4a4744', dark: '#a8a29e', token: '--color-text-secondary' },
+                { name: 'text-muted', light: '#8e827c', dark: '#6b6561', token: '--color-text-muted' },
+                { name: 'text-inverse', light: '#ffffff', dark: '#171412', token: '--color-text-inverse' },
                 { name: 'text-on-accent', light: '#ffffff', dark: '#ffffff', token: '--color-text-on-accent' },
               ]} />
             </Subsection>
             <Subsection title="Accent Primary (Orange)">
               <ColorGrid isDark={isDark} colors={[
-                { name: 'accent-primary', light: '#1e52f1', dark: '#ff8844', token: '--color-accent-primary' },
-                { name: 'accent-primary-hover', light: '#0e42dd', dark: '#ff9955', token: '--color-accent-primary-hover' },
-                { name: 'accent-primary-active', light: '#0c39c0', dark: '#ffaa66', token: '--color-accent-primary-active' },
-                { name: 'accent-primary-subtle', light: 'rgba(30, 82, 241,0.1)', dark: 'rgba(255,136,68,0.15)', token: '--color-accent-primary-subtle' },
-                { name: 'accent-primary-glow', light: 'rgba(30, 82, 241,0.4)', dark: 'rgba(255,136,68,0.4)', token: '--color-accent-primary-glow' },
+                { name: 'accent-primary', light: '#ff7722', dark: '#ff8844', token: '--color-accent-primary' },
+                { name: 'accent-primary-hover', light: '#e5691e', dark: '#ff9955', token: '--color-accent-primary-hover' },
+                { name: 'accent-primary-active', light: '#cc5d1a', dark: '#ffaa66', token: '--color-accent-primary-active' },
+                { name: 'accent-primary-subtle', light: 'rgba(255,119,34,0.1)', dark: 'rgba(255,136,68,0.15)', token: '--color-accent-primary-subtle' },
+                { name: 'accent-primary-glow', light: 'rgba(255,119,34,0.4)', dark: 'rgba(255,136,68,0.4)', token: '--color-accent-primary-glow' },
               ]} />
             </Subsection>
             <Subsection title="Accent Secondary (Purple)">
@@ -267,7 +267,7 @@ export default function DesignSystemPage() {
                 ].map(s => (
                   <div key={s.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 0' }}>
                     <span style={{ width: 70, fontSize: 11, fontFamily: 'monospace', opacity: 0.5 }}>{s.name}</span>
-                    <div style={{ width: s.v, height: 20, background: 'linear-gradient(90deg, #1e52f1, #0e42dd)', borderRadius: 4 }} />
+                    <div style={{ width: s.v, height: 20, background: 'linear-gradient(90deg, #ff7722, #e5691e)', borderRadius: 4 }} />
                     <span style={{ width: 40, fontSize: 12, opacity: 0.6 }}>{s.v}px</span>
                     <span style={{ fontSize: 12, opacity: 0.4 }}>{s.desc}</span>
                   </div>
@@ -278,7 +278,7 @@ export default function DesignSystemPage() {
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 {[{ n: 'xs', v: 4 }, { n: 'sm', v: 6 }, { n: 'md', v: 10 }, { n: 'lg', v: 12 }, { n: 'xl', v: 14 }, { n: '2xl', v: 16 }, { n: 'dock', v: 20 }, { n: 'full', v: 9999 }].map(r => (
                   <div key={r.n} style={{ textAlign: 'center' }}>
-                    <div style={{ width: 56, height: 56, background: isDark ? 'rgba(30, 82, 241,0.2)' : 'rgba(30, 82, 241,0.1)', border: '2px solid #1e52f1', borderRadius: r.v, marginBottom: 6 }} />
+                    <div style={{ width: 56, height: 56, background: isDark ? 'rgba(255,119,34,0.2)' : 'rgba(255,119,34,0.1)', border: '2px solid #ff7722', borderRadius: r.v, marginBottom: 6 }} />
                     <span style={{ fontSize: 11, fontWeight: 600 }}>{r.n}</span>
                     <p style={{ fontSize: 10, fontFamily: 'monospace', opacity: 0.5 }}>{r.v === 9999 ? 'full' : `${r.v}px`}</p>
                   </div>
@@ -300,7 +300,7 @@ export default function DesignSystemPage() {
                   { n: 'xl', v: '0 16px 48px rgba(23,20,18,0.15)' },
                   { n: 'window', v: '0 2px 4px rgba(23,20,18,0.04), 0 12px 32px rgba(23,20,18,0.12)' },
                   { n: 'dock', v: '0 8px 32px rgba(23,20,18,0.12)' },
-                  { n: 'badge', v: '0 2px 6px rgba(30, 82, 241,0.4)' },
+                  { n: 'badge', v: '0 2px 6px rgba(255,119,34,0.4)' },
                 ].map(s => (
                   <div key={s.n} style={{ padding: 20, borderRadius: 12, background: isDark ? '#1a1917' : '#fff', boxShadow: s.v, textAlign: 'center' }}>
                     <span style={{ fontSize: 13, fontWeight: 600 }}>shadow-{s.n}</span>
@@ -309,9 +309,9 @@ export default function DesignSystemPage() {
               </div>
             </Subsection>
             <Subsection title="Glassmorphism">
-              <div style={{ padding: 32, borderRadius: 16, background: 'linear-gradient(135deg, #1e52f1 0%, #3d2fa9 50%, #22c55e 100%)', display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div style={{ padding: 32, borderRadius: 16, background: 'linear-gradient(135deg, #ff7722 0%, #3d2fa9 50%, #22c55e 100%)', display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
                 {[{ n: 'Subtle', blur: 12, op: 0.5 }, { n: 'Medium', blur: 20, op: 0.6 }, { n: 'Heavy', blur: 24, op: 0.7 }].map(g => (
-                  <div key={g.n} style={{ width: 120, height: 80, background: `rgba(255,255,255,${g.op})`, backdropFilter: `blur(${g.blur}px)`, WebkitBackdropFilter: `blur(${g.blur}px)`, borderRadius: 12, border: '1px solid rgba(255,255,255,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#1c1c1c' }}>
+                  <div key={g.n} style={{ width: 120, height: 80, background: `rgba(255,255,255,${g.op})`, backdropFilter: `blur(${g.blur}px)`, WebkitBackdropFilter: `blur(${g.blur}px)`, borderRadius: 12, border: '1px solid rgba(255,255,255,0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#171412' }}>
                     <span style={{ fontSize: 13, fontWeight: 600 }}>{g.n}</span>
                     <span style={{ fontSize: 10, opacity: 0.6 }}>{g.blur}px</span>
                   </div>
@@ -337,7 +337,7 @@ export default function DesignSystemPage() {
                     transition={{ type: 'spring', stiffness: sp.s, damping: sp.d }}
                     style={{ flex: 1, minWidth: 180, padding: 20, borderRadius: 12, background: cardBg, border: `1px solid ${border}`, cursor: 'pointer' }}
                   >
-                    <span style={{ fontSize: 15, fontWeight: 700, color: '#1e52f1' }}>{sp.n}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: '#ff7722' }}>{sp.n}</span>
                     <p style={{ fontSize: 11, fontFamily: 'monospace', opacity: 0.6, marginTop: 4 }}>stiffness: {sp.s}, damping: {sp.d}</p>
                     <p style={{ fontSize: 12, opacity: 0.5, marginTop: 8 }}>{sp.desc}</p>
                     <p style={{ fontSize: 10, opacity: 0.4, marginTop: 4 }}>Hover to preview</p>
@@ -491,7 +491,7 @@ export default function DesignSystemPage() {
               </WidgetDemo>
               <WidgetDemo name="Feedback" icon={ThumbsUp} isDark={isDark}>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>Rate this site</div>
-                <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>{[1,2,3,4,5].map(i => <Star key={i} size={14} fill="#1e52f1" color="#1e52f1" />)}</div>
+                <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>{[1,2,3,4,5].map(i => <Star key={i} size={14} fill="#ff7722" color="#ff7722" />)}</div>
               </WidgetDemo>
               <WidgetDemo name="Status" icon={Activity} isDark={isDark}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -516,14 +516,14 @@ export default function DesignSystemPage() {
                   <p style={{ fontSize: 14, lineHeight: 1.7, opacity: 0.8 }}>Body text with rich formatting support. This is a paragraph of sample text demonstrating the typography and spacing.</p>
                 </BlockDemo>
                 <BlockDemo name="Quote" isDark={isDark}>
-                  <blockquote style={{ borderLeft: '3px solid #1e52f1', paddingLeft: 16, fontStyle: 'italic', opacity: 0.9 }}>
+                  <blockquote style={{ borderLeft: '3px solid #ff7722', paddingLeft: 16, fontStyle: 'italic', opacity: 0.9 }}>
                     &ldquo;Design is not just what it looks like and feels like. Design is how it works.&rdquo;
                     <footer style={{ fontSize: 12, marginTop: 8, opacity: 0.6 }}>— Steve Jobs</footer>
                   </blockquote>
                 </BlockDemo>
                 <BlockDemo name="Callout" isDark={isDark}>
-                  <div style={{ display: 'flex', gap: 12, padding: 16, borderRadius: 12, background: isDark ? 'rgba(30, 82, 241,0.1)' : 'rgba(30, 82, 241,0.08)' }}>
-                    <AlertCircle size={20} color="#1e52f1" />
+                  <div style={{ display: 'flex', gap: 12, padding: 16, borderRadius: 12, background: isDark ? 'rgba(255,119,34,0.1)' : 'rgba(255,119,34,0.08)' }}>
+                    <AlertCircle size={20} color="#ff7722" />
                     <div>
                       <div style={{ fontWeight: 600, marginBottom: 4 }}>Note</div>
                       <div style={{ fontSize: 13, opacity: 0.8 }}>Important information goes here.</div>
@@ -598,7 +598,7 @@ export default function DesignSystemPage() {
                   <div style={{ display: 'flex', gap: 24 }}>
                     {[{ n: '50+', l: 'Projects' }, { n: '10y', l: 'Experience' }, { n: '100%', l: 'Satisfaction' }].map(s => (
                       <div key={s.n} style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: 24, fontWeight: 700, color: '#1e52f1' }}>{s.n}</div>
+                        <div style={{ fontSize: 24, fontWeight: 700, color: '#ff7722' }}>{s.n}</div>
                         <div style={{ fontSize: 11, opacity: 0.6 }}>{s.l}</div>
                       </div>
                     ))}
@@ -608,9 +608,9 @@ export default function DesignSystemPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {[{ y: '2024', t: 'Senior Designer' }, { y: '2022', t: 'Designer' }].map((item, i) => (
                       <div key={i} style={{ display: 'flex', gap: 12 }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#1e52f1', marginTop: 6 }} />
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff7722', marginTop: 6 }} />
                         <div>
-                          <div style={{ fontSize: 11, color: '#1e52f1', fontWeight: 600 }}>{item.y}</div>
+                          <div style={{ fontSize: 11, color: '#ff7722', fontWeight: 600 }}>{item.y}</div>
                           <div style={{ fontSize: 13 }}>{item.t}</div>
                         </div>
                       </div>
@@ -629,7 +629,7 @@ export default function DesignSystemPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
                 <BlockDemo name="Buttons" isDark={isDark}>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    <button style={{ padding: '10px 20px', borderRadius: 8, border: 'none', background: '#1e52f1', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Primary</button>
+                    <button style={{ padding: '10px 20px', borderRadius: 8, border: 'none', background: '#ff7722', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Primary</button>
                     <button style={{ padding: '10px 20px', borderRadius: 8, border: `1px solid ${border}`, background: 'transparent', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: 'inherit' }}>Secondary</button>
                   </div>
                 </BlockDemo>
@@ -654,7 +654,7 @@ export default function DesignSystemPage() {
                 </BlockDemo>
                 <BlockDemo name="Download" isDark={isDark}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 10, background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(23,20,18,0.03)' }}>
-                    <Download size={20} color="#1e52f1" />
+                    <Download size={20} color="#ff7722" />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600 }}>Resume.pdf</div>
                       <div style={{ fontSize: 11, opacity: 0.5 }}>245 KB</div>
@@ -668,20 +668,20 @@ export default function DesignSystemPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                 <BlockDemo name="Case Study" isDark={isDark}>
                   <div style={{ borderRadius: 12, overflow: 'hidden', border: `1px solid ${border}` }}>
-                    <div style={{ height: 100, background: 'linear-gradient(135deg, #1e52f1, #0e42dd)' }} />
+                    <div style={{ height: 100, background: 'linear-gradient(135deg, #ff7722, #e5691e)' }} />
                     <div style={{ padding: 16 }}>
-                      <div style={{ fontSize: 11, color: '#1e52f1', fontWeight: 600, marginBottom: 4 }}>UI/UX Design</div>
+                      <div style={{ fontSize: 11, color: '#ff7722', fontWeight: 600, marginBottom: 4 }}>UI/UX Design</div>
                       <div style={{ fontSize: 15, fontWeight: 700 }}>App Redesign</div>
                       <p style={{ fontSize: 12, opacity: 0.6, marginTop: 8 }}>Complete mobile app redesign...</p>
                     </div>
                   </div>
                 </BlockDemo>
                 <BlockDemo name="Testimonial" isDark={isDark}>
-                  <div style={{ padding: 20, borderRadius: 12, background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(30, 82, 241,0.05)' }}>
-                    <Quote size={20} color="#1e52f1" style={{ opacity: 0.5 }} />
+                  <div style={{ padding: 20, borderRadius: 12, background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,119,34,0.05)' }}>
+                    <Quote size={20} color="#ff7722" style={{ opacity: 0.5 }} />
                     <p style={{ fontSize: 14, lineHeight: 1.6, marginTop: 12, fontStyle: 'italic' }}>&ldquo;Amazing work! Exceeded expectations.&rdquo;</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#1e52f1' }} />
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ff7722' }} />
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 600 }}>John Doe</div>
                         <div style={{ fontSize: 11, opacity: 0.6 }}>CEO, Company</div>
@@ -694,8 +694,8 @@ export default function DesignSystemPage() {
                     <div style={{ width: 80, height: 80, borderRadius: 8, background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(23,20,18,0.05)' }} />
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700 }}>Design Course</div>
-                      <div style={{ fontSize: 18, fontWeight: 700, color: '#1e52f1', marginTop: 4 }}>$99</div>
-                      <button style={{ marginTop: 8, padding: '6px 12px', borderRadius: 6, border: 'none', background: '#1e52f1', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Buy Now</button>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: '#ff7722', marginTop: 4 }}>$99</div>
+                      <button style={{ marginTop: 8, padding: '6px 12px', borderRadius: 6, border: 'none', background: '#ff7722', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Buy Now</button>
                     </div>
                   </div>
                 </BlockDemo>
@@ -752,18 +752,18 @@ export default function DesignSystemPage() {
             </Subsection>
             <Subsection title="Buttons">
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-                <button style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#1e52f1', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Primary</button>
+                <button style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#ff7722', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Primary</button>
                 <button style={{ padding: '12px 24px', borderRadius: 10, border: `1px solid ${border}`, background: 'transparent', color: 'inherit', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Secondary</button>
                 <button style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(23,20,18,0.05)', color: 'inherit', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Ghost</button>
                 <button style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#ff3c34', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Danger</button>
-                <button style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#1e52f1', color: '#fff', fontSize: 14, fontWeight: 600, opacity: 0.5, cursor: 'not-allowed' }}>Disabled</button>
+                <button style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: '#ff7722', color: '#fff', fontSize: 14, fontWeight: 600, opacity: 0.5, cursor: 'not-allowed' }}>Disabled</button>
               </div>
             </Subsection>
             <Subsection title="Button Sizes">
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <button style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: '#1e52f1', color: '#fff', fontSize: 12, fontWeight: 600 }}>Small</button>
-                <button style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: '#1e52f1', color: '#fff', fontSize: 14, fontWeight: 600 }}>Medium</button>
-                <button style={{ padding: '14px 28px', borderRadius: 12, border: 'none', background: '#1e52f1', color: '#fff', fontSize: 16, fontWeight: 600 }}>Large</button>
+                <button style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: '#ff7722', color: '#fff', fontSize: 12, fontWeight: 600 }}>Small</button>
+                <button style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: '#ff7722', color: '#fff', fontSize: 14, fontWeight: 600 }}>Medium</button>
+                <button style={{ padding: '14px 28px', borderRadius: 12, border: 'none', background: '#ff7722', color: '#fff', fontSize: 16, fontWeight: 600 }}>Large</button>
               </div>
             </Subsection>
             <Subsection title="Icon Buttons">
@@ -807,10 +807,10 @@ export default function DesignSystemPage() {
             <Subsection title="Badges">
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {[
-                  { l: 'Primary', bg: '#1e52f1', c: '#fff' },
-                  { l: 'Subtle', bg: 'rgba(30, 82, 241,0.1)', c: '#1e52f1' },
+                  { l: 'Primary', bg: '#ff7722', c: '#fff' },
+                  { l: 'Subtle', bg: 'rgba(255,119,34,0.1)', c: '#ff7722' },
                   { l: 'Success', bg: '#22c55e', c: '#fff' },
-                  { l: 'Warning', bg: '#ffc765', c: '#1c1c1c' },
+                  { l: 'Warning', bg: '#ffc765', c: '#171412' },
                   { l: 'Error', bg: '#ff3c34', c: '#fff' },
                   { l: 'Neutral', bg: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(23,20,18,0.05)', c: 'inherit' },
                   { l: 'New', bg: '#3d2fa9', c: '#fff' },
@@ -836,7 +836,7 @@ export default function DesignSystemPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 4 }}>
                   {[0, 1, 2].map(i => (
-                    <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: '#1e52f1', animation: `pulse 1.5s ease-in-out ${i * 0.2}s infinite` }} />
+                    <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff7722', animation: `pulse 1.5s ease-in-out ${i * 0.2}s infinite` }} />
                   ))}
                 </div>
               </div>
@@ -846,7 +846,7 @@ export default function DesignSystemPage() {
                 <Folder size={40} style={{ opacity: 0.2, marginBottom: 12 }} />
                 <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>No items yet</div>
                 <p style={{ fontSize: 13, opacity: 0.5, marginBottom: 16 }}>Create your first item to get started</p>
-                <button style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: '#1e52f1', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                <button style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: '#ff7722', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                   <Plus size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />
                   Create Item
                 </button>
@@ -954,7 +954,7 @@ function TypeCard({ name, family, sample, usage, font, isDark }: { name: string;
     <div style={{ padding: 20, borderRadius: 12, background: isDark ? 'rgba(255,255,255,0.05)' : '#fff', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(23,20,18,0.08)'}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
         <div>
-          <span style={{ fontSize: 10, fontWeight: 600, color: '#1e52f1', textTransform: 'uppercase' }}>{name}</span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: '#ff7722', textTransform: 'uppercase' }}>{name}</span>
           <div style={{ fontSize: 16, fontWeight: 600, fontFamily: font, marginTop: 2 }}>{family}</div>
         </div>
         <span style={{ fontSize: 10, opacity: 0.5 }}>{usage}</span>
@@ -968,14 +968,14 @@ function DockDemo({ isDark }: { isDark: boolean }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const icons = [Folder, FileText, ImageIcon, Link2, Settings];
   return (
-    <div style={{ padding: 40, borderRadius: 16, background: isDark ? 'linear-gradient(180deg, #1a1917, #0d0c0b)' : 'linear-gradient(180deg, #f7f4ed, #e8e5db)', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 40, borderRadius: 16, background: isDark ? 'linear-gradient(180deg, #1a1917, #0d0c0b)' : 'linear-gradient(180deg, #f2f0e7, #e8e5db)', display: 'flex', justifyContent: 'center' }}>
       <motion.div style={{ display: 'flex', gap: 8, padding: '12px 20px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', borderRadius: 20, border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.6)'}`, boxShadow: '0 8px 32px rgba(23,20,18,0.12)' }}>
         {icons.map((Icon, i) => {
           const dist = hovered !== null ? Math.abs(hovered - i) : null;
           const scale = dist === null ? 1 : dist === 0 ? 1.4 : dist === 1 ? 1.15 : 1;
           const y = dist === null ? 0 : dist === 0 ? -12 : dist === 1 ? -4 : 0;
           return (
-            <motion.div key={i} onHoverStart={() => setHovered(i)} onHoverEnd={() => setHovered(null)} animate={{ scale, y }} transition={SPRING.bouncy} style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.9)', borderRadius: 12, cursor: 'pointer', color: isDark ? '#f5f3eb' : '#1c1c1c' }}>
+            <motion.div key={i} onHoverStart={() => setHovered(i)} onHoverEnd={() => setHovered(null)} animate={{ scale, y }} transition={SPRING.bouncy} style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.9)', borderRadius: 12, cursor: 'pointer', color: isDark ? '#f5f3eb' : '#171412' }}>
               <Icon size={24} />
             </motion.div>
           );
@@ -989,7 +989,7 @@ function MenuBarDemo({ isDark }: { isDark: boolean }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderRadius: 10, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.8)', backdropFilter: 'blur(20px)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(23,20,18,0.08)'}` }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ width: 20, height: 20, borderRadius: 4, background: '#1e52f1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 20, height: 20, borderRadius: 4, background: '#ff7722', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>g</span>
         </div>
         {['File', 'Edit', 'View', 'Go', 'Window', 'Help'].map(m => (
@@ -1013,7 +1013,7 @@ function DockFullDemo({ isDark }: { isDark: boolean }) {
     { icon: Settings, name: 'Settings' },
   ];
   return (
-    <div style={{ padding: 32, borderRadius: 16, background: isDark ? 'linear-gradient(180deg, #1a1917, #0d0c0b)' : 'linear-gradient(180deg, #f7f4ed, #e8e5db)', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 32, borderRadius: 16, background: isDark ? 'linear-gradient(180deg, #1a1917, #0d0c0b)' : 'linear-gradient(180deg, #f2f0e7, #e8e5db)', display: 'flex', justifyContent: 'center' }}>
       <div style={{ display: 'flex', gap: 8, padding: '10px 16px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', borderRadius: 20, border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.6)'}` }}>
         {items.map((item, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -1031,7 +1031,7 @@ function DockFullDemo({ isDark }: { isDark: boolean }) {
 function DesktopIconsDemo({ isDark }: { isDark: boolean }) {
   const icons = [
     { icon: Folder, name: 'Projects', color: '#3b82f6' },
-    { icon: FileText, name: 'About Me', color: '#1e52f1' },
+    { icon: FileText, name: 'About Me', color: '#ff7722' },
     { icon: ImageIcon, name: 'Gallery', color: '#22c55e' },
     { icon: Link2, name: 'Links', color: '#8b5cf6' },
   ];
@@ -1120,9 +1120,9 @@ function CommandPaletteDemo({ isDark }: { isDark: boolean }) {
           { icon: Folder, name: 'Projects', type: 'Folder' },
           { icon: Settings, name: 'Settings', type: 'Action' },
         ].map((item, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 8, background: i === 0 ? (isDark ? 'rgba(30, 82, 241,0.15)' : 'rgba(30, 82, 241,0.1)') : 'transparent' }}>
-            <item.icon size={18} color={i === 0 ? '#1e52f1' : undefined} style={{ opacity: i === 0 ? 1 : 0.5 }} />
-            <span style={{ flex: 1, fontSize: 14, color: i === 0 ? '#1e52f1' : 'inherit' }}>{item.name}</span>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 8, background: i === 0 ? (isDark ? 'rgba(255,119,34,0.15)' : 'rgba(255,119,34,0.1)') : 'transparent' }}>
+            <item.icon size={18} color={i === 0 ? '#ff7722' : undefined} style={{ opacity: i === 0 ? 1 : 0.5 }} />
+            <span style={{ flex: 1, fontSize: 14, color: i === 0 ? '#ff7722' : 'inherit' }}>{item.name}</span>
             <span style={{ fontSize: 11, opacity: 0.4 }}>{item.type}</span>
           </div>
         ))}
@@ -1134,7 +1134,7 @@ function CommandPaletteDemo({ isDark }: { isDark: boolean }) {
 function NotificationDemo({ isDark }: { isDark: boolean }) {
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 20px', borderRadius: 16, background: isDark ? 'rgba(30,28,26,0.95)' : 'rgba(255,255,255,0.95)', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(23,20,18,0.15)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(23,20,18,0.08)'}` }}>
-      <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, #1e52f1, #0e42dd)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, #ff7722, #e5691e)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{ fontSize: 20 }}>👋</span>
       </div>
       <div>
@@ -1149,7 +1149,7 @@ function BadgeDemo({ isDark }: { isDark: boolean }) {
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 9999, background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(23,20,18,0.05)', fontSize: 12, fontWeight: 500 }}>
       <span style={{ opacity: 0.6 }}>Made with</span>
-      <span style={{ fontWeight: 700, color: '#1e52f1' }}>goOS</span>
+      <span style={{ fontWeight: 700, color: '#ff7722' }}>goOS</span>
     </div>
   );
 }
@@ -1205,7 +1205,7 @@ function WindowDemo({ isDark, title, type }: { isDark: boolean; title: string; t
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {['Building new feature', 'Reading design books'].map((e, i) => (
           <div key={i} style={{ display: 'flex', gap: 10, padding: 12, borderRadius: 8, background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(23,20,18,0.03)', fontSize: 13 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#1e52f1', marginTop: 4 }} />
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff7722', marginTop: 4 }} />
             <span>{e}</span>
           </div>
         ))}
@@ -1248,7 +1248,7 @@ function BlockDemo({ name, children, isDark }: { name: string; children: React.R
 }
 
 function InputDemo({ label, placeholder, icon: Icon, focused, error, disabled, isDark }: { label: string; placeholder: string; icon?: React.ComponentType<{ size?: number; style?: React.CSSProperties }>; focused?: boolean; error?: boolean; disabled?: boolean; isDark: boolean }) {
-  const border = error ? '#ff3c34' : focused ? '#1e52f1' : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(23,20,18,0.15)';
+  const border = error ? '#ff3c34' : focused ? '#ff7722' : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(23,20,18,0.15)';
   return (
     <div>
       <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.6, marginBottom: 6, display: 'block' }}>{label}</label>
@@ -1263,7 +1263,7 @@ function InputDemo({ label, placeholder, icon: Icon, focused, error, disabled, i
             padding: Icon ? '12px 14px 12px 40px' : '12px 14px',
             borderRadius: 10,
             border: `1px solid ${border}`,
-            boxShadow: focused ? '0 0 0 3px rgba(30, 82, 241,0.15)' : 'none',
+            boxShadow: focused ? '0 0 0 3px rgba(255,119,34,0.15)' : 'none',
             background: isDark ? 'rgba(255,255,255,0.05)' : '#fff',
             color: 'inherit',
             fontSize: 14,
@@ -1280,7 +1280,7 @@ function InputDemo({ label, placeholder, icon: Icon, focused, error, disabled, i
 function ToggleDemo({ label, checked, isDark }: { label: string; checked: boolean; isDark: boolean }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ width: 44, height: 24, borderRadius: 12, background: checked ? '#1e52f1' : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(23,20,18,0.15)'), padding: 2, cursor: 'pointer' }}>
+      <div style={{ width: 44, height: 24, borderRadius: 12, background: checked ? '#ff7722' : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(23,20,18,0.15)'), padding: 2, cursor: 'pointer' }}>
         <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#fff', transform: checked ? 'translateX(20px)' : 'translateX(0)', transition: 'transform 0.2s ease' }} />
       </div>
       <span style={{ fontSize: 13 }}>{label}</span>
@@ -1291,7 +1291,7 @@ function ToggleDemo({ label, checked, isDark }: { label: string; checked: boolea
 function CheckboxDemo({ label, checked, isDark }: { label: string; checked: boolean; isDark: boolean }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-      <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${checked ? '#1e52f1' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(23,20,18,0.2)')}`, background: checked ? '#1e52f1' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${checked ? '#ff7722' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(23,20,18,0.2)')}`, background: checked ? '#ff7722' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {checked && <Check size={12} color="white" />}
       </div>
       <span style={{ fontSize: 13 }}>{label}</span>

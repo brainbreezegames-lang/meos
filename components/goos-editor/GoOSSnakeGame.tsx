@@ -40,15 +40,15 @@ const MIN_SPEED = 70;
 
 // Colors - warm palette matching goOS
 const COLORS = {
-  bg: 'var(--color-bg-base)', // Warm cream background
+  bg: '#FBF9EF', // Warm cream background
   grid: 'rgba(209, 199, 178, 0.3)', // Very subtle grid
   gridAlt: 'rgba(209, 199, 178, 0.15)', // Even more subtle alternating
   snakeHead: '#28c840', // Bright green
   snakeBody: '#34d058', // Slightly lighter green
   snakeTail: '#85e89d', // Fade to light green
-  food: 'var(--color-accent-primary)', // Orange accent
+  food: '#ff7722', // Orange accent
   foodGlow: '#ff9955', // Orange glow
-  particle: ['var(--color-accent-primary)', '#ffaa44', '#ffcc66', '#ff9955'], // Orange particles
+  particle: ['#ff7722', '#ffaa44', '#ffcc66', '#ff9955'], // Orange particles
 };
 
 export function GoOSSnakeGame({
@@ -352,8 +352,8 @@ export function GoOSSnakeGame({
       foodCenterX, foodCenterY, 0,
       foodCenterX, foodCenterY, foodRadius * 2
     );
-    glowGradient.addColorStop(0, 'var(--color-accent-primary-glow)');
-    glowGradient.addColorStop(1, 'rgba(30, 82, 241, 0)');
+    glowGradient.addColorStop(0, 'rgba(255, 119, 34, 0.3)');
+    glowGradient.addColorStop(1, 'rgba(255, 119, 34, 0)');
     ctx.fillStyle = glowGradient;
     ctx.beginPath();
     ctx.arc(foodCenterX, foodCenterY, foodRadius * 2, 0, Math.PI * 2);
@@ -516,13 +516,13 @@ export function GoOSSnakeGame({
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '10px 14px',
-            background: 'linear-gradient(135deg, rgba(30, 82, 241,0.08) 0%, rgba(30, 82, 241,0.03) 100%)',
+            background: 'linear-gradient(135deg, rgba(255,119,34,0.08) 0%, rgba(255,119,34,0.03) 100%)',
             borderRadius: 10,
-            border: '1px solid rgba(30, 82, 241,0.15)',
+            border: '1px solid rgba(255,119,34,0.15)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Sparkles size={16} color="var(--color-accent-primary)" />
+            <Sparkles size={16} color="#ff7722" />
             <span
               style={{
                 fontSize: 11,
@@ -539,7 +539,7 @@ export function GoOSSnakeGame({
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                color: 'var(--color-accent-primary)',
+                color: '#ff7722',
                 fontFamily: 'var(--font-mono)',
               }}
             >
@@ -613,7 +613,7 @@ export function GoOSSnakeGame({
                     fontSize: countdown === 0 ? 36 : 72,
                     fontWeight: 800,
                     fontFamily: 'var(--font-mono)',
-                    color: countdown === 0 ? '#28c840' : 'var(--color-accent-primary)',
+                    color: countdown === 0 ? '#28c840' : '#ff7722',
                     textShadow: '0 4px 12px rgba(0,0,0,0.15)',
                   }}
                 >
@@ -667,7 +667,7 @@ export function GoOSSnakeGame({
                         fontFamily: 'var(--font-body)',
                       }}
                     >
-                      Score: <span style={{ fontWeight: 700, color: 'var(--color-accent-primary)' }}>{score}</span>
+                      Score: <span style={{ fontWeight: 700, color: '#ff7722' }}>{score}</span>
                     </motion.div>
                     {score === highScore && score > 0 && (
                       <motion.div
@@ -709,12 +709,12 @@ export function GoOSSnakeGame({
                         fontSize: 14,
                         fontWeight: 600,
                         fontFamily: 'var(--font-body)',
-                        background: 'linear-gradient(135deg, #1e52f1 0%, #ff5500 100%)',
+                        background: 'linear-gradient(135deg, #ff7722 0%, #ff5500 100%)',
                         color: 'white',
                         border: 'none',
                         borderRadius: 10,
                         cursor: 'pointer',
-                        boxShadow: '0 4px 12px rgba(30, 82, 241, 0.3)',
+                        boxShadow: '0 4px 12px rgba(255, 119, 34, 0.3)',
                       }}
                     >
                       <RotateCcw size={16} />
