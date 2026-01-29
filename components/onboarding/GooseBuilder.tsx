@@ -22,12 +22,10 @@ import {
   Table2,
   Kanban,
   X,
-  Sparkles,
-  Zap,
 } from 'lucide-react';
 import { SPRING, DURATION, EASE } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
-import { ConfettiBurst, SparkleEffect } from '@/components/ui/Delight';
+import { ConfettiBurst } from '@/components/ui/Delight';
 
 // ============================================================================
 // Types
@@ -86,23 +84,7 @@ interface PlanData {
 }
 
 // ============================================================================
-// Palette — uses design system CSS variables (light/dark aware)
-// ============================================================================
-
-const C = {
-  panel: 'var(--color-bg-elevated, rgba(255,255,255,0.92))',
-  card: 'var(--color-bg-subtle, rgba(0,0,0,0.03))',
-  border: 'var(--color-border-default, rgba(0,0,0,0.08))',
-  accent: 'var(--color-accent-primary, #ff7722)',
-  text: 'var(--color-text-primary, #171412)',
-  textSub: 'var(--color-text-secondary, #4a4744)',
-  textMuted: 'var(--color-text-muted, #8e827c)',
-  success: 'var(--color-success, #22c55e)',
-  error: 'var(--color-error, #ff3c34)',
-} as const;
-
-// ============================================================================
-// Constants
+// Constants — design system tokens only, no hardcoded values
 // ============================================================================
 
 const ICON_MAP: Record<string, typeof FileText> = {
@@ -129,12 +111,8 @@ const GOOSE_LINES: Record<Phase, string[]> = {
     'Writing your content...',
     'Putting it all together...',
   ],
-  complete: [
-    'Your space is ready.',
-  ],
-  error: [
-    'Something went wrong.',
-  ],
+  complete: ['Your space is ready.'],
+  error: ['Something went wrong.'],
 };
 
 function pickLine(phase: Phase): string {
@@ -142,202 +120,14 @@ function pickLine(phase: Phase): string {
   return lines[Math.floor(Math.random() * lines.length)];
 }
 
-// ============================================================================
-// Animated Phase Ring — the centerpiece visual
-// ============================================================================
-
-function PhaseRing({ phase, progress }: { phase: Phase; progress: number }) {
-  const prefersReducedMotion = useReducedMotion();
-  const size = 56;
-  const strokeWidth = 2.5;
-  const radius = (size - strokeWidth * 2) / 2;
-  const circumference = 2 * Math.PI * radius;
-
-  const isActive = phase !== 'error' && phase !== 'complete';
-  const isComplete = phase === 'complete';
-
-  const orbiterCount = phase === 'building' ? 3 : phase === 'planning' ? 2 : 1;
-
-  return (
-    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
-      {/* Background track */}
-      <svg width={size} height={size} className="absolute inset-0" style={{ transform: 'rotate(-90deg)' }}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={C.border}
-          strokeWidth={strokeWidth}
-        />
-        {/* Progress arc */}
-        <motion.circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={isComplete ? C.success : C.accent}
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          animate={{
-            strokeDashoffset: circumference - (progress * circumference),
-          }}
-          transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-        />
-      </svg>
-
-      {/* Orbiting particles */}
-      {isActive && !prefersReducedMotion && (
-        <>
-          {Array.from({ length: orbiterCount }).map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute"
-              style={{
-                width: 4,
-                height: 4,
-                borderRadius: '50%',
-                background: C.accent,
-                top: '50%',
-                left: '50%',
-                marginTop: -2,
-                marginLeft: -2,
-                boxShadow: `0 0 6px ${C.accent}`,
-              }}
-              animate={{
-                rotate: [0 + (i * (360 / orbiterCount)), 360 + (i * (360 / orbiterCount))],
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: 'linear',
-              }}
-              transformTemplate={({ rotate }) =>
-                `rotate(${rotate}) translateY(-${radius}px)`
-              }
-            />
-          ))}
-        </>
-      )}
-
-      {/* Center icon */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <AnimatePresence mode="wait">
-          {phase === 'connecting' && (
-            <motion.div
-              key="connecting"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              transition={SPRING.snappy}
-            >
-              <Loader2 size={20} className="animate-spin" style={{ color: C.accent }} />
-            </motion.div>
-          )}
-          {phase === 'understanding' && (
-            <motion.div
-              key="understanding"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              transition={SPRING.snappy}
-            >
-              <Brain size={20} style={{ color: C.accent }} />
-            </motion.div>
-          )}
-          {phase === 'planning' && (
-            <motion.div
-              key="planning"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              transition={SPRING.snappy}
-            >
-              <Compass size={20} style={{ color: C.accent }} />
-            </motion.div>
-          )}
-          {phase === 'building' && (
-            <motion.div
-              key="building"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              transition={SPRING.snappy}
-            >
-              <motion.div
-                animate={{ rotate: [-5, 5, -5], y: [0, -2, 0] }}
-                transition={{ repeat: Infinity, duration: 0.6 }}
-              >
-                <Zap size={20} style={{ color: C.accent }} />
-              </motion.div>
-            </motion.div>
-          )}
-          {phase === 'complete' && (
-            <motion.div
-              key="complete"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={SPRING.bouncy}
-            >
-              <Check size={22} strokeWidth={2.5} style={{ color: C.success }} />
-            </motion.div>
-          )}
-          {phase === 'error' && (
-            <motion.div
-              key="error"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={SPRING.snappy}
-            >
-              <AlertCircle size={20} style={{ color: C.error }} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// Waveform Visualizer — shows during thinking phases
-// ============================================================================
-
-function ThinkingWaveform({ isActive }: { isActive: boolean }) {
-  const prefersReducedMotion = useReducedMotion();
-  const barCount = 16;
-
-  if (prefersReducedMotion || !isActive) return null;
-
-  return (
-    <div
-      className="flex items-end justify-center gap-px"
-      style={{ height: 20 }}
-    >
-      {Array.from({ length: barCount }).map((_, i) => (
-        <motion.div
-          key={i}
-          style={{
-            width: 2,
-            borderRadius: 1,
-            background: C.accent,
-            opacity: 0.4,
-          }}
-          animate={{
-            height: [3, 8 + Math.random() * 12, 3],
-            opacity: [0.2, 0.5, 0.2],
-          }}
-          transition={{
-            duration: 0.8 + Math.random() * 0.6,
-            repeat: Infinity,
-            delay: i * 0.05,
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
-    </div>
-  );
-}
+const PHASE_ICON: Record<Phase, typeof FileText> = {
+  connecting: Loader2,
+  understanding: Brain,
+  planning: Compass,
+  building: Loader2,
+  complete: Check,
+  error: AlertCircle,
+};
 
 // ============================================================================
 // Component
@@ -594,8 +384,6 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
 
   const spring = prefersReducedMotion ? { duration: DURATION.instant } : SPRING.gentle;
   const bounce = prefersReducedMotion ? { duration: DURATION.instant } : SPRING.bouncy;
-  const isBuilding = phase === 'building';
-  const isThinking = phase === 'understanding' || phase === 'planning';
 
   const totalPlan = plan?.items.length || 0;
   const phaseProgress = (() => {
@@ -608,12 +396,14 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
     return 0.35;
   })();
 
+  const PhaseIcon = PHASE_ICON[phase];
+  const isSpinning = phase === 'connecting' || phase === 'building';
+
   return (
     <>
       <ConfettiBurst trigger={showConfetti} />
 
       <AnimatePresence>
-        {/* Floating panel — bottom-right, transparent over the desktop */}
         <motion.div
           className="fixed z-[10000] flex flex-col overflow-hidden"
           initial={{ opacity: 0, y: 60, scale: 0.92 }}
@@ -625,155 +415,157 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
             right: 24,
             width: 380,
             maxHeight: '65vh',
-            borderRadius: 'var(--radius-xl, 20px)',
-            background: C.panel,
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
-            border: `1px solid ${C.border}`,
-            boxShadow: 'var(--shadow-xl, 0 16px 48px rgba(23,20,18,0.15))',
+            borderRadius: 'var(--window-radius)',
+            background: 'var(--color-bg-base)',
+            border: '1px solid var(--color-border-default)',
+            boxShadow: 'var(--shadow-window)',
           }}
         >
-          {/* Ambient glow — shifts color with phase */}
-          <motion.div
-            className="absolute inset-0 pointer-events-none overflow-hidden"
-            style={{ borderRadius: 'var(--radius-xl, 20px)', zIndex: 0 }}
-          >
-            <motion.div
-              className="absolute"
+          {/* ─── Progress bar ─── */}
+          {phase !== 'complete' && phase !== 'error' && (
+            <div
               style={{
-                width: '140%',
-                height: '140%',
-                top: '-20%',
-                left: '-20%',
-                borderRadius: '50%',
-                opacity: 0.04,
-                filter: 'blur(40px)',
+                height: 2,
+                background: 'var(--color-border-subtle)',
+                borderRadius: 'var(--radius-full)',
+                overflow: 'hidden',
+                flexShrink: 0,
               }}
-              animate={{
-                background: phase === 'complete'
-                  ? `radial-gradient(ellipse at center, ${C.success} 0%, transparent 70%)`
-                  : phase === 'error'
-                    ? `radial-gradient(ellipse at center, ${C.error} 0%, transparent 70%)`
-                    : `radial-gradient(ellipse at center, ${C.accent} 0%, transparent 70%)`,
-                scale: isBuilding ? [1, 1.1, 1] : 1,
-              }}
-              transition={isBuilding ? { repeat: Infinity, duration: 3, ease: 'easeInOut' } : { duration: 0.8 }}
-            />
-          </motion.div>
-
-          {/* Animated border glow during active phases */}
-          {(isBuilding || isThinking) && !prefersReducedMotion && (
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              style={{ borderRadius: 'var(--radius-xl, 20px)', zIndex: 1 }}
-              animate={{
-                boxShadow: isBuilding
-                  ? [
-                    `inset 0 0 0 1px color-mix(in srgb, ${C.accent} 10%, transparent)`,
-                    `inset 0 0 0 1px color-mix(in srgb, ${C.accent} 25%, transparent), 0 0 20px color-mix(in srgb, ${C.accent} 8%, transparent)`,
-                    `inset 0 0 0 1px color-mix(in srgb, ${C.accent} 10%, transparent)`,
-                  ]
-                  : [
-                    `inset 0 0 0 1px color-mix(in srgb, ${C.accent} 5%, transparent)`,
-                    `inset 0 0 0 1px color-mix(in srgb, ${C.accent} 15%, transparent)`,
-                    `inset 0 0 0 1px color-mix(in srgb, ${C.accent} 5%, transparent)`,
-                  ],
-              }}
-              transition={{ repeat: Infinity, duration: isBuilding ? 2 : 3, ease: 'easeInOut' }}
-            />
+            >
+              <motion.div
+                style={{
+                  height: '100%',
+                  background: 'var(--color-accent-primary)',
+                  borderRadius: 'var(--radius-full)',
+                  transformOrigin: 'left',
+                }}
+                animate={{ scaleX: phaseProgress }}
+                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              />
+            </div>
           )}
 
           {/* ─── Header ─── */}
-          <div className="relative z-10 px-5 pt-5 pb-2">
-            <div className="flex items-start gap-4">
-              {/* Phase ring — the hero visual */}
-              <PhaseRing phase={phase} progress={phaseProgress} />
-
-              <div className="flex-1 min-w-0 pt-0.5">
-                <div className="flex items-center justify-between">
-                  <AnimatePresence mode="wait">
-                    <motion.h2
-                      key={phase === 'complete' ? 'done' : phase === 'error' ? 'err' : 'building'}
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      transition={{ duration: 0.2, ease: EASE.out }}
-                      style={{
-                        fontSize: '0.875rem',
-                        color: C.text,
-                        fontWeight: 600,
-                        letterSpacing: '-0.01em',
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      {phase === 'complete' ? 'Your space is ready' : phase === 'error' ? 'Something went wrong' : 'Building your space'}
-                    </motion.h2>
-                  </AnimatePresence>
-
-                  {phase !== 'complete' && (
-                    <button
-                      onClick={handleCancel}
-                      className="flex-shrink-0 p-1 rounded-lg transition-colors"
-                      onMouseEnter={e => e.currentTarget.style.background = 'var(--color-bg-subtle, rgba(0,0,0,0.04))'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                      aria-label="Cancel build"
-                    >
-                      <X size={14} style={{ color: C.textMuted }} />
-                    </button>
-                  )}
-                </div>
-
-                {/* Status line */}
+          <div style={{ padding: 'var(--space-4) var(--space-5) var(--space-2)' }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center" style={{ gap: 'var(--space-2)' }}>
                 <AnimatePresence mode="wait">
-                  <motion.p
-                    key={statusMessage}
-                    initial={{ opacity: 0, y: 3 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="text-xs mt-0.5"
-                    style={{ color: C.textMuted }}
+                  <motion.div
+                    key={phase}
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    transition={SPRING.snappy}
+                    className="flex-shrink-0"
                   >
-                    {statusMessage}
-                  </motion.p>
+                    <PhaseIcon
+                      size={16}
+                      strokeWidth={2}
+                      className={isSpinning && !prefersReducedMotion ? 'animate-spin' : ''}
+                      style={{
+                        color: phase === 'complete'
+                          ? 'var(--color-success)'
+                          : phase === 'error'
+                            ? 'var(--color-error)'
+                            : 'var(--color-accent-primary)',
+                      }}
+                    />
+                  </motion.div>
                 </AnimatePresence>
 
-                {/* Build counter */}
-                {(isBuilding || phase === 'complete') && totalPlan > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center gap-1.5 mt-1.5"
+                <AnimatePresence mode="wait">
+                  <motion.h2
+                    key={phase === 'complete' ? 'done' : phase === 'error' ? 'err' : 'building'}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.2, ease: EASE.out }}
+                    style={{
+                      fontSize: 'var(--font-size-sm)',
+                      color: 'var(--color-text-primary)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      letterSpacing: 'var(--letter-spacing-tight)',
+                      lineHeight: 'var(--line-height-snug)',
+                      fontFamily: 'var(--font-body)',
+                      margin: 0,
+                    }}
                   >
-                    <span className="text-[11px] font-medium tabular-nums" style={{ color: C.accent }}>
-                      {createdItems.length}
-                    </span>
-                    <span className="text-[10px]" style={{ color: C.textMuted }}>
-                      / {totalPlan} files
-                    </span>
-                  </motion.div>
-                )}
+                    {phase === 'complete' ? 'Your space is ready' : phase === 'error' ? 'Something went wrong' : 'Building your space'}
+                  </motion.h2>
+                </AnimatePresence>
               </div>
+
+              {phase !== 'complete' && (
+                <button
+                  onClick={handleCancel}
+                  className="flex-shrink-0 flex items-center justify-center transition-colors"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--color-bg-subtle-hover)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  aria-label="Cancel build"
+                >
+                  <X size={13} style={{ color: 'var(--color-text-muted)' }} />
+                </button>
+              )}
             </div>
 
-            {/* Waveform visualizer during thinking */}
-            <AnimatePresence>
-              {isThinking && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 28 }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3, ease: EASE.out }}
-                  className="mt-3 overflow-hidden"
+            {/* Status line */}
+            <div style={{ paddingLeft: 24 }}>
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={statusMessage}
+                  initial={{ opacity: 0, y: 3 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  style={{
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--color-text-muted)',
+                    fontFamily: 'var(--font-body)',
+                    lineHeight: 'var(--line-height-normal)',
+                    margin: '2px 0 0',
+                  }}
                 >
-                  <ThinkingWaveform isActive={isThinking} />
-                </motion.div>
+                  {statusMessage}
+                </motion.p>
+              </AnimatePresence>
+
+              {/* Build counter */}
+              {(phase === 'building' || phase === 'complete') && totalPlan > 0 && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  style={{
+                    fontSize: 'var(--font-size-xs)',
+                    fontFamily: 'var(--font-body)',
+                    margin: '4px 0 0',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  <span style={{ color: 'var(--color-accent-primary)', fontWeight: 'var(--font-weight-medium)' }}>
+                    {createdItems.length}
+                  </span>
+                  <span style={{ color: 'var(--color-text-muted)' }}>
+                    {' '}/ {totalPlan} files
+                  </span>
+                </motion.p>
               )}
-            </AnimatePresence>
+            </div>
           </div>
 
           {/* ─── Scrollable content ─── */}
-          <div ref={scrollRef} className="relative z-10 flex-1 overflow-y-auto px-5 pb-4 space-y-3 min-h-0">
+          <div
+            ref={scrollRef}
+            className="flex-1 overflow-y-auto min-h-0"
+            style={{ padding: '0 var(--space-5) var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
+          >
 
             {/* Thinking lines */}
             <AnimatePresence>
@@ -782,20 +574,23 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="space-y-1 py-1"
+                  style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4, paddingBottom: 4 }}
                 >
                   {thinkingLines.slice(-3).map((line, i, arr) => (
                     <motion.p
                       key={`${line}-${i}`}
                       initial={{ opacity: 0, x: -6 }}
                       animate={{
-                        opacity: i === arr.length - 1 ? 0.7 : 0.3,
+                        opacity: i === arr.length - 1 ? 0.7 : 0.35,
                         x: 0,
                       }}
-                      className="text-[11px] leading-snug"
                       style={{
-                        color: C.textMuted,
+                        fontSize: 'var(--font-size-xs)',
+                        fontFamily: 'var(--font-body)',
+                        lineHeight: 'var(--line-height-normal)',
+                        color: 'var(--color-text-muted)',
                         fontStyle: 'italic',
+                        margin: 0,
                       }}
                     >
                       {line}
@@ -812,32 +607,69 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={spring}
-                  className="rounded-xl p-3.5"
-                  style={{ background: C.card }}
+                  style={{
+                    background: 'var(--color-bg-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-3) var(--space-4)',
+                  }}
                 >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Brain size={12} style={{ color: C.accent }} />
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: C.textMuted }}>
+                  <div className="flex items-center" style={{ gap: 6, marginBottom: 'var(--space-2)' }}>
+                    <Brain size={12} style={{ color: 'var(--color-accent-primary)' }} />
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 'var(--font-weight-semibold)',
+                        textTransform: 'uppercase',
+                        letterSpacing: 'var(--letter-spacing-wider)',
+                        color: 'var(--color-text-muted)',
+                        fontFamily: 'var(--font-body)',
+                      }}
+                    >
                       Understanding
                     </span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: C.text }}>
+                  <p
+                    style={{
+                      fontSize: 'var(--font-size-sm)',
+                      fontFamily: 'var(--font-body)',
+                      lineHeight: 'var(--line-height-relaxed)',
+                      color: 'var(--color-text-primary)',
+                      margin: 0,
+                    }}
+                  >
                     {understanding.summary}
                   </p>
                   {(understanding.identity?.profession || understanding.tone || promptKeywords.length > 0) && (
-                    <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap" style={{ gap: 6, marginTop: 'var(--space-2)' }}>
                       {understanding.identity?.profession && (
                         <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
-                          style={{ background: 'color-mix(in srgb, var(--color-accent-primary, #ff7722) 8%, transparent)', color: C.accent }}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            padding: '2px 8px',
+                            borderRadius: 'var(--radius-full)',
+                            fontSize: '10px',
+                            fontWeight: 'var(--font-weight-medium)',
+                            fontFamily: 'var(--font-body)',
+                            background: 'var(--color-accent-primary-subtle)',
+                            color: 'var(--color-accent-primary)',
+                          }}
                         >
                           {understanding.identity.profession}
                         </span>
                       )}
                       {understanding.tone && (
                         <span
-                          className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px]"
-                          style={{ background: C.card, color: C.textSub }}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            padding: '2px 8px',
+                            borderRadius: 'var(--radius-full)',
+                            fontSize: '10px',
+                            fontFamily: 'var(--font-body)',
+                            background: 'var(--color-bg-subtle-hover)',
+                            color: 'var(--color-text-secondary)',
+                          }}
                         >
                           {understanding.tone}
                         </span>
@@ -848,10 +680,16 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: i * 0.05 }}
-                          className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium"
                           style={{
-                            background: 'color-mix(in srgb, var(--color-accent-primary, #ff7722) 8%, transparent)',
-                            color: C.accent,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            padding: '2px 8px',
+                            borderRadius: 'var(--radius-full)',
+                            fontSize: '10px',
+                            fontWeight: 'var(--font-weight-medium)',
+                            fontFamily: 'var(--font-body)',
+                            background: 'var(--color-accent-primary-subtle)',
+                            color: 'var(--color-accent-primary)',
                           }}
                         >
                           {kw}
@@ -870,20 +708,42 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ ...spring, delay: 0.08 }}
-                  className="rounded-xl p-3.5"
-                  style={{ background: C.card }}
+                  style={{
+                    background: 'var(--color-bg-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-3) var(--space-4)',
+                  }}
                 >
-                  <div className="flex items-center gap-1.5 mb-2.5">
-                    <Compass size={12} style={{ color: C.accent }} />
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: C.textMuted }}>
-                      Plan
-                    </span>
-                    <span className="text-[10px] tabular-nums ml-auto font-medium" style={{ color: C.textMuted }}>
+                  <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-2)' }}>
+                    <div className="flex items-center" style={{ gap: 6 }}>
+                      <Compass size={12} style={{ color: 'var(--color-accent-primary)' }} />
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 'var(--font-weight-semibold)',
+                          textTransform: 'uppercase',
+                          letterSpacing: 'var(--letter-spacing-wider)',
+                          color: 'var(--color-text-muted)',
+                          fontFamily: 'var(--font-body)',
+                        }}
+                      >
+                        Plan
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontVariantNumeric: 'tabular-nums',
+                        fontWeight: 'var(--font-weight-medium)',
+                        color: 'var(--color-text-muted)',
+                        fontFamily: 'var(--font-body)',
+                      }}
+                    >
                       {createdItems.length}/{plan.items.length}
                     </span>
                   </div>
 
-                  <div className="space-y-1">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {plan.items.map((planItem, idx) => {
                       const isCreated = createdItems.some(ci => ci.title === planItem.name);
                       const isCurrBuilding = currentlyBuilding === planItem.name;
@@ -895,63 +755,68 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                           initial={{ opacity: 0, x: -8 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.04, ...SPRING.snappy }}
-                          className="flex items-center gap-2 py-1 rounded-lg px-2 transition-colors"
+                          className="flex items-center"
                           style={{
-                            background: isCurrBuilding
-                              ? 'color-mix(in srgb, var(--color-accent-primary, #ff7722) 6%, transparent)'
-                              : 'transparent',
+                            gap: 'var(--space-2)',
+                            padding: '4px var(--space-2)',
+                            borderRadius: 'var(--radius-sm)',
+                            background: isCurrBuilding ? 'var(--color-accent-primary-subtle)' : 'transparent',
                           }}
                         >
                           {/* Status indicator */}
-                          <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
+                          <div className="flex-shrink-0 flex items-center justify-center" style={{ width: 16, height: 16 }}>
                             {isCreated ? (
                               <motion.div
                                 initial={{ scale: 0, rotate: -90 }}
                                 animate={{ scale: 1, rotate: 0 }}
                                 transition={bounce}
+                                className="flex items-center justify-center"
+                                style={{
+                                  width: 16, height: 16,
+                                  borderRadius: 'var(--radius-full)',
+                                  background: 'var(--color-success-subtle)',
+                                }}
                               >
-                                <div
-                                  className="w-4 h-4 rounded-full flex items-center justify-center"
-                                  style={{ background: 'color-mix(in srgb, var(--color-success, #22c55e) 15%, transparent)' }}
-                                >
-                                  <Check size={10} strokeWidth={3} style={{ color: C.success }} />
-                                </div>
+                                <Check size={10} strokeWidth={3} style={{ color: 'var(--color-success)' }} />
                               </motion.div>
                             ) : isCurrBuilding ? (
                               <motion.div
-                                animate={{ rotate: 360 }}
+                                animate={prefersReducedMotion ? {} : { rotate: 360 }}
                                 transition={{ repeat: Infinity, duration: 1.2, ease: 'linear' }}
                               >
-                                <Loader2 size={14} style={{ color: C.accent }} />
+                                <Loader2 size={14} style={{ color: 'var(--color-accent-primary)' }} />
                               </motion.div>
                             ) : (
                               <div
-                                className="w-3.5 h-3.5 rounded-full"
-                                style={{ border: `1.5px solid color-mix(in srgb, ${C.textMuted} 40%, transparent)` }}
+                                style={{
+                                  width: 14, height: 14,
+                                  borderRadius: 'var(--radius-full)',
+                                  border: '1.5px solid var(--color-border-strong)',
+                                }}
                               />
                             )}
                           </div>
 
-                          <Icon size={11} className="flex-shrink-0" style={{ color: isCurrBuilding ? C.accent : C.textMuted }} />
+                          <Icon
+                            size={11}
+                            className="flex-shrink-0"
+                            style={{ color: isCurrBuilding ? 'var(--color-accent-primary)' : 'var(--color-text-muted)' }}
+                          />
                           <span
-                            className="text-[12px] truncate"
+                            className="truncate"
                             style={{
-                              color: isCreated ? C.success : isCurrBuilding ? C.text : C.textSub,
-                              fontWeight: isCurrBuilding ? 500 : 400,
+                              fontSize: '12px',
+                              fontFamily: 'var(--font-body)',
+                              color: isCreated
+                                ? 'var(--color-success)'
+                                : isCurrBuilding
+                                  ? 'var(--color-text-primary)'
+                                  : 'var(--color-text-secondary)',
+                              fontWeight: isCurrBuilding ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                             }}
                           >
                             {planItem.name}
                           </span>
-
-                          {isCurrBuilding && !prefersReducedMotion && (
-                            <motion.div
-                              className="flex-shrink-0 ml-auto"
-                              animate={{ opacity: [0.4, 1, 0.4] }}
-                              transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-                            >
-                              <Sparkles size={10} style={{ color: C.accent }} />
-                            </motion.div>
-                          )}
                         </motion.div>
                       );
                     })}
@@ -960,7 +825,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
               )}
             </AnimatePresence>
 
-            {/* Recently created file — celebratory flash */}
+            {/* Recently created file */}
             <AnimatePresence>
               {recentlyCreated && phase === 'building' && (
                 <motion.div
@@ -968,28 +833,39 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -4, scale: 0.98 }}
                   transition={SPRING.snappy}
-                  className="relative rounded-xl p-3 overflow-hidden"
-                  style={{ background: C.card }}
+                  style={{
+                    background: 'var(--color-bg-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-3)',
+                  }}
                 >
-                  <SparkleEffect trigger={true} config={{ count: 6, spread: 30, minSize: 3, maxSize: 6 }} />
-
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center" style={{ gap: 'var(--space-2)' }}>
                     <motion.div
-                      className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
-                      style={{ background: 'color-mix(in srgb, var(--color-accent-primary, #ff7722) 12%, transparent)' }}
+                      className="flex-shrink-0 flex items-center justify-center"
+                      style={{
+                        width: 32, height: 32,
+                        borderRadius: 'var(--radius-sm)',
+                        background: 'var(--color-accent-primary-subtle)',
+                      }}
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={SPRING.bouncy}
                     >
                       {(() => {
                         const Icon = ICON_MAP[recentlyCreated.fileType || ''] || FileText;
-                        return <Icon size={14} style={{ color: C.accent }} />;
+                        return <Icon size={14} style={{ color: 'var(--color-accent-primary)' }} />;
                       })()}
                     </motion.div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <motion.p
-                        className="text-xs font-medium truncate"
-                        style={{ color: C.text }}
+                        className="truncate"
+                        style={{
+                          fontSize: 'var(--font-size-sm)',
+                          fontWeight: 'var(--font-weight-medium)',
+                          fontFamily: 'var(--font-body)',
+                          color: 'var(--color-text-primary)',
+                          margin: 0,
+                        }}
                         initial={{ opacity: 0, x: -8 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 }}
@@ -997,8 +873,12 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                         {recentlyCreated.title}
                       </motion.p>
                       <motion.p
-                        className="text-[10px] mt-0.5"
-                        style={{ color: C.textMuted }}
+                        style={{
+                          fontSize: '10px',
+                          fontFamily: 'var(--font-body)',
+                          color: 'var(--color-text-muted)',
+                          margin: '2px 0 0',
+                        }}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -1007,12 +887,12 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                       </motion.p>
                     </div>
                     <motion.div
-                      className="flex-shrink-0 ml-auto"
+                      className="flex-shrink-0"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ ...SPRING.bouncy, delay: 0.15 }}
                     >
-                      <Check size={14} style={{ color: C.success }} />
+                      <Check size={14} style={{ color: 'var(--color-success)' }} />
                     </motion.div>
                   </div>
                 </motion.div>
@@ -1026,25 +906,56 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={spring}
-                  className="rounded-xl p-4"
-                  style={{ background: C.card }}
+                  style={{
+                    background: 'var(--color-bg-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-4)',
+                  }}
                 >
-                  <p className="text-xs mb-3 leading-relaxed" style={{ color: C.textSub }}>
+                  <p
+                    style={{
+                      fontSize: 'var(--font-size-sm)',
+                      fontFamily: 'var(--font-body)',
+                      lineHeight: 'var(--line-height-relaxed)',
+                      color: 'var(--color-text-secondary)',
+                      margin: '0 0 var(--space-3)',
+                    }}
+                  >
                     {error || 'Something went wrong. Please try again.'}
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex" style={{ gap: 'var(--space-2)' }}>
                     <button
                       onClick={handleRetry}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all hover:brightness-110"
-                      style={{ background: C.accent, color: 'var(--color-text-on-accent, #fff)' }}
+                      className="flex items-center transition-all"
+                      style={{
+                        gap: 6,
+                        padding: '8px 16px',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: 'var(--font-weight-medium)',
+                        fontFamily: 'var(--font-body)',
+                        background: 'var(--color-accent-primary)',
+                        color: 'var(--color-text-on-accent)',
+                        border: 'none',
+                        cursor: 'pointer',
+                      }}
                     >
                       <RefreshCw size={12} />
                       Try again
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="px-3 py-2 rounded-full text-xs transition-all hover:opacity-70"
-                      style={{ color: C.textMuted }}
+                      className="transition-all"
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: 'var(--font-size-sm)',
+                        fontFamily: 'var(--font-body)',
+                        color: 'var(--color-text-muted)',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                      }}
                     >
                       Cancel
                     </button>
@@ -1053,32 +964,46 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
               )}
             </AnimatePresence>
 
-            {/* Complete state — triumphant */}
+            {/* Complete state */}
             <AnimatePresence>
               {phase === 'complete' && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={bounce}
-                  className="rounded-xl p-5 text-center"
-                  style={{ background: C.card }}
+                  className="text-center"
+                  style={{
+                    background: 'var(--color-bg-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 'var(--space-5)',
+                  }}
                 >
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ ...SPRING.bouncy, delay: 0.1 }}
-                    className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center"
-                    style={{ background: 'color-mix(in srgb, var(--color-success, #22c55e) 12%, transparent)' }}
+                    className="mx-auto flex items-center justify-center"
+                    style={{
+                      width: 48, height: 48,
+                      borderRadius: 'var(--radius-lg)',
+                      background: 'var(--color-success-subtle)',
+                      marginBottom: 'var(--space-3)',
+                    }}
                   >
-                    <Check size={24} strokeWidth={2.5} style={{ color: C.success }} />
+                    <Check size={24} strokeWidth={2.5} style={{ color: 'var(--color-success)' }} />
                   </motion.div>
 
                   <motion.p
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-sm font-semibold"
-                    style={{ color: C.text }}
+                    style={{
+                      fontSize: 'var(--font-size-base)',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      fontFamily: 'var(--font-body)',
+                      color: 'var(--color-text-primary)',
+                      margin: 0,
+                    }}
                   >
                     {createdItems.length} item{createdItems.length !== 1 ? 's' : ''} created
                   </motion.p>
@@ -1086,8 +1011,12 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.35 }}
-                    className="text-xs mt-1"
-                    style={{ color: C.textMuted }}
+                    style={{
+                      fontSize: 'var(--font-size-xs)',
+                      fontFamily: 'var(--font-body)',
+                      color: 'var(--color-text-muted)',
+                      margin: '4px 0 0',
+                    }}
                   >
                     Opening your space...
                   </motion.p>
