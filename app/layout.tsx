@@ -77,12 +77,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className={`${ibmPlexSans.variable} ${sourceCodePro.variable} ${averiaSerifLibre.variable} ${instrumentSans.variable} ${instrumentSerif.variable} ${gochiHand.variable} ${inter.variable} ${outfit.variable} font-sans bg-[var(--bg-app)] text-[var(--text-primary)] antialiased overflow-hidden`}>
 
 

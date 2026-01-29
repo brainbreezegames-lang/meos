@@ -59,9 +59,7 @@ import { WidgetRenderer, WIDGET_METADATA, WidgetContextMenu } from '@/components
 import { ClockWidgetEditor } from '@/components/widgets/ClockWidgetEditor';
 import type { Widget } from '@/types';
 import { PresentView } from '@/components/views';
-import { DrawingApp } from '@/components/apps/DrawingApp';
-import { PresentationView } from '@/components/presentation';
-import { CaseStudyPageView } from '@/components/casestudy';
+// DrawingApp, PresentationView, CaseStudyPageView — dynamic imported below
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
 import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
 import { MenuBarDropdown, MenuBarItem, MenuBarDivider, MenuBarGroup, MenuBarTrigger, useMenuBarState } from '@/components/menubar';
@@ -81,10 +79,10 @@ import {
     buttonPress,
 } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
-import { CommandPalette } from '@/components/command-palette/CommandPalette';
+// CommandPalette — dynamic imported below
 import { DesktopReveal } from '@/components/desktop-reveal/DesktopReveal';
 import { WALLPAPERS } from '@/lib/wallpapers';
-import { FallingLetters } from '@/components/desktop/FallingLetters';
+// FallingLetters — dynamic imported below (pulls in matter-js 988KB)
 import { Launchpad, LaunchpadDockIcon } from '@/components/desktop/Launchpad';
 // Dock icons are now real PNG images at /icons/dock/
 import { OnboardingPrompt, GooseBuilder } from '@/components/onboarding';
@@ -609,6 +607,33 @@ const GoOSSheetEditor = dynamic(
         loading: () => <PlayfulLoader />,
         ssr: false
     }
+);
+
+// Lazy load heavy view components (conditionally rendered, not needed on initial load)
+const DrawingApp = dynamic(
+    () => import('@/components/apps/DrawingApp').then(mod => ({ default: mod.DrawingApp })),
+    { ssr: false }
+);
+
+const PresentationView = dynamic(
+    () => import('@/components/presentation').then(mod => ({ default: mod.PresentationView })),
+    { ssr: false }
+);
+
+const CaseStudyPageView = dynamic(
+    () => import('@/components/casestudy').then(mod => ({ default: mod.CaseStudyPageView })),
+    { ssr: false }
+);
+
+const CommandPalette = dynamic(
+    () => import('@/components/command-palette/CommandPalette').then(mod => ({ default: mod.CommandPalette })),
+    { ssr: false }
+);
+
+// FallingLetters pulls in matter-js (988 KB) — must be lazy loaded
+const FallingLetters = dynamic(
+    () => import('@/components/desktop/FallingLetters').then(mod => ({ default: mod.FallingLetters })),
+    { ssr: false }
 );
 
 // ============================================
@@ -4405,10 +4430,14 @@ function GoOSDemoContent() {
             {/* WALLPAPER BACKGROUND - With Space Theme Support */}
             {wallpaper ? (
                 <>
-                <img
+                <Image
                     src={wallpaper.startsWith('http') ? wallpaper : `/${wallpaper}.png`}
                     alt=""
-                    className="absolute inset-0 w-full h-full pointer-events-none select-none"
+                    fill
+                    priority
+                    sizes="100vw"
+                    quality={85}
+                    className="pointer-events-none select-none"
                     style={{
                         objectFit: 'cover',
                         objectPosition: 'center',
