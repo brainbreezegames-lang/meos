@@ -3414,7 +3414,31 @@ function GoOSDemoContent() {
             console.log('[onboarding] Clearing demo files for onboarding...');
             clearGoOSFiles();
             hasClearedRef.current = true;
+            // Give the clear a moment to settle before creating new files
+            await new Promise(r => setTimeout(r, 200));
         }
+
+        // Retry helper — retries a function up to maxRetries times with delay
+        const withRetry = async <T,>(fn: () => Promise<T | null>, label: string, maxRetries = 2, delayMs = 600): Promise<T | null> => {
+            for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                try {
+                    const result = await fn();
+                    if (result !== null) return result;
+                    if (attempt < maxRetries) {
+                        console.warn(`[onboarding] Retry ${attempt + 1}/${maxRetries} for "${label}" (returned null)`);
+                        await new Promise(r => setTimeout(r, delayMs * (attempt + 1)));
+                    }
+                } catch (err) {
+                    if (attempt < maxRetries) {
+                        console.warn(`[onboarding] Retry ${attempt + 1}/${maxRetries} for "${label}" (error):`, err);
+                        await new Promise(r => setTimeout(r, delayMs * (attempt + 1)));
+                    } else {
+                        throw err;
+                    }
+                }
+            }
+            return null;
+        };
 
         if (item.type === 'widget' && item.widgetType) {
             try {
@@ -3422,7 +3446,10 @@ function GoOSDemoContent() {
                     x: 80,
                     y: 10 + fileCreationIndexRef.current * 12,
                 };
-                await createWidget(item.widgetType as WidgetType, widgetPos);
+                await withRetry(
+                    () => createWidget(item.widgetType as WidgetType, widgetPos).then(() => true as const),
+                    `widget:${item.title}`,
+                );
                 console.log(`[onboarding] Created widget: ${item.widgetType} (${item.title})`);
                 playSound('materialize');
             } catch (err) {
@@ -3439,16 +3466,23 @@ function GoOSDemoContent() {
                     const position = parentId ? undefined : POSITIONS[fileCreationIndexRef.current % POSITIONS.length];
                     const { createLinkFile } = goosContext;
                     if (createLinkFile) {
-                        const linkFile = await createLinkFile(item.linkUrl, {
-                            title: item.title,
-                            description: item.purpose,
-                            parentId,
-                            position,
-                        });
+                        const linkFile = await withRetry(
+                            () => createLinkFile(item.linkUrl!, {
+                                title: item.title,
+                                description: item.purpose,
+                                parentId,
+                                position,
+                            }),
+                            `link:${item.title}`,
+                        );
                         if (linkFile) {
                             console.log(`[onboarding] Created link: "${item.title}" → ${item.linkUrl}`);
                             playSound('materialize');
+                        } else {
+                            console.error(`[onboarding] Failed to create link "${item.title}" after retries`);
                         }
+                    } else {
+                        console.error(`[onboarding] createLinkFile not available in context for "${item.title}"`);
                     }
                 } catch (err) {
                     console.error(`[onboarding] Failed to create link "${item.title}":`, err);
@@ -3462,13 +3496,29 @@ function GoOSDemoContent() {
             console.log(`[onboarding] Creating file "${item.title}" at position:`, position, 'content length:', item.content?.length || 0);
 
             try {
-                const newFile = await createGoOSFile(item.fileType as FileType, parentId, position);
+                const newFile = await withRetry(
+                    () => createGoOSFile(item.fileType as FileType, parentId, position),
+                    `file:${item.title}`,
+                );
+
                 if (newFile) {
                     const updateData: { title: string; content?: string } = { title: item.title };
                     if (item.content && item.content.length > 0) {
                         updateData.content = item.content;
                     }
-                    await updateGoOSFile(newFile.id, updateData);
+
+                    // Retry the update too — the file exists but might fail to set title/content
+                    try {
+                        await updateGoOSFile(newFile.id, updateData);
+                    } catch (updateErr) {
+                        console.warn(`[onboarding] First update failed for "${item.title}", retrying...`);
+                        await new Promise(r => setTimeout(r, 500));
+                        try {
+                            await updateGoOSFile(newFile.id, updateData);
+                        } catch (retryErr) {
+                            console.error(`[onboarding] Update retry also failed for "${item.title}":`, retryErr);
+                        }
+                    }
 
                     // Track folder IDs for parent resolution
                     if (item.fileType === 'folder') {
@@ -3478,7 +3528,7 @@ function GoOSDemoContent() {
                     console.log(`[onboarding] Created file: "${item.title}" id=${newFile.id}`);
                     playSound('materialize');
                 } else {
-                    console.error(`[onboarding] createGoOSFile returned null for "${item.title}"`);
+                    console.error(`[onboarding] createGoOSFile returned null for "${item.title}" after retries`);
                 }
             } catch (err) {
                 console.error(`[onboarding] Failed to create "${item.title}":`, err);

@@ -387,6 +387,10 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
       } catch (err) {
         console.error('Failed to create item:', item.title, err);
       }
+      // Brief pause between items to prevent API contention
+      if (itemQueueRef.current.length > 0) {
+        await new Promise(r => setTimeout(r, 300));
+      }
     }
     processingRef.current = false;
   }, []);
