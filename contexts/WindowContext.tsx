@@ -49,84 +49,73 @@ interface WindowProviderProps {
 export function WindowProvider({ children }: WindowProviderProps) {
   const [windows, setWindows] = useState<WindowInstance[]>([]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
-  const [nextZIndex, setNextZIndex] = useState(1);
+  // Use ref for z-index counter to avoid recreating callbacks on every z-index bump
+  const nextZIndexRef = React.useRef(1);
+  const getNextZ = () => nextZIndexRef.current++;
 
   const openWindow = useCallback((itemId: string): string => {
-    // Check if window for this item already exists
-    const existingWindow = windows.find(w => w.itemId === itemId);
-    if (existingWindow) {
-      // If minimized, restore it
-      if (existingWindow.state === 'minimized') {
-        setWindows(prev => prev.map(w =>
-          w.id === existingWindow.id
-            ? { ...w, state: 'normal' as WindowState, zIndex: nextZIndex }
-            : w
-        ));
-        setNextZIndex(prev => prev + 1);
-      } else {
-        // Just focus it
-        setWindows(prev => prev.map(w =>
-          w.id === existingWindow.id
-            ? { ...w, zIndex: nextZIndex }
-            : w
-        ));
-        setNextZIndex(prev => prev + 1);
+    let resultId = '';
+    setWindows(prev => {
+      const existingWindow = prev.find(w => w.itemId === itemId);
+      if (existingWindow) {
+        resultId = existingWindow.id;
+        const z = getNextZ();
+        if (existingWindow.state === 'minimized') {
+          return prev.map(w =>
+            w.id === existingWindow.id
+              ? { ...w, state: 'normal' as WindowState, zIndex: z }
+              : w
+          );
+        }
+        return prev.map(w =>
+          w.id === existingWindow.id ? { ...w, zIndex: z } : w
+        );
       }
-      setActiveWindowId(existingWindow.id);
-      return existingWindow.id;
-    }
-
-    // Create new window
-    const windowId = `window-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const newWindow: WindowInstance = {
-      id: windowId,
-      itemId,
-      state: 'normal',
-      zIndex: nextZIndex,
-      position: { x: 0, y: 0 }, // Will be set by the component
-      size: { width: 440, height: 500 },
-    };
-
-    setWindows(prev => [...prev, newWindow]);
-    setActiveWindowId(windowId);
-    setNextZIndex(prev => prev + 1);
-    return windowId;
-  }, [windows, nextZIndex]);
+      const windowId = `window-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      resultId = windowId;
+      return [...prev, {
+        id: windowId,
+        itemId,
+        state: 'normal' as WindowState,
+        zIndex: getNextZ(),
+        position: { x: 0, y: 0 },
+        size: { width: 440, height: 500 },
+      }];
+    });
+    setActiveWindowId(resultId);
+    return resultId;
+  }, []);
 
   const closeWindow = useCallback((windowId: string) => {
-    setWindows(prev => prev.filter(w => w.id !== windowId));
-    if (activeWindowId === windowId) {
-      // Focus the next highest z-index window
-      setWindows(prev => {
-        const remaining = prev.filter(w => w.id !== windowId);
-        if (remaining.length > 0) {
-          const topWindow = remaining.reduce((a, b) => a.zIndex > b.zIndex ? a : b);
-          setActiveWindowId(topWindow.id);
-        } else {
-          setActiveWindowId(null);
-        }
-        return remaining;
-      });
-    }
-  }, [activeWindowId]);
+    setWindows(prev => {
+      const remaining = prev.filter(w => w.id !== windowId);
+      // Focus next highest z-index window
+      if (remaining.length > 0) {
+        const topWindow = remaining.reduce((a, b) => a.zIndex > b.zIndex ? a : b);
+        setActiveWindowId(topWindow.id);
+      } else {
+        setActiveWindowId(null);
+      }
+      return remaining;
+    });
+  }, []);
 
   const minimizeWindow = useCallback((windowId: string) => {
-    setWindows(prev => prev.map(w =>
-      w.id === windowId
-        ? { ...w, state: 'minimized' as WindowState }
-        : w
-    ));
-    if (activeWindowId === windowId) {
-      // Focus the next visible window
-      const visibleWindows = windows.filter(w => w.id !== windowId && w.state !== 'minimized');
+    setWindows(prev => {
+      const updated = prev.map(w =>
+        w.id === windowId ? { ...w, state: 'minimized' as WindowState } : w
+      );
+      // Focus next visible window
+      const visibleWindows = updated.filter(w => w.id !== windowId && w.state !== 'minimized');
       if (visibleWindows.length > 0) {
         const topWindow = visibleWindows.reduce((a, b) => a.zIndex > b.zIndex ? a : b);
         setActiveWindowId(topWindow.id);
       } else {
         setActiveWindowId(null);
       }
-    }
-  }, [activeWindowId, windows]);
+      return updated;
+    });
+  }, []);
 
   const maximizeWindow = useCallback((windowId: string) => {
     setWindows(prev => prev.map(w =>
@@ -137,30 +126,24 @@ export function WindowProvider({ children }: WindowProviderProps) {
   }, []);
 
   const restoreWindow = useCallback((windowId: string) => {
+    const z = getNextZ();
     setWindows(prev => prev.map(w =>
-      w.id === windowId
-        ? { ...w, state: 'normal' as WindowState, zIndex: nextZIndex }
-        : w
+      w.id === windowId ? { ...w, state: 'normal' as WindowState, zIndex: z } : w
     ));
     setActiveWindowId(windowId);
-    setNextZIndex(prev => prev + 1);
-  }, [nextZIndex]);
+  }, []);
 
   const focusWindow = useCallback((windowId: string) => {
+    const z = getNextZ();
     setWindows(prev => prev.map(w =>
-      w.id === windowId
-        ? { ...w, zIndex: nextZIndex }
-        : w
+      w.id === windowId ? { ...w, zIndex: z } : w
     ));
     setActiveWindowId(windowId);
-    setNextZIndex(prev => prev + 1);
-  }, [nextZIndex]);
+  }, []);
 
   const updateWindowPosition = useCallback((windowId: string, x: number, y: number) => {
     setWindows(prev => prev.map(w =>
-      w.id === windowId
-        ? { ...w, position: { x, y } }
-        : w
+      w.id === windowId ? { ...w, position: { x, y } } : w
     ));
   }, []);
 

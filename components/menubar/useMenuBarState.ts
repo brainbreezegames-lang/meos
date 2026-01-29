@@ -21,7 +21,7 @@ export function useMenuBarState(): UseMenuBarReturn {
   const [activeMenu, setActiveMenu] = useState<MenuId | null>(null);
   const activeMenuRef = useRef<MenuId | null>(null);
 
-  // Keep ref in sync for use in event listener
+  // Keep ref in sync for use in event listeners
   activeMenuRef.current = activeMenu;
 
   const toggleMenu = useCallback((id: MenuId) => {
@@ -45,7 +45,7 @@ export function useMenuBarState(): UseMenuBarReturn {
     }
   }, []);
 
-  // Global click-outside handler
+  // Global click-outside + Escape key handler
   useEffect(() => {
     if (activeMenu === null) return;
 
@@ -59,23 +59,31 @@ export function useMenuBarState(): UseMenuBarReturn {
           el.hasAttribute('data-menubar-trigger') ||
           el.hasAttribute('data-menubar-dropdown')
         ) {
-          return; // Click is inside a menu trigger or dropdown — don't close
+          return;
         }
         el = el.parentElement;
       }
 
-      // Click is outside all menus
       setActiveMenu(null);
     };
 
-    // Use requestAnimationFrame to avoid closing on the same click that opened
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setActiveMenu(null);
+      }
+    };
+
+    // Use rAF to avoid closing on the same click that opened
     const raf = requestAnimationFrame(() => {
       document.addEventListener('mousedown', handleMouseDown);
+      document.addEventListener('keydown', handleKeyDown);
     });
 
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [activeMenu]);
 

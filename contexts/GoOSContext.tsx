@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import type { GoOSFile, GoOSFileType, PublishStatus } from '@/lib/validations/goos';
 import { getDefaultCVContent, getDefaultBoardContent, getDefaultSheetContent } from '@/lib/validations/goos';
 import { playSound } from '@/lib/sounds';
@@ -137,6 +137,9 @@ export function GoOSProvider({
   // Track pending create operations to prevent race conditions with refreshFiles
   const pendingCreatesRef = useRef<Set<string>>(new Set());
 
+  // Toast timeout ref for cleanup
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Show toast with sound
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     // Play appropriate sound for toast type
@@ -146,8 +149,9 @@ export function GoOSProvider({
       playSound('notification');
     }
     // Note: success sounds are played at the action site for more specific feedback
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    toastTimeoutRef.current = setTimeout(() => setToast(null), 3000);
   }, []);
 
   // Set save status for a file
@@ -1115,10 +1119,11 @@ export function GoOSProvider({
   useEffect(() => {
     return () => {
       Object.values(saveTimeoutsRef.current).forEach(clearTimeout);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     };
   }, []);
 
-  const value: GoOSContextType = {
+  const value = useMemo<GoOSContextType>(() => ({
     files,
     isLoading,
     error,
@@ -1144,7 +1149,33 @@ export function GoOSProvider({
     refreshFiles,
     showToast,
     toast,
-  };
+  }), [
+    files,
+    isLoading,
+    error,
+    saveStatus,
+    viewMode,
+    createFile,
+    updateFile,
+    deleteFile,
+    duplicateFile,
+    moveFile,
+    clearFiles,
+    resetFiles,
+    createImageFile,
+    createLinkFile,
+    createEmbedFile,
+    createDownloadFile,
+    autoSave,
+    publishFile,
+    unpublishFile,
+    setAccessLevel,
+    lockFile,
+    unlockFile,
+    refreshFiles,
+    showToast,
+    toast,
+  ]);
 
   return (
     <GoOSContext.Provider value={value}>

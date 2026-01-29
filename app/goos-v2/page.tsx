@@ -3563,6 +3563,9 @@ function GoOSDemoContent() {
                     alt: file.name,
                     position: offsetPosition,
                 });
+                // Revoke object URL after upload completes to free memory
+                // (server response replaces with permanent URL)
+                URL.revokeObjectURL(imageUrl);
             }
         }
 
@@ -4551,9 +4554,9 @@ function GoOSDemoContent() {
                                 }}
                                 onCreateSpace={() => { setShowCreateSpaceModal(true); menuBar.closeAll(); }}
                                 onManageSpaces={() => { setShowManageSpacesDialog(true); menuBar.closeAll(); }}
-                                isOpen={menuBar.isOpen('spaces')}
+                                isOpen={menuBar.activeMenu === 'spaces'}
                                 onToggle={() => menuBar.toggleMenu('spaces')}
-                                onMouseEnterTrigger={() => menuBar.getTriggerProps('spaces').onMouseEnter()}
+                                onMouseEnterTrigger={menuBar.getTriggerProps('spaces').onMouseEnter}
                             />
 
                             {/* Widgets Menu — shared MenuBar components */}

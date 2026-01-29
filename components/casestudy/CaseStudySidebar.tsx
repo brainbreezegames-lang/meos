@@ -84,15 +84,13 @@ export function CaseStudySidebar({
   const sectionIds = entries.map((e) => e.id);
   const activeSection = useScrollSpy(sectionIds);
 
-  // Hide sidebar below 1024px
+  // Hide sidebar below 1024px — use matchMedia for efficient breakpoint detection
   useEffect(() => {
-    const checkWidth = () => {
-      setIsWideEnough(window.innerWidth > 1024);
-    };
-
-    checkWidth();
-    window.addEventListener('resize', checkWidth);
-    return () => window.removeEventListener('resize', checkWidth);
+    const mql = window.matchMedia('(min-width: 1025px)');
+    setIsWideEnough(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsWideEnough(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
   }, []);
 
   const scrollToSection = useCallback(

@@ -32,6 +32,7 @@ export function WidgetWrapper({
   const dragStartRef = useRef<{ mouseX: number; mouseY: number; elemX: number; elemY: number } | null>(null);
   const hasDragged = useRef(false);
   const currentPositionRef = useRef({ x: widget.positionX, y: widget.positionY });
+  const dragListenersRef = useRef<{ move: (e: MouseEvent) => void; up: () => void } | null>(null);
 
   // Sync position with widget prop changes (only when not dragging)
   useEffect(() => {
@@ -93,6 +94,7 @@ export function WidgetWrapper({
     const handleMouseUp = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      dragListenersRef.current = null;
 
       const wasActualDrag = hasDragged.current;
       setIsDragging(false);
@@ -119,9 +121,20 @@ export function WidgetWrapper({
       dragStartRef.current = null;
     };
 
+    dragListenersRef.current = { move: handleMouseMove, up: handleMouseUp };
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
   }, [isOwner, position, onPositionChange]);
+
+  // Cleanup drag listeners on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (dragListenersRef.current) {
+        window.removeEventListener('mousemove', dragListenersRef.current.move);
+        window.removeEventListener('mouseup', dragListenersRef.current.up);
+      }
+    };
+  }, []);
 
   if (!widget.isVisible && !isOwner) {
     return null;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import type { DesktopItem, BlockData } from '@/types';
@@ -133,23 +133,29 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
   };
 
   const blocksToRender = getBlocksToRender();
-  const sortedBlocks = [...blocksToRender].sort((a, b) => a.order - b.order);
-  const sortedTabs = item?.tabs ? [...item.tabs].sort((a, b) => a.order - b.order) : [];
+  const sortedBlocks = useMemo(
+    () => [...blocksToRender].sort((a, b) => a.order - b.order),
+    [blocksToRender]
+  );
+  const sortedTabs = useMemo(
+    () => item?.tabs ? [...item.tabs].sort((a, b) => a.order - b.order) : [],
+    [item?.tabs]
+  );
 
   // Handle block updates
-  const handleBlockUpdate = (blockId: string, data: Record<string, unknown>) => {
+  const handleBlockUpdate = useCallback((blockId: string, data: Record<string, unknown>) => {
     if (!item || !context) return;
     context.updateBlock(item.id, blockId, { data });
-  };
+  }, [item, context]);
 
   // Handle block delete
-  const handleBlockDelete = (blockId: string) => {
+  const handleBlockDelete = useCallback((blockId: string) => {
     if (!item || !context) return;
     context.deleteBlock(item.id, blockId);
-  };
+  }, [item, context]);
 
   // Handle add block
-  const handleAddBlock = (type: string) => {
+  const handleAddBlock = useCallback((type: string) => {
     if (!item || !context) return;
 
     const blockDef = BLOCK_DEFINITIONS.find(b => b.type === type);
@@ -162,47 +168,47 @@ export function MultiWindow({ window: windowInstance, item }: MultiWindowProps) 
     });
 
     blockPicker.close();
-  };
+  }, [item, context, sortedBlocks.length, blockPicker]);
 
   // Open inline block picker
-  const openBlockPicker = () => {
+  const openBlockPicker = useCallback(() => {
     if (addBlockButtonRef.current) {
       const rect = addBlockButtonRef.current.getBoundingClientRect();
       blockPicker.open(rect.left, rect.top - 360);
     }
-  };
+  }, [blockPicker]);
 
   // Handle item field updates
-  const handleTitleChange = (value: string) => {
+  const handleTitleChange = useCallback((value: string) => {
     if (!item || !context) return;
     context.updateItem(item.id, { windowTitle: value });
-  };
+  }, [item, context]);
 
-  const handleSubtitleChange = (value: string) => {
+  const handleSubtitleChange = useCallback((value: string) => {
     if (!item || !context) return;
     context.updateItem(item.id, { windowSubtitle: value });
-  };
+  }, [item, context]);
 
-  const handleHeaderImageChange = (url: string) => {
+  const handleHeaderImageChange = useCallback((url: string) => {
     if (!item || !context) return;
     context.updateItem(item.id, { windowHeaderImage: url });
-  };
+  }, [item, context]);
 
-  const handleWindowClick = () => {
+  const handleWindowClick = useCallback(() => {
     windowContext.focusWindow(windowInstance.id);
-  };
+  }, [windowContext, windowInstance.id]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     windowContext.closeWindow(windowInstance.id);
-  };
+  }, [windowContext, windowInstance.id]);
 
-  const handleMinimize = () => {
+  const handleMinimize = useCallback(() => {
     windowContext.minimizeWindow(windowInstance.id);
-  };
+  }, [windowContext, windowInstance.id]);
 
-  const handleMaximize = () => {
+  const handleMaximize = useCallback(() => {
     windowContext.maximizeWindow(windowInstance.id);
-  };
+  }, [windowContext, windowInstance.id]);
 
   // Calculate window dimensions
   const windowWidth = item.windowWidth || 440;

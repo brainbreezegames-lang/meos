@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { ChevronDown, Check, Lock, Plus, Settings2 } from 'lucide-react';
-import { SPRING, REDUCED_MOTION, buttonPress, DURATION } from '@/lib/animations';
+import { buttonPress } from '@/lib/animations';
 import { MenuBarDropdown } from '@/components/menubar';
 
 // ============================================
@@ -55,7 +55,6 @@ export function SpaceSwitcher({
   onToggle: controlledOnToggle,
   onMouseEnterTrigger,
 }: SpaceSwitcherProps) {
-  const prefersReducedMotion = useReducedMotion();
   const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -64,34 +63,40 @@ export function SpaceSwitcher({
   // Support both controlled and uncontrolled modes
   const isControlled = controlledIsOpen !== undefined;
   const isOpen = isControlled ? controlledIsOpen : uncontrolledIsOpen;
-  const setIsOpen = isControlled
-    ? () => controlledOnToggle?.()
-    : (v: boolean | ((prev: boolean) => boolean)) => {
-        if (typeof v === 'function') {
-          setUncontrolledIsOpen(v);
-        } else {
-          setUncontrolledIsOpen(v);
-        }
-      };
 
-  const close = () => {
+  const close = useCallback(() => {
     if (isControlled) {
-      if (isOpen) controlledOnToggle?.();
+      if (controlledIsOpen) controlledOnToggle?.();
     } else {
       setUncontrolledIsOpen(false);
     }
-  };
+  }, [isControlled, controlledIsOpen, controlledOnToggle]);
 
-  const toggle = () => {
+  const toggle = useCallback(() => {
     if (isControlled) {
       controlledOnToggle?.();
     } else {
       setUncontrolledIsOpen((prev) => !prev);
     }
-  };
+  }, [isControlled, controlledOnToggle]);
 
-  const activeSpace = spaces.find(s => s.id === activeSpaceId);
-  const sortedSpaces = [...spaces].sort((a, b) => a.order - b.order);
+  // Memoize derived data
+  const activeSpace = useMemo(
+    () => spaces.find(s => s.id === activeSpaceId),
+    [spaces, activeSpaceId]
+  );
+
+  const sortedSpaces = useMemo(
+    () => [...spaces].sort((a, b) => a.order - b.order),
+    [spaces]
+  );
+
+  // Reset focusedIndex when dropdown closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFocusedIndex(-1);
+    }
+  }, [isOpen]);
 
   // Close on outside click (only in uncontrolled mode)
   useEffect(() => {
@@ -99,7 +104,6 @@ export function SpaceSwitcher({
 
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Check for menubar attributes
       let el: HTMLElement | null = target;
       while (el) {
         if (
@@ -135,7 +139,7 @@ export function SpaceSwitcher({
         return;
       }
 
-      const totalItems = sortedSpaces.length + 2; // spaces + create + manage
+      const totalItems = sortedSpaces.length + 2;
 
       switch (e.key) {
         case 'Escape':
@@ -175,7 +179,7 @@ export function SpaceSwitcher({
           break;
       }
     },
-    [isOpen, sortedSpaces, focusedIndex, onSwitchSpace, onCreateSpace, onManageSpaces]
+    [isOpen, sortedSpaces, focusedIndex, onSwitchSpace, onCreateSpace, onManageSpaces, toggle, close]
   );
 
   // Focus management
@@ -201,10 +205,10 @@ export function SpaceSwitcher({
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
   }, [sortedSpaces, onSwitchSpace]);
 
-  const handleSpaceClick = (spaceId: string) => {
+  const handleSpaceClick = useCallback((spaceId: string) => {
     onSwitchSpace(spaceId);
     close();
-  };
+  }, [onSwitchSpace, close]);
 
   return (
     <div className="relative">
@@ -227,7 +231,6 @@ export function SpaceSwitcher({
           cursor: 'pointer',
         }}
       >
-        {/* Space Icon */}
         <span
           className="text-sm leading-none select-none"
           style={{
@@ -237,7 +240,6 @@ export function SpaceSwitcher({
           {activeSpace?.icon || '🏠'}
         </span>
 
-        {/* Space Name */}
         <span
           className="text-[13px] font-semibold tracking-tight max-w-[100px] truncate"
           style={{ color: 'var(--color-text-primary)' }}
@@ -245,7 +247,6 @@ export function SpaceSwitcher({
           {activeSpace?.name || 'My Space'}
         </span>
 
-        {/* Private indicator */}
         {activeSpace && !activeSpace.isPublic && (
           <Lock
             size={10}
@@ -254,7 +255,6 @@ export function SpaceSwitcher({
           />
         )}
 
-        {/* Chevron */}
         <motion.span
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
@@ -264,10 +264,9 @@ export function SpaceSwitcher({
         </motion.span>
       </motion.button>
 
-      {/* Dropdown Menu - using shared MenuBarDropdown */}
+      {/* Dropdown Menu */}
       <MenuBarDropdown isOpen={isOpen} width={DROPDOWN_WIDTH}>
-        <div onKeyDown={handleKeyDown}>
-          {/* Spaces List */}
+        <div onKeyDown={handleKeyDown} role="listbox" aria-label="Spaces">
           <div
             className="overflow-y-auto"
             style={{
@@ -305,7 +304,6 @@ export function SpaceSwitcher({
                     fontFamily: 'var(--font-body)',
                   }}
                 >
-                  {/* Emoji Icon */}
                   <span
                     className="text-base leading-none select-none w-5 text-center"
                     style={{
@@ -315,7 +313,6 @@ export function SpaceSwitcher({
                     {space.icon}
                   </span>
 
-                  {/* Name + Badge */}
                   <span className="flex-1 flex items-center gap-1.5 min-w-0">
                     <span
                       className="text-[13px] font-medium truncate"
@@ -324,7 +321,6 @@ export function SpaceSwitcher({
                       {space.name}
                     </span>
 
-                    {/* Primary badge */}
                     {space.isPrimary && (
                       <span
                         className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
@@ -337,7 +333,6 @@ export function SpaceSwitcher({
                       </span>
                     )}
 
-                    {/* Private indicator */}
                     {!space.isPublic && (
                       <Lock
                         size={10}
@@ -350,7 +345,6 @@ export function SpaceSwitcher({
                     )}
                   </span>
 
-                  {/* Keyboard shortcut */}
                   {index < 9 && (
                     <span
                       className="text-[10px] font-mono tracking-tight"
@@ -360,7 +354,6 @@ export function SpaceSwitcher({
                     </span>
                   )}
 
-                  {/* Active checkmark */}
                   <span
                     className="w-4 flex justify-center"
                     style={{ color: 'var(--color-accent-primary)' }}
@@ -383,7 +376,6 @@ export function SpaceSwitcher({
 
           {/* Actions */}
           <div>
-            {/* New Space */}
             <motion.button
               ref={el => { itemRefs.current[sortedSpaces.length] = el; }}
               role="option"
@@ -423,7 +415,6 @@ export function SpaceSwitcher({
               </span>
             </motion.button>
 
-            {/* Manage Spaces */}
             <motion.button
               ref={el => { itemRefs.current[sortedSpaces.length + 1] = el; }}
               role="option"

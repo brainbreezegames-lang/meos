@@ -533,6 +533,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   const hasDragged = useRef(false);
   // Track current position during drag to avoid stale closure
   const currentPositionRef = useRef({ x: position.x, y: position.y });
+  // Track active drag listeners for cleanup on unmount
+  const dragListenersRef = useRef<{ move: (e: MouseEvent) => void; up: () => void } | null>(null);
 
   // Refs for callbacks to avoid stale closures
   const onPositionChangeRef = useRef(onPositionChange);
@@ -811,6 +813,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     const handleMouseUp = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      dragListenersRef.current = null;
 
       const wasActualDrag = hasDragged.current;
       setIsDragging(false);
@@ -825,9 +828,20 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
       dragStartRef.current = null;
     };
 
+    dragListenersRef.current = { move: handleMouseMove, up: handleMouseUp };
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
   }, [id, isRenaming, throttledOnDrag]);
+
+  // Cleanup drag listeners on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (dragListenersRef.current) {
+        window.removeEventListener('mousemove', dragListenersRef.current.move);
+        window.removeEventListener('mouseup', dragListenersRef.current.up);
+      }
+    };
+  }, []);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     // If we dragged, don't trigger click

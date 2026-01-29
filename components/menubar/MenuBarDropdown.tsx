@@ -2,7 +2,29 @@
 
 import React from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { contextMenu, SPRING, REDUCED_MOTION } from '@/lib/animations';
+import { SPRING, REDUCED_MOTION } from '@/lib/animations';
+import type { Variants } from 'framer-motion';
+
+// Menubar-specific dropdown animation — subtler than contextMenu
+// since the menubar is compact and menus are close to the trigger
+const menuBarDropdown: Variants = {
+  initial: { opacity: 0, scale: 0.97, y: -2 },
+  animate: { opacity: 1, scale: 1, y: 0 },
+  exit: { opacity: 0, scale: 0.98, y: -2 },
+};
+
+// Stable color maps — avoid recreating on every render
+const ITEM_COLORS = {
+  default: 'var(--color-text-primary)',
+  accent: 'var(--color-accent-primary)',
+  danger: 'var(--color-error, #e53e3e)',
+} as const;
+
+const ICON_COLORS = {
+  default: 'var(--color-text-secondary)',
+  accent: 'var(--color-accent-primary)',
+  danger: 'var(--color-error, #e53e3e)',
+} as const;
 
 // ============================================
 // MENUBAR DROPDOWN PANEL
@@ -30,7 +52,7 @@ export function MenuBarDropdown({
       {isOpen && (
         <motion.div
           data-menubar-dropdown=""
-          variants={contextMenu}
+          variants={menuBarDropdown}
           initial="initial"
           animate="animate"
           exit="exit"
@@ -87,12 +109,6 @@ export function MenuBarItem({
   trailing,
   disabled,
 }: MenuBarItemProps) {
-  const colorMap = {
-    default: 'var(--color-text-primary)',
-    accent: 'var(--color-accent-primary)',
-    danger: 'var(--color-error, #e53e3e)',
-  };
-
   return (
     <motion.button
       onClick={disabled ? undefined : onClick}
@@ -114,10 +130,11 @@ export function MenuBarItem({
         cursor: disabled ? 'default' : 'pointer',
         fontSize: 13,
         fontWeight: variant === 'accent' ? 500 : 400,
-        color: disabled ? 'var(--color-text-muted)' : colorMap[variant],
+        color: disabled ? 'var(--color-text-muted)' : ITEM_COLORS[variant],
         textAlign: 'left' as const,
         fontFamily: 'var(--font-body)',
         opacity: disabled ? 0.5 : 1,
+        outline: 'none',
       }}
     >
       {icon && (
@@ -129,12 +146,7 @@ export function MenuBarItem({
             justifyContent: 'center',
             flexShrink: 0,
             fontSize: 14,
-            color:
-              variant === 'accent'
-                ? 'var(--color-accent-primary)'
-                : variant === 'danger'
-                  ? 'var(--color-error, #e53e3e)'
-                  : 'var(--color-text-secondary)',
+            color: ICON_COLORS[variant],
           }}
         >
           {icon}
@@ -243,11 +255,11 @@ export function MenuBarTrigger({
         border: 'none',
         padding: '2px 6px',
         fontSize: 13,
-        fontWeight: 400,
-        color: 'var(--color-text-secondary)',
+        fontWeight: isOpen ? 500 : 400,
+        color: isOpen ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
         cursor: 'pointer',
         borderRadius: 'var(--radius-xs, 4px)',
-        transition: 'background 0.12s ease',
+        transition: 'background 0.12s ease, color 0.12s ease, font-weight 0.12s ease',
         fontFamily: 'var(--font-body)',
       }}
       onMouseEnter={(e) => {

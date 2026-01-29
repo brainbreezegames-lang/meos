@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Widget, WidgetType } from '@/types';
 
 export interface WidgetContextType {
@@ -68,11 +68,13 @@ export function WidgetProvider({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Show toast
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    toastTimeoutRef.current = setTimeout(() => setToast(null), 3000);
   }, []);
 
   // Fetch widgets from API
@@ -269,6 +271,13 @@ export function WidgetProvider({
       return false;
     }
   }, [isOwner, localOnly, widgets, showToast]);
+
+  // Cleanup toast timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
 
   const value = useMemo<WidgetContextType>(() => ({
     widgets,
