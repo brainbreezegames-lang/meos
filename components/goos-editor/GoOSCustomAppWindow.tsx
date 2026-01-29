@@ -29,7 +29,13 @@ function readCSSVars(): string {
     .join('\n      ');
 }
 
+function stripRootBlock(html: string): string {
+  // Remove any :root { ... } blocks from AI-generated CSS so our injected vars take priority
+  return html.replace(/:root\s*\{[^}]*\}/g, '/* vars injected by host */');
+}
+
 function buildSrcdoc(htmlContent: string, cssVars: string): string {
+  const cleanedContent = stripRootBlock(htmlContent);
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -65,7 +71,7 @@ function buildSrcdoc(htmlContent: string, cssVars: string): string {
   </style>
 </head>
 <body>
-${htmlContent}
+${cleanedContent}
 </body>
 </html>`;
 }

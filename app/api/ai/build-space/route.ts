@@ -247,32 +247,27 @@ Requirements:
 1. Return ONLY the HTML content that goes inside <body> — no <html>, <head>, or <body> tags
 2. Include ALL CSS in a single <style> tag at the very top
 3. Include ALL JavaScript in a single <script> tag at the very bottom
-4. The app must be FULLY FUNCTIONAL with real interactivity — no placeholders, no "coming soon"
-5. Use modern CSS (flexbox, grid, custom properties, transitions)
-6. Use vanilla JavaScript only — no frameworks, no imports, no CDN links, no external resources
-7. Use these CSS variables for theming so the app matches the desktop:
+4. The app must be FULLY FUNCTIONAL — no placeholders, no "coming soon", no TODO comments
+5. Use vanilla JavaScript only — no frameworks, no imports, no CDN links
+6. CRITICAL: Do NOT define a :root CSS block. The CSS variables are pre-injected by the host. Just USE them directly:
    - var(--color-bg-base) — main background
-   - var(--color-bg-elevated) — cards, panels, modals
-   - var(--color-bg-subtle) — secondary backgrounds, hover states
-   - var(--color-text-primary) — main text color
+   - var(--color-bg-elevated) — cards/panels
+   - var(--color-bg-subtle) — secondary backgrounds
+   - var(--color-text-primary) — main text
    - var(--color-text-secondary) — secondary text
-   - var(--color-text-muted) — muted/placeholder text
-   - var(--color-accent-primary) — buttons, active states, highlights (orange #ff7722)
-   - var(--color-accent-secondary) — secondary accent (purple #3d2fa9)
-   - var(--color-success) — success states
-   - var(--color-error) — error/danger states
+   - var(--color-text-muted) — muted text
+   - var(--color-accent-primary) — buttons, active states (orange)
    - var(--color-border-default) — borders
    - var(--color-border-subtle) — subtle borders
    - var(--radius-sm) / var(--radius-md) / var(--radius-lg) — border radius (6px/10px/12px)
-8. Design for a window approximately 640x480px but make it responsive
-9. Use smooth CSS transitions (0.15s-0.2s ease) for hover states and interactions
-10. Include meaningful default data so the app feels alive on first open (pre-filled entries, sample data, realistic defaults)
-11. Typography: use system font stack, clear hierarchy with font-weight and size contrast
-12. Make buttons feel tactile: subtle hover lift, active press, appropriate cursor
-13. Keep the code under 4000 lines total
-14. The aesthetic should be warm, polished, and premium — think Apple/macOS quality
+   - var(--color-success) — success, var(--color-error) — error
+7. Keep CSS COMPACT — use shorthand properties, avoid redundant rules. Target under 80 CSS rules total.
+8. Design for ~600x450px, responsive with flexbox/grid
+9. Include meaningful defaults (pre-filled data, realistic state)
+10. PRIORITY: The JavaScript MUST be complete. Never leave a function body unfinished. Keep logic clean and concise.
+11. Total code must fit within 3000 lines. Be concise.
 
-IMPORTANT: Return ONLY the raw HTML content (style tag + markup + script tag). No markdown code fences, no explanation, no comments outside the code.`;
+IMPORTANT: Return ONLY raw HTML (style tag + markup + script tag). No markdown fences, no explanation.`;
 
 // OpenRouter API (Kimi K2.5)
 async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string> {
@@ -1093,10 +1088,17 @@ export async function POST(request: NextRequest) {
                 .replace('{purpose}', item.purpose as string)
                 .replace('{brief}', item.contentBrief as string);
 
-              content = await callAI(appPrompt, 1, 8000);
+              content = await callAI(appPrompt, 1, 16000);
 
-              // Clean up any markdown code blocks from content
+              // Clean up markdown fences and :root blocks (host injects CSS vars)
               content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
+              content = content.replace(/:root\s*\{[^}]*\}/g, '');
+
+              // If the script tag was truncated, close it so the page doesn't break
+              if (content.includes('<script') && !content.includes('</script>')) {
+                content += '\n})();\n</script>';
+              }
+
               console.log(`[AI] Custom app for "${item.name}": ${content.length} chars`);
             } catch (contentError) {
               console.error(`[AI] Custom app generation failed for ${item.name}:`, contentError);
