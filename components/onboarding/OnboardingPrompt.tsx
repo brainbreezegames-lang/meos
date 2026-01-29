@@ -199,42 +199,42 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
             backgroundColor: '#b8cce0',
           }}
         >
-          {/* Layout: push content toward lower-center like the reference */}
-          <div className="relative z-10 flex-1 flex flex-col items-center justify-end pb-[12vh] px-6">
+          {/* Layout: centered content sitting above the horizon line */}
+          <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6" style={{ paddingBottom: '14vh' }}>
 
-            {/* Logo — large, warm, serif italic */}
+            {/* Logo */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
               style={{
-                fontSize: 'clamp(4rem, 12vw, 7rem)',
+                fontSize: 'clamp(2.75rem, 8vw, 4.5rem)',
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontFamily: 'Georgia, "Times New Roman", serif',
                 color: '#fff',
                 letterSpacing: '-0.035em',
                 lineHeight: 0.95,
-                marginBottom: '0.75rem',
+                marginBottom: '0.5rem',
                 textShadow: softShadow,
               }}
             >
               goOS
             </motion.h1>
 
-            {/* Subtitle — friendly, approachable */}
+            {/* Subtitle */}
             <motion.p
               className="text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
               style={{
-                fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
-                color: 'rgba(255,255,255,0.85)',
+                fontSize: 'clamp(0.8125rem, 1.8vw, 0.9375rem)',
+                color: 'rgba(255,255,255,0.8)',
                 lineHeight: 1.5,
-                maxWidth: '30rem',
+                maxWidth: '26rem',
                 textShadow: '0 1px 8px rgba(0,0,0,0.25)',
-                marginBottom: '2.5rem',
+                marginBottom: '1.75rem',
               }}
             >
               Your personal space on the internet.
@@ -390,49 +390,53 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
               ))}
             </motion.div>
 
-            {/* Bottom hint */}
-            <motion.p
-              className="mt-8 text-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
+          </div>
+
+          {/* Bottom bar — pinned to bottom center, small and elegant */}
+          <motion.div
+            className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center gap-3 pb-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+          >
+            <span
               style={{
-                color: 'rgba(255,255,255,0.55)',
-                textShadow: '0 1px 6px rgba(0,0,0,0.2)',
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.5)',
+                letterSpacing: '0.01em',
+                textShadow: '0 1px 6px rgba(0,0,0,0.3)',
               }}
             >
               Press <kbd style={{
                 display: 'inline-block',
-                padding: '2px 8px',
-                borderRadius: 6,
-                background: 'rgba(255,255,255,0.15)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                fontSize: 12,
+                padding: '1px 5px',
+                borderRadius: 4,
+                background: 'rgba(255,255,255,0.12)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                fontSize: 10,
                 fontWeight: 600,
-                marginInline: 4,
-              }}>Enter</kbd> to build your space
-            </motion.p>
-
-            {/* Skip link */}
+                marginInline: 2,
+              }}>Enter</kbd> to build
+            </span>
+            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11 }}>·</span>
             <motion.button
               onClick={() => { playSound('collapse'); onClose(); }}
               disabled={isLoading}
-              className="mt-4 text-sm transition-all"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
+              className="transition-all"
               style={{
+                fontSize: 11,
                 color: 'rgba(255,255,255,0.4)',
-                textShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                textShadow: '0 1px 4px rgba(0,0,0,0.2)',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
+                letterSpacing: '0.01em',
               }}
               whileHover={{ color: 'rgba(255,255,255,0.7)' }}
             >
-              or start with an empty workspace
+              start with an empty workspace
             </motion.button>
-          </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
