@@ -1693,3 +1693,31 @@ h6 {
 .brand-floating-cta-button:hover {
     transform: scale(1.05);
 }
+
+/* Onboarding prompt textarea */
+.onboarding-textarea {
+    outline: none;
+}
+
+.onboarding-textarea::placeholder {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.onboarding-textarea:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px rgba(249, 115, 22, 0.3);
+    border-radius: 16px;
+}
+
+/* Focus-visible ring for onboarding overlay (white context) */
+.onboarding-prompt-overlay button:focus-visible,
+.onboarding-prompt-overlay [role="button"]:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 2px;
+}
+
+/* Focus-visible ring for onboarding builder panel (theme context) */
+.onboarding-builder-panel button:focus-visible {
+    outline: 2px solid var(--color-accent-primary, #ff7722);
+    outline-offset: 2px;
+}

@@ -257,7 +257,7 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[10000] flex flex-col overflow-hidden"
+          className="fixed inset-0 z-[10000] flex flex-col overflow-hidden onboarding-prompt-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -371,7 +371,7 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
                   placeholder={userHasInteracted ? 'What will you build today?' : ''}
                   disabled={isLoading}
                   rows={3}
-                  className="w-full px-5 pt-5 pb-14 bg-transparent text-base resize-none outline-none"
+                  className="w-full px-5 pt-5 pb-14 bg-transparent text-base resize-none onboarding-textarea"
                   style={{
                     color: 'rgba(0,0,0,0.85)',
                     lineHeight: 1.6,
@@ -380,8 +380,7 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
                     fontSize: 16,
                     position: 'relative',
                     zIndex: 2,
-                    '::placeholder': { color: 'rgba(0,0,0,0.3)' },
-                  } as React.CSSProperties}
+                  }}
                 />
 
                 {/* Bottom bar */}
@@ -422,6 +421,7 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
                   <motion.button
                     onClick={handleSubmit}
                     disabled={!canSubmit || isLoading}
+                    aria-label={isLoading ? 'Building...' : 'Build workspace'}
                     className="flex items-center justify-center rounded-xl transition-all"
                     style={{
                       width: 36,
@@ -513,6 +513,7 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
             <motion.button
               onClick={() => { playSound('collapse'); onClose(); }}
               disabled={isLoading}
+              aria-label="Skip AI build and start with an empty workspace"
               className="transition-all"
               style={{
                 fontSize: 11,
