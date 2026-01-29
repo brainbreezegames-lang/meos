@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUp, Loader2 } from 'lucide-react';
+import { ArrowUp, Loader2, Mic, MicOff } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
 
 interface OnboardingPromptProps {
@@ -114,6 +114,10 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typewriter = useTypewriter(TYPEWRITER_EXAMPLES);
   const [userHasInteracted, setUserHasInteracted] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     if (isOpen && textareaRef.current) {

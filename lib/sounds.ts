@@ -24,7 +24,13 @@ type SoundType =
   | 'notification'    // Attention getter
   | 'whoosh'          // Quick transition
   | 'bubble'          // Bubbly pop
-  | 'startup';        // System boot chime
+  | 'startup'         // System boot chime
+  | 'thinkingHum'     // Soft warm hum for AI understanding phase
+  | 'typeClick'       // Crisp mechanical typewriter click for planning phase
+  | 'materialize'     // Shimmering crystallization for files appearing on desktop
+  | 'chime'           // Warm completion arpeggio for build completion
+  | 'swooshIn'        // Gentle whoosh inward for cinematic reveal
+  | 'voiceReady';     // Soft ping for voice recording activation
 
 // Audio context singleton
 let audioContext: AudioContext | null = null;
@@ -123,6 +129,24 @@ export function playSound(type: SoundType, options?: { volume?: number }): void 
       break;
     case 'startup':
       synthesizeStartup(ctx, now, volume);
+      break;
+    case 'thinkingHum':
+      synthesizeThinkingHum(ctx, now, volume);
+      break;
+    case 'typeClick':
+      synthesizeTypeClick(ctx, now, volume);
+      break;
+    case 'materialize':
+      synthesizeMaterialize(ctx, now, volume);
+      break;
+    case 'chime':
+      synthesizeChime(ctx, now, volume);
+      break;
+    case 'swooshIn':
+      synthesizeSwooshIn(ctx, now, volume);
+      break;
+    case 'voiceReady':
+      synthesizeVoiceReady(ctx, now, volume);
       break;
   }
 }
@@ -530,6 +554,248 @@ function synthesizeBubble(ctx: AudioContext, time: number, volume: number): void
 
   osc.start(time);
   osc.stop(time + 0.15);
+}
+
+// Thinking hum - soft, warm, continuous-feeling hum for AI understanding phase
+// Low triangle wave ~180Hz with slow envelope, 800ms
+function synthesizeThinkingHum(ctx: AudioContext, time: number, volume: number): void {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(180, time);
+  // Gentle vibrato for organic warmth
+  osc.frequency.setValueAtTime(180, time);
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  lfo.type = 'sine';
+  lfo.frequency.setValueAtTime(4, time); // Slow 4Hz vibrato
+  lfoGain.gain.setValueAtTime(3, time);  // ±3Hz deviation
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc.frequency);
+
+  // Slow envelope: gentle fade in, sustain, gentle fade out
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(volume * 0.25, time + 0.15);   // Slow attack
+  gain.gain.setValueAtTime(volume * 0.25, time + 0.5);             // Sustain
+  gain.gain.linearRampToValueAtTime(0, time + 0.8);                // Slow release
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  lfo.start(time);
+  osc.start(time);
+  osc.stop(time + 0.85);
+  lfo.stop(time + 0.85);
+}
+
+// Type click - crisp mechanical typewriter click for planning phase
+// High-freq noise burst with bandpass ~3000Hz, very short 30ms decay
+function synthesizeTypeClick(ctx: AudioContext, time: number, volume: number): void {
+  const bufferSize = Math.ceil(ctx.sampleRate * 0.04);
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(3000, time);
+  filter.Q.setValueAtTime(5, time); // Tight resonance for that crisp "click" character
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(volume * 0.4, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  noise.start(time);
+  noise.stop(time + 0.04);
+}
+
+// Materialize - shimmering crystallization sound for files appearing on desktop
+// Ascending sweep 400→2000Hz with chorus effect using two detuned oscillators, 400ms
+function synthesizeMaterialize(ctx: AudioContext, time: number, volume: number): void {
+  // Primary oscillator - ascending sweep
+  const osc1 = ctx.createOscillator();
+  const gain1 = ctx.createGain();
+
+  osc1.type = 'sine';
+  osc1.frequency.setValueAtTime(400, time);
+  osc1.frequency.exponentialRampToValueAtTime(2000, time + 0.3);
+  osc1.frequency.exponentialRampToValueAtTime(1800, time + 0.4); // Slight settle at end
+
+  gain1.gain.setValueAtTime(0, time);
+  gain1.gain.linearRampToValueAtTime(volume * 0.3, time + 0.03);
+  gain1.gain.setValueAtTime(volume * 0.3, time + 0.2);
+  gain1.gain.exponentialRampToValueAtTime(0.001, time + 0.4);
+
+  osc1.connect(gain1);
+  gain1.connect(ctx.destination);
+
+  // Detuned chorus oscillator - slightly sharp for shimmer
+  const osc2 = ctx.createOscillator();
+  const gain2 = ctx.createGain();
+
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(404, time);  // +4Hz detune for chorus beating
+  osc2.frequency.exponentialRampToValueAtTime(2012, time + 0.3);
+  osc2.frequency.exponentialRampToValueAtTime(1810, time + 0.4);
+
+  gain2.gain.setValueAtTime(0, time);
+  gain2.gain.linearRampToValueAtTime(volume * 0.2, time + 0.05);
+  gain2.gain.setValueAtTime(volume * 0.2, time + 0.2);
+  gain2.gain.exponentialRampToValueAtTime(0.001, time + 0.4);
+
+  osc2.connect(gain2);
+  gain2.connect(ctx.destination);
+
+  // High sparkle layer for crystalline character
+  const sparkle = ctx.createOscillator();
+  const sparkleGain = ctx.createGain();
+
+  sparkle.type = 'sine';
+  sparkle.frequency.setValueAtTime(800, time + 0.05);
+  sparkle.frequency.exponentialRampToValueAtTime(4000, time + 0.3);
+
+  sparkleGain.gain.setValueAtTime(0, time + 0.05);
+  sparkleGain.gain.linearRampToValueAtTime(volume * 0.1, time + 0.08);
+  sparkleGain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
+
+  sparkle.connect(sparkleGain);
+  sparkleGain.connect(ctx.destination);
+
+  osc1.start(time);
+  osc2.start(time);
+  sparkle.start(time + 0.05);
+  osc1.stop(time + 0.45);
+  osc2.stop(time + 0.45);
+  sparkle.stop(time + 0.4);
+}
+
+// Chime - warm completion arpeggio for build completion
+// C5→E5→G5→C6 arpeggio with triangle waves, each note 150ms with overlap, reverb tail
+function synthesizeChime(ctx: AudioContext, time: number, volume: number): void {
+  // Create a reverb-like effect for the tail
+  const convolver = ctx.createConvolver();
+  const reverbTime = 1.2;
+  const sampleRate = ctx.sampleRate;
+  const length = sampleRate * reverbTime;
+  const impulse = ctx.createBuffer(2, length, sampleRate);
+
+  for (let channel = 0; channel < 2; channel++) {
+    const channelData = impulse.getChannelData(channel);
+    for (let i = 0; i < length; i++) {
+      channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.5);
+    }
+  }
+  convolver.buffer = impulse;
+
+  const wetGain = ctx.createGain();
+  wetGain.gain.setValueAtTime(0.2, time);
+
+  const dryGain = ctx.createGain();
+  dryGain.gain.setValueAtTime(0.8, time);
+
+  convolver.connect(wetGain);
+  wetGain.connect(ctx.destination);
+  dryGain.connect(ctx.destination);
+
+  // C5 → E5 → G5 → C6 arpeggio
+  const notes = [
+    { freq: 523.25, delay: 0 },        // C5
+    { freq: 659.25, delay: 0.1 },       // E5 (overlaps with C5)
+    { freq: 783.99, delay: 0.2 },       // G5 (overlaps with E5)
+    { freq: 1046.50, delay: 0.3 },      // C6 (overlaps with G5, bright finish)
+  ];
+
+  notes.forEach(({ freq, delay }, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, time + delay);
+
+    // Bell-like envelope with 150ms sustain and overlap
+    gain.gain.setValueAtTime(0, time + delay);
+    gain.gain.linearRampToValueAtTime(volume * 0.3, time + delay + 0.015);
+    gain.gain.exponentialRampToValueAtTime(volume * 0.15, time + delay + 0.08);
+    // Last note rings longer
+    const tailDuration = i === 3 ? 0.6 : 0.3;
+    gain.gain.exponentialRampToValueAtTime(0.001, time + delay + tailDuration);
+
+    osc.connect(gain);
+    gain.connect(dryGain);
+    gain.connect(convolver);
+
+    osc.start(time + delay);
+    osc.stop(time + delay + tailDuration + 0.1);
+  });
+}
+
+// Swoosh in - gentle whoosh inward for cinematic reveal
+// Bandpass noise sweep 4000→800Hz, 200ms
+function synthesizeSwooshIn(ctx: AudioContext, time: number, volume: number): void {
+  const bufferSize = Math.ceil(ctx.sampleRate * 0.25);
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  // Shaped noise: ramp up then down for swoosh envelope
+  for (let i = 0; i < bufferSize; i++) {
+    const progress = i / bufferSize;
+    // Peak at 40% through, then taper - gives the "arriving" feel
+    const envelope = progress < 0.4
+      ? progress / 0.4
+      : Math.pow(1 - (progress - 0.4) / 0.6, 2);
+    data[i] = (Math.random() * 2 - 1) * envelope;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(4000, time);
+  filter.frequency.exponentialRampToValueAtTime(800, time + 0.2);
+  filter.Q.setValueAtTime(1.5, time);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(volume * 0.3, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  noise.start(time);
+  noise.stop(time + 0.25);
+}
+
+// Voice ready - soft ping for voice recording activation
+// Pure sine 880Hz, quick 100ms with fade
+function synthesizeVoiceReady(ctx: AudioContext, time: number, volume: number): void {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, time); // A5
+
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(volume * 0.35, time + 0.01);  // Quick attack
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);      // Quick fade
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(time);
+  osc.stop(time + 0.12);
 }
 
 // Startup - iconic goOS welcome chime

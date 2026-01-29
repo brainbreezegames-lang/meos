@@ -616,11 +616,24 @@ export async function POST(request: NextRequest) {
 
         // ========== PHASE 1: UNDERSTANDING ==========
         send('phase', { phase: 'understanding', message: 'Understanding your needs...' });
+        send('thinking', { text: 'Reading your description carefully...', phase: 'understanding' });
 
         try {
           const understandingPrompt = UNDERSTANDING_PROMPT.replace('{input}', prompt);
           const understandingRaw = await callAI(understandingPrompt);
           understanding = extractJSON(understandingRaw) as Record<string, unknown>;
+
+          // Extract insights to share
+          const identity = understanding.identity as Record<string, string>;
+          const needs = understanding.needs as Record<string, string[]>;
+          if (identity?.profession) {
+            send('thinking', { text: `I see — you're a ${identity.profession} focused on ${identity.niche || 'your craft'}.`, phase: 'understanding' });
+            await new Promise(resolve => setTimeout(resolve, 600));
+          }
+          if (needs?.implicit?.length) {
+            send('thinking', { text: `You'll also need ${needs.implicit[0].toLowerCase()}...`, phase: 'understanding' });
+            await new Promise(resolve => setTimeout(resolve, 400));
+          }
         } catch (aiError) {
           console.error('AI understanding failed, using fallback:', aiError);
           useFallback = true;
@@ -635,6 +648,16 @@ export async function POST(request: NextRequest) {
             identity: fallback.identity,
             goals: fallback.goals,
             tone: 'professional',
+          });
+
+          send('thinking', { text: 'Setting up a great starting point for you...', phase: 'understanding' });
+
+          send('prompt_keywords', {
+            keywords: [
+              fallback.identity.profession,
+              fallback.identity.niche,
+            ].filter(Boolean),
+            interpretation: fallback.understanding,
           });
 
           send('phase', { phase: 'planning', message: 'Designing your space...' });
@@ -677,8 +700,18 @@ export async function POST(request: NextRequest) {
           tone: understanding.tone,
         });
 
+        send('prompt_keywords', {
+          keywords: [
+            ...((understanding.needs as Record<string, string[]>)?.explicit?.slice(0, 4) || []),
+            (understanding.identity as Record<string, string>)?.profession,
+            (understanding.identity as Record<string, string>)?.niche,
+          ].filter(Boolean),
+          interpretation: understanding.understanding,
+        });
+
         // ========== PHASE 2: PLANNING ==========
         send('phase', { phase: 'planning', message: 'Designing your space...' });
+        send('thinking', { text: 'Designing something tailored for you...', phase: 'planning' });
 
         const planningPrompt = PLANNING_PROMPT.replace('{context}', JSON.stringify(understanding, null, 2));
         const planningRaw = await callAI(planningPrompt);
@@ -706,6 +739,16 @@ export async function POST(request: NextRequest) {
 
         const planData = plan.plan as { summary: string; items: Array<Record<string, unknown>> };
 
+        const planItems = planData?.items;
+        if (planItems?.length) {
+          send('thinking', { text: `Planning ${planItems.length} components — mixing content, tools, and resources.`, phase: 'planning' });
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        if (plan.reasoning) {
+          send('thinking', { text: String(plan.reasoning), phase: 'planning' });
+          await new Promise(resolve => setTimeout(resolve, 400));
+        }
+
         send('plan', {
           summary: planData.summary,
           reasoning: plan.reasoning,
@@ -727,6 +770,9 @@ export async function POST(request: NextRequest) {
         const builtItems: Array<Record<string, unknown>> = [];
 
         for (const item of items) {
+          send('thinking', { text: `${item.purpose as string}`, phase: 'building' });
+          await new Promise(resolve => setTimeout(resolve, 300));
+
           send('building', {
             name: item.name,
             type: item.type,
