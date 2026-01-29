@@ -5,7 +5,6 @@ import { NextRequest } from 'next/server';
  * Uses Server-Sent Events to stream AI reasoning and progress in real-time
  */
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2.5';
 
@@ -236,37 +235,7 @@ Return ONLY valid JSON in this exact format:
 }`;
 
 // Primary: Gemini API (more reliable)
-async function callGemini(prompt: string, maxTokens = 2000): Promise<string> {
-  if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: maxTokens,
-        },
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('Gemini error:', response.status, error);
-    throw new Error(`Gemini error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('Empty Gemini response');
-  return text;
-}
-
-// Fallback: OpenRouter API
+// OpenRouter API (Kimi K2.5)
 async function callOpenRouter(prompt: string, maxTokens = 2000): Promise<string> {
   if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not configured');
 
@@ -296,25 +265,17 @@ async function callOpenRouter(prompt: string, maxTokens = 2000): Promise<string>
   return data.choices?.[0]?.message?.content || '';
 }
 
-// Try OpenRouter (Kimi K2.5) first, then Gemini as fallback, with retries
+// Call Kimi K2.5 via OpenRouter with retries
 async function callAI(prompt: string, retries = 1, maxTokens = 2000): Promise<string> {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    // Try OpenRouter (Kimi K2.5) first
-    if (OPENROUTER_API_KEY) {
-      try {
-        return await callOpenRouter(prompt, maxTokens);
-      } catch (err) {
-        console.error(`OpenRouter attempt ${attempt} failed:`, err);
-      }
-    }
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY not configured');
+  }
 
-    // Try Gemini as fallback
-    if (GEMINI_API_KEY) {
-      try {
-        return await callGemini(prompt, maxTokens);
-      } catch (err) {
-        console.error(`Gemini attempt ${attempt} failed:`, err);
-      }
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await callOpenRouter(prompt, maxTokens);
+    } catch (err) {
+      console.error(`Kimi K2.5 attempt ${attempt} failed:`, err);
     }
 
     if (attempt < retries) {
@@ -322,7 +283,7 @@ async function callAI(prompt: string, retries = 1, maxTokens = 2000): Promise<st
     }
   }
 
-  throw new Error('All AI providers failed');
+  throw new Error('Kimi K2.5 API failed after all retries');
 }
 
 // Curated Unsplash wallpapers — multiple options per category to prevent repetition
