@@ -325,81 +325,292 @@ async function callAI(prompt: string, retries = 1, maxTokens = 2000): Promise<st
   throw new Error('All AI providers failed');
 }
 
-// Curated Unsplash wallpapers mapped to keywords — no API key needed
-const WALLPAPER_CATALOG: Array<{ keywords: string[]; url: string }> = [
-  // Design / Creative
-  { keywords: ['design', 'creative', 'ui', 'ux', 'graphic', 'minimal', 'workspace', 'studio'],
-    url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=2560&h=1440&fit=crop&q=85' },
+// Curated Unsplash wallpapers — multiple options per category to prevent repetition
+// URL format: photo ID + w=2560&h=1440&fit=crop&q=90&auto=format for high-quality desktop wallpapers
+const U = (id: string) => `https://images.unsplash.com/photo-${id}?w=2560&h=1440&fit=crop&q=90&auto=format`;
+
+const WALLPAPER_CATALOG: Array<{ keywords: string[]; urls: string[] }> = [
+  // Design / Creative / UI / UX
+  { keywords: ['design', 'creative', 'ui', 'ux', 'graphic', 'minimal', 'workspace', 'studio', 'brand', 'logo'],
+    urls: [
+      U('1497366216548-37526070297c'), // modern open office
+      U('1558618666-fcd25c85f82e'), // gradient abstract setup
+      U('1558591710-4b4a1ae0f04d'), // colorful paint swirl
+      U('1550859492-d5da9d8e45f3'), // abstract gradients
+    ] },
   // Technology / Code / Developer
-  { keywords: ['code', 'developer', 'engineer', 'programming', 'tech', 'software', 'data', 'cyber', 'hacker'],
-    url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['code', 'developer', 'engineer', 'programming', 'tech', 'software', 'data', 'cyber', 'hacker', 'web', 'app', 'frontend', 'backend', 'fullstack', 'devops', 'api'],
+    urls: [
+      U('1518770660439-4636190af475'), // circuit board macro
+      U('1555949963-ff9fe0c870eb'), // code on dark screen
+      U('1526374965328-7f61d4dc18c5'), // matrix green code
+      U('1550751827-4bd374c3f58b'), // dark code editor
+    ] },
   // Food / Bakery / Chef / Restaurant
-  { keywords: ['food', 'bakery', 'baker', 'chef', 'restaurant', 'cook', 'culinary', 'kitchen', 'cafe', 'coffee'],
-    url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['food', 'bakery', 'baker', 'chef', 'restaurant', 'cook', 'culinary', 'kitchen', 'recipe', 'meal'],
+    urls: [
+      U('1509440159596-0249088772ff'), // artisan bread
+      U('1504754524776-8f4f37790ca0'), // food spread overhead
+      U('1466637574441-749b8f19452f'), // cooking in kitchen
+      U('1414235077428-338989a2e8c0'), // restaurant interior warm
+    ] },
+  // Coffee / Cafe / Barista
+  { keywords: ['coffee', 'cafe', 'barista', 'espresso', 'latte', 'tea', 'brew'],
+    urls: [
+      U('1495474472287-4d71bcdd2085'), // latte art
+      U('1501339847302-ac426a4a7cbb'), // coffee beans
+      U('1442512595331-e89e73853f31'), // cozy coffee shop
+      U('1559496417-e7f25cb247f3'), // espresso pour
+    ] },
   // Photography / Camera
-  { keywords: ['photo', 'camera', 'film', 'cinema', 'video', 'visual', 'shoot'],
-    url: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['photo', 'camera', 'lens', 'portrait', 'shoot', 'lightroom', 'capture'],
+    urls: [
+      U('1452587925148-ce544e77e70d'), // photographer at dusk
+      U('1516035069371-29a1b244cc32'), // photographer in landscape
+      U('1554048612-b6a482bc67e5'), // camera gear flat lay
+      U('1502982720700-bfff97f2ecac'), // film reels vintage
+    ] },
+  // Film / Video / Cinema
+  { keywords: ['film', 'cinema', 'video', 'movie', 'director', 'cinemat', 'editing', 'production', 'youtube', 'content creator'],
+    urls: [
+      U('1485846234645-a62644f84728'), // film strip macro
+      U('1478720568477-152d9b164e26'), // cinema seats red
+      U('1536440136628-849c177e76a1'), // dark theater
+      U('1440404653325-ab127d49abc1'), // vintage projector
+    ] },
   // Music / Audio
-  { keywords: ['music', 'audio', 'sound', 'band', 'dj', 'producer', 'singer', 'instrument', 'piano', 'guitar'],
-    url: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['music', 'audio', 'sound', 'band', 'dj', 'producer', 'singer', 'instrument', 'piano', 'guitar', 'concert', 'vinyl', 'record', 'beat', 'song'],
+    urls: [
+      U('1511379938547-c1f69419868d'), // piano keys warm light
+      U('1507838153414-b4b713384a76'), // concert stage lights
+      U('1514320291840-2e0a9bf2a9ae'), // vinyl records
+      U('1510915361894-db8b60106cb1'), // recording studio
+    ] },
   // Books / Writing / Literature
-  { keywords: ['book', 'write', 'writer', 'author', 'blog', 'journal', 'read', 'library', 'literature', 'poet', 'story'],
-    url: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['book', 'write', 'writer', 'author', 'blog', 'journal', 'read', 'library', 'literature', 'poet', 'story', 'novel', 'copywrite', 'content', 'editorial'],
+    urls: [
+      U('1507842217343-583bb7270b66'), // grand library interior
+      U('1524995997946-a1c2e315a42f'), // open book with coffee
+      U('1506880018603-83d5b814b5a6'), // reading on beach
+      U('1457369804613-52c61a468e7d'), // vintage typewriter
+    ] },
   // Travel / Adventure
-  { keywords: ['travel', 'adventure', 'explore', 'wander', 'backpack', 'tourist', 'nomad', 'trip', 'journey'],
-    url: 'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=2560&h=1440&fit=crop&q=85' },
-  // Architecture / Buildings
-  { keywords: ['architect', 'building', 'interior', 'house', 'real estate', 'construction', 'urban', 'city'],
-    url: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=2560&h=1440&fit=crop&q=85' },
-  // Art / Gallery / Painting
-  { keywords: ['art', 'gallery', 'paint', 'illustrat', 'draw', 'sculpt', 'canvas', 'museum', 'craft'],
-    url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['travel', 'adventure', 'explore', 'wander', 'backpack', 'tourist', 'nomad', 'trip', 'journey', 'passport', 'flight'],
+    urls: [
+      U('1488085061387-422e29b40080'), // tropical beach aerial
+      U('1469854523086-cc02fe5d8800'), // mountain road sunset
+      U('1476514525535-07fb3b4ae5f1'), // majestic waterfall
+      U('1530789253388-582c481c54b0'), // hot air balloons
+    ] },
+  // Architecture / Buildings / Interior Design
+  { keywords: ['architect', 'building', 'interior', 'house', 'construction', 'urban', 'structural', 'blueprint'],
+    urls: [
+      U('1487958449943-2429e8be8625'), // modern architecture lines
+      U('1431576901776-e539bd916ba2'), // interior design light
+      U('1600585154340-be6161a56a0c'), // modern living room
+      U('1600607687939-ce8a6c25118c'), // luxury bathroom marble
+    ] },
+  // Real Estate / Property
+  { keywords: ['real estate', 'property', 'realtor', 'home', 'apartment', 'condo', 'housing', 'mortgage'],
+    urls: [
+      U('1600596542815-ffad4c1539a9'), // modern house exterior
+      U('1600585154340-be6161a56a0c'), // modern living room
+      U('1560448204-e02f11c3d0e2'), // luxury home exterior
+      U('1512917774080-9991f1c4c750'), // suburban house
+    ] },
+  // Art / Gallery / Painting / Illustration
+  { keywords: ['art', 'gallery', 'paint', 'illustrat', 'draw', 'sculpt', 'canvas', 'museum', 'craft', 'abstract', 'mural', 'sketch'],
+    urls: [
+      U('1513364776144-60967b0f800f'), // paint brushes color
+      U('1547891654-e66ed7ebb968'), // art gallery white
+      U('1460661419201-fd4cecdf8a8b'), // abstract watercolor
+      U('1541961017774-22349e4a1262'), // art supplies studio
+    ] },
   // Fitness / Sports / Health
-  { keywords: ['fitness', 'gym', 'sport', 'health', 'yoga', 'workout', 'training', 'wellness', 'coach'],
-    url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['fitness', 'gym', 'sport', 'health', 'workout', 'training', 'athlete', 'crossfit', 'personal trainer'],
+    urls: [
+      U('1534438327276-14e5300c3a48'), // modern gym equipment
+      U('1517836357463-d25dfeac3438'), // weight lifting
+      U('1571019613454-1cb2f99b2d8b'), // runner in city
+      U('1552674605-db6ffd4facb5'), // gym interior dark
+    ] },
+  // Yoga / Wellness / Meditation
+  { keywords: ['yoga', 'wellness', 'meditation', 'mindful', 'holistic', 'spa', 'zen', 'calm', 'healing', 'therapist', 'mental health'],
+    urls: [
+      U('1506126613408-eca07ce68773'), // meditation on beach
+      U('1545205597-3d9d02c29597'), // yoga pose sunset
+      U('1540555700478-4be289fbec6f'), // spa stones
+      U('1544367567-0f2fcb009e0b'), // yoga serene
+    ] },
   // Fashion / Style
-  { keywords: ['fashion', 'style', 'clothing', 'model', 'brand', 'apparel', 'textile', 'boutique'],
-    url: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['fashion', 'style', 'clothing', 'model', 'apparel', 'textile', 'boutique', 'couture', 'runway', 'wardrobe', 'outfit'],
+    urls: [
+      U('1445205170230-053b83016050'), // fashion runway
+      U('1490481651871-ab68de25d43d'), // fabric rolls colorful
+      U('1441984904996-e0b6ba687e04'), // clothing rack curated
+      U('1469334031218-e382a71b716b'), // fashion portrait editorial
+    ] },
+  // Beauty / Skincare / Makeup
+  { keywords: ['beauty', 'skincare', 'makeup', 'cosmetic', 'salon', 'hair', 'nail', 'esthetician', 'glow'],
+    urls: [
+      U('1522335789203-aabd1fc54bc9'), // beauty products flat lay
+      U('1596462502278-27bfdc403348'), // skincare routine
+      U('1487412720507-e7ab37603c6f'), // spa setting serene
+      U('1512496015851-a90fb38ba796'), // makeup palette
+    ] },
   // Education / Student / Learning
-  { keywords: ['student', 'education', 'learn', 'teach', 'school', 'university', 'study', 'academic', 'tutor'],
-    url: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=2560&h=1440&fit=crop&q=85' },
-  // Business / Finance / Consulting
-  { keywords: ['business', 'finance', 'consulting', 'startup', 'entrepreneur', 'corporate', 'marketing', 'agency'],
-    url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['student', 'education', 'learn', 'teach', 'school', 'university', 'study', 'academic', 'tutor', 'professor', 'lecture', 'course'],
+    urls: [
+      U('1481627834876-b7833e8f5570'), // library stacks
+      U('1503676260728-1c00da094a0b'), // university campus
+      U('1523050854058-8df90110c8f1'), // graduation day
+      U('1427504494785-3a9ca7044f45'), // classroom
+    ] },
+  // Business / Finance / Consulting / Marketing
+  { keywords: ['business', 'finance', 'consulting', 'startup', 'entrepreneur', 'corporate', 'marketing', 'agency', 'strategy', 'manager', 'ceo', 'founder', 'saas'],
+    urls: [
+      U('1454165804606-c3d57bc86b40'), // business desk setup
+      U('1486406146926-c627a92ad1ab'), // city skyline golden
+      U('1444653614773-995cb1ef9efa'), // conference room glass
+      U('1497366754035-f200968a6e72'), // modern office space
+    ] },
   // Nature / Garden / Botanical
-  { keywords: ['nature', 'garden', 'plant', 'botanical', 'flower', 'outdoor', 'landscape', 'forest', 'green'],
-    url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=2560&h=1440&fit=crop&q=85' },
-  // Ocean / Marine / Surf
-  { keywords: ['ocean', 'sea', 'marine', 'surf', 'beach', 'coast', 'water', 'dive', 'sail'],
-    url: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['nature', 'garden', 'plant', 'botanical', 'flower', 'outdoor', 'forest', 'green', 'eco', 'organic', 'floral', 'landscape'],
+    urls: [
+      U('1470071459604-3b5ec3a7fe05'), // foggy forest morning
+      U('1441974231531-c6227db76b6e'), // forest path dappled
+      U('1518173946687-a46569ce7367'), // flower garden vibrant
+      U('1465146344425-f00d5f5c8f07'), // wildflower meadow
+    ] },
+  // Ocean / Marine / Surf / Beach
+  { keywords: ['ocean', 'sea', 'marine', 'surf', 'beach', 'coast', 'water', 'dive', 'sail', 'tropical', 'island', 'wave'],
+    urls: [
+      U('1505118380757-91f5f5632de0'), // deep blue underwater
+      U('1507525428034-b723cf961d3e'), // tropical beach palm
+      U('1439405326854-014607f694d7'), // ocean aerial turquoise
+      U('1518837695005-2083093ee35b'), // wave barrel surfing
+    ] },
+  // Mountain / Alpine / Hiking
+  { keywords: ['mountain', 'alpine', 'hiking', 'climb', 'summit', 'trail', 'trekking', 'peak', 'outdoor adventure'],
+    urls: [
+      U('1506905925346-21bda4d32df4'), // alpine peaks snow
+      U('1464822759023-fed622ff2c3b'), // mountain panorama
+      U('1454496522488-7a8e488e8606'), // mountain mist valley
+      U('1483728642387-6c3bdd6c93e5'), // alpine lake reflection
+    ] },
   // Space / Astronomy / Science
-  { keywords: ['space', 'star', 'astro', 'science', 'cosmos', 'galaxy', 'night sky', 'research'],
-    url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['space', 'star', 'astro', 'science', 'cosmos', 'galaxy', 'night sky', 'research', 'lab', 'physics', 'chemistry'],
+    urls: [
+      U('1519681393784-d120267933ba'), // starry mountain silhouette
+      U('1462331940025-496dfbfc7564'), // nebula deep space
+      U('1451187580459-43490279c0fa'), // earth from space
+      U('1444703686981-a3abbc4d4fe3'), // milky way night
+    ] },
   // Gaming / Esports
-  { keywords: ['game', 'gaming', 'esport', 'streamer', 'twitch', 'neon', 'rgb'],
-    url: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['game', 'gaming', 'esport', 'streamer', 'twitch', 'neon', 'rgb', 'console', 'gamer', 'play'],
+    urls: [
+      U('1538481199705-c710c4e965fc'), // gaming setup neon
+      U('1542751371-adc38448a05e'), // neon lights pink
+      U('1511512578047-dfb367046420'), // game controller
+      U('1550745165-9bc0b252726f'), // gaming purple ambient
+    ] },
   // Pet / Animal / Vet
-  { keywords: ['pet', 'animal', 'dog', 'cat', 'vet', 'veterinar'],
-    url: 'https://images.unsplash.com/photo-1444212477490-ca407925329e?w=2560&h=1440&fit=crop&q=85' },
+  { keywords: ['pet', 'animal', 'dog', 'cat', 'vet', 'veterinar', 'puppy', 'kitten', 'rescue'],
+    urls: [
+      U('1444212477490-ca407925329e'), // dogs in golden field
+      U('1415369629372-26f2fe60c467'), // cat portrait elegant
+      U('1548199973-03cce0bbc87b'), // dogs running joyful
+      U('1425082661705-1834bfd09dca'), // sleeping cat peaceful
+    ] },
+  // Automotive / Cars / Motor
+  { keywords: ['car', 'auto', 'motor', 'vehicle', 'drive', 'racing', 'mechanic', 'garage', 'electric vehicle'],
+    urls: [
+      U('1492144534655-ae79c964c9d7'), // sports car sleek
+      U('1503376780353-7e6692767b70'), // racing action
+      U('1449130320187-0a18a1b4c5f0'), // car dashboard
+      U('1544636331-e26879cd4d9b'), // car on highway scenic
+    ] },
+  // Medical / Healthcare / Nursing
+  { keywords: ['medical', 'doctor', 'nurse', 'healthcare', 'hospital', 'clinic', 'dental', 'pharmacy', 'patient'],
+    urls: [
+      U('1538108149393-fbbd81895907'), // stethoscope
+      U('1579684385127-1ef15d508118'), // lab equipment
+      U('1559757175-0eb30cd8c063'), // medical technology
+      U('1576091160550-2173dba999ef'), // clean medical space
+    ] },
+  // Legal / Law / Consulting
+  { keywords: ['legal', 'law', 'lawyer', 'attorney', 'justice', 'court', 'paralegal', 'contract'],
+    urls: [
+      U('1589829545856-d10d557cf95f'), // scales of justice
+      U('1507003211169-0a1dd7228f2d'), // professional portrait
+      U('1450101499163-c8848e968ad7'), // library classical
+      U('1497366811353-6870744d04b2'), // serious workspace
+    ] },
+  // Craft / Handmade / Maker
+  { keywords: ['craft', 'handmade', 'maker', 'artisan', 'pottery', 'woodwork', 'diy', 'leather', 'jewelry', 'sewing', 'knit', 'crochet', 'embroid'],
+    urls: [
+      U('1452860606245-08c1cc2b07e0'), // pottery wheel
+      U('1416339306562-f3d12fefd36f'), // woodworking
+      U('1473186578172-c141e6798cf4'), // sewing machine
+      U('1460661419201-fd4cecdf8a8b'), // abstract crafts
+    ] },
 ];
 
-// Generic fallbacks — beautiful wallpapers for anything not matched
+// Beautiful generic fallback wallpapers — for prompts that don't match any category
 const FALLBACK_WALLPAPERS = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2560&h=1440&fit=crop&q=85', // Alpine peaks
-  'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=2560&h=1440&fit=crop&q=85', // Sand dunes
-  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=2560&h=1440&fit=crop&q=85', // Abstract blue
-  'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=2560&h=1440&fit=crop&q=85', // Gradient mesh
-  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2560&h=1440&fit=crop&q=85', // Starry peaks
+  U('1506905925346-21bda4d32df4'), // Alpine peaks panorama
+  U('1507400492013-162706c8c05e'), // Sand dunes golden hour
+  U('1618005182384-a83a8bd57fbe'), // Abstract blue gradients
+  U('1557682250-33bd709cbe85'), // Gradient mesh purple
+  U('1519681393784-d120267933ba'), // Starry mountain night
+  U('1477346611705-65d1883cee1e'), // Lake reflection golden
+  U('1500534314209-a25ddb2bd429'), // Lavender field sunset
+  U('1505144808419-1957a94ca61e'), // Aerial coastline
+  U('1509023464722-18d996393ca8'), // Aurora borealis
+  U('1501785888108-c5582816b979'), // Misty mountain layers
+  U('1470115636492-6d2b56f9b754'), // Desert canyon warm
+  U('1433086966358-54859d0ed716'), // Mediterranean coast
+  U('1504198453319-5ce911bafcde'), // Sunset clouds vivid
+  U('1531366936337-7c912a4589a7'), // Teal ocean calm
+  U('1494500764479-0c8f2919a3d8'), // Forest path magical
 ];
 
 function findWallpaperForKeyword(keyword: string): string {
   const lower = keyword.toLowerCase();
+  const words = lower.split(/\s+/).filter(w => w.length > 2);
+
+  // Score each category by number of keyword matches
+  let bestScore = 0;
+  let bestUrls: string[] = [];
+
   for (const entry of WALLPAPER_CATALOG) {
-    if (entry.keywords.some(kw => lower.includes(kw) || kw.includes(lower))) {
-      return entry.url;
+    let score = 0;
+    for (const kw of entry.keywords) {
+      // Full phrase contains keyword
+      if (lower.includes(kw)) {
+        score += 2;
+      }
+      // Individual word matches
+      for (const word of words) {
+        if (kw.includes(word) || word.includes(kw)) {
+          score += 1;
+        }
+      }
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestUrls = [...entry.urls];
+    } else if (score === bestScore && score > 0) {
+      // Combine equally scored categories for more variety
+      bestUrls.push(...entry.urls);
     }
   }
-  // Return a random fallback
+
+  if (bestUrls.length > 0) {
+    return bestUrls[Math.floor(Math.random() * bestUrls.length)];
+  }
+
   return FALLBACK_WALLPAPERS[Math.floor(Math.random() * FALLBACK_WALLPAPERS.length)];
 }
 
