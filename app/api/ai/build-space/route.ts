@@ -1,5 +1,8 @@
 import { NextRequest } from 'next/server';
 
+// Allow up to 5 minutes for custom-app generation (multiple AI calls per build)
+export const maxDuration = 300;
+
 /**
  * Streaming endpoint for intelligent space building
  * Uses Server-Sent Events to stream AI reasoning and progress in real-time
@@ -1088,7 +1091,7 @@ export async function POST(request: NextRequest) {
                 .replace('{purpose}', item.purpose as string)
                 .replace('{brief}', item.contentBrief as string);
 
-              content = await callAI(appPrompt, 1, 16000);
+              content = await callAI(appPrompt, 1, 12000);
 
               // Clean up markdown fences and :root blocks (host injects CSS vars)
               content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
