@@ -200,7 +200,7 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
           }}
         >
           {/* Layout: centered content sitting above the horizon line */}
-          <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6" style={{ paddingBottom: '14vh' }}>
+          <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6" style={{ paddingBottom: 'calc(14vh + 48px)' }}>
 
             {/* Logo */}
             <motion.h1
