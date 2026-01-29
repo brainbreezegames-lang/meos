@@ -549,6 +549,59 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
               )}
             </AnimatePresence>
 
+            {/* Prompt keywords — what the AI picked up */}
+            <AnimatePresence>
+              {promptKeywords.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex flex-wrap gap-1.5"
+                >
+                  {promptKeywords.map((kw, i) => (
+                    <motion.span
+                      key={kw}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.06 }}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px]"
+                      style={{
+                        background: 'color-mix(in srgb, var(--color-accent-primary, #ff7722) 10%, transparent)',
+                        color: C.accent,
+                        fontWeight: 500,
+                      }}
+                    >
+                      {kw}
+                    </motion.span>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Thinking lines — AI's real-time thought process */}
+            <AnimatePresence>
+              {thinkingLines.length > 0 && phase !== 'complete' && phase !== 'error' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-1"
+                >
+                  {thinkingLines.slice(-3).map((line, i, arr) => (
+                    <motion.p
+                      key={`${line}-${i}`}
+                      initial={{ opacity: 0, x: -4 }}
+                      animate={{ opacity: i === arr.length - 1 ? 0.8 : 0.4, x: 0 }}
+                      className="text-[11px] italic leading-snug"
+                      style={{ color: C.textMuted }}
+                    >
+                      {line}
+                    </motion.p>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Plan checklist — compact */}
             <AnimatePresence>
               {plan && plan.items.length > 0 && (

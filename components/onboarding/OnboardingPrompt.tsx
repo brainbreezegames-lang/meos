@@ -119,6 +119,72 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
 
+  // Detect speech recognition support
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    setSpeechSupported(!!SR);
+  }, []);
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+
+    const recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    let finalTranscript = prompt;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += (finalTranscript ? ' ' : '') + transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+      setPrompt(finalTranscript + (interim ? ' ' + interim : ''));
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+    playSound('voiceReady');
+
+    if (!userHasInteracted) {
+      setUserHasInteracted(true);
+      typewriter.stop();
+    }
+  }, [isListening, prompt, userHasInteracted, typewriter]);
+
+  // Stop listening when prompt is submitted or modal closes
+  useEffect(() => {
+    if (!isOpen || isLoading) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    }
+  }, [isOpen, isLoading]);
+
   useEffect(() => {
     if (isOpen && textareaRef.current) {
       playSound('expand');
@@ -326,11 +392,32 @@ export function OnboardingPrompt({ isOpen, onClose, onSubmit, isLoading = false 
                     zIndex: 3,
                   }}
                 >
-                  <span className="text-xs" style={{ color: 'rgba(0,0,0,0.3)' }}>
-                    {prompt.length > 0 && prompt.trim().length < 10
-                      ? 'Keep going...'
-                      : ''}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs" style={{ color: 'rgba(0,0,0,0.3)' }}>
+                      {prompt.length > 0 && prompt.trim().length < 10
+                        ? 'Keep going...'
+                        : ''}
+                    </span>
+                    {speechSupported && (
+                      <motion.button
+                        onClick={toggleListening}
+                        className="flex items-center justify-center rounded-lg transition-all"
+                        style={{
+                          width: 32,
+                          height: 32,
+                          background: isListening ? 'rgba(239,68,68,0.1)' : 'rgba(0,0,0,0.04)',
+                          color: isListening ? '#ef4444' : 'rgba(0,0,0,0.35)',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                        whileHover={{ scale: 1.06 }}
+                        whileTap={{ scale: 0.94 }}
+                        aria-label={isListening ? 'Stop listening' : 'Start voice input'}
+                      >
+                        {isListening ? <MicOff size={15} /> : <Mic size={15} />}
+                      </motion.button>
+                    )}
+                  </div>
 
                   <motion.button
                     onClick={handleSubmit}

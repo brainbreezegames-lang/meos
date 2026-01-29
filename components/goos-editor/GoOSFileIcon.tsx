@@ -506,7 +506,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
   id,
   type,
   title,
-  status,
+  // status is accepted but not visually rendered on icons
+  status: _status,
   accessLevel,
   isSelected = false,
   isRenaming = false,
