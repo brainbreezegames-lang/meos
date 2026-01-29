@@ -88,6 +88,7 @@ import { FallingLetters } from '@/components/desktop/FallingLetters';
 import { Launchpad, LaunchpadDockIcon } from '@/components/desktop/Launchpad';
 // Dock icons are now real PNG images at /icons/dock/
 import { OnboardingPrompt, GooseBuilder } from '@/components/onboarding';
+import { Button } from '@/components/ui/Button';
 import { useAIOnboarding, StreamingBuildItem } from '@/hooks/useAIOnboarding';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 
@@ -2868,6 +2869,9 @@ function GoOSDemoContent() {
     // AI Onboarding
     const onboarding = useAIOnboarding();
     const [hasOnboarded, setHasOnboarded] = useState(false);
+    const [showCinematicReveal, setShowCinematicReveal] = useState(false);
+    const [showGuidedTour, setShowGuidedTour] = useState(false);
+    const [guidedTourStep, setGuidedTourStep] = useState(0);
     const hasClearedRef = useRef(false); // Track if we've cleared for this session
 
     // Boot sequence state: splash -> booting -> revealing -> ready
@@ -3361,24 +3365,30 @@ function GoOSDemoContent() {
     // Track file creation index for positioning
     const fileCreationIndexRef = useRef(0);
 
-    // Spread items across desktop with good spacing (4x4 grid, right side free for floating panel)
+    // Spread items across desktop with good spacing
+    // 5 columns x 4 rows = 20 positions. Right side (>65%) reserved for GooseBuilder panel during build.
+    // After build, files can be dragged anywhere.
     const POSITIONS = useMemo(() => [
-        { x: 5, y: 15 },
-        { x: 19, y: 15 },
-        { x: 33, y: 15 },
-        { x: 47, y: 15 },
-        { x: 5, y: 35 },
-        { x: 19, y: 35 },
-        { x: 33, y: 35 },
-        { x: 47, y: 35 },
-        { x: 5, y: 55 },
-        { x: 19, y: 55 },
-        { x: 33, y: 55 },
-        { x: 47, y: 55 },
-        { x: 5, y: 75 },
-        { x: 19, y: 75 },
-        { x: 33, y: 75 },
-        { x: 47, y: 75 },
+        { x: 4, y: 12 },
+        { x: 17, y: 12 },
+        { x: 30, y: 12 },
+        { x: 43, y: 12 },
+        { x: 56, y: 12 },
+        { x: 4, y: 32 },
+        { x: 17, y: 32 },
+        { x: 30, y: 32 },
+        { x: 43, y: 32 },
+        { x: 56, y: 32 },
+        { x: 4, y: 52 },
+        { x: 17, y: 52 },
+        { x: 30, y: 52 },
+        { x: 43, y: 52 },
+        { x: 56, y: 52 },
+        { x: 4, y: 72 },
+        { x: 17, y: 72 },
+        { x: 30, y: 72 },
+        { x: 43, y: 72 },
+        { x: 56, y: 72 },
     ], []);
 
     // Track created folders by name→id for parentFolder resolution
@@ -3414,7 +3424,7 @@ function GoOSDemoContent() {
                 };
                 await createWidget(item.widgetType as WidgetType, widgetPos);
                 console.log(`[onboarding] Created widget: ${item.widgetType} (${item.title})`);
-                playSound('bubble');
+                playSound('materialize');
             } catch (err) {
                 console.error(`[onboarding] Failed to create widget ${item.widgetType}:`, err);
             }
@@ -3437,7 +3447,7 @@ function GoOSDemoContent() {
                         });
                         if (linkFile) {
                             console.log(`[onboarding] Created link: "${item.title}" → ${item.linkUrl}`);
-                            playSound('bubble');
+                            playSound('materialize');
                         }
                     }
                 } catch (err) {
@@ -3466,7 +3476,7 @@ function GoOSDemoContent() {
                     }
 
                     console.log(`[onboarding] Created file: "${item.title}" id=${newFile.id}`);
-                    playSound('bubble');
+                    playSound('materialize');
                 } else {
                     console.error(`[onboarding] createGoOSFile returned null for "${item.title}"`);
                 }
@@ -3490,10 +3500,29 @@ function GoOSDemoContent() {
         console.log('[onboarding] Complete with', items.length, 'items');
         fileCreationIndexRef.current = 0;
         createdFoldersRef.current = {};
-        setHasOnboarded(true);
-        onboarding.completeOnboarding();
-        showGoOSToast('Your nest is ready! 🪿', 'success');
-    }, [onboarding, showGoOSToast]);
+
+        // Cinematic reveal: flash white, then fade in desktop
+        setShowCinematicReveal(true);
+        playSound('chime');
+
+        // After chime plays, reveal desktop
+        setTimeout(() => {
+            setHasOnboarded(true);
+            onboarding.completeOnboarding();
+            playSound('swooshIn');
+        }, 800);
+
+        // Fade out cinematic overlay
+        setTimeout(() => {
+            setShowCinematicReveal(false);
+        }, 2200);
+
+        // Start guided tour after reveal
+        setTimeout(() => {
+            setShowGuidedTour(true);
+            setGuidedTourStep(0);
+        }, 3000);
+    }, [onboarding]);
 
     // Handle AI onboarding error
     const handleOnboardingError = useCallback((message: string) => {
@@ -6100,6 +6129,111 @@ function GoOSDemoContent() {
                 onWallpaper={handleOnboardingWallpaper}
                 onError={handleOnboardingError}
             />
+
+            {/* Cinematic completion reveal — brief white flash + fade */}
+            <AnimatePresence>
+                {showCinematicReveal && (
+                    <motion.div
+                        className="fixed inset-0 z-[10001] pointer-events-none"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0, 0.9, 0.9, 0] }}
+                        transition={{ duration: 2.2, times: [0, 0.15, 0.5, 1], ease: 'easeInOut' }}
+                        style={{ background: 'var(--color-bg-elevated, #fff)' }}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Guided tour — post-build tips */}
+            <AnimatePresence>
+                {showGuidedTour && (
+                    <motion.div
+                        className="fixed z-[10002] flex flex-col items-center"
+                        variants={fadeInUp}
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        style={{
+                            bottom: 120,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                        }}
+                    >
+                        <motion.div
+                            key={guidedTourStep}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={SPRING.gentle}
+                            className="glass-panel text-center"
+                            style={{
+                                borderRadius: 'var(--radius-xl, 22px)',
+                                padding: 'var(--space-5, 1.25rem) var(--space-6, 1.5rem)',
+                                background: 'var(--color-bg-elevated, rgba(255,255,255,0.95))',
+                                backdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+                                WebkitBackdropFilter: 'var(--blur-glass, blur(20px) saturate(180%))',
+                                boxShadow: 'var(--shadow-lg, 0 8px 32px rgba(0,0,0,0.12))',
+                                border: '1px solid var(--color-border-subtle, rgba(0,0,0,0.06))',
+                                maxWidth: 380,
+                            }}
+                        >
+                            {guidedTourStep === 0 && (
+                                <>
+                                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #171412)' }}>
+                                        Your space is ready!
+                                    </p>
+                                    <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary, #8e827c)', lineHeight: 1.5 }}>
+                                        Double-click any file to open it. Right-click for more options. Drag files to rearrange.
+                                    </p>
+                                </>
+                            )}
+                            {guidedTourStep === 1 && (
+                                <>
+                                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #171412)' }}>
+                                        Make it yours
+                                    </p>
+                                    <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary, #8e827c)', lineHeight: 1.5 }}>
+                                        Edit any file to personalize content. Use the dock below to create new files or change your wallpaper.
+                                    </p>
+                                </>
+                            )}
+                            <div className="flex items-center justify-center gap-3">
+                                <div className="flex gap-1.5">
+                                    {[0, 1].map(i => (
+                                        <motion.div
+                                            key={i}
+                                            className="rounded-full"
+                                            animate={{
+                                                width: guidedTourStep === i ? 16 : 6,
+                                                background: guidedTourStep === i
+                                                    ? 'var(--color-accent-primary, #ff7722)'
+                                                    : 'var(--color-border-default, rgba(0,0,0,0.12))',
+                                            }}
+                                            transition={SPRING.snappy}
+                                            style={{ height: 6 }}
+                                        />
+                                    ))}
+                                </div>
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={() => {
+                                        if (guidedTourStep < 1) {
+                                            setGuidedTourStep(s => s + 1);
+                                            playSound('click');
+                                        } else {
+                                            setShowGuidedTour(false);
+                                            playSound('collapse');
+                                        }
+                                    }}
+                                    style={{ borderRadius: 'var(--radius-pill, 9999px)' }}
+                                >
+                                    {guidedTourStep < 1 ? 'Next' : 'Got it'}
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Command Palette */}
             <CommandPalette

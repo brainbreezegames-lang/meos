@@ -96,14 +96,22 @@ If the user asks for something that can't be built with available components (cu
 - Describe what the tool would do and suggest a workaround
 - Never promise features that don't exist — be honest and helpful
 
+SPATIAL LAYOUT: Items will be placed on a 4x4 desktop grid (16 positions). Consider visual grouping:
+- Place introductory items (About, Bio) in the top-left area (priority 1-2)
+- Place portfolio/work items in the middle rows (priority 3-6)
+- Place utilities, boards, and sheets in the lower rows (priority 7-9)
+- Place contact/social widgets last (priority 10-12)
+- Use folders to group 3+ related items and keep the desktop uncluttered
+
 Rules:
 - Create 6-12 items. Be thorough, not lazy.
-- Use SHORT, descriptive file names (2-4 words max). Examples: "Learning Plan", "Vocab Sheet", "About Me", "Design Process"
+- Use SHORT, DISTINCTIVE file names (2-4 words max) that feel PERSONAL. Bad: "Projects". Good: "Client Work", "Design Lab", "Recipe Book"
+- Name files using the user's actual domain language (e.g., "Shot List" for photographer, "Pattern Library" for designer)
 - Include at least 1 widget if the user has any functional needs (booking, contact, availability, links)
 - Include at least 1 board OR sheet if the user's needs involve structured data, planning, or tracking
-- Include 2-3 link items for relevant external resources (real URLs)
+- Include 2-3 link items for relevant external resources (real URLs to actual tools/sites they'd use)
 - Every item must have a CLEAR PURPOSE for THIS specific user
-- Content descriptions should reference their actual situation
+- Content briefs should reference their actual situation with SPECIFIC details
 - Order items logically (introduction first, then portfolio, then widgets/contact last)
 - For items that belong inside a folder, set parentFolder to the exact folder name
 - For link items, set linkUrl to a real, valid URL
@@ -141,15 +149,18 @@ Component to create:
 - Brief: {brief}
 
 Write the content AS IF YOU ARE THIS PERSON.
-- Use first person
-- Match their tone ({tone})
-- Reference their specific niche and situation
-- Make it sound authentic, not templated
-- Use [Your Name] only for their actual name
-- Keep it concise but compelling (150-250 words for notes)
+- Use first person ("I", "my", "we")
+- Match their tone ({tone}) — adapt vocabulary, sentence length, and formality
+- Reference their SPECIFIC niche, tools, clients, and situation — no generic phrases
+- Make it sound authentic and confident, never templated or AI-generated
+- Use [Your Name] only as a placeholder for their actual name
+- Be SPECIFIC: mention actual technologies, industries, techniques, or methodologies they'd use
+- Include concrete details: numbers, timeframes, specific outcomes where believable
+- Write 200-350 words for notes, 300-500 words for case-studies
+- Each section should have genuine substance — not filler
 
-For notes, use HTML: <h1>, <h2>, <p>, <ul>, <li>, <strong>, <em>
-For case-studies, include sections: Overview, Challenge, Approach, Results
+For notes, use HTML: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <strong>, <em>, <blockquote>
+For case-studies, include sections: Overview, The Challenge, My Approach, Key Results — each with REAL detail
 
 Return just the HTML content, nothing else.`;
 
