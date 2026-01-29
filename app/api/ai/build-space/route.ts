@@ -8,6 +8,7 @@ import { NextRequest } from 'next/server';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2:free';
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
 // Phase 1: Deep Understanding Prompt
 const UNDERSTANDING_PROMPT = `You are analyzing a user's request to build their personal workspace. Extract DEEP understanding, not surface-level parsing.
@@ -49,7 +50,8 @@ Return JSON:
   },
   "tone": "one word describing ideal tone",
   "customRequests": ["any unique tools or features they mentioned"],
-  "understanding": "2-3 sentence summary of who this person is and what they need, written like you're explaining to a colleague"
+  "understanding": "2-3 sentence summary of who this person is and what they need, written like you're explaining to a colleague",
+  "wallpaperKeyword": "A 1-3 word search term for finding a beautiful, atmospheric background photo that matches this person's vibe/field. Think abstract/mood rather than literal. Examples: 'minimal workspace', 'warm bakery', 'ocean aerial', 'dark code', 'botanical garden', 'architectural detail'. Pick something that would look stunning as a desktop wallpaper."
 }`;
 
 // Phase 2: Architecture Planning Prompt
@@ -311,6 +313,31 @@ async function callAI(prompt: string, retries = 1, maxTokens = 2000): Promise<st
   }
 
   throw new Error('All AI providers failed');
+}
+
+// Search Unsplash for a landscape wallpaper matching a keyword
+async function searchUnsplashWallpaper(query: string): Promise<string | null> {
+  if (!UNSPLASH_ACCESS_KEY) return null;
+  try {
+    const params = new URLSearchParams({
+      query,
+      orientation: 'landscape',
+      per_page: '1',
+    });
+    const response = await fetch(
+      `https://api.unsplash.com/search/photos?${params}`,
+      { headers: { Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}` } }
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    const photo = data.results?.[0];
+    if (!photo) return null;
+    // Use raw URL with high-quality params for wallpaper
+    return `${photo.urls.raw}&w=2560&h=1440&fit=crop&q=85`;
+  } catch (err) {
+    console.error('Unsplash search failed:', err);
+    return null;
+  }
 }
 
 function extractJSON(text: string): unknown {
@@ -580,10 +607,14 @@ export async function POST(request: NextRequest) {
             send('created', { item, remaining: fallback.items.length - i - 1 });
           }
 
+          // Search Unsplash for a wallpaper based on the user's niche
+          const fallbackWallpaperUrl = await searchUnsplashWallpaper(fallback.identity.niche);
+
           send('complete', {
             items: fallback.items,
             summary: fallback.summary,
             understanding: fallback.understanding,
+            wallpaper: fallbackWallpaperUrl ? { url: fallbackWallpaperUrl } : null,
           });
 
           controller.close();
@@ -761,11 +792,16 @@ export async function POST(request: NextRequest) {
           await new Promise(resolve => setTimeout(resolve, 400));
         }
 
+        // ========== WALLPAPER ==========
+        const wallpaperKeyword = (understanding.wallpaperKeyword as string) || (understanding.identity as Record<string, string>)?.niche || '';
+        const wallpaperUrl = wallpaperKeyword ? await searchUnsplashWallpaper(wallpaperKeyword) : null;
+
         // ========== COMPLETE ==========
         send('complete', {
           items: builtItems,
           summary: planData.summary,
           understanding: understanding.understanding,
+          wallpaper: wallpaperUrl ? { url: wallpaperUrl } : null,
         });
 
         controller.close();

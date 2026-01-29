@@ -3480,12 +3480,16 @@ function GoOSDemoContent() {
     }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, createWidget, goosContext]);
 
     // Handle AI onboarding completion
-    const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
+    const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string, wallpaperData?: { url: string } | null) => {
         console.log('Onboarding complete with', items.length, 'items');
         fileCreationIndexRef.current = 0;
         createdFoldersRef.current = {};
         setHasOnboarded(true);
         onboarding.completeOnboarding();
+        // Set personalized wallpaper from Unsplash if provided
+        if (wallpaperData?.url) {
+            setWallpaper(wallpaperData.url);
+        }
         showGoOSToast('Your nest is ready! 🪿', 'success');
     }, [onboarding, showGoOSToast]);
 
@@ -4321,8 +4325,9 @@ function GoOSDemoContent() {
 
             {/* WALLPAPER BACKGROUND - With Space Theme Support */}
             {wallpaper ? (
+                <>
                 <img
-                    src={`/${wallpaper}.png`}
+                    src={wallpaper.startsWith('http') ? wallpaper : `/${wallpaper}.png`}
                     alt=""
                     className="absolute inset-0 w-full h-full pointer-events-none select-none"
                     style={{
@@ -4332,6 +4337,15 @@ function GoOSDemoContent() {
                     }}
                     draggable={false}
                 />
+                {/* Dark overlay for readability (30% opacity) */}
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        background: 'rgba(0, 0, 0, 0.3)',
+                        zIndex: 1,
+                    }}
+                />
+                </>
             ) : (
                 /* Plain background with subtle dots */
                 <div

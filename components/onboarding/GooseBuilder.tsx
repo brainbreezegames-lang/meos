@@ -48,7 +48,7 @@ interface GooseBuilderProps {
   isActive: boolean;
   prompt: string;
   onItemCreated: (item: BuildItem, remaining: number) => void;
-  onComplete: (items: BuildItem[], summary: string) => void;
+  onComplete: (items: BuildItem[], summary: string, wallpaper?: { url: string } | null) => void;
   onError: (message: string) => void;
 }
 
@@ -246,7 +246,8 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onEr
           setShowConfetti(true);
           const items = data.items as BuildItem[];
           const summary = data.summary as string;
-          setTimeout(() => onCompleteRef.current(items, summary), 2500);
+          const wallpaper = data.wallpaper as { url: string } | null | undefined;
+          setTimeout(() => onCompleteRef.current(items, summary, wallpaper), 2500);
         }
         break;
       }
