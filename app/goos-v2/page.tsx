@@ -3743,13 +3743,11 @@ function GoOSDemoContent() {
             return;
         }
 
-        // If it's a link, open in browser window
+        // If it's a link, open the URL directly in a new tab
+        // (iframe embedding fails for 99% of sites due to X-Frame-Options/CSP)
         if (file.type === 'link' && file.linkUrl) {
-            if (!openLinkBrowsers.includes(fileId)) {
-                setOpenLinkBrowsers(prev => [...prev, fileId]);
-            }
-            setWindowZ(prev => ({ ...prev, [`link-${fileId}`]: topZIndex + 1 }));
-            setTopZIndex(prev => prev + 1);
+            window.open(file.linkUrl, '_blank', 'noopener,noreferrer');
+            playSound('pop');
             return;
         }
 
