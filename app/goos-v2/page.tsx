@@ -64,6 +64,7 @@ import { PresentationView } from '@/components/presentation';
 import { CaseStudyPageView } from '@/components/casestudy';
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
 import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
+import { MenuBarDropdown, MenuBarItem, MenuBarDivider, MenuBarGroup, MenuBarTrigger, useMenuBarState } from '@/components/menubar';
 import {
     SPRING,
     DURATION,
@@ -2861,8 +2862,8 @@ function GoOSDemoContent() {
     const [logoClicks, setLogoClicks] = useState(0);
     const [showEasterEgg, setShowEasterEgg] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
-    const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
-    const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+    // Unified menu bar state — coordinates all dropdown menus
+    const menuBar = useMenuBarState();
 
     // AI Onboarding
     const onboarding = useAIOnboarding();
@@ -3221,6 +3222,9 @@ function GoOSDemoContent() {
     // Launchpad state
     const [launchpadOpen, setLaunchpadOpen] = useState(false);
 
+    // Widgets menu state
+    const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
+
     // Zen focus mode - true when any window is maximized OR in page/present view
     const isZenMode = maximizedEditors.size > 0 || viewMode === 'page' || viewMode === 'present';
 
@@ -3357,17 +3361,37 @@ function GoOSDemoContent() {
     // Track file creation index for positioning
     const fileCreationIndexRef = useRef(0);
 
-    // Spread items across desktop with good spacing
+    // Spread items across desktop with good spacing (4x4 grid, right side free for floating panel)
     const POSITIONS = useMemo(() => [
-        { x: 5, y: 20 },
-        { x: 20, y: 20 },
-        { x: 35, y: 20 },
-        { x: 5, y: 45 },
-        { x: 20, y: 45 },
-        { x: 35, y: 45 },
-        { x: 5, y: 70 },
-        { x: 20, y: 70 },
+        { x: 5, y: 15 },
+        { x: 19, y: 15 },
+        { x: 33, y: 15 },
+        { x: 47, y: 15 },
+        { x: 5, y: 35 },
+        { x: 19, y: 35 },
+        { x: 33, y: 35 },
+        { x: 47, y: 35 },
+        { x: 5, y: 55 },
+        { x: 19, y: 55 },
+        { x: 33, y: 55 },
+        { x: 47, y: 55 },
+        { x: 5, y: 75 },
+        { x: 19, y: 75 },
+        { x: 33, y: 75 },
+        { x: 47, y: 75 },
     ], []);
+
+    // Track created folders by name→id for parentFolder resolution
+    const createdFoldersRef = useRef<Record<string, string>>({});
+
+    // Clear demo files immediately when building starts
+    useEffect(() => {
+        if (onboarding.isBuilding && !hasClearedRef.current) {
+            console.log('[onboarding] Building started — clearing demo files');
+            clearGoOSFiles();
+            hasClearedRef.current = true;
+        }
+    }, [onboarding.isBuilding, clearGoOSFiles]);
 
     // Handle streaming item creation - creates files as they arrive from AI.
     // Uses refs for clear-once logic to avoid stale closure issues (this callback
@@ -3396,17 +3420,51 @@ function GoOSDemoContent() {
             }
             fileCreationIndexRef.current++;
         } else if (item.type === 'file' && item.fileType) {
-            const position = POSITIONS[fileCreationIndexRef.current % POSITIONS.length];
+            // Resolve parentFolder to parentId
+            const parentId = item.parentFolder ? (createdFoldersRef.current[item.parentFolder] || null) : null;
+
+            // Link files use createLinkFile
+            if (item.fileType === 'link' && item.linkUrl) {
+                try {
+                    const position = parentId ? undefined : POSITIONS[fileCreationIndexRef.current % POSITIONS.length];
+                    const { createLinkFile } = goosContext;
+                    if (createLinkFile) {
+                        const linkFile = await createLinkFile(item.linkUrl, {
+                            title: item.title,
+                            description: item.purpose,
+                            parentId,
+                            position,
+                        });
+                        if (linkFile) {
+                            console.log(`[onboarding] Created link: "${item.title}" → ${item.linkUrl}`);
+                            playSound('bubble');
+                        }
+                    }
+                } catch (err) {
+                    console.error(`[onboarding] Failed to create link "${item.title}":`, err);
+                }
+                fileCreationIndexRef.current++;
+                return;
+            }
+
+            // Items inside folders don't need desktop positions
+            const position = parentId ? undefined : POSITIONS[fileCreationIndexRef.current % POSITIONS.length];
             console.log(`[onboarding] Creating file "${item.title}" at position:`, position, 'content length:', item.content?.length || 0);
 
             try {
-                const newFile = await createGoOSFile(item.fileType as FileType, null, position);
+                const newFile = await createGoOSFile(item.fileType as FileType, parentId, position);
                 if (newFile) {
                     const updateData: { title: string; content?: string } = { title: item.title };
                     if (item.content && item.content.length > 0) {
                         updateData.content = item.content;
                     }
                     await updateGoOSFile(newFile.id, updateData);
+
+                    // Track folder IDs for parent resolution
+                    if (item.fileType === 'folder') {
+                        createdFoldersRef.current[item.title] = newFile.id;
+                    }
+
                     console.log(`[onboarding] Created file: "${item.title}" id=${newFile.id}`);
                     playSound('bubble');
                 } else {
@@ -3419,12 +3477,13 @@ function GoOSDemoContent() {
         } else {
             console.warn(`[onboarding] Skipped item "${item.title}" — type=${item.type}, fileType=${item.fileType}, widgetType=${item.widgetType}`);
         }
-    }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, createWidget]);
+    }, [POSITIONS, createGoOSFile, updateGoOSFile, clearGoOSFiles, createWidget, goosContext]);
 
     // Handle AI onboarding completion
     const handleOnboardingComplete = useCallback(async (items: StreamingBuildItem[], summary: string) => {
         console.log('Onboarding complete with', items.length, 'items');
-        fileCreationIndexRef.current = 0; // Reset for next onboarding
+        fileCreationIndexRef.current = 0;
+        createdFoldersRef.current = {};
         setHasOnboarded(true);
         onboarding.completeOnboarding();
         showGoOSToast('Your nest is ready! 🪿', 'success');
@@ -3444,6 +3503,7 @@ function GoOSDemoContent() {
         setHasOnboarded(false);
         hasClearedRef.current = false;
         fileCreationIndexRef.current = 0;
+        createdFoldersRef.current = {};
         onboarding.resetOnboarding();
         playSound('expand');
         showGoOSToast('Desktop reset! 🪿', 'success');
@@ -4477,269 +4537,108 @@ function GoOSDemoContent() {
                                 }}
                             />
 
-                            {/* Space Switcher */}
+                            {/* Space Switcher — controlled by menuBar */}
                             <SpaceSwitcher
                                 spaces={DEMO_SPACES}
                                 activeSpaceId={activeSpaceId}
                                 onSwitchSpace={(spaceId) => {
                                     setActiveSpaceId(spaceId);
+                                    menuBar.closeAll();
                                     const space = DEMO_SPACES.find(s => s.id === spaceId);
                                     if (space) {
                                         showGoOSToast(`Switched to ${space.name}`, 'success');
                                     }
                                 }}
-                                onCreateSpace={() => setShowCreateSpaceModal(true)}
-                                onManageSpaces={() => setShowManageSpacesDialog(true)}
+                                onCreateSpace={() => { setShowCreateSpaceModal(true); menuBar.closeAll(); }}
+                                onManageSpaces={() => { setShowManageSpacesDialog(true); menuBar.closeAll(); }}
+                                isOpen={menuBar.isOpen('spaces')}
+                                onToggle={() => menuBar.toggleMenu('spaces')}
+                                onMouseEnterTrigger={() => menuBar.getTriggerProps('spaces').onMouseEnter()}
                             />
 
-                            {/* Widgets Menu */}
+                            {/* Widgets Menu — shared MenuBar components */}
                             <div className="relative">
-                                <button
-                                    onClick={() => setShowWidgetsMenu(!showWidgetsMenu)}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        padding: '2px 6px',
-                                        fontSize: '13px',
-                                        fontWeight: 400,
-                                        color: 'var(--color-text-secondary)',
-                                        cursor: 'pointer',
-                                        borderRadius: 'var(--radius-xs)',
-                                        transition: 'background 0.15s ease',
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
+                                <MenuBarTrigger isOpen={menuBar.isOpen('widgets')} triggerProps={menuBar.getTriggerProps('widgets')}>
                                     Widgets
-                                </button>
-                                <AnimatePresence>
-                                    {showWidgetsMenu && (
-                                        <>
-                                            <div className="fixed inset-0 z-[2000]" onClick={() => setShowWidgetsMenu(false)} />
-                                            <motion.div
-                                                initial={{ opacity: 0, y: -4, scale: 0.96 }}
-                                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                exit={{ opacity: 0, y: -4, scale: 0.96 }}
-                                                transition={{ duration: 0.12, ease: [0.4, 0, 0.2, 1] }}
-                                                className="absolute top-full left-0 mt-1 z-[2001] py-1"
-                                                style={{
-                                                    background: 'var(--color-bg-elevated)',
-                                                    backdropFilter: 'blur(20px) saturate(180%)',
-                                                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                                                    border: '1px solid var(--color-border-subtle)',
-                                                    borderRadius: 'var(--radius-md)',
-                                                    boxShadow: 'var(--shadow-dropdown)',
-                                                    minWidth: '140px',
-                                                }}
-                                            >
-                                                {/* AI Setup Option */}
-                                                <button
+                                </MenuBarTrigger>
+                                <MenuBarDropdown isOpen={menuBar.isOpen('widgets')} width={180}>
+                                    <MenuBarItem
+                                        icon={<span style={{ fontSize: 14 }}>✨</span>}
+                                        label="AI Setup"
+                                        variant="accent"
+                                        onClick={() => { onboarding.startOnboarding(); menuBar.closeAll(); }}
+                                    />
+                                    <MenuBarDivider />
+                                    <MenuBarGroup label="Interactive">
+                                        {(['clock', 'book', 'tipjar', 'contact'] as const).map((type) => {
+                                            const meta = WIDGET_METADATA[type];
+                                            return (
+                                                <MenuBarItem
+                                                    key={type}
+                                                    icon={<span style={{ fontSize: 14 }}>{meta.icon}</span>}
+                                                    label={meta.label}
                                                     onClick={() => {
-                                                        onboarding.startOnboarding();
-                                                        setShowWidgetsMenu(false);
+                                                        handleAddWidget(type, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                                                        menuBar.closeAll();
                                                     }}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '6px 12px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '8px',
-                                                        background: 'transparent',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontSize: '13px',
-                                                        fontWeight: 500,
-                                                        color: 'var(--color-accent-primary)',
-                                                        textAlign: 'left',
-                                                        transition: 'background 0.1s ease',
+                                                />
+                                            );
+                                        })}
+                                    </MenuBarGroup>
+                                    <MenuBarDivider />
+                                    <MenuBarGroup label="Engagement">
+                                        {(['links', 'feedback', 'status', 'sticky-note'] as const).map((type) => {
+                                            const meta = WIDGET_METADATA[type];
+                                            return (
+                                                <MenuBarItem
+                                                    key={type}
+                                                    icon={<span style={{ fontSize: 14 }}>{meta.icon}</span>}
+                                                    label={meta.label}
+                                                    onClick={() => {
+                                                        handleAddWidget(type, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                                                        menuBar.closeAll();
                                                     }}
-                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                                >
-                                                    <span style={{ fontSize: '14px' }}>✨</span>
-                                                    <span>AI Setup</span>
-                                                </button>
-                                                <div style={{ height: 1, background: 'var(--color-border-subtle)', margin: '4px 8px' }} />
-                                                {Object.entries(WIDGET_METADATA).map(([type, meta]) => (
-                                                    <button
-                                                        key={type}
-                                                        onClick={() => {
-                                                            handleAddWidget(type, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
-                                                            setShowWidgetsMenu(false);
-                                                        }}
-                                                        style={{
-                                                            width: '100%',
-                                                            padding: '6px 12px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '8px',
-                                                            background: 'transparent',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            fontSize: '13px',
-                                                            fontWeight: 400,
-                                                            color: 'var(--color-text-primary)',
-                                                            textAlign: 'left',
-                                                            transition: 'background 0.1s ease',
-                                                        }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                                    >
-                                                        <span style={{ fontSize: '14px' }}>{meta.icon}</span>
-                                                        <span>{meta.label}</span>
-                                                    </button>
-                                                ))}
-                                            </motion.div>
-                                        </>
-                                    )}
-                                </AnimatePresence>
+                                                />
+                                            );
+                                        })}
+                                    </MenuBarGroup>
+                                </MenuBarDropdown>
                             </div>
 
-                            {/* Settings Menu */}
+                            {/* Settings Menu — shared MenuBar components */}
                             <div className="relative">
-                                <button
-                                    onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        padding: '2px 6px',
-                                        fontSize: '13px',
-                                        fontWeight: 400,
-                                        color: 'var(--color-text-secondary)',
-                                        cursor: 'pointer',
-                                        borderRadius: 'var(--radius-xs)',
-                                        transition: 'background 0.15s ease',
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
+                                <MenuBarTrigger isOpen={menuBar.isOpen('settings')} triggerProps={menuBar.getTriggerProps('settings')}>
                                     Settings
-                                </button>
-                                <AnimatePresence>
-                                    {showSettingsMenu && (
+                                </MenuBarTrigger>
+                                <MenuBarDropdown isOpen={menuBar.isOpen('settings')} width={180}>
+                                    <MenuBarItem
+                                        icon={<BarChart3 size={14} strokeWidth={1.5} />}
+                                        label="Analytics"
+                                        onClick={() => { toggleApp('analytics'); menuBar.closeAll(); }}
+                                    />
+                                    <MenuBarItem
+                                        icon={<Settings size={14} strokeWidth={1.5} />}
+                                        label="Preferences"
+                                        onClick={() => { toggleApp('settings'); menuBar.closeAll(); }}
+                                    />
+                                    <MenuBarDivider />
+                                    <MenuBarItem
+                                        icon={<FileText size={14} strokeWidth={1.5} />}
+                                        label="Falling Letters"
+                                        trailing={showFallingLetters ? 'On' : 'Off'}
+                                        onClick={() => setShowFallingLetters(!showFallingLetters)}
+                                    />
+                                    {hasOnboarded && (
                                         <>
-                                            <div className="fixed inset-0 z-[2000]" onClick={() => setShowSettingsMenu(false)} />
-                                            <motion.div
-                                                initial={{ opacity: 0, y: -4, scale: 0.96 }}
-                                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                exit={{ opacity: 0, y: -4, scale: 0.96 }}
-                                                transition={{ duration: 0.12, ease: [0.4, 0, 0.2, 1] }}
-                                                className="absolute top-full left-0 mt-1 z-[2001] py-1"
-                                                style={{
-                                                    background: 'var(--color-bg-elevated)',
-                                                    backdropFilter: 'blur(20px) saturate(180%)',
-                                                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                                                    border: '1px solid var(--color-border-subtle)',
-                                                    borderRadius: 'var(--radius-md)',
-                                                    boxShadow: 'var(--shadow-dropdown)',
-                                                    minWidth: '140px',
-                                                }}
-                                            >
-                                                <button
-                                                    onClick={() => { toggleApp('analytics'); setShowSettingsMenu(false); }}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '6px 12px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '8px',
-                                                        background: 'transparent',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontSize: '13px',
-                                                        fontWeight: 400,
-                                                        color: 'var(--color-text-primary)',
-                                                        textAlign: 'left',
-                                                        transition: 'background 0.1s ease',
-                                                    }}
-                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                                >
-                                                    <BarChart3 size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
-                                                    <span>Analytics</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => { toggleApp('settings'); setShowSettingsMenu(false); }}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '6px 12px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '8px',
-                                                        background: 'transparent',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontSize: '13px',
-                                                        fontWeight: 400,
-                                                        color: 'var(--color-text-primary)',
-                                                        textAlign: 'left',
-                                                        transition: 'background 0.1s ease',
-                                                    }}
-                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                                >
-                                                    <Settings size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
-                                                    <span>Preferences</span>
-                                                </button>
-                                                <div style={{ height: '1px', background: 'var(--color-border-subtle)', margin: '4px 8px' }} />
-                                                <button
-                                                    onClick={() => setShowFallingLetters(!showFallingLetters)}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '6px 12px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '8px',
-                                                        background: 'transparent',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                        fontSize: '13px',
-                                                        fontWeight: 400,
-                                                        color: 'var(--color-text-primary)',
-                                                        textAlign: 'left',
-                                                        transition: 'background 0.1s ease',
-                                                    }}
-                                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                                >
-                                                    <FileText size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
-                                                    <span>Falling Letters</span>
-                                                    <span style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
-                                                        {showFallingLetters ? 'On' : 'Off'}
-                                                    </span>
-                                                </button>
-                                                {hasOnboarded && (
-                                                    <>
-                                                        <div style={{ height: '1px', background: 'var(--color-border-subtle)', margin: '4px 8px' }} />
-                                                        <button
-                                                            onClick={() => { handleResetDesktop(); setShowSettingsMenu(false); }}
-                                                            style={{
-                                                                width: '100%',
-                                                                padding: '6px 12px',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                gap: '8px',
-                                                                background: 'transparent',
-                                                                border: 'none',
-                                                                cursor: 'pointer',
-                                                                fontSize: '13px',
-                                                                fontWeight: 400,
-                                                                color: 'var(--color-text-primary)',
-                                                                textAlign: 'left',
-                                                                transition: 'background 0.1s ease',
-                                                            }}
-                                                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-                                                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                                        >
-                                                            <RotateCcw size={14} strokeWidth={1.5} style={{ color: 'var(--color-text-secondary)' }} />
-                                                            <span>Reset Desktop</span>
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </motion.div>
+                                            <MenuBarDivider />
+                                            <MenuBarItem
+                                                icon={<RotateCcw size={14} strokeWidth={1.5} />}
+                                                label="Reset Desktop"
+                                                onClick={() => { handleResetDesktop(); menuBar.closeAll(); }}
+                                            />
                                         </>
                                     )}
-                                </AnimatePresence>
+                                </MenuBarDropdown>
                             </div>
                         </div>
 
@@ -4925,18 +4824,20 @@ function GoOSDemoContent() {
                 {/* Desktop View Mode - only show when viewMode is 'desktop' */}
                 {viewMode === 'desktop' && (
                     <>
-                        {/* Decorative Plant (Right side) */}
-                        <motion.div
-                            className="fixed top-16 right-6 z-[30] text-4xl select-none"
-                            animate={{ rotate: [-2, 2, -2] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                            style={{ transformOrigin: 'bottom center' }}
-                        >
-                            🪴
-                        </motion.div>
+                        {/* Decorative Plant (Right side) — hide during build/after onboard */}
+                        {!onboarding.isBuilding && !hasOnboarded && (
+                            <motion.div
+                                className="fixed top-16 right-6 z-[30] text-4xl select-none"
+                                animate={{ rotate: [-2, 2, -2] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                style={{ transformOrigin: 'bottom center' }}
+                            >
+                                🪴
+                            </motion.div>
+                        )}
 
-                        {/* Portfolio Desktop Icons - goOS style (draggable) */}
-                        {items.map((item) => (
+                        {/* Portfolio Desktop Icons — hide during AI build and after onboarding */}
+                        {!onboarding.isBuilding && !hasOnboarded && items.map((item) => (
                             <GoOSDesktopIcon
                                 key={item.id}
                                 id={item.id}
@@ -4949,8 +4850,8 @@ function GoOSDemoContent() {
                             />
                         ))}
 
-                        {/* Portfolio Windows */}
-                        <WindowManager items={items} />
+                        {/* Portfolio Windows — hide during build/after onboard */}
+                        {!onboarding.isBuilding && !hasOnboarded && <WindowManager items={items} />}
 
                         {/* goOS File Icons (desktop - root level only) - with staggered pop-in */}
                         <AnimatePresence mode="sync" initial={false}>
@@ -4996,8 +4897,8 @@ function GoOSDemoContent() {
                             })}
                         </AnimatePresence>
 
-                        {/* Canvas App Desktop Icon - Standalone drawing app */}
-                        <motion.div
+                        {/* Canvas App Desktop Icon — hide during build/after onboard */}
+                        {!onboarding.isBuilding && !hasOnboarded && <motion.div
                             initial={{ opacity: 0, scale: 0.5, y: 30 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             transition={{ ...SPRING.bouncy, delay: 0.3 }}
@@ -5032,7 +4933,7 @@ function GoOSDemoContent() {
                                     onPositionChange={(pos) => handleCanvasPositionChange(pos)}
                                 />
                             </div>
-                        </motion.div>
+                        </motion.div>}
 
                         {/* goOS Widgets - fully functional */}
                         <WidgetRenderer

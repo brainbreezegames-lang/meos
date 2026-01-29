@@ -3,7 +3,6 @@ import { NextRequest } from 'next/server';
 /**
  * Streaming endpoint for intelligent space building
  * Uses Server-Sent Events to stream AI reasoning and progress in real-time
- * Powered by OpenRouter (Kimi-k2 model)
  */
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -66,6 +65,9 @@ FILES (rich content):
 - case-study: Portfolio piece with structured sections (Challenge, Approach, Results)
 - folder: Container to organize related files together
 - embed: Embedded external content (portfolio site, YouTube showreel, Figma prototype, etc.)
+- board: Kanban board with columns and cards — use for plans, workflows, task tracking, learning paths, project pipelines. Pre-fill with REAL useful cards.
+- sheet: Spreadsheet with rows and columns — use for data tables, word lists, price lists, schedules, trackers. Pre-fill with REAL data (at least 10-20 rows).
+- link: URL shortcut on the desktop — use for useful external resources, tools, references. You MUST provide a real valid linkUrl for each link item.
 
 WIDGETS (interactive elements — use when the user needs functional tools, not just content):
 - widget: Interactive widget. You MUST set "widgetType" to one of:
@@ -76,13 +78,17 @@ WIDGETS (interactive elements — use when the user needs functional tools, not 
   - "tipjar" — Support/tip jar for fans and followers
   - "feedback" — Collect visitor feedback and testimonials
 
-IMPORTANT: Create 4-8 items that are SPECIFIC to this user. Mix files AND widgets based on their needs:
+IMPORTANT: Create 6-12 items that are SPECIFIC to this user. Mix files AND widgets based on their needs:
 - An About/Introduction that reflects their personality and niche
 - Portfolio content matching their SPECIFIC work (e.g., "Wedding Shoots" not "Projects")
 - Case studies for their type of work
 - Widgets for functional needs: booking calls → book widget, show availability → status widget, share links → links widget
 - Service descriptions if relevant
 - Blog/writing if they mentioned content creation
+- Board items for planning, tracking, or structured workflows
+- Sheet items for data-heavy content (vocabulary, pricing, schedules, etc.)
+- Link items for useful external resources (tools, references, communities, etc.)
+- Use folders to group related items (e.g., "Resources" folder with links inside, or "Portfolio" folder with case studies)
 
 If the user asks for something that can't be built with available components (custom calculator, store, interactive tool):
 - Create a note as a thoughtful placeholder that acknowledges the need
@@ -90,12 +96,16 @@ If the user asks for something that can't be built with available components (cu
 - Never promise features that don't exist — be honest and helpful
 
 Rules:
-- Create 4-8 items. Be thorough, not lazy.
+- Create 6-12 items. Be thorough, not lazy.
+- Use SHORT, descriptive file names (2-4 words max). Examples: "Learning Plan", "Vocab Sheet", "About Me", "Design Process"
 - Include at least 1 widget if the user has any functional needs (booking, contact, availability, links)
+- Include at least 1 board OR sheet if the user's needs involve structured data, planning, or tracking
+- Include 2-3 link items for relevant external resources (real URLs)
 - Every item must have a CLEAR PURPOSE for THIS specific user
-- Names should be SPECIFIC (not generic like "Projects" or "Work")
 - Content descriptions should reference their actual situation
 - Order items logically (introduction first, then portfolio, then widgets/contact last)
+- For items that belong inside a folder, set parentFolder to the exact folder name
+- For link items, set linkUrl to a real, valid URL
 
 Return JSON:
 {
@@ -103,19 +113,21 @@ Return JSON:
     "summary": "One sentence describing what you're building and why",
     "items": [
       {
-        "type": "note|case-study|folder|embed|widget",
+        "type": "note|case-study|folder|embed|board|sheet|link|widget",
         "widgetType": "status|contact|book|links|tipjar|feedback (ONLY when type is widget, omit otherwise)",
-        "name": "Specific name for this user",
-        "purpose": "Why THIS user needs this (1-2 sentences)",
+        "name": "Short descriptive name (2-4 words)",
+        "purpose": "Why THIS user needs this (1 sentence)",
         "contentBrief": "What should be inside, specific to their situation",
-        "priority": 1-8 (order to create)
+        "priority": 1-12,
+        "linkUrl": "https://... (ONLY for type=link, omit otherwise)",
+        "parentFolder": "Exact folder name if this item belongs in a folder, omit otherwise"
       }
     ]
   },
   "reasoning": "Brief explanation of your overall design decisions"
 }`;
 
-// Phase 3: Content Generation Prompt
+// Phase 3: Content Generation Prompt (HTML for notes/case-studies)
 const CONTENT_PROMPT = `Generate the actual content for this workspace component.
 
 User context:
@@ -140,8 +152,79 @@ For case-studies, include sections: Overview, Challenge, Approach, Results
 
 Return just the HTML content, nothing else.`;
 
+// Phase 3b: Structured content for boards
+const BOARD_CONTENT_PROMPT = `Generate a detailed kanban board for this workspace component.
+
+User context:
+{context}
+
+Board to create:
+- Name: {name}
+- Purpose: {purpose}
+- Brief: {brief}
+
+Create a board that is GENUINELY USEFUL. Pre-fill with REAL content, not placeholders.
+Each column should have 3-6 cards with meaningful titles and descriptions.
+Use checklist items where appropriate for actionable tasks.
+Use card colors to categorize (red, orange, yellow, green, blue, purple, pink, gray).
+
+Return ONLY valid JSON in this exact format:
+{
+  "columns": [
+    {
+      "id": "col-1",
+      "title": "Column Name",
+      "cards": [
+        {
+          "id": "card-1",
+          "title": "Card Title",
+          "description": "Helpful description",
+          "color": "blue",
+          "order": 0,
+          "checklist": [
+            { "id": "cl-1", "text": "Action item", "checked": false }
+          ]
+        }
+      ],
+      "order": 0
+    }
+  ]
+}`;
+
+// Phase 3c: Structured content for sheets
+const SHEET_CONTENT_PROMPT = `Generate spreadsheet data for this workspace component.
+
+User context:
+{context}
+
+Sheet to create:
+- Name: {name}
+- Purpose: {purpose}
+- Brief: {brief}
+
+Create a sheet with REAL, useful data. Include at least 15-25 rows of actual content.
+The first row should be headers.
+Use appropriate cell types (text, number, currency, date, checkbox).
+
+Return ONLY valid JSON in this exact format:
+{
+  "data": [
+    [
+      { "value": "Header 1", "type": "text" },
+      { "value": "Header 2", "type": "text" },
+      { "value": "Header 3", "type": "text" }
+    ],
+    [
+      { "value": "Cell data", "type": "text" },
+      { "value": 42, "type": "number" },
+      { "value": true, "type": "checkbox" }
+    ]
+  ],
+  "frozenRows": 1
+}`;
+
 // Primary: Gemini API (more reliable)
-async function callGemini(prompt: string): Promise<string> {
+async function callGemini(prompt: string, maxTokens = 2000): Promise<string> {
   if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
 
   const response = await fetch(
@@ -153,7 +236,7 @@ async function callGemini(prompt: string): Promise<string> {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 2000,
+          maxOutputTokens: maxTokens,
         },
       }),
     }
@@ -172,7 +255,7 @@ async function callGemini(prompt: string): Promise<string> {
 }
 
 // Fallback: OpenRouter API
-async function callOpenRouter(prompt: string): Promise<string> {
+async function callOpenRouter(prompt: string, maxTokens = 2000): Promise<string> {
   if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not configured');
 
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -187,7 +270,7 @@ async function callOpenRouter(prompt: string): Promise<string> {
       model: OPENROUTER_MODEL,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
-      max_tokens: 2000,
+      max_tokens: maxTokens,
     }),
   });
 
@@ -202,12 +285,12 @@ async function callOpenRouter(prompt: string): Promise<string> {
 }
 
 // Try Gemini first, then OpenRouter, with retries
-async function callAI(prompt: string, retries = 1): Promise<string> {
+async function callAI(prompt: string, retries = 1, maxTokens = 2000): Promise<string> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     // Try Gemini first
     if (GEMINI_API_KEY) {
       try {
-        return await callGemini(prompt);
+        return await callGemini(prompt, maxTokens);
       } catch (err) {
         console.error(`Gemini attempt ${attempt} failed:`, err);
       }
@@ -216,7 +299,7 @@ async function callAI(prompt: string, retries = 1): Promise<string> {
     // Try OpenRouter as fallback
     if (OPENROUTER_API_KEY) {
       try {
-        return await callOpenRouter(prompt);
+        return await callOpenRouter(prompt, maxTokens);
       } catch (err) {
         console.error(`OpenRouter attempt ${attempt} failed:`, err);
       }
@@ -275,6 +358,11 @@ function createFallbackResponse(prompt: string) {
     niche = 'writing';
     folderName = 'Published Work';
     serviceName = 'Writing Services';
+  } else if (lowerPrompt.includes('learn')) {
+    profession = 'learner';
+    niche = 'learning';
+    folderName = 'Resources';
+    serviceName = 'Study Notes';
   }
 
   // Detect functional needs from prompt
@@ -293,6 +381,8 @@ function createFallbackResponse(prompt: string) {
     title: string;
     content: string;
     purpose: string;
+    linkUrl?: string;
+    parentFolder?: string;
   }> = [
     {
       id: `item-${timestamp}-about`,
@@ -301,7 +391,7 @@ function createFallbackResponse(prompt: string) {
       title: 'About Me',
       content: `<h1>Hey, I'm [Your Name]</h1>
 <p>I'm a ${profession} passionate about creating meaningful work in ${niche}.</p>
-<p>My approach combines creativity with purpose—every project is an opportunity to solve problems and create something valuable.</p>
+<p>My approach combines creativity with purpose\u2014every project is an opportunity to solve problems and create something valuable.</p>
 <h2>What I Do</h2>
 <p>I help clients achieve their goals through thoughtful, intentional ${niche}. Whether you need a complete solution or guidance on your next project, I'm here to help.</p>
 <p><strong>Let's work together.</strong></p>`,
@@ -348,6 +438,25 @@ function createFallbackResponse(prompt: string) {
 <p>Every project starts with understanding your needs. From there, we'll work together to create something you'll love.</p>
 <p><strong>Ready to start? Get in touch.</strong></p>`,
       purpose: 'Explain what you offer',
+    },
+    {
+      id: `item-${timestamp}-board`,
+      type: 'file',
+      fileType: 'board',
+      title: 'Project Board',
+      content: JSON.stringify({
+        columns: [
+          { id: 'col-todo', title: 'To Do', cards: [
+            { id: 'c1', title: 'Update portfolio pieces', description: 'Add your latest work', order: 0, color: 'blue' },
+            { id: 'c2', title: 'Write case studies', description: 'Document your process', order: 1, color: 'orange' },
+          ], order: 0 },
+          { id: 'col-progress', title: 'In Progress', cards: [
+            { id: 'c3', title: 'Set up workspace', description: 'Customize your space', order: 0, color: 'green' },
+          ], order: 1 },
+          { id: 'col-done', title: 'Done', cards: [], order: 2 },
+        ],
+      }),
+      purpose: 'Track your workspace setup tasks',
     },
   ];
 
@@ -544,9 +653,63 @@ export async function POST(request: NextRequest) {
             purpose: item.purpose,
           });
 
-          // Generate content for non-widget items
+          // Generate content based on type
           let content = '';
-          if (item.type !== 'widget' && item.type !== 'folder') {
+          const itemType = item.type as string;
+
+          if (itemType === 'widget' || itemType === 'folder' || itemType === 'link') {
+            // No content generation needed for these types
+            content = '';
+          } else if (itemType === 'board') {
+            // Generate structured board content
+            try {
+              const boardPrompt = BOARD_CONTENT_PROMPT
+                .replace('{context}', JSON.stringify(understanding, null, 2))
+                .replace('{name}', item.name as string)
+                .replace('{purpose}', item.purpose as string)
+                .replace('{brief}', item.contentBrief as string);
+
+              const boardRaw = await callAI(boardPrompt, 1, 4000);
+              const boardData = extractJSON(boardRaw);
+              content = JSON.stringify(boardData);
+            } catch (contentError) {
+              console.error(`Board content generation failed for ${item.name}:`, contentError);
+              // Fallback board
+              content = JSON.stringify({
+                columns: [
+                  { id: 'col-1', title: 'To Do', cards: [
+                    { id: 'c1', title: 'Get started', description: 'Add your first items here', order: 0, color: 'blue' },
+                  ], order: 0 },
+                  { id: 'col-2', title: 'In Progress', cards: [], order: 1 },
+                  { id: 'col-3', title: 'Done', cards: [], order: 2 },
+                ],
+              });
+            }
+          } else if (itemType === 'sheet') {
+            // Generate structured sheet content
+            try {
+              const sheetPrompt = SHEET_CONTENT_PROMPT
+                .replace('{context}', JSON.stringify(understanding, null, 2))
+                .replace('{name}', item.name as string)
+                .replace('{purpose}', item.purpose as string)
+                .replace('{brief}', item.contentBrief as string);
+
+              const sheetRaw = await callAI(sheetPrompt, 1, 6000);
+              const sheetData = extractJSON(sheetRaw);
+              content = JSON.stringify(sheetData);
+            } catch (contentError) {
+              console.error(`Sheet content generation failed for ${item.name}:`, contentError);
+              // Fallback empty sheet
+              content = JSON.stringify({
+                data: [
+                  [{ value: 'Item', type: 'text' }, { value: 'Description', type: 'text' }, { value: 'Status', type: 'text' }],
+                  [{ value: 'Example', type: 'text' }, { value: 'Add your data here', type: 'text' }, { value: 'Pending', type: 'text' }],
+                ],
+                frozenRows: 1,
+              });
+            }
+          } else {
+            // HTML content for notes, case-studies, embeds
             try {
               const contentPrompt = CONTENT_PROMPT
                 .replace('{context}', JSON.stringify(understanding, null, 2))
@@ -562,12 +725,11 @@ export async function POST(request: NextRequest) {
               content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
             } catch (contentError) {
               console.error(`Content generation failed for ${item.name}:`, contentError);
-              // Graceful fallback — create with placeholder content
               content = `<h1>${item.name}</h1><p>Add your content here to personalize this section.</p>`;
             }
           }
 
-          const isWidget = item.type === 'widget';
+          const isWidget = itemType === 'widget';
           const builtItem = isWidget
             ? {
                 id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -584,6 +746,8 @@ export async function POST(request: NextRequest) {
                 title: item.name,
                 content,
                 purpose: item.purpose,
+                ...(item.linkUrl ? { linkUrl: item.linkUrl as string } : {}),
+                ...(item.parentFolder ? { parentFolder: item.parentFolder as string } : {}),
               };
 
           builtItems.push(builtItem);

@@ -17,6 +17,8 @@ export interface StreamingBuildItem {
   content?: string;
   purpose?: string;
   config?: Record<string, unknown>;
+  linkUrl?: string;
+  parentFolder?: string;
 }
 
 export function useAIOnboarding() {

@@ -875,7 +875,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        width: 80,
+        width: 100,
         zIndex: isDragging ? 1000 : 10, // Above falling letters (z:1)
         opacity: isAppearing ? 0 : 1,
         transform: isDragging ? 'scale(1.05)' : 'scale(1)',
@@ -909,24 +909,6 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         }}
       >
         {getIcon()}
-
-        {/* Draft indicator - orange dot */}
-        {type !== 'folder' && status === 'draft' && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              width: 10,
-              height: 10,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #ff9500 0%, #ff7722 100%)',
-              border: '1.5px solid #fff',
-              boxShadow: '0 1px 3px rgba(255, 119, 34, 0.4)',
-            }}
-            title="Draft"
-          />
-        )}
 
         {/* Lock indicator */}
         {type !== 'folder' && isLocked && (
@@ -993,8 +975,11 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             textAlign: 'center',
             maxWidth: '100%',
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
+            wordBreak: 'break-word' as const,
+            lineHeight: '1.3',
             padding: '3px 6px',
             borderRadius: 6,
             background: isSelected

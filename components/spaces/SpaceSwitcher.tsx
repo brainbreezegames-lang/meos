@@ -3,7 +3,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChevronDown, Check, Lock, Plus, Settings2 } from 'lucide-react';
-import { SPRING, fadeInDown, REDUCED_MOTION, buttonPress, DURATION } from '@/lib/animations';
+import { SPRING, REDUCED_MOTION, buttonPress, DURATION } from '@/lib/animations';
+import { MenuBarDropdown } from '@/components/menubar';
 
 // ============================================
 // TYPES
@@ -26,6 +27,10 @@ export interface SpaceSwitcherProps {
   onSwitchSpace: (spaceId: string) => void;
   onCreateSpace: () => void;
   onManageSpaces: () => void;
+  // Controlled mode props (from useMenuBarState)
+  isOpen?: boolean;
+  onToggle?: () => void;
+  onMouseEnterTrigger?: () => void;
 }
 
 // ============================================
@@ -46,33 +51,68 @@ export function SpaceSwitcher({
   onSwitchSpace,
   onCreateSpace,
   onManageSpaces,
+  isOpen: controlledIsOpen,
+  onToggle: controlledOnToggle,
+  onMouseEnterTrigger,
 }: SpaceSwitcherProps) {
   const prefersReducedMotion = useReducedMotion();
-  const [isOpen, setIsOpen] = useState(false);
+  const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Support both controlled and uncontrolled modes
+  const isControlled = controlledIsOpen !== undefined;
+  const isOpen = isControlled ? controlledIsOpen : uncontrolledIsOpen;
+  const setIsOpen = isControlled
+    ? () => controlledOnToggle?.()
+    : (v: boolean | ((prev: boolean) => boolean)) => {
+        if (typeof v === 'function') {
+          setUncontrolledIsOpen(v);
+        } else {
+          setUncontrolledIsOpen(v);
+        }
+      };
+
+  const close = () => {
+    if (isControlled) {
+      if (isOpen) controlledOnToggle?.();
+    } else {
+      setUncontrolledIsOpen(false);
+    }
+  };
+
+  const toggle = () => {
+    if (isControlled) {
+      controlledOnToggle?.();
+    } else {
+      setUncontrolledIsOpen((prev) => !prev);
+    }
+  };
 
   const activeSpace = spaces.find(s => s.id === activeSpaceId);
   const sortedSpaces = [...spaces].sort((a, b) => a.order - b.order);
 
-  // Close on outside click
+  // Close on outside click (only in uncontrolled mode)
   useEffect(() => {
-    if (!isOpen) return;
+    if (isControlled || !isOpen) return;
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(e.target as Node) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
+      const target = e.target as HTMLElement;
+      // Check for menubar attributes
+      let el: HTMLElement | null = target;
+      while (el) {
+        if (
+          el.hasAttribute('data-menubar-trigger') ||
+          el.hasAttribute('data-menubar-dropdown')
+        ) {
+          return;
+        }
+        el = el.parentElement;
       }
+      setUncontrolledIsOpen(false);
     };
 
-    // Delay to prevent immediate close
     const timer = setTimeout(() => {
       document.addEventListener('mousedown', handleClickOutside);
     }, 10);
@@ -81,7 +121,7 @@ export function SpaceSwitcher({
       clearTimeout(timer);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isControlled, isOpen]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
@@ -89,7 +129,7 @@ export function SpaceSwitcher({
       if (!isOpen) {
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
           e.preventDefault();
-          setIsOpen(true);
+          toggle();
           setFocusedIndex(0);
         }
         return;
@@ -100,7 +140,7 @@ export function SpaceSwitcher({
       switch (e.key) {
         case 'Escape':
           e.preventDefault();
-          setIsOpen(false);
+          close();
           triggerRef.current?.focus();
           break;
         case 'ArrowDown':
@@ -116,13 +156,13 @@ export function SpaceSwitcher({
           e.preventDefault();
           if (focusedIndex < sortedSpaces.length) {
             onSwitchSpace(sortedSpaces[focusedIndex].id);
-            setIsOpen(false);
+            close();
           } else if (focusedIndex === sortedSpaces.length) {
             onCreateSpace();
-            setIsOpen(false);
+            close();
           } else {
             onManageSpaces();
-            setIsOpen(false);
+            close();
           }
           break;
         case 'Home':
@@ -163,7 +203,7 @@ export function SpaceSwitcher({
 
   const handleSpaceClick = (spaceId: string) => {
     onSwitchSpace(spaceId);
-    setIsOpen(false);
+    close();
   };
 
   return (
@@ -171,13 +211,15 @@ export function SpaceSwitcher({
       {/* Trigger Button */}
       <motion.button
         ref={triggerRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggle}
+        onMouseEnter={onMouseEnterTrigger}
         onKeyDown={handleKeyDown}
         whileHover={buttonPress.hover}
         whileTap={buttonPress.tap}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`Current space: ${activeSpace?.name || 'Select space'}`}
+        data-menubar-trigger="spaces"
         className="flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors"
         style={{
           background: isOpen ? 'var(--color-bg-subtle)' : 'transparent',
@@ -222,240 +264,207 @@ export function SpaceSwitcher({
         </motion.span>
       </motion.button>
 
-      {/* Dropdown Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Invisible backdrop for click-outside */}
-            <div
-              className="fixed inset-0 z-[2000]"
-              onClick={() => setIsOpen(false)}
-            />
+      {/* Dropdown Menu - using shared MenuBarDropdown */}
+      <MenuBarDropdown isOpen={isOpen} width={DROPDOWN_WIDTH}>
+        <div onKeyDown={handleKeyDown}>
+          {/* Spaces List */}
+          <div
+            className="overflow-y-auto"
+            style={{
+              maxHeight: sortedSpaces.length > MAX_VISIBLE_SPACES
+                ? MAX_VISIBLE_SPACES * ITEM_HEIGHT + 12
+                : 'auto',
+            }}
+          >
+            {sortedSpaces.map((space, index) => {
+              const isActive = space.id === activeSpaceId;
+              const isFocused = focusedIndex === index;
 
-            <motion.div
-              ref={menuRef}
-              role="listbox"
-              aria-label="Spaces"
-              variants={fadeInDown}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy}
-              onKeyDown={handleKeyDown}
-              className="absolute top-full left-0 mt-1.5 z-[2001] overflow-hidden"
-              style={{
-                width: DROPDOWN_WIDTH,
-                background: 'var(--color-bg-base)',
-                border: '2px solid var(--color-text-primary)',
-                borderRadius: 10,
-                boxShadow: `
-                  0 4px 6px -1px rgba(23, 20, 18, 0.08),
-                  0 10px 24px -3px rgba(23, 20, 18, 0.15),
-                  0 20px 40px -4px rgba(23, 20, 18, 0.1)
-                `,
-                transformOrigin: 'top left',
-              }}
-            >
-              {/* Spaces List */}
-              <div
-                className="py-1.5 overflow-y-auto"
-                style={{
-                  maxHeight: sortedSpaces.length > MAX_VISIBLE_SPACES
-                    ? MAX_VISIBLE_SPACES * ITEM_HEIGHT + 12
-                    : 'auto',
-                }}
-              >
-                {sortedSpaces.map((space, index) => {
-                  const isActive = space.id === activeSpaceId;
-                  const isFocused = focusedIndex === index;
+              return (
+                <motion.button
+                  key={space.id}
+                  ref={el => { itemRefs.current[index] = el; }}
+                  role="option"
+                  aria-selected={isActive}
+                  onClick={() => handleSpaceClick(space.id)}
+                  initial={false}
+                  animate={{
+                    backgroundColor: isFocused
+                      ? 'var(--color-bg-subtle)'
+                      : 'transparent',
+                  }}
+                  whileHover={{
+                    backgroundColor: 'var(--color-bg-subtle)',
+                  }}
+                  transition={{ duration: 0.08 }}
+                  className="w-full flex items-center gap-2.5 px-3 text-left outline-none"
+                  style={{
+                    height: ITEM_HEIGHT,
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  {/* Emoji Icon */}
+                  <span
+                    className="text-base leading-none select-none w-5 text-center"
+                    style={{
+                      filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.08))',
+                    }}
+                  >
+                    {space.icon}
+                  </span>
 
-                  return (
-                    <motion.button
-                      key={space.id}
-                      ref={el => { itemRefs.current[index] = el; }}
-                      role="option"
-                      aria-selected={isActive}
-                      onClick={() => handleSpaceClick(space.id)}
-                      initial={false}
-                      animate={{
-                        backgroundColor: isFocused
-                          ? 'var(--color-bg-subtle)'
-                          : 'transparent',
-                      }}
-                      whileHover={{
-                        backgroundColor: 'var(--color-bg-subtle)',
-                      }}
-                      transition={{ duration: 0.1 }}
-                      className="w-full flex items-center gap-2.5 px-3 text-left outline-none"
-                      style={{
-                        height: ITEM_HEIGHT,
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontFamily: 'var(--font-body)',
-                      }}
+                  {/* Name + Badge */}
+                  <span className="flex-1 flex items-center gap-1.5 min-w-0">
+                    <span
+                      className="text-[13px] font-medium truncate"
+                      style={{ color: 'var(--color-text-primary)' }}
                     >
-                      {/* Emoji Icon */}
+                      {space.name}
+                    </span>
+
+                    {/* Primary badge */}
+                    {space.isPrimary && (
                       <span
-                        className="text-base leading-none select-none w-5 text-center"
+                        className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
                         style={{
-                          filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.08))',
+                          background: 'var(--color-accent-primary-subtle)',
+                          color: 'var(--color-accent-primary)',
                         }}
                       >
-                        {space.icon}
+                        Main
                       </span>
+                    )}
 
-                      {/* Name + Badge */}
-                      <span className="flex-1 flex items-center gap-1.5 min-w-0">
-                        <span
-                          className="text-[13px] font-medium truncate"
-                          style={{ color: 'var(--color-text-primary)' }}
-                        >
-                          {space.name}
-                        </span>
+                    {/* Private indicator */}
+                    {!space.isPublic && (
+                      <Lock
+                        size={10}
+                        strokeWidth={2.5}
+                        style={{
+                          color: 'var(--color-text-muted)',
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                  </span>
 
-                        {/* Primary badge */}
-                        {space.isPrimary && (
-                          <span
-                            className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                            style={{
-                              background: 'var(--color-accent-primary-subtle)',
-                              color: 'var(--color-accent-primary)',
-                            }}
-                          >
-                            Main
-                          </span>
-                        )}
+                  {/* Keyboard shortcut */}
+                  {index < 9 && (
+                    <span
+                      className="text-[10px] font-mono tracking-tight"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      ⌘{index + 1}
+                    </span>
+                  )}
 
-                        {/* Private indicator */}
-                        {!space.isPublic && (
-                          <Lock
-                            size={10}
-                            strokeWidth={2.5}
-                            style={{
-                              color: 'var(--color-text-muted)',
-                              flexShrink: 0,
-                            }}
-                          />
-                        )}
-                      </span>
-
-                      {/* Keyboard shortcut */}
-                      {index < 9 && (
-                        <span
-                          className="text-[10px] font-mono tracking-tight"
-                          style={{ color: 'var(--color-text-muted)' }}
-                        >
-                          ⌘{index + 1}
-                        </span>
-                      )}
-
-                      {/* Active checkmark */}
-                      <span
-                        className="w-4 flex justify-center"
-                        style={{ color: 'var(--color-accent-primary)' }}
-                      >
-                        {isActive && <Check size={14} strokeWidth={3} />}
-                      </span>
-                    </motion.button>
-                  );
-                })}
-              </div>
-
-              {/* Divider */}
-              <div
-                style={{
-                  height: 1,
-                  background: 'var(--color-border-default)',
-                  margin: '0 8px',
-                }}
-              />
-
-              {/* Actions */}
-              <div className="py-1.5">
-                {/* New Space */}
-                <motion.button
-                  ref={el => { itemRefs.current[sortedSpaces.length] = el; }}
-                  role="option"
-                  onClick={() => {
-                    onCreateSpace();
-                    setIsOpen(false);
-                  }}
-                  initial={false}
-                  animate={{
-                    backgroundColor: focusedIndex === sortedSpaces.length
-                      ? 'var(--color-bg-subtle)'
-                      : 'transparent',
-                  }}
-                  whileHover={{
-                    backgroundColor: 'var(--color-bg-subtle)',
-                  }}
-                  transition={{ duration: 0.1 }}
-                  className="w-full flex items-center gap-2.5 px-3 text-left outline-none"
-                  style={{
-                    height: ITEM_HEIGHT,
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontFamily: 'var(--font-body)',
-                  }}
-                >
+                  {/* Active checkmark */}
                   <span
-                    className="w-5 flex justify-center"
+                    className="w-4 flex justify-center"
                     style={{ color: 'var(--color-accent-primary)' }}
                   >
-                    <Plus size={14} strokeWidth={2.5} />
-                  </span>
-                  <span
-                    className="text-[13px] font-medium"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    New Space...
+                    {isActive && <Check size={14} strokeWidth={3} />}
                   </span>
                 </motion.button>
+              );
+            })}
+          </div>
 
-                {/* Manage Spaces */}
-                <motion.button
-                  ref={el => { itemRefs.current[sortedSpaces.length + 1] = el; }}
-                  role="option"
-                  onClick={() => {
-                    onManageSpaces();
-                    setIsOpen(false);
-                  }}
-                  initial={false}
-                  animate={{
-                    backgroundColor: focusedIndex === sortedSpaces.length + 1
-                      ? 'var(--color-bg-subtle)'
-                      : 'transparent',
-                  }}
-                  whileHover={{
-                    backgroundColor: 'var(--color-bg-subtle)',
-                  }}
-                  transition={{ duration: 0.1 }}
-                  className="w-full flex items-center gap-2.5 px-3 text-left outline-none"
-                  style={{
-                    height: ITEM_HEIGHT,
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontFamily: 'var(--font-body)',
-                  }}
-                >
-                  <span
-                    className="w-5 flex justify-center"
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  >
-                    <Settings2 size={14} strokeWidth={2} />
-                  </span>
-                  <span
-                    className="text-[13px] font-medium"
-                    style={{ color: 'var(--color-text-primary)' }}
-                  >
-                    Manage Spaces...
-                  </span>
-                </motion.button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          {/* Divider */}
+          <div
+            style={{
+              height: 1,
+              background: 'var(--color-border-subtle)',
+              margin: '4px 8px',
+            }}
+          />
+
+          {/* Actions */}
+          <div>
+            {/* New Space */}
+            <motion.button
+              ref={el => { itemRefs.current[sortedSpaces.length] = el; }}
+              role="option"
+              onClick={() => {
+                onCreateSpace();
+                close();
+              }}
+              initial={false}
+              animate={{
+                backgroundColor: focusedIndex === sortedSpaces.length
+                  ? 'var(--color-bg-subtle)'
+                  : 'transparent',
+              }}
+              whileHover={{
+                backgroundColor: 'var(--color-bg-subtle)',
+              }}
+              transition={{ duration: 0.08 }}
+              className="w-full flex items-center gap-2.5 px-3 text-left outline-none"
+              style={{
+                height: ITEM_HEIGHT,
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              <span
+                className="w-5 flex justify-center"
+                style={{ color: 'var(--color-accent-primary)' }}
+              >
+                <Plus size={14} strokeWidth={2.5} />
+              </span>
+              <span
+                className="text-[13px] font-medium"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
+                New Space...
+              </span>
+            </motion.button>
+
+            {/* Manage Spaces */}
+            <motion.button
+              ref={el => { itemRefs.current[sortedSpaces.length + 1] = el; }}
+              role="option"
+              onClick={() => {
+                onManageSpaces();
+                close();
+              }}
+              initial={false}
+              animate={{
+                backgroundColor: focusedIndex === sortedSpaces.length + 1
+                  ? 'var(--color-bg-subtle)'
+                  : 'transparent',
+              }}
+              whileHover={{
+                backgroundColor: 'var(--color-bg-subtle)',
+              }}
+              transition={{ duration: 0.08 }}
+              className="w-full flex items-center gap-2.5 px-3 text-left outline-none"
+              style={{
+                height: ITEM_HEIGHT,
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              <span
+                className="w-5 flex justify-center"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
+                <Settings2 size={14} strokeWidth={2} />
+              </span>
+              <span
+                className="text-[13px] font-medium"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
+                Manage Spaces...
+              </span>
+            </motion.button>
+          </div>
+        </div>
+      </MenuBarDropdown>
     </div>
   );
 }
