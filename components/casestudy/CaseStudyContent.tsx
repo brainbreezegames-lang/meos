@@ -183,7 +183,7 @@ function ContentCallout({ html, variant = 'insight' }: { html: string; variant?:
   };
 
   const bgMap = {
-    insight: 'var(--cs-callout-bg, rgba(255, 119, 34, 0.04))',
+    insight: 'var(--cs-callout-bg, rgba(30, 82, 241, 0.04))',
     warning: 'var(--cs-callout-warning-bg, rgba(232, 163, 23, 0.04))',
     success: 'var(--cs-callout-success-bg, rgba(22, 163, 74, 0.04))',
   };

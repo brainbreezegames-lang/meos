@@ -33,7 +33,7 @@ const colors = {
   tabActiveBg: 'var(--color-bg-white, #ffffff)',
   tabActiveColor: CONTENT.titleColor,
   tabInactiveColor: CONTENT.mutedColor,
-  accentColor: 'var(--color-accent-primary, #ff7722)',
+  accentColor: 'var(--color-accent-primary)',
   buttonBg: 'var(--color-bg-white, #ffffff)',
   imageShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
 };

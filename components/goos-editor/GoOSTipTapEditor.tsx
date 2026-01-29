@@ -633,7 +633,7 @@ export function GoOSTipTapEditor({
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'var(--color-accent-primary-subtle)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 119, 34, 0.3)';
+                  e.currentTarget.style.borderColor = 'var(--color-accent-primary-glow)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'var(--color-bg-subtle)';
@@ -679,7 +679,7 @@ export function GoOSTipTapEditor({
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'var(--color-accent-primary-subtle)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 119, 34, 0.3)';
+                  e.currentTarget.style.borderColor = 'var(--color-accent-primary-glow)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'var(--color-bg-subtle)';
@@ -720,7 +720,7 @@ export function GoOSTipTapEditor({
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'var(--color-accent-primary-subtle)';
-                    e.currentTarget.style.borderColor = 'rgba(255, 119, 34, 0.3)';
+                    e.currentTarget.style.borderColor = 'var(--color-accent-primary-glow)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'var(--color-bg-subtle)';
@@ -974,13 +974,13 @@ export function GoOSTipTapEditor({
 
         /* Text selection - always visible with warm accent */
         .goos-editor-content ::selection {
-          background: rgba(255, 119, 34, 0.25);
-          color: #171412;
+          background: rgba(30, 82, 241, 0.25);
+          color: #1c1c1c;
         }
 
         .goos-editor-content ::-moz-selection {
-          background: rgba(255, 119, 34, 0.25);
-          color: #171412;
+          background: rgba(30, 82, 241, 0.25);
+          color: #1c1c1c;
         }
 
         /* ProseMirror selection state */
@@ -1284,8 +1284,8 @@ export function GoOSTipTapEditor({
 
         .goos-bubble-menu button.is-active {
           background: ${goOSTokens.colors.accent.primary};
-          color: var(--color-text-on-accent, #fbf9ef);
-          box-shadow: 0 2px 8px rgba(255, 119, 34, 0.3);
+          color: var(--color-text-on-accent, #fcfbf8);
+          box-shadow: 0 2px 8px rgba(30, 82, 241, 0.3);
         }
 
         /* Image Menu - appears when image selected */
@@ -1326,7 +1326,7 @@ export function GoOSTipTapEditor({
 
         .goos-image-menu button.is-active {
           background: ${goOSTokens.colors.accent.primary};
-          color: var(--color-text-on-accent, #fbf9ef);
+          color: var(--color-text-on-accent, #fcfbf8);
         }
 
         /* Floating Menu - calm-tech glass style */
@@ -1358,7 +1358,7 @@ export function GoOSTipTapEditor({
 
         .goos-floating-menu button:hover {
           background: ${goOSTokens.colors.accent.pale};
-          border-color: rgba(255, 119, 34, 0.2);
+          border-color: rgba(30, 82, 241, 0.2);
           color: ${goOSTokens.colors.accent.dark};
           transform: translateY(-1px);
         }

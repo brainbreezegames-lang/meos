@@ -43,8 +43,8 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
           <div
             className="menubar-logo w-[18px] h-[18px] rounded-md flex items-center justify-center"
             style={{
-              background: 'var(--color-accent-primary, #ff7722)',
-              boxShadow: '0 1px 2px rgba(255, 119, 34, 0.2)',
+              background: 'var(--color-accent-primary)',
+              boxShadow: '0 1px 2px rgba(30, 82, 241, 0.2)',
             }}
           >
             <svg
@@ -92,7 +92,7 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
           </div>
           <span
             className="menubar-title text-[13px] font-semibold tracking-tight select-none"
-            style={{ color: 'var(--color-text-primary, #171412)' }}
+            style={{ color: 'var(--color-text-primary, #1c1c1c)' }}
           >
             {title}
           </span>
@@ -110,7 +110,7 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
             onClick={onSettingsClick}
             className="menubar-item w-[22px] h-[22px] flex items-center justify-center rounded-md transition-colors"
             style={{
-              color: 'var(--color-text-secondary, #4a4744)',
+              color: 'var(--color-text-secondary, #5f5f5d)',
               background: 'transparent',
             }}
             onMouseEnter={(e) => {
@@ -132,7 +132,7 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
           className="menubar-item w-[14px] h-[14px]"
           viewBox="0 0 24 24"
           fill="none"
-          style={{ color: 'var(--color-text-muted, #8e827c)' }}
+          style={{ color: 'var(--color-text-muted, #8d8d8b)' }}
         >
           <path
             d="M12 18.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5z"
@@ -156,7 +156,7 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
         </svg>
 
         {/* Battery icon */}
-        <div className="menubar-item flex items-center gap-0.5" style={{ color: 'var(--color-text-muted, #8e827c)' }}>
+        <div className="menubar-item flex items-center gap-0.5" style={{ color: 'var(--color-text-muted, #8d8d8b)' }}>
           <div
             className="w-[20px] h-[9px] rounded-[2.5px] border flex items-center p-[1.5px]"
             style={{ borderColor: 'currentColor', borderWidth: '1.5px' }}
@@ -175,7 +175,7 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
         {/* Date */}
         <span
           className="menubar-clock text-[12px] font-medium select-none"
-          style={{ color: 'var(--color-text-secondary, #4a4744)' }}
+          style={{ color: 'var(--color-text-secondary, #5f5f5d)' }}
         >
           {formatDate(currentTime)}
         </span>
@@ -183,7 +183,7 @@ export function MenuBar({ title = 'MeOS', onSettingsClick, rightContent }: MenuB
         {/* Time */}
         <span
           className="menubar-clock text-[12px] font-semibold tabular-nums select-none min-w-[50px] text-right"
-          style={{ color: 'var(--color-text-primary, #171412)' }}
+          style={{ color: 'var(--color-text-primary, #1c1c1c)' }}
         >
           {formatTime(currentTime)}
         </span>

@@ -76,7 +76,7 @@ const THEMES = {
       inset 0 1px 0 rgba(255, 255, 255, 0.05),
       inset 0 0 0 1px rgba(255, 255, 255, 0.04)
     `,
-    submitBg: 'linear-gradient(145deg, #ff7722, #e5691e)',
+    submitBg: 'linear-gradient(145deg, #1e52f1, #0e42dd)',
     submitDisabledBg: '#3a3a38',
     iconStroke: '#707068',
     iconFill: 'url(#bubbleGradDark)',

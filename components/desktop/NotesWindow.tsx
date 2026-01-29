@@ -98,67 +98,67 @@ interface ThemeColors {
 function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
   // ONE design system - Appart theme via CSS variables
   return {
-    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    windowBg: 'var(--color-bg-base, #fcfbf8)',
     windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
     windowShadowInactive: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
     windowBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
 
-    titleBarBg: 'var(--color-bg-base, #fbf9ef)',
+    titleBarBg: 'var(--color-bg-base, #fcfbf8)',
     titleBarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    titleText: 'var(--color-text-primary, #171412)',
-    iconColor: 'var(--color-accent-primary, #ff7722)',
+    titleText: 'var(--color-text-primary, #1c1c1c)',
+    iconColor: 'var(--color-accent-primary)',
 
-    sidebarBg: 'var(--color-bg-subtle, #f2f0e7)',
+    sidebarBg: 'var(--color-bg-subtle, #f7f4ed)',
     sidebarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
     searchBg: 'var(--color-bg-white, #ffffff)',
     searchBgFocused: 'var(--color-bg-white, #ffffff)',
     searchBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    searchBorderFocused: 'var(--color-accent-primary, #ff7722)',
-    searchShadowFocused: '0 0 0 3px var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.15))',
-    searchIcon: 'var(--color-text-muted, #8e827c)',
-    searchIconFocused: 'var(--color-accent-primary, #ff7722)',
-    searchText: 'var(--color-text-primary, #171412)',
+    searchBorderFocused: 'var(--color-accent-primary)',
+    searchShadowFocused: '0 0 0 3px var(--color-accent-primary-light)',
+    searchIcon: 'var(--color-text-muted, #8d8d8b)',
+    searchIconFocused: 'var(--color-accent-primary)',
+    searchText: 'var(--color-text-primary, #1c1c1c)',
 
-    folderText: 'var(--color-text-primary, #171412)',
-    folderCount: 'var(--color-text-muted, #8e827c)',
-    folderHoverBg: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.08))',
+    folderText: 'var(--color-text-primary, #1c1c1c)',
+    folderCount: 'var(--color-text-muted, #8d8d8b)',
+    folderHoverBg: 'var(--color-accent-primary-subtle)',
 
     noteCardBg: 'var(--color-bg-white, #ffffff)',
     noteCardShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
     noteCardHoverShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
-    noteCardSelectedBg: 'var(--color-accent-primary, #ff7722)',
-    noteCardSelectedShadow: 'var(--shadow-badge, 0 4px 16px rgba(255, 119, 34, 0.25))',
-    noteTitle: 'var(--color-text-primary, #171412)',
+    noteCardSelectedBg: 'var(--color-accent-primary)',
+    noteCardSelectedShadow: 'var(--shadow-badge, 0 4px 16px rgba(30, 82, 241, 0.25))',
+    noteTitle: 'var(--color-text-primary, #1c1c1c)',
     noteTitleSelected: 'var(--color-bg-white, #ffffff)',
-    noteDate: 'var(--color-accent-primary, #ff7722)',
+    noteDate: 'var(--color-accent-primary)',
     noteDateSelected: 'rgba(255, 255, 255, 0.9)',
-    notePreview: 'var(--color-text-muted, #8e827c)',
+    notePreview: 'var(--color-text-muted, #8d8d8b)',
     notePreviewSelected: 'rgba(255, 255, 255, 0.8)',
     noteDot: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
     noteDotSelected: 'rgba(255, 255, 255, 0.5)',
 
-    contentBg: 'var(--color-bg-base, #fbf9ef)',
+    contentBg: 'var(--color-bg-base, #fcfbf8)',
     contentHeaderBg: 'transparent',
     contentBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    contentTitle: 'var(--color-text-primary, #171412)',
-    contentMeta: 'var(--color-text-muted, #8e827c)',
-    contentText: 'var(--color-text-primary, #171412)',
+    contentTitle: 'var(--color-text-primary, #1c1c1c)',
+    contentMeta: 'var(--color-text-muted, #8d8d8b)',
+    contentText: 'var(--color-text-primary, #1c1c1c)',
 
-    emptyBg: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.06))',
-    emptyShadow: 'var(--shadow-badge, 0 8px 24px rgba(255, 119, 34, 0.08))',
-    emptyIconColor: 'var(--color-accent-primary, #ff7722)',
-    emptyTitle: 'var(--color-text-primary, #171412)',
-    emptyText: 'var(--color-text-muted, #8e827c)',
+    emptyBg: 'var(--color-accent-primary-subtle, rgba(30, 82, 241, 0.06))',
+    emptyShadow: 'var(--shadow-badge, 0 8px 24px rgba(30, 82, 241, 0.08))',
+    emptyIconColor: 'var(--color-accent-primary)',
+    emptyTitle: 'var(--color-text-primary, #1c1c1c)',
+    emptyText: 'var(--color-text-muted, #8d8d8b)',
 
-    buttonText: 'var(--color-text-muted, #8e827c)',
-    buttonHoverBg: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.08))',
-    buttonHoverText: 'var(--color-text-primary, #171412)',
-    primaryButtonBg: 'var(--color-accent-primary, #ff7722)',
+    buttonText: 'var(--color-text-muted, #8d8d8b)',
+    buttonHoverBg: 'var(--color-accent-primary-subtle)',
+    buttonHoverText: 'var(--color-text-primary, #1c1c1c)',
+    primaryButtonBg: 'var(--color-accent-primary)',
     primaryButtonText: 'var(--color-bg-white, #ffffff)',
-    primaryButtonShadow: 'var(--shadow-badge, 0 4px 12px rgba(255, 119, 34, 0.25))',
+    primaryButtonShadow: 'var(--shadow-badge, 0 4px 12px rgba(30, 82, 241, 0.25))',
 
-    accent: 'var(--color-accent-primary, #ff7722)',
-    accentLight: 'var(--color-accent-primary-subtle, rgba(255, 119, 34, 0.1))',
+    accent: 'var(--color-accent-primary)',
+    accentLight: 'var(--color-accent-primary-subtle, rgba(30, 82, 241, 0.1))',
   };
 }
 
@@ -342,7 +342,7 @@ export function NotesWindow({ window: windowInstance, item }: NotesWindowProps) 
 
             {/* Title */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--color-accent-primary, #ff7722)' }}>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--color-accent-primary)' }}>
                 <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" fill="currentColor" fillOpacity="0.15" />
                 <path d="M7 7H17M7 11H17M7 15H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>

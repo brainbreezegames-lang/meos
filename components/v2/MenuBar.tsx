@@ -50,7 +50,7 @@ export function MenuBar({ appName = 'goOS', rightContent }: MenuBarProps) {
         zIndex: 400,
         fontFamily: 'var(--font-body)',
         fontSize: 13,
-        color: 'var(--color-text-primary, #171412)',
+        color: 'var(--color-text-primary, #1c1c1c)',
         userSelect: 'none',
         WebkitUserSelect: 'none',
       }}
@@ -64,7 +64,7 @@ export function MenuBar({ appName = 'goOS', rightContent }: MenuBarProps) {
           <button
             key={item}
             style={{
-              color: 'var(--color-text-secondary, #4a4744)',
+              color: 'var(--color-text-secondary, #5f5f5d)',
               background: 'transparent',
               border: 'none',
               padding: '4px 8px',
@@ -92,7 +92,7 @@ export function MenuBar({ appName = 'goOS', rightContent }: MenuBarProps) {
           style={{
             fontVariantNumeric: 'tabular-nums',
             fontWeight: 500,
-            color: 'var(--color-text-primary, #171412)',
+            color: 'var(--color-text-primary, #1c1c1c)',
           }}
         >
           {currentTime}

@@ -79,48 +79,48 @@ interface ThemeColors {
 function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
   // ONE design system - Appart theme via CSS variables
   return {
-    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    windowBg: 'var(--color-bg-base, #fcfbf8)',
     windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
     windowShadowInactive: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
     windowBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
 
-    titleBarBg: 'var(--color-bg-base, #fbf9ef)',
+    titleBarBg: 'var(--color-bg-base, #fcfbf8)',
     titleBarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    titleText: 'var(--color-text-primary, #171412)',
-    iconBg: 'var(--color-accent-primary, #ff7722)',
+    titleText: 'var(--color-text-primary, #1c1c1c)',
+    iconBg: 'var(--color-accent-primary)',
     iconColor: 'var(--color-bg-white, #ffffff)',
 
-    sidebarBg: 'var(--color-bg-subtle, #f2f0e7)',
+    sidebarBg: 'var(--color-bg-subtle, #f7f4ed)',
     sidebarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    sectionHeader: 'var(--color-text-muted, #8e827c)',
+    sectionHeader: 'var(--color-text-muted, #8d8d8b)',
     sectionItemBg: 'transparent',
-    sectionItemSelectedBg: 'var(--color-accent-primary, #ff7722)',
-    sectionItemText: 'var(--color-text-primary, #171412)',
+    sectionItemSelectedBg: 'var(--color-accent-primary)',
+    sectionItemText: 'var(--color-text-primary, #1c1c1c)',
     sectionItemSelectedText: 'var(--color-bg-white, #ffffff)',
-    sectionNumber: 'var(--color-text-muted, #8e827c)',
+    sectionNumber: 'var(--color-text-muted, #8d8d8b)',
     sectionNumberBg: 'rgba(23, 20, 18, 0.04)',
     sectionNumberSelectedBg: 'rgba(255, 255, 255, 0.2)',
 
-    contentBg: 'var(--color-bg-base, #fbf9ef)',
-    contentText: 'var(--color-text-primary, #171412)',
-    contentTitle: 'var(--color-text-primary, #171412)',
-    contentSubtitle: 'var(--color-text-muted, #8e827c)',
+    contentBg: 'var(--color-bg-base, #fcfbf8)',
+    contentText: 'var(--color-text-primary, #1c1c1c)',
+    contentTitle: 'var(--color-text-primary, #1c1c1c)',
+    contentSubtitle: 'var(--color-text-muted, #8d8d8b)',
     contentBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
 
     progressBg: 'rgba(23, 20, 18, 0.04)',
-    progressFill: 'var(--color-accent-primary, #ff7722)',
-    progressText: 'var(--color-text-muted, #8e827c)',
+    progressFill: 'var(--color-accent-primary)',
+    progressText: 'var(--color-text-muted, #8d8d8b)',
 
-    buttonText: 'var(--color-text-muted, #8e827c)',
-    buttonHoverBg: 'rgba(255, 119, 34, 0.08)',
+    buttonText: 'var(--color-text-muted, #8d8d8b)',
+    buttonHoverBg: 'var(--color-accent-primary-subtle)',
     buttonDisabledText: 'rgba(23, 20, 18, 0.2)',
 
-    emptyBg: 'rgba(255, 119, 34, 0.06)',
-    emptyIcon: 'var(--color-text-muted, #8e827c)',
-    emptyTitle: 'var(--color-text-primary, #171412)',
-    emptyText: 'var(--color-text-muted, #8e827c)',
+    emptyBg: 'var(--color-accent-primary-muted)',
+    emptyIcon: 'var(--color-text-muted, #8d8d8b)',
+    emptyTitle: 'var(--color-text-primary, #1c1c1c)',
+    emptyText: 'var(--color-text-muted, #8d8d8b)',
 
-    accent: 'var(--color-accent-primary, #ff7722)',
+    accent: 'var(--color-accent-primary)',
   };
 }
 

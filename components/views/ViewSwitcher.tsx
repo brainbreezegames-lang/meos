@@ -8,13 +8,13 @@ import type { ViewMode } from '@/types';
 // goOS Design Tokens - Brand Appart (uses CSS variables)
 const goOS = {
   colors: {
-    paper: 'var(--color-bg-base, #fbf9ef)',
-    border: 'var(--color-text-primary, #171412)',
+    paper: 'var(--color-bg-base, #fcfbf8)',
+    border: 'var(--color-text-primary, #1c1c1c)',
     text: {
-      primary: 'var(--color-text-primary, #171412)',
-      secondary: 'var(--color-text-muted, #8e827c)',
+      primary: 'var(--color-text-primary, #1c1c1c)',
+      secondary: 'var(--color-text-muted, #8d8d8b)',
     },
-    accent: 'var(--color-accent-primary, #ff7722)',
+    accent: 'var(--color-accent-primary)',
   },
 };
 

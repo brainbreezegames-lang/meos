@@ -436,7 +436,7 @@ export function BrowserWindow({ window: windowInstance, item }: BrowserWindowPro
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap"
                             style={{
                               background: blockPickerCategory === cat.id ? 'var(--accent-primary)' : 'transparent',
-                              color: blockPickerCategory === cat.id ? 'var(--color-text-on-accent, #fbf9ef)' : 'var(--text-secondary)',
+                              color: blockPickerCategory === cat.id ? 'var(--color-text-on-accent, #fcfbf8)' : 'var(--text-secondary)',
                             }}
                           >
                             <span>{cat.icon}</span>

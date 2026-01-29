@@ -77,41 +77,41 @@ interface ThemeColors {
 function getThemeColors(_themeId: ThemeId | undefined): ThemeColors {
   // ONE design system - Appart theme via CSS variables
   return {
-    windowBg: 'var(--color-bg-base, #fbf9ef)',
+    windowBg: 'var(--color-bg-base, #fcfbf8)',
     windowShadow: 'var(--shadow-window, 0 2px 4px rgba(23, 20, 18, 0.04), 0 12px 32px rgba(23, 20, 18, 0.12), 0 24px 60px rgba(23, 20, 18, 0.08))',
     windowShadowInactive: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
 
-    titleBarBg: 'var(--color-bg-base, #fbf9ef)',
+    titleBarBg: 'var(--color-bg-base, #fcfbf8)',
     titleBarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    titleText: 'var(--color-text-primary, #171412)',
-    badgeBg: 'rgba(255, 119, 34, 0.1)',
-    badgeText: 'var(--color-accent-primary, #ff7722)',
+    titleText: 'var(--color-text-primary, #1c1c1c)',
+    badgeBg: 'var(--color-accent-primary-subtle)',
+    badgeText: 'var(--color-accent-primary)',
 
-    toolbarBg: 'var(--color-bg-subtle, #f2f0e7)',
+    toolbarBg: 'var(--color-bg-subtle, #f7f4ed)',
     toolbarBorder: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
-    toolbarText: 'var(--color-text-muted, #8e827c)',
-    toolbarHoverBg: 'rgba(255, 119, 34, 0.08)',
-    toolbarActiveBg: 'var(--color-accent-primary, #ff7722)',
+    toolbarText: 'var(--color-text-muted, #8d8d8b)',
+    toolbarHoverBg: 'var(--color-accent-primary-subtle)',
+    toolbarActiveBg: 'var(--color-accent-primary)',
     toolbarActiveText: 'var(--color-bg-white, #ffffff)',
 
-    contentBg: 'var(--color-bg-base, #fbf9ef)',
+    contentBg: 'var(--color-bg-base, #fcfbf8)',
     photoCardBg: 'var(--color-bg-white, #ffffff)',
     photoCardShadow: 'var(--shadow-sm, 0 2px 8px rgba(23, 20, 18, 0.06))',
     photoCardHoverShadow: 'var(--shadow-md, 0 4px 20px rgba(23, 20, 18, 0.08))',
     photoOverlay: 'linear-gradient(180deg, transparent 60%, rgba(23, 20, 18, 0.6) 100%)',
 
-    emptyBg: 'rgba(255, 119, 34, 0.06)',
-    emptyIcon: 'var(--color-text-muted, #8e827c)',
-    emptyTitle: 'var(--color-text-primary, #171412)',
-    emptyText: 'var(--color-text-muted, #8e827c)',
+    emptyBg: 'var(--color-accent-primary-muted)',
+    emptyIcon: 'var(--color-text-muted, #8d8d8b)',
+    emptyTitle: 'var(--color-text-primary, #1c1c1c)',
+    emptyText: 'var(--color-text-muted, #8d8d8b)',
 
     lightboxBg: 'rgba(251, 249, 239, 0.98)',
-    lightboxText: 'var(--color-text-primary, #171412)',
+    lightboxText: 'var(--color-text-primary, #1c1c1c)',
     lightboxButtonBg: 'rgba(23, 20, 18, 0.08)',
     lightboxButtonHoverBg: 'rgba(23, 20, 18, 0.15)',
 
-    accent: 'var(--color-accent-primary, #ff7722)',
-    favoriteColor: 'var(--color-accent-primary, #ff7722)',
+    accent: 'var(--color-accent-primary)',
+    favoriteColor: 'var(--color-accent-primary)',
   };
 }
 
@@ -372,7 +372,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                               className="w-4 h-4"
                               fill={favorites.has(photo.id) ? colors.favoriteColor : 'none'}
                               viewBox="0 0 24 24"
-                              stroke={favorites.has(photo.id) ? colors.favoriteColor : 'var(--color-bg-base, #fbf9ef)'}
+                              stroke={favorites.has(photo.id) ? colors.favoriteColor : 'var(--color-bg-base, #fcfbf8)'}
                               strokeWidth={2}
                             >
                               <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -380,7 +380,7 @@ export function PhotosWindow({ window: windowInstance, item }: PhotosWindowProps
                           </button>
                           {/* Caption on hover */}
                           <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <p className="text-xs font-medium truncate" style={{ color: 'var(--color-bg-base, #fbf9ef)' }}>{photo.alt}</p>
+                            <p className="text-xs font-medium truncate" style={{ color: 'var(--color-bg-base, #fcfbf8)' }}>{photo.alt}</p>
                           </div>
                         </>
                       ) : (

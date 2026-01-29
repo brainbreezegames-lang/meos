@@ -312,7 +312,7 @@ export function ColliderEditor() {
             onClick={() => setCurrentLetter(i)}
             style={{
               padding: '8px 16px',
-              background: i === currentLetter ? '#ff7722' : '#333',
+              background: i === currentLetter ? 'var(--color-accent-primary)' : '#333',
               border: 'none',
               borderRadius: 6,
               color: '#fff',

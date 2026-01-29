@@ -74,10 +74,10 @@ function CaseStudyIcon() {
       <rect x="10" y="9" width="24" height="15" rx="2" fill="url(#screenGradient)" />
       {/* Chart bars */}
       <rect x="13" y="18" width="4" height="4" rx="0.5" fill="#3d2fa9" opacity="0.9" />
-      <rect x="19" y="14" width="4" height="8" rx="0.5" fill="#ff7722" opacity="0.9" />
+      <rect x="19" y="14" width="4" height="8" rx="0.5" fill="var(--color-accent-primary)" opacity="0.9" />
       <rect x="25" y="16" width="4" height="6" rx="0.5" fill="#3d2fa9" opacity="0.7" />
       {/* Chart line overlay */}
-      <path d="M13 17L17 15L23 13L29 14" stroke="#ff7722" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
+      <path d="M13 17L17 15L23 13L29 14" stroke="var(--color-accent-primary)" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.7" />
       {/* Stand */}
       <path d="M22 30V36" stroke="rgba(23, 20, 18, 0.25)" strokeWidth="2" strokeLinecap="round" />
       <ellipse cx="22" cy="37" rx="6" ry="2" fill="rgba(23, 20, 18, 0.1)" />
@@ -328,7 +328,7 @@ function GameIcon() {
           <rect x="8.5" y="10.5" width="3" height="1" rx="0.5" fill="#28c840" />
           <rect x="9.5" y="9.5" width="1" height="3" rx="0.5" fill="#28c840" />
           {/* Buttons */}
-          <circle cx="14" cy="10" r="0.8" fill="#ff7722" />
+          <circle cx="14" cy="10" r="0.8" fill="var(--color-accent-primary)" />
           <circle cx="15.5" cy="11" r="0.8" fill="#3d2fa9" />
           <circle cx="14" cy="12" r="0.8" fill="#22c55e" />
           <circle cx="12.5" cy="11" r="0.8" fill="#f59e0b" />
@@ -343,7 +343,7 @@ function GameIcon() {
           width: 18,
           height: 18,
           borderRadius: 6,
-          background: 'linear-gradient(145deg, #ff8a4c 0%, #ff7722 100%)',
+          background: 'linear-gradient(145deg, #ff8a4c 0%, #1e52f1 100%)',
           border: '2px solid #fff',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
           display: 'flex',
@@ -661,7 +661,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
                 width: 18,
                 height: 18,
                 borderRadius: 6,
-                background: 'linear-gradient(145deg, #ff8a4c 0%, #ff7722 100%)',
+                background: 'linear-gradient(145deg, #ff8a4c 0%, #1e52f1 100%)',
                 border: '2px solid #fff',
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
                 display: 'flex',
@@ -715,7 +715,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
           <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="6" y="8" width="32" height="28" rx="3" fill="rgba(23, 20, 18, 0.08)" transform="translate(1, 1)" />
             <rect x="6" y="8" width="32" height="28" rx="3" fill="url(#imgGradient)" />
-            <circle cx="15" cy="17" r="4" fill="#ff7722" opacity="0.8" />
+            <circle cx="15" cy="17" r="4" fill="var(--color-accent-primary)" opacity="0.8" />
             <path d="M6 28L14 22L20 26L28 18L38 26V33C38 34.6569 36.6569 36 35 36H9C7.34315 36 6 34.6569 6 33V28Z" fill="#22c55e" opacity="0.7" />
             <rect x="6" y="8" width="32" height="28" rx="3" stroke="rgba(23, 20, 18, 0.15)" strokeWidth="1" fill="none" />
             <defs>
@@ -971,11 +971,11 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             fontWeight: 500,
             textAlign: 'center',
             background: 'var(--bg-elevated, #fff)',
-            color: 'var(--text-primary, #171412)',
-            border: '2px solid var(--color-accent-primary, #ff7722)',
+            color: 'var(--text-primary, #1c1c1c)',
+            border: '2px solid var(--color-accent-primary)',
             borderRadius: 6,
             outline: 'none',
-            boxShadow: '0 2px 8px rgba(255, 119, 34, 0.2)',
+            boxShadow: '0 2px 8px rgba(30, 82, 241, 0.2)',
           }}
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
@@ -998,7 +998,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
             padding: '3px 6px',
             borderRadius: 6,
             background: isSelected
-              ? 'var(--color-accent-primary, #ff7722)'
+              ? 'var(--color-accent-primary)'
               : 'var(--label-bg, rgba(0, 0, 0, 0.4))',
             backdropFilter: isSelected ? 'none' : 'var(--label-blur, blur(12px) saturate(150%))',
             WebkitBackdropFilter: isSelected ? 'none' : 'var(--label-blur, blur(12px) saturate(150%))',

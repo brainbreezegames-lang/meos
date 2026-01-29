@@ -301,7 +301,7 @@ export function GoOSDesktopContextMenu({
                       fontSize: '12px',
                       fontWeight: 500,
                       color: isPressed
-                        ? 'var(--color-text-on-accent, #fbf9ef)'
+                        ? 'var(--color-text-on-accent, #fcfbf8)'
                         : item.disabled
                         ? 'var(--color-text-muted)'
                         : 'var(--color-text-primary)',
@@ -317,7 +317,7 @@ export function GoOSDesktopContextMenu({
                         justifyContent: 'center',
                         width: 18,
                         color: isPressed
-                          ? 'var(--color-text-on-accent, #fbf9ef)'
+                          ? 'var(--color-text-on-accent, #fcfbf8)'
                           : isHovered
                           ? 'var(--color-accent-primary)'
                           : 'var(--color-text-secondary)',

@@ -48,7 +48,7 @@ export const TITLE_BAR = {
   // Title text
   titleFontSize: 13,
   titleFontWeight: 500,
-  titleColor: 'var(--color-text-primary, #171412)',
+  titleColor: 'var(--color-text-primary, #1c1c1c)',
   titleLetterSpacing: '-0.01em',
   titleOpacityActive: 0.7,
   titleOpacityInactive: 0.5,
@@ -143,17 +143,17 @@ export const CONTENT = {
   // Typography
   titleFontSize: 17,
   titleFontWeight: 600,
-  titleColor: 'var(--color-text-primary, #171412)',
+  titleColor: 'var(--color-text-primary, #1c1c1c)',
   titleLetterSpacing: '-0.02em',
 
   subtitleFontSize: 13,
-  subtitleColor: 'var(--color-text-muted, #8e827c)',
+  subtitleColor: 'var(--color-text-muted, #8d8d8b)',
 
   bodyFontSize: 14,
-  bodyColor: 'var(--color-text-primary, #171412)',
+  bodyColor: 'var(--color-text-primary, #1c1c1c)',
   bodyLineHeight: 1.5,
 
-  mutedColor: 'var(--color-text-muted, #8e827c)',
+  mutedColor: 'var(--color-text-muted, #8d8d8b)',
   borderColor: 'var(--color-border-default, rgba(23, 20, 18, 0.08))',
 } as const;
 

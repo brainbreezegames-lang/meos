@@ -144,7 +144,7 @@ export function ClockWidgetEditor({ widget, onSave, onClose, isOpen }: ClockWidg
                           borderRadius: 10,
                           textAlign: 'left',
                           background: isSelected
-                            ? 'var(--color-accent-primary, #ff7722)'
+                            ? 'var(--color-accent-primary)'
                             : 'var(--color-bg-secondary, rgba(0,0,0,0.04))',
                           border: 'none',
                           cursor: 'pointer',
@@ -207,7 +207,7 @@ export function ClockWidgetEditor({ widget, onSave, onClose, isOpen }: ClockWidg
                       fontSize: 13,
                       fontWeight: 500,
                       background: format === '12h'
-                        ? 'var(--color-accent-primary, #ff7722)'
+                        ? 'var(--color-accent-primary)'
                         : 'var(--color-bg-secondary, rgba(0,0,0,0.04))',
                       color: format === '12h' ? '#fff' : 'var(--color-text-primary, #666)',
                       border: 'none',
@@ -226,7 +226,7 @@ export function ClockWidgetEditor({ widget, onSave, onClose, isOpen }: ClockWidg
                       fontSize: 13,
                       fontWeight: 500,
                       background: format === '24h'
-                        ? 'var(--color-accent-primary, #ff7722)'
+                        ? 'var(--color-accent-primary)'
                         : 'var(--color-bg-secondary, rgba(0,0,0,0.04))',
                       color: format === '24h' ? '#fff' : 'var(--color-text-primary, #666)',
                       border: 'none',
@@ -274,7 +274,7 @@ export function ClockWidgetEditor({ widget, onSave, onClose, isOpen }: ClockWidg
                   fontSize: 13,
                   fontWeight: 600,
                   color: '#fff',
-                  background: 'var(--color-accent-primary, #ff7722)',
+                  background: 'var(--color-accent-primary)',
                   border: 'none',
                   cursor: 'pointer',
                 }}

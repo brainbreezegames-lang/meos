@@ -246,7 +246,7 @@ export function WidgetContextMenu({
                 borderRadius: '50%',
                 background: widget.isVisible
                   ? 'var(--color-success, #22c55e)'
-                  : 'var(--color-text-muted, #8e827c)',
+                  : 'var(--color-text-muted, #8d8d8b)',
                 flexShrink: 0,
               }}
             />
@@ -255,7 +255,7 @@ export function WidgetContextMenu({
                 fontSize: '11px',
                 fontWeight: 600,
                 fontFamily: 'var(--font-body)',
-                color: 'var(--color-text-secondary, #4a4744)',
+                color: 'var(--color-text-secondary, #5f5f5d)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.03em',
               }}
@@ -298,11 +298,11 @@ export function WidgetContextMenu({
                     backgroundColor: isPressed
                       ? item.danger
                         ? 'var(--color-error, #ff3c34)'
-                        : 'var(--color-accent-primary, #ff7722)'
+                        : 'var(--color-accent-primary)'
                       : isHovered
                         ? item.danger
                           ? 'rgba(255, 60, 52, 0.1)'
-                          : 'var(--color-bg-subtle, #f2f0e7)'
+                          : 'var(--color-bg-subtle, #f7f4ed)'
                         : 'transparent',
                     scale: isPressed ? 0.98 : 1,
                   }}
@@ -324,10 +324,10 @@ export function WidgetContextMenu({
                     color: isPressed
                       ? '#fff'
                       : item.disabled
-                        ? 'var(--color-text-muted, #8e827c)'
+                        ? 'var(--color-text-muted, #8d8d8b)'
                         : item.danger
                           ? 'var(--color-error, #ff3c34)'
-                          : 'var(--color-text-primary, #171412)',
+                          : 'var(--color-text-primary, #1c1c1c)',
                     opacity: item.disabled ? 0.5 : 1,
                     textAlign: 'left',
                     outline: 'none',
@@ -342,10 +342,10 @@ export function WidgetContextMenu({
                       color: isPressed
                         ? '#fff'
                         : isHovered && !item.danger
-                          ? 'var(--color-accent-primary, #ff7722)'
+                          ? 'var(--color-accent-primary)'
                           : item.danger
                             ? 'var(--color-error, #ff3c34)'
-                            : 'var(--color-text-secondary, #4a4744)',
+                            : 'var(--color-text-secondary, #5f5f5d)',
                       transition: 'color 0.1s ease',
                     }}
                     aria-hidden="true"
@@ -358,7 +358,7 @@ export function WidgetContextMenu({
                       style={{
                         fontSize: '10px',
                         fontWeight: 500,
-                        color: isPressed ? 'rgba(255,255,255,0.7)' : 'var(--color-text-muted, #8e827c)',
+                        color: isPressed ? 'rgba(255,255,255,0.7)' : 'var(--color-text-muted, #8d8d8b)',
                         fontFamily: 'var(--font-mono)',
                       }}
                     >

@@ -325,11 +325,11 @@ export function GoOSFileContextMenu({
                     backgroundColor: isPressed
                       ? item.danger
                         ? 'rgba(239, 68, 68, 0.15)'
-                        : 'rgba(255, 119, 34, 0.15)'
+                        : 'var(--color-accent-primary-light)'
                       : isHovered
                       ? item.danger
                         ? 'rgba(239, 68, 68, 0.08)'
-                        : 'rgba(255, 119, 34, 0.08)'
+                        : 'var(--color-accent-primary-subtle)'
                       : 'rgba(255, 255, 255, 0)',
                     scale: isPressed ? 0.98 : 1,
                   }}
