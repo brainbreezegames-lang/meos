@@ -422,28 +422,38 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
           }}
         >
           {/* ─── Progress bar ─── */}
-          {phase !== 'complete' && phase !== 'error' && (
-            <div
-              style={{
-                height: 2,
-                background: 'var(--color-border-subtle)',
-                borderRadius: 'var(--radius-full)',
-                overflow: 'hidden',
-                flexShrink: 0,
-              }}
-            >
+          <AnimatePresence>
+            {phase !== 'complete' && phase !== 'error' && (
               <motion.div
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: EASE.out }}
                 style={{
-                  height: '100%',
-                  background: 'var(--color-accent-primary)',
+                  height: 2,
+                  background: 'var(--color-border-subtle)',
                   borderRadius: 'var(--radius-full)',
-                  transformOrigin: 'left',
+                  overflow: 'hidden',
+                  flexShrink: 0,
                 }}
-                animate={{ scaleX: phaseProgress }}
-                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-              />
-            </div>
-          )}
+              >
+                <motion.div
+                  style={{
+                    height: '100%',
+                    background: 'var(--color-accent-primary)',
+                    borderRadius: 'var(--radius-full)',
+                    transformOrigin: 'left',
+                  }}
+                  animate={{
+                    scaleX: phaseProgress,
+                    opacity: prefersReducedMotion ? 1 : [1, 0.5, 1],
+                  }}
+                  transition={{
+                    scaleX: { duration: 0.6, ease: EASE.expo },
+                    opacity: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ─── Header ─── */}
           <div style={{ padding: 'var(--space-4) var(--space-5) var(--space-2)' }}>
@@ -576,26 +586,30 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                   exit={{ opacity: 0 }}
                   style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4, paddingBottom: 4 }}
                 >
-                  {thinkingLines.slice(-3).map((line, i, arr) => (
-                    <motion.p
-                      key={`${line}-${i}`}
-                      initial={{ opacity: 0, x: -6 }}
-                      animate={{
-                        opacity: i === arr.length - 1 ? 0.7 : 0.35,
-                        x: 0,
-                      }}
-                      style={{
-                        fontSize: 'var(--font-size-xs)',
-                        fontFamily: 'var(--font-body)',
-                        lineHeight: 'var(--line-height-normal)',
-                        color: 'var(--color-text-muted)',
-                        fontStyle: 'italic',
-                        margin: 0,
-                      }}
-                    >
-                      {line}
-                    </motion.p>
-                  ))}
+                  {thinkingLines.slice(-3).map((line, i, arr) => {
+                    const isLatest = i === arr.length - 1;
+                    return (
+                      <motion.p
+                        key={`${line}-${i}`}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{
+                          opacity: isLatest ? 0.7 : 0.3,
+                          y: 0,
+                        }}
+                        transition={isLatest ? SPRING.snappy : { duration: DURATION.normal, ease: EASE.out }}
+                        style={{
+                          fontSize: 'var(--font-size-xs)',
+                          fontFamily: 'var(--font-body)',
+                          lineHeight: 'var(--line-height-normal)',
+                          color: 'var(--color-text-muted)',
+                          fontStyle: 'italic',
+                          margin: 0,
+                        }}
+                      >
+                        {line}
+                      </motion.p>
+                    );
+                  })}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -679,7 +693,7 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                           key={kw}
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: i * 0.05 }}
+                          transition={{ delay: i * 0.05, ...SPRING.snappy }}
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -757,12 +771,29 @@ export function GooseBuilder({ isActive, prompt, onItemCreated, onComplete, onWa
                           transition={{ delay: idx * 0.04, ...SPRING.snappy }}
                           className="flex items-center"
                           style={{
+                            position: 'relative',
                             gap: 'var(--space-2)',
                             padding: '4px var(--space-2)',
                             borderRadius: 'var(--radius-sm)',
                             background: isCurrBuilding ? 'var(--color-accent-primary-subtle)' : 'transparent',
                           }}
                         >
+                          {/* Sliding accent indicator */}
+                          {isCurrBuilding && !prefersReducedMotion && (
+                            <motion.div
+                              layoutId="active-build-indicator"
+                              style={{
+                                position: 'absolute',
+                                left: 0,
+                                top: 2,
+                                bottom: 2,
+                                width: 2,
+                                borderRadius: 'var(--radius-full)',
+                                background: 'var(--color-accent-primary)',
+                              }}
+                              transition={SPRING.snappy}
+                            />
+                          )}
                           {/* Status indicator */}
                           <div className="flex-shrink-0 flex items-center justify-center" style={{ width: 16, height: 16 }}>
                             {isCreated ? (
