@@ -66,6 +66,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       parentId: item.parentItemId,
       position: { x: item.positionX, y: item.positionY },
       childCount: item._count.children,
+      // Link fields
+      linkUrl: item.goosLinkUrl,
+      linkTitle: item.goosLinkTitle,
+      linkDescription: item.goosLinkDescription,
+      // Image fields
+      imageUrl: item.goosImageUrl,
+      imageAlt: item.goosImageAlt,
+      imageCaption: item.goosImageCaption,
     };
 
     return NextResponse.json({ success: true, data: file });
@@ -182,6 +190,28 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       updateData.parentItemId = validatedData.parentId;
     }
 
+    // Link fields
+    if (validatedData.linkUrl !== undefined) {
+      updateData.goosLinkUrl = validatedData.linkUrl;
+    }
+    if (validatedData.linkTitle !== undefined) {
+      updateData.goosLinkTitle = validatedData.linkTitle;
+    }
+    if (validatedData.linkDescription !== undefined) {
+      updateData.goosLinkDescription = validatedData.linkDescription;
+    }
+
+    // Image fields
+    if (validatedData.imageUrl !== undefined) {
+      updateData.goosImageUrl = validatedData.imageUrl;
+    }
+    if (validatedData.imageAlt !== undefined) {
+      updateData.goosImageAlt = validatedData.imageAlt;
+    }
+    if (validatedData.imageCaption !== undefined) {
+      updateData.goosImageCaption = validatedData.imageCaption;
+    }
+
     const item = await prisma.desktopItem.update({
       where: { id },
       data: updateData,
@@ -205,6 +235,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       parentId: item.parentItemId,
       position: { x: item.positionX, y: item.positionY },
       childCount: item._count.children,
+      // Link fields
+      linkUrl: item.goosLinkUrl,
+      linkTitle: item.goosLinkTitle,
+      linkDescription: item.goosLinkDescription,
+      // Image fields
+      imageUrl: item.goosImageUrl,
+      imageAlt: item.goosImageAlt,
+      imageCaption: item.goosImageCaption,
     };
 
     return NextResponse.json({ success: true, data: file });

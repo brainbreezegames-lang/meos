@@ -223,6 +223,14 @@ export async function POST(request: NextRequest) {
         positionY: validatedData.position.y,
         parentItemId: validatedData.parentId || null,
         publishStatus: 'draft',
+        // Link fields
+        goosLinkUrl: validatedData.linkUrl || null,
+        goosLinkTitle: validatedData.linkTitle || null,
+        goosLinkDescription: validatedData.linkDescription || null,
+        // Image fields
+        goosImageUrl: validatedData.imageUrl || null,
+        goosImageAlt: validatedData.imageAlt || null,
+        goosImageCaption: validatedData.imageCaption || null,
       },
     });
 
@@ -239,6 +247,14 @@ export async function POST(request: NextRequest) {
       parentId: item.parentItemId,
       position: { x: item.positionX, y: item.positionY },
       childCount: 0,
+      // Link fields
+      linkUrl: item.goosLinkUrl,
+      linkTitle: item.goosLinkTitle,
+      linkDescription: item.goosLinkDescription,
+      // Image fields
+      imageUrl: item.goosImageUrl,
+      imageAlt: item.goosImageAlt,
+      imageCaption: item.goosImageCaption,
     };
 
     return NextResponse.json({ success: true, data: file });
