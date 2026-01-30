@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-// Allow up to 5 minutes for custom-app generation (multiple AI calls per build)
+// Allow up to 5 minutes for multi-step AI generation
 export const maxDuration = 300;
 
 /**
@@ -71,7 +71,6 @@ FILES (rich content):
 - board: Kanban board with columns and cards — use for plans, workflows, task tracking, learning paths, project pipelines. Pre-fill with REAL useful cards.
 - sheet: Spreadsheet with rows and columns — use for data tables, word lists, price lists, schedules, trackers. Pre-fill with REAL data (at least 10-20 rows).
 - link: URL shortcut on the desktop — use for useful external resources, tools, references. You MUST provide a real valid linkUrl for each link item.
-- custom-app: Self-contained interactive HTML app (inline CSS + JS). Use for tools, utilities, mini-apps that need genuine interactivity: Pomodoro timer, habit tracker, invoice calculator, CRM dashboard, unit converter, color picker, mood journal, workout logger, recipe scaler, budget planner, etc. ONLY use custom-app when the user needs real interactivity (buttons, inputs, state changes, timers). For static content, use note or case-study instead.
 
 WIDGETS (interactive elements — use when the user needs functional tools, not just content):
 - widget: Interactive widget. You MUST set "widgetType" to one of:
@@ -94,7 +93,10 @@ IMPORTANT: Create 6-12 items that are SPECIFIC to this user. Mix files AND widge
 - Link items for useful external resources (tools, references, communities, etc.)
 - Use folders to group related items (e.g., "Resources" folder with links inside, or "Portfolio" folder with case studies)
 
-If the user asks for interactive tools or mini-apps (calculator, timer, tracker, CRM, planner, etc.), use the "custom-app" type. These generate fully functional self-contained HTML/CSS/JS applications that run inside the desktop.
+If the user asks for something that can't be built with available components (custom calculator, store, interactive tool):
+- Create a note as a thoughtful placeholder that acknowledges the need
+- Describe what the tool would do and suggest a workaround
+- Never promise features that don't exist — be honest and helpful
 
 SPATIAL LAYOUT: Items will be placed on a 4x4 desktop grid (16 positions). Consider visual grouping:
 - Place introductory items (About, Bio) in the top-left area (priority 1-2)
@@ -122,7 +124,7 @@ Return JSON:
     "summary": "One sentence describing what you're building and why",
     "items": [
       {
-        "type": "note|case-study|folder|embed|board|sheet|link|custom-app|widget",
+        "type": "note|case-study|folder|embed|board|sheet|link|widget",
         "widgetType": "status|contact|book|links|tipjar|feedback (ONLY when type is widget, omit otherwise)",
         "name": "Short descriptive name (2-4 words)",
         "purpose": "Why THIS user needs this (1 sentence)",
@@ -235,43 +237,6 @@ Return ONLY valid JSON in this exact format:
   "frozenRows": 1
 }`;
 
-// Phase 3d: Content for custom apps (self-contained HTML/CSS/JS)
-const CUSTOM_APP_CONTENT_PROMPT = `Generate a complete, self-contained interactive HTML application.
-
-User context:
-{context}
-
-App to create:
-- Name: {name}
-- Purpose: {purpose}
-- Brief: {brief}
-
-Requirements:
-1. Return ONLY the HTML content that goes inside <body> — no <html>, <head>, or <body> tags
-2. Include ALL CSS in a single <style> tag at the very top
-3. Include ALL JavaScript in a single <script> tag at the very bottom
-4. The app must be FULLY FUNCTIONAL — no placeholders, no "coming soon", no TODO comments
-5. Use vanilla JavaScript only — no frameworks, no imports, no CDN links
-6. CRITICAL: Do NOT define a :root CSS block. The CSS variables are pre-injected by the host. Just USE them directly:
-   - var(--color-bg-base) — main background
-   - var(--color-bg-elevated) — cards/panels
-   - var(--color-bg-subtle) — secondary backgrounds
-   - var(--color-text-primary) — main text
-   - var(--color-text-secondary) — secondary text
-   - var(--color-text-muted) — muted text
-   - var(--color-accent-primary) — buttons, active states (orange)
-   - var(--color-border-default) — borders
-   - var(--color-border-subtle) — subtle borders
-   - var(--radius-sm) / var(--radius-md) / var(--radius-lg) — border radius (6px/10px/12px)
-   - var(--color-success) — success, var(--color-error) — error
-7. Keep CSS COMPACT — use shorthand properties, avoid redundant rules. Target under 80 CSS rules total.
-8. Design for ~600x450px, responsive with flexbox/grid
-9. Include meaningful defaults (pre-filled data, realistic state)
-10. PRIORITY: The JavaScript MUST be complete. Never leave a function body unfinished. Keep logic clean and concise.
-11. Total code must fit within 3000 lines. Be concise.
-
-IMPORTANT: Return ONLY raw HTML (style tag + markup + script tag). No markdown fences, no explanation.`;
-
 // Gemini 3 Pro API
 async function callGemini(prompt: string, maxTokens = 4000): Promise<string> {
   if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
@@ -314,7 +279,7 @@ async function callGemini(prompt: string, maxTokens = 4000): Promise<string> {
   return content;
 }
 
-// Call AI — Gemini 3 Pro
+// Call AI — Gemini 3 Pro with retries
 async function callAI(prompt: string, retries = 1, maxTokens = 4000): Promise<string> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -572,7 +537,7 @@ const FALLBACK_WALLPAPERS = [
   U('1500534314209-a25ddb2bd429'), // Lavender field sunset
   U('1505144808419-1957a94ca61e'), // Aerial coastline
   U('1509023464722-18d996393ca8'), // Aurora borealis
-  U('1470071459604-3b5ec3a7fe05'), // Foggy forest morning
+  U('1501785888108-c5582816b979'), // Misty mountain layers
   U('1470115636492-6d2b56f9b754'), // Desert canyon warm
   U('1433086966358-54859d0ed716'), // Mediterranean coast
   U('1504198453319-5ce911bafcde'), // Sunset clouds vivid
@@ -1073,40 +1038,6 @@ export async function POST(request: NextRequest) {
                 ],
                 frozenRows: 1,
               });
-            }
-          } else if (itemType === 'custom-app') {
-            // Generate self-contained HTML/CSS/JS app
-            try {
-              console.log(`[AI] Generating custom app for "${item.name}"...`);
-              const appPrompt = CUSTOM_APP_CONTENT_PROMPT
-                .replace('{context}', JSON.stringify(understanding, null, 2))
-                .replace('{name}', item.name as string)
-                .replace('{purpose}', item.purpose as string)
-                .replace('{brief}', item.contentBrief as string);
-
-              content = await callAI(appPrompt, 1, 12000);
-
-              // Clean up markdown fences and :root blocks (host injects CSS vars)
-              content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
-              content = content.replace(/:root\s*\{[^}]*\}/g, '');
-
-              // If the script tag was truncated, close it so the page doesn't break
-              if (content.includes('<script') && !content.includes('</script>')) {
-                content += '\n})();\n</script>';
-              }
-
-              console.log(`[AI] Custom app for "${item.name}": ${content.length} chars`);
-            } catch (contentError) {
-              console.error(`[AI] Custom app generation failed for ${item.name}:`, contentError);
-              content = `<style>
-  .fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center; gap: 12px; padding: 32px; }
-  .fallback h2 { color: var(--color-text-primary, #171412); font-size: 20px; font-weight: 600; margin: 0; }
-  .fallback p { color: var(--color-text-muted, #8a8680); margin: 0; max-width: 280px; line-height: 1.5; }
-</style>
-<div class="fallback">
-  <h2>${item.name}</h2>
-  <p>This app is being set up. Edit the content to add your custom HTML, CSS, and JavaScript.</p>
-</div>`;
             }
           } else {
             // HTML content for notes, case-studies, embeds

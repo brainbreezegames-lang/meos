@@ -70,7 +70,7 @@ export interface Desktop {
 export type WindowType = 'default' | 'browser' | 'mail' | 'gallery' | 'document' | 'pages' | 'notes' | 'photos' | 'finder' | 'preview' | 'workbench' | 'board' | 'sheet';
 
 // === goOS Primitive Types ===
-export type GoOSFileType = 'note' | 'case-study' | 'folder' | 'image' | 'link' | 'embed' | 'download' | 'cv' | 'game' | 'board' | 'sheet' | 'custom-app';
+export type GoOSFileType = 'note' | 'case-study' | 'folder' | 'image' | 'link' | 'embed' | 'download' | 'cv' | 'game' | 'board' | 'sheet';
 export type PublishStatus = 'draft' | 'published';
 export type AccessLevel = 'free' | 'paid' | 'email';
 export type EmbedType = 'youtube' | 'vimeo' | 'spotify' | 'figma' | 'loom' | 'codepen' | 'other';

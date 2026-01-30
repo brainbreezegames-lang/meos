@@ -462,66 +462,6 @@ function SheetIcon() {
   );
 }
 
-// Custom App icon — purple gradient with code brackets, interactive app badge
-function CustomAppIcon() {
-  return (
-    <div
-      style={{
-        width: 52,
-        height: 52,
-        position: 'relative',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          borderRadius: 12,
-          background: 'linear-gradient(145deg, #a78bfa 0%, #7c3aed 50%, #5b21b6 100%)',
-          boxShadow: `
-            0 1px 2px rgba(0, 0, 0, 0.06),
-            0 4px 8px rgba(124, 58, 237, 0.25),
-            0 8px 16px rgba(124, 58, 237, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.25)
-          `,
-          border: '0.5px solid rgba(0, 0, 0, 0.08)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {/* Code brackets icon */}
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 6L3 12L8 18" stroke="rgba(255,255,255,0.95)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M16 6L21 12L16 18" stroke="rgba(255,255,255,0.95)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="13.5" y1="5" x2="10.5" y2="19" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-      </div>
-      {/* Sparkle badge */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -2,
-          right: -2,
-          width: 18,
-          height: 18,
-          borderRadius: 6,
-          background: 'linear-gradient(145deg, #ff8a4c 0%, #ff7722 100%)',
-          border: '2px solid #fff',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <svg width="9" height="9" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 0L9.8 6.2L16 8L9.8 9.8L8 16L6.2 9.8L0 8L6.2 6.2L8 0Z" fill="white" />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
 // Throttle function for performance
 function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
@@ -537,7 +477,7 @@ function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   }) as T;
 }
 
-export type FileType = 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download' | 'game' | 'board' | 'sheet' | 'custom-app';
+export type FileType = 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download' | 'game' | 'board' | 'sheet';
 
 interface GoOSFileIconProps {
   id: string;
@@ -802,8 +742,6 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         return <BoardIcon />;
       case 'sheet':
         return <SheetIcon />;
-      case 'custom-app':
-        return <CustomAppIcon />;
       default:
         return <NoteIcon />;
     }
