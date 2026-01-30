@@ -15,6 +15,7 @@ import {
   ImageIcon,
   Kanban,
   Table,
+  Receipt,
 } from 'lucide-react';
 import { playSound } from '@/lib/sounds';
 import { SPRING, contextMenu as contextMenuVariants, TRANSITION } from '@/lib/animations';
@@ -52,6 +53,7 @@ interface GoOSDesktopContextMenuProps {
   onNewCV?: () => void;
   onNewBoard?: () => void;
   onNewSheet?: () => void;
+  onNewInvoice?: () => void;
   onNewImage?: () => void;
   onNewLink?: () => void;
   onPaste?: () => void;
@@ -71,6 +73,7 @@ export function GoOSDesktopContextMenu({
   onNewCV,
   onNewBoard,
   onNewSheet,
+  onNewInvoice,
   onNewImage,
   onNewLink,
   onPaste,
@@ -95,6 +98,7 @@ export function GoOSDesktopContextMenu({
         { id: 'new-cv', label: 'CV', icon: <FileUser size={14} strokeWidth={1.5} />, onClick: () => onNewCV?.() },
         { id: 'new-board', label: 'Board', icon: <Kanban size={14} strokeWidth={1.5} />, onClick: () => onNewBoard?.() },
         { id: 'new-sheet', label: 'Sheet', icon: <Table size={14} strokeWidth={1.5} />, onClick: () => onNewSheet?.() },
+        { id: 'new-invoice', label: 'Invoice', icon: <Receipt size={14} strokeWidth={1.5} />, onClick: () => onNewInvoice?.() },
         { id: 'new-folder', label: 'Folder', icon: <FolderPlus size={14} strokeWidth={1.5} />, onClick: onNewFolder },
       ],
     },

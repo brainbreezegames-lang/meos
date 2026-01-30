@@ -4779,6 +4779,23 @@ function GoOSDemoContent() {
                                         })}
                                     </MenuBarGroup>
                                     <MenuBarDivider />
+                                    <MenuBarGroup label="Productivity">
+                                        {(['pomodoro', 'habits'] as const).map((type) => {
+                                            const meta = WIDGET_METADATA[type];
+                                            return (
+                                                <MenuBarItem
+                                                    key={type}
+                                                    icon={<span style={{ fontSize: 14 }}>{meta.icon}</span>}
+                                                    label={meta.label}
+                                                    onClick={() => {
+                                                        handleAddWidget(type, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                                                        menuBar.closeAll();
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </MenuBarGroup>
+                                    <MenuBarDivider />
                                     <MenuBarGroup label="Engagement">
                                         {(['links', 'feedback', 'status', 'sticky-note'] as const).map((type) => {
                                             const meta = WIDGET_METADATA[type];
@@ -5933,6 +5950,9 @@ function GoOSDemoContent() {
                 }}
                 onNewSheet={() => {
                     createFile('sheet', { x: desktopContextMenu.x, y: desktopContextMenu.y });
+                }}
+                onNewInvoice={() => {
+                    createFile('invoice', { x: desktopContextMenu.x, y: desktopContextMenu.y });
                 }}
                 onNewImage={() => handleOpenCreateFileDialog('image', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}

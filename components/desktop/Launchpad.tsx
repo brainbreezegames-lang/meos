@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Search, FileText, Folder, Image as ImageIcon, Link2, Play, Download, Presentation, Gamepad2, Sparkles } from 'lucide-react';
+import { Search, FileText, Folder, Image as ImageIcon, Link2, Play, Download, Presentation, Gamepad2, Sparkles, Receipt, Kanban, Table } from 'lucide-react';
 import { SPRING, DURATION } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
 
@@ -52,6 +52,21 @@ const FILE_TYPE_CONFIG: Record<string, { icon: React.ReactNode; bg: string; acce
     icon: <Sparkles size={28} strokeWidth={1.8} />,
     bg: 'linear-gradient(145deg, #DCFCE7 0%, #BBF7D0 100%)',
     accent: '#22C55E',
+  },
+  board: {
+    icon: <Kanban size={28} strokeWidth={1.8} />,
+    bg: 'linear-gradient(145deg, #E0E7FF 0%, #C7D2FE 100%)',
+    accent: '#6366F1',
+  },
+  sheet: {
+    icon: <Table size={28} strokeWidth={1.8} />,
+    bg: 'linear-gradient(145deg, #D1FAE5 0%, #A7F3D0 100%)',
+    accent: '#059669',
+  },
+  invoice: {
+    icon: <Receipt size={28} strokeWidth={1.8} />,
+    bg: 'linear-gradient(145deg, #FEF3C7 0%, #FDE68A 100%)',
+    accent: '#D97706',
   },
 };
 
