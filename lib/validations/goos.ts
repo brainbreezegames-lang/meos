@@ -13,6 +13,7 @@ export const goosFileTypeSchema = z.enum([
   'game',        // Interactive game (snake, etc.)
   'board',       // Kanban board
   'sheet',       // Spreadsheet
+  'invoice',     // Invoice document
 ]);
 export type GoOSFileType = z.infer<typeof goosFileTypeSchema>;
 
@@ -197,6 +198,83 @@ export function getDefaultCVContent(): CVContent {
   };
 }
 
+// === Invoice Schemas ===
+export const invoiceLineItemSchema = z.object({
+  id: z.string(),
+  description: z.string(),
+  quantity: z.number().min(0),
+  unitPrice: z.number().min(0),
+});
+export type InvoiceLineItem = z.infer<typeof invoiceLineItemSchema>;
+
+export const invoiceCompanyInfoSchema = z.object({
+  name: z.string(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  website: z.string().optional(),
+});
+export type InvoiceCompanyInfo = z.infer<typeof invoiceCompanyInfoSchema>;
+
+export const invoiceClientInfoSchema = z.object({
+  name: z.string(),
+  company: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  email: z.string().optional(),
+});
+export type InvoiceClientInfo = z.infer<typeof invoiceClientInfoSchema>;
+
+export const invoiceContentSchema = z.object({
+  invoiceNumber: z.string(),
+  issueDate: z.string(),
+  dueDate: z.string(),
+  currency: z.string().default('USD'),
+  from: invoiceCompanyInfoSchema,
+  to: invoiceClientInfoSchema,
+  lineItems: z.array(invoiceLineItemSchema),
+  taxRate: z.number().min(0).max(100).default(0),
+  notes: z.string().optional(),
+  paymentTerms: z.string().optional(),
+});
+export type InvoiceContent = z.infer<typeof invoiceContentSchema>;
+
+export function getDefaultInvoiceContent(): InvoiceContent {
+  const now = new Date();
+  const due = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  return {
+    invoiceNumber: 'INV-001',
+    issueDate: now.toISOString().split('T')[0],
+    dueDate: due.toISOString().split('T')[0],
+    currency: 'USD',
+    from: {
+      name: 'Your Company',
+      address: '123 Business Street',
+      city: 'City, State 12345',
+      country: 'Country',
+      email: 'hello@yourcompany.com',
+    },
+    to: {
+      name: 'Client Name',
+      company: 'Client Company',
+      address: '456 Client Avenue',
+      city: 'City, State 67890',
+      email: 'client@company.com',
+    },
+    lineItems: [
+      { id: 'li-1', description: 'Web Design — Landing Page', quantity: 1, unitPrice: 2500 },
+      { id: 'li-2', description: 'Brand Identity Package', quantity: 1, unitPrice: 1500 },
+      { id: 'li-3', description: 'Revision Rounds', quantity: 3, unitPrice: 200 },
+    ],
+    taxRate: 0,
+    notes: 'Thank you for your business! Payment is due within 30 days.',
+    paymentTerms: 'Net 30',
+  };
+}
+
 // Publish status
 export const publishStatusSchema = z.enum(['draft', 'published']);
 export type PublishStatus = z.infer<typeof publishStatusSchema>;
@@ -225,6 +303,10 @@ export const widgetTypeSchema = z.enum([
   'contact',
   'links',
   'feedback',
+  'status',
+  'sticky-note',
+  'pomodoro',
+  'habits',
 ]);
 export type WidgetType = z.infer<typeof widgetTypeSchema>;
 

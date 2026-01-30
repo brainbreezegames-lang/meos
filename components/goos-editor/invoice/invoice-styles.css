@@ -1,0 +1,645 @@
+/* ==========================================================================
+   INVOICE DOCUMENT STYLES
+   Professional Invoice Template
+   Typography: Averia Serif Libre (headings) + Instrument Sans (body)
+   ========================================================================== */
+
+/* Fallback font import for invoice document */
+@import url('https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@400;700&family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
+/* Document Container */
+.invoice-document {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 48px 56px;
+  background: var(--invoice-background, #ffffff);
+  color: var(--invoice-text, #1a1a1a);
+  font-family: var(--font-instrument), 'Instrument Sans', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100%;
+}
+
+/* Text Selection */
+.invoice-document ::selection {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--invoice-text, #1a1a1a);
+}
+
+.invoice-document ::-moz-selection {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--invoice-text, #1a1a1a);
+}
+
+/* ==========================================================================
+   HEADER - Invoice Title + Number
+   ========================================================================== */
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  padding-bottom: 28px;
+  border-bottom: 1.5px solid var(--invoice-border, #1a1a1a);
+}
+
+.invoice-title {
+  font-family: 'Averia Serif Libre', Georgia, serif !important;
+  font-size: clamp(32px, 5vw, 42px);
+  font-weight: 700;
+  color: var(--invoice-text, #1a1a1a);
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.invoice-number {
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--invoice-text, #1a1a1a);
+  text-align: right;
+  margin-top: 8px;
+}
+
+.invoice-number-label {
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--invoice-text-muted, #666666);
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* ==========================================================================
+   PARTIES - From / Bill To
+   ========================================================================== */
+
+.invoice-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 32px;
+}
+
+.invoice-party {
+  /* Individual party block */
+}
+
+.invoice-party-label {
+  font-family: 'Averia Serif Libre', Georgia, serif !important;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--invoice-text-muted, #666666);
+  margin: 0 0 10px 0;
+}
+
+.invoice-party-name {
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--invoice-text, #1a1a1a);
+  margin: 0 0 4px 0;
+}
+
+.invoice-party-detail {
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  color: var(--invoice-text, #1a1a1a);
+  margin: 0 0 2px 0;
+  line-height: 1.5;
+}
+
+.invoice-party-detail-muted {
+  color: var(--invoice-text-muted, #666666);
+}
+
+/* ==========================================================================
+   DATES ROW
+   ========================================================================== */
+
+.invoice-dates {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+  padding: 16px 20px;
+  background: var(--invoice-dates-bg, #f8f8f8);
+  border-radius: 8px;
+}
+
+.invoice-date-block {
+  /* Individual date block */
+}
+
+.invoice-date-label {
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--invoice-text-muted, #666666);
+  margin: 0 0 4px 0;
+}
+
+.invoice-date-value {
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--invoice-text, #1a1a1a);
+  margin: 0;
+}
+
+/* ==========================================================================
+   LINE ITEMS TABLE
+   ========================================================================== */
+
+.invoice-table {
+  width: 100%;
+  margin-bottom: 32px;
+  border-collapse: collapse;
+}
+
+.invoice-table-header {
+  display: grid;
+  grid-template-columns: 1fr 80px 120px 120px;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--invoice-table-header-bg, #f0f0f0);
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+.invoice-table-header-cell {
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--invoice-text-muted, #666666);
+}
+
+.invoice-table-header-cell.align-right {
+  text-align: right;
+}
+
+.invoice-table-header-cell.align-center {
+  text-align: center;
+}
+
+.invoice-table-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 120px 120px;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--invoice-row-border, #f0f0f0);
+  position: relative;
+  align-items: center;
+}
+
+.invoice-table-row:last-child {
+  border-bottom: none;
+}
+
+.invoice-table-row:hover {
+  background: var(--invoice-row-hover, rgba(0, 0, 0, 0.02));
+}
+
+.invoice-table-cell {
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  color: var(--invoice-text, #1a1a1a);
+}
+
+.invoice-table-cell.align-right {
+  text-align: right;
+}
+
+.invoice-table-cell.align-center {
+  text-align: center;
+}
+
+.invoice-table-cell.amount {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-table-cell.description {
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   TOTALS
+   ========================================================================== */
+
+.invoice-totals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 40px;
+  padding-top: 16px;
+  border-top: 1.5px solid var(--invoice-border, #1a1a1a);
+}
+
+.invoice-total-row {
+  display: flex;
+  justify-content: space-between;
+  width: 280px;
+  padding: 8px 0;
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  color: var(--invoice-text, #1a1a1a);
+}
+
+.invoice-total-row.subtotal {
+  color: var(--invoice-text-muted, #666666);
+}
+
+.invoice-total-row.tax {
+  color: var(--invoice-text-muted, #666666);
+  padding-bottom: 12px;
+}
+
+.invoice-total-row.total {
+  border-top: 1.5px solid var(--invoice-border, #1a1a1a);
+  padding-top: 12px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.invoice-total-label {
+  font-weight: 400;
+}
+
+.invoice-total-value {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.invoice-total-row.total .invoice-total-value {
+  font-weight: 700;
+}
+
+.invoice-tax-rate {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==========================================================================
+   NOTES
+   ========================================================================== */
+
+.invoice-notes {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--invoice-row-border, #f0f0f0);
+}
+
+.invoice-notes-label {
+  font-family: 'Averia Serif Libre', Georgia, serif !important;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--invoice-text-muted, #666666);
+  margin: 0 0 8px 0;
+}
+
+.invoice-notes-text {
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  color: var(--invoice-text-muted, #666666);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* ==========================================================================
+   EDITING STYLES
+   ========================================================================== */
+
+.invoice-editable-text {
+  cursor: default;
+  border-radius: 2px;
+  transition: background-color 0.15s;
+  font-family: inherit !important;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.invoice-editable-hover {
+  cursor: text;
+}
+
+.invoice-editable-hover:hover {
+  background-color: var(--invoice-edit-bg, rgba(59, 130, 246, 0.08));
+}
+
+.invoice-placeholder {
+  opacity: 0.4;
+  font-style: italic;
+}
+
+.invoice-editable-input {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  background: var(--invoice-edit-bg, rgba(59, 130, 246, 0.08));
+  border: none;
+  border-radius: 3px;
+  outline: 2px solid var(--invoice-edit-border, rgba(59, 130, 246, 0.4));
+  outline-offset: 1px;
+  padding: 2px 6px;
+  margin: -2px -6px;
+  width: calc(100% + 12px);
+}
+
+.invoice-editable-input.invoice-editable-number {
+  width: 80px;
+  text-align: right;
+  margin: 0;
+  padding: 2px 6px;
+}
+
+.invoice-editable-textarea {
+  resize: vertical;
+  min-height: 60px;
+  width: calc(100% + 12px);
+}
+
+/* Delete buttons */
+.invoice-delete-btn {
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: #ef4444;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.invoice-table-row:hover .invoice-delete-btn {
+  opacity: 0.8;
+}
+
+.invoice-delete-btn:hover {
+  opacity: 1 !important;
+}
+
+/* Add buttons */
+.invoice-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  margin-top: 8px;
+  background: transparent;
+  border: 1px dashed var(--invoice-text-muted, #cccccc);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-instrument), 'Instrument Sans', sans-serif;
+  font-size: 12px;
+  color: var(--invoice-text-muted, #666666);
+  transition: all 0.15s;
+}
+
+.invoice-add-btn:hover {
+  border-color: var(--invoice-link, #3b82f6);
+  color: var(--invoice-link, #3b82f6);
+  background: var(--invoice-edit-bg, rgba(59, 130, 246, 0.04));
+}
+
+.invoice-add-btn-icon {
+  font-size: 16px;
+  font-weight: 300;
+}
+
+/* ==========================================================================
+   RESPONSIVE / MOBILE
+   ========================================================================== */
+
+@media (max-width: 700px) {
+  .invoice-document {
+    padding: 32px 24px;
+  }
+
+  .invoice-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .invoice-number {
+    text-align: left;
+  }
+
+  .invoice-parties {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .invoice-dates {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .invoice-table-header,
+  .invoice-table-row {
+    grid-template-columns: 1fr 60px 90px 90px;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .invoice-totals {
+    align-items: stretch;
+  }
+
+  .invoice-total-row {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   PRINT STYLES
+   ========================================================================== */
+
+@media print {
+  .invoice-document {
+    padding: 0;
+    max-width: none;
+  }
+
+  .invoice-add-btn,
+  .invoice-delete-btn {
+    display: none !important;
+  }
+
+  .invoice-editable-hover:hover {
+    background: none;
+  }
+}
+
+/* ==========================================================================
+   DARK MODE
+   ========================================================================== */
+
+.dark .invoice-document,
+.theme-sketch.dark .invoice-document,
+html.dark .invoice-document {
+  --invoice-background: oklch(18% 0.012 70);
+  --invoice-text: oklch(94% 0.008 95);
+  --invoice-text-muted: oklch(65% 0.006 90);
+  --invoice-border: oklch(35% 0.010 70);
+  --invoice-link: #3b82f6;
+  --invoice-edit-bg: rgba(59, 130, 246, 0.12);
+  --invoice-edit-border: rgba(59, 130, 246, 0.4);
+  --invoice-dates-bg: oklch(22% 0.010 70);
+  --invoice-table-header-bg: oklch(22% 0.010 70);
+  --invoice-row-border: oklch(28% 0.010 70);
+  --invoice-row-hover: rgba(255, 255, 255, 0.03);
+
+  background: var(--invoice-background);
+  color: var(--invoice-text);
+}
+
+.dark .invoice-header,
+.theme-sketch.dark .invoice-header,
+html.dark .invoice-header {
+  border-bottom-color: var(--invoice-border);
+}
+
+.dark .invoice-title,
+.theme-sketch.dark .invoice-title,
+html.dark .invoice-title {
+  color: var(--invoice-text);
+}
+
+.dark .invoice-number,
+.dark .invoice-party-name,
+.dark .invoice-party-detail,
+.dark .invoice-date-value,
+.dark .invoice-table-cell,
+.dark .invoice-total-row,
+.theme-sketch.dark .invoice-number,
+.theme-sketch.dark .invoice-party-name,
+.theme-sketch.dark .invoice-party-detail,
+.theme-sketch.dark .invoice-date-value,
+.theme-sketch.dark .invoice-table-cell,
+.theme-sketch.dark .invoice-total-row {
+  color: var(--invoice-text);
+}
+
+.dark .invoice-number-label,
+.dark .invoice-party-label,
+.dark .invoice-party-detail-muted,
+.dark .invoice-date-label,
+.dark .invoice-table-header-cell,
+.dark .invoice-notes-label,
+.dark .invoice-notes-text,
+.dark .invoice-total-row.subtotal,
+.dark .invoice-total-row.tax,
+.theme-sketch.dark .invoice-number-label,
+.theme-sketch.dark .invoice-party-label,
+.theme-sketch.dark .invoice-party-detail-muted,
+.theme-sketch.dark .invoice-date-label,
+.theme-sketch.dark .invoice-table-header-cell,
+.theme-sketch.dark .invoice-notes-label,
+.theme-sketch.dark .invoice-notes-text,
+.theme-sketch.dark .invoice-total-row.subtotal,
+.theme-sketch.dark .invoice-total-row.tax {
+  color: var(--invoice-text-muted);
+}
+
+.dark .invoice-dates,
+.theme-sketch.dark .invoice-dates {
+  background: var(--invoice-dates-bg);
+}
+
+.dark .invoice-table-header,
+.theme-sketch.dark .invoice-table-header {
+  background: var(--invoice-table-header-bg);
+}
+
+.dark .invoice-table-row,
+.theme-sketch.dark .invoice-table-row {
+  border-bottom-color: var(--invoice-row-border);
+}
+
+.dark .invoice-table-row:hover,
+.theme-sketch.dark .invoice-table-row:hover {
+  background: var(--invoice-row-hover);
+}
+
+.dark .invoice-totals,
+.theme-sketch.dark .invoice-totals {
+  border-top-color: var(--invoice-border);
+}
+
+.dark .invoice-total-row.total,
+.theme-sketch.dark .invoice-total-row.total {
+  border-top-color: var(--invoice-border);
+}
+
+.dark .invoice-notes,
+.theme-sketch.dark .invoice-notes {
+  border-top-color: var(--invoice-row-border);
+}
+
+.dark .invoice-editable-hover:hover,
+.theme-sketch.dark .invoice-editable-hover:hover {
+  background-color: var(--invoice-edit-bg);
+}
+
+.dark .invoice-editable-input,
+.theme-sketch.dark .invoice-editable-input {
+  background: var(--invoice-edit-bg);
+  color: var(--invoice-text);
+  outline-color: var(--invoice-edit-border);
+}
+
+.dark .invoice-add-btn,
+.theme-sketch.dark .invoice-add-btn {
+  border-color: var(--invoice-text-muted);
+  color: var(--invoice-text-muted);
+}
+
+.dark .invoice-add-btn:hover,
+.theme-sketch.dark .invoice-add-btn:hover {
+  border-color: var(--invoice-link);
+  color: var(--invoice-link);
+  background: var(--invoice-edit-bg);
+}
+
+/* Selection in dark mode */
+.dark .invoice-document ::selection,
+.theme-sketch.dark .invoice-document ::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: var(--invoice-text);
+}
+
+.dark .invoice-document ::-moz-selection,
+.theme-sketch.dark .invoice-document ::-moz-selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: var(--invoice-text);
+}
