@@ -591,6 +591,15 @@ const GoOSCVWindow = dynamic(
     }
 );
 
+// Lazy load Invoice window component
+const GoOSInvoiceWindow = dynamic(
+    () => import('@/components/goos-editor/invoice/GoOSInvoiceWindow').then(mod => ({ default: mod.GoOSInvoiceWindow })),
+    {
+        loading: () => <PlayfulLoader />,
+        ssr: false
+    }
+);
+
 // Lazy load Board editor component
 const GoOSBoardEditor = dynamic(
     () => import('@/components/goos-editor/GoOSBoardEditor').then(mod => ({ default: mod.GoOSBoardEditor })),
@@ -635,6 +644,10 @@ const FallingLetters = dynamic(
     () => import('@/components/desktop/FallingLetters').then(mod => ({ default: mod.FallingLetters })),
     { ssr: false }
 );
+
+// AI Chat components
+import { AIChatButton } from '@/components/ai-chat/AIChatButton';
+import { AIChatPanel, type ChatBuildItem } from '@/components/ai-chat/AIChatPanel';
 
 // ============================================
 // GOOS DESIGN TOKENS - Calm-Tech 2025 Design System
@@ -3133,6 +3146,9 @@ function GoOSDemoContent() {
         canvas: 609,
     });
 
+    // AI Chat state
+    const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+
     // Guestbook state
     const [guestbookEntries, setGuestbookEntries] = useState<GuestbookEntry[]>(DEMO_GUESTBOOK_ENTRIES);
 
@@ -3598,6 +3614,54 @@ function GoOSDemoContent() {
             setGuidedTourStep(0);
         }, 3000);
     }, [onboarding]);
+
+    // Handle AI Chat item creation — creates a file or widget on the desktop WITHOUT clearing existing items
+    const handleChatItemCreated = useCallback(async (item: ChatBuildItem) => {
+        console.log('[ai-chat] Creating item:', item.title, 'type:', item.type);
+
+        if (item.type === 'widget' && item.widgetType) {
+            try {
+                // Find an empty-ish position for the widget
+                const widgetPos = { x: 70, y: 15 + Math.random() * 40 };
+                await createWidget(item.widgetType as WidgetType, widgetPos);
+                console.log(`[ai-chat] Created widget: ${item.widgetType}`);
+                playSound('materialize');
+            } catch (err) {
+                console.error(`[ai-chat] Failed to create widget:`, err);
+            }
+        } else if (item.type === 'file' && item.fileType) {
+            try {
+                // Pick a random-ish desktop position
+                const posIdx = goosFilesRaw.length % POSITIONS.length;
+                const position = POSITIONS[posIdx];
+
+                if (item.fileType === 'link' && item.linkUrl) {
+                    const { createLinkFile } = goosContext;
+                    if (createLinkFile) {
+                        await createLinkFile(item.linkUrl, {
+                            title: item.title,
+                            description: item.purpose,
+                            position,
+                        });
+                        playSound('materialize');
+                    }
+                } else {
+                    const newFile = await createGoOSFile(item.fileType as FileType, null, position);
+                    if (newFile) {
+                        const updateData: { title: string; content?: string } = { title: item.title };
+                        if (item.content && item.content.length > 0) {
+                            updateData.content = item.content;
+                        }
+                        await updateGoOSFile(newFile.id, updateData);
+                        playSound('materialize');
+                    }
+                }
+                console.log(`[ai-chat] Created file: "${item.title}"`);
+            } catch (err) {
+                console.error(`[ai-chat] Failed to create file:`, err);
+            }
+        }
+    }, [POSITIONS, createGoOSFile, updateGoOSFile, createWidget, goosContext, goosFilesRaw.length]);
 
     // Handle AI onboarding error
     const handleOnboardingError = useCallback((message: string) => {
@@ -5123,6 +5187,9 @@ function GoOSDemoContent() {
                             onStickyNoteChange={(widgetId, content) => {
                                 updateWidget(widgetId, { config: { content } });
                             }}
+                            onWidgetConfigChange={(widgetId, config) => {
+                                updateWidget(widgetId, { config });
+                            }}
                         />
 
                         {/* goOS Editor Windows */}
@@ -5150,6 +5217,36 @@ function GoOSDemoContent() {
                                                         goosAutoSave(file.id, updates.content, file.title);
                                                     }
                                                     // Use immediate update for status changes
+                                                    if (updates.status !== undefined) {
+                                                        if (updates.status === 'published') {
+                                                            publishGoOSFile(file.id);
+                                                            celebrate();
+                                                        } else {
+                                                            unpublishGoOSFile(file.id);
+                                                        }
+                                                    }
+                                                }}
+                                                isActive={activeEditorId === file.id}
+                                                zIndex={windowZ[`editor-${file.id}`] || topZIndex}
+                                                isOwner={true}
+                                            />
+                                        );
+                                    }
+
+                                    // Render Invoice Window for invoice files
+                                    if (file.type === 'invoice') {
+                                        return (
+                                            <GoOSInvoiceWindow
+                                                key={file.id}
+                                                file={file as Parameters<typeof GoOSInvoiceWindow>[0]['file']}
+                                                onClose={() => closeEditor(file.id)}
+                                                onMinimize={() => minimizeEditor(file.id)}
+                                                onMaximize={() => toggleMaximizeEditor(file.id)}
+                                                isMaximized={maximizedEditors.has(file.id)}
+                                                onUpdate={(updates) => {
+                                                    if (updates.content !== undefined) {
+                                                        goosAutoSave(file.id, updates.content, file.title);
+                                                    }
                                                     if (updates.status !== undefined) {
                                                         if (updates.status === 'published') {
                                                             publishGoOSFile(file.id);
@@ -5500,44 +5597,16 @@ function GoOSDemoContent() {
                                 </div>
                             </SketchWindow>
 
-                            <SketchWindow
-                                id="chat"
-                                title="Chat"
-                                icon={<MessageCircle size={14} />}
-                                isOpen={appWindows.chat}
-                                zIndex={windowZ.chat}
-                                defaultX={getWindowX(600)}
-                                defaultY={150}
-                                width={340}
-                                height={400}
-                                onClose={() => closeApp('chat')}
-                                onFocus={() => focusApp('chat')}
-                            >
-                                <div className="flex flex-col h-full">
-                                    <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-                                        <div className="flex gap-3">
-                                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: 'var(--accent-light)', border: '1px solid var(--border-subtle)' }}>🦆</div>
-                                            <div className="rounded-xl rounded-tl-none px-4 py-2.5" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', boxShadow: goOS.shadows.sm }}>
-                                                <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Welcome to goOS Demo! 🦆</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-3 justify-end">
-                                            <div className="rounded-xl rounded-tr-none px-4 py-2.5" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-medium)', boxShadow: goOS.shadows.sm }}>
-                                                <span className="text-sm" style={{ color: 'var(--text-primary)' }}>This looks amazing!</span>
-                                            </div>
-                                        </div>
-                                        <TypingIndicator />
-                                    </div>
-                                    <div className="p-3" style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-subtle)' }}>
-                                        <input
-                                            type="text"
-                                            placeholder="Type a message..."
-                                            className="w-full px-4 py-2 rounded-lg text-sm focus:outline-none"
-                                            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }}
-                                        />
-                                    </div>
-                                </div>
-                            </SketchWindow>
+                            {/* AI Chat Panel + Button (replaces old chat window) */}
+                            <AIChatPanel
+                                isOpen={isAIChatOpen}
+                                onClose={() => setIsAIChatOpen(false)}
+                                onItemCreated={handleChatItemCreated}
+                            />
+                            <AIChatButton
+                                isOpen={isAIChatOpen}
+                                onClick={() => setIsAIChatOpen(prev => !prev)}
+                            />
 
                             <SketchWindow
                                 id="shell"
@@ -5752,10 +5821,10 @@ function GoOSDemoContent() {
                                 }}
                             />
                             <DockIcon
-                                icon={<Image src="/icons/dock/messages.png" alt="Chat" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
-                                onClick={() => toggleApp('chat')}
-                                isActive={appWindows.chat}
-                                label="Chat"
+                                icon={<Image src="/icons/dock/messages.png" alt="AI Chat" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
+                                onClick={() => setIsAIChatOpen(prev => !prev)}
+                                isActive={isAIChatOpen}
+                                label="AI Chat"
                             />
                             <DockIcon
                                 icon={<Image src="/icons/dock/terminal.png" alt="Shell" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}

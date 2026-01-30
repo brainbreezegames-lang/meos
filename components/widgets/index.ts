@@ -7,6 +7,8 @@ export { LinksWidget, LINKS_WIDGET_DEFAULT_CONFIG } from './LinksWidget';
 export { FeedbackWidget, FEEDBACK_WIDGET_DEFAULT_CONFIG } from './FeedbackWidget';
 export { StatusWidget, STATUS_WIDGET_DEFAULT_CONFIG } from './StatusWidget';
 export { StickyNoteWidget } from './StickyNoteWidget';
+export { PomodoroWidget, POMODORO_WIDGET_DEFAULT_CONFIG } from './PomodoroWidget';
+export { HabitTrackerWidget, HABITS_WIDGET_DEFAULT_CONFIG } from './HabitTrackerWidget';
 export { WidgetRenderer } from './WidgetRenderer';
 export { WidgetContextMenu } from './WidgetContextMenu';
 
@@ -20,6 +22,8 @@ import { LinksWidget } from './LinksWidget';
 import { FeedbackWidget } from './FeedbackWidget';
 import { StatusWidget } from './StatusWidget';
 import { StickyNoteWidget } from './StickyNoteWidget';
+import { PomodoroWidget } from './PomodoroWidget';
+import { HabitTrackerWidget } from './HabitTrackerWidget';
 
 export const WIDGET_COMPONENTS: Record<WidgetType, React.ComponentType<{
   widget: Widget;
@@ -35,6 +39,8 @@ export const WIDGET_COMPONENTS: Record<WidgetType, React.ComponentType<{
   feedback: FeedbackWidget,
   status: StatusWidget,
   'sticky-note': StickyNoteWidget,
+  pomodoro: PomodoroWidget,
+  habits: HabitTrackerWidget,
 };
 
 // Widget metadata for UI
@@ -82,5 +88,15 @@ export const WIDGET_METADATA: Record<WidgetType, {
     label: 'Sticky Note',
     icon: '📝',
     description: 'Handwritten notes with cozy typography',
+  },
+  pomodoro: {
+    label: 'Pomodoro Timer',
+    icon: '🍅',
+    description: 'Focus timer with work/break cycles',
+  },
+  habits: {
+    label: 'Habit Tracker',
+    icon: '✅',
+    description: 'Track daily habits with streak view',
   },
 };

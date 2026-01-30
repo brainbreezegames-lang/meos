@@ -16,6 +16,7 @@ export const FILE_TYPE_TO_WINDOW: Record<GoOSFileType, WindowType> = {
   'game': 'default',      // Interactive game
   'board': 'board',       // Kanban board
   'sheet': 'sheet',       // Spreadsheet
+  'invoice': 'document',  // Invoice document
 };
 
 /**
@@ -40,6 +41,7 @@ export const FILE_TYPE_ICONS: Record<GoOSFileType, string> = {
   'game': '🎮',
   'board': '📋',
   'sheet': '📊',
+  'invoice': '🧾',
 };
 
 /**
@@ -57,6 +59,7 @@ export const FILE_TYPE_LABELS: Record<GoOSFileType, string> = {
   'game': 'Game',
   'board': 'Board',
   'sheet': 'Sheet',
+  'invoice': 'Invoice',
 };
 
 /**

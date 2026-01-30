@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import type { GoOSFile, GoOSFileType, PublishStatus } from '@/lib/validations/goos';
-import { getDefaultCVContent, getDefaultBoardContent, getDefaultSheetContent } from '@/lib/validations/goos';
+import { getDefaultCVContent, getDefaultBoardContent, getDefaultSheetContent, getDefaultInvoiceContent } from '@/lib/validations/goos';
 import { playSound } from '@/lib/sounds';
 
 // Types
@@ -269,12 +269,13 @@ export function GoOSProvider({
     const position = customPosition
       ? findNonOverlappingPosition(basePosition, parentId)
       : basePosition; // getNextPosition already calls findNonOverlappingPosition
-    const title = type === 'folder' ? 'New Folder' : type === 'cv' ? 'My CV' : type === 'board' ? 'Untitled Board' : type === 'sheet' ? 'Untitled Sheet' : `Untitled ${type}`;
+    const title = type === 'folder' ? 'New Folder' : type === 'cv' ? 'My CV' : type === 'board' ? 'Untitled Board' : type === 'sheet' ? 'Untitled Sheet' : type === 'invoice' ? 'New Invoice' : `Untitled ${type}`;
 
     // Set default content for structured file types
     const content = type === 'cv' ? JSON.stringify(getDefaultCVContent())
       : type === 'board' ? JSON.stringify(getDefaultBoardContent())
       : type === 'sheet' ? JSON.stringify(getDefaultSheetContent())
+      : type === 'invoice' ? JSON.stringify(getDefaultInvoiceContent())
       : '';
 
     // Create file object

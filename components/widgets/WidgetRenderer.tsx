@@ -10,6 +10,8 @@ import { LinksWidget } from './LinksWidget';
 import { FeedbackWidget } from './FeedbackWidget';
 import { StatusWidget } from './StatusWidget';
 import { StickyNoteWidget } from './StickyNoteWidget';
+import { PomodoroWidget } from './PomodoroWidget';
+import { HabitTrackerWidget } from './HabitTrackerWidget';
 
 interface WidgetRendererProps {
   widgets: Widget[];
@@ -24,6 +26,7 @@ interface WidgetRendererProps {
   onContact?: (data: { name?: string; email: string; message: string }) => Promise<void>;
   onFeedback?: (feedback: string) => Promise<void>;
   onStickyNoteChange?: (widgetId: string, content: string) => void;
+  onWidgetConfigChange?: (widgetId: string, config: Record<string, unknown>) => void;
 }
 
 export function WidgetRenderer({
@@ -39,6 +42,7 @@ export function WidgetRenderer({
   onContact,
   onFeedback,
   onStickyNoteChange,
+  onWidgetConfigChange,
 }: WidgetRendererProps) {
   // Filter visible widgets (or show all if owner)
   const visibleWidgets = useMemo(() =>
@@ -52,6 +56,7 @@ export function WidgetRenderer({
   const getPositionHandler = useCallback((id: string) => (x: number, y: number) => onWidgetPositionChange?.(id, x, y), [onWidgetPositionChange]);
   const getContextMenuHandler = useCallback((widget: Widget) => (e: React.MouseEvent) => onWidgetContextMenu?.(e, widget), [onWidgetContextMenu]);
   const getStickyNoteHandler = useCallback((widgetId: string) => (content: string) => onStickyNoteChange?.(widgetId, content), [onStickyNoteChange]);
+  const getConfigChangeHandler = useCallback((widgetId: string) => (config: Record<string, unknown>) => onWidgetConfigChange?.(widgetId, config), [onWidgetConfigChange]);
 
   return (
     <>
@@ -88,6 +93,16 @@ export function WidgetRenderer({
                 key={widget.id}
                 {...commonProps}
                 onContentChange={getStickyNoteHandler(widget.id)}
+              />
+            );
+          case 'pomodoro':
+            return <PomodoroWidget key={widget.id} {...commonProps} />;
+          case 'habits':
+            return (
+              <HabitTrackerWidget
+                key={widget.id}
+                {...commonProps}
+                onConfigChange={getConfigChangeHandler(widget.id)}
               />
             );
           default:

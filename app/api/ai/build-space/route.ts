@@ -71,6 +71,7 @@ FILES (rich content):
 - board: Kanban board with columns and cards — use for plans, workflows, task tracking, learning paths, project pipelines. Pre-fill with REAL useful cards.
 - sheet: Spreadsheet with rows and columns — use for data tables, word lists, price lists, schedules, trackers. Pre-fill with REAL data (at least 10-20 rows).
 - link: URL shortcut on the desktop — use for useful external resources, tools, references. You MUST provide a real valid linkUrl for each link item.
+- invoice: Professional invoice document — use for freelancers who need to bill clients. Pre-filled with sample data, fully editable, PDF export.
 
 WIDGETS (interactive elements — use when the user needs functional tools, not just content):
 - widget: Interactive widget. You MUST set "widgetType" to one of:
@@ -80,6 +81,8 @@ WIDGETS (interactive elements — use when the user needs functional tools, not 
   - "links" — Collection of social media and external links
   - "tipjar" — Support/tip jar for fans and followers
   - "feedback" — Collect visitor feedback and testimonials
+  - "pomodoro" — Pomodoro timer for focused work sessions (25min work / 5min break)
+  - "habits" — Habit tracker with daily check-off and 7-day streak view
 
 IMPORTANT: Create 6-12 items that are SPECIFIC to this user. Mix files AND widgets based on their needs:
 - An About/Introduction that reflects their personality and niche
@@ -124,8 +127,8 @@ Return JSON:
     "summary": "One sentence describing what you're building and why",
     "items": [
       {
-        "type": "note|case-study|folder|embed|board|sheet|link|widget",
-        "widgetType": "status|contact|book|links|tipjar|feedback (ONLY when type is widget, omit otherwise)",
+        "type": "note|case-study|folder|embed|board|sheet|link|invoice|widget",
+        "widgetType": "status|contact|book|links|tipjar|feedback|pomodoro|habits (ONLY when type is widget, omit otherwise)",
         "name": "Short descriptive name (2-4 words)",
         "purpose": "Why THIS user needs this (1 sentence)",
         "contentBrief": "What should be inside, specific to their situation",
