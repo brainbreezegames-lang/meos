@@ -8,8 +8,6 @@ export const maxDuration = 300;
  * Uses Server-Sent Events to stream AI reasoning and progress in real-time
  */
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2.5';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3-pro-preview';
 
@@ -274,57 +272,12 @@ Requirements:
 
 IMPORTANT: Return ONLY raw HTML (style tag + markup + script tag). No markdown fences, no explanation.`;
 
-// OpenRouter API (Kimi K2.5 with reasoning)
-async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string> {
-  if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not configured');
-
-  const startTime = Date.now();
-  console.log(`[AI] Calling Kimi K2.5 (max_tokens=${maxTokens}, reasoning=high)...`);
-
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://meos-delta.vercel.app',
-      'X-Title': 'MeOS Space Builder',
-    },
-    body: JSON.stringify({
-      model: OPENROUTER_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      max_tokens: maxTokens,
-      reasoning: { effort: 'high' },
-    }),
-  });
-
-  const elapsed = Date.now() - startTime;
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error(`[AI] OpenRouter error (${elapsed}ms):`, response.status, error);
-    throw new Error(`OpenRouter error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices?.[0]?.message?.content || '';
-
-  console.log(`[AI] Kimi response (${elapsed}ms, ${content.length} chars, finish=${data.choices?.[0]?.finish_reason})`);
-
-  if (!content || content.trim().length === 0) {
-    console.error('[AI] Empty response from Kimi K2.5');
-    throw new Error('Empty response from Kimi K2.5');
-  }
-
-  return content;
-}
-
-// Gemini API fallback
+// Gemini 3 Pro API
 async function callGemini(prompt: string, maxTokens = 4000): Promise<string> {
   if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
 
   const startTime = Date.now();
-  console.log(`[AI] Calling Gemini ${GEMINI_MODEL} fallback (max_tokens=${maxTokens})...`);
+  console.log(`[AI] Calling ${GEMINI_MODEL} (max_tokens=${maxTokens})...`);
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
@@ -361,33 +314,20 @@ async function callGemini(prompt: string, maxTokens = 4000): Promise<string> {
   return content;
 }
 
-// Call AI with Kimi K2.5 primary → Gemini fallback
+// Call AI — Gemini 3 Pro
 async function callAI(prompt: string, retries = 1, maxTokens = 4000): Promise<string> {
-  // Try Kimi K2.5 first
-  if (OPENROUTER_API_KEY) {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        return await callOpenRouter(prompt, maxTokens);
-      } catch (err) {
-        console.error(`[AI] Kimi attempt ${attempt} failed:`, err);
-      }
-      if (attempt < retries) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-    }
-    console.warn('[AI] Kimi K2.5 failed, falling back to Gemini...');
-  }
-
-  // Fallback to Gemini
-  if (GEMINI_API_KEY) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       return await callGemini(prompt, maxTokens);
     } catch (err) {
-      console.error('[AI] Gemini fallback failed:', err);
+      console.error(`[AI] Gemini attempt ${attempt} failed:`, err);
+    }
+    if (attempt < retries) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 
-  throw new Error('All AI providers failed');
+  throw new Error('Gemini API failed after all retries');
 }
 
 // Curated Unsplash wallpapers — multiple options per category to prevent repetition
