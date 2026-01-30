@@ -10,6 +10,8 @@ export const maxDuration = 300;
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'moonshotai/kimi-k2.5';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 
 // Phase 1: Deep Understanding Prompt
 const UNDERSTANDING_PROMPT = `You are analyzing a user's request to build their personal workspace. Extract DEEP understanding, not surface-level parsing.
@@ -272,12 +274,12 @@ Requirements:
 
 IMPORTANT: Return ONLY raw HTML (style tag + markup + script tag). No markdown fences, no explanation.`;
 
-// OpenRouter API (Kimi K2.5)
+// OpenRouter API (Kimi K2.5 with reasoning)
 async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string> {
   if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not configured');
 
   const startTime = Date.now();
-  console.log(`[AI] Calling Kimi K2.5 (max_tokens=${maxTokens})...`);
+  console.log(`[AI] Calling Kimi K2.5 (max_tokens=${maxTokens}, reasoning=high)...`);
 
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -292,6 +294,7 @@ async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string>
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: maxTokens,
+      reasoning: { effort: 'high' },
     }),
   });
 
@@ -306,7 +309,7 @@ async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string>
   const data = await response.json();
   const content = data.choices?.[0]?.message?.content || '';
 
-  console.log(`[AI] Response received (${elapsed}ms, ${content.length} chars, finish=${data.choices?.[0]?.finish_reason})`);
+  console.log(`[AI] Kimi response (${elapsed}ms, ${content.length} chars, finish=${data.choices?.[0]?.finish_reason})`);
 
   if (!content || content.trim().length === 0) {
     console.error('[AI] Empty response from Kimi K2.5');
@@ -316,25 +319,75 @@ async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string>
   return content;
 }
 
-// Call Kimi K2.5 via OpenRouter with retries
+// Gemini API fallback
+async function callGemini(prompt: string, maxTokens = 4000): Promise<string> {
+  if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
+
+  const startTime = Date.now();
+  console.log(`[AI] Calling Gemini ${GEMINI_MODEL} fallback (max_tokens=${maxTokens})...`);
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          maxOutputTokens: maxTokens,
+          temperature: 0.7,
+        },
+      }),
+    }
+  );
+
+  const elapsed = Date.now() - startTime;
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error(`[AI] Gemini error (${elapsed}ms):`, response.status, error);
+    throw new Error(`Gemini error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+  console.log(`[AI] Gemini response (${elapsed}ms, ${content.length} chars)`);
+
+  if (!content || content.trim().length === 0) {
+    throw new Error('Empty response from Gemini');
+  }
+
+  return content;
+}
+
+// Call AI with Kimi K2.5 primary → Gemini fallback
 async function callAI(prompt: string, retries = 1, maxTokens = 4000): Promise<string> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY not configured');
+  // Try Kimi K2.5 first
+  if (OPENROUTER_API_KEY) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        return await callOpenRouter(prompt, maxTokens);
+      } catch (err) {
+        console.error(`[AI] Kimi attempt ${attempt} failed:`, err);
+      }
+      if (attempt < retries) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    console.warn('[AI] Kimi K2.5 failed, falling back to Gemini...');
   }
 
-  for (let attempt = 0; attempt <= retries; attempt++) {
+  // Fallback to Gemini
+  if (GEMINI_API_KEY) {
     try {
-      return await callOpenRouter(prompt, maxTokens);
+      return await callGemini(prompt, maxTokens);
     } catch (err) {
-      console.error(`Kimi K2.5 attempt ${attempt} failed:`, err);
-    }
-
-    if (attempt < retries) {
-      await new Promise(resolve => setTimeout(resolve, 1500 * (attempt + 1)));
+      console.error('[AI] Gemini fallback failed:', err);
     }
   }
 
-  throw new Error('Kimi K2.5 API failed after all retries');
+  throw new Error('All AI providers failed');
 }
 
 // Curated Unsplash wallpapers — multiple options per category to prevent repetition
@@ -579,7 +632,7 @@ const FALLBACK_WALLPAPERS = [
   U('1500534314209-a25ddb2bd429'), // Lavender field sunset
   U('1505144808419-1957a94ca61e'), // Aerial coastline
   U('1509023464722-18d996393ca8'), // Aurora borealis
-  U('1501785888108-c5582816b979'), // Misty mountain layers
+  U('1470071459604-3b5ec3a7fe05'), // Foggy forest morning
   U('1470115636492-6d2b56f9b754'), // Desert canyon warm
   U('1433086966358-54859d0ed716'), // Mediterranean coast
   U('1504198453319-5ce911bafcde'), // Sunset clouds vivid
