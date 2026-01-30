@@ -187,10 +187,15 @@ export function HabitTrackerWidget({
   const last7Days = getLastNDays(7);
   const today = new Date().toISOString().split('T')[0];
 
+  // Consistent square sizing — shared between header labels and day grid
+  const SQ = 16;
+  const SQ_GAP = 5;
+  const GRID_W = 7 * SQ + 6 * SQ_GAP; // 142px
+
   if (!mounted) {
     return (
       <WidgetWrapper widget={widget} isOwner={isOwner} onEdit={onEdit} onDelete={onDelete} onPositionChange={onPositionChange} onContextMenu={onContextMenu} isHighlighted={isHighlighted}>
-        <div style={{ width: 220, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 240, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ color: theme.textMuted, fontSize: 12 }}>...</div>
         </div>
       </WidgetWrapper>
@@ -202,12 +207,12 @@ export function HabitTrackerWidget({
       {/* Outer housing */}
       <div
         style={{
-          width: 220,
+          width: 240,
           minHeight: 200,
-          borderRadius: 20,
+          borderRadius: 22,
           background: theme.housing,
           boxShadow: theme.housingShadow,
-          padding: 12,
+          padding: '16px 16px 26px',
           position: 'relative',
           transition: 'all 0.3s ease',
         }}
@@ -220,13 +225,29 @@ export function HabitTrackerWidget({
           <div key={i} style={{ position: 'absolute', ...pos, width: 4, height: 4, borderRadius: '50%', background: theme.dotColor, transition: 'all 0.3s ease' }} />
         ))}
 
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, paddingTop: 4 }}>
+        {/* Header — title left, individual day labels right aligned to squares */}
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10, paddingTop: 2 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: theme.textPrimary, letterSpacing: '-0.01em', fontFamily: 'system-ui, -apple-system, sans-serif', transition: 'color 0.3s ease' }}>
             Habits
           </div>
-          <div style={{ fontSize: 9, fontWeight: 600, color: '#ff6b00', letterSpacing: '0.05em' }}>
-            {last7Days.map(d => getDayLabel(d)).join(' ')}
+          {/* Day-of-week letters — each centered on its column */}
+          <div style={{ display: 'flex', gap: SQ_GAP, width: GRID_W, flexShrink: 0 }}>
+            {last7Days.map(d => (
+              <div
+                key={d}
+                style={{
+                  width: SQ,
+                  textAlign: 'center',
+                  fontSize: 9,
+                  fontWeight: 600,
+                  color: d === today ? '#ff6b00' : theme.textMuted,
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {getDayLabel(d)}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -234,28 +255,39 @@ export function HabitTrackerWidget({
         <div
           style={{
             background: theme.contentBg,
-            borderRadius: 12,
+            borderRadius: 14,
             boxShadow: theme.contentShadow,
-            padding: '8px 10px',
+            padding: '10px 12px',
             transition: 'all 0.3s ease',
           }}
         >
           {/* Habits list */}
           {habits.map((habit, idx) => (
-            <div key={habit.id}>
+            <div
+              key={habit.id}
+              className="habit-row"
+              style={{ position: 'relative' }}
+              onMouseEnter={e => {
+                const btn = e.currentTarget.querySelector<HTMLElement>('.habit-delete');
+                if (btn) btn.style.opacity = '1';
+              }}
+              onMouseLeave={e => {
+                const btn = e.currentTarget.querySelector<HTMLElement>('.habit-delete');
+                if (btn) btn.style.opacity = '0';
+              }}
+            >
               {idx > 0 && (
-                <div style={{ height: 1, background: theme.separatorColor, margin: '6px 0' }} />
+                <div style={{ height: 1, background: theme.separatorColor, margin: '8px 0' }} />
               )}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 6,
-                  position: 'relative',
-                  minHeight: 28,
+                  gap: 8,
+                  minHeight: 32,
                 }}
               >
-                {/* Habit name */}
+                {/* Habit name — flexible width */}
                 {editingId === habit.id && isOwner ? (
                   <input
                     autoFocus
@@ -264,7 +296,8 @@ export function HabitTrackerWidget({
                     onBlur={() => setEditingId(null)}
                     onKeyDown={e => { if (e.key === 'Enter') setEditingId(null); }}
                     style={{
-                      flex: '0 0 70px',
+                      flex: 1,
+                      minWidth: 0,
                       fontSize: 11,
                       fontWeight: 500,
                       fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -272,16 +305,16 @@ export function HabitTrackerWidget({
                       background: theme.inputBg,
                       border: `1px solid ${theme.inputBorder}`,
                       borderRadius: 4,
-                      padding: '2px 4px',
+                      padding: '3px 6px',
                       outline: 'none',
-                      width: 70,
                     }}
                   />
                 ) : (
                   <div
                     onClick={() => isOwner && setEditingId(habit.id)}
                     style={{
-                      flex: '0 0 70px',
+                      flex: 1,
+                      minWidth: 0,
                       fontSize: 11,
                       fontWeight: 500,
                       color: theme.textPrimary,
@@ -297,8 +330,8 @@ export function HabitTrackerWidget({
                   </div>
                 )}
 
-                {/* Day squares */}
-                <div style={{ display: 'flex', gap: 3, flex: 1, justifyContent: 'flex-end' }}>
+                {/* Day squares — fixed grid aligned with header */}
+                <div style={{ display: 'flex', gap: SQ_GAP, width: GRID_W, flexShrink: 0 }}>
                   {last7Days.map(day => {
                     const isCompleted = habit.completedDays.includes(day);
                     const isToday = day === today;
@@ -309,9 +342,9 @@ export function HabitTrackerWidget({
                         disabled={!isOwner}
                         aria-label={`${habit.name} - ${day}${isCompleted ? ' (completed)' : ''}`}
                         style={{
-                          width: 14,
-                          height: 14,
-                          borderRadius: 3,
+                          width: SQ,
+                          height: SQ,
+                          borderRadius: 4,
                           border: isToday ? `1.5px solid ${isCompleted ? '#ff6b00' : theme.textMuted}` : 'none',
                           background: isCompleted ? '#ff6b00' : theme.dotEmpty,
                           cursor: isOwner ? 'pointer' : 'default',
@@ -324,24 +357,23 @@ export function HabitTrackerWidget({
                   })}
                 </div>
 
-                {/* Delete button */}
+                {/* Delete — only visible on row hover */}
                 {isOwner && (
                   <button
+                    className="habit-delete"
                     onClick={() => removeHabit(habit.id)}
                     style={{
-                      width: 16, height: 16, borderRadius: 4,
+                      width: 18, height: 18, borderRadius: 5,
                       border: 'none', cursor: 'pointer',
                       background: theme.deleteBg,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       color: theme.textMuted,
                       fontSize: 10,
                       padding: 0,
-                      opacity: 0.4,
+                      opacity: 0,
                       transition: 'opacity 0.15s ease',
                       flexShrink: 0,
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-                    onMouseLeave={e => (e.currentTarget.style.opacity = '0.4')}
                     aria-label={`Remove ${habit.name}`}
                   >
                     <svg width="8" height="8" viewBox="0 0 16 16" fill="none">
@@ -353,23 +385,23 @@ export function HabitTrackerWidget({
             </div>
           ))}
 
-          {/* Add habit button */}
+          {/* Add habit */}
           {isOwner && habits.length < 8 && (
             <>
-              <div style={{ height: 1, background: theme.separatorColor, margin: '6px 0' }} />
+              <div style={{ height: 1, background: theme.separatorColor, margin: '8px 0' }} />
               <button
                 onClick={addHabit}
                 style={{
                   width: '100%',
-                  height: 28,
-                  borderRadius: 6,
+                  height: 30,
+                  borderRadius: 7,
                   border: `1.5px dashed ${theme.addBorder}`,
                   background: 'transparent',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 4,
+                  gap: 5,
                   color: theme.textMuted,
                   fontSize: 11,
                   fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -387,7 +419,7 @@ export function HabitTrackerWidget({
         </div>
 
         {/* Bottom dots */}
-        <div style={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
+        <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
           {[...Array(5)].map((_, i) => (
             <div key={i} style={{ width: 3, height: 3, borderRadius: '50%', background: theme.dotColor, transition: 'all 0.3s ease' }} />
           ))}
