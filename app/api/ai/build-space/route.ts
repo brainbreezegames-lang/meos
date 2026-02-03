@@ -308,7 +308,7 @@ const WALLPAPER_CATALOG: Array<{ keywords: string[]; urls: string[] }> = [
   { keywords: ['design', 'creative', 'ui', 'ux', 'graphic', 'minimal', 'workspace', 'studio', 'brand', 'logo'],
     urls: [
       U('1497366216548-37526070297c'), // modern open office
-      U('1558618666-fcd25c85f82e'), // gradient abstract setup
+      U('1618005182384-a83a8bd57fbe'), // abstract blue gradients
       U('1558591710-4b4a1ae0f04d'), // colorful paint swirl
       U('1550859492-d5da9d8e45f3'), // abstract gradients
     ] },
