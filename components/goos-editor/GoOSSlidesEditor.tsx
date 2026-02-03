@@ -623,12 +623,13 @@ function AddSlideMenu({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [onClose, anchorRef]);
 
+  const [pressedIndex, setPressedIndex] = useState<number | null>(null);
+
   if (!mounted) return null;
 
   return ReactDOM.createPortal(
     <motion.div
       ref={menuRef}
-      className="font-sans"
       initial={contextMenuVariants.initial}
       animate={contextMenuVariants.animate}
       exit={contextMenuVariants.exit}
@@ -653,6 +654,7 @@ function AddSlideMenu({
         const isHovered = hoveredIndex === index;
         const isFocused = focusedIndex === index;
         const isActive = isHovered || isFocused;
+        const isPressed = pressedIndex === index;
 
         return (
           <motion.button
@@ -666,26 +668,38 @@ function AddSlideMenu({
               setFocusedIndex(index);
             }}
             onMouseLeave={() => setHoveredIndex(null)}
+            onMouseDown={() => setPressedIndex(index)}
+            onMouseUp={() => setPressedIndex(null)}
             onFocus={() => setFocusedIndex(index)}
             initial={false}
             animate={{
-              backgroundColor: isActive ? 'var(--color-accent-primary, #ff7722)' : 'transparent',
+              backgroundColor: isPressed
+                ? 'var(--color-accent-primary)'
+                : isActive
+                ? 'var(--color-bg-subtle)'
+                : 'transparent',
+              scale: isPressed ? 0.98 : 1,
             }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.08 }}
+            transition={{ duration: 0.06 }}
             style={{
               width: '100%',
+              height: 32,
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
-              padding: '8px 12px',
+              gap: 8,
+              padding: '0 10px',
               background: 'transparent',
               border: 'none',
-              borderRadius: 'var(--radius-sm, 8px)',
+              borderRadius: '8px',
               cursor: 'pointer',
+              fontFamily: 'var(--font-body)',
+              fontSize: '12px',
+              fontWeight: 500,
+              color: isPressed
+                ? 'var(--color-text-on-accent, #fbf9ef)'
+                : 'var(--color-text-primary)',
               textAlign: 'left',
               outline: 'none',
-              color: isActive ? '#fff' : 'var(--color-text-secondary, #555)',
             }}
           >
             <span style={{
@@ -693,14 +707,16 @@ function AddSlideMenu({
               alignItems: 'center',
               justifyContent: 'center',
               width: 18,
-              flexShrink: 0,
-              opacity: isActive ? 1 : 0.7,
+              color: isPressed
+                ? 'var(--color-text-on-accent, #fbf9ef)'
+                : isActive
+                ? 'var(--color-accent-primary)'
+                : 'var(--color-text-secondary)',
+              transition: 'color 0.1s ease',
             }}>
               {React.cloneElement(icon as React.ReactElement, { size: 14, strokeWidth: 1.5 })}
             </span>
-            <span className="text-[13px] font-medium flex-1">
-              {label}
-            </span>
+            <span style={{ flex: 1 }}>{label}</span>
           </motion.button>
         );
       })}
