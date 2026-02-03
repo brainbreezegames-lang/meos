@@ -324,35 +324,153 @@ export const slidesContentSchema = z.object({
 });
 export type SlidesContent = z.infer<typeof slidesContentSchema>;
 
-// Default slides content for new files
+// Default slides content for new files - UX Case Study template
 export function getDefaultSlidesContent(): SlidesContent {
   return {
     slides: [
+      // 1. Hero - Impact + Project scope + Product name
       {
         id: crypto.randomUUID(),
         template: 'title',
         content: {
-          heading: 'Your Presentation Title',
-          subheading: 'A compelling subtitle goes here',
+          heading: '[Impact] + [Product Name]',
+          subheading: 'e.g. "Increasing conversions through redesigning the checkout flow"',
           author: 'Your Name',
           date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
         },
+        speakerNotes: 'Your title should communicate the impact and scope of your project. Example: "Reducing cart abandonment by 40% through checkout redesign"',
       },
+      // 2. Project Overview
       {
         id: crypto.randomUUID(),
         template: 'section',
         content: {
-          heading: 'First Section',
+          heading: 'Project Overview',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'list',
+        content: {
+          heading: 'The Details',
+          items: [
+            'Role: Lead UX Designer',
+            'Timeline: 6 weeks',
+            'Team: 2 designers, 3 developers, 1 PM',
+            'Tools: Figma, Maze, Hotjar',
+          ],
+        },
+        speakerNotes: 'Set the context: What was your role? Who did you work with? What constraints did you face?',
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'content',
+        content: {
+          heading: 'The Problem',
+          body: 'Describe the challenge you were trying to solve. What pain points existed? Why did this matter to users and the business?',
+        },
+        speakerNotes: 'Be specific about the problem. Use data if you have it: "Users were abandoning checkout at a 68% rate"',
+      },
+      // 3. Discovery/Research
+      {
+        id: crypto.randomUUID(),
+        template: 'section',
+        content: {
+          heading: 'Discovery & Research',
         },
       },
       {
         id: crypto.randomUUID(),
         template: 'content',
         content: {
-          heading: 'Key Point',
-          body: 'Add your main content here. Make it compelling and concise.',
+          heading: 'Research Methods',
+          body: 'Explain what research you conducted and why. User interviews? Competitive analysis? Analytics review? Surveys?',
+        },
+        speakerNotes: 'For each method, answer: Why did you choose it? What did you find? How did it influence your next steps?',
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'quote',
+        content: {
+          quote: 'Include a key user insight or quote that shaped your direction',
+          attribution: 'User Interview Participant',
+        },
+        speakerNotes: 'Real user quotes make your case study memorable and credible',
+      },
+      // 4. Design Process
+      {
+        id: crypto.randomUUID(),
+        template: 'section',
+        content: {
+          heading: 'Design Process',
         },
       },
+      {
+        id: crypto.randomUUID(),
+        template: 'image-text',
+        content: {
+          heading: 'Wireframes & Iteration',
+          body: 'Show your process from low-fidelity to high-fidelity. Explain the key decisions you made along the way.',
+          image: '',
+        },
+        speakerNotes: 'The most powerful thing you can show is a wireframe that failed testing and how you fixed it',
+      },
+      // 5. Final Design
+      {
+        id: crypto.randomUUID(),
+        template: 'section',
+        content: {
+          heading: 'Final Design',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'image',
+        content: {
+          image: '',
+          caption: 'Add your final design screenshots or prototype embed here',
+        },
+        speakerNotes: 'Explain: Why this solution? What alternatives did you consider? Show before/after if relevant.',
+      },
+      // 6. Impact
+      {
+        id: crypto.randomUUID(),
+        template: 'section',
+        content: {
+          heading: 'Impact & Results',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'stat',
+        content: {
+          stat_value: '+40%',
+          stat_label: 'Conversion rate improvement',
+        },
+        speakerNotes: 'If you have metrics, showcase them. If not, use testimonials, usability test results, or before/after comparisons.',
+      },
+      // 7. Learnings
+      {
+        id: crypto.randomUUID(),
+        template: 'section',
+        content: {
+          heading: 'Learnings',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'list',
+        content: {
+          heading: 'Key Takeaways',
+          items: [
+            'What did you learn from this project?',
+            'What would you do differently?',
+            'What new skills did you develop?',
+          ],
+        },
+        speakerNotes: 'Reflection shows growth mindset. Be honest about challenges and what you learned.',
+      },
+      // End
       {
         id: crypto.randomUUID(),
         template: 'end',
