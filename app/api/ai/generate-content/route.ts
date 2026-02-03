@@ -33,7 +33,7 @@ const requestSchema = z.object({
 });
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const AI_MODEL = process.env.AI_MODEL || 'deepseek/deepseek-chat-v3-0324';
+const AI_MODEL = process.env.AI_MODEL || 'deepseek/deepseek-v3.2';
 
 async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
   if (!OPENROUTER_API_KEY) {

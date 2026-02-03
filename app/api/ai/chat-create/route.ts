@@ -9,7 +9,7 @@ export const maxDuration = 120;
  */
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const AI_MODEL = process.env.AI_MODEL || 'deepseek/deepseek-chat-v3-0324';
+const AI_MODEL = process.env.AI_MODEL || 'deepseek/deepseek-v3.2';
 
 // Prompt to understand what the user wants to create
 const INTENT_PROMPT = `You are a helpful assistant inside a personal workspace app called MeOS (a macOS-style web desktop).
