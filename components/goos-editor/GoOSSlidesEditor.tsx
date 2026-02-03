@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, useDragControls, useReducedMotion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -524,77 +525,360 @@ function ListField({
 }
 
 // ─── Add Slide Menu ────────────────────────────────────────────
+// A polished, macOS-style popover menu with delightful micro-interactions
+// Uses a portal to escape overflow:hidden containers
 function AddSlideMenu({
   onAdd,
   onClose,
+  anchorRef,
 }: {
   onAdd: (template: SlideTemplate) => void;
   onClose: () => void;
+  anchorRef: React.RefObject<HTMLButtonElement | null>;
 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      onClick={onClose}
-      style={{
-        position: 'absolute',
-        bottom: '100%',
-        left: 0,
-        right: 0,
-        marginBottom: 8,
-        background: 'var(--color-bg-elevated, #fff)',
-        borderRadius: 12,
-        border: '1px solid var(--color-border-default)',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-        padding: 8,
-        zIndex: 100,
-      }}
-    >
-      <div style={{
-        fontSize: 10,
-        fontWeight: 600,
-        fontFamily: 'var(--font-body)',
-        color: 'var(--color-text-muted)',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        padding: '8px 12px 4px',
-      }}>
-        Add Slide
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
-        {SLIDE_TEMPLATES.map(({ template, icon, label, description }) => (
-          <button
-            key={template}
-            onClick={(e) => { e.stopPropagation(); onAdd(template); }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '10px 12px',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 8,
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: 'background 0.1s ease',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-subtle)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          >
-            <span style={{ color: 'var(--color-accent-primary)' }}>{icon}</span>
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-body)', color: 'var(--color-text-primary)' }}>
-                {label}
-              </div>
-              <div style={{ fontSize: 10, fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)' }}>
-                {description}
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-    </motion.div>
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [mounted, setMounted] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Wait for mount to access document.body
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Position the menu above the anchor button
+  useEffect(() => {
+    if (anchorRef.current && mounted) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.top - 12,
+        left: rect.left + rect.width / 2,
+      });
+    }
+  }, [anchorRef, mounted]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setFocusedIndex((i) => Math.min(i + 1, SLIDE_TEMPLATES.length - 1));
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setFocusedIndex((i) => Math.max(i - 1, 0));
+          break;
+        case 'Enter':
+          e.preventDefault();
+          playSound('pop');
+          onAdd(SLIDE_TEMPLATES[focusedIndex].template);
+          break;
+        case 'Escape':
+          e.preventDefault();
+          onClose();
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [focusedIndex, onAdd, onClose]);
+
+  // Click outside to close
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node) &&
+          anchorRef.current && !anchorRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose, anchorRef]);
+
+  // Template icon backgrounds for visual interest
+  const templateColors: Record<SlideTemplate, { bg: string; accent: string }> = {
+    'title': { bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', accent: '#d97706' },
+    'section': { bg: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)', accent: '#2563eb' },
+    'content': { bg: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)', accent: '#9333ea' },
+    'image': { bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)', accent: '#16a34a' },
+    'image-text': { bg: 'linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%)', accent: '#0891b2' },
+    'quote': { bg: 'linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)', accent: '#db2777' },
+    'list': { bg: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%)', accent: '#ea580c' },
+    'stat': { bg: 'linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)', accent: '#7c3aed' },
+    'end': { bg: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', accent: '#475569' },
+  };
+
+  if (!mounted) return null;
+
+  return ReactDOM.createPortal(
+    <>
+      {/* Backdrop with subtle blur */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.15)',
+          backdropFilter: 'blur(2px)',
+          WebkitBackdropFilter: 'blur(2px)',
+          zIndex: 9998,
+        }}
+      />
+
+      {/* Menu */}
+      <motion.div
+        ref={menuRef}
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={prefersReducedMotion ? { duration: 0.1 } : {
+          type: 'spring',
+          stiffness: 500,
+          damping: 30,
+          mass: 0.8,
+        }}
+        style={{
+          position: 'fixed',
+          top: menuPosition.top,
+          left: menuPosition.left,
+          transform: 'translate(-50%, -100%)',
+          width: 340,
+          background: 'rgba(255, 255, 255, 0.98)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderRadius: 16,
+          border: '1px solid rgba(0, 0, 0, 0.08)',
+          boxShadow: `
+            0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+            0 12px 40px rgba(0, 0, 0, 0.15),
+            0 4px 12px rgba(0, 0, 0, 0.1)
+          `,
+          zIndex: 9999,
+          overflow: 'hidden',
+        }}
+      >
+        {/* Header */}
+        <div style={{
+          padding: '16px 18px 12px',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+          background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 100%)',
+        }}>
+          <div style={{
+            fontSize: 14,
+            fontWeight: 600,
+            fontFamily: 'var(--font-body)',
+            color: '#1a1a1a',
+            letterSpacing: '-0.02em',
+          }}>
+            Add New Slide
+          </div>
+          <div style={{
+            fontSize: 12,
+            fontFamily: 'var(--font-body)',
+            color: '#737373',
+            marginTop: 3,
+          }}>
+            Choose a template to get started
+          </div>
+        </div>
+
+        {/* Template List */}
+        <div style={{
+          padding: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          maxHeight: 400,
+          overflowY: 'auto',
+        }}>
+          {SLIDE_TEMPLATES.map(({ template, icon, label, description }, index) => {
+            const colors = templateColors[template];
+            const isHovered = hoveredIndex === index;
+            const isFocused = focusedIndex === index;
+            const isActive = isHovered || isFocused;
+
+            return (
+              <motion.button
+                key={template}
+                onClick={() => {
+                  playSound('pop');
+                  onAdd(template);
+                }}
+                onMouseEnter={() => {
+                  setHoveredIndex(index);
+                  setFocusedIndex(index);
+                }}
+                onMouseLeave={() => setHoveredIndex(null)}
+                onFocus={() => setFocusedIndex(index)}
+                initial={false}
+                animate={{
+                  backgroundColor: isActive ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.1 }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  padding: '12px 14px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  outline: 'none',
+                  position: 'relative',
+                }}
+              >
+                {/* Focus indicator bar */}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: isActive ? 1 : 0,
+                    scaleY: isActive ? 1 : 0.5,
+                  }}
+                  transition={{ duration: 0.15 }}
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: '20%',
+                    bottom: '20%',
+                    width: 3,
+                    borderRadius: 2,
+                    background: colors.accent,
+                  }}
+                />
+
+                {/* Icon with colored background */}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    scale: isActive ? 1.08 : 1,
+                    rotate: isActive ? 2 : 0,
+                  }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 11,
+                    background: colors.bg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: colors.accent,
+                    flexShrink: 0,
+                    boxShadow: isActive
+                      ? `0 4px 14px ${colors.accent}30, 0 2px 6px ${colors.accent}20`
+                      : '0 1px 3px rgba(0,0,0,0.06)',
+                    transition: 'box-shadow 0.2s ease',
+                  }}
+                >
+                  {React.cloneElement(icon as React.ReactElement, { size: 20 })}
+                </motion.div>
+
+                {/* Label and description */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    fontFamily: 'var(--font-body)',
+                    color: '#1a1a1a',
+                    letterSpacing: '-0.01em',
+                  }}>
+                    {label}
+                  </div>
+                  <div style={{
+                    fontSize: 11,
+                    fontFamily: 'var(--font-body)',
+                    color: '#737373',
+                    marginTop: 2,
+                  }}>
+                    {description}
+                  </div>
+                </div>
+
+                {/* Plus indicator on hover */}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: isActive ? 1 : 0,
+                    scale: isActive ? 1 : 0.8,
+                    x: isActive ? 0 : -4,
+                  }}
+                  transition={{ duration: 0.15 }}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 8,
+                    background: colors.accent,
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: `0 2px 8px ${colors.accent}40`,
+                  }}
+                >
+                  <Plus size={16} strokeWidth={2.5} />
+                </motion.div>
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {/* Footer with keyboard hints */}
+        <div style={{
+          padding: '12px 18px 14px',
+          borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+          background: 'linear-gradient(180deg, rgba(250,250,250,1) 0%, rgba(245,245,245,1) 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 20,
+        }}>
+          {[
+            { keys: '↑↓', label: 'navigate' },
+            { keys: '⏎', label: 'select' },
+            { keys: 'esc', label: 'close' },
+          ].map(({ keys, label }) => (
+            <span
+              key={keys}
+              style={{
+                fontSize: 11,
+                fontFamily: 'var(--font-body)',
+                color: '#a3a3a3',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+              }}
+            >
+              <kbd style={{
+                padding: '3px 6px',
+                background: 'rgba(0,0,0,0.06)',
+                borderRadius: 5,
+                fontSize: 10,
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 500,
+                color: '#666',
+                border: '1px solid rgba(0,0,0,0.08)',
+                boxShadow: '0 1px 0 rgba(0,0,0,0.04)',
+              }}>
+                {keys}
+              </kbd>
+              {label}
+            </span>
+          ))}
+        </div>
+      </motion.div>
+    </>,
+    document.body
   );
 }
 
@@ -716,6 +1000,7 @@ export function GoOSSlidesEditor({
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [isPresenting, setIsPresenting] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const addSlideButtonRef = useRef<HTMLButtonElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dragControls = useDragControls();
   const prefersReducedMotion = useReducedMotion();
@@ -1056,40 +1341,62 @@ export function GoOSSlidesEditor({
             ))}
           </div>
 
-          {/* Add Slide */}
-          <div style={{ padding: 12, borderTop: '1px solid var(--color-border-subtle)', position: 'relative' }}>
-            <button
-              onClick={() => setShowAddMenu(!showAddMenu)}
+          {/* Add Slide Button */}
+          <div style={{ padding: 12, borderTop: '1px solid var(--color-border-subtle)' }}>
+            <motion.button
+              ref={addSlideButtonRef}
+              onClick={() => {
+                playSound('click');
+                setShowAddMenu(!showAddMenu);
+              }}
+              whileHover={{ scale: 1.02, borderColor: 'var(--color-accent-primary)' }}
+              whileTap={{ scale: 0.98 }}
               style={{
                 width: '100%',
-                padding: '10px 12px',
-                background: 'transparent',
-                border: '1px dashed var(--color-border-default)',
-                borderRadius: 8,
+                padding: '12px 14px',
+                background: showAddMenu
+                  ? 'var(--color-accent-primary)'
+                  : 'linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(250,250,250,0.9) 100%)',
+                border: showAddMenu
+                  ? '1px solid var(--color-accent-primary)'
+                  : '1px dashed var(--color-border-default)',
+                borderRadius: 10,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 6,
-                fontSize: 12,
+                gap: 8,
+                fontSize: 13,
+                fontWeight: 600,
                 fontFamily: 'var(--font-body)',
-                color: 'var(--color-text-muted)',
-                transition: 'all 0.15s ease',
+                color: showAddMenu ? '#fff' : 'var(--color-text-secondary)',
+                transition: 'background 0.15s ease, color 0.15s ease, border-color 0.15s ease',
+                boxShadow: showAddMenu
+                  ? '0 4px 12px rgba(255, 119, 34, 0.3)'
+                  : '0 1px 3px rgba(0,0,0,0.04)',
               }}
             >
-              <Plus size={14} />
+              <motion.div
+                animate={{ rotate: showAddMenu ? 45 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Plus size={16} strokeWidth={2.5} />
+              </motion.div>
               Add Slide
-            </button>
-            <AnimatePresence>
-              {showAddMenu && (
-                <AddSlideMenu
-                  onAdd={(template) => addSlide(template, selectedSlideIndex)}
-                  onClose={() => setShowAddMenu(false)}
-                />
-              )}
-            </AnimatePresence>
+            </motion.button>
           </div>
         </div>
+
+        {/* Add Slide Menu Portal */}
+        <AnimatePresence>
+          {showAddMenu && (
+            <AddSlideMenu
+              onAdd={(template) => addSlide(template, selectedSlideIndex)}
+              onClose={() => setShowAddMenu(false)}
+              anchorRef={addSlideButtonRef}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Slide Preview */}
         <div style={{
