@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ThemeProvider, type ThemeId } from '@/contexts/ThemeContext';
+import { IconStyleProvider } from '@/contexts/IconStyleContext';
 import { DesktopCanvas, MenuBar, Dock, MadeWithBadge, StatusWidget } from '@/components/desktop';
 import { PersonaLoginScreen, useVisitorPersona, PersonaModeToggle, type VisitorPersona } from './PersonaLoginScreen';
 import type { Desktop } from '@/types';
@@ -73,39 +74,41 @@ export function PublicDesktop({
 
   return (
     <ThemeProvider initialTheme={theme}>
-      {/* Login screen overlay */}
-      {showLoginScreen && (
-        <PersonaLoginScreen
-          profileImage={ownerImage}
-          name={title}
-          title={ownerTitle}
-          onSelect={handlePersonaSelect}
-        />
-      )}
+      <IconStyleProvider>
+        {/* Login screen overlay */}
+        {showLoginScreen && (
+          <PersonaLoginScreen
+            profileImage={ownerImage}
+            name={title}
+            title={ownerTitle}
+            onSelect={handlePersonaSelect}
+          />
+        )}
 
-      {/* Main desktop (hidden during login screen) */}
-      {!showLoginScreen && (
-        <main className="min-h-screen overflow-hidden">
-          <MenuBar
-            title={title}
-            rightContent={
-              persona && persona !== 'guest' && (
-                <PersonaModeToggle
-                  currentMode={persona}
-                  onChange={handleModeChange}
-                />
-              )
-            }
-          />
-          <DesktopCanvas
-            desktop={desktop}
-            viewMode={persona === 'recruiter' ? 'recruiter' : 'visitor'}
-          />
-          <Dock items={desktop.dockItems} />
-          <StatusWidget statusWidget={desktop.statusWidget} />
-          <MadeWithBadge />
-        </main>
-      )}
+        {/* Main desktop (hidden during login screen) */}
+        {!showLoginScreen && (
+          <main className="min-h-screen overflow-hidden">
+            <MenuBar
+              title={title}
+              rightContent={
+                persona && persona !== 'guest' && (
+                  <PersonaModeToggle
+                    currentMode={persona}
+                    onChange={handleModeChange}
+                  />
+                )
+              }
+            />
+            <DesktopCanvas
+              desktop={desktop}
+              viewMode={persona === 'recruiter' ? 'recruiter' : 'visitor'}
+            />
+            <Dock items={desktop.dockItems} />
+            <StatusWidget statusWidget={desktop.statusWidget} />
+            <MadeWithBadge />
+          </main>
+        )}
+      </IconStyleProvider>
     </ThemeProvider>
   );
 }

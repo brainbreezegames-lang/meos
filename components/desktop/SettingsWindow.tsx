@@ -2,6 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme, THEMES, type ThemeId } from '@/contexts/ThemeContext';
+import { useIconStyleSafe } from '@/contexts/IconStyleContext';
+import { IconStyleSettings } from './IconStyleSettings';
 
 interface SettingsWindowProps {
   isOpen: boolean;
@@ -136,6 +138,7 @@ function ThemePreview({ themeId, isActive, onClick }: { themeId: ThemeId; isActi
 
 export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
   const { theme, setTheme, availableThemes } = useTheme();
+  const iconStyleContext = useIconStyleSafe();
 
   return (
     <AnimatePresence>
@@ -236,12 +239,12 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
               </div>
 
               {/* Content */}
-              <div className="p-6">
+              <div className="p-6 max-h-[70vh] overflow-y-auto">
                 {/* Appearance Section */}
-                <div>
+                <div className="mb-8">
                   <h3
                     className="text-[13px] font-medium uppercase tracking-wide mb-4"
-                    style={{ color: 'var(--text-tertiary)' }}
+                    style={{ color: 'var(--color-text-muted, var(--text-tertiary))' }}
                   >
                     Appearance
                   </h3>
@@ -250,7 +253,7 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                   <div className="mb-6">
                     <label
                       className="text-[13px] font-medium mb-3 block"
-                      style={{ color: 'var(--text-primary)' }}
+                      style={{ color: 'var(--color-text-primary, var(--text-primary))' }}
                     >
                       Theme
                     </label>
@@ -270,15 +273,15 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                   <div
                     className="p-4 rounded-xl"
                     style={{
-                      background: 'var(--bg-glass)',
-                      border: '1px solid var(--border-light)',
+                      background: 'var(--color-bg-subtle, var(--bg-glass))',
+                      border: '1px solid var(--color-border-subtle, var(--border-light))',
                     }}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className="w-10 h-10 rounded-lg flex items-center justify-center"
                         style={{
-                          background: 'var(--accent-primary)',
+                          background: 'var(--color-accent-primary, var(--accent-primary))',
                         }}
                       >
                         <svg className="w-5 h-5 text-white" viewBox="0 0 20 20" fill="currentColor">
@@ -288,13 +291,13 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                       <div>
                         <div
                           className="text-[14px] font-medium"
-                          style={{ color: 'var(--text-primary)' }}
+                          style={{ color: 'var(--color-text-primary, var(--text-primary))' }}
                         >
                           {THEMES[theme].name}
                         </div>
                         <div
                           className="text-[12px]"
-                          style={{ color: 'var(--text-secondary)' }}
+                          style={{ color: 'var(--color-text-secondary, var(--text-secondary))' }}
                         >
                           {THEMES[theme].description}
                         </div>
@@ -302,6 +305,16 @@ export function SettingsWindow({ isOpen, onClose }: SettingsWindowProps) {
                     </div>
                   </div>
                 </div>
+
+                {/* Icon Style Section - only show if provider is available */}
+                {iconStyleContext && (
+                  <div
+                    className="pt-6"
+                    style={{ borderTop: '1px solid var(--color-border-subtle, var(--border-light))' }}
+                  >
+                    <IconStyleSettings />
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>

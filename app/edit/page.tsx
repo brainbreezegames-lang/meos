@@ -10,6 +10,7 @@ import { DesktopCanvas, MenuBar, Dock, MadeWithBadge, StatusWidget, StatusWidget
 import { SettingsWindow } from '@/components/desktop/SettingsWindow';
 import type { StatusWidget as StatusWidgetType } from '@/types';
 import { ThemeProvider, type ThemeId } from '@/contexts/ThemeContext';
+import { IconStyleProvider } from '@/contexts/IconStyleContext';
 import type { Desktop, DesktopItem, DockItem } from '@/types';
 
 export default function EditPage() {
@@ -354,6 +355,7 @@ export default function EditPage() {
 
   return (
     <ThemeProvider initialTheme={initialTheme} desktopId={desktop.id} isOwner={true}>
+      <IconStyleProvider desktopId={desktop.id} isOwner={true}>
       <div className="min-h-screen" style={{ background: 'var(--bg-solid)' }}>
         <EditorToolbar
           username={session.user.username}
@@ -426,6 +428,7 @@ export default function EditPage() {
           onSave={handleUpdateStatusWidget}
         />
       </div>
+      </IconStyleProvider>
     </ThemeProvider>
   );
 }
