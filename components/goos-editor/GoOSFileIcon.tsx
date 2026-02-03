@@ -6,6 +6,7 @@ import { goOSTokens } from './GoOSTipTapEditor';
 import { PublishStatus } from './GoOSPublishToggle';
 import { AccessLevel } from '@/contexts/GoOSContext';
 import { playSound } from '@/lib/sounds';
+import { getPremiumIcon } from './PremiumIcons';
 
 // ============================================================================
 // BEAUTIFUL FILE ICONS - macOS Big Sur inspired with goOS warmth
@@ -648,175 +649,14 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     }
   };
 
+  // Use premium icons that respond to IconStyleContext settings
   const getIcon = () => {
-    switch (type) {
-      case 'link':
-        // Beautiful macOS-style app icon with favicon
-        const faviconUrl = linkUrl ? getFaviconUrl(linkUrl) : null;
-        return (
-          <div
-            style={{
-              width: 52,
-              height: 52,
-              position: 'relative',
-            }}
-          >
-            {/* macOS-style rounded square background with gradient */}
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: 12,
-                background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 50%, #e8e8e8 100%)',
-                boxShadow: `
-                  0 1px 2px rgba(0, 0, 0, 0.06),
-                  0 4px 8px rgba(0, 0, 0, 0.08),
-                  0 8px 16px rgba(0, 0, 0, 0.04),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.8)
-                `,
-                border: '0.5px solid rgba(0, 0, 0, 0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-              }}
-            >
-              {faviconUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={faviconUrl}
-                  alt=""
-                  style={{
-                    width: 32,
-                    height: 32,
-                    objectFit: 'contain',
-                  }}
-                  draggable={false}
-                  onError={(e) => {
-                    // Hide broken image and show fallback
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              {/* Fallback icon - shown if no favicon or on error */}
-              <div
-                style={{
-                  display: faviconUrl ? 'none' : 'flex',
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  background: 'linear-gradient(145deg, #5C6BC0 0%, #3949AB 100%)',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M10 6H7C5.89543 6 5 6.89543 5 8V10M10 18H7C5.89543 18 5 17.1046 5 16V14M14 6H17C18.1046 6 19 6.89543 19 8V10M14 18H17C18.1046 18 19 17.1046 19 16V14M8 12H16"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-            </div>
-            {/* Small link indicator badge */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: -2,
-                right: -2,
-                width: 18,
-                height: 18,
-                borderRadius: 6,
-                background: 'linear-gradient(145deg, #ff8a4c 0%, #ff7722 100%)',
-                border: '2px solid #fff',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M7 17L17 7M17 7H8M17 7V16"
-                  stroke="white"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          </div>
-        );
-      case 'image':
-        // Show actual image thumbnail
-        if (imageUrl) {
-          return (
-            <div
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: 8,
-                overflow: 'hidden',
-                background: 'rgba(23, 20, 18, 0.04)',
-                border: '1px solid rgba(23, 20, 18, 0.08)',
-                boxShadow: '0 2px 8px rgba(23, 20, 18, 0.1)',
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imageUrl}
-                alt={title}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
-                draggable={false}
-              />
-            </div>
-          );
-        }
-        // Fallback to generic image icon
-        return (
-          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="6" y="8" width="32" height="28" rx="3" fill="rgba(23, 20, 18, 0.08)" transform="translate(1, 1)" />
-            <rect x="6" y="8" width="32" height="28" rx="3" fill="url(#imgGradient)" />
-            <circle cx="15" cy="17" r="4" fill="#ff7722" opacity="0.8" />
-            <path d="M6 28L14 22L20 26L28 18L38 26V33C38 34.6569 36.6569 36 35 36H9C7.34315 36 6 34.6569 6 33V28Z" fill="#22c55e" opacity="0.7" />
-            <rect x="6" y="8" width="32" height="28" rx="3" stroke="rgba(23, 20, 18, 0.15)" strokeWidth="1" fill="none" />
-            <defs>
-              <linearGradient id="imgGradient" x1="6" y1="8" x2="38" y2="36" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#FFFDF7" />
-                <stop offset="1" stopColor="#F5F0E4" />
-              </linearGradient>
-            </defs>
-          </svg>
-        );
-      case 'case-study':
-        return <CaseStudyIcon />;
-      case 'folder':
-        return <FolderIcon />;
-      case 'cv':
-        return <CVIcon />;
-      case 'embed':
-        return <EmbedIcon />;
-      case 'download':
-        return <DownloadIcon />;
-      case 'game':
-        return <GameIcon />;
-      case 'board':
-        return <BoardIcon />;
-      case 'sheet':
-        return <SheetIcon />;
-      case 'slides':
-        return <SlidesIcon />;
-      default:
-        return <NoteIcon />;
-    }
+    const faviconUrl = linkUrl ? getFaviconUrl(linkUrl) : null;
+    return getPremiumIcon(type, {
+      size: 52,
+      imageUrl,
+      faviconUrl,
+    });
   };
 
   const handleRenameSubmit = () => {
