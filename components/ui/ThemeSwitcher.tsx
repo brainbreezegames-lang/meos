@@ -14,6 +14,8 @@ const themePreviewColors: Record<ThemeId, { bg: string; accent: string; isDark: 
   warm: { bg: '#FAFAF9', accent: '#EA580C', isDark: false },
   clay: { bg: '#F7F4F0', accent: '#C9785C', isDark: false },
   posthog: { bg: '#EEEFE9', accent: '#EB9D2A', isDark: false },
+  sketch: { bg: '#FFFEF5', accent: '#FF6B6B', isDark: false },
+  'brand-appart': { bg: '#F8F8FA', accent: '#5B50FF', isDark: false },
 };
 
 export function ThemeSwitcher() {

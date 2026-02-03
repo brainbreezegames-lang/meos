@@ -15,18 +15,18 @@ interface SocialBlockRendererProps {
   data: Record<string, unknown>;
 }
 
-const socialIcons: Record<SocialPlatform, { icon: string; color: string; label: string }> = {
-  twitter: { icon: '𝕏', color: '#0a0a0a', label: 'Twitter' },
-  linkedin: { icon: 'in', color: '#0A66C2', label: 'LinkedIn' },
-  github: { icon: 'gh', color: '#181717', label: 'GitHub' },
-  instagram: { icon: '📷', color: '#E4405F', label: 'Instagram' },
-  dribbble: { icon: '🏀', color: '#EA4C89', label: 'Dribbble' },
-  behance: { icon: 'Bē', color: '#1769FF', label: 'Behance' },
-  youtube: { icon: '▶', color: '#FF0000', label: 'YouTube' },
-  tiktok: { icon: '♪', color: '#0a0a0a', label: 'TikTok' },
-  facebook: { icon: 'f', color: '#1877F2', label: 'Facebook' },
-  email: { icon: '✉', color: '#007AFF', label: 'Email' },
-  website: { icon: '🌐', color: '#007AFF', label: 'Website' },
+const socialIcons: Record<SocialPlatform, { icon: string; colorVar: string; label: string }> = {
+  twitter: { icon: '𝕏', colorVar: 'var(--color-social-twitter)', label: 'Twitter' },
+  linkedin: { icon: 'in', colorVar: 'var(--color-social-linkedin)', label: 'LinkedIn' },
+  github: { icon: 'gh', colorVar: 'var(--color-social-github)', label: 'GitHub' },
+  instagram: { icon: '📷', colorVar: 'var(--color-social-instagram)', label: 'Instagram' },
+  dribbble: { icon: '🏀', colorVar: 'var(--color-social-dribbble)', label: 'Dribbble' },
+  behance: { icon: 'Bē', colorVar: 'var(--color-social-behance)', label: 'Behance' },
+  youtube: { icon: '▶', colorVar: 'var(--color-social-youtube)', label: 'YouTube' },
+  tiktok: { icon: '♪', colorVar: 'var(--color-social-tiktok)', label: 'TikTok' },
+  facebook: { icon: 'f', colorVar: 'var(--color-social-facebook)', label: 'Facebook' },
+  email: { icon: '✉', colorVar: 'var(--color-social-email)', label: 'Email' },
+  website: { icon: '🌐', colorVar: 'var(--color-social-website)', label: 'Website' },
 };
 
 export default function SocialBlockRenderer({ data }: SocialBlockRendererProps) {
@@ -56,8 +56,8 @@ export default function SocialBlockRenderer({ data }: SocialBlockRendererProps) 
                 borderRadius: 'var(--radius-social)',
                 fontSize: 'var(--font-size-social-icon)',
                 fontFamily: 'var(--font-body)',
-                background: `${social.color}15`,
-                color: social.color,
+                background: `color-mix(in srgb, ${social.colorVar} 9%, transparent)`,
+                color: social.colorVar,
                 border: 'var(--border-social)',
               }}
               title={social.label}

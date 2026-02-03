@@ -93,6 +93,63 @@
    --color-error-subtle: rgba(255, 60, 52, 0.1);
 
    /* ─────────────────────────────────────────────────────────────────────────
+     1.4a SOCIAL PLATFORM COLORS
+     Brand colors for social media links
+     ───────────────────────────────────────────────────────────────────────── */
+   --color-social-twitter: #0a0a0a;
+   --color-social-linkedin: #0A66C2;
+   --color-social-github: #181717;
+   --color-social-instagram: #E4405F;
+   --color-social-dribbble: #EA4C89;
+   --color-social-behance: #1769FF;
+   --color-social-youtube: #FF0000;
+   --color-social-tiktok: #0a0a0a;
+   --color-social-facebook: #1877F2;
+   --color-social-email: #007AFF;
+   --color-social-website: #007AFF;
+
+   /* ─────────────────────────────────────────────────────────────────────────
+     1.4b STICKY NOTE COLORS
+     Warm, refined palette for sticky notes
+     ───────────────────────────────────────────────────────────────────────── */
+   /* Yellow */
+   --sticky-yellow-bg: #fffef5;
+   --sticky-yellow-header: #fef9e7;
+   --sticky-yellow-text: #78350f;
+   --sticky-yellow-line: rgba(120, 53, 15, 0.12);
+   --sticky-yellow-accent: #f59e0b;
+   /* Blue */
+   --sticky-blue-bg: #f8fbff;
+   --sticky-blue-header: #eef5fc;
+   --sticky-blue-text: #1e3a5f;
+   --sticky-blue-line: rgba(30, 58, 95, 0.12);
+   --sticky-blue-accent: #3b82f6;
+   /* Green */
+   --sticky-green-bg: #f5fff8;
+   --sticky-green-header: #edfcf2;
+   --sticky-green-text: #14532d;
+   --sticky-green-line: rgba(20, 83, 45, 0.12);
+   --sticky-green-accent: #22c55e;
+   /* Pink */
+   --sticky-pink-bg: #fff8fb;
+   --sticky-pink-header: #fceff4;
+   --sticky-pink-text: #831843;
+   --sticky-pink-line: rgba(131, 24, 67, 0.12);
+   --sticky-pink-accent: #ec4899;
+   /* Purple */
+   --sticky-purple-bg: #faf8ff;
+   --sticky-purple-header: #f3f0fc;
+   --sticky-purple-text: #3b0764;
+   --sticky-purple-line: rgba(59, 7, 100, 0.12);
+   --sticky-purple-accent: #8b5cf6;
+   /* Orange */
+   --sticky-orange-bg: #fffaf5;
+   --sticky-orange-header: #fef4eb;
+   --sticky-orange-text: #7c2d12;
+   --sticky-orange-line: rgba(124, 45, 18, 0.12);
+   --sticky-orange-accent: #f97316;
+
+   /* ─────────────────────────────────────────────────────────────────────────
      1.5 BORDERS
      ───────────────────────────────────────────────────────────────────────── */
    --color-border-default: rgba(23, 20, 18, 0.08);

@@ -1,5 +1,3 @@
-'use client';
-
 import '@/styles/design-system.css';
 import '@/styles/delight.css';
 

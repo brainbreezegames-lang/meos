@@ -5,49 +5,49 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useEditContextSafe } from '@/contexts/EditContext';
 import { SPRING, REDUCED_MOTION } from '@/lib/animations';
 
-// Sticky note colors - warm, refined palette
+// Sticky note colors - uses CSS variables from design-system.css
 const STICKY_COLORS = {
   yellow: {
-    bg: '#fffef5',
-    headerBg: '#fef9e7',
-    text: '#78350f',
-    lineColor: 'rgba(120, 53, 15, 0.12)',
-    accentColor: '#f59e0b',
+    bg: 'var(--sticky-yellow-bg)',
+    headerBg: 'var(--sticky-yellow-header)',
+    text: 'var(--sticky-yellow-text)',
+    lineColor: 'var(--sticky-yellow-line)',
+    accentColor: 'var(--sticky-yellow-accent)',
   },
   blue: {
-    bg: '#f8fbff',
-    headerBg: '#eef5fc',
-    text: '#1e3a5f',
-    lineColor: 'rgba(30, 58, 95, 0.12)',
-    accentColor: '#3b82f6',
+    bg: 'var(--sticky-blue-bg)',
+    headerBg: 'var(--sticky-blue-header)',
+    text: 'var(--sticky-blue-text)',
+    lineColor: 'var(--sticky-blue-line)',
+    accentColor: 'var(--sticky-blue-accent)',
   },
   green: {
-    bg: '#f5fff8',
-    headerBg: '#edfcf2',
-    text: '#14532d',
-    lineColor: 'rgba(20, 83, 45, 0.12)',
-    accentColor: '#22c55e',
+    bg: 'var(--sticky-green-bg)',
+    headerBg: 'var(--sticky-green-header)',
+    text: 'var(--sticky-green-text)',
+    lineColor: 'var(--sticky-green-line)',
+    accentColor: 'var(--sticky-green-accent)',
   },
   pink: {
-    bg: '#fff8fb',
-    headerBg: '#fceff4',
-    text: '#831843',
-    lineColor: 'rgba(131, 24, 67, 0.12)',
-    accentColor: '#ec4899',
+    bg: 'var(--sticky-pink-bg)',
+    headerBg: 'var(--sticky-pink-header)',
+    text: 'var(--sticky-pink-text)',
+    lineColor: 'var(--sticky-pink-line)',
+    accentColor: 'var(--sticky-pink-accent)',
   },
   purple: {
-    bg: '#faf8ff',
-    headerBg: '#f3f0fc',
-    text: '#3b0764',
-    lineColor: 'rgba(59, 7, 100, 0.12)',
-    accentColor: '#8b5cf6',
+    bg: 'var(--sticky-purple-bg)',
+    headerBg: 'var(--sticky-purple-header)',
+    text: 'var(--sticky-purple-text)',
+    lineColor: 'var(--sticky-purple-line)',
+    accentColor: 'var(--sticky-purple-accent)',
   },
   orange: {
-    bg: '#fffaf5',
-    headerBg: '#fef4eb',
-    text: '#7c2d12',
-    lineColor: 'rgba(124, 45, 18, 0.12)',
-    accentColor: '#f97316',
+    bg: 'var(--sticky-orange-bg)',
+    headerBg: 'var(--sticky-orange-header)',
+    text: 'var(--sticky-orange-text)',
+    lineColor: 'var(--sticky-orange-line)',
+    accentColor: 'var(--sticky-orange-accent)',
   },
 } as const;
 
@@ -601,10 +601,10 @@ export function StickyNotesContainer({ notes, onNotesChange, maxNotes = 5 }: Sti
           onClick={addNote}
           className="fixed bottom-24 right-4 w-10 h-10 rounded-full flex items-center justify-center z-[100]"
           style={{
-            background: 'linear-gradient(145deg, #fffef5, #fef9e7)',
+            background: `linear-gradient(145deg, var(--sticky-yellow-bg), var(--sticky-yellow-header))`,
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255,255,255,0.8)',
             fontSize: '20px',
-            color: '#78350f',
+            color: 'var(--sticky-yellow-text)',
             border: '1px solid rgba(0,0,0,0.08)',
           }}
           whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
