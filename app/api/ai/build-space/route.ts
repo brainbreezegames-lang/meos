@@ -9,7 +9,7 @@ export const maxDuration = 300;
  */
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const AI_MODEL = process.env.AI_MODEL || 'deepseek/deepseek-v3.2';
+const AI_MODEL = process.env.AI_MODEL || 'deepseek/deepseek-chat';
 
 // Phase 1: Deep Understanding Prompt
 const UNDERSTANDING_PROMPT = `You are analyzing a user's request to build their personal workspace. Extract DEEP understanding, not surface-level parsing.
