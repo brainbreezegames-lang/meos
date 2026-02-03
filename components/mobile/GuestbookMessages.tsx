@@ -122,7 +122,7 @@ export function GuestbookMessages({
 
             <div className="flex items-center gap-2">
               {ownerImage && (
-                <img src={ownerImage} alt={ownerName} className="w-8 h-8 rounded-full object-cover" />
+                <img src={ownerImage} alt={ownerName} className="w-8 h-8 rounded-full object-cover" loading="lazy" decoding="async" />
               )}
               <div className="text-center">
                 <p

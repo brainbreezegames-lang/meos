@@ -119,7 +119,7 @@ export function RecruiterMode({
                 }}
               >
                 {profileImage ? (
-                  <img src={profileImage} alt={profileName} className="w-full h-full object-cover" />
+                  <img src={profileImage} alt={profileName} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-3xl text-white/50">
                     {profileName.charAt(0)}

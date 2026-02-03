@@ -263,10 +263,10 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
                       >
                         {file.type === 'image' && file.imageUrl ? (
                           /* eslint-disable-next-line @next/next/no-img-element */
-                          <img src={file.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} draggable={false} />
+                          <img src={file.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} draggable={false} loading="lazy" decoding="async" />
                         ) : file.type === 'link' && faviconUrl ? (
                           /* eslint-disable-next-line @next/next/no-img-element */
-                          <img src={faviconUrl} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} draggable={false} />
+                          <img src={faviconUrl} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} draggable={false} loading="lazy" decoding="async" />
                         ) : (
                           <div style={{ color }}>{getFileTypeIcon(file.type, 24)}</div>
                         )}
@@ -343,10 +343,10 @@ export const GoOSFolderWindow = memo(function GoOSFolderWindow({
                         >
                           {file.type === 'image' && file.imageUrl ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={file.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} draggable={false} />
+                            <img src={file.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} draggable={false} loading="lazy" decoding="async" />
                           ) : file.type === 'link' && faviconUrl ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={faviconUrl} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} draggable={false} />
+                            <img src={faviconUrl} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} draggable={false} loading="lazy" decoding="async" />
                           ) : (
                             <div style={{ color }}>{getFileTypeIcon(file.type, 14)}</div>
                           )}

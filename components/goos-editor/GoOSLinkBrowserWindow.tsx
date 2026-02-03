@@ -175,7 +175,7 @@ export function GoOSLinkBrowserWindow({
         </div>
         {faviconUrl && (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={faviconUrl} alt="" style={{ width: 14, height: 14, borderRadius: 'var(--radius-xs)', flexShrink: 0 }} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+          <img src={faviconUrl} alt="" style={{ width: 14, height: 14, borderRadius: 'var(--radius-xs)', flexShrink: 0 }} onError={(e) => { e.currentTarget.style.display = 'none'; }} loading="lazy" decoding="async" />
         )}
         <span style={{ flex: 1, fontSize: 12, fontFamily: 'var(--font-body)', color: 'var(--color-text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {displayUrl}
