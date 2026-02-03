@@ -8,8 +8,8 @@ export const maxDuration = 120;
  * Creates ONE item per request (file or widget).
  */
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3-pro-preview';
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const AI_MODEL = process.env.AI_MODEL || 'deepseek/deepseek-chat-v3-0324';
 
 // Prompt to understand what the user wants to create
 const INTENT_PROMPT = `You are a helpful assistant inside a personal workspace app called MeOS (a macOS-style web desktop).
@@ -105,30 +105,34 @@ Return JSON:
 
 Create a header row + 5-8 data rows with realistic, useful content.`;
 
-async function callGemini(prompt: string, maxTokens = 4000): Promise<string> {
-  if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
+async function callAI(prompt: string, maxTokens = 4000): Promise<string> {
+  if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not configured');
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
-      }),
-    }
-  );
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://meos-delta.vercel.app',
+      'X-Title': 'MeOS',
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: maxTokens,
+      temperature: 0.7,
+    }),
+  });
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('[chat-create] Gemini error:', response.status, error);
-    throw new Error(`Gemini error: ${response.status}`);
+    console.error('[chat-create] OpenRouter error:', response.status, error);
+    throw new Error(`AI error: ${response.status}`);
   }
 
   const data = await response.json();
-  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  if (!content.trim()) throw new Error('Empty Gemini response');
+  const content = data.choices?.[0]?.message?.content || '';
+  if (!content.trim()) throw new Error('Empty AI response');
   return content;
 }
 
@@ -167,7 +171,7 @@ export async function POST(req: NextRequest) {
           send('thinking', { text: 'Understanding your request...' });
 
           const intentPrompt = INTENT_PROMPT.replace('{message}', message);
-          const intentRaw = await callGemini(intentPrompt, 2000);
+          const intentRaw = await callAI(intentPrompt, 2000);
           const intent = extractJSON(intentRaw) as Record<string, string>;
 
           const itemType = intent.type; // 'file' or 'widget'
@@ -199,14 +203,14 @@ export async function POST(req: NextRequest) {
               .replace('{purpose}', purpose)
               .replace('{title}', title)
               .replace('{brief}', contentBrief);
-            const boardRaw = await callGemini(boardPrompt, 4000);
+            const boardRaw = await callAI(boardPrompt, 4000);
             content = JSON.stringify(extractJSON(boardRaw));
           } else if (fileType === 'sheet') {
             const sheetPrompt = SHEET_PROMPT
               .replace('{purpose}', purpose)
               .replace('{title}', title)
               .replace('{brief}', contentBrief);
-            const sheetRaw = await callGemini(sheetPrompt, 6000);
+            const sheetRaw = await callAI(sheetPrompt, 6000);
             content = JSON.stringify(extractJSON(sheetRaw));
           } else {
             // HTML content for notes and case studies
@@ -215,7 +219,7 @@ export async function POST(req: NextRequest) {
               .replace('{title}', title)
               .replace('{fileType}', fileType || 'note')
               .replace('{brief}', contentBrief);
-            content = await callGemini(contentPrompt, 4000);
+            content = await callAI(contentPrompt, 4000);
             content = content.replace(/```html?\s*/g, '').replace(/```\s*/g, '').trim();
           }
 
