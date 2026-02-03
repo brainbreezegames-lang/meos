@@ -39,6 +39,8 @@ import {
 } from 'lucide-react';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
+import { IconStyleProvider, useIconStyleSafe } from '@/contexts/IconStyleContext';
+import { IconStyleSettings } from '@/components/desktop/IconStyleSettings';
 // ThemeProvider removed - using only Appart theme via data-theme attribute
 import { WindowManager } from '@/components/desktop/MultiWindow';
 import { SaveIndicator, Toast } from '@/components/editing/SaveIndicator';
@@ -5751,22 +5753,17 @@ function GoOSDemoContent() {
                                 zIndex={windowZ.settings}
                                 defaultX={350}
                                 defaultY={180}
-                                width={380}
-                                height={280}
+                                width={480}
+                                height={520}
                                 onClose={() => closeApp('settings')}
                                 onFocus={() => focusApp('settings')}
                             >
-                                <div className="p-5 space-y-4" style={{ background: 'var(--bg-surface)' }}>
-                                    <div>
-                                        <h4 className="text-sm font-bold mb-3 pb-2" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-subtle)' }}>Appearance</h4>
-                                        <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
-                                            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>Dark Mode</span>
-                                            <div className="w-10 h-5 rounded-full relative cursor-pointer" style={{ background: 'var(--border-medium)' }}>
-                                                <div className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full" style={{ background: 'var(--text-primary)' }} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
+                                <div className="p-5 space-y-4 overflow-y-auto max-h-[calc(100%-40px)]" style={{ background: 'var(--bg-surface)' }}>
+                                    {/* Icon Style Settings */}
+                                    <IconStyleSettings />
+
+                                    {/* About Section */}
+                                    <div className="pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                                         <h4 className="text-sm font-bold mb-3 pb-2" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-subtle)' }}>About</h4>
                                         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>goOS Demo — A playful portfolio experience</p>
                                     </div>
@@ -6579,6 +6576,7 @@ export default function GoOSDemoPage() {
                 position: 'relative',
             }}
         >
+            <IconStyleProvider>
             <EditProvider initialDesktop={DEMO_DESKTOP} initialIsOwner={false} demoMode={true}>
                 <WindowProvider>
                     <GoOSProvider viewMode="owner" localOnly={true} initialFiles={INITIAL_GOOS_FILES}>
@@ -6588,6 +6586,7 @@ export default function GoOSDemoPage() {
                     </GoOSProvider>
                 </WindowProvider>
             </EditProvider>
+        </IconStyleProvider>
         </div>
     );
 }
