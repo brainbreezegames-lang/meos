@@ -8,8 +8,8 @@ export const maxDuration = 300;
  * Uses Server-Sent Events to stream AI reasoning and progress in real-time
  */
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3-pro-preview';
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const AI_MODEL = process.env.AI_MODEL || 'deepseek/deepseek-v3.2';
 
 // Phase 1: Deep Understanding Prompt
 const UNDERSTANDING_PROMPT = `You are analyzing a user's request to build their personal workspace. Extract DEEP understanding, not surface-level parsing.
@@ -240,62 +240,63 @@ Return ONLY valid JSON in this exact format:
   "frozenRows": 1
 }`;
 
-// Gemini 3 Pro API
-async function callGemini(prompt: string, maxTokens = 4000): Promise<string> {
-  if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
+// OpenRouter API (DeepSeek)
+async function callOpenRouter(prompt: string, maxTokens = 4000): Promise<string> {
+  if (!OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not configured');
 
   const startTime = Date.now();
-  console.log(`[AI] Calling ${GEMINI_MODEL} (max_tokens=${maxTokens})...`);
+  console.log(`[AI] Calling ${AI_MODEL} (max_tokens=${maxTokens})...`);
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          maxOutputTokens: maxTokens,
-          temperature: 0.7,
-        },
-      }),
-    }
-  );
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://meos-delta.vercel.app',
+      'X-Title': 'MeOS',
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: maxTokens,
+      temperature: 0.7,
+    }),
+  });
 
   const elapsed = Date.now() - startTime;
 
   if (!response.ok) {
     const error = await response.text();
-    console.error(`[AI] Gemini error (${elapsed}ms):`, response.status, error);
-    throw new Error(`Gemini error: ${response.status}`);
+    console.error(`[AI] OpenRouter error (${elapsed}ms):`, response.status, error);
+    throw new Error(`OpenRouter error: ${response.status}`);
   }
 
   const data = await response.json();
-  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const content = data.choices?.[0]?.message?.content || '';
 
-  console.log(`[AI] Gemini response (${elapsed}ms, ${content.length} chars)`);
+  console.log(`[AI] OpenRouter response (${elapsed}ms, ${content.length} chars)`);
 
   if (!content || content.trim().length === 0) {
-    throw new Error('Empty response from Gemini');
+    throw new Error('Empty response from AI');
   }
 
   return content;
 }
 
-// Call AI — Gemini 3 Pro with retries
+// Call AI — OpenRouter with retries
 async function callAI(prompt: string, retries = 1, maxTokens = 4000): Promise<string> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      return await callGemini(prompt, maxTokens);
+      return await callOpenRouter(prompt, maxTokens);
     } catch (err) {
-      console.error(`[AI] Gemini attempt ${attempt} failed:`, err);
+      console.error(`[AI] OpenRouter attempt ${attempt} failed:`, err);
     }
     if (attempt < retries) {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 
-  throw new Error('Gemini API failed after all retries');
+  throw new Error('OpenRouter API failed after all retries');
 }
 
 // Curated Unsplash wallpapers — multiple options per category to prevent repetition

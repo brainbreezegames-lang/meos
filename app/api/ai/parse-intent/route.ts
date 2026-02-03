@@ -33,45 +33,41 @@ const intentSchema = z.object({
   summary: z.string(),
 });
 
-async function callGemini(systemPrompt: string, userPrompt: string): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const model = process.env.AI_MODEL || 'deepseek/deepseek-v3.2';
 
   if (!apiKey) {
-    throw new Error('GEMINI_API_KEY is not configured');
+    throw new Error('OPENROUTER_API_KEY is not configured');
   }
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { text: `${systemPrompt}\n\n${userPrompt}` }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1000,
-        },
-      }),
-    }
-  );
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'HTTP-Referer': 'https://meos-delta.vercel.app',
+      'X-Title': 'MeOS',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      max_tokens: 2000,
+      temperature: 0.7,
+    }),
+  });
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('Gemini error:', error);
-    throw new Error(`Gemini API error: ${response.status}`);
+    console.error('OpenRouter error:', error);
+    throw new Error(`OpenRouter API error: ${response.status}`);
   }
 
   const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  return data.choices?.[0]?.message?.content || '';
 }
 
 function extractJSON(text: string): string {
@@ -98,13 +94,13 @@ export async function POST(request: NextRequest) {
     let intent: ParsedIntent;
 
     // Check if AI is configured
-    if (!process.env.GEMINI_API_KEY) {
-      console.warn('GEMINI_API_KEY not configured, using fallback templates');
+    if (!process.env.OPENROUTER_API_KEY) {
+      console.warn('OPENROUTER_API_KEY not configured, using fallback templates');
       intent = generateFallbackIntent(prompt);
     } else {
       try {
-        // Call Gemini for intent parsing
-        const aiResponse = await callGemini(
+        // Call AI for intent parsing
+        const aiResponse = await callAI(
           INTENT_PARSER_SYSTEM_PROMPT,
           buildIntentParserPrompt(prompt)
         );
@@ -135,8 +131,8 @@ export async function POST(request: NextRequest) {
       success: true,
       data: intent,
       meta: {
-        usedAI: !!process.env.GEMINI_API_KEY,
-        model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+        usedAI: !!process.env.OPENROUTER_API_KEY,
+        model: process.env.AI_MODEL || 'deepseek/deepseek-v3.2',
       },
     });
   } catch (error) {
