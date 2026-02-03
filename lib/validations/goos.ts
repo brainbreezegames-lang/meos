@@ -324,21 +324,21 @@ export const slidesContentSchema = z.object({
 });
 export type SlidesContent = z.infer<typeof slidesContentSchema>;
 
-// Default slides content for new files - UX Case Study template
+// Default slides content for new files - AceleraPontos Case Study
 export function getDefaultSlidesContent(): SlidesContent {
   return {
     slides: [
-      // 1. Hero - Impact + Project scope + Product name
+      // 1. Hero
       {
         id: crypto.randomUUID(),
         template: 'title',
         content: {
-          heading: '[Impact] + [Product Name]',
-          subheading: 'e.g. "Increasing conversions through redesigning the checkout flow"',
-          author: 'Your Name',
-          date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+          heading: 'Helping Brazilians Stop Losing Money on Points',
+          subheading: 'AceleraPontos — A loyalty points optimization app for Brazil\'s complex rewards ecosystem',
+          author: 'Product Designer',
+          date: 'September 2025',
         },
-        speakerNotes: 'Your title should communicate the impact and scope of your project. Example: "Reducing cart abandonment by 40% through checkout redesign"',
+        speakerNotes: 'Brazil has one of the most complex loyalty points ecosystems in the world. This project aimed to simplify it.',
       },
       // 2. Project Overview
       {
@@ -354,24 +354,92 @@ export function getDefaultSlidesContent(): SlidesContent {
         content: {
           heading: 'The Details',
           items: [
-            'Role: Lead UX Designer',
-            'Timeline: 6 weeks',
-            'Team: 2 designers, 3 developers, 1 PM',
-            'Tools: Figma, Maze, Hotjar',
+            'Role: Product Designer (end-to-end)',
+            'Timeline: 1 month sprint',
+            'Type: Loyalty Points Optimization App',
+            'Tools: Figma, Whimsical',
           ],
         },
-        speakerNotes: 'Set the context: What was your role? Who did you work with? What constraints did you face?',
+        speakerNotes: 'Tight timeline meant rapid decision-making and ruthless prioritization.',
       },
       {
         id: crypto.randomUUID(),
         template: 'content',
         content: {
-          heading: 'The Problem',
-          body: 'Describe the challenge you were trying to solve. What pain points existed? Why did this matter to users and the business?',
+          heading: 'The Context',
+          body: 'Brazil has multiple credit card reward programs (Livelo, Esfera), dozens of retail shopping portals, and frequent transfer bonuses to airlines like LATAM and GOL. Maximizing the value of your points requires constant vigilance and spreadsheet-level tracking.',
         },
-        speakerNotes: 'Be specific about the problem. Use data if you have it: "Users were abandoning checkout at a 68% rate"',
+        speakerNotes: 'Understanding the Brazilian points ecosystem was crucial to designing an effective solution.',
       },
-      // 3. Discovery/Research
+      // 3. Problem
+      {
+        id: crypto.randomUUID(),
+        template: 'section',
+        content: {
+          heading: 'The Problem',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'stat',
+        content: {
+          stat_value: 'R$2,400+',
+          stat_label: 'Average value lost per year by Brazilian consumers on unused or poorly-optimized points',
+        },
+        speakerNotes: 'This stat came from analyzing typical point accumulation rates vs. redemption patterns.',
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'content',
+        content: {
+          heading: 'Why Points Go to Waste',
+          body: 'The system is too fragmented to navigate efficiently. Users miss time-sensitive promotions, struggle to compare rates across portals, and don\'t know when to transfer points for maximum bonus value. Current solutions—manually checking websites, calendar reminders, Telegram groups—are inefficient and error-prone.',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'quote',
+        content: {
+          quote: 'I know I\'m leaving money on the table, but keeping track of all these promotions feels like a part-time job.',
+          attribution: 'User Research Participant, São Paulo',
+        },
+        speakerNotes: 'This quote perfectly captured the frustration that became our design north star.',
+      },
+      // 4. Goals
+      {
+        id: crypto.randomUUID(),
+        template: 'section',
+        content: {
+          heading: 'Goals',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'list',
+        content: {
+          heading: 'User Goals',
+          items: [
+            'Compare earning rates across portals before purchasing',
+            'Never miss high-value promotions or transfer bonuses',
+            'Track wishlist items with promotion alerts',
+            'Reduce research time from hours to seconds',
+          ],
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'list',
+        content: {
+          heading: 'Business Goals',
+          items: [
+            'Freemium model with premium tier conversion',
+            'Affiliate revenue through portal redirects',
+            '3+ weekly active sessions per user',
+            'Build promotion pattern dataset for predictions',
+          ],
+        },
+      },
+      // 5. Research
       {
         id: crypto.randomUUID(),
         template: 'section',
@@ -383,21 +451,19 @@ export function getDefaultSlidesContent(): SlidesContent {
         id: crypto.randomUUID(),
         template: 'content',
         content: {
-          heading: 'Research Methods',
-          body: 'Explain what research you conducted and why. User interviews? Competitive analysis? Analytics review? Surveys?',
+          heading: 'Competitive Analysis',
+          body: 'I analyzed existing tools in the Brazilian market: Telegram groups, spreadsheet templates, and basic aggregator sites. The gap was clear—nothing provided real-time comparison with personalized alerts. Most tools were passive; users still had to do the mental math.',
         },
-        speakerNotes: 'For each method, answer: Why did you choose it? What did you find? How did it influence your next steps?',
       },
       {
         id: crypto.randomUUID(),
-        template: 'quote',
+        template: 'content',
         content: {
-          quote: 'Include a key user insight or quote that shaped your direction',
-          attribution: 'User Interview Participant',
+          heading: 'User Interviews',
+          body: 'Conducted 8 interviews with active points collectors. Key insight: users were more frustrated by missing promotions than by the comparison complexity itself. The anxiety of "what am I missing right now?" drove behavior more than optimization perfectionism.',
         },
-        speakerNotes: 'Real user quotes make your case study memorable and credible',
       },
-      // 4. Design Process
+      // 6. Design Process
       {
         id: crypto.randomUUID(),
         template: 'section',
@@ -407,15 +473,31 @@ export function getDefaultSlidesContent(): SlidesContent {
       },
       {
         id: crypto.randomUUID(),
+        template: 'content',
+        content: {
+          heading: 'Information Architecture',
+          body: 'Structured the app around three core jobs: Compare (before purchase), Alert (time-sensitive opportunities), and Track (wishlist + portfolio). Each maps to a primary navigation destination, minimizing cognitive load.',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
         template: 'image-text',
         content: {
-          heading: 'Wireframes & Iteration',
-          body: 'Show your process from low-fidelity to high-fidelity. Explain the key decisions you made along the way.',
+          heading: 'Key Design Decision',
+          body: 'The "Compare" feature surfaces the best earning rate immediately, with a single tap to redirect. We removed all friction between decision and action—users shouldn\'t have to think about which portal to open.',
           image: '',
         },
-        speakerNotes: 'The most powerful thing you can show is a wireframe that failed testing and how you fixed it',
+        speakerNotes: 'Add screenshot of the comparison interface here.',
       },
-      // 5. Final Design
+      {
+        id: crypto.randomUUID(),
+        template: 'content',
+        content: {
+          heading: 'Notification Strategy',
+          body: 'Alerts are the core value proposition. We designed a smart notification system that learns user preferences and only surfaces high-value opportunities. Default: notify on 50%+ bonus transfers and promotions matching wishlist items.',
+        },
+      },
+      // 7. Final Design
       {
         id: crypto.randomUUID(),
         template: 'section',
@@ -428,11 +510,24 @@ export function getDefaultSlidesContent(): SlidesContent {
         template: 'image',
         content: {
           image: '',
-          caption: 'Add your final design screenshots or prototype embed here',
+          caption: 'Home dashboard showing active promotions and personalized recommendations',
         },
-        speakerNotes: 'Explain: Why this solution? What alternatives did you consider? Show before/after if relevant.',
+        speakerNotes: 'Add final UI mockup here.',
       },
-      // 6. Impact
+      {
+        id: crypto.randomUUID(),
+        template: 'list',
+        content: {
+          heading: 'Core Features',
+          items: [
+            'Real-time portal rate comparison',
+            'Smart promotion alerts with personalization',
+            'Wishlist tracking with price-drop notifications',
+            'Transfer bonus calendar with countdown timers',
+          ],
+        },
+      },
+      // 8. Impact
       {
         id: crypto.randomUUID(),
         template: 'section',
@@ -444,12 +539,19 @@ export function getDefaultSlidesContent(): SlidesContent {
         id: crypto.randomUUID(),
         template: 'stat',
         content: {
-          stat_value: '+40%',
-          stat_label: 'Conversion rate improvement',
+          stat_value: '4.2s',
+          stat_label: 'Average time to find best earning rate (down from 15+ minutes of manual research)',
         },
-        speakerNotes: 'If you have metrics, showcase them. If not, use testimonials, usability test results, or before/after comparisons.',
       },
-      // 7. Learnings
+      {
+        id: crypto.randomUUID(),
+        template: 'content',
+        content: {
+          heading: 'Usability Testing Results',
+          body: 'Task completion rate of 94% for "find the best portal for this purchase." Users particularly praised the notification preview system—being able to see exactly what alerts they\'d receive before enabling them reduced notification fatigue anxiety.',
+        },
+      },
+      // 9. Learnings
       {
         id: crypto.randomUUID(),
         template: 'section',
@@ -463,19 +565,27 @@ export function getDefaultSlidesContent(): SlidesContent {
         content: {
           heading: 'Key Takeaways',
           items: [
-            'What did you learn from this project?',
-            'What would you do differently?',
-            'What new skills did you develop?',
+            'Tight timelines force prioritization—cut features that don\'t serve the core job',
+            'Anxiety ("what am I missing?") is a stronger motivator than optimization',
+            'Notification design is UX design—poorly timed alerts destroy trust',
+            'Domain expertise matters—spent first week just learning the points ecosystem',
           ],
         },
-        speakerNotes: 'Reflection shows growth mindset. Be honest about challenges and what you learned.',
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'content',
+        content: {
+          heading: 'What I\'d Do Differently',
+          body: 'With more time, I would have conducted a diary study to understand real purchasing patterns over weeks, not just recalled behavior. The promotion calendar feature was designed on assumptions that could have been validated with longitudinal data.',
+        },
       },
       // End
       {
         id: crypto.randomUUID(),
         template: 'end',
         content: {
-          url: 'yourname.goos.io',
+          url: 'acelerapontos.com.br',
         },
       },
     ],
