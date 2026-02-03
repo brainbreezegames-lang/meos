@@ -3,8 +3,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Home, User, FileText, Briefcase, Sun, Moon, ChevronDown, ArrowLeft } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
-import { staggerContainerVariants, staggerItemVariants } from '@/lib/motion-presets';
 import type { GoOSFileData } from '@/contexts/GoOSContext';
 
 type PageSection = 'home' | 'about' | 'posts' | 'work';
@@ -408,7 +406,7 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
           paddingBottom: 'clamp(80px, 15vh, 160px)',
         }}
       >
-        <div className="layout-content">
+        <div style={{ maxWidth: 680, margin: '0 auto', padding: '0 clamp(20px, 5vw, 40px)' }}>
           {selectedCaseStudy ? (
             <SectionWrapper key={`case-${selectedCaseStudy.id}`} prefersReducedMotion={prefersReducedMotion}>
               <CaseStudyDetail
@@ -720,16 +718,13 @@ function HomeSection({
       </p>
 
       {/* Fun Facts */}
-      <motion.div
-        variants={prefersReducedMotion ? undefined : staggerContainerVariants(0.08)}
-        initial="hidden"
-        animate="visible"
-        style={{ marginBottom: 40 }}
-      >
+      <div style={{ marginBottom: 40 }}>
         {AUTHOR.funFacts.map((fact, i) => (
           <motion.p
             key={i}
-            variants={prefersReducedMotion ? undefined : staggerItemVariants}
+            initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 + i * 0.08, duration: 0.4 }}
             style={{
               fontFamily: 'var(--font-body)',
               fontSize: 15,
@@ -741,7 +736,7 @@ function HomeSection({
             {fact}
           </motion.p>
         ))}
-      </motion.div>
+      </div>
 
       {/* Keep Going Button */}
       <motion.button
@@ -1062,22 +1057,18 @@ function WorkSection({
         Selected projects and case studies from my career.
       </p>
 
-      <motion.div
-        variants={prefersReducedMotion ? undefined : staggerContainerVariants(0.1)}
-        initial="hidden"
-        animate="visible"
-        style={{ display: 'flex', flexDirection: 'column', gap: 48 }}
-      >
-        {CASE_STUDIES.map((study) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+        {CASE_STUDIES.map((study, i) => (
           <WorkItem
             key={study.id}
             study={study}
             colors={colors}
             onClick={() => onSelectWork(study)}
+            delay={i * 0.1}
             prefersReducedMotion={prefersReducedMotion}
           />
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -1086,11 +1077,13 @@ function WorkItem({
   study,
   colors,
   onClick,
+  delay,
   prefersReducedMotion,
 }: {
   study: CaseStudy;
   colors: Record<string, string>;
   onClick: () => void;
+  delay: number;
   prefersReducedMotion: boolean | null;
 }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -1103,8 +1096,9 @@ function WorkItem({
 
   return (
     <motion.div
-      variants={prefersReducedMotion ? undefined : staggerItemVariants}
-      className="hover-lift"
+      initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -1190,11 +1184,23 @@ function WorkItem({
       </div>
 
       {/* Tags */}
-      <div className="flex gap-2 mt-3">
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
         {study.tags.map((tag, i) => (
-          <Badge key={i} variant="default" size="sm">
+          <span
+            key={i}
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 11,
+              fontWeight: 500,
+              color: colors.textMuted,
+              padding: '4px 8px',
+              borderRadius: 4,
+              background: colors.navBg,
+              letterSpacing: '0.02em',
+            }}
+          >
             {tag}
-          </Badge>
+          </span>
         ))}
       </div>
     </motion.div>

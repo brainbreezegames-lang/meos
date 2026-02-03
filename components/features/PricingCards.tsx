@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 
 export default function PricingCards() {
     const [selectedPlan, setSelectedPlan] = useState<'free' | 'paid'>('paid');
@@ -33,7 +32,7 @@ export default function PricingCards() {
             <div className="grid md:grid-cols-2 gap-8">
 
                 {/* Card 1: Included */}
-                <Card variant="soft" padding="lg">
+                <div className="bg-[#FDFDF8] border border-[#E5E7E0] rounded-lg p-6">
                     <h3 className="text-lg font-bold mb-4">What needs to be included in {selectedPlan === 'free' ? 'Free' : 'Pro'}?</h3>
                     <ul className="space-y-3">
                         {[
@@ -61,10 +60,10 @@ export default function PricingCards() {
                             </>
                         )}
                     </ul>
-                </Card>
+                </div>
 
                 {/* Card 2: Calculator/CTA */}
-                <Card variant="raised" padding="lg" className="flex flex-col justify-center items-center text-center">
+                <div className="flex flex-col justify-center items-center text-center p-6 bg-white border border-[#BFC1B7] rounded-lg shadow-sm">
                     <h3 className="text-2xl font-bold mb-2">
                         {selectedPlan === 'free' ? 'Always Free' : 'Start building'}
                     </h3>
@@ -81,7 +80,7 @@ export default function PricingCards() {
                     <p className="text-xs text-[#9EA096]">
                         No credit card required for the free volume.
                     </p>
-                </Card>
+                </div>
 
             </div>
         </div>
