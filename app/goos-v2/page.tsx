@@ -4856,14 +4856,14 @@ function GoOSDemoContent() {
                                 </MenuBarTrigger>
                                 <MenuBarDropdown isOpen={menuBar.isOpen('settings')} width={180}>
                                     <MenuBarItem
+                                        icon={<Palette size={14} strokeWidth={1.5} />}
+                                        label="Icon Style"
+                                        onClick={() => { toggleApp('settings'); menuBar.closeAll(); }}
+                                    />
+                                    <MenuBarItem
                                         icon={<BarChart3 size={14} strokeWidth={1.5} />}
                                         label="Analytics"
                                         onClick={() => { toggleApp('analytics'); menuBar.closeAll(); }}
-                                    />
-                                    <MenuBarItem
-                                        icon={<Settings size={14} strokeWidth={1.5} />}
-                                        label="Preferences"
-                                        onClick={() => { toggleApp('settings'); menuBar.closeAll(); }}
                                     />
                                     <MenuBarDivider />
                                     <MenuBarItem
