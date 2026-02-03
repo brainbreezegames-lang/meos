@@ -4,3 +4,4 @@ export { PresentView } from './PresentView';
 export { NotePresentView } from './NotePresentView';
 export { NotePageView } from './NotePageView';
 export { DesktopPageView } from './DesktopPageView';
+export { WebsiteView } from './WebsiteView';

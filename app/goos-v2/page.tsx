@@ -34,6 +34,8 @@ import {
     PenLine,
     Presentation,
     RotateCcw,
+    Globe,
+    Monitor,
 } from 'lucide-react';
 import { EditProvider, useEditContextSafe } from '@/contexts/EditContext';
 import { WindowProvider, useWindowContext } from '@/contexts/WindowContext';
@@ -58,7 +60,7 @@ import { WidgetProvider, useWidgets } from '@/contexts/WidgetContext';
 import { WidgetRenderer, WIDGET_METADATA, WidgetContextMenu } from '@/components/widgets';
 import { ClockWidgetEditor } from '@/components/widgets/ClockWidgetEditor';
 import type { Widget } from '@/types';
-import { PresentView } from '@/components/views';
+import { PresentView, WebsiteView } from '@/components/views';
 // DrawingApp, PresentationView, CaseStudyPageView — dynamic imported below
 import type { ViewMode, WidgetType, SpaceSummary } from '@/types';
 import { SpaceSwitcher, CreateSpaceModal, ManageSpacesDialog } from '@/components/spaces';
@@ -3279,8 +3281,8 @@ function GoOSDemoContent() {
     // Widgets menu state
     const [showWidgetsMenu, setShowWidgetsMenu] = useState(false);
 
-    // Zen focus mode - true when any window is maximized OR in page/present view
-    const isZenMode = maximizedEditors.size > 0 || viewMode === 'page' || viewMode === 'present';
+    // Zen focus mode - true when any window is maximized OR in page/present/website view
+    const isZenMode = maximizedEditors.size > 0 || viewMode === 'page' || viewMode === 'present' || viewMode === 'website';
 
     // Widget context
     const widgetContext = useWidgets();
@@ -4824,6 +4826,27 @@ function GoOSDemoContent() {
                                 </MenuBarDropdown>
                             </div>
 
+                            {/* View Menu — switch between desktop and website view */}
+                            <div className="relative">
+                                <MenuBarTrigger isOpen={menuBar.isOpen('view')} triggerProps={menuBar.getTriggerProps('view')}>
+                                    View
+                                </MenuBarTrigger>
+                                <MenuBarDropdown isOpen={menuBar.isOpen('view')} width={180}>
+                                    <MenuBarItem
+                                        icon={<Monitor size={14} strokeWidth={1.5} />}
+                                        label="Desktop"
+                                        trailing={viewMode === 'desktop' ? '✓' : ''}
+                                        onClick={() => { setViewMode('desktop'); menuBar.closeAll(); }}
+                                    />
+                                    <MenuBarItem
+                                        icon={<Globe size={14} strokeWidth={1.5} />}
+                                        label="Website"
+                                        trailing={viewMode === 'website' ? '✓' : ''}
+                                        onClick={() => { setViewMode('website'); menuBar.closeAll(); }}
+                                    />
+                                </MenuBarDropdown>
+                            </div>
+
                             {/* Settings Menu — shared MenuBar components */}
                             <div className="relative">
                                 <MenuBarTrigger isOpen={menuBar.isOpen('settings')} triggerProps={menuBar.getTriggerProps('settings')}>
@@ -5036,6 +5059,14 @@ function GoOSDemoContent() {
                     <PresentView
                         items={goosFilesAsDesktopItems}
                         isOwner={true}
+                        onClose={() => setViewMode('desktop')}
+                    />
+                )}
+
+                {/* Website View Mode - personal website experience */}
+                {viewMode === 'website' && (
+                    <WebsiteView
+                        files={goosFiles}
                         onClose={() => setViewMode('desktop')}
                     />
                 )}
