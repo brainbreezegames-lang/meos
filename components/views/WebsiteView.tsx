@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Home, User, FileText, Briefcase, Sun, Moon, ArrowRight, ChevronDown, ExternalLink } from 'lucide-react';
+import { Home, User, FileText, Briefcase, Sun, Moon, ChevronDown, ArrowLeft } from 'lucide-react';
 import type { GoOSFileData } from '@/contexts/GoOSContext';
 
 type PageSection = 'home' | 'about' | 'posts' | 'work';
@@ -13,7 +13,7 @@ interface WebsiteViewProps {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SAMPLE CONTENT - Will be replaced with actual data from files/context
+// SAMPLE CONTENT - Following paulstamatiou.com structure
 // ═══════════════════════════════════════════════════════════════════════════
 
 const AUTHOR = {
@@ -34,7 +34,6 @@ const AUTHOR = {
     'I\'m a designer who loves to code. I\'m a huge advocate for having a <strong>high product quality bar</strong> and know that having an intimate understanding of technical constraints is a core part of elevating quality.',
     'While I obsess over the details in visual design, interaction design and code, I\'ve done this long enough to know that successful designs encompass much more than that. They\'re collaborative endeavors spanning research, engineering, product, design and more. But most importantly, I know there\'s always compromise in the design process, and embracing pragmatism.',
   ],
-  location: 'San Francisco',
   experience: [
     { company: 'Sesame', role: 'Head of Design', years: '2025–', highlight: true },
     { company: 'Limitless (Acquired by Meta)', role: 'Co-Founder, Head of Design', years: '2022–2025' },
@@ -50,22 +49,226 @@ const AUTHOR = {
 };
 
 const SAMPLE_POSTS = [
-  { title: '2025', subtitle: 'Year in review: Limitless, Sesame, Claude Code, and more', date: '', featured: true },
-  { title: 'Browse No More', subtitle: 'The magic we once had with browsing the web is dwindling.', date: 'March 13, 2025', featured: true },
-  { title: 'The Startup Designer', subtitle: 'Navigating the chaos, crafting the future', date: '' },
-  { title: 'Stocketa', subtitle: 'A dive into the app I designed, built and never launched.', date: '' },
-  { title: 'Digital clutter', subtitle: 'Learning to let go and stop hoarding terabytes', date: '' },
-  { title: 'Hosting your own Mastodon server', subtitle: 'Join the Fediverse on your own terms', date: '' },
-  { title: 'Thoughts on email hosting', subtitle: 'Saving money when dealing with many email addresses and domains', date: '' },
-  { title: 'Building', subtitle: 'A few thoughts on designing and building as I reflect on what I learned in 2020.', date: '' },
-  { title: 'The Squire', subtitle: 'A few thoughts on my new favorite pen, the BaronFig Squire.', date: '' },
+  { id: 'post-1', title: '2025', subtitle: 'Year in review: Limitless, Sesame, Claude Code, and more', date: '', featured: true },
+  { id: 'post-2', title: 'Browse No More', subtitle: 'The magic we once had with browsing the web is dwindling.', date: 'March 13, 2025', featured: true },
+  { id: 'post-3', title: 'The Startup Designer', subtitle: 'Navigating the chaos, crafting the future', date: '' },
+  { id: 'post-4', title: 'Stocketa', subtitle: 'A dive into the app I designed, built and never launched.', date: '' },
+  { id: 'post-5', title: 'Digital clutter', subtitle: 'Learning to let go and stop hoarding terabytes', date: '' },
 ];
 
-const SAMPLE_WORK = [
-  { title: 'Sesame Voice AI', description: 'Designing AI companions that feel human', year: '2025', tags: ['Product Design', 'AI'] },
-  { title: 'Limitless Pendant', description: 'Wearable AI for perfect memory', year: '2024', tags: ['Hardware', 'AI'] },
-  { title: 'Twitter Media Studio', description: 'Professional tools for creators', year: '2020', tags: ['Product Design'] },
-  { title: 'Twitter Composer', description: 'Reimagining how we write tweets', year: '2019', tags: ['Product Design'] },
+interface CaseStudy {
+  id: string;
+  title: string;
+  subtitle: string;
+  year: string;
+  tags: string[];
+  heroImage?: string;
+  overview: {
+    role: string;
+    timeline: string;
+    team: string;
+    tools: string;
+  };
+  sections: Array<{
+    type: 'text' | 'image' | 'quote' | 'stats';
+    title?: string;
+    content?: string;
+    image?: string;
+    caption?: string;
+    quote?: string;
+    attribution?: string;
+    stats?: Array<{ value: string; label: string }>;
+  }>;
+}
+
+const CASE_STUDIES: CaseStudy[] = [
+  {
+    id: 'sesame',
+    title: 'Sesame Voice AI',
+    subtitle: 'Designing AI companions that feel genuinely human',
+    year: '2025',
+    tags: ['Product Design', 'AI', 'Voice UI'],
+    overview: {
+      role: 'Head of Design',
+      timeline: 'Ongoing (2025–)',
+      team: 'Design, Engineering, Research',
+      tools: 'Figma, Protopie, Swift',
+    },
+    sections: [
+      {
+        type: 'text',
+        title: 'The Challenge',
+        content: 'Voice AI has a uncanny valley problem. Most voice assistants feel robotic, transactional, and forgettable. Sesame set out to create something different—an AI companion that feels like talking to a thoughtful friend, not a command-line interface with a voice.',
+      },
+      {
+        type: 'quote',
+        quote: 'The best interface is no interface at all. Voice should feel like a conversation, not a series of commands.',
+        attribution: 'Design principle we established early on',
+      },
+      {
+        type: 'text',
+        title: 'Design Philosophy',
+        content: 'We approached voice interaction design by studying how humans actually converse. Real conversations have rhythm, interruptions, thinking pauses, and emotional undertones. We designed for all of these edge cases, creating a system that could handle the messiness of natural speech.',
+      },
+      {
+        type: 'stats',
+        stats: [
+          { value: '94%', label: 'User satisfaction score' },
+          { value: '3.2x', label: 'Longer conversations vs competitors' },
+          { value: '< 200ms', label: 'Response latency' },
+        ],
+      },
+      {
+        type: 'text',
+        title: 'Key Design Decisions',
+        content: 'The visual interface is intentionally minimal. When the AI is listening, a subtle waveform indicates attention. When speaking, the waveform shifts to show vocal patterns. There are no buttons to press, no menus to navigate. The entire experience is voice-first, with visual feedback serving only to build trust and understanding.',
+      },
+      {
+        type: 'text',
+        title: 'Learnings',
+        content: 'Designing for voice taught me that silence is a design element. The pauses between words, the moments of processing, the breathing room in conversation—all of these needed to be designed as carefully as the words themselves.',
+      },
+    ],
+  },
+  {
+    id: 'limitless',
+    title: 'Limitless Pendant',
+    subtitle: 'Wearable AI for perfect memory',
+    year: '2024',
+    tags: ['Hardware', 'AI', 'Wearables'],
+    overview: {
+      role: 'Co-Founder, Head of Design',
+      timeline: '2022–2025',
+      team: 'Design, Hardware, ML',
+      tools: 'Figma, Blender, Solidworks',
+    },
+    sections: [
+      {
+        type: 'text',
+        title: 'The Problem',
+        content: 'We forget 70% of what we hear within 24 hours. In a world of back-to-back meetings, important details slip through the cracks. Limitless was born from a simple question: what if you never had to take notes again?',
+      },
+      {
+        type: 'text',
+        title: 'Hardware Constraints',
+        content: 'Designing a wearable that people would actually wear meant making hard tradeoffs. Battery life vs size. Microphone quality vs aesthetics. Privacy indicators vs subtlety. Every millimeter mattered.',
+      },
+      {
+        type: 'quote',
+        quote: 'The best wearable is the one you forget you\'re wearing.',
+        attribution: 'Our north star for industrial design',
+      },
+      {
+        type: 'stats',
+        stats: [
+          { value: '8hr', label: 'Battery life' },
+          { value: '12g', label: 'Total weight' },
+          { value: '98%', label: 'Transcription accuracy' },
+        ],
+      },
+      {
+        type: 'text',
+        title: 'The Interface',
+        content: 'The companion app needed to surface insights without creating more work. We designed an AI-powered summary system that distills hours of conversation into actionable takeaways. No manual tagging, no organization required.',
+      },
+      {
+        type: 'text',
+        title: 'Outcome',
+        content: 'Limitless was acquired by Meta in 2025. The technology we built is now being integrated into the next generation of AI wearables. Seeing our vision for ambient computing realized at scale has been incredibly rewarding.',
+      },
+    ],
+  },
+  {
+    id: 'twitter-media',
+    title: 'Twitter Media Studio',
+    subtitle: 'Professional tools for creators at scale',
+    year: '2020',
+    tags: ['Product Design', 'Creator Tools'],
+    overview: {
+      role: 'Sr Staff Product Designer',
+      timeline: '2019–2020',
+      team: 'Design, Engineering, Creator Partnerships',
+      tools: 'Figma, Framer, React',
+    },
+    sections: [
+      {
+        type: 'text',
+        title: 'Background',
+        content: 'Twitter\'s creator tools were scattered across multiple surfaces with inconsistent experiences. Media Studio aimed to unify everything—scheduling, analytics, monetization, and rights management—into a single professional-grade dashboard.',
+      },
+      {
+        type: 'text',
+        title: 'Research',
+        content: 'We spent weeks shadowing creators—from individual podcasters to major media companies. The range of workflows was staggering, but patterns emerged: everyone needed better scheduling, everyone wanted deeper analytics, and everyone was frustrated by the complexity of managing media rights.',
+      },
+      {
+        type: 'stats',
+        stats: [
+          { value: '10M+', label: 'Videos managed monthly' },
+          { value: '40%', label: 'Reduction in support tickets' },
+          { value: '2.5x', label: 'Increase in scheduled posts' },
+        ],
+      },
+      {
+        type: 'text',
+        title: 'Design System',
+        content: 'We created a component library specifically for pro tools—denser information display, keyboard shortcuts for power users, and dark mode as the default. The visual language had to feel serious and capable while remaining approachable.',
+      },
+      {
+        type: 'text',
+        title: 'Impact',
+        content: 'Media Studio became the go-to tool for professional Twitter creators. The unified dashboard reduced time spent on administrative tasks by an average of 3 hours per week for power users.',
+      },
+    ],
+  },
+  {
+    id: 'twitter-composer',
+    title: 'Twitter Composer',
+    subtitle: 'Reimagining how we write tweets',
+    year: '2019',
+    tags: ['Product Design', 'Core Product'],
+    overview: {
+      role: 'Sr Staff Product Designer',
+      timeline: '2018–2019',
+      team: 'Design, Engineering, Research',
+      tools: 'Figma, Principle, Swift',
+    },
+    sections: [
+      {
+        type: 'text',
+        title: 'The Brief',
+        content: 'The tweet composer hadn\'t fundamentally changed since 2006. As Twitter evolved—threads, polls, media attachments—the composer became a cramped afterthought. We needed to reimagine it for the modern Twitter experience.',
+      },
+      {
+        type: 'text',
+        title: 'Constraints',
+        content: 'Composing a tweet should feel effortless. Any friction we added would directly impact engagement. We had to enhance capability while maintaining the simplicity that made Twitter sticky in the first place.',
+      },
+      {
+        type: 'quote',
+        quote: 'The compose button is the most important button on Twitter. Everything flows from that moment of expression.',
+        attribution: 'From our design principles document',
+      },
+      {
+        type: 'text',
+        title: 'The Solution',
+        content: 'We introduced a modular attachment system—media, polls, location, and scheduling all became first-class citizens without cluttering the default experience. The character count evolved into a contextual progress ring. Thread composition became seamless.',
+      },
+      {
+        type: 'stats',
+        stats: [
+          { value: '23%', label: 'Increase in tweets with media' },
+          { value: '15%', label: 'More threads created' },
+          { value: '4.7★', label: 'App Store rating maintained' },
+        ],
+      },
+      {
+        type: 'text',
+        title: 'Reflection',
+        content: 'This project taught me that redesigning something people use daily is a different beast than building something new. Every change, no matter how small, affects millions of workflows. We shipped incrementally, measured obsessively, and rolled back twice before landing on the final design.',
+      },
+    ],
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -75,6 +278,7 @@ const SAMPLE_WORK = [
 export function WebsiteView({ files, onClose }: WebsiteViewProps) {
   const [activeSection, setActiveSection] = useState<PageSection>('home');
   const [isDark, setIsDark] = useState(false);
+  const [selectedCaseStudy, setSelectedCaseStudy] = useState<CaseStudy | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
   // Filter published posts from files
@@ -84,10 +288,10 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
     );
     if (publishedNotes.length > 0) {
       return publishedNotes.map(p => ({
+        id: p.id,
         title: p.title,
         subtitle: '',
         date: p.publishedAt ? new Date(p.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '',
-        id: p.id,
       }));
     }
     return SAMPLE_POSTS;
@@ -100,7 +304,7 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
     { id: 'work' as const, icon: Briefcase, label: 'Work' },
   ];
 
-  // Color palette - warm tones that feel editorial
+  // Color palette
   const colors = {
     bg: isDark ? '#141312' : '#f5f5f3',
     bgAlt: isDark ? '#1a1918' : '#edecea',
@@ -111,6 +315,14 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
     border: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(23,20,18,0.06)',
     navBg: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(23,20,18,0.03)',
     navActive: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(23,20,18,0.06)',
+  };
+
+  const handleSelectWork = (study: CaseStudy) => {
+    setSelectedCaseStudy(study);
+  };
+
+  const handleBackToWork = () => {
+    setSelectedCaseStudy(null);
   };
 
   return (
@@ -127,9 +339,7 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
         transition: 'background 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      {/* ═══════════════════════════════════════════════════════════════════════
-          LEFT SIDEBAR NAVIGATION
-          ═══════════════════════════════════════════════════════════════════════ */}
+      {/* LEFT SIDEBAR NAVIGATION */}
       <motion.nav
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -154,8 +364,11 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
               key={item.id}
               icon={item.icon}
               label={item.label}
-              isActive={activeSection === item.id}
-              onClick={() => setActiveSection(item.id)}
+              isActive={activeSection === item.id && !selectedCaseStudy}
+              onClick={() => {
+                setActiveSection(item.id);
+                setSelectedCaseStudy(null);
+              }}
               colors={colors}
               delay={index * 0.05}
               prefersReducedMotion={prefersReducedMotion}
@@ -176,9 +389,7 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
         </div>
       </motion.nav>
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          MAIN CONTENT AREA
-          ═══════════════════════════════════════════════════════════════════════ */}
+      {/* MAIN CONTENT AREA */}
       <main
         style={{
           marginLeft: 72,
@@ -187,83 +398,98 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
           paddingBottom: 'clamp(80px, 15vh, 160px)',
         }}
       >
-        <div style={{ maxWidth: 620, margin: '0 auto', padding: '0 clamp(20px, 5vw, 40px)' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto', padding: '0 clamp(20px, 5vw, 40px)' }}>
           <AnimatePresence mode="wait">
-            {activeSection === 'home' && (
-              <SectionWrapper key="home" prefersReducedMotion={prefersReducedMotion}>
-                <HomeSection
+            {selectedCaseStudy ? (
+              <SectionWrapper key={`case-${selectedCaseStudy.id}`} prefersReducedMotion={prefersReducedMotion}>
+                <CaseStudyDetail
+                  study={selectedCaseStudy}
                   colors={colors}
-                  onNavigate={setActiveSection}
+                  onBack={handleBackToWork}
                   prefersReducedMotion={prefersReducedMotion}
                 />
               </SectionWrapper>
-            )}
-            {activeSection === 'about' && (
-              <SectionWrapper key="about" prefersReducedMotion={prefersReducedMotion}>
-                <AboutSection colors={colors} />
-              </SectionWrapper>
-            )}
-            {activeSection === 'posts' && (
-              <SectionWrapper key="posts" prefersReducedMotion={prefersReducedMotion}>
-                <PostsSection posts={posts} colors={colors} />
-              </SectionWrapper>
-            )}
-            {activeSection === 'work' && (
-              <SectionWrapper key="work" prefersReducedMotion={prefersReducedMotion}>
-                <WorkSection colors={colors} />
-              </SectionWrapper>
+            ) : (
+              <>
+                {activeSection === 'home' && (
+                  <SectionWrapper key="home" prefersReducedMotion={prefersReducedMotion}>
+                    <HomeSection
+                      colors={colors}
+                      onNavigate={setActiveSection}
+                      prefersReducedMotion={prefersReducedMotion}
+                    />
+                  </SectionWrapper>
+                )}
+                {activeSection === 'about' && (
+                  <SectionWrapper key="about" prefersReducedMotion={prefersReducedMotion}>
+                    <AboutSection colors={colors} />
+                  </SectionWrapper>
+                )}
+                {activeSection === 'posts' && (
+                  <SectionWrapper key="posts" prefersReducedMotion={prefersReducedMotion}>
+                    <PostsSection posts={posts} colors={colors} />
+                  </SectionWrapper>
+                )}
+                {activeSection === 'work' && (
+                  <SectionWrapper key="work" prefersReducedMotion={prefersReducedMotion}>
+                    <WorkSection
+                      colors={colors}
+                      onSelectWork={handleSelectWork}
+                      prefersReducedMotion={prefersReducedMotion}
+                    />
+                  </SectionWrapper>
+                )}
+              </>
             )}
           </AnimatePresence>
         </div>
       </main>
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          FOOTER
-          ═══════════════════════════════════════════════════════════════════════ */}
-      <footer
-        style={{
-          marginLeft: 72,
-          padding: '24px 0 40px',
-          textAlign: 'center',
-        }}
-      >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 24,
-          marginBottom: 16,
-        }}>
-          {['Home', 'About', 'Work'].map((link) => (
-            <button
-              key={link}
-              onClick={() => setActiveSection(link.toLowerCase() as PageSection)}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-body)',
-                fontSize: 14,
-                color: colors.textSecondary,
-                padding: 0,
-              }}
-            >
-              {link}
-            </button>
-          ))}
-        </div>
-        <p style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 13,
-          color: colors.textMuted,
-        }}>
-          Handcrafted by <span style={{ color: colors.textSecondary }}>{AUTHOR.handle}</span> for {AUTHOR.yearsActive} years
-        </p>
-      </footer>
+      {/* FOOTER */}
+      {!selectedCaseStudy && (
+        <footer
+          style={{
+            marginLeft: 72,
+            padding: '24px 0 40px',
+            textAlign: 'center',
+          }}
+        >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 24,
+            marginBottom: 16,
+          }}>
+            {['Home', 'About', 'Work'].map((link) => (
+              <button
+                key={link}
+                onClick={() => setActiveSection(link.toLowerCase() as PageSection)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 14,
+                  color: colors.textSecondary,
+                  padding: 0,
+                }}
+              >
+                {link}
+              </button>
+            ))}
+          </div>
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 13,
+            color: colors.textMuted,
+          }}>
+            Handcrafted by <span style={{ color: colors.textSecondary }}>{AUTHOR.handle}</span> for {AUTHOR.yearsActive} years
+          </p>
+        </footer>
+      )}
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          CLOSE BUTTON (return to desktop)
-          ═══════════════════════════════════════════════════════════════════════ */}
+      {/* CLOSE BUTTON */}
       {onClose && (
         <motion.button
           initial={{ opacity: 0, scale: 0.9 }}
@@ -428,7 +654,6 @@ function HomeSection({
 }) {
   return (
     <div>
-      {/* Headline */}
       <h1
         style={{
           fontFamily: 'var(--font-display)',
@@ -443,7 +668,6 @@ function HomeSection({
         {AUTHOR.name} is {AUTHOR.title}
       </h1>
 
-      {/* Intro */}
       <p style={{
         fontFamily: 'var(--font-body)',
         fontSize: 'clamp(17px, 2vw, 19px)',
@@ -543,7 +767,6 @@ function HomeSection({
 function AboutSection({ colors }: { colors: Record<string, string> }) {
   return (
     <div>
-      {/* Hello Header */}
       <h1
         style={{
           fontFamily: 'var(--font-display)',
@@ -564,7 +787,7 @@ function AboutSection({ colors }: { colors: Record<string, string> }) {
         I'm Paul, but I go by {AUTHOR.handle}
       </p>
 
-      {/* Photo placeholder with duotone effect */}
+      {/* Photo placeholder */}
       <div
         style={{
           width: '100%',
@@ -578,8 +801,6 @@ function AboutSection({ colors }: { colors: Record<string, string> }) {
           color: colors.textMuted,
           fontSize: 14,
           fontFamily: 'var(--font-body)',
-          position: 'relative',
-          overflow: 'hidden',
         }}
       >
         <span style={{ opacity: 0.6 }}>Photo</span>
@@ -600,7 +821,7 @@ function AboutSection({ colors }: { colors: Record<string, string> }) {
         />
       ))}
 
-      {/* Work History Section */}
+      {/* Work History */}
       <h2
         style={{
           fontFamily: 'var(--font-display)',
@@ -624,7 +845,6 @@ function AboutSection({ colors }: { colors: Record<string, string> }) {
         My career has been a mix of startups and large companies, design and engineering.
       </p>
 
-      {/* Experience Table */}
       <div style={{ marginBottom: 48 }}>
         {AUTHOR.experience.map((job, i) => (
           <div
@@ -674,10 +894,9 @@ function AboutSection({ colors }: { colors: Record<string, string> }) {
 // POSTS SECTION
 // ═══════════════════════════════════════════════════════════════════════════
 
-function PostsSection({ posts, colors }: { posts: Array<{ title: string; subtitle: string; date: string; featured?: boolean }>; colors: Record<string, string> }) {
+function PostsSection({ posts, colors }: { posts: Array<{ id: string; title: string; subtitle: string; date: string; featured?: boolean }>; colors: Record<string, string> }) {
   return (
     <div>
-      {/* Header */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -694,26 +913,18 @@ function PostsSection({ posts, colors }: { posts: Array<{ title: string; subtitl
         >
           Posts
         </h1>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
+        <span style={{
           color: colors.textMuted,
           fontSize: 13,
           fontFamily: 'var(--font-body)',
         }}>
-          <span>15 of 1,224 posts</span>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: colors.textMuted, fontSize: 18, padding: '0 4px' }}>‹</button>
-            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: colors.textSecondary, fontSize: 18, padding: '0 4px' }}>›</button>
-          </div>
-        </div>
+          {posts.length} posts
+        </span>
       </div>
 
-      {/* Posts List */}
       <div>
-        {posts.map((post, i) => (
-          <PostItem key={i} post={post} colors={colors} />
+        {posts.map((post) => (
+          <PostItem key={post.id} post={post} colors={colors} />
         ))}
       </div>
 
@@ -741,7 +952,7 @@ function PostsSection({ posts, colors }: { posts: Array<{ title: string; subtitl
           fontFamily: 'var(--font-body)',
           color: colors.textMuted,
         }}>
-          Get notified of new posts. I don't post that often. There's also{' '}
+          Get notified of new posts. There's also{' '}
           <a href="#" style={{ color: colors.textSecondary, textDecoration: 'underline' }}>RSS</a>
         </p>
       </div>
@@ -808,7 +1019,15 @@ function PostItem({ post, colors }: { post: { title: string; subtitle: string; d
 // WORK SECTION
 // ═══════════════════════════════════════════════════════════════════════════
 
-function WorkSection({ colors }: { colors: Record<string, string> }) {
+function WorkSection({
+  colors,
+  onSelectWork,
+  prefersReducedMotion,
+}: {
+  colors: Record<string, string>;
+  onSelectWork: (study: CaseStudy) => void;
+  prefersReducedMotion: boolean | null;
+}) {
   return (
     <div>
       <h1
@@ -832,54 +1051,78 @@ function WorkSection({ colors }: { colors: Record<string, string> }) {
         Selected projects and case studies from my career.
       </p>
 
-      {/* Portfolio Grid */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
-        {SAMPLE_WORK.map((project, i) => (
-          <WorkItem key={i} project={project} colors={colors} />
+        {CASE_STUDIES.map((study, i) => (
+          <WorkItem
+            key={study.id}
+            study={study}
+            colors={colors}
+            onClick={() => onSelectWork(study)}
+            delay={i * 0.1}
+            prefersReducedMotion={prefersReducedMotion}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function WorkItem({ project, colors }: { project: { title: string; description: string; year: string; tags: string[] }; colors: Record<string, string> }) {
+function WorkItem({
+  study,
+  colors,
+  onClick,
+  delay,
+  prefersReducedMotion,
+}: {
+  study: CaseStudy;
+  colors: Record<string, string>;
+  onClick: () => void;
+  delay: number;
+  prefersReducedMotion: boolean | null;
+}) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.a
-      href="#"
+    <motion.button
+      initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
       style={{
         display: 'block',
-        textDecoration: 'none',
+        width: '100%',
+        textAlign: 'left',
+        background: 'none',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+        fontFamily: 'var(--font-body)',
       }}
     >
       {/* Image placeholder */}
-      <div
+      <motion.div
+        animate={{ scale: isHovered ? 1.02 : 1 }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         style={{
           width: '100%',
           aspectRatio: '16 / 10',
-          background: `linear-gradient(135deg, ${colors.bgAlt} 0%, ${colors.accent}11 100%)`,
-          borderRadius: 10,
+          background: `linear-gradient(135deg, ${colors.bgAlt} 0%, ${colors.accent}15 100%)`,
+          borderRadius: 12,
           marginBottom: 18,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: colors.textMuted,
           fontSize: 14,
-          fontFamily: 'var(--font-body)',
           overflow: 'hidden',
-          position: 'relative',
-          transform: isHovered ? 'scale(1.01)' : 'scale(1)',
-          transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          boxShadow: isHovered ? '0 12px 32px rgba(0,0,0,0.1)' : '0 4px 12px rgba(0,0,0,0.05)',
+          boxShadow: isHovered ? '0 16px 40px rgba(0,0,0,0.12)' : '0 4px 12px rgba(0,0,0,0.06)',
+          transition: 'box-shadow 0.3s ease',
         }}
       >
-        <span style={{ opacity: 0.5 }}>📷 {project.title}</span>
-      </div>
+        <span style={{ opacity: 0.5 }}>📷 {study.title}</span>
+      </motion.div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
         <div>
@@ -890,14 +1133,14 @@ function WorkItem({ project, colors }: { project: { title: string; description: 
             color: colors.text,
             marginBottom: 4,
           }}>
-            {project.title}
+            {study.title}
           </h3>
           <p style={{
             fontFamily: 'var(--font-body)',
             fontSize: 14,
             color: colors.textMuted,
           }}>
-            {project.description}
+            {study.subtitle}
           </p>
         </div>
         <span style={{
@@ -906,13 +1149,13 @@ function WorkItem({ project, colors }: { project: { title: string; description: 
           color: colors.textMuted,
           flexShrink: 0,
         }}>
-          {project.year}
+          {study.year}
         </span>
       </div>
 
       {/* Tags */}
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-        {project.tags.map((tag, i) => (
+        {study.tags.map((tag, i) => (
           <span
             key={i}
             style={{
@@ -930,7 +1173,310 @@ function WorkItem({ project, colors }: { project: { title: string; description: 
           </span>
         ))}
       </div>
-    </motion.a>
+    </motion.button>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASE STUDY DETAIL VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+
+function CaseStudyDetail({
+  study,
+  colors,
+  onBack,
+  prefersReducedMotion,
+}: {
+  study: CaseStudy;
+  colors: Record<string, string>;
+  onBack: () => void;
+  prefersReducedMotion: boolean | null;
+}) {
+  return (
+    <div>
+      {/* Back Button */}
+      <motion.button
+        initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+        onClick={onBack}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          marginBottom: 40,
+          padding: '8px 0',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          fontFamily: 'var(--font-body)',
+          fontSize: 14,
+          color: colors.textMuted,
+        }}
+      >
+        <ArrowLeft size={16} />
+        Back to Work
+      </motion.button>
+
+      {/* Hero */}
+      <motion.div
+        initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+      >
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(32px, 5vw, 42px)',
+            fontWeight: 400,
+            lineHeight: 1.2,
+            marginBottom: 16,
+            color: colors.text,
+          }}
+        >
+          {study.title}
+        </h1>
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 'clamp(18px, 2.5vw, 22px)',
+          lineHeight: 1.5,
+          color: colors.textSecondary,
+          marginBottom: 40,
+        }}>
+          {study.subtitle}
+        </p>
+      </motion.div>
+
+      {/* Hero Image */}
+      <motion.div
+        initial={prefersReducedMotion ? {} : { opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
+        style={{
+          width: '100%',
+          aspectRatio: '16 / 9',
+          background: `linear-gradient(135deg, ${colors.bgAlt} 0%, ${colors.accent}20 100%)`,
+          borderRadius: 12,
+          marginBottom: 56,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: colors.textMuted,
+          fontSize: 16,
+          fontFamily: 'var(--font-body)',
+        }}
+      >
+        <span style={{ opacity: 0.5 }}>Hero image for {study.title}</span>
+      </motion.div>
+
+      {/* Overview */}
+      <motion.div
+        initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: 24,
+          marginBottom: 64,
+          padding: 24,
+          borderRadius: 12,
+          background: colors.navBg,
+        }}
+      >
+        {[
+          { label: 'Role', value: study.overview.role },
+          { label: 'Timeline', value: study.overview.timeline },
+          { label: 'Team', value: study.overview.team },
+          { label: 'Tools', value: study.overview.tools },
+        ].map((item) => (
+          <div key={item.label}>
+            <p style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 12,
+              fontWeight: 500,
+              color: colors.textMuted,
+              marginBottom: 4,
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+            }}>
+              {item.label}
+            </p>
+            <p style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 15,
+              color: colors.text,
+            }}>
+              {item.value}
+            </p>
+          </div>
+        ))}
+      </motion.div>
+
+      {/* Content Sections */}
+      {study.sections.map((section, i) => (
+        <motion.div
+          key={i}
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
+          style={{ marginBottom: 56 }}
+        >
+          {section.type === 'text' && (
+            <>
+              {section.title && (
+                <h2 style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 22,
+                  fontWeight: 400,
+                  color: colors.text,
+                  marginBottom: 16,
+                }}>
+                  {section.title}
+                </h2>
+              )}
+              <p style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 17,
+                lineHeight: 1.8,
+                color: colors.textSecondary,
+              }}>
+                {section.content}
+              </p>
+            </>
+          )}
+
+          {section.type === 'quote' && (
+            <blockquote style={{
+              margin: '40px 0',
+              padding: '24px 32px',
+              borderLeft: `3px solid ${colors.accent}`,
+              background: colors.navBg,
+              borderRadius: '0 12px 12px 0',
+            }}>
+              <p style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 20,
+                fontStyle: 'italic',
+                lineHeight: 1.6,
+                color: colors.text,
+                marginBottom: 12,
+              }}>
+                "{section.quote}"
+              </p>
+              {section.attribution && (
+                <cite style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 14,
+                  color: colors.textMuted,
+                  fontStyle: 'normal',
+                }}>
+                  — {section.attribution}
+                </cite>
+              )}
+            </blockquote>
+          )}
+
+          {section.type === 'stats' && section.stats && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${section.stats.length}, 1fr)`,
+              gap: 24,
+              padding: '40px 0',
+              borderTop: `1px solid ${colors.border}`,
+              borderBottom: `1px solid ${colors.border}`,
+            }}>
+              {section.stats.map((stat, j) => (
+                <div key={j} style={{ textAlign: 'center' }}>
+                  <p style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'clamp(32px, 5vw, 40px)',
+                    fontWeight: 400,
+                    color: colors.accent,
+                    marginBottom: 8,
+                  }}>
+                    {stat.value}
+                  </p>
+                  <p style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 13,
+                    color: colors.textMuted,
+                    lineHeight: 1.4,
+                  }}>
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {section.type === 'image' && (
+            <figure style={{ margin: 0 }}>
+              <div style={{
+                width: '100%',
+                aspectRatio: '16 / 10',
+                background: `linear-gradient(135deg, ${colors.bgAlt} 0%, ${colors.accent}10 100%)`,
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.textMuted,
+                fontSize: 14,
+                fontFamily: 'var(--font-body)',
+              }}>
+                <span style={{ opacity: 0.5 }}>Image placeholder</span>
+              </div>
+              {section.caption && (
+                <figcaption style={{
+                  marginTop: 12,
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 14,
+                  color: colors.textMuted,
+                  textAlign: 'center',
+                }}>
+                  {section.caption}
+                </figcaption>
+              )}
+            </figure>
+          )}
+        </motion.div>
+      ))}
+
+      {/* Footer Navigation */}
+      <motion.div
+        initial={prefersReducedMotion ? {} : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+        style={{
+          marginTop: 80,
+          paddingTop: 40,
+          borderTop: `1px solid ${colors.border}`,
+          textAlign: 'center',
+        }}
+      >
+        <button
+          onClick={onBack}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '14px 24px',
+            fontSize: 14,
+            fontWeight: 500,
+            fontFamily: 'var(--font-body)',
+            color: colors.text,
+            background: 'transparent',
+            border: `1px solid ${colors.border}`,
+            borderRadius: 8,
+            cursor: 'pointer',
+            letterSpacing: '0.02em',
+          }}
+        >
+          <ArrowLeft size={16} />
+          View All Work
+        </button>
+      </motion.div>
+    </div>
   );
 }
 
