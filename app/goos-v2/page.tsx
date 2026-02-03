@@ -618,6 +618,15 @@ const GoOSSheetEditor = dynamic(
     }
 );
 
+// Lazy load Slides editor component
+const GoOSSlidesEditor = dynamic(
+    () => import('@/components/goos-editor/GoOSSlidesEditor').then(mod => ({ default: mod.GoOSSlidesEditor })),
+    {
+        loading: () => <PlayfulLoader />,
+        ssr: false
+    }
+);
+
 // Lazy load heavy view components (conditionally rendered, not needed on initial load)
 const DrawingApp = dynamic(
     () => import('@/components/apps/DrawingApp').then(mod => ({ default: mod.DrawingApp })),
@@ -5338,6 +5347,35 @@ function GoOSDemoContent() {
                                         );
                                     }
 
+                                    // Render Slides Editor for slides files
+                                    if (file.type === 'slides') {
+                                        return (
+                                            <GoOSSlidesEditor
+                                                key={file.id}
+                                                file={file as any}
+                                                onClose={() => closeEditor(file.id)}
+                                                onMinimize={() => minimizeEditor(file.id)}
+                                                onMaximize={() => toggleMaximizeEditor(file.id)}
+                                                isMaximized={maximizedEditors.has(file.id)}
+                                                onUpdate={(updates) => {
+                                                    if (updates.content !== undefined || updates.title !== undefined) {
+                                                        goosAutoSave(file.id, updates.content ?? file.content, updates.title);
+                                                    }
+                                                    if (updates.status !== undefined) {
+                                                        if (updates.status === 'published') {
+                                                            publishGoOSFile(file.id);
+                                                            celebrate();
+                                                        } else {
+                                                            unpublishGoOSFile(file.id);
+                                                        }
+                                                    }
+                                                }}
+                                                isActive={activeEditorId === file.id}
+                                                zIndex={windowZ[`editor-${file.id}`] || topZIndex}
+                                            />
+                                        );
+                                    }
+
                                     // Render Editor Window for other file types
                                     return (
                                         <GoOSEditorWindow
@@ -5953,6 +5991,9 @@ function GoOSDemoContent() {
                 }}
                 onNewInvoice={() => {
                     createFile('invoice', { x: desktopContextMenu.x, y: desktopContextMenu.y });
+                }}
+                onNewSlides={() => {
+                    createFile('slides', { x: desktopContextMenu.x, y: desktopContextMenu.y });
                 }}
                 onNewImage={() => handleOpenCreateFileDialog('image', { x: desktopContextMenu.x, y: desktopContextMenu.y })}
                 onNewLink={() => handleOpenCreateFileDialog('link', { x: desktopContextMenu.x, y: desktopContextMenu.y })}

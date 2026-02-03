@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Search, FileText, Folder, Image as ImageIcon, Link2, Play, Download, Presentation, Gamepad2, Sparkles, Receipt, Kanban, Table } from 'lucide-react';
+import { Search, FileText, Folder, Image as ImageIcon, Link2, Play, Download, Presentation, Gamepad2, Sparkles, Receipt, Kanban, Table, SlidersHorizontal } from 'lucide-react';
 import { SPRING, DURATION } from '@/lib/animations';
 import { playSound } from '@/lib/sounds';
 
@@ -67,6 +67,11 @@ const FILE_TYPE_CONFIG: Record<string, { icon: React.ReactNode; bg: string; acce
     icon: <Receipt size={28} strokeWidth={1.8} />,
     bg: 'linear-gradient(145deg, #FEF3C7 0%, #FDE68A 100%)',
     accent: '#D97706',
+  },
+  slides: {
+    icon: <Presentation size={28} strokeWidth={1.8} />,
+    bg: 'linear-gradient(145deg, #FFEDD5 0%, #FDBA74 100%)',
+    accent: '#EA580C',
   },
 };
 

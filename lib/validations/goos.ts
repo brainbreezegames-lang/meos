@@ -14,6 +14,7 @@ export const goosFileTypeSchema = z.enum([
   'board',       // Kanban board
   'sheet',       // Spreadsheet
   'invoice',     // Invoice document
+  'slides',      // Presentation slides
 ]);
 export type GoOSFileType = z.infer<typeof goosFileTypeSchema>;
 
@@ -272,6 +273,96 @@ export function getDefaultInvoiceContent(): InvoiceContent {
     taxRate: 0,
     notes: 'Thank you for your business! Payment is due within 30 days.',
     paymentTerms: 'Net 30',
+  };
+}
+
+// === Slides (Presentation) Schemas ===
+
+export const slideTemplateSchema = z.enum([
+  'title',
+  'section',
+  'content',
+  'image',
+  'image-text',
+  'quote',
+  'list',
+  'stat',
+  'end',
+]);
+export type SlideTemplate = z.infer<typeof slideTemplateSchema>;
+
+export const slideContentSchema = z.object({
+  heading: z.string().optional(),
+  subheading: z.string().optional(),
+  body: z.string().optional(),
+  image: z.string().optional(),
+  caption: z.string().optional(),
+  quote: z.string().optional(),
+  attribution: z.string().optional(),
+  items: z.array(z.string()).optional(),
+  stat_value: z.string().optional(),
+  stat_label: z.string().optional(),
+  author: z.string().optional(),
+  date: z.string().optional(),
+  url: z.string().optional(),
+});
+export type SlideContentData = z.infer<typeof slideContentSchema>;
+
+export const slideSchema = z.object({
+  id: z.string(),
+  template: slideTemplateSchema,
+  content: slideContentSchema,
+  speakerNotes: z.string().optional(),
+});
+export type Slide = z.infer<typeof slideSchema>;
+
+export const slidesContentSchema = z.object({
+  slides: z.array(slideSchema),
+  themeId: z.string().default('paper'),
+  author: z.string().optional(),
+  aspectRatio: z.enum(['16:9', '4:3']).default('16:9'),
+});
+export type SlidesContent = z.infer<typeof slidesContentSchema>;
+
+// Default slides content for new files
+export function getDefaultSlidesContent(): SlidesContent {
+  return {
+    slides: [
+      {
+        id: crypto.randomUUID(),
+        template: 'title',
+        content: {
+          heading: 'Your Presentation Title',
+          subheading: 'A compelling subtitle goes here',
+          author: 'Your Name',
+          date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'section',
+        content: {
+          heading: 'First Section',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'content',
+        content: {
+          heading: 'Key Point',
+          body: 'Add your main content here. Make it compelling and concise.',
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        template: 'end',
+        content: {
+          url: 'yourname.goos.io',
+        },
+      },
+    ],
+    themeId: 'paper',
+    aspectRatio: '16:9',
   };
 }
 

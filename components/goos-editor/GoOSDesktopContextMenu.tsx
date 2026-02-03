@@ -54,6 +54,7 @@ interface GoOSDesktopContextMenuProps {
   onNewBoard?: () => void;
   onNewSheet?: () => void;
   onNewInvoice?: () => void;
+  onNewSlides?: () => void;
   onNewImage?: () => void;
   onNewLink?: () => void;
   onPaste?: () => void;
@@ -74,6 +75,7 @@ export function GoOSDesktopContextMenu({
   onNewBoard,
   onNewSheet,
   onNewInvoice,
+  onNewSlides,
   onNewImage,
   onNewLink,
   onPaste,
@@ -99,6 +101,7 @@ export function GoOSDesktopContextMenu({
         { id: 'new-board', label: 'Board', icon: <Kanban size={14} strokeWidth={1.5} />, onClick: () => onNewBoard?.() },
         { id: 'new-sheet', label: 'Sheet', icon: <Table size={14} strokeWidth={1.5} />, onClick: () => onNewSheet?.() },
         { id: 'new-invoice', label: 'Invoice', icon: <Receipt size={14} strokeWidth={1.5} />, onClick: () => onNewInvoice?.() },
+        { id: 'new-slides', label: 'Slides', icon: <Presentation size={14} strokeWidth={1.5} />, onClick: () => onNewSlides?.() },
         { id: 'new-folder', label: 'Folder', icon: <FolderPlus size={14} strokeWidth={1.5} />, onClick: onNewFolder },
       ],
     },
@@ -123,7 +126,7 @@ export function GoOSDesktopContextMenu({
         { id: 'change-wallpaper', label: 'Change Wallpaper', icon: <ImageIcon size={14} strokeWidth={1.5} />, onClick: () => onChangeWallpaper?.() },
       ],
     },
-  ], [onNewNote, onNewCaseStudy, onNewFolder, onNewCV, onNewBoard, onNewSheet, onNewImage, onNewLink, onPaste, onArrangeIcons, onRefresh, onChangeWallpaper, canPaste]);
+  ], [onNewNote, onNewCaseStudy, onNewFolder, onNewCV, onNewBoard, onNewSheet, onNewInvoice, onNewSlides, onNewImage, onNewLink, onPaste, onArrangeIcons, onRefresh, onChangeWallpaper, canPaste]);
 
   // Calculate menu height
   const estimatedHeight = useMemo(() => {

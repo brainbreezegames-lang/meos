@@ -17,6 +17,7 @@ export const FILE_TYPE_TO_WINDOW: Record<GoOSFileType, WindowType> = {
   'board': 'board',       // Kanban board
   'sheet': 'sheet',       // Spreadsheet
   'invoice': 'document',  // Invoice document
+  'slides': 'slides',     // Presentation slides
 };
 
 /**
@@ -42,6 +43,7 @@ export const FILE_TYPE_ICONS: Record<GoOSFileType, string> = {
   'board': '📋',
   'sheet': '📊',
   'invoice': '🧾',
+  'slides': '📽️',
 };
 
 /**
@@ -60,6 +62,7 @@ export const FILE_TYPE_LABELS: Record<GoOSFileType, string> = {
   'board': 'Board',
   'sheet': 'Sheet',
   'invoice': 'Invoice',
+  'slides': 'Slides',
 };
 
 /**
