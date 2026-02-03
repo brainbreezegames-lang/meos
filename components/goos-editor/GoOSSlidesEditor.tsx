@@ -628,6 +628,7 @@ function AddSlideMenu({
   return ReactDOM.createPortal(
     <motion.div
       ref={menuRef}
+      className="font-sans"
       initial={contextMenuVariants.initial}
       animate={contextMenuVariants.animate}
       exit={contextMenuVariants.exit}
@@ -697,12 +698,7 @@ function AddSlideMenu({
             }}>
               {React.cloneElement(icon as React.ReactElement, { size: 14, strokeWidth: 1.5 })}
             </span>
-            <span style={{
-              fontSize: 13,
-              fontWeight: 500,
-              fontFamily: 'var(--font-body)',
-              flex: 1,
-            }}>
+            <span className="text-[13px] font-medium flex-1">
               {label}
             </span>
           </motion.button>
