@@ -22,6 +22,7 @@ import {
   Maximize2,
   GripVertical,
 } from 'lucide-react';
+import { SPRING, contextMenu as contextMenuVariants } from '@/lib/animations';
 import { GoOSAutoSaveIndicator, SaveStatus } from './GoOSAutoSaveIndicator';
 import { GoOSPublishToggle, GoOSPublishBadge, PublishStatus } from './GoOSPublishToggle';
 import { TrafficLights } from '../desktop/TrafficLights';
@@ -525,6 +526,11 @@ function ListField({
 }
 
 // ─── Add Slide Menu ────────────────────────────────────────────
+// Menu dimensions for positioning calculations
+const ADD_SLIDE_MENU_WIDTH = 340;
+const ADD_SLIDE_MENU_HEIGHT = 520; // Approximate height with all templates
+const VIEWPORT_PADDING = 12;
+
 // A polished, macOS-style popover menu with delightful micro-interactions
 // Uses a portal to escape overflow:hidden containers
 function AddSlideMenu({
@@ -539,24 +545,51 @@ function AddSlideMenu({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [adjustedPosition, setAdjustedPosition] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   // Wait for mount to access document.body
   useEffect(() => {
     setMounted(true);
+    playSound('expand');
   }, []);
 
-  // Position the menu above the anchor button
+  // Viewport-aware positioning - positions above the button with smart edge detection
   useEffect(() => {
-    if (anchorRef.current && mounted) {
-      const rect = anchorRef.current.getBoundingClientRect();
-      setMenuPosition({
-        top: rect.top - 12,
-        left: rect.left + rect.width / 2,
-      });
+    if (!anchorRef.current || !mounted) return;
+
+    const rect = anchorRef.current.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Start with position centered above the button
+    let x = rect.left + rect.width / 2 - ADD_SLIDE_MENU_WIDTH / 2;
+    let y = rect.top - ADD_SLIDE_MENU_HEIGHT - 12;
+
+    // If menu would go off the top, position it below the button instead
+    if (y < VIEWPORT_PADDING) {
+      y = rect.bottom + 12;
     }
+
+    // If menu still doesn't fit below, position it as high as possible
+    if (y + ADD_SLIDE_MENU_HEIGHT + VIEWPORT_PADDING > viewportHeight) {
+      y = Math.max(VIEWPORT_PADDING, viewportHeight - ADD_SLIDE_MENU_HEIGHT - VIEWPORT_PADDING);
+    }
+
+    // Ensure horizontal positioning stays within viewport
+    if (x + ADD_SLIDE_MENU_WIDTH + VIEWPORT_PADDING > viewportWidth) {
+      x = viewportWidth - ADD_SLIDE_MENU_WIDTH - VIEWPORT_PADDING;
+    }
+    if (x < VIEWPORT_PADDING) {
+      x = VIEWPORT_PADDING;
+    }
+
+    // Final bounds check
+    x = Math.max(VIEWPORT_PADDING, Math.min(x, viewportWidth - ADD_SLIDE_MENU_WIDTH - VIEWPORT_PADDING));
+    y = Math.max(VIEWPORT_PADDING, Math.min(y, viewportHeight - ADD_SLIDE_MENU_HEIGHT - VIEWPORT_PADDING));
+
+    setAdjustedPosition({ x, y });
   }, [anchorRef, mounted]);
 
   // Keyboard navigation
@@ -578,6 +611,7 @@ function AddSlideMenu({
           break;
         case 'Escape':
           e.preventDefault();
+          playSound('click');
           onClose();
           break;
       }
@@ -625,7 +659,7 @@ function AddSlideMenu({
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0, 0, 0, 0.15)',
+          background: 'rgba(0, 0, 0, 0.1)',
           backdropFilter: 'blur(2px)',
           WebkitBackdropFilter: 'blur(2px)',
           zIndex: 9998,
@@ -635,46 +669,41 @@ function AddSlideMenu({
       {/* Menu */}
       <motion.div
         ref={menuRef}
-        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        transition={prefersReducedMotion ? { duration: 0.1 } : {
-          type: 'spring',
-          stiffness: 500,
-          damping: 30,
-          mass: 0.8,
-        }}
+        initial={contextMenuVariants.initial}
+        animate={contextMenuVariants.animate}
+        exit={contextMenuVariants.exit}
+        transition={prefersReducedMotion ? { duration: 0.1 } : SPRING.snappy}
         style={{
           position: 'fixed',
-          top: menuPosition.top,
-          left: menuPosition.left,
-          transform: 'translate(-50%, -100%)',
-          width: 340,
-          background: 'rgba(255, 255, 255, 0.98)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          borderRadius: 16,
-          border: '1px solid rgba(0, 0, 0, 0.08)',
-          boxShadow: `
-            0 0 0 1px rgba(255, 255, 255, 0.5) inset,
-            0 12px 40px rgba(0, 0, 0, 0.15),
-            0 4px 12px rgba(0, 0, 0, 0.1)
-          `,
+          top: adjustedPosition.y,
+          left: adjustedPosition.x,
+          width: ADD_SLIDE_MENU_WIDTH,
+          maxHeight: `calc(100vh - ${VIEWPORT_PADDING * 2}px)`,
+          background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+          backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+          WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+          borderRadius: 'var(--radius-md, 14px)',
+          border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+          boxShadow: 'var(--shadow-lg, 0 20px 40px rgba(0, 0, 0, 0.15))',
           zIndex: 9999,
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          transformOrigin: 'bottom center',
         }}
       >
         {/* Header */}
         <div style={{
           padding: '16px 18px 12px',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
-          background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 100%)',
+          borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+          background: 'var(--color-bg-elevated, rgba(255, 255, 255, 0.8))',
+          flexShrink: 0,
         }}>
           <div style={{
             fontSize: 14,
             fontWeight: 600,
             fontFamily: 'var(--font-body)',
-            color: '#1a1a1a',
+            color: 'var(--color-text-primary, #171412)',
             letterSpacing: '-0.02em',
           }}>
             Add New Slide
@@ -682,7 +711,7 @@ function AddSlideMenu({
           <div style={{
             fontSize: 12,
             fontFamily: 'var(--font-body)',
-            color: '#737373',
+            color: 'var(--color-text-muted, #737373)',
             marginTop: 3,
           }}>
             Choose a template to get started
@@ -695,8 +724,8 @@ function AddSlideMenu({
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          maxHeight: 400,
           overflowY: 'auto',
+          flex: 1,
         }}>
           {SLIDE_TEMPLATES.map(({ template, icon, label, description }, index) => {
             const colors = templateColors[template];
@@ -719,7 +748,7 @@ function AddSlideMenu({
                 onFocus={() => setFocusedIndex(index)}
                 initial={false}
                 animate={{
-                  backgroundColor: isActive ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                  backgroundColor: isActive ? 'var(--color-bg-subtle, rgba(0, 0, 0, 0.04))' : 'transparent',
                 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.1 }}
@@ -730,7 +759,7 @@ function AddSlideMenu({
                   padding: '12px 14px',
                   background: 'transparent',
                   border: 'none',
-                  borderRadius: 12,
+                  borderRadius: 'var(--radius-sm, 10px)',
                   cursor: 'pointer',
                   textAlign: 'left',
                   outline: 'none',
@@ -789,7 +818,7 @@ function AddSlideMenu({
                     fontSize: 13,
                     fontWeight: 600,
                     fontFamily: 'var(--font-body)',
-                    color: '#1a1a1a',
+                    color: 'var(--color-text-primary, #171412)',
                     letterSpacing: '-0.01em',
                   }}>
                     {label}
@@ -797,7 +826,7 @@ function AddSlideMenu({
                   <div style={{
                     fontSize: 11,
                     fontFamily: 'var(--font-body)',
-                    color: '#737373',
+                    color: 'var(--color-text-muted, #737373)',
                     marginTop: 2,
                   }}>
                     {description}
@@ -836,12 +865,13 @@ function AddSlideMenu({
         {/* Footer with keyboard hints */}
         <div style={{
           padding: '12px 18px 14px',
-          borderTop: '1px solid rgba(0, 0, 0, 0.06)',
-          background: 'linear-gradient(180deg, rgba(250,250,250,1) 0%, rgba(245,245,245,1) 100%)',
+          borderTop: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
+          background: 'var(--color-bg-subtle, rgba(0, 0, 0, 0.02))',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 20,
+          flexShrink: 0,
         }}>
           {[
             { keys: '↑↓', label: 'navigate' },
@@ -853,7 +883,7 @@ function AddSlideMenu({
               style={{
                 fontSize: 11,
                 fontFamily: 'var(--font-body)',
-                color: '#a3a3a3',
+                color: 'var(--color-text-muted, #a3a3a3)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
@@ -861,13 +891,13 @@ function AddSlideMenu({
             >
               <kbd style={{
                 padding: '3px 6px',
-                background: 'rgba(0,0,0,0.06)',
+                background: 'var(--color-bg-base, rgba(0,0,0,0.06))',
                 borderRadius: 5,
                 fontSize: 10,
                 fontFamily: 'var(--font-mono)',
                 fontWeight: 500,
-                color: '#666',
-                border: '1px solid rgba(0,0,0,0.08)',
+                color: 'var(--color-text-secondary, #666)',
+                border: '1px solid var(--color-border-default, rgba(0,0,0,0.08))',
                 boxShadow: '0 1px 0 rgba(0,0,0,0.04)',
               }}>
                 {keys}
