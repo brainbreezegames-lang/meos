@@ -88,6 +88,7 @@ const CASE_STUDIES: CaseStudy[] = [
     subtitle: 'Designing AI companions that feel genuinely human',
     year: '2025',
     tags: ['Product Design', 'AI', 'Voice UI'],
+    heroImage: 'https://images.unsplash.com/photo-1589254065878-42c9da997008?w=1200&h=750&fit=crop',
     overview: {
       role: 'Head of Design',
       timeline: 'Ongoing (2025–)',
@@ -136,6 +137,7 @@ const CASE_STUDIES: CaseStudy[] = [
     subtitle: 'Wearable AI for perfect memory',
     year: '2024',
     tags: ['Hardware', 'AI', 'Wearables'],
+    heroImage: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=1200&h=750&fit=crop',
     overview: {
       role: 'Co-Founder, Head of Design',
       timeline: '2022–2025',
@@ -184,6 +186,7 @@ const CASE_STUDIES: CaseStudy[] = [
     subtitle: 'Professional tools for creators at scale',
     year: '2020',
     tags: ['Product Design', 'Creator Tools'],
+    heroImage: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1200&h=750&fit=crop',
     overview: {
       role: 'Sr Staff Product Designer',
       timeline: '2019–2020',
@@ -227,6 +230,7 @@ const CASE_STUDIES: CaseStudy[] = [
     subtitle: 'Reimagining how we write tweets',
     year: '2019',
     tags: ['Product Design', 'Core Product'],
+    heroImage: 'https://images.unsplash.com/photo-1611605698335-8b1569810432?w=1200&h=750&fit=crop',
     overview: {
       role: 'Sr Staff Product Designer',
       timeline: '2018–2019',
@@ -1082,47 +1086,71 @@ function WorkItem({
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  };
+
   return (
-    <motion.button
+    <motion.div
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      onClick={onClick}
+      onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
       style={{
         display: 'block',
         width: '100%',
         textAlign: 'left',
-        background: 'none',
-        border: 'none',
-        padding: 0,
         cursor: 'pointer',
-        fontFamily: 'var(--font-body)',
       }}
     >
-      {/* Image placeholder */}
-      <motion.div
-        animate={{ scale: isHovered ? 1.02 : 1 }}
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      {/* Project Image */}
+      <div
         style={{
           width: '100%',
           aspectRatio: '16 / 10',
-          background: `linear-gradient(135deg, ${colors.bgAlt} 0%, ${colors.accent}15 100%)`,
+          background: colors.bgAlt,
           borderRadius: 12,
           marginBottom: 18,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: colors.textMuted,
-          fontSize: 14,
           overflow: 'hidden',
-          boxShadow: isHovered ? '0 16px 40px rgba(0,0,0,0.12)' : '0 4px 12px rgba(0,0,0,0.06)',
-          transition: 'box-shadow 0.3s ease',
+          border: `1px solid ${colors.border}`,
+          transition: 'border-color 0.2s ease',
+          borderColor: isHovered ? colors.accent : colors.border,
+          position: 'relative',
         }}
       >
-        <span style={{ opacity: 0.5 }}>📷 {study.title}</span>
-      </motion.div>
+        {study.heroImage ? (
+          <img
+            src={study.heroImage}
+            alt={study.title}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              transform: isHovered ? 'scale(1.03)' : 'scale(1)',
+            }}
+          />
+        ) : (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: colors.textMuted,
+            fontSize: 14,
+          }}>
+            <span style={{ opacity: 0.5 }}>{study.title}</span>
+          </div>
+        )}
+      </div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16 }}>
         <div>
@@ -1173,7 +1201,7 @@ function WorkItem({
           </span>
         ))}
       </div>
-    </motion.button>
+    </motion.div>
   );
 }
 
@@ -1255,18 +1283,37 @@ function CaseStudyDetail({
         style={{
           width: '100%',
           aspectRatio: '16 / 9',
-          background: `linear-gradient(135deg, ${colors.bgAlt} 0%, ${colors.accent}20 100%)`,
+          background: colors.bgAlt,
           borderRadius: 12,
           marginBottom: 56,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: colors.textMuted,
-          fontSize: 16,
-          fontFamily: 'var(--font-body)',
+          overflow: 'hidden',
+          border: `1px solid ${colors.border}`,
         }}
       >
-        <span style={{ opacity: 0.5 }}>Hero image for {study.title}</span>
+        {study.heroImage ? (
+          <img
+            src={study.heroImage}
+            alt={study.title}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: colors.textMuted,
+            fontSize: 16,
+            fontFamily: 'var(--font-body)',
+          }}>
+            <span style={{ opacity: 0.5 }}>{study.title}</span>
+          </div>
+        )}
       </motion.div>
 
       {/* Overview */}
