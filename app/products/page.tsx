@@ -3,7 +3,7 @@ import { DesktopIconsLeft, DesktopIconsRight } from '@/components/desktop/Deskto
 import Window from '@/components/window/Window';
 import WindowToolbar from '@/components/window/WindowToolbar';
 import ProductGrid from '@/components/features/ProductGrid';
-import CTAButton from '@/components/ui/CTAButton';
+import { Button } from '@/components/ui/Button';
 
 export default function ProductsPage() {
     return (
@@ -37,9 +37,9 @@ export default function ProductsPage() {
 
                                 <div className="bg-[#EEEFE9] rounded p-4">
                                     <h3 className="font-bold text-[13px] mb-2">Ready to start?</h3>
-                                    <CTAButton href="/signup" size="small" className="w-full">
+                                    <Button href="/signup" size="sm" className="w-full">
                                         Get started free
-                                    </CTAButton>
+                                    </Button>
                                 </div>
                             </aside>
 

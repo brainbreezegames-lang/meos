@@ -4,7 +4,7 @@ import { DesktopIconsLeft, DesktopIconsRight } from '@/components/desktop/Deskto
 import Window from '@/components/window/Window';
 import SoftwareBox from '@/components/features/SoftwareBox';
 import VisitorCounter from '@/components/features/VisitorCounter';
-import CTAButton from '@/components/ui/CTAButton';
+import { Button } from '@/components/ui/Button';
 import WindowToolbar from '@/components/window/WindowToolbar';
 import ProductGrid from '@/components/features/ProductGrid';
 import { Zap } from 'lucide-react';
@@ -83,12 +83,12 @@ export default function Home() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-                    <CTAButton href="/signup" size="large">
+                    <Button href="/signup" size="lg">
                       Get started
-                    </CTAButton>
-                    <CTAButton href="/demo" variant="secondary" size="large">
+                    </Button>
+                    <Button href="/demo" variant="secondary" size="lg">
                       Watch demo
-                    </CTAButton>
+                    </Button>
                   </div>
 
                   {/* Urgency Banner */}

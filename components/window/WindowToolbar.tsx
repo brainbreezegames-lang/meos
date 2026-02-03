@@ -12,7 +12,7 @@ import {
     Search,
     Settings
 } from 'lucide-react';
-import CTAButton from '@/components/ui/CTAButton';
+import { Button } from '@/components/ui/Button';
 
 export default function WindowToolbar() {
     return (
@@ -103,9 +103,9 @@ export default function WindowToolbar() {
                     </button>
                 </div>
 
-                <CTAButton href="/signup" size="small">
+                <Button href="/signup" size="sm">
                     Get started
-                </CTAButton>
+                </Button>
             </div>
 
         </div>

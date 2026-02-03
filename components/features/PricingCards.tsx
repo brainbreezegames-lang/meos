@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
-import CTAButton from '@/components/ui/CTAButton';
+import { Button } from '@/components/ui/Button';
 
 export default function PricingCards() {
     const [selectedPlan, setSelectedPlan] = useState<'free' | 'paid'>('paid');
@@ -73,9 +73,9 @@ export default function PricingCards() {
                             : 'Scale with your users. First 1M events are always free.'}
                     </p>
 
-                    <CTAButton href="/signup" size="large" className="w-full max-w-[200px] mb-4">
+                    <Button href="/signup" size="lg" className="w-full max-w-[200px] mb-4">
                         Get started - free
-                    </CTAButton>
+                    </Button>
 
                     <p className="text-xs text-[#9EA096]">
                         No credit card required for the free volume.

@@ -297,6 +297,17 @@
    --space-24: 96px;    /* Large hero areas */
 
    /* ─────────────────────────────────────────────────────────────────────────
+     1.10b CONTENT SPACING (Section rhythm)
+
+     Use at section/container level for consistent vertical rhythm.
+     These map to the spacing scale but are semantically named for sections.
+     ───────────────────────────────────────────────────────────────────────── */
+   --content-spacing-sm: var(--space-8);   /* 32px - tight sections, related content */
+   --content-spacing-md: var(--space-12);  /* 48px - standard section gaps */
+   --content-spacing-lg: var(--space-16);  /* 64px - major section breaks */
+   --content-spacing-xl: var(--space-24);  /* 96px - hero/landing page sections */
+
+   /* ─────────────────────────────────────────────────────────────────────────
      1.11 BLUR / GLASSMORPHISM
      ───────────────────────────────────────────────────────────────────────── */
    --blur-subtle: 12px;
@@ -587,4 +598,82 @@
    opacity: var(--opacity-disabled);
    pointer-events: none;
    cursor: not-allowed;
+}
+
+/* =============================================================================
+   6. LAYOUT UTILITIES
+   Editorial grid structure for consistent alignment and rhythm
+   ============================================================================= */
+
+/* Content container - optimal reading width for body text */
+.layout-content {
+   max-width: 680px;
+   margin-left: auto;
+   margin-right: auto;
+   padding-left: clamp(var(--space-4), 5vw, var(--space-10));
+   padding-right: clamp(var(--space-4), 5vw, var(--space-10));
+}
+
+/* Wide container - for feature grids, galleries, multi-column layouts */
+.layout-wide {
+   max-width: 1120px;
+   margin-left: auto;
+   margin-right: auto;
+   padding-left: clamp(var(--space-4), 5vw, var(--space-10));
+   padding-right: clamp(var(--space-4), 5vw, var(--space-10));
+}
+
+/* Full-width with side padding only */
+.layout-full {
+   padding-left: clamp(var(--space-4), 5vw, var(--space-10));
+   padding-right: clamp(var(--space-4), 5vw, var(--space-10));
+}
+
+/* 12-column grid (add to layout containers when needed) */
+.layout-grid-12 {
+   display: grid;
+   grid-template-columns: repeat(12, 1fr);
+   gap: var(--space-4);
+}
+
+/* Grid span utilities */
+.col-span-4 { grid-column: span 4; }
+.col-span-6 { grid-column: span 6; }
+.col-span-8 { grid-column: span 8; }
+.col-span-12 { grid-column: span 12; }
+
+/* Section spacing utilities */
+.section-gap-sm { margin-top: var(--content-spacing-sm); }
+.section-gap-md { margin-top: var(--content-spacing-md); }
+.section-gap-lg { margin-top: var(--content-spacing-lg); }
+.section-gap-xl { margin-top: var(--content-spacing-xl); }
+
+/* =============================================================================
+   7. CARD UTILITIES
+   Two depths for consistent card elevation
+   ============================================================================= */
+
+/* Soft card - subtle elevation for content containers, lists */
+.card-soft {
+   background: var(--color-bg-elevated);
+   border: 1px solid var(--color-border-subtle);
+   border-radius: var(--radius-lg);
+   box-shadow: var(--shadow-sm);
+}
+
+/* Raised card - prominent elevation for hero cards, interactive elements */
+.card-raised {
+   background: var(--color-bg-elevated);
+   border: 1px solid var(--color-border-default);
+   border-radius: var(--radius-lg);
+   box-shadow: var(--shadow-md);
+}
+
+/* Interactive card base - combine with hover-lift from delight.css */
+.card-interactive {
+   background: var(--color-bg-elevated);
+   border: 1px solid var(--color-border-default);
+   border-radius: var(--radius-lg);
+   box-shadow: var(--shadow-sm);
+   cursor: pointer;
 }

@@ -136,6 +136,81 @@
 }
 
 /* =============================================================================
+   STANDARDIZED HOVER STATES
+   Context-aware hover language for interactive elements
+   ============================================================================= */
+
+/* Lift hover - for cards, clickable containers */
+.hover-lift {
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-lift:active {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Background hover - for list items, menu items */
+.hover-bg {
+  transition: background-color 0.15s var(--ease-out);
+}
+
+.hover-bg:hover {
+  background-color: var(--color-bg-subtle-hover);
+}
+
+/* Underline hover - for text links */
+.hover-underline {
+  position: relative;
+  text-decoration: none;
+}
+
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.2s var(--ease-out);
+}
+
+.hover-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Scale hover - for icons, small interactive elements */
+.hover-scale {
+  transition: transform 0.15s var(--ease-out);
+}
+
+.hover-scale:hover {
+  transform: scale(1.1);
+}
+
+.hover-scale:active {
+  transform: scale(0.95);
+}
+
+/* Glow hover - for accent/highlight elements */
+.hover-glow {
+  transition: box-shadow 0.2s var(--ease-out);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px -5px var(--color-accent-primary-glow);
+}
+
+/* =============================================================================
    SUCCESS CHECKMARK ANIMATION
    ============================================================================= */
 
@@ -396,6 +471,83 @@
 }
 
 /* =============================================================================
+   AMBIENT BACKGROUND EFFECTS
+   Use sparingly - hero sections and landing pages only
+   ============================================================================= */
+
+/* Slow gradient drift - creates living, breathing feel */
+@keyframes gradientDrift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.bg-ambient-drift {
+  background-size: 200% 200%;
+  animation: gradientDrift 20s ease-in-out infinite;
+}
+
+/* Faster drift variant for more energy */
+.bg-ambient-drift-fast {
+  background-size: 200% 200%;
+  animation: gradientDrift 12s ease-in-out infinite;
+}
+
+/* Subtle noise texture overlay - adds depth and warmth */
+.bg-noise {
+  position: relative;
+}
+
+.bg-noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+}
+
+/* Soft vignette effect */
+.bg-vignette {
+  position: relative;
+}
+
+.bg-vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.08) 100%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Shimmer effect - for loading or attention */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.bg-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* =============================================================================
    REDUCED MOTION SUPPORT
    ============================================================================= */
 
@@ -405,8 +557,18 @@
   .card-lift,
   .traffic-light,
   .menu-item-hover::before,
-  .link-underline::after {
+  .link-underline::after,
+  .hover-lift,
+  .hover-bg,
+  .hover-underline::after,
+  .hover-scale,
+  .hover-glow {
     transition: none;
+  }
+
+  .hover-lift:hover,
+  .hover-scale:hover {
+    transform: none;
   }
 
   .success-checkmark-circle,
@@ -419,7 +581,10 @@
   .badge-bounce,
   .icon-spin-click:active,
   .stagger-item,
-  .image-fade-in {
+  .image-fade-in,
+  .bg-ambient-drift,
+  .bg-ambient-drift-fast,
+  .bg-shimmer {
     animation: none;
     opacity: 1;
     transform: none;

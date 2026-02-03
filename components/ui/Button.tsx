@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
+import Link from 'next/link';
 import { motion, HTMLMotionProps, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SPRING, buttonPress, REDUCED_MOTION } from '@/lib/animations';
@@ -9,11 +10,16 @@ interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
+  href?: string;
+  external?: boolean;
   children: React.ReactNode;
 }
 
+// Create motion-wrapped Link component
+const MotionLink = motion(Link);
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
+  ({ className, variant = 'primary', size = 'md', isLoading, href, external, children, disabled, ...props }, ref) => {
     const prefersReducedMotion = useReducedMotion();
 
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
@@ -51,38 +57,66 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       lg: 'text-[14px] px-5 py-2.5 min-h-[44px]',
     };
 
+    const combinedClassName = cn(baseStyles, variants[variant], sizes[size], className);
+    const animationProps = {
+      whileHover: prefersReducedMotion ? {} : buttonPress.hover,
+      whileTap: prefersReducedMotion ? {} : buttonPress.tap,
+      transition: prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy,
+    };
+
+    const loadingSpinner = isLoading && (
+      <svg
+        className="animate-spin -ml-1 mr-2 h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        />
+      </svg>
+    );
+
+    // Render as Link if href is provided
+    if (href) {
+      const linkProps = external
+        ? { target: '_blank', rel: 'noopener noreferrer' }
+        : {};
+
+      return (
+        <MotionLink
+          href={href}
+          className={combinedClassName}
+          style={variantStyles[variant]}
+          {...animationProps}
+          {...linkProps}
+        >
+          {loadingSpinner}
+          {children}
+        </MotionLink>
+      );
+    }
+
+    // Render as button
     return (
       <motion.button
         ref={ref}
-        className={cn(baseStyles, variants[variant], sizes[size], className)}
+        className={combinedClassName}
         style={variantStyles[variant]}
         disabled={disabled || isLoading}
-        whileHover={prefersReducedMotion ? {} : buttonPress.hover}
-        whileTap={prefersReducedMotion ? {} : buttonPress.tap}
-        transition={prefersReducedMotion ? REDUCED_MOTION.transition : SPRING.snappy}
+        {...animationProps}
         {...props}
       >
-        {isLoading && (
-          <svg
-            className="animate-spin -ml-1 mr-2 h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-        )}
+        {loadingSpinner}
         {children}
       </motion.button>
     );
