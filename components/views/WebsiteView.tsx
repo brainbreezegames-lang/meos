@@ -323,10 +323,14 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
 
   const handleSelectWork = (study: CaseStudy) => {
     setSelectedCaseStudy(study);
+    // Scroll to top when opening case study
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToWork = () => {
     setSelectedCaseStudy(null);
+    setActiveSection('work');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -403,49 +407,47 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
         }}
       >
         <div style={{ maxWidth: 680, margin: '0 auto', padding: '0 clamp(20px, 5vw, 40px)' }}>
-          <AnimatePresence mode="wait">
-            {selectedCaseStudy ? (
-              <SectionWrapper key={`case-${selectedCaseStudy.id}`} prefersReducedMotion={prefersReducedMotion}>
-                <CaseStudyDetail
-                  study={selectedCaseStudy}
-                  colors={colors}
-                  onBack={handleBackToWork}
-                  prefersReducedMotion={prefersReducedMotion}
-                />
-              </SectionWrapper>
-            ) : (
-              <>
-                {activeSection === 'home' && (
-                  <SectionWrapper key="home" prefersReducedMotion={prefersReducedMotion}>
-                    <HomeSection
-                      colors={colors}
-                      onNavigate={setActiveSection}
-                      prefersReducedMotion={prefersReducedMotion}
-                    />
-                  </SectionWrapper>
-                )}
-                {activeSection === 'about' && (
-                  <SectionWrapper key="about" prefersReducedMotion={prefersReducedMotion}>
-                    <AboutSection colors={colors} />
-                  </SectionWrapper>
-                )}
-                {activeSection === 'posts' && (
-                  <SectionWrapper key="posts" prefersReducedMotion={prefersReducedMotion}>
-                    <PostsSection posts={posts} colors={colors} />
-                  </SectionWrapper>
-                )}
-                {activeSection === 'work' && (
-                  <SectionWrapper key="work" prefersReducedMotion={prefersReducedMotion}>
-                    <WorkSection
-                      colors={colors}
-                      onSelectWork={handleSelectWork}
-                      prefersReducedMotion={prefersReducedMotion}
-                    />
-                  </SectionWrapper>
-                )}
-              </>
-            )}
-          </AnimatePresence>
+          {selectedCaseStudy ? (
+            <SectionWrapper key={`case-${selectedCaseStudy.id}`} prefersReducedMotion={prefersReducedMotion}>
+              <CaseStudyDetail
+                study={selectedCaseStudy}
+                colors={colors}
+                onBack={handleBackToWork}
+                prefersReducedMotion={prefersReducedMotion}
+              />
+            </SectionWrapper>
+          ) : (
+            <>
+              {activeSection === 'home' && (
+                <SectionWrapper key="home" prefersReducedMotion={prefersReducedMotion}>
+                  <HomeSection
+                    colors={colors}
+                    onNavigate={setActiveSection}
+                    prefersReducedMotion={prefersReducedMotion}
+                  />
+                </SectionWrapper>
+              )}
+              {activeSection === 'about' && (
+                <SectionWrapper key="about" prefersReducedMotion={prefersReducedMotion}>
+                  <AboutSection colors={colors} />
+                </SectionWrapper>
+              )}
+              {activeSection === 'posts' && (
+                <SectionWrapper key="posts" prefersReducedMotion={prefersReducedMotion}>
+                  <PostsSection posts={posts} colors={colors} />
+                </SectionWrapper>
+              )}
+              {activeSection === 'work' && (
+                <SectionWrapper key="work" prefersReducedMotion={prefersReducedMotion}>
+                  <WorkSection
+                    colors={colors}
+                    onSelectWork={handleSelectWork}
+                    prefersReducedMotion={prefersReducedMotion}
+                  />
+                </SectionWrapper>
+              )}
+            </>
+          )}
         </div>
       </main>
 
