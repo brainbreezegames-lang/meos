@@ -195,16 +195,18 @@
 
    /* ─────────────────────────────────────────────────────────────────────────
      1.8 BORDER RADIUS
-     Consistent radius scale for visual cohesion
+     Consolidated radius scale — only 4 values for consistency
      ───────────────────────────────────────────────────────────────────────── */
+   --radius-sm: 6px;       /* Small: buttons, inputs, badges */
+   --radius-md: 10px;      /* Medium: cards, dropdowns, popovers */
+   --radius-lg: 14px;      /* Large: windows, modals, panels */
+   --radius-full: 9999px;  /* Pills: toggles, tags, avatars */
+
+   /* Legacy aliases (deprecated — migrate to above) */
    --radius-xs: 4px;
-   --radius-sm: 6px;
-   --radius-md: 10px;
-   --radius-lg: 12px;
    --radius-xl: 14px;
    --radius-xxl: 16px;
    --radius-dock: 20px;
-   --radius-full: 9999px;
 
    /* ─────────────────────────────────────────────────────────────────────────
      1.9 TYPOGRAPHY
@@ -265,6 +267,21 @@
    --line-height-relaxed: 1.65;    /* Long-form content */
    --line-height-loose: 1.8;       /* Very relaxed */
 
+   /*
+    * SIMPLIFIED TYPE TIERS
+    * For consistent UI typography — use these instead of raw sizes
+    */
+   --type-caption: var(--font-size-xs);      /* 10-12px — Labels, metadata, timestamps */
+   --type-body: var(--font-size-base);       /* 14-16px — Primary reading text */
+   --type-heading: var(--font-size-lg);      /* 18-20px — Section headers, card titles */
+   --type-display: var(--font-size-2xl);     /* 24-30px — Page titles, hero text */
+
+   /* Corresponding line heights for each tier */
+   --type-caption-leading: var(--line-height-normal);
+   --type-body-leading: var(--line-height-normal);
+   --type-heading-leading: var(--line-height-snug);
+   --type-display-leading: var(--line-height-tight);
+
    /* Letter spacing */
    --letter-spacing-tighter: -0.03em;  /* Large display text */
    --letter-spacing-tight: -0.015em;   /* Headings */
@@ -315,13 +332,44 @@
    --blur-heavy: 24px;
 
    /* ─────────────────────────────────────────────────────────────────────────
-     1.12 TRANSITIONS
+     1.11b TEXTURE & GRAIN
+     Subtle visual texture for large flat surfaces
      ───────────────────────────────────────────────────────────────────────── */
-   --transition-fast: 150ms;
-   --transition-medium: 200ms;
-   --transition-slow: 300ms;
-   --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
-   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+   --texture-grain-opacity: 0.03;
+   --texture-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+
+   /* Depth gradients for subtle elevation */
+   --gradient-depth-subtle: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.02) 100%);
+   --gradient-depth-medium: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.04) 100%);
+
+   /* Inner highlight for cards (material feel) */
+   --highlight-card: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+   --highlight-card-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+
+   /* ─────────────────────────────────────────────────────────────────────────
+     1.12 TRANSITIONS
+     Standardized timing scale — use consistently across all interactions
+     ───────────────────────────────────────────────────────────────────────── */
+   --duration-instant: 100ms;  /* Focus rings, state indicators */
+   --duration-fast: 160ms;     /* Hover states, micro-interactions */
+   --duration-normal: 220ms;   /* Panels, dropdowns, cards */
+   --duration-slow: 280ms;     /* Modals, page transitions */
+
+   /* Legacy aliases */
+   --transition-fast: var(--duration-fast);
+   --transition-medium: var(--duration-normal);
+   --transition-slow: var(--duration-slow);
+
+   /* Easing curves */
+   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);       /* Apple-like smooth stop */
+   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);        /* Exits, things going away */
+   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);   /* Bidirectional */
+   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* Playful overshoot */
+
+   /* Ready-to-use transitions */
+   --transition-hover: var(--duration-fast) var(--ease-out);
+   --transition-panel: var(--duration-normal) var(--ease-out);
+   --transition-modal: var(--duration-slow) var(--ease-out);
 
    /* ─────────────────────────────────────────────────────────────────────────
      1.13 FOCUS STATES
@@ -338,8 +386,16 @@
    /* ─────────────────────────────────────────────────────────────────────────
      1.14 INTERACTIVE STATES
 
-     Consistent opacity values for disabled and loading states.
+     Unified hover/active colors and opacity values.
+     Use these for ALL interactive elements to feel like one product.
      ───────────────────────────────────────────────────────────────────────── */
+
+   /* Standardized hover backgrounds */
+   --hover-bg: rgba(23, 20, 18, 0.04);
+   --hover-bg-strong: rgba(23, 20, 18, 0.08);
+   --active-bg: rgba(23, 20, 18, 0.12);
+
+   /* Opacity values */
    --opacity-disabled: 0.5;
    --opacity-hover: 0.9;
    --opacity-loading: 0.7;
@@ -676,4 +732,109 @@
    border-radius: var(--radius-lg);
    box-shadow: var(--shadow-sm);
    cursor: pointer;
+}
+
+/* Card with inner highlight (material feel) */
+.card-highlighted {
+   background: var(--color-bg-elevated);
+   border: 1px solid var(--color-border-default);
+   border-radius: var(--radius-lg);
+   box-shadow: var(--shadow-md), var(--highlight-card);
+}
+
+/* =============================================================================
+   7b. TEXTURE UTILITIES
+   Subtle visual texture for premium surfaces
+   ============================================================================= */
+
+/* Grain overlay - apply to large flat backgrounds */
+.texture-grain::before {
+   content: '';
+   position: absolute;
+   inset: 0;
+   background-image: var(--texture-grain);
+   opacity: var(--texture-grain-opacity);
+   pointer-events: none;
+   z-index: 1;
+}
+
+.texture-grain {
+   position: relative;
+}
+
+/* Depth gradient overlay - subtle elevation hint */
+.texture-depth::after {
+   content: '';
+   position: absolute;
+   inset: 0;
+   background: var(--gradient-depth-subtle);
+   pointer-events: none;
+   z-index: 0;
+}
+
+.texture-depth {
+   position: relative;
+}
+
+/* =============================================================================
+   8. ICON TILE SYSTEM
+   Premium configurable icon styles with visual directions
+   ============================================================================= */
+
+:root {
+   /* Icon color palette - set by IconStyleContext */
+   --icon-color-primary: #2d2a26;
+   --icon-color-secondary: #8b7355;
+   --icon-color-accent: #c4703f;
+   --icon-color-surface: #f5f0e8;
+
+   /* Icon rendering variables */
+   --icon-depth: 1;
+   --icon-shadow-opacity: 0.15;
+   --icon-highlight-opacity: 0.4;
+   --icon-gradient-intensity: 0.12;
+
+   /* Icon tile dimensions */
+   --icon-tile-radius: 22%;
+   --icon-tile-padding: 12%;
+}
+
+/* Visual Direction: Warm Editorial */
+[data-icon-direction="warm-editorial"] {
+   --icon-color-primary: #2d2a26;
+   --icon-color-secondary: #8b7355;
+   --icon-color-accent: #c4703f;
+   --icon-color-surface: #f5f0e8;
+}
+
+/* Visual Direction: Minimal Monochrome */
+[data-icon-direction="minimal-monochrome"] {
+   --icon-color-primary: #1a1a1a;
+   --icon-color-secondary: #666666;
+   --icon-color-accent: #000000;
+   --icon-color-surface: #ffffff;
+}
+
+/* Visual Direction: Premium Playful */
+[data-icon-direction="premium-playful"] {
+   --icon-color-primary: #1e3a5f;
+   --icon-color-secondary: #7c3aed;
+   --icon-color-accent: #f97316;
+   --icon-color-surface: #fef3c7;
+}
+
+/* Render Style: Flat Illustrated */
+[data-icon-style="flat-illustrated"] {
+   --icon-depth: 0;
+   --icon-shadow-opacity: 0;
+   --icon-highlight-opacity: 0;
+   --icon-gradient-intensity: 0;
+}
+
+/* Render Style: Soft 3D */
+[data-icon-style="soft-3d"] {
+   --icon-depth: 1;
+   --icon-shadow-opacity: 0.15;
+   --icon-highlight-opacity: 0.4;
+   --icon-gradient-intensity: 0.12;
 }
