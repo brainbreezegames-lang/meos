@@ -527,12 +527,11 @@ function ListField({
 
 // ─── Add Slide Menu ────────────────────────────────────────────
 // Menu dimensions for positioning calculations
-const ADD_SLIDE_MENU_WIDTH = 340;
-const ADD_SLIDE_MENU_HEIGHT = 520; // Approximate height with all templates
+const ADD_SLIDE_MENU_WIDTH = 200;
+const ADD_SLIDE_MENU_HEIGHT = 296; // 8 items × 32px + padding
 const VIEWPORT_PADDING = 12;
 
-// A polished, macOS-style popover menu with delightful micro-interactions
-// Uses a portal to escape overflow:hidden containers
+// Compact, design-system-aligned menu
 function AddSlideMenu({
   onAdd,
   onClose,
@@ -549,13 +548,12 @@ function AddSlideMenu({
   const [mounted, setMounted] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
-  // Wait for mount to access document.body
   useEffect(() => {
     setMounted(true);
     playSound('expand');
   }, []);
 
-  // Viewport-aware positioning - positions above the button with smart edge detection
+  // Viewport-aware positioning
   useEffect(() => {
     if (!anchorRef.current || !mounted) return;
 
@@ -563,31 +561,25 @@ function AddSlideMenu({
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // Start with position centered above the button
-    let x = rect.left + rect.width / 2 - ADD_SLIDE_MENU_WIDTH / 2;
-    let y = rect.top - ADD_SLIDE_MENU_HEIGHT - 12;
+    // Position above the button, aligned to left edge
+    let x = rect.left;
+    let y = rect.top - ADD_SLIDE_MENU_HEIGHT - 8;
 
-    // If menu would go off the top, position it below the button instead
+    // If menu would go off the top, position below
     if (y < VIEWPORT_PADDING) {
-      y = rect.bottom + 12;
+      y = rect.bottom + 8;
     }
 
-    // If menu still doesn't fit below, position it as high as possible
-    if (y + ADD_SLIDE_MENU_HEIGHT + VIEWPORT_PADDING > viewportHeight) {
-      y = Math.max(VIEWPORT_PADDING, viewportHeight - ADD_SLIDE_MENU_HEIGHT - VIEWPORT_PADDING);
-    }
-
-    // Ensure horizontal positioning stays within viewport
+    // Horizontal bounds
     if (x + ADD_SLIDE_MENU_WIDTH + VIEWPORT_PADDING > viewportWidth) {
       x = viewportWidth - ADD_SLIDE_MENU_WIDTH - VIEWPORT_PADDING;
     }
-    if (x < VIEWPORT_PADDING) {
-      x = VIEWPORT_PADDING;
-    }
+    x = Math.max(VIEWPORT_PADDING, x);
 
-    // Final bounds check
-    x = Math.max(VIEWPORT_PADDING, Math.min(x, viewportWidth - ADD_SLIDE_MENU_WIDTH - VIEWPORT_PADDING));
-    y = Math.max(VIEWPORT_PADDING, Math.min(y, viewportHeight - ADD_SLIDE_MENU_HEIGHT - VIEWPORT_PADDING));
+    // Vertical bounds
+    if (y + ADD_SLIDE_MENU_HEIGHT + VIEWPORT_PADDING > viewportHeight) {
+      y = Math.max(VIEWPORT_PADDING, viewportHeight - ADD_SLIDE_MENU_HEIGHT - VIEWPORT_PADDING);
+    }
 
     setAdjustedPosition({ x, y });
   }, [anchorRef, mounted]);
@@ -611,7 +603,6 @@ function AddSlideMenu({
           break;
         case 'Escape':
           e.preventDefault();
-          playSound('click');
           onClose();
           break;
       }
@@ -632,282 +623,92 @@ function AddSlideMenu({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [onClose, anchorRef]);
 
-  // Template icon backgrounds for visual interest
-  const templateColors: Record<SlideTemplate, { bg: string; accent: string }> = {
-    'title': { bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', accent: '#d97706' },
-    'section': { bg: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)', accent: '#2563eb' },
-    'content': { bg: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)', accent: '#9333ea' },
-    'image': { bg: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)', accent: '#16a34a' },
-    'image-text': { bg: 'linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%)', accent: '#0891b2' },
-    'quote': { bg: 'linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)', accent: '#db2777' },
-    'list': { bg: 'linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%)', accent: '#ea580c' },
-    'stat': { bg: 'linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)', accent: '#7c3aed' },
-    'end': { bg: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', accent: '#475569' },
-  };
-
   if (!mounted) return null;
 
   return ReactDOM.createPortal(
-    <>
-      {/* Backdrop with subtle blur */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.15 }}
-        onClick={onClose}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0, 0, 0, 0.1)',
-          backdropFilter: 'blur(2px)',
-          WebkitBackdropFilter: 'blur(2px)',
-          zIndex: 9998,
-        }}
-      />
+    <motion.div
+      ref={menuRef}
+      initial={contextMenuVariants.initial}
+      animate={contextMenuVariants.animate}
+      exit={contextMenuVariants.exit}
+      transition={prefersReducedMotion ? { duration: 0.1 } : SPRING.snappy}
+      style={{
+        position: 'fixed',
+        top: adjustedPosition.y,
+        left: adjustedPosition.x,
+        width: ADD_SLIDE_MENU_WIDTH,
+        background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
+        backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+        WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
+        borderRadius: 'var(--radius-md, 14px)',
+        border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
+        boxShadow: 'var(--shadow-lg, 0 20px 40px rgba(0, 0, 0, 0.15))',
+        zIndex: 9999,
+        padding: 4,
+        transformOrigin: 'bottom left',
+      }}
+    >
+      {SLIDE_TEMPLATES.map(({ template, icon, label }, index) => {
+        const isHovered = hoveredIndex === index;
+        const isFocused = focusedIndex === index;
+        const isActive = isHovered || isFocused;
 
-      {/* Menu */}
-      <motion.div
-        ref={menuRef}
-        initial={contextMenuVariants.initial}
-        animate={contextMenuVariants.animate}
-        exit={contextMenuVariants.exit}
-        transition={prefersReducedMotion ? { duration: 0.1 } : SPRING.snappy}
-        style={{
-          position: 'fixed',
-          top: adjustedPosition.y,
-          left: adjustedPosition.x,
-          width: ADD_SLIDE_MENU_WIDTH,
-          maxHeight: `calc(100vh - ${VIEWPORT_PADDING * 2}px)`,
-          background: 'var(--color-bg-glass-heavy, rgba(251, 249, 239, 0.95))',
-          backdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-          WebkitBackdropFilter: 'var(--blur-glass-heavy, blur(24px) saturate(180%))',
-          borderRadius: 'var(--radius-md, 14px)',
-          border: '1px solid var(--color-border-default, rgba(23, 20, 18, 0.08))',
-          boxShadow: 'var(--shadow-lg, 0 20px 40px rgba(0, 0, 0, 0.15))',
-          zIndex: 9999,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          transformOrigin: 'bottom center',
-        }}
-      >
-        {/* Header */}
-        <div style={{
-          padding: '16px 18px 12px',
-          borderBottom: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-          background: 'var(--color-bg-elevated, rgba(255, 255, 255, 0.8))',
-          flexShrink: 0,
-        }}>
-          <div style={{
-            fontSize: 14,
-            fontWeight: 600,
-            fontFamily: 'var(--font-body)',
-            color: 'var(--color-text-primary, #171412)',
-            letterSpacing: '-0.02em',
-          }}>
-            Add New Slide
-          </div>
-          <div style={{
-            fontSize: 12,
-            fontFamily: 'var(--font-body)',
-            color: 'var(--color-text-muted, #737373)',
-            marginTop: 3,
-          }}>
-            Choose a template to get started
-          </div>
-        </div>
-
-        {/* Template List */}
-        <div style={{
-          padding: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-          overflowY: 'auto',
-          flex: 1,
-        }}>
-          {SLIDE_TEMPLATES.map(({ template, icon, label, description }, index) => {
-            const colors = templateColors[template];
-            const isHovered = hoveredIndex === index;
-            const isFocused = focusedIndex === index;
-            const isActive = isHovered || isFocused;
-
-            return (
-              <motion.button
-                key={template}
-                onClick={() => {
-                  playSound('pop');
-                  onAdd(template);
-                }}
-                onMouseEnter={() => {
-                  setHoveredIndex(index);
-                  setFocusedIndex(index);
-                }}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onFocus={() => setFocusedIndex(index)}
-                initial={false}
-                animate={{
-                  backgroundColor: isActive ? 'var(--color-bg-subtle, rgba(0, 0, 0, 0.04))' : 'transparent',
-                }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.1 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  padding: '12px 14px',
-                  background: 'transparent',
-                  border: 'none',
-                  borderRadius: 'var(--radius-sm, 10px)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  outline: 'none',
-                  position: 'relative',
-                }}
-              >
-                {/* Focus indicator bar */}
-                <motion.div
-                  initial={false}
-                  animate={{
-                    opacity: isActive ? 1 : 0,
-                    scaleY: isActive ? 1 : 0.5,
-                  }}
-                  transition={{ duration: 0.15 }}
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: '20%',
-                    bottom: '20%',
-                    width: 3,
-                    borderRadius: 2,
-                    background: colors.accent,
-                  }}
-                />
-
-                {/* Icon with colored background */}
-                <motion.div
-                  initial={false}
-                  animate={{
-                    scale: isActive ? 1.08 : 1,
-                    rotate: isActive ? 2 : 0,
-                  }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 11,
-                    background: colors.bg,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: colors.accent,
-                    flexShrink: 0,
-                    boxShadow: isActive
-                      ? `0 4px 14px ${colors.accent}30, 0 2px 6px ${colors.accent}20`
-                      : '0 1px 3px rgba(0,0,0,0.06)',
-                    transition: 'box-shadow 0.2s ease',
-                  }}
-                >
-                  {React.cloneElement(icon as React.ReactElement, { size: 20 })}
-                </motion.div>
-
-                {/* Label and description */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    fontFamily: 'var(--font-body)',
-                    color: 'var(--color-text-primary, #171412)',
-                    letterSpacing: '-0.01em',
-                  }}>
-                    {label}
-                  </div>
-                  <div style={{
-                    fontSize: 11,
-                    fontFamily: 'var(--font-body)',
-                    color: 'var(--color-text-muted, #737373)',
-                    marginTop: 2,
-                  }}>
-                    {description}
-                  </div>
-                </div>
-
-                {/* Plus indicator on hover */}
-                <motion.div
-                  initial={false}
-                  animate={{
-                    opacity: isActive ? 1 : 0,
-                    scale: isActive ? 1 : 0.8,
-                    x: isActive ? 0 : -4,
-                  }}
-                  transition={{ duration: 0.15 }}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 8,
-                    background: colors.accent,
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    boxShadow: `0 2px 8px ${colors.accent}40`,
-                  }}
-                >
-                  <Plus size={16} strokeWidth={2.5} />
-                </motion.div>
-              </motion.button>
-            );
-          })}
-        </div>
-
-        {/* Footer with keyboard hints */}
-        <div style={{
-          padding: '12px 18px 14px',
-          borderTop: '1px solid var(--color-border-subtle, rgba(23, 20, 18, 0.06))',
-          background: 'var(--color-bg-subtle, rgba(0, 0, 0, 0.02))',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 20,
-          flexShrink: 0,
-        }}>
-          {[
-            { keys: '↑↓', label: 'navigate' },
-            { keys: '⏎', label: 'select' },
-            { keys: 'esc', label: 'close' },
-          ].map(({ keys, label }) => (
-            <span
-              key={keys}
-              style={{
-                fontSize: 11,
-                fontFamily: 'var(--font-body)',
-                color: 'var(--color-text-muted, #a3a3a3)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-              }}
-            >
-              <kbd style={{
-                padding: '3px 6px',
-                background: 'var(--color-bg-base, rgba(0,0,0,0.06))',
-                borderRadius: 5,
-                fontSize: 10,
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 500,
-                color: 'var(--color-text-secondary, #666)',
-                border: '1px solid var(--color-border-default, rgba(0,0,0,0.08))',
-                boxShadow: '0 1px 0 rgba(0,0,0,0.04)',
-              }}>
-                {keys}
-              </kbd>
+        return (
+          <motion.button
+            key={template}
+            onClick={() => {
+              playSound('pop');
+              onAdd(template);
+            }}
+            onMouseEnter={() => {
+              setHoveredIndex(index);
+              setFocusedIndex(index);
+            }}
+            onMouseLeave={() => setHoveredIndex(null)}
+            onFocus={() => setFocusedIndex(index)}
+            initial={false}
+            animate={{
+              backgroundColor: isActive ? 'var(--color-accent-primary, #ff7722)' : 'transparent',
+            }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.08 }}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              padding: '8px 12px',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: 'var(--radius-sm, 8px)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              outline: 'none',
+              color: isActive ? '#fff' : 'var(--color-text-secondary, #555)',
+            }}
+          >
+            <span style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 18,
+              flexShrink: 0,
+              opacity: isActive ? 1 : 0.7,
+            }}>
+              {React.cloneElement(icon as React.ReactElement, { size: 14, strokeWidth: 1.5 })}
+            </span>
+            <span style={{
+              fontSize: 13,
+              fontWeight: 500,
+              fontFamily: 'var(--font-body)',
+              flex: 1,
+            }}>
               {label}
             </span>
-          ))}
-        </div>
-      </motion.div>
-    </>,
+          </motion.button>
+        );
+      })}
+    </motion.div>,
     document.body
   );
 }
