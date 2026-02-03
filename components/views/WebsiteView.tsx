@@ -119,7 +119,7 @@ export function WebsiteView({ files, onClose }: WebsiteViewProps) {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 200,
+        zIndex: 9000,
         background: colors.bg,
         fontFamily: 'var(--font-body)',
         overflowY: 'auto',

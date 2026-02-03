@@ -5052,6 +5052,14 @@ function GoOSDemoContent() {
                 );
             })()}
 
+            {/* WEBSITE VIEW MODE - Personal website experience */}
+            {viewMode === 'website' && (
+                <WebsiteView
+                    files={goosFiles}
+                    onClose={() => setViewMode('desktop')}
+                />
+            )}
+
             {/* DESKTOP AREA */}
             <main className="pt-10 pb-20 min-h-screen relative">
                 {/* Present View Mode */}
@@ -5059,14 +5067,6 @@ function GoOSDemoContent() {
                     <PresentView
                         items={goosFilesAsDesktopItems}
                         isOwner={true}
-                        onClose={() => setViewMode('desktop')}
-                    />
-                )}
-
-                {/* Website View Mode - personal website experience */}
-                {viewMode === 'website' && (
-                    <WebsiteView
-                        files={goosFiles}
                         onClose={() => setViewMode('desktop')}
                     />
                 )}
