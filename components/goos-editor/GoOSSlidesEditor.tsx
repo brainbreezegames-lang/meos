@@ -1225,10 +1225,10 @@ export function GoOSSlidesEditor({
           )}
         </AnimatePresence>
 
-        {/* Slide Preview */}
+        {/* Slide Preview - warm charcoal canvas */}
         <div style={{
           flex: 1,
-          background: '#1a1a1a',
+          background: '#3a3734',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
