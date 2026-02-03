@@ -630,6 +630,7 @@ function AddSlideMenu({
   return ReactDOM.createPortal(
     <motion.div
       ref={menuRef}
+      className="font-sans"
       initial={contextMenuVariants.initial}
       animate={contextMenuVariants.animate}
       exit={contextMenuVariants.exit}
@@ -692,8 +693,7 @@ function AddSlideMenu({
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer',
-              fontFamily: 'var(--font-body)',
-              fontSize: '12px',
+              fontSize: 13,
               fontWeight: 500,
               color: isPressed
                 ? 'var(--color-text-on-accent, #fbf9ef)'
@@ -828,7 +828,19 @@ export function GoOSSlidesEditor({
 }: GoOSSlidesEditorProps) {
   const parsedContent = useMemo(() => {
     try {
-      if (file.content) return JSON.parse(file.content) as SlidesContent;
+      if (file.content) {
+        const parsed = JSON.parse(file.content) as SlidesContent;
+        // Validate that we have actual slides with content
+        if (parsed.slides && parsed.slides.length > 0) {
+          // Check if slides have actual content (not just empty objects)
+          const hasValidContent = parsed.slides.some(
+            (slide) => slide.content && Object.keys(slide.content).length > 0
+          );
+          if (hasValidContent) {
+            return parsed;
+          }
+        }
+      }
     } catch { /* use default */ }
     return getDefaultSlidesContent();
   }, [file.content]);
