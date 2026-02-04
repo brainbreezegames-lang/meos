@@ -408,8 +408,8 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         </div>
       )}
 
-      {/* Title or Rename Input */}
-      {isRenaming ? (
+      {/* Title or Rename Input — hidden for image cards */}
+      {isImageCard ? null : isRenaming ? (
         <input
           autoFocus
           value={renameValue}
