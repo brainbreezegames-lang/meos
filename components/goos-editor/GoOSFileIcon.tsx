@@ -23,6 +23,16 @@ function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   }) as T;
 }
 
+// Deterministic rotation from file ID for image cards
+function getRotationFromId(id: string): number {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = ((hash << 5) - hash) + id.charCodeAt(i);
+    hash |= 0;
+  }
+  return (hash % 9) - 4; // -4 to +4 degrees
+}
+
 export type FileType = 'note' | 'case-study' | 'folder' | 'cv' | 'image' | 'link' | 'embed' | 'download' | 'game' | 'board' | 'sheet' | 'slides';
 
 interface GoOSFileIconProps {
@@ -124,12 +134,15 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
     }
   };
 
+  const isImageCard = type === 'image' && !!imageUrl;
+  const cardRotation = useMemo(() => isImageCard ? getRotationFromId(id) : 0, [id, isImageCard]);
+
   // Use premium icons that respond to IconStyleContext settings
   const getIcon = () => {
     const faviconUrl = linkUrl ? getFaviconUrl(linkUrl) : null;
     return getPremiumIcon(type, {
       size: 52,
-      imageUrl,
+      imageUrl: isImageCard ? undefined : imageUrl, // Don't pass imageUrl if rendering as card
       faviconUrl,
     });
   };
@@ -271,22 +284,28 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 6,
-        padding: 8,
-        borderRadius: 8,
+        gap: isImageCard ? 8 : 6,
+        padding: isImageCard ? 0 : 8,
+        borderRadius: isImageCard ? 12 : 8,
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        width: 100,
-        zIndex: isDragging ? 1000 : 10, // Above falling letters (z:1)
+        width: isImageCard ? 200 : 100,
+        zIndex: isDragging ? 1000 : 10,
         opacity: isAppearing ? 0 : 1,
-        transform: isDragging ? 'scale(1.05)' : 'scale(1)',
-        background: isSelected
+        transform: isDragging
+          ? `scale(1.05) rotate(${cardRotation}deg)`
+          : `scale(1) rotate(${cardRotation}deg)`,
+        background: isImageCard
+          ? 'transparent'
+          : isSelected
           ? `${goOSTokens.colors.accent.primary}20`
           : isDraggedOver && type === 'folder'
           ? `${goOSTokens.colors.accent.primary}15`
           : 'transparent',
-        border: isSelected
+        border: isImageCard
+          ? (isSelected ? `2px solid ${goOSTokens.colors.accent.primary}` : '2px solid transparent')
+          : isSelected
           ? `2px solid ${goOSTokens.colors.accent.primary}`
           : isDraggedOver && type === 'folder'
           ? `2px dashed ${goOSTokens.colors.accent.primary}`
@@ -297,44 +316,97 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         outline: 'none',
       }}
     >
-      {/* Icon - Beautiful macOS-style SVG icons */}
-      <div
-        style={{
-          width: 52,
-          height: 52,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          filter: isDragging ? 'drop-shadow(0 8px 16px rgba(23, 20, 18, 0.2))' : 'drop-shadow(0 2px 4px rgba(23, 20, 18, 0.08))',
-          transition: 'filter 0.15s ease',
-        }}
-      >
-        {getIcon()}
-
-        {/* Lock indicator */}
-        {type !== 'folder' && isLocked && (
-          <div
+      {/* Image card or standard icon */}
+      {isImageCard ? (
+        <div
+          style={{
+            width: '100%',
+            background: '#ffffff',
+            borderRadius: 12,
+            padding: 6,
+            boxShadow: isDragging
+              ? '0 20px 40px rgba(0, 0, 0, 0.25), 0 8px 16px rgba(0, 0, 0, 0.15)'
+              : '0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08)',
+            transition: 'box-shadow 0.2s ease',
+            position: 'relative',
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imageUrl}
+            alt={title}
             style={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              width: 16,
-              height: 16,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-              border: '1.5px solid #fff',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              width: '100%',
+              aspectRatio: '4 / 5',
+              objectFit: 'cover',
+              borderRadius: 8,
+              display: 'block',
             }}
-            title="Locked - requires purchase"
-          >
-            <Lock size={9} color="white" strokeWidth={2.5} />
-          </div>
-        )}
-      </div>
+            draggable={false}
+          />
+
+          {/* Lock indicator */}
+          {isLocked && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                border: '2px solid #fff',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              title="Locked - requires purchase"
+            >
+              <Lock size={11} color="white" strokeWidth={2.5} />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div
+          style={{
+            width: 52,
+            height: 52,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            filter: isDragging ? 'drop-shadow(0 8px 16px rgba(23, 20, 18, 0.2))' : 'drop-shadow(0 2px 4px rgba(23, 20, 18, 0.08))',
+            transition: 'filter 0.15s ease',
+          }}
+        >
+          {getIcon()}
+
+          {/* Lock indicator */}
+          {type !== 'folder' && isLocked && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                border: '1.5px solid #fff',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              title="Locked - requires purchase"
+            >
+              <Lock size={9} color="white" strokeWidth={2.5} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Title or Rename Input */}
       {isRenaming ? (
