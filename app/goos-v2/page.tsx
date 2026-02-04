@@ -3750,9 +3750,6 @@ function GoOSDemoContent() {
                     alt: file.name,
                     position: offsetPosition,
                 });
-                // Revoke object URL after upload completes to free memory
-                // (server response replaces with permanent URL)
-                URL.revokeObjectURL(imageUrl);
             }
         }
 

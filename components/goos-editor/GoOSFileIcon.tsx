@@ -290,7 +290,7 @@ export const GoOSFileIcon = memo(function GoOSFileIcon({
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        width: isImageCard ? 200 : 100,
+        width: isImageCard ? 100 : 100,
         zIndex: isDragging ? 1000 : 10,
         opacity: isAppearing ? 0 : 1,
         transform: isDragging
