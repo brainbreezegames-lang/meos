@@ -95,13 +95,12 @@ import { useAIOnboarding, StreamingBuildItem } from '@/hooks/useAIOnboarding';
 // import { LiquidBackground } from '@/components/desktop/LiquidBackground'; // Disabled for performance
 
 // ============================================
-// DEMO SPACES (for SpaceSwitcher demo)
+// DEMO SPACES (for SpaceSwitcher demo) - Sankalp Sinha's goOS
 // ============================================
 const DEMO_SPACES: SpaceSummary[] = [
-    { id: 'space-1', name: 'Portfolio', icon: '🎨', slug: null, isPrimary: true, isPublic: true, order: 0, fileCount: 12 },
-    { id: 'space-2', name: 'Writing', icon: '✍️', slug: 'writing', isPrimary: false, isPublic: true, order: 1, fileCount: 8 },
-    { id: 'space-3', name: 'Photography', icon: '📸', slug: 'photos', isPrimary: false, isPublic: true, order: 2, fileCount: 24 },
-    { id: 'space-4', name: 'Personal', icon: '🔐', slug: null, isPrimary: false, isPublic: false, order: 3, fileCount: 5 },
+    { id: 'space-1', name: 'Work', icon: '🚀', slug: null, isPrimary: true, isPublic: true, order: 0, fileCount: 8 },
+    { id: 'space-2', name: 'Life', icon: '📚', slug: 'life', isPrimary: false, isPublic: true, order: 1, fileCount: 12 },
+    { id: 'space-3', name: 'Notes', icon: '📝', slug: 'notes', isPrimary: false, isPublic: true, order: 2, fileCount: 6 },
 ];
 
 // ============================================
@@ -109,364 +108,224 @@ const DEMO_SPACES: SpaceSummary[] = [
 // Files with IDs starting with these prefixes belong to that space
 // ============================================
 const SPACE_FILE_PREFIXES: Record<string, string[]> = {
-    'space-1': ['file-1', 'file-2', 'file-3', 'file-4', 'file-5', 'file-6', 'file-prompts', 'game-snake'], // Portfolio - existing demo files
-    'space-2': ['writing-'], // Writing space
-    'space-3': ['photo-'], // Photography space
-    'space-4': ['personal-'], // Personal space
+    'space-1': ['file-'], // Work space - design shots, projects
+    'space-2': ['life-'], // Life space - books, movies, games, photos
+    'space-3': ['notes-'], // Notes space - blog posts
 };
 
-// Demo files for Writing space (space-2) - A writer's workspace
-const WRITING_SPACE_FILES: GoOSFileData[] = [
+// Demo files for Life space (space-2) - Sankalp's personal library
+const LIFE_SPACE_FILES: GoOSFileData[] = [
+    // Books Section
     {
-        id: 'writing-1',
-        type: 'note',
-        title: 'Newsletter #47: On Simplicity',
-        content: '<h1>Newsletter #47: On Simplicity</h1><p>This week I\'ve been thinking about what we leave out. The art of omission...</p><p>Every great piece of writing is defined as much by what it excludes as what it includes.</p>',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 5, y: 25 },
-    },
-    {
-        id: 'writing-2',
+        id: 'life-books',
         type: 'folder',
-        title: 'Essays',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 22, y: 25 },
-    },
-    {
-        id: 'writing-3',
-        type: 'note',
-        title: 'Draft: Why I Write',
-        content: '<h1>Why I Write</h1><p>I write to think. The act of putting words on paper forces clarity...</p><p>There\'s something about the blank page that demands honesty.</p>',
-        status: 'draft',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 39, y: 25 },
-    },
-    {
-        id: 'writing-4',
-        type: 'link',
-        title: 'Substack',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 56, y: 25 },
-        linkUrl: 'https://substack.com',
-        linkTitle: 'My Newsletter',
-    },
-    {
-        id: 'writing-5',
-        type: 'folder',
-        title: 'Book Notes',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 5, y: 50 },
-    },
-    {
-        id: 'writing-6',
-        type: 'note',
-        title: 'Interview Questions',
-        content: '<h1>Interview Prep</h1><ul><li>What inspired your latest piece?</li><li>Your writing process?</li><li>Advice for aspiring writers?</li></ul>',
-        status: 'draft',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now()),
-        parentId: null,
-        position: { x: 22, y: 50 },
-    },
-    {
-        id: 'writing-7',
-        type: 'note',
-        title: 'Reading List 2024',
-        content: '<h1>Reading List</h1><ul><li>✓ Bird by Bird - Anne Lamott</li><li>✓ On Writing - Stephen King</li><li>○ The War of Art</li><li>○ Zen in the Art of Writing</li></ul>',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 39, y: 50 },
-    },
-    {
-        id: 'writing-8',
-        type: 'folder',
-        title: 'Archive',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 56, y: 50 },
-    },
-];
-
-// Demo files for Photography space (space-3) - A photographer's gallery
-const PHOTOGRAPHY_SPACE_FILES: GoOSFileData[] = [
-    {
-        id: 'photo-1',
-        type: 'image',
-        title: 'Tokyo Nights',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 5, y: 25 },
-        imageUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&h=800&fit=crop',
-        imageCaption: 'Shibuya crossing at midnight',
-        imageAlt: 'Tokyo cityscape at night with neon lights',
-    },
-    {
-        id: 'photo-2',
-        type: 'folder',
-        title: 'Japan 2024',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 22, y: 25 },
-    },
-    {
-        id: 'photo-3',
-        type: 'image',
-        title: 'Morning Fog',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 39, y: 25 },
-        imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop',
-        imageCaption: 'Dolomites at dawn',
-        imageAlt: 'Mountain peaks emerging from fog',
-    },
-    {
-        id: 'photo-4',
-        type: 'image',
-        title: 'Street Portrait #12',
-        content: '',
-        status: 'draft',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now()),
-        parentId: null,
-        position: { x: 56, y: 25 },
-        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=800&fit=crop',
-        imageCaption: 'Work in progress',
-        imageAlt: 'Portrait study',
-    },
-    {
-        id: 'photo-5',
-        type: 'folder',
-        title: 'Landscapes',
-        content: '',
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 5, y: 50 },
-    },
-    {
-        id: 'photo-6',
-        type: 'link',
-        title: 'Instagram',
+        title: 'Books',
         content: '',
         status: 'published',
         accessLevel: 'free',
         publishedAt: null,
         createdAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 22, y: 50 },
-        linkUrl: 'https://instagram.com',
-        linkTitle: '@photographer',
-    },
-    {
-        id: 'photo-7',
-        type: 'image',
-        title: 'Abstract #7',
-        content: '',
-        status: 'published',
-        accessLevel: 'premium',
-        publishedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 39, y: 50 },
-        imageUrl: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=1200&h=800&fit=crop',
-        imageCaption: 'Light and shadow study',
-        imageAlt: 'Abstract architectural photograph',
-    },
-    {
-        id: 'photo-8',
-        type: 'folder',
-        title: 'Client Work',
-        content: '',
-        status: 'draft',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         parentId: null,
-        position: { x: 56, y: 50 },
+        position: { x: 5, y: 25 },
     },
     {
-        id: 'photo-9',
+        id: 'life-reading',
         type: 'note',
-        title: 'Gear List',
-        content: '<h1>Current Kit</h1><ul><li>Sony A7IV</li><li>24-70mm f/2.8 GM</li><li>85mm f/1.4 GM</li><li>Peak Design bag</li></ul>',
-        status: 'draft',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 73, y: 25 },
-    },
-    {
-        id: 'photo-10',
-        type: 'folder',
-        title: 'Portraits',
-        content: '',
+        title: 'Currently Reading',
+        content: '<h1>Currently Reading</h1><ul><li><strong>The Daily Stoic</strong> - Ryan Holiday</li><li><strong>The Coaching Habit</strong> - Michael Bungay Stanier</li></ul><h2>Next in Line</h2><ul><li>This is Marketing - Seth Godin</li><li>Super Human - Dave Asprey</li><li>Getting Acquired - Andrew Gazdecki</li><li>Build - Tony Fadell</li></ul>',
         status: 'published',
         accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+        publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         parentId: null,
-        position: { x: 73, y: 50 },
+        position: { x: 22, y: 25 },
     },
-];
-
-// Demo files for Personal space (space-4) - Private notes and ideas
-const PERSONAL_SPACE_FILES: GoOSFileData[] = [
+    // Movies & Shows Section
     {
-        id: 'personal-1',
-        type: 'note',
-        title: 'Goals 2024',
-        content: '<h1>2024 Goals</h1><ul><li>☑ Launch portfolio site</li><li>☐ Write 12 newsletters</li><li>☐ Learn Blender</li><li>☐ Take a proper vacation</li></ul>',
-        status: 'draft',
+        id: 'life-movies',
+        type: 'folder',
+        title: 'Movies & Shows',
+        content: '',
+        status: 'published',
         accessLevel: 'free',
         publishedAt: null,
         createdAt: new Date(Date.now() - 300 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 39, y: 25 },
+    },
+    // Games Section
+    {
+        id: 'life-games',
+        type: 'folder',
+        title: 'Games',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 56, y: 25 },
+    },
+    // Photos Section
+    {
+        id: 'life-photos',
+        type: 'folder',
+        title: 'Photos',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 500 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 73, y: 25 },
+    },
+    // Travel Photos
+    {
+        id: 'life-photo-italy',
+        type: 'image',
+        title: 'Italy 2024',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 5, y: 50 },
+        imageUrl: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&h=800&fit=crop',
+        imageCaption: 'Working remotely from Italy',
+        imageAlt: 'Venice canal with gondolas',
+    },
+    {
+        id: 'life-photo-singapore',
+        type: 'image',
+        title: 'Singapore',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 22, y: 50 },
+        imageUrl: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&h=800&fit=crop',
+        imageCaption: 'Marina Bay at night',
+        imageAlt: 'Singapore skyline with Marina Bay Sands',
+    },
+    // Uses / Gear
+    {
+        id: 'life-uses',
+        type: 'note',
+        title: 'My Setup',
+        content: '<h1>My Setup</h1><h2>Hardware</h2><ul><li>MacBook Pro M1 Max</li><li>Logitech Lift Mouse</li><li>Peak Design Everyday Backpack</li></ul><h2>Software</h2><ul><li>Figma - Design</li><li>Notion - Notes & Kanban</li><li>VS Code - Code</li><li>PostHog - Analytics</li></ul><h2>Philosophy</h2><p>Software should be fun to use while delivering value.</p>',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 39, y: 50 },
+    },
+    // Favorite Books Note
+    {
+        id: 'life-favorites',
+        type: 'note',
+        title: 'Life-Changing Books',
+        content: '<h1>Books That Changed My Life</h1><ul><li><strong>4-Hour Work Week</strong> - Tim Ferriss (changed my life)</li><li><strong>The Lean Startup</strong> - Eric Ries</li><li><strong>Make Time</strong> - Jake Knapp</li><li><strong>Hell Yeah Or No</strong> - Derek Sivers</li><li><strong>Remote</strong> - Basecamp</li><li><strong>The Mom Test</strong> - Rob Fitzpatrick</li><li><strong>Getting Things Done</strong> - David Allen</li></ul><p><em>My dad is a writer. I grew up around books.</em></p>',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 56, y: 50 },
+    },
+];
+
+// Demo files for Notes space (space-3) - Sankalp's blog posts
+const NOTES_SPACE_FILES: GoOSFileData[] = [
+    {
+        id: 'notes-1',
+        type: 'note',
+        title: 'In the world of Leo Beebes, be Ken Miles',
+        content: '<h1>In the world of Leo Beebes, be Ken Miles</h1><p><em>July 5, 2025</em></p><p>The story of Ken Miles in Ford v Ferrari resonates deeply with me. In a world full of corporate politics and people playing it safe, Miles stayed true to his craft.</p><p>He didn\'t care about looking good in meetings. He cared about building the best damn car possible.</p><p>Most people optimize for looking smart. Few optimize for being right.</p><blockquote>"Do it with all your heart, or don\'t do it at all."</blockquote><p>That\'s the philosophy I\'m trying to live by as I build in public.</p>',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date('2025-07-05'),
+        createdAt: new Date('2025-07-01'),
+        updatedAt: new Date('2025-07-05'),
         parentId: null,
         position: { x: 5, y: 25 },
     },
     {
-        id: 'personal-2',
-        type: 'folder',
-        title: 'Finances',
-        content: '',
-        status: 'draft',
+        id: 'notes-2',
+        type: 'note',
+        title: 'Why leaders resist remote work',
+        content: '<h1>Why leaders resist remote work</h1><p><em>June 23, 2025</em></p><p>After 13+ years of working remotely, traveling to 1-2 countries per year for a month each, working from cafes around the world, I\'ve noticed a pattern.</p><p>Leaders who resist remote work often confuse presence with productivity. They mistake seeing people at desks for actual output.</p><p>The best work I\'ve done has been from cafes in Bangalore, apartments in Italy, co-working spaces in Singapore.</p><p>Location doesn\'t determine quality. Focus does.</p>',
+        status: 'published',
         accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        publishedAt: new Date('2025-06-23'),
+        createdAt: new Date('2025-06-20'),
+        updatedAt: new Date('2025-06-23'),
         parentId: null,
         position: { x: 22, y: 25 },
     },
     {
-        id: 'personal-3',
+        id: 'notes-3',
         type: 'note',
-        title: 'App Ideas',
-        content: '<h1>Ideas to explore</h1><ul><li>Habit tracker with streaks</li><li>Recipe organizer</li><li>Mood journal</li></ul><p>Maybe start with the habit tracker?</p>',
-        status: 'draft',
+        title: 'Leap from a cushy job to startup founder',
+        content: '<h1>Leap from a cushy job to startup founder</h1><p><em>May 14, 2025</em></p><p>In April 2025, I left my $15k+ MRR full-time job to go full indie.</p><p>Everyone thought I was crazy. A stable income, great team, interesting problems. Why leave?</p><p>Because I had to know. Could I build something of my own? Could I make it work?</p><p>NextDoor.Company is now crossing ₹1 lakh MRR. 100+ handpicked startups, 1600+ jobs indexed, 100+ paid users.</p><p>The leap was terrifying. But staying would have been worse.</p>',
+        status: 'published',
         accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        publishedAt: new Date('2025-05-14'),
+        createdAt: new Date('2025-05-10'),
+        updatedAt: new Date('2025-05-14'),
         parentId: null,
         position: { x: 39, y: 25 },
     },
     {
-        id: 'personal-4',
-        type: 'link',
-        title: 'Bank',
-        content: '',
-        status: 'draft',
+        id: 'notes-4',
+        type: 'note',
+        title: 'Counterintuitive productivity',
+        content: '<h1>Counterintuitive productivity</h1><p><em>October 8, 2023</em></p><p>The most productive people I know don\'t optimize for more hours. They optimize for fewer, better hours.</p><p>They say no to almost everything. They protect their mornings. They batch their communication.</p><p>Productivity isn\'t about doing more. It\'s about doing less, better.</p><p>That\'s why I built 3Goals.Today - to force myself to pick just three things each day that actually matter.</p>',
+        status: 'published',
         accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 500 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+        publishedAt: new Date('2023-10-08'),
+        createdAt: new Date('2023-10-05'),
+        updatedAt: new Date('2023-10-08'),
         parentId: null,
         position: { x: 56, y: 25 },
-        linkUrl: 'https://example-bank.com',
-        linkTitle: 'Online Banking',
     },
     {
-        id: 'personal-5',
-        type: 'folder',
-        title: 'Receipts',
-        content: '',
-        status: 'draft',
+        id: 'notes-5',
+        type: 'note',
+        title: 'New design job',
+        content: '<h1>New design job</h1><p><em>July 7, 2022</em></p><p>Just joined a new role. Reflecting on my journey so far:</p><ul><li><strong>Wingify/VWO</strong> - 3+ years, A/B testing product</li><li><strong>SellerCrowd</strong> - ~4 years, solo designer</li><li><strong>p0.inc</strong> - Founding Lead Designer, 95+ Figma screens</li></ul><p>Every role taught me something different. At Wingify, I learned systems thinking. At SellerCrowd, I learned to ship fast. At p0, I learned to build from zero.</p><p>The best designers I know are perpetual students.</p>',
+        status: 'published',
         accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        publishedAt: new Date('2022-07-07'),
+        createdAt: new Date('2022-07-05'),
+        updatedAt: new Date('2022-07-07'),
         parentId: null,
         position: { x: 5, y: 50 },
     },
     {
-        id: 'personal-6',
+        id: 'notes-6',
         type: 'note',
-        title: 'Passwords (encrypted)',
-        content: '<h1>Important Accounts</h1><p>This is a placeholder - use a real password manager!</p>',
-        status: 'draft',
+        title: '1st sabbatical',
+        content: '<h1>1st sabbatical</h1><p><em>December 28, 2021</em></p><p>Taking my first real break in years. No Slack. No emails. No "quick calls."</p><p>Just me, some books, and time to think.</p><p>The 4-Hour Work Week changed my life when I first read it. Now I\'m finally putting it into practice.</p><p>Sometimes the most productive thing you can do is stop.</p>',
+        status: 'published',
         accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 600 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        publishedAt: new Date('2021-12-28'),
+        createdAt: new Date('2021-12-25'),
+        updatedAt: new Date('2021-12-28'),
         parentId: null,
         position: { x: 22, y: 50 },
-    },
-    {
-        id: 'personal-7',
-        type: 'note',
-        title: 'Journal - Dec 15',
-        content: '<p>Good day today. Finally finished that project I\'d been putting off. Sometimes you just need to start.</p>',
-        status: 'draft',
-        accessLevel: 'free',
-        publishedAt: null,
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now()),
-        parentId: null,
-        position: { x: 39, y: 50 },
     },
 ];
 
@@ -478,16 +337,15 @@ function getSpaceFiles(spaceId: string, allFiles: GoOSFileData[]): GoOSFileData[
     // Get dynamically created files (local- or temp- prefix) from allFiles
     const dynamicFiles = allFiles.filter(f => f.id.startsWith('local-') || f.id.startsWith('temp-'));
 
-    // For space-1 (Portfolio), use the main demo files + dynamic files
+    // For space-1 (Work), use the main demo files + dynamic files
     if (spaceId === 'space-1') {
         const demoFiles = allFiles.filter(f => prefixes.some(prefix => f.id.startsWith(prefix)));
         return [...demoFiles, ...dynamicFiles];
     }
 
     // For other spaces, return their specific demo files + dynamic files
-    if (spaceId === 'space-2') return [...WRITING_SPACE_FILES, ...dynamicFiles];
-    if (spaceId === 'space-3') return [...PHOTOGRAPHY_SPACE_FILES, ...dynamicFiles];
-    if (spaceId === 'space-4') return [...PERSONAL_SPACE_FILES, ...dynamicFiles];
+    if (spaceId === 'space-2') return [...LIFE_SPACE_FILES, ...dynamicFiles];
+    if (spaceId === 'space-3') return [...NOTES_SPACE_FILES, ...dynamicFiles];
 
     return dynamicFiles;
 }
@@ -853,284 +711,147 @@ const DEMO_ANALYTICS_DATA = {
 // ============================================
 // DEMO FILES (goOS Editor)
 // ============================================
-// Initial files for GoOSProvider (GoOSFileData format)
+// Initial files for GoOSProvider (GoOSFileData format) - Sankalp's Work space
 const INITIAL_GOOS_FILES: GoOSFileData[] = [
+    // About/Bio
     {
-        id: 'file-1',
+        id: 'file-about',
         type: 'note',
-        title: 'Welcome to goOS',
-        content: '<h1>Welcome to goOS!</h1><p>This is your digital creative space. Use the editor to write notes, case studies, and more.</p><p>Try the formatting toolbar above to style your text.</p>',
+        title: 'About Sankalp',
+        content: '<h1>Sankalp Sinha</h1><p><em>Multi-disciplinary product designer turned entrepreneur. 13+ years designing software.</em></p><blockquote>"Do it with all your heart, or don\'t do it at all."</blockquote><p>Based in Bangalore, India. Works remotely, travels to 1-2 countries per year for a month each. Has a twin brother named Shaleen. Dad is a writer.</p><p>Left a $15k+ MRR full-time job in April 2025 to go full indie.</p><p><strong>Featured in:</strong> Yahoo, Discovery Channel, Mashable, BBC Radio, HuffPost.</p>',
         status: 'published',
         accessLevel: 'free',
         publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
         updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         parentId: null,
         position: { x: 5, y: 35 },
-        headerImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1920&h=1080&fit=crop',
+        headerImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&h=1080&fit=crop',
     },
+    // Design Shots Folder
     {
-        id: 'file-2',
-        type: 'case-study',
-        title: 'Pulse',
-        headerImage: null,
-        content: `<h2>Overview</h2>
-
-<h4>Rethinking Podcast Listening</h4>
-
-<p>A podcast app focused on bridging the gap between listeners and creators through in-episode polls, feedback tools, and discussion prompts, supported by a streamlined and accessible playback experience.</p>
-
-<p>Most podcast apps are built around playback — play, pause, skip, repeat. This project explores a different direction: what if podcast listening felt more like a conversation than consumption?</p>
-
-<p>I led the research and product thinking, translating insights into a clear problem statement, MVP scope, and interaction strategy. I was also responsible for the information architecture, core UX flows, and UI design across the app.</p>
-
-<p>Given the short timeline, I intentionally limited the scope to test a single idea well, using in-episode polls and discussion prompts to introduce engagement as a behavior.</p>
-
-<div data-block-type="info-grid">
-<dl>
-<dt>Timeline</dt><dd>7 — 11 April, 2025</dd>
-<dt>Type</dt><dd>Design Sprint</dd>
-<dt>Tools</dt><dd>Figma, FigJam, Google Forms</dd>
-<dt>Role</dt><dd>Product Designer</dd>
-</dl>
-</div>
-
-<div data-block-type="tool-badges">
-<span data-tool>Figma</span>
-<span data-tool>FigJam</span>
-<span data-tool>Google Forms</span>
-<span data-tool>Notion</span>
-<span data-tool>Miro</span>
-</div>
-
-<hr />
-
-<h2>Current Space</h2>
-
-<h4>The Current Podcast Landscape</h4>
-
-<p>Podcast listening today is dominated by a few big players, each winning for very different reasons. While most people use mainstream apps for convenience, power users often migrate to niche platforms that offer deeper control.</p>
-
-<p><strong>Spotify</strong> is popular for its recommendation algorithm and discovery. Users rely on it to surface new podcasts without much effort, especially if they already use Spotify for music.</p>
-
-<p><strong>Apple Podcasts</strong> benefits heavily from the Apple ecosystem. It comes pre-installed, syncs well across devices, and feels familiar to iOS users.</p>
-
-<h3>Power-User Favorites</h3>
-
-<p><strong>PocketCasts</strong> is loved for its clean UI, advanced playback controls, and features like silence trimming and episode archiving.</p>
-
-<p><strong>Overcast</strong> attracts users who care about audio control, smart speed, and a no-frills listening experience.</p>
-
-<div data-block-type="callout" data-variant="insight">
-<p><strong>Key finding:</strong> While people love certain features of certain apps, podcast listening is completely passive. No platform offers meaningful in-episode interaction.</p>
-</div>
-
-<h2>Research</h2>
-
-<h4>Delving Into Research</h4>
-
-<p>Early research focused on understanding how people currently experience podcasts and where that experience breaks down. I combined secondary research, app analysis, and informal surveys to uncover behavioral gaps.</p>
-
-<h3>How do people experience podcasts today?</h3>
-
-<p>Listeners consume podcasts passively, often while multitasking. Listening is treated as background activity, with little opportunity to react, respond, or reflect in the moment. This makes podcasts feel personal, but also isolating.</p>
-
-<h3>Why don't people engage today?</h3>
-
-<p>Most podcast apps don't support interaction during listening. Existing engagement happens outside the episode — on platforms like X, Reddit, or YouTube comments. This breaks context and creates friction between listening and responding.</p>
-
-<h3>When do listeners want to engage?</h3>
-
-<p>Engagement doesn't happen constantly. It tends to occur at specific moments:</p>
-
-<ul>
-<li>When a strong opinion is shared</li>
-<li>When a question is asked</li>
-<li>When listeners feel represented or challenged</li>
-</ul>
-
-<h3>What is missing from the current experience?</h3>
-
-<p>While users have no way to respond, react, or participate within the listening experience itself, they did not explicitly ask for interaction features. In fact, many were neutral or unsure when asked about engagement during listening.</p>
-
-<div data-block-type="key-takeaway">
-<p><strong>Key Takeaway:</strong> The biggest opportunity wasn't adding features — it was rethinking what "engagement" means in a passive listening context. Users don't ask for interaction because they've never experienced it done well.</p>
-</div>
-
-<h2>Stakeholders</h2>
-
-<h4>Stakeholder Pain Points</h4>
-
-<p>Looking closer, this space really comes down to three stakeholders, each facing a distinct disconnect.</p>
-
-<div data-block-type="card-grid">
-<div data-card data-icon="🎧">
-<span data-card-title>Audience</span>
-<span data-card-desc>Podcast listeners spend hours with content but have no simple way to react or feel involved while listening, making the experience feel isolated.</span>
-</div>
-<div data-card data-icon="🎙">
-<span data-card-title>Podcaster</span>
-<span data-card-desc>Creators lack immediate, in-context feedback, making it hard to understand what resonates with their audience beyond download numbers.</span>
-</div>
-<div data-card data-icon="📡">
-<span data-card-title>Platforms</span>
-<span data-card-desc>Platforms struggle to differentiate beyond playback and discovery, with limited ways to foster deeper engagement or community around shows.</span>
-</div>
-</div>
-
-<h2>Problem Statement</h2>
-
-<h4>Core Problem</h4>
-
-<blockquote>Podcast listening today is designed as a one-way experience, leaving both listeners and creators disconnected during the moments that matter most.</blockquote>
-
-<h2>Opportunity</h2>
-
-<h4>How Can We Build Something Great?</h4>
-
-<p>Podcast listening is often done while multitasking — walking, commuting, working, or resting. Any solution that required too much attention would immediately break the experience people already value. This led me to ask a different set of questions:</p>
-
-<blockquote>"What if podcast listening didn't have to be one-way?"</blockquote>
-
-<blockquote>"What if listeners could influence what comes next?"</blockquote>
-
-<blockquote>"What is the smallest possible action a listener could take while still feeling involved?"</blockquote>
-
-<h2>Approach</h2>
-
-<h4>Scoping Down</h4>
-
-<div data-block-type="process-stepper">
-<div data-step data-label="Research"><span data-step-label>Research</span><span data-step-desc>Surveys, competitive analysis, user interviews</span></div>
-<div data-step data-label="Define"><span data-step-label>Define</span><span data-step-desc>Problem framing, stakeholder mapping, HMW</span></div>
-<div data-step data-label="Scope"><span data-step-label>Scope</span><span data-step-desc>Feature prioritization, MVP definition</span></div>
-<div data-step data-label="Design"><span data-step-label>Design</span><span data-step-desc>Wireframes, UI, interaction patterns</span></div>
-<div data-step data-label="Validate"><span data-step-label>Validate</span><span data-step-desc>Concept testing, iteration, refinement</span></div>
-</div>
-
-<p>From earlier competitive study, I noticed that users consistently valued specific features across different podcast apps. Rather than reinventing everything, I narrowed the scope and grouped these patterns into three core categories.</p>
-
-<h3>Must Have</h3>
-
-<p>Non-negotiable features essential for the product to function.</p>
-
-<ul>
-<li>Resume listening and accurate playback memory</li>
-<li>Basic listening history and progress tracking</li>
-<li>Core playback controls including skip, speed, and seek</li>
-</ul>
-
-<h3>Should Have</h3>
-
-<p>Important features that add significant value but aren't critical for immediate success.</p>
-
-<ul>
-<li>Episode organization through folders or simple grouping</li>
-<li>Silence trimming and intro or outro skipping</li>
-<li>Personalized recommendations based on listening habits</li>
-<li>Quick discovery through categories and smart surfacing</li>
-</ul>
-
-<h3>Could Have</h3>
-
-<p>The core differentiator — validated through concept testing.</p>
-
-<ul>
-<li>In-episode polls</li>
-<li>Episode discussion prompts</li>
-<li>Feedback and ideas from listeners</li>
-</ul>
-
-<div data-block-type="callout" data-variant="insight">
-<p><strong>Design principle:</strong> Not every popular feature was treated as essential. I intentionally deprioritized power-user optimizations unless they supported the core listening experience.</p>
-</div>
-
-<h2>Explorations</h2>
-
-<h4>Design Decisions</h4>
-
-<p>After a few explorations, I realized the app needed two layers of navigation serving different purposes. The primary navigation (Home, Library, Discover) supports discovery and quick access without pulling attention away. Inside the player screen, a secondary navigation layer surfaces listening-specific actions like playback controls, timestamps, annotations, and queue.</p>
-
-<h3>Home Screen</h3>
-
-<p>The home screen is built around continuity. I prioritized Resume Listening and Up Next so users can jump back in instantly, while discovery stays lightweight through a single Spotlight pick and categories.</p>
-
-<h3>Library</h3>
-
-<p>I treated the Library as a place for intent, not discovery. This is where users come back to continue, manage, and revisit content they already care about.</p>
-
-<h3>Player Controls</h3>
-
-<p>Rather than overwhelming the core experience, I deliberately surfaced advanced controls like custom speed, silence trimming, and volume boost as optional tools for power users who need deeper control or accessibility support.</p>
-
-<h3>Interaction Design</h3>
-
-<p>I treated interaction as optional, not mandatory, knowing most listeners are hands-free while listening. Creator polls are lightweight and time-aware, allowing listeners to respond when it's convenient, not disruptive.</p>
-
-<p>Discussions are separated from playback to avoid interrupting passive listening, while still giving engaged users a clear place to respond.</p>
-
-<div data-block-type="key-takeaway">
-<p><strong>Key Takeaway:</strong> Every design decision was filtered through one question: does this respect the listener's current context? If a feature required active attention, it was either made optional or removed entirely.</p>
-</div>
-
-<h2>Solution</h2>
-
-<h4>The Final Experience</h4>
-
-<p>The final design introduces a new interaction paradigm for podcast apps — one that respects the passive nature of listening while creating intentional, low-friction moments for participation.</p>
-
-<p>Polls, prompts, and feedback tools are woven into the timeline rather than bolted on top. The result is an experience that feels participatory without ever demanding attention.</p>
-
-<div data-block-type="comparison">
-<div data-before data-label="Traditional Podcast Apps">One-way passive listening. No interaction during episodes. Engagement happens outside the app on social media and forums.</div>
-<div data-after data-label="Pulse">Two-way participatory listening. In-episode polls and prompts. Engagement woven into the timeline without disrupting flow.</div>
-</div>
-
-<div data-block-type="callout" data-variant="success">
-<p><strong>Outcome:</strong> By scoping tightly and designing for context, Pulse demonstrates that podcast engagement doesn't require reinventing the listening experience — it just requires meeting listeners where they already are.</p>
-</div>
-
-<div data-block-type="info-grid">
-<dl>
-<dt>Designed by</dt><dd>Riddhiman Paul</dd>
-<dt>Year</dt><dd>2025</dd>
-<dt>Status</dt><dd>Concept</dd>
-</dl>
-</div>`,
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        parentId: null,
-        position: { x: 13, y: 35 },
-    },
-    {
-        id: 'file-prompts',
-        type: 'note',
-        title: 'AI Image Prompts',
-        content: `<h1>goOS — AI Image Generation Prompts</h1><p>Copy and paste each prompt directly into Midjourney, DALL-E, or your preferred AI image tool.</p><hr><h2>HERO ILLUSTRATIONS</h2><h3>Prompt 1: Goose at the Desk (Main Hero)</h3><p>Line illustration of a goose sitting at a desk working on a laptop, surrounded by floating papers, folders, and sticky notes in organized chaos. Other human coworkers in the background look impressed and confused. Mediterranean blue line art on cream white background. Hand-drawn imperfect lines, minimal halftone dot patterns for shading. Whimsical, absurd, professional yet funny. Style of editorial illustration, simple and clean.</p><h3>Prompt 2: Goose Running a Business</h3><p>Line illustration of a confident goose in a cozy home office, multiple browser windows floating around, coffee mug, plants, files neatly scattered on desk. The goose looks pleased with itself. Mediterranean blue monochrome line art on warm cream background. Hand-drawn editorial illustration style with subtle halftone textures. Charming, slightly absurd, warm and inviting.</p><h3>Prompt 3: Goose Welcoming Visitors</h3><p>Line illustration of a friendly goose standing at the entrance of a cozy digital workspace, gesturing welcomingly with one wing. Floating icons and windows in the background suggesting a desktop environment. Mediterranean blue line drawing on off-white cream background. Simple, warm, hand-drawn feel with minimal halftone shading. Inviting and slightly humorous.</p><hr><h2>FEATURE ILLUSTRATIONS</h2><h3>Prompt 4: Goose Selling Digital Products</h3><p>Line illustration of a goose handing a glowing file folder through a window to a happy customer. Coins and sparkles floating between them. Simple transaction moment. Mediterranean blue line art on cream background. Hand-drawn editorial style, imperfect charming lines, subtle halftone dots. Whimsical and friendly, like a neighborhood shop.</p><h3>Prompt 5: Goose Teaching a Course</h3><p>Line illustration of a goose standing at a small chalkboard or whiteboard, pointing at diagrams, with attentive students (mix of humans and other birds) sitting with laptops. Floating video icons and folder icons around. Mediterranean blue monochrome line drawing on warm cream background. Hand-drawn style with halftone textures. Educational but absurd and charming.</p><h3>Prompt 6: Goose Organizing Files</h3><p>Line illustration of a goose surrounded by a tornado of papers, folders, images, and documents, but the goose looks calm and in control, casually sorting them with its wings. Organized chaos energy. Mediterranean blue line art on cream white background. Editorial illustration style, hand-drawn imperfect lines, minimal halftone shading. Funny and relatable.</p><h3>Prompt 7: Goose Sharing Work</h3><p>Line illustration of a goose proudly showing off a framed piece of work to a small audience of impressed viewers. Social media hearts and share icons floating above. Mediterranean blue line drawing on off-white background. Simple hand-drawn editorial style with subtle halftone patterns. Warm, celebratory, slightly absurd.</p><hr><h2>EMPTY STATE ILLUSTRATIONS</h2><h3>Prompt 8: Goose on Empty Desktop</h3><p>Line illustration of a single goose sitting in the middle of an empty minimalist desktop space, looking at the viewer expectantly, head slightly tilted. One small file icon next to it. Lots of white space. Mediterranean blue line art on cream background. Simple, minimal, hand-drawn style. Cute, patient, slightly lonely but hopeful.</p><h3>Prompt 9: Goose Waiting to Start</h3><p>Line illustration of a goose sitting on an empty desk, wings folded, looking up with anticipation. A single cursor arrow hovering nearby. Very minimal composition with lots of breathing room. Mediterranean blue line drawing on warm cream background. Hand-drawn editorial style, charming and inviting. Caption energy: "Let's make something."</p><h3>Prompt 10: Goose with Empty Folder</h3><p>Line illustration of a goose holding an open empty folder, peering inside it curiously, then looking at the viewer with a shrug. Minimal background. Mediterranean blue monochrome line art on off-white background. Hand-drawn imperfect lines, simple and charming. Funny empty state energy.</p><hr><h2>ERROR STATE ILLUSTRATIONS</h2><h3>Prompt 11: Goose Looking Guilty</h3><p>Line illustration of a goose looking guilty and sheepish, standing next to a knocked-over stack of papers and a spilled coffee mug. Oops energy. Mediterranean blue line art on cream background. Hand-drawn editorial illustration style with subtle halftone shading. Sympathetic and funny, not frustrating.</p><h3>Prompt 12: Goose Lost</h3><p>Line illustration of a confused goose holding a map upside down, surrounded by floating question marks and tangled paths. Lost but not panicked. Mediterranean blue line drawing on warm cream background. Simple hand-drawn style, imperfect charming lines. Humorous 404 error energy.</p><h3>Prompt 13: Goose Fixing Things</h3><p>Line illustration of a determined goose wearing tiny safety goggles, holding a wrench, working on fixing a floating broken window icon. Sparks and tools scattered around. Mediterranean blue line art on off-white background. Hand-drawn editorial style with halftone textures. Reassuring and funny, "we're on it" energy.</p><hr><h2>SUCCESS / CELEBRATION ILLUSTRATIONS</h2><h3>Prompt 14: Goose Celebrating</h3><p>Line illustration of an excited goose throwing confetti, wings spread wide in celebration. Floating checkmarks, stars, and sparkles around. Joyful energy. Mediterranean blue line art on cream background. Hand-drawn editorial illustration style, imperfect expressive lines. Pure happiness and accomplishment.</p><h3>Prompt 15: Goose High-Five</h3><p>Line illustration of a goose giving a wing high-five to a human hand reaching into frame. Sparkle effect at the point of contact. Celebratory moment. Mediterranean blue line drawing on warm cream background. Simple hand-drawn style with minimal halftone shading. Friendly, triumphant, team energy.</p><hr><h2>ICON PACK PROMPTS</h2><h3>Prompt 16: Desktop Icon Set - Line Style</h3><p>Icon set of 12 minimal desktop icons: folder, file, image, video, note, settings gear, mail envelope, calendar, camera, music note, download arrow, and lock. Mediterranean blue line art on transparent or cream background. Consistent 2px stroke weight, rounded corners, simple geometric shapes. Clean, modern, hand-drawn feel but precise. Cohesive icon family.</p><h3>Prompt 17: Goose Emoji Set</h3><p>Set of 9 goose face expressions as simple icons: happy, thinking, surprised, winking, sleeping, confused, excited, focused, and mischievous. Mediterranean blue line art, minimal strokes, consistent style. Simple circular or square frames. Cute and expressive, emoji energy. Clean lines on cream or transparent background.</p><h3>Prompt 18: File Type Icons with Goose</h3><p>Icon set of 6 file type icons with tiny goose incorporated: PDF with goose reading, ZIP with goose packing, image file with goose posing, video with goose directing, audio with goose singing, code file with goose typing. Mediterranean blue line art, consistent style, minimal and charming. Small icons, clean strokes.</p><h3>Prompt 19: Action Icons - Rounded Style</h3><p>Set of 16 UI action icons: plus, minus, close X, checkmark, arrow up, arrow down, arrow left, arrow right, refresh, search magnifier, edit pencil, trash bin, share, link chain, eye view, and heart. Mediterranean blue, 2px rounded stroke, soft corners, consistent 24px grid. Modern, friendly, cohesive set on transparent background.</p><h3>Prompt 20: Navigation Icons</h3><p>Icon set of 8 navigation icons for dock: home house, folder, mail, chat bubble, camera, calendar, settings cog, and analytics chart. Mediterranean blue line art, filled style with rounded corners, consistent weight and padding. Friendly and modern, suitable for bottom dock navigation bar. Clean on light background.</p><hr><h2>BACKGROUND PROMPTS</h2><h3>Prompt 21: Minimal Gradient Desktop Background</h3><p>Minimal desktop wallpaper with soft gradient from warm cream white at top to very pale Mediterranean blue at bottom. Subtle grain texture overlay. No objects, no patterns, just calm color transition. 16:9 aspect ratio, high resolution. Clean, serene, perfect for desktop with icons on top.</p><h3>Prompt 22: Abstract Geometric Background</h3><p>Abstract desktop wallpaper with scattered soft geometric shapes - circles, rounded rectangles, organic blobs - in very pale Mediterranean blue and cream tones. Subtle, minimal, barely there pattern. Soft shadows. Modern and calm. 16:9 aspect ratio. Background that doesn't compete with desktop icons.</p><h3>Prompt 23: Mediterranean Inspired Pattern Background</h3><p>Subtle desktop wallpaper inspired by Mediterranean tile patterns, very faded and minimal, in pale blue and cream white. Geometric repeating pattern at low opacity. Elegant and warm. 16:9 aspect ratio, high resolution. Sophisticated but not busy, perfect as desktop background.</p><h3>Prompt 24: Soft Clouds Background</h3><p>Desktop wallpaper of soft abstract cloud shapes in pale Mediterranean blue on warm cream background. Dreamy, minimal, organic shapes. Very subtle and calming. No sharp edges, everything soft and blurred. 16:9 aspect ratio. Peaceful desktop background that lets icons stand out.</p><h3>Prompt 25: Grain Texture Solid Background</h3><p>Solid desktop wallpaper in warm cream off-white color with subtle film grain texture overlay. Minimal, clean, tactile feel. No patterns, no gradients, just warm neutral with gentle noise. 16:9 aspect ratio, high resolution. Timeless and sophisticated desktop background.</p><h3>Prompt 26: Goose Silhouette Background</h3><p>Minimal desktop wallpaper with a single very subtle goose silhouette in the bottom right corner, barely visible in slightly darker cream tone. Rest of background is warm cream white with soft grain texture. Understated brand presence. 16:9 aspect ratio. Elegant and playful.</p><hr><h2>LANDING PAGE ILLUSTRATIONS</h2><h3>Prompt 27: "Your Space" Hero Scene</h3><p>Wide editorial illustration showing a cozy digital workspace from above - desk with laptop, floating windows, scattered files, plants, coffee - with a goose comfortably working in the center. Warm and inviting atmosphere. Mediterranean blue line art on cream background. Hand-drawn style with halftone textures. Panoramic composition, 16:9 aspect ratio. Feels like home.</p><h3>Prompt 28: Features Overview Scene</h3><p>Line illustration showing multiple small vignettes in one image: goose writing at desk, goose selling to customer, goose organizing folders, goose celebrating. Connected by flowing lines. Mediterranean blue on cream background. Editorial hand-drawn style. Shows variety of use cases in one charming scene.</p><h3>Prompt 29: Community of Creators</h3><p>Line illustration of multiple different geese (and maybe other birds) each with their own small desk/workspace, all connected by dotted lines suggesting a network. Each workspace is slightly different showing personality. Mediterranean blue line art on cream background. Hand-drawn editorial style. Community and connection energy.</p><hr><h2>TIPS FOR BEST RESULTS</h2><ol><li><strong>For Midjourney:</strong> Add <code>--ar 16:9</code> for backgrounds, <code>--ar 1:1</code> for icons</li><li><strong>For consistency:</strong> Save your best result and use it as a style reference for future prompts</li><li><strong>Color accuracy:</strong> If the blue isn't right, add "color hex #2B4AE2" or "Santorini blue" or "Greek blue"</li><li><strong>For line art:</strong> Add "no fill, outline only" if you're getting filled shapes</li><li><strong>For icons:</strong> Add "flat design, no shadows, no gradients" for cleaner results</li></ol>`,
-        status: 'published',
-        accessLevel: 'free',
-        publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now()),
-        parentId: null,
-        position: { x: 21, y: 35 },
-        headerImage: 'https://images.unsplash.com/photo-1675271591211-930246f80c5d?w=1920&h=1080&fit=crop',
-    },
-    {
-        id: 'game-snake',
-        type: 'game',
-        title: 'Snake',
+        id: 'file-design',
+        type: 'folder',
+        title: 'Design Shots',
         content: '',
         status: 'published',
         accessLevel: 'free',
         publishedAt: null,
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(Date.now()),
+        createdAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 13, y: 35 },
+    },
+    // Project Links
+    {
+        id: 'file-nextdoor',
+        type: 'link',
+        title: 'NextDoor.Company',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 21, y: 35 },
+        linkUrl: 'https://nextdoor.company',
+        linkTitle: 'Find startups hiring nearby',
+        linkDescription: '100+ handpicked startups, 1600+ jobs indexed, 100+ paid users. Crossing ₹1 lakh MRR.',
+    },
+    {
+        id: 'file-highvalue',
+        type: 'link',
+        title: 'HighValue.Team',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
         parentId: null,
         position: { x: 29, y: 35 },
+        linkUrl: 'https://highvalue.team',
+        linkTitle: 'Talent acquisition platform',
+        linkDescription: 'Help recruiters cut screening time by 80%. Co-founded with Abhishek.',
+    },
+    {
+        id: 'file-3goals',
+        type: 'link',
+        title: '3Goals.Today',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 37, y: 35 },
+        linkUrl: 'https://3goals.today',
+        linkTitle: 'Daily productivity tool',
+        linkDescription: 'Pick just three things each day that actually matter.',
+    },
+    {
+        id: 'file-albus',
+        type: 'link',
+        title: 'TryAlbus.ai',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 5, y: 55 },
+        linkUrl: 'https://tryalbus.ai',
+        linkTitle: 'AI Summarization',
+        linkDescription: 'Summarize articles in seconds with 1-click. For social media marketers and heavy readers.',
+    },
+    {
+        id: 'file-framer',
+        type: 'link',
+        title: 'BuildwithFramer.com',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 13, y: 55 },
+        linkUrl: 'https://buildwithframer.com',
+        linkTitle: 'Framer templates',
+        linkDescription: 'Helping creators launch sites within hours using pre-built Framer templates.',
+    },
+    {
+        id: 'file-visit',
+        type: 'link',
+        title: 'Visit.Page',
+        content: '',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: null,
+        createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 21, y: 55 },
+        linkUrl: 'https://visit.page',
+        linkTitle: 'Better link-in-bio',
+        linkDescription: 'Better link-in-bio page for creators.',
+    },
+    // Building in Public note
+    {
+        id: 'file-building',
+        type: 'note',
+        title: 'Building in Public',
+        content: '<h1>Building in Public</h1><p>Started my first portfolio in 2012. Now I share everything openly.</p><h2>My Stack</h2><ul><li><strong>Notion</strong> - Kanban board for tasks</li><li><strong>Figma</strong> - All wireframes and designs</li><li><strong>GitHub</strong> - Code</li><li><strong>PostHog</strong> - Analytics (shared publicly)</li><li><strong>Twitter/X</strong> - Changelog tweets</li></ul><h2>Why Build in Public?</h2><ol><li>Social accountability</li><li>Bias towards action</li><li>Project documentation</li><li>Attracting collaborators/customers</li><li>Multi-day marketing vs single launch day</li></ol><p>My whole site is hand-coded, not template-based. I link to all my Figma source files publicly.</p>',
+        status: 'published',
+        accessLevel: 'free',
+        publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        parentId: null,
+        position: { x: 29, y: 55 },
     },
 ];
 
@@ -1147,38 +868,82 @@ const DEMO_FILES: GoOSFile[] = INITIAL_GOOS_FILES.map(f => ({
 }));
 
 // ============================================
-// DEMO WIDGETS - Initial widgets for the demo (only clock by default)
+// DEMO WIDGETS - Sankalp's widgets
 // ============================================
 const INITIAL_DEMO_WIDGETS = [
+    // Clock - Bangalore timezone
     {
         id: 'demo-widget-clock',
         desktopId: 'goos-demo',
         widgetType: 'clock' as const,
         positionX: 88,
-        positionY: 16,
+        positionY: 8,
         title: null,
         isVisible: true,
-        config: { timezone: 'America/New_York', format: '12h', showTimezoneName: true },
+        config: { timezone: 'Asia/Kolkata', format: '12h', showTimezoneName: true },
         order: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    // Status widget - Building in public
+    {
+        id: 'demo-widget-status',
+        desktopId: 'goos-demo',
+        widgetType: 'status' as const,
+        positionX: 88,
+        positionY: 28,
+        title: null,
+        isVisible: true,
+        config: { statusType: 'open', title: 'Building in Public', description: 'From Bangalore', ctaUrl: 'https://twitter.com/sankalpdomore', ctaLabel: 'Follow along' },
+        order: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    // Sticky note with testimonial
+    {
+        id: 'demo-widget-sticky',
+        desktopId: 'goos-demo',
+        widgetType: 'sticky-note' as const,
+        positionX: 4,
+        positionY: 8,
+        title: null,
+        isVisible: true,
+        config: { content: '"Driven, ambitious, infectious enthusiasm... the guy you want on your team."\n\n— Marcin Wtorkowski, CTO @ SellerCrowd', color: 'cream', rotation: -2 },
+        order: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    // Links widget
+    {
+        id: 'demo-widget-links',
+        desktopId: 'goos-demo',
+        widgetType: 'links' as const,
+        positionX: 4,
+        positionY: 55,
+        title: null,
+        isVisible: true,
+        config: { links: [{ name: 'Twitter/X', url: 'https://twitter.com/sankalpdomore', icon: 'twitter' }, { name: 'LinkedIn', url: 'https://linkedin.com/in/hellosankalpsinha', icon: 'linkedin' }, { name: 'GitHub', url: 'https://github.com/sankalpdomore', icon: 'github' }] },
+        order: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
     },
 ];
 
 // ============================================
-// DEMO ITEMS
+// DEMO ITEMS - Sankalp Sinha's goOS
 // ============================================
 const DEMO_ITEMS: DesktopItem[] = [
+    // About Sankalp - Profile Card
     {
         id: 'item-1',
         desktopId: 'goos-demo',
-        label: 'About Me',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
+        label: 'Sankalp Sinha',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop',
         positionX: 15,
         positionY: 22,
-        windowTitle: 'Alex Chen',
-        windowSubtitle: 'Product Designer & Developer',
-        windowHeaderImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+        windowTitle: 'Sankalp Sinha',
+        windowSubtitle: 'Designer & Entrepreneur',
+        windowHeaderImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
         windowDescription: '',
         windowWidth: 480,
         windowDetails: null,
@@ -1191,24 +956,24 @@ const DEMO_ITEMS: DesktopItem[] = [
                 label: 'About',
                 order: 0,
                 blocks: [
-                    { id: 'b1', type: 'text', order: 0, data: { content: "Hey there! I'm a creative developer passionate about building beautiful digital experiences that feel alive.\n\nI design and build products that people love to use. Currently at Figma, previously Stripe & Airbnb." } },
+                    { id: 'b1', type: 'text', order: 0, data: { content: "Multi-disciplinary product designer turned entrepreneur. 13+ years designing software.\n\n\"Do it with all your heart, or don't do it at all.\"\n\nBased in Bangalore, India. Works remotely, travels to 1-2 countries per year. Left a $15k+ MRR job in April 2025 to go full indie." } },
                     {
                         id: 'b2', type: 'details', order: 1, data: {
                             items: [
-                                { label: 'Location', value: 'San Francisco, CA' },
-                                { label: 'Experience', value: '8 years' },
-                                { label: 'Focus', value: 'Product Design' },
-                                { label: 'Status', value: 'Available for freelance' },
+                                { label: 'Location', value: 'Bangalore, India' },
+                                { label: 'Experience', value: '13+ years' },
+                                { label: 'Focus', value: 'Product Design & Indie Building' },
+                                { label: 'Status', value: 'Building in public' },
                             ]
                         }
                     },
                     {
                         id: 'b3', type: 'social', order: 2, data: {
                             profiles: [
-                                { platform: 'twitter', url: 'https://twitter.com' },
-                                { platform: 'linkedin', url: 'https://linkedin.com' },
-                                { platform: 'github', url: 'https://github.com' },
-                                { platform: 'dribbble', url: 'https://dribbble.com' },
+                                { platform: 'twitter', url: 'https://twitter.com/sankalpdomore' },
+                                { platform: 'linkedin', url: 'https://linkedin.com/in/hellosankalpsinha' },
+                                { platform: 'github', url: 'https://github.com/sankalpdomore' },
+                                { platform: 'dribbble', url: 'https://dribbble.com/sankalpdomore' },
                             ]
                         }
                     },
@@ -1216,7 +981,7 @@ const DEMO_ITEMS: DesktopItem[] = [
                         id: 'b4', type: 'buttons', order: 3, data: {
                             buttons: [
                                 { label: 'Download CV', url: '/resume.pdf', style: 'primary', icon: '📄', newTab: true },
-                                { label: 'Book a Call', url: 'https://cal.com', style: 'secondary', newTab: true },
+                                { label: 'Email Me', url: 'mailto:hello@sankalpsinha.com', style: 'secondary', newTab: true },
                             ]
                         }
                     },
@@ -1230,9 +995,10 @@ const DEMO_ITEMS: DesktopItem[] = [
                     {
                         id: 'b5', type: 'timeline', order: 0, data: {
                             items: [
-                                { date: '2022 - Present', title: 'Senior Product Designer', subtitle: 'Figma', description: 'Leading design system initiatives' },
-                                { date: '2020 - 2022', title: 'Product Designer', subtitle: 'Stripe', description: 'Designed checkout flows' },
-                                { date: '2018 - 2020', title: 'UI Designer', subtitle: 'Airbnb', description: 'Host experience team' },
+                                { date: '2025 - Present', title: 'Indie Founder', subtitle: 'Full-time', description: 'Building NextDoor.Company, HighValue.Team, and more' },
+                                { date: '2021 - 2025', title: 'Founding Lead Designer', subtitle: 'p0.inc', description: 'Built product from scratch, 95+ Figma screens' },
+                                { date: '2017 - 2021', title: 'Solo Designer', subtitle: 'SellerCrowd', description: '~4 years juggling multiple features' },
+                                { date: '2014 - 2017', title: 'Product Designer', subtitle: 'Wingify/VWO', description: 'A/B testing product, 3+ years' },
                             ]
                         }
                     },
@@ -1244,6 +1010,7 @@ const DEMO_ITEMS: DesktopItem[] = [
         commentsEnabled: true,
         order: 0,
     },
+    // Projects - Sankalp's Startups
     {
         id: 'item-3',
         desktopId: 'goos-demo',
@@ -1251,8 +1018,8 @@ const DEMO_ITEMS: DesktopItem[] = [
         thumbnailUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200&h=200&fit=crop',
         positionX: 30,
         positionY: 18,
-        windowTitle: 'My Projects',
-        windowSubtitle: "Things I've Built",
+        windowTitle: 'My Startups',
+        windowSubtitle: 'Things I\'m Building',
         windowHeaderImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=400&fit=crop',
         windowDescription: '',
         windowType: 'browser',
@@ -1266,26 +1033,29 @@ const DEMO_ITEMS: DesktopItem[] = [
             {
                 id: 'pr1', type: 'stats', order: 0, data: {
                     items: [
-                        { value: '4', label: 'Active' },
-                        { value: '27', label: 'Shipped' },
-                        { value: '12', label: 'Open Source' },
+                        { value: '6', label: 'Active Projects' },
+                        { value: '₹1L+', label: 'MRR' },
+                        { value: '100+', label: 'Paid Users' },
                     ]
                 }
             },
             {
                 id: 'pr2', type: 'product', order: 1, data: {
                     products: [
-                        { image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200&h=200&fit=crop', name: 'DevTools Pro', description: 'Developer productivity tools', url: 'https://github.com', status: 'active', metrics: '10k users' },
-                        { image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=200&h=200&fit=crop', name: 'DesignKit', description: 'Open source design system', url: 'https://github.com', status: 'active', metrics: '5k stars' },
-                        { image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&h=200&fit=crop', name: 'ColorAI', description: 'AI-powered color palette', url: 'https://github.com', status: 'acquired', metrics: 'Acquired' },
+                        { image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=200&h=200&fit=crop', name: 'NextDoor.Company', description: 'Find startups hiring nearby via visual map', url: 'https://nextdoor.company', status: 'active', metrics: '1600+ jobs' },
+                        { image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&fit=crop', name: 'HighValue.Team', description: 'Cut screening time by 80%', url: 'https://highvalue.team', status: 'active', metrics: 'Co-founded' },
+                        { image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=200&h=200&fit=crop', name: '3Goals.Today', description: 'Daily productivity tool', url: 'https://3goals.today', status: 'active', metrics: 'Live' },
+                        { image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop', name: 'TryAlbus.ai', description: 'AI summarization tool', url: 'https://tryalbus.ai', status: 'active', metrics: 'Live' },
+                        { image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=200&h=200&fit=crop', name: 'BuildwithFramer.com', description: 'Framer templates for creators', url: 'https://buildwithframer.com', status: 'active', metrics: 'Live' },
+                        { image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200&h=200&fit=crop', name: 'Visit.Page', description: 'Better link-in-bio for creators', url: 'https://visit.page', status: 'active', metrics: 'Live' },
                     ]
                 }
             },
-            { id: 'pr3', type: 'callout', order: 2, data: { text: 'Looking to collaborate? I\'m open to interesting side projects.', style: 'info', icon: '💡' } },
+            { id: 'pr3', type: 'callout', order: 2, data: { text: 'Software should be fun to use while delivering value.', style: 'info', icon: '✨' } },
             {
                 id: 'pr4', type: 'buttons', order: 3, data: {
                     buttons: [
-                        { label: 'View All on GitHub', url: 'https://github.com', style: 'primary', icon: '🐙', newTab: true },
+                        { label: 'Follow on Twitter', url: 'https://twitter.com/sankalpdomore', style: 'primary', icon: '🐦', newTab: true },
                     ]
                 }
             },
@@ -1294,16 +1064,17 @@ const DEMO_ITEMS: DesktopItem[] = [
         commentsEnabled: true,
         order: 2,
     },
+    // Design Shots - Portfolio
     {
         id: 'item-4',
         desktopId: 'goos-demo',
-        label: 'Photography',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=200&h=200&fit=crop',
+        label: 'Design Shots',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=200&h=200&fit=crop',
         positionX: 45,
         positionY: 22,
-        windowTitle: 'Photography',
-        windowSubtitle: 'Moments Captured',
-        windowHeaderImage: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=400&fit=crop',
+        windowTitle: 'Design Shots',
+        windowSubtitle: 'Selected Work',
+        windowHeaderImage: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=400&fit=crop',
         windowDescription: '',
         windowType: 'photos',
         windowWidth: 700,
@@ -1313,16 +1084,16 @@ const DEMO_ITEMS: DesktopItem[] = [
         useTabs: false,
         tabs: [],
         blocks: [
-            { id: 'ph1', type: 'text', order: 0, data: { content: "Photography is how I see the world when I'm not behind a screen. I'm drawn to street photography, architecture, and golden hour moments." } },
+            { id: 'ph1', type: 'text', order: 0, data: { content: "Heavy focus on NextDoor.Company lately: map interactions, city navigation, startup search, onboarding guides. Before that, lots of p0 work (API testing dashboard, design systems). Also Albus landing page explorations and HighValue.Team auth/landing pages." } },
             {
                 id: 'ph2', type: 'gallery', order: 1, data: {
                     columns: 3, expandable: true, images: [
-                        { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop', caption: 'Mountain sunrise', alt: 'Mountain at sunrise' },
-                        { url: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=400&fit=crop', caption: 'Forest path', alt: 'Path through forest' },
-                        { url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop', caption: 'Beach at dusk', alt: 'Beach sunset' },
-                        { url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=400&fit=crop', caption: 'Misty mountains', alt: 'Foggy mountain range' },
-                        { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&h=400&fit=crop', caption: 'Starry night', alt: 'Mountain under stars' },
-                        { url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop', caption: 'Sunlit forest', alt: 'Sun through trees' },
+                        { url: 'https://images.unsplash.com/photo-1545235617-9465d2a55698?w=600&h=400&fit=crop', caption: 'NextDoor - Map View', alt: 'NextDoor Company map interface' },
+                        { url: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=600&h=400&fit=crop', caption: 'NextDoor - Onboarding', alt: 'Onboarding flow design' },
+                        { url: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&h=400&fit=crop', caption: 'p0.inc - Dashboard', alt: 'API testing dashboard' },
+                        { url: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop', caption: 'Albus - Landing', alt: 'Albus AI landing page' },
+                        { url: 'https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=600&h=400&fit=crop', caption: 'HighValue - Auth', alt: 'HighValue Team authentication' },
+                        { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop', caption: 'BuildwithFramer', alt: 'Framer templates homepage' },
                     ]
                 }
             },
@@ -1331,6 +1102,7 @@ const DEMO_ITEMS: DesktopItem[] = [
         commentsEnabled: true,
         order: 3,
     },
+    // Testimonials - Real quotes from Sankalp's colleagues
     {
         id: 'item-6',
         desktopId: 'goos-demo',
@@ -1339,10 +1111,10 @@ const DEMO_ITEMS: DesktopItem[] = [
         positionX: 60,
         positionY: 18,
         windowTitle: 'What People Say',
-        windowSubtitle: 'Client Testimonials',
+        windowSubtitle: 'From Colleagues & Collaborators',
         windowHeaderImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=400&fit=crop',
         windowDescription: '',
-        windowWidth: 500,
+        windowWidth: 520,
         windowDetails: null,
         windowGallery: null,
         windowLinks: null,
@@ -1352,9 +1124,12 @@ const DEMO_ITEMS: DesktopItem[] = [
             {
                 id: 't1', type: 'testimonial', order: 0, data: {
                     style: 'cards', testimonials: [
-                        { quote: 'Working with Alex transformed our entire product. The attention to detail was incredible — every pixel mattered.', name: 'Sarah Chen', title: 'CEO', company: 'TechStart', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
-                        { quote: 'Exceptional attention to detail and a deep understanding of user experience. Delivered ahead of schedule.', name: 'Marcus Johnson', title: 'Product Lead', company: 'DesignCo', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
-                        { quote: '10/10 would hire again. Brought fresh perspective and solved problems we didn\'t know we had.', name: 'Emily Park', title: 'Founder', company: 'Startup Labs', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
+                        { quote: 'Solid foundation of rational thought... thoughtful and playful aesthetic.', name: 'Chuck Burt', title: 'Product Management Leader', company: 'Embark Veterinary', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
+                        { quote: 'Believes in community growth... fun, enthusiastic, high on design trends.', name: 'Akshar Patel', title: 'Design Manager', company: 'Gojek', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
+                        { quote: 'One of the most fearless voices... fresh energy and perspective.', name: 'Pooja Dave', title: 'Sr. PM', company: 'Amazon', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
+                        { quote: 'Talented designer with strong empathy for users.', name: 'Aaron Burnett', title: 'CEO', company: 'Spaced Ventures', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop' },
+                        { quote: 'Driven, ambitious, infectious enthusiasm... the guy you want on your team.', name: 'Marcin Wtorkowski', title: 'CTO', company: 'SellerCrowd', image: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop' },
+                        { quote: 'Creative & forward-thinking... clear design handoff.', name: 'Anca Oaida', title: 'QA Lead', company: 'SellerCrowd', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
                     ]
                 }
             },
@@ -1382,21 +1157,21 @@ const DEMO_ITEMS: DesktopItem[] = [
         tabs: [],
         blocks: [
             { id: 'c1', type: 'text', order: 0, data: { content: "I'm always open to discussing new projects, creative ideas, or opportunities to collaborate.\n\nWhether you have a question, want to work together, or just want to say hi — my inbox is open." } },
-            { id: 'c2', type: 'callout', order: 1, data: { text: 'Currently accepting new clients for Q1 2025', style: 'success', icon: '✓' } },
+            { id: 'c2', type: 'callout', order: 1, data: { text: 'Building in public from Bangalore, India', style: 'success', icon: '🚀' } },
             {
                 id: 'c3', type: 'social', order: 2, data: {
                     profiles: [
-                        { platform: 'twitter', url: 'https://twitter.com' },
-                        { platform: 'linkedin', url: 'https://linkedin.com' },
-                        { platform: 'email', url: 'mailto:hello@alexchen.design' },
+                        { platform: 'twitter', url: 'https://twitter.com/sankalpdomore' },
+                        { platform: 'linkedin', url: 'https://linkedin.com/in/hellosankalpsinha' },
+                        { platform: 'email', url: 'mailto:hello@sankalpsinha.com' },
                     ]
                 }
             },
             {
                 id: 'c4', type: 'buttons', order: 3, data: {
                     buttons: [
-                        { label: 'Email Me', url: 'mailto:hello@alexchen.design', style: 'primary', newTab: false },
-                        { label: 'Schedule a Call', url: 'https://cal.com', style: 'secondary', newTab: true },
+                        { label: 'Email Me', url: 'mailto:hello@sankalpsinha.com', style: 'primary', newTab: false },
+                        { label: 'Follow on X', url: 'https://twitter.com/sankalpdomore', style: 'secondary', newTab: true },
                     ]
                 }
             },
@@ -1405,16 +1180,17 @@ const DEMO_ITEMS: DesktopItem[] = [
         commentsEnabled: true,
         order: 6,
     },
+    // Featured In - Press mentions
     {
         id: 'item-10',
         desktopId: 'goos-demo',
-        label: 'Skills',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=200&h=200&fit=crop',
+        label: 'Featured In',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&h=200&fit=crop',
         positionX: 30,
         positionY: 48,
-        windowTitle: 'Technical Skills',
-        windowSubtitle: 'What I Work With',
-        windowHeaderImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
+        windowTitle: 'Featured In',
+        windowSubtitle: 'Press & Media',
+        windowHeaderImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=400&fit=crop',
         windowDescription: '',
         windowWidth: 440,
         windowDetails: null,
@@ -1423,46 +1199,37 @@ const DEMO_ITEMS: DesktopItem[] = [
         useTabs: false,
         tabs: [],
         blocks: [
-            { id: 'sk1', type: 'heading', order: 0, data: { text: 'Languages & Frameworks', level: 3 } },
+            { id: 'sk1', type: 'text', order: 0, data: { content: "Over the years, my work and projects have been featured in various publications:" } },
             {
-                id: 'sk2', type: 'table', order: 1, data: {
-                    headers: ['Skill', 'Level', 'Years'],
-                    rows: [
-                        ['React / Next.js', 'Expert', '5+'],
-                        ['TypeScript', 'Expert', '4+'],
-                        ['Node.js', 'Advanced', '4+'],
-                        ['Python', 'Intermediate', '3+'],
-                    ],
-                }
-            },
-            { id: 'sk3', type: 'heading', order: 2, data: { text: 'Design Tools', level: 3 } },
-            {
-                id: 'sk4', type: 'list', order: 3, data: {
+                id: 'sk4', type: 'list', order: 1, data: {
                     style: 'bullet', items: [
-                        'Figma (Expert)',
-                        'Framer (Advanced)',
-                        'After Effects (Intermediate)',
-                        'Blender (Learning)',
+                        'Yahoo',
+                        'Discovery Channel',
+                        'Mashable',
+                        'BBC Radio',
+                        'HuffPost',
                     ]
                 }
             },
+            { id: 'sk5', type: 'callout', order: 2, data: { text: '"Do it with all your heart, or don\'t do it at all."', style: 'info', icon: '💭' } },
         ],
         zIndex: 0,
         commentsEnabled: true,
         order: 9,
     },
+    // Work History
     {
         id: 'item-12',
         desktopId: 'goos-demo',
-        label: 'Portfolio',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=200&h=200&fit=crop',
+        label: 'Work History',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=200&h=200&fit=crop',
         positionX: 45,
         positionY: 52,
-        windowTitle: 'Featured Work',
-        windowSubtitle: 'Selected Projects',
-        windowHeaderImage: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=400&fit=crop',
+        windowTitle: 'Work History',
+        windowSubtitle: '13+ Years in Design',
+        windowHeaderImage: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=400&fit=crop',
         windowDescription: '',
-        windowWidth: 540,
+        windowWidth: 500,
         windowDetails: null,
         windowGallery: null,
         windowLinks: null,
@@ -1470,28 +1237,21 @@ const DEMO_ITEMS: DesktopItem[] = [
         tabs: [],
         blocks: [
             {
-                id: 'pf1', type: 'carousel', order: 0, data: {
-                    images: [
-                        { url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop', caption: 'E-commerce Redesign' },
-                        { url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop', caption: 'Analytics Dashboard' },
-                        { url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=450&fit=crop', caption: 'Developer Tools' },
-                    ],
-                }
-            },
-            {
-                id: 'pf2', type: 'stats', order: 1, data: {
+                id: 'pf1', type: 'timeline', order: 0, data: {
                     items: [
-                        { value: '50+', label: 'Projects' },
-                        { value: '4.9', label: 'Rating', suffix: '★' },
-                        { value: '100%', label: 'On Time' },
-                    ]
+                        { date: '2025 - Now', title: 'Indie Founder', subtitle: 'Full-time', description: 'Building NextDoor.Company and more' },
+                        { date: '2021 - 2025', title: 'Founding Lead Designer', subtitle: 'p0.inc', description: '95+ Figma screens, product from scratch' },
+                        { date: '2017 - 2021', title: 'Solo Designer', subtitle: 'SellerCrowd', description: '~4 years, multiple features' },
+                        { date: '2014 - 2017', title: 'Product Designer', subtitle: 'Wingify/VWO', description: 'A/B testing, 3+ years on & off' },
+                        { date: '2013 - 2014', title: 'UI Designer', subtitle: 'VDX.tv', description: 'Advertising company' },
+                    ],
                 }
             },
             {
                 id: 'pf3', type: 'buttons', order: 2, data: {
                     buttons: [
-                        { label: 'View on Dribbble', url: 'https://dribbble.com', style: 'primary', newTab: true },
-                        { label: 'View on Behance', url: 'https://behance.net', style: 'secondary', newTab: true },
+                        { label: 'View on LinkedIn', url: 'https://linkedin.com/in/hellosankalpsinha', style: 'primary', newTab: true },
+                        { label: 'View on Dribbble', url: 'https://dribbble.com/sankalpdomore', style: 'secondary', newTab: true },
                     ]
                 }
             },
@@ -1505,12 +1265,12 @@ const DEMO_ITEMS: DesktopItem[] = [
 const DEMO_DESKTOP: Desktop = {
     id: 'goos-demo',
     userId: 'goos-demo-user',
-    backgroundUrl: null,
+    backgroundUrl: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1920&h=1080&fit=crop',
     backgroundPosition: 'cover',
-    backgroundOverlay: null,
+    backgroundOverlay: 'rgba(0,0,0,0.1)',
     theme: 'brand-appart',
-    title: 'goOS Demo',
-    description: 'goOS themed portfolio demo',
+    title: 'Sankalp Sinha',
+    description: 'Multi-disciplinary designer & entrepreneur building in public from Bangalore',
     ogImageUrl: null,
     isPublic: true,
     items: DEMO_ITEMS,
@@ -5929,6 +5689,32 @@ function GoOSDemoContent() {
                                 isActive={appWindows.guestbook}
                                 badge={guestbookEntries.length}
                                 label="Guestbook"
+                            />
+                            {/* Sankalp's Project Links */}
+                            <div
+                                className="dock-separator mx-1"
+                                style={{
+                                    width: 1,
+                                    height: 36,
+                                    borderRadius: 1,
+                                    background: 'rgba(0,0,0,0.15)',
+                                    transition: 'background 0.3s ease',
+                                }}
+                            />
+                            <DockIcon
+                                icon={<Image src="/icons/dock/safari.png" alt="NextDoor" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
+                                onClick={() => window.open('https://nextdoor.company', '_blank')}
+                                label="NextDoor.Company"
+                            />
+                            <DockIcon
+                                icon={<Image src="/icons/dock/safari.png" alt="HighValue" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
+                                onClick={() => window.open('https://highvalue.team', '_blank')}
+                                label="HighValue.Team"
+                            />
+                            <DockIcon
+                                icon={<Image src="/icons/dock/safari.png" alt="3Goals" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
+                                onClick={() => window.open('https://3goals.today', '_blank')}
+                                label="3Goals.Today"
                             />
                             {/* Minimized Editors */}
                             {minimizedEditors.size > 0 && (
