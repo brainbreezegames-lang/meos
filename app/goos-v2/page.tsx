@@ -858,8 +858,8 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
     {
         id: 'file-1',
         type: 'note',
-        title: 'Welcome to goOS',
-        content: '<h1>Welcome to goOS!</h1><p>This is your digital creative space. Use the editor to write notes, case studies, and more.</p><p>Try the formatting toolbar above to style your text.</p>',
+        title: 'Building in Public',
+        content: '<h1>Building in Public</h1><p>Started my first portfolio in 2012. Now I share everything openly.</p><h2>My Stack</h2><ul><li><strong>Notion</strong> - Kanban board for tasks</li><li><strong>Figma</strong> - All wireframes and designs</li><li><strong>GitHub</strong> - Code</li><li><strong>PostHog</strong> - Analytics (shared publicly)</li><li><strong>Twitter/X</strong> - Changelog tweets</li></ul><h2>Why Build in Public?</h2><ol><li>Social accountability</li><li>Bias towards action</li><li>Project documentation</li><li>Attracting collaborators/customers</li><li>Multi-day marketing vs single launch day</li></ol><p><em>My whole site is hand-coded, not template-based.</em></p>',
         status: 'published',
         accessLevel: 'free',
         publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
@@ -867,7 +867,7 @@ const INITIAL_GOOS_FILES: GoOSFileData[] = [
         updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
         parentId: null,
         position: { x: 5, y: 35 },
-        headerImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1920&h=1080&fit=crop',
+        headerImage: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1920&h=1080&fit=crop',
     },
     {
         id: 'file-2',
@@ -1158,7 +1158,7 @@ const INITIAL_DEMO_WIDGETS = [
         positionY: 16,
         title: null,
         isVisible: true,
-        config: { timezone: 'America/New_York', format: '12h', showTimezoneName: true },
+        config: { timezone: 'Asia/Kolkata', format: '12h', showTimezoneName: true },
         order: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -1172,13 +1172,13 @@ const DEMO_ITEMS: DesktopItem[] = [
     {
         id: 'item-1',
         desktopId: 'goos-demo',
-        label: 'About Me',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
+        label: 'Sankalp',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop',
         positionX: 15,
         positionY: 22,
-        windowTitle: 'Alex Chen',
-        windowSubtitle: 'Product Designer & Developer',
-        windowHeaderImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+        windowTitle: 'Sankalp Sinha',
+        windowSubtitle: 'Designer & Entrepreneur',
+        windowHeaderImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
         windowDescription: '',
         windowWidth: 480,
         windowDetails: null,
@@ -1191,32 +1191,32 @@ const DEMO_ITEMS: DesktopItem[] = [
                 label: 'About',
                 order: 0,
                 blocks: [
-                    { id: 'b1', type: 'text', order: 0, data: { content: "Hey there! I'm a creative developer passionate about building beautiful digital experiences that feel alive.\n\nI design and build products that people love to use. Currently at Figma, previously Stripe & Airbnb." } },
+                    { id: 'b1', type: 'text', order: 0, data: { content: "Multi-disciplinary product designer turned entrepreneur. 13+ years designing software.\n\n\"Do it with all your heart, or don't do it at all.\"\n\nLeft a $15k+ MRR job in April 2025 to go full indie. Featured in Yahoo, Discovery Channel, Mashable, BBC Radio, HuffPost." } },
                     {
                         id: 'b2', type: 'details', order: 1, data: {
                             items: [
-                                { label: 'Location', value: 'San Francisco, CA' },
-                                { label: 'Experience', value: '8 years' },
-                                { label: 'Focus', value: 'Product Design' },
-                                { label: 'Status', value: 'Available for freelance' },
+                                { label: 'Location', value: 'Bangalore, India' },
+                                { label: 'Experience', value: '13+ years' },
+                                { label: 'Focus', value: 'Product Design & Indie Building' },
+                                { label: 'Status', value: 'Building in public' },
                             ]
                         }
                     },
                     {
                         id: 'b3', type: 'social', order: 2, data: {
                             profiles: [
-                                { platform: 'twitter', url: 'https://twitter.com' },
-                                { platform: 'linkedin', url: 'https://linkedin.com' },
-                                { platform: 'github', url: 'https://github.com' },
-                                { platform: 'dribbble', url: 'https://dribbble.com' },
+                                { platform: 'twitter', url: 'https://twitter.com/sankalpdomore' },
+                                { platform: 'linkedin', url: 'https://linkedin.com/in/hellosankalpsinha' },
+                                { platform: 'github', url: 'https://github.com/sankalpdomore' },
+                                { platform: 'dribbble', url: 'https://dribbble.com/sankalpdomore' },
                             ]
                         }
                     },
                     {
                         id: 'b4', type: 'buttons', order: 3, data: {
                             buttons: [
-                                { label: 'Download CV', url: '/resume.pdf', style: 'primary', icon: '📄', newTab: true },
-                                { label: 'Book a Call', url: 'https://cal.com', style: 'secondary', newTab: true },
+                                { label: 'Email Me', url: 'mailto:hello@sankalpsinha.com', style: 'primary', icon: '📧', newTab: false },
+                                { label: 'Follow on X', url: 'https://twitter.com/sankalpdomore', style: 'secondary', newTab: true },
                             ]
                         }
                     },
@@ -1230,9 +1230,10 @@ const DEMO_ITEMS: DesktopItem[] = [
                     {
                         id: 'b5', type: 'timeline', order: 0, data: {
                             items: [
-                                { date: '2022 - Present', title: 'Senior Product Designer', subtitle: 'Figma', description: 'Leading design system initiatives' },
-                                { date: '2020 - 2022', title: 'Product Designer', subtitle: 'Stripe', description: 'Designed checkout flows' },
-                                { date: '2018 - 2020', title: 'UI Designer', subtitle: 'Airbnb', description: 'Host experience team' },
+                                { date: '2025 - Present', title: 'Indie Founder', subtitle: 'Full-time', description: 'Building NextDoor.Company, HighValue.Team & more' },
+                                { date: '2021 - 2025', title: 'Founding Lead Designer', subtitle: 'p0.inc', description: 'Built product from scratch, 95+ Figma screens' },
+                                { date: '2017 - 2021', title: 'Solo Designer', subtitle: 'SellerCrowd', description: '~4 years juggling multiple features' },
+                                { date: '2014 - 2017', title: 'Product Designer', subtitle: 'Wingify/VWO', description: 'A/B testing product' },
                             ]
                         }
                     },
@@ -1251,8 +1252,8 @@ const DEMO_ITEMS: DesktopItem[] = [
         thumbnailUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200&h=200&fit=crop',
         positionX: 30,
         positionY: 18,
-        windowTitle: 'My Projects',
-        windowSubtitle: "Things I've Built",
+        windowTitle: 'My Startups',
+        windowSubtitle: "Things I'm Building",
         windowHeaderImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=400&fit=crop',
         windowDescription: '',
         windowType: 'browser',
@@ -1266,26 +1267,29 @@ const DEMO_ITEMS: DesktopItem[] = [
             {
                 id: 'pr1', type: 'stats', order: 0, data: {
                     items: [
-                        { value: '4', label: 'Active' },
-                        { value: '27', label: 'Shipped' },
-                        { value: '12', label: 'Open Source' },
+                        { value: '6', label: 'Active' },
+                        { value: '₹1L+', label: 'MRR' },
+                        { value: '100+', label: 'Paid Users' },
                     ]
                 }
             },
             {
                 id: 'pr2', type: 'product', order: 1, data: {
                     products: [
-                        { image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200&h=200&fit=crop', name: 'DevTools Pro', description: 'Developer productivity tools', url: 'https://github.com', status: 'active', metrics: '10k users' },
-                        { image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=200&h=200&fit=crop', name: 'DesignKit', description: 'Open source design system', url: 'https://github.com', status: 'active', metrics: '5k stars' },
-                        { image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&h=200&fit=crop', name: 'ColorAI', description: 'AI-powered color palette', url: 'https://github.com', status: 'acquired', metrics: 'Acquired' },
+                        { image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=200&h=200&fit=crop', name: 'NextDoor.Company', description: 'Find startups hiring nearby', url: 'https://nextdoor.company', status: 'active', metrics: '1600+ jobs' },
+                        { image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&fit=crop', name: 'HighValue.Team', description: 'Cut screening time by 80%', url: 'https://highvalue.team', status: 'active', metrics: 'Co-founded' },
+                        { image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=200&h=200&fit=crop', name: '3Goals.Today', description: 'Daily productivity tool', url: 'https://3goals.today', status: 'active', metrics: 'Live' },
+                        { image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop', name: 'TryAlbus.ai', description: 'AI summarization', url: 'https://tryalbus.ai', status: 'active', metrics: 'Live' },
+                        { image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=200&h=200&fit=crop', name: 'BuildwithFramer', description: 'Framer templates', url: 'https://buildwithframer.com', status: 'active', metrics: 'Live' },
+                        { image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200&h=200&fit=crop', name: 'Visit.Page', description: 'Better link-in-bio', url: 'https://visit.page', status: 'active', metrics: 'Live' },
                     ]
                 }
             },
-            { id: 'pr3', type: 'callout', order: 2, data: { text: 'Looking to collaborate? I\'m open to interesting side projects.', style: 'info', icon: '💡' } },
+            { id: 'pr3', type: 'callout', order: 2, data: { text: 'Software should be fun to use while delivering value.', style: 'info', icon: '✨' } },
             {
                 id: 'pr4', type: 'buttons', order: 3, data: {
                     buttons: [
-                        { label: 'View All on GitHub', url: 'https://github.com', style: 'primary', icon: '🐙', newTab: true },
+                        { label: 'Follow on X', url: 'https://twitter.com/sankalpdomore', style: 'primary', icon: '🐦', newTab: true },
                     ]
                 }
             },
@@ -1339,10 +1343,10 @@ const DEMO_ITEMS: DesktopItem[] = [
         positionX: 60,
         positionY: 18,
         windowTitle: 'What People Say',
-        windowSubtitle: 'Client Testimonials',
+        windowSubtitle: 'From Colleagues',
         windowHeaderImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=400&fit=crop',
         windowDescription: '',
-        windowWidth: 500,
+        windowWidth: 520,
         windowDetails: null,
         windowGallery: null,
         windowLinks: null,
@@ -1352,9 +1356,11 @@ const DEMO_ITEMS: DesktopItem[] = [
             {
                 id: 't1', type: 'testimonial', order: 0, data: {
                     style: 'cards', testimonials: [
-                        { quote: 'Working with Alex transformed our entire product. The attention to detail was incredible — every pixel mattered.', name: 'Sarah Chen', title: 'CEO', company: 'TechStart', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
-                        { quote: 'Exceptional attention to detail and a deep understanding of user experience. Delivered ahead of schedule.', name: 'Marcus Johnson', title: 'Product Lead', company: 'DesignCo', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
-                        { quote: '10/10 would hire again. Brought fresh perspective and solved problems we didn\'t know we had.', name: 'Emily Park', title: 'Founder', company: 'Startup Labs', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
+                        { quote: 'Driven, ambitious, infectious enthusiasm... the guy you want on your team.', name: 'Marcin Wtorkowski', title: 'CTO', company: 'SellerCrowd', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
+                        { quote: 'One of the most fearless voices... fresh energy and perspective.', name: 'Pooja Dave', title: 'Sr. PM', company: 'Amazon', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
+                        { quote: 'Talented designer with strong empathy for users.', name: 'Aaron Burnett', title: 'CEO', company: 'Spaced Ventures', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
+                        { quote: 'Believes in community growth... fun, enthusiastic, high on design trends.', name: 'Akshar Patel', title: 'Design Manager', company: 'Gojek', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop' },
+                        { quote: 'Solid foundation of rational thought... thoughtful and playful aesthetic.', name: 'Chuck Burt', title: 'Product Lead', company: 'Embark Veterinary', image: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop' },
                     ]
                 }
             },
@@ -1382,21 +1388,21 @@ const DEMO_ITEMS: DesktopItem[] = [
         tabs: [],
         blocks: [
             { id: 'c1', type: 'text', order: 0, data: { content: "I'm always open to discussing new projects, creative ideas, or opportunities to collaborate.\n\nWhether you have a question, want to work together, or just want to say hi — my inbox is open." } },
-            { id: 'c2', type: 'callout', order: 1, data: { text: 'Currently accepting new clients for Q1 2025', style: 'success', icon: '✓' } },
+            { id: 'c2', type: 'callout', order: 1, data: { text: 'Building in public from Bangalore, India', style: 'success', icon: '🚀' } },
             {
                 id: 'c3', type: 'social', order: 2, data: {
                     profiles: [
-                        { platform: 'twitter', url: 'https://twitter.com' },
-                        { platform: 'linkedin', url: 'https://linkedin.com' },
-                        { platform: 'email', url: 'mailto:hello@alexchen.design' },
+                        { platform: 'twitter', url: 'https://twitter.com/sankalpdomore' },
+                        { platform: 'linkedin', url: 'https://linkedin.com/in/hellosankalpsinha' },
+                        { platform: 'email', url: 'mailto:hello@sankalpsinha.com' },
                     ]
                 }
             },
             {
                 id: 'c4', type: 'buttons', order: 3, data: {
                     buttons: [
-                        { label: 'Email Me', url: 'mailto:hello@alexchen.design', style: 'primary', newTab: false },
-                        { label: 'Schedule a Call', url: 'https://cal.com', style: 'secondary', newTab: true },
+                        { label: 'Email Me', url: 'mailto:hello@sankalpsinha.com', style: 'primary', newTab: false },
+                        { label: 'Follow on X', url: 'https://twitter.com/sankalpdomore', style: 'secondary', newTab: true },
                     ]
                 }
             },
@@ -1505,12 +1511,12 @@ const DEMO_ITEMS: DesktopItem[] = [
 const DEMO_DESKTOP: Desktop = {
     id: 'goos-demo',
     userId: 'goos-demo-user',
-    backgroundUrl: null,
+    backgroundUrl: '/bg12.png',
     backgroundPosition: 'cover',
     backgroundOverlay: null,
     theme: 'brand-appart',
-    title: 'goOS Demo',
-    description: 'goOS themed portfolio demo',
+    title: 'Sankalp Sinha',
+    description: 'Designer & Entrepreneur building in public from Bangalore',
     ogImageUrl: null,
     isPublic: true,
     items: DEMO_ITEMS,
@@ -5929,6 +5935,31 @@ function GoOSDemoContent() {
                                 isActive={appWindows.guestbook}
                                 badge={guestbookEntries.length}
                                 label="Guestbook"
+                            />
+                            {/* Sankalp's Project Links */}
+                            <div
+                                className="dock-separator mx-1"
+                                style={{
+                                    width: 1,
+                                    height: 36,
+                                    borderRadius: 1,
+                                    background: 'rgba(0,0,0,0.15)',
+                                }}
+                            />
+                            <DockIcon
+                                icon={<Image src="/icons/dock/safari.png" alt="NextDoor" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
+                                onClick={() => window.open('https://nextdoor.company', '_blank')}
+                                label="NextDoor.Company"
+                            />
+                            <DockIcon
+                                icon={<Image src="/icons/dock/safari.png" alt="HighValue" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
+                                onClick={() => window.open('https://highvalue.team', '_blank')}
+                                label="HighValue.Team"
+                            />
+                            <DockIcon
+                                icon={<Image src="/icons/dock/safari.png" alt="3Goals" width={52} height={52} className="w-full h-full object-contain" draggable={false} />}
+                                onClick={() => window.open('https://3goals.today', '_blank')}
+                                label="3Goals.Today"
                             />
                             {/* Minimized Editors */}
                             {minimizedEditors.size > 0 && (
