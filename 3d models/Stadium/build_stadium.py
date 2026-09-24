@@ -27,6 +27,7 @@ ap.add_argument("--no-export", action="store_true")
 ap.add_argument("--samples", type=int, default=96)
 ap.add_argument("--res", type=int, default=1600)
 ap.add_argument("--cams", default="")
+ap.add_argument("--hide-roof", action="store_true", help="render without the roof truss and banners (top-down game camera view)")
 ARGS, _ = ap.parse_known_args(argv)
 OUT = ARGS.out
 os.makedirs(os.path.join(OUT, "previews"), exist_ok=True)
@@ -1213,8 +1214,11 @@ if not ARGS.no_render:
     scene.view_settings.look = 'AgX - Medium High Contrast'
     scene.view_settings.exposure = 0.3
     wanted = [c for c in ARGS.cams.split(",") if c] or list(CAMS)
+    if ARGS.hide_roof:
+        C_ROOF.hide_render = True
+        C_DRESS.hide_render = True
     for key in wanted:
         scene.camera = CAMS[key]
-        scene.render.filepath = os.path.join(OUT, "previews", f"{key}.png")
+        scene.render.filepath = os.path.join(OUT, "previews", f"{key}{'_noroof' if ARGS.hide_roof else ''}.png")
         bpy.ops.render.render(write_still=True)
         print("rendered", key)
