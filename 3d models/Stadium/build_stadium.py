@@ -1141,7 +1141,7 @@ ROOT["blue_goal"] = "-X"
 ROOT["fans"] = NFANS
 
 CAMS = {
-    "hero_low":  camera("Cam_Hero", (-48, -36, 20), (10, 2, 4), lens=30),
+    "hero_low":  camera("Cam_Hero", (-38, -46, 17), (12, 4, 4), lens=30),
     "overview":  camera("Cam_Overview", (-100, -125, 90), (0, 0, 12), lens=40),
     "topdown":   camera("Cam_TopDown", (0, -95, 112), (0, -3, 0), lens=45),
     "red_goal":  camera("Cam_RedGoal", (0, -16, 5), (24, 0, 2.5), lens=40),
